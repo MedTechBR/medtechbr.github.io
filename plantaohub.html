@@ -4,43 +4,57 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PlantãoHub — Gestão de plantões | MedTech</title>
-<meta name="description" content="PlantãoHub: organize seus plantões, controle horas e acompanhe quanto você ganha e quanto já recebeu — por local e por mês.">
+<meta name="description" content="PlantãoHub: organize seus plantões, controle horas e acompanhe quanto você ganha e quanto já recebeu — por local, por mês e por ano. Com login e sincronização na nuvem.">
 <meta name="theme-color" content="#0E5A6D">
 <link rel="icon" type="image/png" href="favicon.png">
+<script src="_mtfb.js?v=1"></script>
+<script>window.MT_APP={id:"plantaohub",name:"PlantãoHub"};</script>
+<script type="module" src="_mtauth.js?v=1"></script>
 <style>
-:root{--petrol:#0E5A6D;--petrol-dark:#083845;--ink:#0E2A31;--mint:#2DD4A8;--mint-dark:#14b894;--bg:#F6FAFB;--soft:#EAF3F4;--line:#dbe8ea;--muted:#5B7882;--green:#14794f;--green-bg:#e7f7f1;--amber:#c97a17;--amber-bg:#fdf0e0;--red:#c0392b}
+:root{--petrol:#0E5A6D;--petrol-dark:#083845;--ink:#0E2A31;--mint:#2DD4A8;--mint-dark:#14b894;--bg:#F6FAFB;--soft:#EAF3F4;--line:#dbe8ea;--muted:#5B7882;--green:#14794f;--green-bg:#e7f7f1;--amber:#c97a17;--amber-bg:#fdf0e0;--red:#c0392b;--violet:#6b46c1;--violet-bg:#efe9fb}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--ink);background:var(--bg)}
-header{background:linear-gradient(135deg,var(--petrol),var(--petrol-dark));color:#fff;padding:16px 0}
-.wrap{max-width:920px;margin:0 auto;padding:0 18px}
+header{background:linear-gradient(135deg,var(--petrol),var(--petrol-dark));color:#fff;padding:14px 0}
+.wrap{max-width:960px;margin:0 auto;padding:0 18px}
 .top{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.5px}
 .logo .mark{width:34px;height:34px;border-radius:10px;background:#2DD4A8;display:grid;place-items:center;flex:0 0 auto}
 .logo .mark svg{width:22px;height:22px}
 .logo b{color:var(--mint)}
-.top a{color:#cfe3e6;text-decoration:none;font-size:14px;font-weight:600}
 .subtitle{color:#bcd6db;font-size:12.5px;margin-top:3px}
-main{max-width:920px;margin:0 auto;padding:20px 18px}
-.monthbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
-.monthbar .nav{display:flex;align-items:center;gap:12px}
-.monthbar h2{font-size:19px;text-transform:capitalize}
-.monthbar button.arr{background:#fff;border:1px solid var(--line);border-radius:9px;width:38px;height:38px;font-size:18px;cursor:pointer;color:var(--petrol)}
-.btn{display:inline-flex;align-items:center;gap:7px;border:none;border-radius:10px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.usr{display:flex;align-items:center;gap:10px}
+.usr .who{font-size:12.5px;color:#cfe3e6;text-align:right;line-height:1.3;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.usr a,.usr button{color:#cfe3e6;text-decoration:none;font-size:13px;font-weight:600;background:rgba(255,255,255,.12);border:none;border-radius:8px;padding:7px 11px;cursor:pointer;font-family:inherit}
+.usr button:hover{background:rgba(255,255,255,.22)}
+main{max-width:960px;margin:0 auto;padding:18px 18px 60px}
+.tabs{display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:5px;margin-bottom:16px;width:fit-content}
+.tabs button{border:none;background:none;padding:9px 20px;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;color:var(--muted);font-family:inherit}
+.tabs button.on{background:var(--petrol);color:#fff}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.bar .nav{display:flex;align-items:center;gap:10px}
+.bar h2{font-size:18px;text-transform:capitalize}
+.bar .arr{background:#fff;border:1px solid var(--line);border-radius:9px;width:38px;height:38px;font-size:18px;cursor:pointer;color:var(--petrol)}
+.bar .right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+select.flt,.btn{font-family:inherit}
+select.flt{padding:9px 12px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;background:#fff;color:var(--ink)}
+.btn{display:inline-flex;align-items:center;gap:7px;border:none;border-radius:10px;padding:11px 16px;font-weight:700;font-size:14px;cursor:pointer}
 .btn-p{background:var(--mint);color:var(--petrol-dark)}.btn-p:hover{background:var(--mint-dark)}
 .btn-g{background:#fff;color:var(--petrol);border:1px solid var(--line)}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
-.kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}
-.kpi .l{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
-.kpi .v{font-size:24px;font-weight:800;color:var(--petrol);margin-top:4px}
-.kpi.green .v{color:var(--green)}.kpi.amber .v{color:var(--amber)}
-.shift{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px}
-.shift .day{text-align:center;min-width:52px}
-.shift .day .d{font-size:22px;font-weight:800;line-height:1}
+.btn-sm{padding:8px 12px;font-size:13px}
+.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin-bottom:16px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}
+.kpi .l{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.kpi .v{font-size:21px;font-weight:800;color:var(--petrol);margin-top:4px}
+.kpi.green .v{color:var(--green)}.kpi.amber .v{color:var(--amber)}.kpi.red .v{color:var(--red)}
+.shift{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin-bottom:10px;display:flex;align-items:center;gap:14px}
+.shift .day{text-align:center;min-width:50px}
+.shift .day .d{font-size:21px;font-weight:800;line-height:1}
 .shift .day .w{font-size:11px;color:var(--muted);text-transform:uppercase}
-.shift .mid{flex:1}
+.shift .mid{flex:1;min-width:0}
 .shift .mid .loc{font-weight:700;font-size:15px}
 .shift .mid .det{color:var(--muted);font-size:13px;margin-top:2px}
-.shift .val{text-align:right;font-weight:800;color:var(--petrol)}
+.shift .mid .obs{font-size:12.5px;color:#41606a;margin-top:4px;background:var(--soft);padding:4px 9px;border-radius:7px;display:inline-block}
+.shift .val{text-align:right;font-weight:800;color:var(--petrol);white-space:nowrap}
 .shift .acts{display:flex;gap:6px}
 .shift .acts button{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 9px;cursor:pointer;font-size:13px}
 .stat{display:inline-block;font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;margin-top:4px;cursor:pointer}
@@ -48,17 +62,28 @@ main{max-width:920px;margin:0 auto;padding:20px 18px}
 .empty{text-align:center;color:var(--muted);padding:36px;background:#fff;border:1px dashed var(--line);border-radius:14px}
 .note{background:var(--soft);border-radius:12px;padding:13px 16px;font-size:13px;color:#28424a;margin-top:16px}
 .note b{color:var(--petrol)}
-.modal{position:fixed;inset:0;background:rgba(8,56,69,.45);display:flex;align-items:center;justify-content:center;padding:18px;z-index:50}
-.modal .box{background:#fff;border-radius:16px;padding:24px;max-width:440px;width:100%;max-height:92vh;overflow:auto}
+table.yr{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+table.yr th,table.yr td{padding:11px 13px;text-align:right;font-size:13.5px;border-bottom:1px solid var(--line)}
+table.yr th{background:var(--soft);color:var(--petrol-dark);font-size:11.5px;text-transform:uppercase;letter-spacing:.03em}
+table.yr td:first-child,table.yr th:first-child{text-align:left;text-transform:capitalize;font-weight:700}
+table.yr tr:last-child td{border-bottom:none}
+table.yr tr.tot td{background:#f0f7f8;font-weight:800;color:var(--petrol-dark)}
+.locgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:11px;margin-top:14px}
+.loccard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+.loccard .ln{font-weight:700;font-size:14px}.loccard .lv{color:var(--muted);font-size:12.5px;margin-top:3px}
+.modal{position:fixed;inset:0;background:rgba(8,56,69,.45);display:flex;align-items:center;justify-content:center;padding:18px;z-index:60}
+.modal .box{background:#fff;border-radius:16px;padding:24px;max-width:460px;width:100%;max-height:92vh;overflow:auto}
 .modal h3{margin-bottom:16px}
 .field{margin-bottom:13px}.field label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
-.field input,.field select{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit;background:#fff}
-.field input:focus{outline:none;border-color:var(--mint)}
+.field input,.field select,.field textarea{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit;background:#fff}
+.field textarea{resize:vertical;min-height:52px}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--mint)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.row{display:flex;gap:10px;margin-top:8px}
+.row{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap}
 footer{text-align:center;color:var(--muted);font-size:13px;padding:24px}
 footer a{color:var(--petrol);font-weight:600;text-decoration:none}
-@media(max-width:680px){.cards{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.cards{grid-template-columns:1fr 1fr 1fr}}
+@media(max-width:520px){.cards{grid-template-columns:1fr 1fr}.shift{flex-wrap:wrap}}
 </style>
 </head>
 <body>
@@ -68,90 +93,179 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
       <div class="logo"><span class="mark"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#062a33" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Plantão<b>Hub</b></div>
       <div class="subtitle">Seus plantões, horas e ganhos sob controle · por MedTech</div>
     </div>
-    <a href="index.html">← MedTech</a>
+    <div class="usr" id="usr"></div>
   </div>
 </header>
 
 <main>
-  <div class="monthbar">
-    <div class="nav"><button class="arr" onclick="moveMonth(-1)">‹</button><h2 id="mlabel"></h2><button class="arr" onclick="moveMonth(1)">›</button></div>
-    <button class="btn btn-p" onclick="openForm()">+ Novo plantão</button>
+  <div class="tabs">
+    <button id="tab-mes" class="on" onclick="setTab('mes')">Mês</button>
+    <button id="tab-ano" onclick="setTab('ano')">Ano</button>
   </div>
-  <div class="cards" id="kpis"></div>
-  <div id="list"></div>
-  <div class="note">📌 Seus dados ficam salvos <b>neste navegador</b>. PlantãoHub te ajuda a saber quantas horas você fez, quanto vai receber e o que já caiu — por mês e por local. <span style="color:var(--muted)">(Em breve: troca de plantões entre colegas.)</span></div>
+  <div id="view"></div>
+  <div class="note">📌 <b id="storenote">Carregando…</b> PlantãoHub te ajuda a saber quantas horas você fez, quanto vai receber e o que já caiu — por mês, por ano e por local. <span style="color:var(--muted)">(Em breve: troca de plantões entre colegas.)</span></div>
 </main>
 
 <footer>© 2026 <a href="index.html">MedTech</a> · <a href="privacidade.html">Privacidade</a></footer>
 
 <script>
-const LS='plantaohub_v1';
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
-let shifts=[];let cur=new Date();cur.setDate(1);
 const MES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const MESC=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 const WD=['dom','seg','ter','qua','qui','sex','sáb'];
-function load(){try{shifts=JSON.parse(localStorage.getItem(LS))||[];}catch(e){shifts=[];}if(!shifts.length)seed();}
-function save(){localStorage.setItem(LS,JSON.stringify(shifts));}
-function seed(){const t=new Date();const f=d=>{const x=new Date(t);x.setDate(d);return x.toISOString().slice(0,10);};
-  shifts=[
-   {id:uid(),date:f(5),local:'UPA Central',start:'19:00',end:'07:00',value:1200,status:'pago'},
-   {id:uid(),date:f(12),local:'Hospital São Lucas — PS',start:'07:00',end:'19:00',value:1100,status:'pago'},
-   {id:uid(),date:f(20),local:'UPA Central',start:'19:00',end:'07:00',value:1200,status:'agendado'},
-   {id:uid(),date:f(26),local:'Clínica Vida — ambulatório',start:'08:00',end:'12:00',value:500,status:'agendado'}
-  ];save();}
-function hoursOf(s){const[a,b]=s.start.split(':').map(Number);const[c,d]=s.end.split(':').map(Number);let h=(c*60+d)-(a*60+b);if(h<=0)h+=1440;return h/60;}
-const money=v=>'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-function monthKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
-function inMonth(s){return s.date.slice(0,7)===monthKey(cur);}
+let state={shifts:[],locais:{}};
+let cur=new Date();cur.setDate(1);
+let curY=new Date().getFullYear();
+let tab='mes';
+let fltLocal='';
 
-function render(){
-  document.getElementById('mlabel').textContent=MES[cur.getMonth()]+' '+cur.getFullYear();
-  const ms=shifts.filter(inMonth).sort((a,b)=>a.date.localeCompare(b.date));
+const money=v=>'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const money0=v=>'R$ '+Number(v||0).toLocaleString('pt-BR',{maximumFractionDigits:0});
+const hnum=h=>h.toLocaleString('pt-BR',{maximumFractionDigits:1});
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+function hoursOf(s){const[a,b]=s.start.split(':').map(Number);const[c,d]=s.end.split(':').map(Number);let h=(c*60+d)-(a*60+b);if(h<=0)h+=1440;return h/60;}
+function monthKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+function sampleSeed(){const t=new Date();const f=dd=>{const x=new Date(t);x.setDate(dd);return x.toISOString().slice(0,10);};
+  return {shifts:[
+   {id:uid(),date:f(5),local:'UPA Central',start:'19:00',end:'07:00',value:1200,status:'pago',note:''},
+   {id:uid(),date:f(12),local:'Hospital São Lucas — PS',start:'07:00',end:'19:00',value:1100,status:'pago',note:''},
+   {id:uid(),date:f(20),local:'UPA Central',start:'19:00',end:'07:00',value:1200,status:'agendado',note:''},
+   {id:uid(),date:f(26),local:'Clínica Vida — ambulatório',start:'08:00',end:'12:00',value:500,status:'agendado',note:'Levar carimbo'}
+  ],locais:{'UPA Central':{start:'19:00',end:'07:00',value:1200},'Hospital São Lucas — PS':{start:'07:00',end:'19:00',value:1100}}};
+}
+
+/* ---------- boot via MT (login + nuvem ou demo) ---------- */
+function whenMT(cb){if(window.MT){cb();}else{setTimeout(()=>whenMT(cb),30);}}
+whenMT(()=>{
+  MT.onData(d=>{
+    if(d&&typeof d==='object'){state={shifts:d.shifts||[],locais:d.locais||{}};}
+    else{state=(MT.mode==='demo')?sampleSeed():{shifts:[],locais:{}};if(MT.mode==='demo')MT.save(state);}
+    renderUser();render();
+  });
+  renderUser();
+});
+function persist(){MT.save(state);}
+function renderUser(){
+  const el=document.getElementById('usr');if(!el)return;
+  document.getElementById('storenote').textContent=(MT.mode==='demo')?'Modo demonstração — dados salvos neste navegador.':'Conectado — seus dados sincronizam na nuvem.';
+  if(MT.mode==='demo'){el.innerHTML='<span class="who">Modo demo</span><a href="index.html">← MedTech</a>';return;}
+  const u=MT.user;const nm=u?(u.displayName||u.email||'Conta'):'';
+  el.innerHTML=`<span class="who">${esc(nm)}</span><button onclick="MT.signOut()">Sair</button>`;
+}
+
+/* ---------- tabs ---------- */
+function setTab(t){tab=t;document.getElementById('tab-mes').className=t==='mes'?'on':'';document.getElementById('tab-ano').className=t==='ano'?'on':'';render();}
+function render(){tab==='mes'?renderMonth():renderYear();}
+
+/* ---------- MÊS ---------- */
+function inMonth(s){return s.date.slice(0,7)===monthKey(cur);}
+function renderMonth(){
+  let ms=state.shifts.filter(inMonth);
+  const locs=[...new Set(state.shifts.map(s=>s.local))].sort();
+  if(fltLocal)ms=ms.filter(s=>s.local===fltLocal);
+  ms.sort((a,b)=>a.date.localeCompare(b.date));
   const horas=ms.reduce((s,x)=>s+hoursOf(x),0);
   const prev=ms.reduce((s,x)=>s+Number(x.value||0),0);
   const receb=ms.filter(x=>x.status==='pago').reduce((s,x)=>s+Number(x.value||0),0);
-  document.getElementById('kpis').innerHTML=`
-   <div class="kpi"><div class="l">Plantões</div><div class="v">${ms.length}</div></div>
-   <div class="kpi"><div class="l">Horas</div><div class="v">${horas.toLocaleString('pt-BR',{maximumFractionDigits:1})}h</div></div>
-   <div class="kpi amber"><div class="l">Previsto</div><div class="v" style="font-size:20px">${money(prev)}</div></div>
-   <div class="kpi green"><div class="l">Recebido</div><div class="v" style="font-size:20px">${money(receb)}</div></div>`;
-  const list=document.getElementById('list');
-  if(!ms.length){list.innerHTML='<div class="empty">Nenhum plantão neste mês.<br>Toque em <b>+ Novo plantão</b> para começar.</div>';return;}
-  list.innerHTML=ms.map(s=>{const dt=new Date(s.date+'T00:00:00');return `<div class="shift">
+  const areceber=prev-receb;
+  const opts=['<option value="">Todos os locais</option>'].concat(locs.map(l=>`<option value="${esc(l)}" ${fltLocal===l?'selected':''}>${esc(l)}</option>`)).join('');
+  let html=`<div class="bar">
+    <div class="nav"><button class="arr" onclick="moveMonth(-1)">‹</button><h2>${MES[cur.getMonth()]} ${cur.getFullYear()}</h2><button class="arr" onclick="moveMonth(1)">›</button></div>
+    <div class="right"><select class="flt" onchange="fltLocal=this.value;render()">${opts}</select><button class="btn btn-g btn-sm" onclick="exportCSV()">⬇︎ CSV</button><button class="btn btn-p btn-sm" onclick="openForm()">+ Novo plantão</button></div>
+  </div>
+  <div class="cards">
+    <div class="kpi"><div class="l">Plantões</div><div class="v">${ms.length}</div></div>
+    <div class="kpi"><div class="l">Horas</div><div class="v">${hnum(horas)}h</div></div>
+    <div class="kpi amber"><div class="l">Previsto</div><div class="v" style="font-size:18px">${money0(prev)}</div></div>
+    <div class="kpi green"><div class="l">Recebido</div><div class="v" style="font-size:18px">${money0(receb)}</div></div>
+    <div class="kpi red"><div class="l">A receber</div><div class="v" style="font-size:18px">${money0(areceber)}</div></div>
+  </div>`;
+  if(!ms.length){html+=`<div class="empty">Nenhum plantão ${fltLocal?'deste local ':''}neste mês.<br>Toque em <b>+ Novo plantão</b> para começar.</div>`;}
+  else{html+=ms.map(s=>{const dt=new Date(s.date+'T00:00:00');return `<div class="shift">
     <div class="day"><div class="d">${String(dt.getDate()).padStart(2,'0')}</div><div class="w">${WD[dt.getDay()]}</div></div>
     <div class="mid"><div class="loc">${esc(s.local)}</div>
-      <div class="det">${s.start}–${s.end} · ${hoursOf(s).toLocaleString('pt-BR',{maximumFractionDigits:1})}h</div>
+      <div class="det">${s.start}–${s.end} · ${hnum(hoursOf(s))}h</div>
+      ${s.note?`<div class="obs">${esc(s.note)}</div>`:''}
       <span class="stat ${s.status==='pago'?'s-pg':'s-ag'}" onclick="toggleStatus('${s.id}')">${s.status==='pago'?'✓ recebido':'agendado'}</span>
     </div>
     <div class="val">${money(s.value)}</div>
-    <div class="acts"><button onclick="openForm('${s.id}')">✏️</button><button onclick="del('${s.id}')">🗑️</button></div>
-  </div>`;}).join('');
+    <div class="acts"><button title="Duplicar p/ semana seguinte" onclick="dup('${s.id}')">⧉</button><button onclick="openForm('${s.id}')">✏️</button><button onclick="del('${s.id}')">🗑️</button></div>
+  </div>`;}).join('');}
+  document.getElementById('view').innerHTML=html;
 }
 function moveMonth(n){cur.setMonth(cur.getMonth()+n);render();}
-function toggleStatus(id){const s=shifts.find(x=>x.id===id);s.status=s.status==='pago'?'agendado':'pago';save();render();}
-function del(id){if(confirm('Excluir este plantão?')){shifts=shifts.filter(x=>x.id!==id);save();render();}}
-function esc(s){return String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+function toggleStatus(id){const s=state.shifts.find(x=>x.id===id);s.status=s.status==='pago'?'agendado':'pago';persist();render();}
+function del(id){if(confirm('Excluir este plantão?')){state.shifts=state.shifts.filter(x=>x.id!==id);persist();render();}}
+function dup(id){const s=state.shifts.find(x=>x.id===id);const d=new Date(s.date+'T00:00:00');d.setDate(d.getDate()+7);
+  state.shifts.push({...s,id:uid(),date:d.toISOString().slice(0,10),status:'agendado'});persist();cur=new Date(d);cur.setDate(1);render();}
 
+/* ---------- ANO ---------- */
+function renderYear(){
+  const ys=state.shifts.filter(s=>s.date.slice(0,4)==String(curY));
+  const rows=[];let tP=0,tR=0,tH=0,tN=0;
+  for(let m=0;m<12;m++){
+    const mm=ys.filter(s=>Number(s.date.slice(5,7))===m+1);
+    const h=mm.reduce((a,x)=>a+hoursOf(x),0);
+    const p=mm.reduce((a,x)=>a+Number(x.value||0),0);
+    const r=mm.filter(x=>x.status==='pago').reduce((a,x)=>a+Number(x.value||0),0);
+    tP+=p;tR+=r;tH+=h;tN+=mm.length;
+    rows.push(`<tr><td>${MES[m]}</td><td>${mm.length||''}</td><td>${mm.length?hnum(h)+'h':''}</td><td>${mm.length?money0(p):''}</td><td>${mm.length?money0(r):''}</td></tr>`);
+  }
+  const porLocal={};
+  ys.forEach(s=>{porLocal[s.local]=(porLocal[s.local]||0)+Number(s.value||0);});
+  const topLoc=Object.entries(porLocal).sort((a,b)=>b[1]-a[1]);
+  let html=`<div class="bar">
+    <div class="nav"><button class="arr" onclick="moveYear(-1)">‹</button><h2>${curY}</h2><button class="arr" onclick="moveYear(1)">›</button></div>
+    <div class="right"><button class="btn btn-g btn-sm" onclick="exportCSV(true)">⬇︎ CSV do ano</button></div>
+  </div>
+  <div class="cards">
+    <div class="kpi"><div class="l">Plantões</div><div class="v">${tN}</div></div>
+    <div class="kpi"><div class="l">Horas</div><div class="v">${hnum(tH)}h</div></div>
+    <div class="kpi amber"><div class="l">Previsto</div><div class="v" style="font-size:18px">${money0(tP)}</div></div>
+    <div class="kpi green"><div class="l">Recebido</div><div class="v" style="font-size:18px">${money0(tR)}</div></div>
+    <div class="kpi red"><div class="l">A receber</div><div class="v" style="font-size:18px">${money0(tP-tR)}</div></div>
+  </div>
+  <table class="yr"><thead><tr><th>Mês</th><th>Plantões</th><th>Horas</th><th>Previsto</th><th>Recebido</th></tr></thead>
+  <tbody>${rows.join('')}<tr class="tot"><td>Total ${curY}</td><td>${tN}</td><td>${hnum(tH)}h</td><td>${money0(tP)}</td><td>${money0(tR)}</td></tr></tbody></table>`;
+  if(topLoc.length){html+=`<div class="locgrid">`+topLoc.map(([l,v])=>`<div class="loccard"><div class="ln">${esc(l)}</div><div class="lv">${money(v)} no ano</div></div>`).join('')+`</div>`;}
+  document.getElementById('view').innerHTML=html;
+}
+function moveYear(n){curY+=n;render();}
+
+/* ---------- form ---------- */
 function openForm(id){
-  const s=id?shifts.find(x=>x.id===id):{date:new Date().toISOString().slice(0,10),local:'',start:'19:00',end:'07:00',value:'',status:'agendado'};
+  const s=id?state.shifts.find(x=>x.id===id):{date:new Date().toISOString().slice(0,10),local:'',start:'19:00',end:'07:00',value:'',status:'agendado',note:''};
+  const dl=Object.keys(state.locais||{}).map(l=>`<option value="${esc(l)}">`).join('');
   modal(`<h3>${id?'Editar':'Novo'} plantão</h3>
    <div class="field"><label>Data</label><input id="f_date" type="date" value="${s.date}"></div>
-   <div class="field"><label>Local / instituição</label><input id="f_local" value="${esc(s.local)}" placeholder="Ex.: UPA Central"></div>
+   <div class="field"><label>Local / instituição</label><input id="f_local" list="locdl" value="${esc(s.local)}" placeholder="Ex.: UPA Central" oninput="fillLocal()"><datalist id="locdl">${dl}</datalist></div>
    <div class="two"><div class="field"><label>Início</label><input id="f_start" type="time" value="${s.start}"></div>
    <div class="field"><label>Fim</label><input id="f_end" type="time" value="${s.end}"></div></div>
    <div class="two"><div class="field"><label>Valor (R$)</label><input id="f_value" type="number" step="0.01" value="${s.value}" placeholder="0,00"></div>
    <div class="field"><label>Status</label><select id="f_status"><option value="agendado" ${s.status==='agendado'?'selected':''}>Agendado</option><option value="pago" ${s.status==='pago'?'selected':''}>Recebido</option></select></div></div>
+   <div class="field"><label>Observação (opcional)</label><textarea id="f_note" placeholder="Ex.: levar carimbo, escala dupla...">${esc(s.note||'')}</textarea></div>
    <div class="row"><button class="btn btn-p" onclick="saveForm('${id||''}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
 }
+function fillLocal(){const v=document.getElementById('f_local').value;const m=(state.locais||{})[v];if(m){document.getElementById('f_start').value=m.start;document.getElementById('f_end').value=m.end;if(!document.getElementById('f_value').value)document.getElementById('f_value').value=m.value;}}
 function saveForm(id){
-  const o={date:document.getElementById('f_date').value,local:document.getElementById('f_local').value.trim()||'Plantão',start:document.getElementById('f_start').value,end:document.getElementById('f_end').value,value:parseFloat(document.getElementById('f_value').value)||0,status:document.getElementById('f_status').value};
+  const o={date:document.getElementById('f_date').value,local:document.getElementById('f_local').value.trim()||'Plantão',start:document.getElementById('f_start').value,end:document.getElementById('f_end').value,value:parseFloat(document.getElementById('f_value').value)||0,status:document.getElementById('f_status').value,note:document.getElementById('f_note').value.trim()};
   if(!o.date){alert('Informe a data.');return;}
-  if(id){Object.assign(shifts.find(x=>x.id===id),o);}else{shifts.push({id:uid(),...o});}
-  save();closeModal();cur=new Date(o.date+'T00:00:00');cur.setDate(1);render();
+  if(id){Object.assign(state.shifts.find(x=>x.id===id),o);}else{state.shifts.push({id:uid(),...o});}
+  if(!state.locais)state.locais={};state.locais[o.local]={start:o.start,end:o.end,value:o.value};
+  persist();closeModal();cur=new Date(o.date+'T00:00:00');cur.setDate(1);if(tab==='ano')curY=new Date(o.date+'T00:00:00').getFullYear();render();
 }
 function modal(html){const d=document.createElement('div');d.className='modal';d.id='modal';d.innerHTML='<div class="box">'+html+'</div>';d.onclick=e=>{if(e.target===d)closeModal();};document.body.appendChild(d);}
 function closeModal(){const m=document.getElementById('modal');if(m)m.remove();}
-load();render();
+
+/* ---------- export CSV ---------- */
+function exportCSV(year){
+  const list=year?state.shifts.filter(s=>s.date.slice(0,4)==String(curY)):state.shifts.filter(inMonth);
+  const rows=[['Data','Local','Início','Fim','Horas','Valor','Status','Observação']];
+  list.sort((a,b)=>a.date.localeCompare(b.date)).forEach(s=>rows.push([s.date,s.local,s.start,s.end,hnum(hoursOf(s)),String(s.value||0).replace('.',','),s.status==='pago'?'Recebido':'Agendado',s.note||'']));
+  const csv='﻿'+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=`plantoes-${year?curY:monthKey(cur)}.csv`;a.click();URL.revokeObjectURL(a.href);
+}
 </script>
 </body>
 </html>
