@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EvoluAI — Voz para evolução clínica (SOAP) | MedTech</title>
+<meta name="description" content="EvoluAI: dite e a IA organiza em evolução médica estruturada (SOAP), anamnese ou resumo de alta. Menos tempo no prontuário.">
+<meta name="theme-color" content="#0E5A6D">
+<link rel="icon" type="image/png" href="favicon.png">
+<style>
+:root{--petrol:#0E5A6D;--petrol-dark:#083845;--ink:#0E2A31;--mint:#2DD4A8;--mint-dark:#14b894;--bg:#F6FAFB;--soft:#EAF3F4;--line:#dbe8ea;--muted:#5B7882;--red:#c0392b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+header{background:linear-gradient(135deg,var(--petrol),var(--petrol-dark));color:#fff;padding:16px 0}
+.wrap{max-width:1080px;margin:0 auto;padding:0 18px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.5px}
+.logo .mark{width:34px;height:34px;border-radius:10px;background:#2DD4A8;display:grid;place-items:center;flex:0 0 auto}
+.logo .mark svg{width:22px;height:22px}
+.logo b{color:var(--mint)}
+.top a{color:#cfe3e6;text-decoration:none;font-size:14px;font-weight:600}
+.subtitle{color:#bcd6db;font-size:12.5px;margin-top:3px}
+main{max-width:1080px;margin:0 auto;padding:20px 18px}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.btn{display:inline-flex;align-items:center;gap:7px;border:none;border-radius:10px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.btn-p{background:var(--mint);color:var(--petrol-dark)}.btn-p:hover{background:var(--mint-dark)}
+.btn-d{background:var(--petrol);color:#fff}.btn-d:hover{background:var(--petrol-dark)}
+.btn-g{background:#fff;color:var(--petrol);border:1px solid var(--line)}.btn-g:hover{background:var(--soft)}
+.btn-mic{background:#fff;color:var(--petrol);border:1px solid var(--line)}
+.btn-mic.on{background:#fde8e8;color:var(--red);border-color:#f3c2c2}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 10px 30px -24px rgba(8,56,69,.3)}
+.card h3{font-size:15px;margin-bottom:10px;color:var(--petrol-dark);display:flex;align-items:center;justify-content:space-between;gap:8px}
+textarea{width:100%;min-height:320px;padding:13px;border:1px solid var(--line);border-radius:10px;font-size:14.5px;font-family:inherit;line-height:1.55;resize:vertical;background:#fff}
+textarea:focus{outline:none;border-color:var(--mint)}
+#out{min-height:320px;white-space:pre-wrap;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:14px;font-size:14.5px;line-height:1.6}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+select{padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;font-family:inherit;background:#fff}
+.live{display:inline-flex;align-items:center;gap:6px;color:var(--red);font-size:12.5px;font-weight:700}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--red);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.note{background:#fff8ed;border:1px solid #f4d9a8;color:#8a5a16;border-radius:12px;padding:12px 15px;font-size:13px;margin-top:14px}
+.muted{color:var(--muted);font-size:13px}
+.spin{display:inline-block;width:15px;height:15px;border:2px solid var(--petrol-dark);border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.modal{position:fixed;inset:0;background:rgba(8,56,69,.45);display:flex;align-items:center;justify-content:center;padding:18px;z-index:50}
+.modal .box{background:#fff;border-radius:16px;padding:24px;max-width:480px;width:100%}
+.field{margin-bottom:14px}.field label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
+.field input{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:24px}
+footer a{color:var(--petrol);font-weight:600;text-decoration:none}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap top">
+    <div>
+      <div class="logo"><span class="mark"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#062a33" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Evolu<b>AI</b></div>
+      <div class="subtitle">Voz → evolução clínica estruturada · por MedTech</div>
+    </div>
+    <a href="index.html">← MedTech</a>
+  </div>
+</header>
+
+<main>
+  <div class="row">
+    <label class="muted" style="font-weight:700">Formato:</label>
+    <select id="fmt">
+      <option value="soap">Evolução SOAP</option>
+      <option value="anamnese">Anamnese estruturada</option>
+      <option value="alta">Resumo de alta</option>
+      <option value="evolucao">Evolução livre (organizada)</option>
+    </select>
+    <button class="btn btn-g" onclick="openKey()">⚙️ Chave Gemini</button>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>1. Rascunho / ditado <span id="liveTag"></span></h3>
+      <div class="toolbar">
+        <button class="btn btn-mic" id="micBtn" onclick="toggleMic()">🎤 Ditar</button>
+        <button class="btn btn-g" onclick="clearRaw()">Limpar</button>
+        <button class="btn btn-g" onclick="loadExample()">Exemplo</button>
+      </div>
+      <textarea id="raw" placeholder="Dite ou digite o caso aqui... Ex.: 'Paciente masculino 62 anos, hipertenso, refere dor torácica há 2 horas...'"></textarea>
+    </div>
+    <div class="card">
+      <h3>2. Documento gerado <button class="btn btn-g" style="padding:6px 12px" onclick="copyOut()">📋 Copiar</button></h3>
+      <div class="toolbar">
+        <button class="btn btn-p" id="genBtn" onclick="generate()">✨ Gerar com IA</button>
+        <button class="btn btn-g" onclick="editOut()">✏️ Editar</button>
+      </div>
+      <div id="out" contenteditable="false">O documento estruturado aparecerá aqui.</div>
+    </div>
+  </div>
+
+  <div class="note">⚠️ Ferramenta de apoio. A IA <b>não inventa dados</b> — mas <b>revise sempre</b> antes de assinar. Evite inserir dados que identifiquem o paciente; o conteúdo é processado pela API do Google Gemini. A responsabilidade pelo registro é do profissional. <a href="privacidade.html" style="color:#8a5a16;text-decoration:underline">Política de privacidade</a>.</div>
+</main>
+
+<footer>© 2026 <a href="index.html">MedTech</a> · <a href="privacidade.html">Privacidade</a></footer>
+
+<script>
+const $=s=>document.querySelector(s);
+const FORMATS={
+ soap:'Organize em evolução médica no formato SOAP — S (Subjetivo), O (Objetivo: exame físico, sinais vitais, exames), A (Avaliação / impressão diagnóstica), P (Plano / conduta).',
+ anamnese:'Organize em anamnese estruturada: Identificação, Queixa principal, História da doença atual, Antecedentes pessoais e familiares, Hábitos, Medicações em uso, Exame físico, Hipóteses diagnósticas e Conduta.',
+ alta:'Organize em resumo de alta hospitalar: Diagnósticos, Resumo da internação, Procedimentos realizados, Medicações de alta, Orientações e Seguimento.',
+ evolucao:'Organize o texto em uma evolução médica clara, concisa e profissional, mantendo apenas as informações fornecidas.'
+};
+
+/* ====== Ditado por voz (Web Speech API) ====== */
+let rec=null,listening=false;
+function toggleMic(){ if(listening){stopMic();return;} const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert('Seu navegador não suporta ditado por voz. Use o Google Chrome (no computador ou celular) ou digite o texto.');return;}
+  rec=new SR();rec.lang='pt-BR';rec.continuous=true;rec.interimResults=true;
+  rec.onresult=e=>{let fin='';for(let i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)fin+=e.results[i][0].transcript;}if(fin){const ta=$('#raw');ta.value=(ta.value?ta.value.replace(/\s*$/,'')+' ':'')+fin.trim();}};
+  rec.onerror=ev=>{if(ev.error==='not-allowed')alert('Permita o acesso ao microfone para ditar.');};
+  rec.onend=()=>{if(listening){try{rec.start();}catch(e){}}};
+  try{rec.start();listening=true;updateMic();}catch(e){alert('Não foi possível iniciar o microfone.');}
+}
+function stopMic(){listening=false;if(rec){try{rec.stop();}catch(e){}}updateMic();}
+function updateMic(){const b=$('#micBtn');const t=$('#liveTag');if(listening){b.classList.add('on');b.textContent='⏹️ Parar';t.innerHTML='<span class="live"><span class="dot"></span>ouvindo…</span>';}else{b.classList.remove('on');b.textContent='🎤 Ditar';t.innerHTML='';}}
+function clearRaw(){$('#raw').value='';}
+function loadExample(){$('#raw').value='Paciente masculino 62 anos, hipertenso e diabético, chega ao pronto-socorro com dor torácica opressiva há cerca de duas horas irradiando para o braço esquerdo associada a sudorese. Refere uso irregular das medicações. Ao exame está consciente orientado, pressão 160 por 95, frequência cardíaca 98, saturação 96 por cento, ausculta cardíaca sem sopros, pulmões limpos. Eletrocardiograma mostra supra de ST em parede inferior. Penso em infarto agudo com supra de ST de parede inferior, vou dar AAS 300 mg, acionar a hemodinâmica para angioplastia primária e iniciar anticoagulação.';}
+
+/* ====== Saída ====== */
+function copyOut(){const t=$('#out').innerText;if(!t||t.startsWith('O documento'))return;navigator.clipboard.writeText(t).then(()=>{const o=$('#out');});const b=event.target;const old=b.textContent;b.textContent='✓ Copiado';setTimeout(()=>b.textContent=old,1500);}
+function editOut(){const o=$('#out');const on=o.getAttribute('contenteditable')==='true';o.setAttribute('contenteditable',on?'false':'true');if(!on)o.focus();event.target.textContent=on?'✏️ Editar':'✓ Concluir edição';}
+
+/* ====== Geração com IA ====== */
+async function generate(){
+  const key=localStorage.getItem('evoluai_key');
+  const raw=$('#raw').value.trim();
+  if(!key){alert('Configure sua chave do Gemini primeiro (⚙️).');return;}
+  if(!raw){alert('Dite ou digite o caso antes de gerar.');return;}
+  const fmt=$('#fmt').value;const model=localStorage.getItem('evoluai_model')||'gemini-2.5-flash';
+  const g=$('#genBtn');g.innerHTML='<span class="spin"></span> Gerando...';g.disabled=true;
+  const prompt='Você é um escriba clínico experiente. A partir do rascunho/ditado abaixo, produza o documento solicitado em português do Brasil, de forma concisa e profissional. REGRAS: não invente dados, exames, doses ou condutas que não foram mencionados; se algo essencial estiver faltando, escreva "[não informado]". '+FORMATS[fmt]+'\n\nRascunho:\n'+raw;
+  try{
+    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent?key='+encodeURIComponent(key),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});
+    if(!r.ok){const e=await r.text();throw new Error('HTTP '+r.status+' — verifique a chave/modelo. '+e.slice(0,140));}
+    const data=await r.json();
+    const text=(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts[0].text)||'';
+    if(!text)throw new Error('A IA não retornou texto. Tente novamente.');
+    $('#out').textContent=text.trim();
+  }catch(err){$('#out').textContent='⚠️ '+err.message;}
+  g.innerHTML='✨ Gerar com IA';g.disabled=false;
+}
+
+/* ====== Chave ====== */
+function openKey(){const cur=localStorage.getItem('evoluai_key')||'';
+  modal(`<h3>⚙️ Chave do Google Gemini</h3>
+   <div class="field"><label>API Key (fica salva só neste navegador)</label><input id="mkey" type="password" placeholder="AIza..." value="${cur}"></div>
+   <div class="field"><label>Modelo</label><input id="mmodel" value="${localStorage.getItem('evoluai_model')||'gemini-2.5-flash'}"></div>
+   <p class="muted">Crie uma chave gratuita em aistudio.google.com/app/apikey.</p>
+   <div class="row" style="margin-top:14px"><button class="btn btn-p" onclick="saveKey()">Salvar</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);}
+function saveKey(){localStorage.setItem('evoluai_key',$('#mkey').value.trim());localStorage.setItem('evoluai_model',$('#mmodel').value.trim()||'gemini-2.5-flash');closeModal();}
+function modal(html){const d=document.createElement('div');d.className='modal';d.id='modal';d.innerHTML='<div class="box">'+html+'</div>';d.onclick=e=>{if(e.target===d)closeModal();};document.body.appendChild(d);}
+function closeModal(){const m=document.getElementById('modal');if(m)m.remove();}
+</script>
+</body>
+</html>
