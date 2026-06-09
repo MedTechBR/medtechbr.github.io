@@ -1,11 +1,10 @@
 /* Configuração do Firebase MedTech (login único + nuvem).
-   Enquanto estiver "COLE_AQUI", os apps rodam em MODO DEMONSTRAÇÃO.
-   Substitua pelos 6 valores do seu projeto Firebase (ver GUIA_FIREBASE_MEDTECH.md). */
+   Projeto: MedTech (medtech-c658c). */
 window.MEDTECH_FB = {
-  apiKey: "COLE_AQUI",
-  authDomain: "COLE_AQUI",
-  projectId: "COLE_AQUI",
-  storageBucket: "COLE_AQUI",
-  messagingSenderId: "COLE_AQUI",
-  appId: "COLE_AQUI"
+  apiKey: "AIzaSyD2mGtXsfAyirtqvAaeWjoPacKMOK3qtVU",
+  authDomain: "medtech-c658c.firebaseapp.com",
+  projectId: "medtech-c658c",
+  storageBucket: "medtech-c658c.firebasestorage.app",
+  messagingSenderId: "815142768751",
+  appId: "1:815142768751:web:2db574351bd785b0b7fd9a"
 };
