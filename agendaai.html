@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgendaAI — Agenda de consultas | MedTech</title>
+<meta name="description" content="AgendaAI: organize sua agenda de consultas, controle o dia e envie confirmações e lembretes pelo WhatsApp em um toque.">
+<meta name="theme-color" content="#0E5A6D">
+<link rel="icon" type="image/png" href="favicon.png">
+<style>
+:root{--petrol:#0E5A6D;--petrol-dark:#083845;--ink:#0E2A31;--mint:#2DD4A8;--mint-dark:#14b894;--bg:#F6FAFB;--soft:#EAF3F4;--line:#dbe8ea;--muted:#5B7882;--green:#14794f;--green-bg:#e7f7f1;--amber:#c97a17;--amber-bg:#fdf0e0;--red:#c0392b;--red-bg:#fdecea;--blue:#2563a8;--blue-bg:#e8f1fb;--wa:#25D366}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+header{background:linear-gradient(135deg,var(--petrol),var(--petrol-dark));color:#fff;padding:16px 0}
+.wrap{max-width:960px;margin:0 auto;padding:0 18px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.5px}
+.logo .mark{width:34px;height:34px;border-radius:10px;background:#2DD4A8;display:grid;place-items:center;flex:0 0 auto}
+.logo .mark svg{width:22px;height:22px}
+.logo b{color:var(--mint)}
+.top a{color:#cfe3e6;text-decoration:none;font-size:14px;font-weight:600}
+.subtitle{color:#bcd6db;font-size:12.5px;margin-top:3px}
+main{max-width:960px;margin:0 auto;padding:20px 18px}
+.daybar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.daybar .nav{display:flex;align-items:center;gap:10px}
+.daybar h2{font-size:18px;text-transform:capitalize}
+.daybar button.arr{background:#fff;border:1px solid var(--line);border-radius:9px;width:38px;height:38px;font-size:18px;cursor:pointer;color:var(--petrol)}
+.btn{display:inline-flex;align-items:center;gap:7px;border:none;border-radius:10px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;text-decoration:none}
+.btn-p{background:var(--mint);color:var(--petrol-dark)}.btn-p:hover{background:var(--mint-dark)}
+.btn-g{background:#fff;color:var(--petrol);border:1px solid var(--line)}
+.btn-wa{background:var(--wa);color:#fff}
+.btn-sm{padding:7px 12px;font-size:13px;border-radius:9px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px}
+.kpi .l{font-size:11.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.kpi .v{font-size:24px;font-weight:800;color:var(--petrol);margin-top:4px}
+.kpi.green .v{color:var(--green)}.kpi.blue .v{color:var(--blue)}.kpi.amber .v{color:var(--amber)}
+.todaybtn{background:#fff;border:1px solid var(--line);border-radius:9px;padding:9px 14px;font-weight:700;font-size:13px;cursor:pointer;color:var(--petrol)}
+.appt{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px}
+.appt .time{text-align:center;min-width:56px;padding-top:2px}
+.appt .time .t{font-size:18px;font-weight:800;line-height:1;color:var(--petrol)}
+.appt .time .dur{font-size:11px;color:var(--muted);margin-top:3px}
+.appt .mid{flex:1;min-width:0}
+.appt .mid .pac{font-weight:700;font-size:15.5px}
+.appt .mid .det{color:var(--muted);font-size:13px;margin-top:2px}
+.appt .mid .obs{font-size:12.5px;color:#41606a;margin-top:4px;background:var(--soft);padding:5px 9px;border-radius:8px;display:inline-block}
+.tag{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:999px;margin-right:6px;vertical-align:middle}
+.t-con{background:var(--blue-bg);color:var(--blue)}
+.t-ret{background:var(--soft);color:var(--petrol)}
+.t-tel{background:#efe9fb;color:#6b46c1}
+.t-pro{background:var(--amber-bg);color:var(--amber)}
+.t-exa{background:#e7f7f1;color:var(--green)}
+.stat{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px;cursor:pointer;border:none;font-family:inherit}
+.s-ag{background:var(--amber-bg);color:var(--amber)}
+.s-cf{background:var(--blue-bg);color:var(--blue)}
+.s-at{background:var(--green-bg);color:var(--green)}
+.s-fa{background:var(--red-bg);color:var(--red)}
+.s-ca{background:#eee;color:#777;text-decoration:line-through}
+.appt .acts{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.appt .acts .iconbtns{display:flex;gap:6px}
+.appt .acts .iconbtns button{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 9px;cursor:pointer;font-size:13px}
+.empty{text-align:center;color:var(--muted);padding:40px;background:#fff;border:1px dashed var(--line);border-radius:14px}
+.note{background:var(--soft);border-radius:12px;padding:13px 16px;font-size:13px;color:#28424a;margin-top:16px;line-height:1.6}
+.note b{color:var(--petrol)}
+.modal{position:fixed;inset:0;background:rgba(8,56,69,.45);display:flex;align-items:center;justify-content:center;padding:18px;z-index:50}
+.modal .box{background:#fff;border-radius:16px;padding:24px;max-width:460px;width:100%;max-height:92vh;overflow:auto}
+.modal h3{margin-bottom:16px}
+.field{margin-bottom:13px}.field label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit;background:#fff}
+.field textarea{resize:vertical;min-height:58px}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--mint)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap}
+.hint{font-size:12px;color:var(--muted);margin-top:4px}
+.wa-preview{background:#e6f6ec;border:1px solid #bfe6cd;border-radius:12px;padding:13px 15px;font-size:13.5px;color:#1c3a28;white-space:pre-wrap;line-height:1.5;margin:8px 0 14px}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:24px}
+footer a{color:var(--petrol);font-weight:600;text-decoration:none}
+@media(max-width:680px){.cards{grid-template-columns:1fr 1fr}.appt{flex-wrap:wrap}.appt .acts{flex-direction:row;width:100%;justify-content:space-between;margin-top:4px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap top">
+    <div>
+      <div class="logo"><span class="mark"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#062a33" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Agenda<b>AI</b></div>
+      <div class="subtitle">Sua agenda de consultas + confirmação por WhatsApp · por MedTech</div>
+    </div>
+    <a href="index.html">← MedTech</a>
+  </div>
+</header>
+
+<main>
+  <div class="daybar">
+    <div class="nav">
+      <button class="arr" onclick="moveDay(-1)">‹</button>
+      <h2 id="dlabel"></h2>
+      <button class="arr" onclick="moveDay(1)">›</button>
+      <button class="todaybtn" onclick="goToday()">Hoje</button>
+    </div>
+    <div class="row" style="margin:0">
+      <input id="datepick" type="date" style="padding:9px 12px;border:1px solid var(--line);border-radius:9px;font-family:inherit;font-size:14px" onchange="pickDate(this.value)">
+      <button class="btn btn-p" onclick="openForm()">+ Nova consulta</button>
+    </div>
+  </div>
+  <div class="cards" id="kpis"></div>
+  <div id="list"></div>
+  <div class="note">📌 Seus dados ficam salvos <b>neste navegador</b>. O botão <b>WhatsApp</b> abre o app com a mensagem de confirmação já pronta para o paciente — você só revisa e envia. <span style="color:var(--muted)">(Em breve: confirmação e lembrete automáticos via WhatsApp Business e agenda online para o paciente marcar sozinho.)</span></div>
+</main>
+
+<footer>© 2026 <a href="index.html">MedTech</a> · <a href="privacidade.html">Privacidade</a></footer>
+
+<script>
+const LS='agendaai_v1';
+const CFG='agendaai_cfg_v1';
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+let appts=[];let cfg={medico:'',clinica:''};
+let cur=new Date();cur.setHours(0,0,0,0);
+const MES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const WDL=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+const TYPES={con:{l:'Consulta',c:'t-con'},ret:{l:'Retorno',c:'t-ret'},tel:{l:'Telemedicina',c:'t-tel'},pro:{l:'Procedimento',c:'t-pro'},exa:{l:'Exame',c:'t-exa'}};
+const STATUS={agendado:{l:'Agendado',c:'s-ag'},confirmado:{l:'Confirmado',c:'s-cf'},atendido:{l:'Atendido',c:'s-at'},faltou:{l:'Faltou',c:'s-fa'},cancelado:{l:'Cancelado',c:'s-ca'}};
+const SORDER=['agendado','confirmado','atendido','faltou','cancelado'];
+
+function load(){
+  try{appts=JSON.parse(localStorage.getItem(LS))||[];}catch(e){appts=[];}
+  try{cfg=Object.assign(cfg,JSON.parse(localStorage.getItem(CFG))||{});}catch(e){}
+  if(!appts.length)seed();
+}
+function save(){localStorage.setItem(LS,JSON.stringify(appts));}
+function saveCfg(){localStorage.setItem(CFG,JSON.stringify(cfg));}
+function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function seed(){const f=ymd(cur);
+  appts=[
+   {id:uid(),date:f,time:'08:30',dur:30,pac:'Maria Oliveira',fone:'',type:'con',status:'confirmado',obs:'Primeira consulta — dor torácica'},
+   {id:uid(),date:f,time:'09:15',dur:20,pac:'João Pereira',fone:'',type:'ret',status:'agendado',obs:'Retorno exames de tireoide'},
+   {id:uid(),date:f,time:'10:00',dur:30,pac:'Ana Costa',fone:'',type:'tel',status:'agendado',obs:''},
+   {id:uid(),date:f,time:'14:00',dur:45,pac:'Carlos Souza',fone:'',type:'pro',status:'atendido',obs:'Infiltração'}
+  ];save();
+}
+function esc(s){return String(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+function inDay(a){return a.date===ymd(cur);}
+function minutesOf(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
+
+function render(){
+  document.getElementById('dlabel').textContent=cur.getDate()+' de '+MES[cur.getMonth()]+' · '+WDL[cur.getDay()];
+  document.getElementById('datepick').value=ymd(cur);
+  const ds=appts.filter(inDay).sort((a,b)=>minutesOf(a.time)-minutesOf(b.time));
+  const ativos=ds.filter(a=>a.status!=='cancelado');
+  const conf=ds.filter(a=>a.status==='confirmado'||a.status==='atendido').length;
+  const aguard=ds.filter(a=>a.status==='agendado').length;
+  const tel=ds.filter(a=>a.type==='tel'&&a.status!=='cancelado').length;
+  document.getElementById('kpis').innerHTML=`
+   <div class="kpi"><div class="l">Consultas hoje</div><div class="v">${ativos.length}</div></div>
+   <div class="kpi green"><div class="l">Confirmadas</div><div class="v">${conf}</div></div>
+   <div class="kpi amber"><div class="l">A confirmar</div><div class="v">${aguard}</div></div>
+   <div class="kpi blue"><div class="l">Telemedicina</div><div class="v">${tel}</div></div>`;
+  const list=document.getElementById('list');
+  if(!ds.length){list.innerHTML='<div class="empty">Nenhuma consulta neste dia.<br>Toque em <b>+ Nova consulta</b> para começar.</div>';return;}
+  list.innerHTML=ds.map(a=>{const ty=TYPES[a.type]||TYPES.con;const st=STATUS[a.status]||STATUS.agendado;
+    const end=fmtEnd(a.time,a.dur);
+    return `<div class="appt">
+    <div class="time"><div class="t">${a.time}</div><div class="dur">${end} · ${a.dur}min</div></div>
+    <div class="mid">
+      <div class="pac"><span class="tag ${ty.c}">${ty.l}</span>${esc(a.pac)}</div>
+      <div class="det">${a.fone?('📱 '+esc(a.fone)+' · '):''}<button class="stat ${st.c}" onclick="cycleStatus('${a.id}')">${st.l}</button></div>
+      ${a.obs?`<div class="obs">${esc(a.obs)}</div>`:''}
+    </div>
+    <div class="acts">
+      <button class="btn btn-wa btn-sm" onclick="waMenu('${a.id}')">WhatsApp</button>
+      <div class="iconbtns"><button onclick="openForm('${a.id}')">✏️</button><button onclick="del('${a.id}')">🗑️</button></div>
+    </div>
+  </div>`;}).join('');
+}
+function fmtEnd(t,dur){const tot=minutesOf(t)+Number(dur||0);const h=Math.floor(tot/60)%24,m=tot%60;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');}
+function moveDay(n){cur.setDate(cur.getDate()+n);render();}
+function goToday(){cur=new Date();cur.setHours(0,0,0,0);render();}
+function pickDate(v){if(v){cur=new Date(v+'T00:00:00');render();}}
+function cycleStatus(id){const a=appts.find(x=>x.id===id);const i=SORDER.indexOf(a.status);a.status=SORDER[(i+1)%SORDER.length];save();render();}
+function del(id){if(confirm('Excluir esta consulta?')){appts=appts.filter(x=>x.id!==id);save();render();}}
+
+function openForm(id){
+  const a=id?appts.find(x=>x.id===id):{date:ymd(cur),time:'08:00',dur:30,pac:'',fone:'',type:'con',status:'agendado',obs:''};
+  const topt=Object.entries(TYPES).map(([k,v])=>`<option value="${k}" ${a.type===k?'selected':''}>${v.l}</option>`).join('');
+  const sopt=SORDER.map(k=>`<option value="${k}" ${a.status===k?'selected':''}>${STATUS[k].l}</option>`).join('');
+  modal(`<h3>${id?'Editar':'Nova'} consulta</h3>
+   <div class="field"><label>Paciente</label><input id="f_pac" value="${esc(a.pac)}" placeholder="Nome do paciente"></div>
+   <div class="two">
+     <div class="field"><label>Data</label><input id="f_date" type="date" value="${a.date}"></div>
+     <div class="field"><label>Telefone (WhatsApp)</label><input id="f_fone" value="${esc(a.fone)}" placeholder="(11) 99999-9999"></div>
+   </div>
+   <div class="two">
+     <div class="field"><label>Horário</label><input id="f_time" type="time" value="${a.time}"></div>
+     <div class="field"><label>Duração (min)</label><input id="f_dur" type="number" min="5" step="5" value="${a.dur}"></div>
+   </div>
+   <div class="two">
+     <div class="field"><label>Tipo</label><select id="f_type">${topt}</select></div>
+     <div class="field"><label>Status</label><select id="f_status">${sopt}</select></div>
+   </div>
+   <div class="field"><label>Observações</label><textarea id="f_obs" placeholder="Motivo, convênio, lembrete...">${esc(a.obs)}</textarea></div>
+   <div class="row"><button class="btn btn-p" onclick="saveForm('${id||''}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
+}
+function saveForm(id){
+  const o={
+    date:document.getElementById('f_date').value,
+    time:document.getElementById('f_time').value||'08:00',
+    dur:parseInt(document.getElementById('f_dur').value)||30,
+    pac:document.getElementById('f_pac').value.trim()||'Paciente',
+    fone:document.getElementById('f_fone').value.trim(),
+    type:document.getElementById('f_type').value,
+    status:document.getElementById('f_status').value,
+    obs:document.getElementById('f_obs').value.trim()
+  };
+  if(!o.date){alert('Informe a data.');return;}
+  if(id){Object.assign(appts.find(x=>x.id===id),o);}else{appts.push({id:uid(),...o});}
+  save();closeModal();cur=new Date(o.date+'T00:00:00');render();
+}
+
+/* ---- WhatsApp ---- */
+function onlyDigits(s){return String(s||'').replace(/\D/g,'');}
+function waNumber(fone){let d=onlyDigits(fone);if(!d)return '';if(d.length<=11&&!d.startsWith('55'))d='55'+d;return d;}
+function dataLonga(iso){const d=new Date(iso+'T00:00:00');return d.getDate()+' de '+MES[d.getMonth()]+' ('+WDL[d.getDay()]+')';}
+function waText(a,kind){
+  const quem=cfg.medico?('Dr(a). '+cfg.medico):'sua consulta';
+  const onde=cfg.clinica?(' na '+cfg.clinica):'';
+  const ass=cfg.medico?('\\n\\n— '+(cfg.clinica||('Dr(a). '+cfg.medico))):'';
+  const dia=dataLonga(a.date);
+  if(kind==='confirm')
+    return `Olá, ${a.pac.split(' ')[0]}! 👋\\n\\nPassando para confirmar ${cfg.medico?('seu atendimento com '+quem):'sua consulta'}${onde}:\\n\\n📅 ${dia}\\n🕒 ${a.time}h\\n\\nPodemos confirmar sua presença? Responda *SIM* para confirmar ou avise se precisar remarcar. 🙂${ass}`;
+  if(kind==='lembrete')
+    return `Olá, ${a.pac.split(' ')[0]}! 😊\\n\\nLembrete da sua ${a.type==='tel'?'teleconsulta':'consulta'}${onde}:\\n\\n📅 ${dia}\\n🕒 ${a.time}h\\n\\n${a.type==='tel'?'O link de acesso será enviado próximo ao horário.':'Chegue com alguns minutos de antecedência. '}Até lá! 👋${ass}`;
+  return `Olá, ${a.pac.split(' ')[0]}!`;
+}
+function waMenu(id){
+  const a=appts.find(x=>x.id===id);
+  const num=waNumber(a.fone);
+  const foneField=`<div class="field"><label>Telefone do paciente (WhatsApp)</label><input id="wa_fone" value="${esc(a.fone)}" placeholder="(11) 99999-9999"><div class="hint">Com DDD. Se não tiver o 55, ele é adicionado automaticamente.</div></div>`;
+  modal(`<h3>WhatsApp · ${esc(a.pac)}</h3>
+    ${!cfg.medico?`<div class="field"><label>Seu nome (assinatura)</label><input id="wa_med" value="${esc(cfg.medico)}" placeholder="Ex.: Marina Lima"></div>
+    <div class="field"><label>Clínica / consultório (opcional)</label><input id="wa_cli" value="${esc(cfg.clinica)}" placeholder="Ex.: Clínica Vida"></div>`:''}
+    ${foneField}
+    <label style="font-weight:600;font-size:14px">Mensagem</label>
+    <div class="wa-preview" id="wa_prev"></div>
+    <div class="row">
+      <button class="btn btn-wa" onclick="waSend('${id}','confirm')">Confirmar presença</button>
+      <button class="btn btn-wa" onclick="waSend('${id}','lembrete')">Lembrete</button>
+      <button class="btn btn-g" onclick="closeModal()">Fechar</button>
+    </div>
+    <div class="hint" style="margin-top:10px">Abre o WhatsApp com a mensagem pronta. Você revisa e envia — nada é enviado automaticamente.</div>`);
+  updateWaPreview(id,'confirm');
+  const prev=()=>updateWaPreview(id,window.__waKind||'confirm');
+  const f=document.getElementById('wa_fone');if(f)f.addEventListener('input',prev);
+}
+function updateWaPreview(id,kind){window.__waKind=kind;const a=appts.find(x=>x.id===id);const p=document.getElementById('wa_prev');if(p)p.textContent=waText(a,kind).replace(/\\n/g,'\n').replace(/\*/g,'');}
+function waSend(id,kind){
+  const a=appts.find(x=>x.id===id);
+  const med=document.getElementById('wa_med');if(med){cfg.medico=med.value.trim();}
+  const cli=document.getElementById('wa_cli');if(cli){cfg.clinica=cli.value.trim();}
+  const ff=document.getElementById('wa_fone');if(ff){a.fone=ff.value.trim();}
+  saveCfg();save();
+  const num=waNumber(a.fone);
+  const txt=waText(a,kind).replace(/\\n/g,'\n');
+  const url=(num?('https://wa.me/'+num):'https://wa.me/')+'?text='+encodeURIComponent(txt);
+  window.open(url,'_blank');
+  if(kind==='confirm'&&a.status==='agendado'){/* deixa o médico decidir; não muda sozinho */}
+  closeModal();render();
+}
+
+function modal(html){const d=document.createElement('div');d.className='modal';d.id='modal';d.innerHTML='<div class="box">'+html+'</div>';d.onclick=e=>{if(e.target===d)closeModal();};document.body.appendChild(d);}
+function closeModal(){const m=document.getElementById('modal');if(m)m.remove();}
+load();render();
+</script>
+</body>
+</html>
