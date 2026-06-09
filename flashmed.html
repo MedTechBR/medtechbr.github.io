@@ -7,6 +7,9 @@
 <meta name="description" content="FlashMed: estude com flashcards e repetição espaçada (SM-2). Crie baralhos, gere cartões com IA (Gemini) e fixe conteúdo de medicina.">
 <meta name="theme-color" content="#0E5A6D">
 <link rel="icon" type="image/png" href="favicon.png">
+<script src="_mtfb.js?v=1"></script>
+<script>window.MT_APP={id:"flashmed",name:"FlashMed"};</script>
+<script type="module" src="_mtauth.js?v=1"></script>
 <style>
 :root{--petrol:#0E5A6D;--petrol-dark:#083845;--ink:#0E2A31;--mint:#2DD4A8;--mint-dark:#14b894;--bg:#F6FAFB;--soft:#EAF3F4;--line:#dbe8ea;--muted:#5B7882;--red:#c0392b;--amber:#c97a17}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -88,7 +91,7 @@ const LS='flashmed_decks_v1';
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 let decks=[];
 function load(){try{decks=JSON.parse(localStorage.getItem(LS))||[];}catch(e){decks=[];}if(!decks.length)seed();}
-function save(){localStorage.setItem(LS,JSON.stringify(decks));}
+function save(){if(window.MT){MT.save({decks});}else{localStorage.setItem(LS,JSON.stringify(decks));}}
 function seed(){
   const c=(q,a)=>({id:uid(),front:q,back:a,ef:2.5,interval:0,reps:0,due:0});
   decks=[{id:uid(),name:'Cardiologia — básico',cards:[
@@ -230,7 +233,8 @@ async function runAI(){
 function modal(html){const d=document.createElement('div');d.className='modal';d.id='modal';d.innerHTML='<div class="box">'+html+'</div>';d.onclick=e=>{if(e.target===d)closeModal();};document.body.appendChild(d);}
 function closeModal(){const m=document.getElementById('modal');if(m)m.remove();}
 
-load();render();
+function whenMT(cb){if(window.MT){cb();}else{setTimeout(()=>whenMT(cb),30);}}
+whenMT(()=>{MT.onData(function(d){if(d&&d.decks){decks=d.decks;render();}else{seed();render();}});});
 </script>
 </body>
 </html>
