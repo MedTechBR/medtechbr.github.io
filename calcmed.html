@@ -241,6 +241,84 @@ const CALCS=[
 {cat:'Obstetrícia / Pediatria',id:'retic',name:'Reticulócitos corrigidos',desc:'Corrige a contagem de reticulócitos pela anemia.',
  fields:`<div class="grid2">${fld('Reticulócitos (%)',inp('r','','0.1'))}${fld('Hematócrito (%)',inp('ht'))}</div>`,
  calc(){const r=num('r'),ht=num('ht');if(!r||!ht)return null;const v=r*(ht/45);let c='Resposta medular adequada',b='b-green';if(v<2){c='Baixo — resposta medular inadequada';b='b-amber'}return{val:fmt(v,2),unit:'%',interp:c,badge:b}}},
+
+/* ---------------- TEV / EMBOLIA ---------------- */
+{cat:'TEV / Embolia',id:'pesi',name:'PESI (gravidade do TEP)',desc:'Índice de gravidade da embolia pulmonar.',
+ fields:`<div class="grid2">${fld('Idade (anos)',inp('i'))}${fld('Sexo',sel('s',[['m','Masculino'],['f','Feminino']]))}</div><div class="checks">${chk('p1','Câncer (30)')}${chk('p2','Insuficiência cardíaca (10)')}${chk('p3','Doença pulmonar crônica (10)')}${chk('p4','FC ≥ 110 bpm (20)')}${chk('p5','PAS < 100 mmHg (30)')}${chk('p6','FR ≥ 30 irpm (20)')}${chk('p7','Temperatura < 36 °C (20)')}${chk('p8','Alteração do estado mental (60)')}${chk('p9','SpO₂ < 90% (20)')}</div>`,
+ calc(){const i=num('i');if(!i)return null;let s=i+(document.getElementById('s').value==='m'?10:0)+(checked('p1')?30:0)+(checked('p2')?10:0)+(checked('p3')?10:0)+(checked('p4')?20:0)+(checked('p5')?30:0)+(checked('p6')?20:0)+(checked('p7')?20:0)+(checked('p8')?60:0)+(checked('p9')?20:0);let c,b;if(s<=65){c='Classe I — muito baixo risco';b='b-green'}else if(s<=85){c='Classe II — baixo risco';b='b-green'}else if(s<=105){c='Classe III — risco intermediário';b='b-amber'}else if(s<=125){c='Classe IV — alto risco';b='b-red'}else{c='Classe V — muito alto risco';b='b-red'}return{val:s,unit:'pontos',interp:c,badge:b}}},
+{cat:'TEV / Embolia',id:'spesi',name:'sPESI (PESI simplificado)',desc:'0 ponto = baixo risco no TEP.',
+ fields:`<div class="checks">${chk('q1','Idade > 80 anos')}${chk('q2','Câncer')}${chk('q3','Doença cardiopulmonar crônica')}${chk('q4','FC ≥ 110 bpm')}${chk('q5','PAS < 100 mmHg')}${chk('q6','SpO₂ < 90%')}</div>`,
+ calc(){let s=0;for(let i=1;i<=6;i++)s+=checked('q'+i)?1:0;let c='Baixo risco (0)',b='b-green';if(s>=1){c='Alto risco (≥1) — não é candidato a manejo ambulatorial';b='b-red'}return{val:s,unit:'pontos',interp:c,badge:b}}},
+
+/* ---------------- CARDIOLOGIA AVANÇADA ---------------- */
+{cat:'Cardiologia avançada',id:'heart',name:'HEART (dor torácica)',desc:'Risco de evento cardíaco em 6 semanas na dor torácica.',
+ fields:`${fld('História (anamnese)',sel('h1',[['0','Pouco suspeita (0)'],['1','Moderadamente suspeita (1)'],['2','Muito suspeita (2)']]))}${fld('ECG',sel('h2',[['0','Normal (0)'],['1','Alteração inespecífica (1)'],['2','Depressão de ST significativa (2)']]))}${fld('Idade',sel('h3',[['0','<45 anos (0)'],['1','45–64 anos (1)'],['2','≥65 anos (2)']]))}${fld('Fatores de risco',sel('h4',[['0','Nenhum (0)'],['1','1–2 fatores (1)'],['2','≥3 ou aterosclerose conhecida (2)']]))}${fld('Troponina',sel('h5',[['0','≤ limite normal (0)'],['1','1–3× o limite (1)'],['2','> 3× o limite (2)']]))}`,
+ calc(){let s=0;for(let i=1;i<=5;i++)s+=num('h'+i)||0;let c='Baixo risco (0–3) — alta precoce possível',b='b-green';if(s>=7){c='Alto risco (7–10)';b='b-red'}else if(s>=4){c='Risco moderado (4–6) — observação';b='b-amber'}return{val:s,unit:'/ 10',interp:c,badge:b}}},
+{cat:'Cardiologia avançada',id:'grace',name:'GRACE (SCA)',desc:'Mortalidade hospitalar na síndrome coronariana aguda (estimativa).',
+ fields:`<div class="grid2">${fld('Idade (anos)',inp('i'))}${fld('FC (bpm)',inp('fc'))}</div><div class="grid2">${fld('PAS (mmHg)',inp('pas'))}${fld('Creatinina (mg/dL)',inp('cr','','0.01'))}</div>${fld('Classe de Killip',sel('k',[['0','I — sem IC (0)'],['20','II — estertores/B3 (20)'],['39','III — edema agudo (39)'],['59','IV — choque (59)']]))}<div class="checks">${chk('a1','Parada cardíaca na admissão (39)')}${chk('a2','Desvio do segmento ST (28)')}${chk('a3','Enzimas/marcadores elevados (14)')}</div>`,
+ calc(){const i=num('i'),fc=num('fc'),pas=num('pas'),cr=num('cr');if(!i||!fc||!pas||!cr)return null;
+  const ageP=i<30?0:i<40?8:i<50?25:i<60?41:i<70?58:i<80?75:i<90?91:100;
+  const hrP=fc<50?0:fc<70?3:fc<90?9:fc<110?15:fc<150?24:fc<200?38:46;
+  const sbpP=pas<80?58:pas<100?53:pas<120?43:pas<140?34:pas<160?24:pas<200?10:0;
+  const crP=cr<0.4?1:cr<0.8?4:cr<1.2?7:cr<1.6?10:cr<2?13:cr<4?21:28;
+  const s=ageP+hrP+sbpP+crP+(num('k')||0)+(checked('a1')?39:0)+(checked('a2')?28:0)+(checked('a3')?14:0);
+  let c='Baixo risco (≤108)',b='b-green';if(s>140){c='Alto risco (>140)';b='b-red'}else if(s>108){c='Risco intermediário (109–140)';b='b-amber'}return{val:s,unit:'pontos',interp:c,badge:b}}},
+{cat:'Cardiologia avançada',id:'framingham',name:'Framingham (risco CV 10 anos)',desc:'Risco de evento coronariano em 10 anos (ATP III).',
+ fields:`<div class="grid2">${fld('Idade (anos)',inp('i'))}${fld('Sexo',sel('s',[['m','Masculino'],['f','Feminino']]))}</div><div class="grid2">${fld('Colesterol total (mg/dL)',inp('ct'))}${fld('HDL (mg/dL)',inp('hdl'))}</div><div class="grid2">${fld('PA sistólica (mmHg)',inp('pas'))}${fld('Em tratamento p/ HAS?',sel('tr',[['n','Não'],['y','Sim']]))}</div>${fld('Tabagista?',sel('fu',[['n','Não'],['y','Sim']]))}`,
+ calc(){const i=num('i'),ct=num('ct'),hdl=num('hdl'),pas=num('pas');if(!i||!ct||!hdl||!pas)return null;const f=document.getElementById('s').value==='f';const tr=document.getElementById('tr').value==='y';const fu=document.getElementById('fu').value==='y';
+  const gi=i<40?0:i<50?1:i<60?2:i<70?3:4;
+  let pts=0;
+  if(!f){pts+=i<35?-9:i<40?-4:i<45?0:i<50?3:i<55?6:i<60?8:i<65?10:i<70?11:i<75?12:13;
+    const chol=ct<160?[0,0,0,0,0]:ct<200?[4,3,2,1,0]:ct<240?[7,5,3,1,0]:ct<280?[9,6,4,2,1]:[11,8,5,3,1];pts+=chol[gi];
+    if(fu)pts+=[8,5,3,1,1][gi];
+    pts+=hdl>=60?-1:hdl>=50?0:hdl>=40?1:2;
+    pts+=tr?(pas<120?0:pas<130?1:pas<140?2:pas<160?2:3):(pas<120?0:pas<130?0:pas<140?1:pas<160?1:2);
+  }else{pts+=i<35?-7:i<40?-3:i<45?0:i<50?3:i<55?6:i<60?8:i<65?10:i<70?12:i<75?14:16;
+    const chol=ct<160?[0,0,0,0,0]:ct<200?[4,3,2,1,1]:ct<240?[8,6,4,2,1]:ct<280?[11,8,5,3,2]:[13,10,7,4,2];pts+=chol[gi];
+    if(fu)pts+=[9,7,4,2,1][gi];
+    pts+=hdl>=60?-1:hdl>=50?0:hdl>=40?1:2;
+    pts+=tr?(pas<120?0:pas<130?3:pas<140?4:pas<160?5:6):(pas<120?0:pas<130?1:pas<140?2:pas<160?3:4);
+  }
+  let risk;
+  if(!f){risk=pts<0?'<1':pts<=4?'1':pts<=6?'2':pts===7?'3':pts===8?'4':pts===9?'5':pts===10?'6':pts===11?'8':pts===12?'10':pts===13?'12':pts===14?'16':pts===15?'20':pts===16?'25':'≥30';}
+  else{risk=pts<9?'<1':pts<=12?'1':pts<=14?'2':pts===15?'3':pts===16?'4':pts===17?'5':pts===18?'6':pts===19?'8':pts===20?'11':pts===21?'14':pts===22?'17':pts===23?'22':pts===24?'27':'≥30';}
+  let b='b-green';const rn=parseInt(risk);if(risk==='≥30'||rn>=20)b='b-red';else if(rn>=10)b='b-amber';
+  return{val:risk+'%',unit:'em 10 anos',interp:pts+' pontos (Framingham/ATP III)',badge:b}}},
+
+/* ---------------- NEUROLOGIA / AVC ---------------- */
+{cat:'Neurologia / AVC',id:'nihss',name:'NIHSS (gravidade do AVC)',desc:'National Institutes of Health Stroke Scale (0–42).',
+ fields:`${fld('1a. Nível de consciência',sel('n1',[['0','Alerta (0)'],['1','Sonolento (1)'],['2','Torpor (2)'],['3','Coma (3)']]))}${fld('1b. Perguntas (mês/idade)',sel('n2',[['0','Ambas corretas (0)'],['1','Uma correta (1)'],['2','Nenhuma (2)']]))}${fld('1c. Comandos',sel('n3',[['0','Ambos (0)'],['1','Um (1)'],['2','Nenhum (2)']]))}${fld('2. Olhar conjugado',sel('n4',[['0','Normal (0)'],['1','Paralisia parcial (1)'],['2','Desvio forçado (2)']]))}${fld('3. Campos visuais',sel('n5',[['0','Normal (0)'],['1','Hemianopsia parcial (1)'],['2','Hemianopsia completa (2)'],['3','Cegueira bilateral (3)']]))}${fld('4. Paralisia facial',sel('n6',[['0','Normal (0)'],['1','Leve (1)'],['2','Parcial (2)'],['3','Completa (3)']]))}${fld('5a. Motor — braço esquerdo',sel('n7',[['0','Sem queda (0)'],['1','Queda (1)'],['2','Algum esforço contra gravidade (2)'],['3','Sem esforço (3)'],['4','Sem movimento (4)']]))}${fld('5b. Motor — braço direito',sel('n8',[['0','Sem queda (0)'],['1','Queda (1)'],['2','Algum esforço (2)'],['3','Sem esforço (3)'],['4','Sem movimento (4)']]))}${fld('6a. Motor — perna esquerda',sel('n9',[['0','Sem queda (0)'],['1','Queda (1)'],['2','Algum esforço (2)'],['3','Sem esforço (3)'],['4','Sem movimento (4)']]))}${fld('6b. Motor — perna direita',sel('n10',[['0','Sem queda (0)'],['1','Queda (1)'],['2','Algum esforço (2)'],['3','Sem esforço (3)'],['4','Sem movimento (4)']]))}${fld('7. Ataxia de membros',sel('n11',[['0','Ausente (0)'],['1','Em 1 membro (1)'],['2','Em 2 membros (2)']]))}${fld('8. Sensibilidade',sel('n12',[['0','Normal (0)'],['1','Perda leve a moderada (1)'],['2','Perda grave (2)']]))}${fld('9. Linguagem',sel('n13',[['0','Normal (0)'],['1','Afasia leve a moderada (1)'],['2','Afasia grave (2)'],['3','Mutismo/afasia global (3)']]))}${fld('10. Disartria',sel('n14',[['0','Normal (0)'],['1','Leve a moderada (1)'],['2','Grave/anartria (2)']]))}${fld('11. Extinção/negligência',sel('n15',[['0','Normal (0)'],['1','Desatenção em 1 modalidade (1)'],['2','Hemi-desatenção grave (2)']]))}`,
+ calc(){let s=0;for(let i=1;i<=15;i++)s+=num('n'+i)||0;let c='Sem déficit (0)',b='b-green';if(s>=21){c='AVC grave (21–42)';b='b-red'}else if(s>=16){c='Moderado a grave (16–20)';b='b-red'}else if(s>=5){c='Moderado (5–15)';b='b-amber'}else if(s>=1){c='Leve (1–4)';b='b-amber'}return{val:s,unit:'/ 42',interp:c,badge:b}}},
+{cat:'Neurologia / AVC',id:'ich',name:'ICH Score (hemorragia)',desc:'Mortalidade na hemorragia intraparenquimatosa.',
+ fields:`${fld('Glasgow',sel('g',[['0','13–15 (0)'],['1','5–12 (1)'],['2','3–4 (2)']]))}${fld('Volume do hematoma',sel('v',[['0','< 30 mL (0)'],['1','≥ 30 mL (1)']]))}<div class="checks">${chk('a','Hemorragia intraventricular (1)')}${chk('b','Origem infratentorial (1)')}${chk('c','Idade ≥ 80 anos (1)')}</div>`,
+ calc(){let s=(num('g')||0)+(num('v')||0)+(checked('a')?1:0)+(checked('b')?1:0)+(checked('c')?1:0);let b='b-green';if(s>=3)b='b-red';else if(s>=2)b='b-amber';return{val:s,unit:'/ 6',interp:'Maior = maior mortalidade',badge:b}}},
+
+/* ---------------- TERAPIA INTENSIVA ---------------- */
+{cat:'Terapia intensiva',id:'shock',name:'Índice de choque',desc:'FC ÷ PAS — triagem de instabilidade.',
+ fields:`<div class="grid2">${fld('FC (bpm)',inp('fc'))}${fld('PAS (mmHg)',inp('pas'))}</div>`,
+ calc(){const fc=num('fc'),pas=num('pas');if(!fc||!pas)return null;const v=fc/pas;let c='Normal (0,5–0,7)',b='b-green';if(v>=0.9){c='Elevado (≥0,9) — possível choque';b='b-red'}else if(v>0.7){c='Limítrofe';b='b-amber'}return{val:fmt(v,2),unit:'',interp:c,badge:b}}},
+{cat:'Terapia intensiva',id:'apache',name:'APACHE II',desc:'Gravidade em UTI (12 variáveis + idade + doença crônica).',
+ fields:`${fld('Temperatura (°C)',sel('t',[['0','36–38,4 (0)'],['1','38,5–38,9 ou 34–35,9 (1)'],['2','32–33,9 (2)'],['3','39–40,9 ou 30–31,9 (3)'],['4','≥41 ou <30 (4)']]))}${fld('PA média (mmHg)',sel('m',[['0','70–109 (0)'],['2','50–69 ou 110–129 (2)'],['3','130–159 (3)'],['4','≥160 ou <50 (4)']]))}${fld('FC (bpm)',sel('h',[['0','70–109 (0)'],['2','55–69 ou 110–139 (2)'],['3','40–54 ou 140–179 (3)'],['4','≥180 ou <40 (4)']]))}${fld('FR (irpm)',sel('r',[['0','12–24 (0)'],['1','10–11 ou 25–34 (1)'],['2','6–9 (2)'],['3','35–49 (3)'],['4','≥50 ou <6 (4)']]))}${fld('Oxigenação — PaO₂ (FiO₂<0,5)',sel('o',[['0','>70 (0)'],['1','61–70 (1)'],['3','55–60 (3)'],['4','<55 (4)']]))}${fld('pH arterial',sel('p',[['0','7,33–7,49 (0)'],['1','7,50–7,59 (1)'],['2','7,25–7,32 (2)'],['3','7,15–7,24 ou 7,60–7,69 (3)'],['4','<7,15 ou ≥7,70 (4)']]))}${fld('Sódio (mEq/L)',sel('na',[['0','130–149 (0)'],['1','150–154 (1)'],['2','120–129 ou 155–159 (2)'],['3','111–119 ou 160–179 (3)'],['4','≤110 ou ≥180 (4)']]))}${fld('Potássio (mEq/L)',sel('k',[['0','3,5–5,4 (0)'],['1','3–3,4 ou 5,5–5,9 (1)'],['2','2,5–2,9 (2)'],['3','6–6,9 (3)'],['4','<2,5 ou ≥7 (4)']]))}${fld('Creatinina (mg/dL)',sel('cr',[['0','0,6–1,4 (0)'],['2','<0,6 ou 1,5–1,9 (2)'],['3','2–3,4 (3)'],['4','≥3,5 (4)']]))}<div class="checks">${chk('ira','Insuficiência renal aguda (dobra pontos da creatinina)')}</div>${fld('Hematócrito (%)',sel('ht',[['0','30–45,9 (0)'],['1','46–49,9 (1)'],['2','20–29,9 ou 50–59,9 (2)'],['4','<20 ou ≥60 (4)']]))}${fld('Leucócitos (×10³)',sel('le',[['0','3–14,9 (0)'],['1','15–19,9 (1)'],['2','1–2,9 ou 20–39,9 (2)'],['4','<1 ou ≥40 (4)']]))}${fld('Glasgow (3–15)',inp('gcs'))}${fld('Idade (anos)',sel('age',[['0','≤44 (0)'],['2','45–54 (2)'],['3','55–64 (3)'],['5','65–74 (5)'],['6','≥75 (6)']]))}${fld('Doença crônica grave',sel('ch',[['0','Nenhuma (0)'],['2','Pós-op eletivo (2)'],['5','Não-operatório / pós-op emergência (5)']]))}`,
+ calc(){const gcs=num('gcs');if(!gcs)return null;let crP=num('cr')||0;if(checked('ira'))crP*=2;const gcsP=15-gcs;let s=(num('t')||0)+(num('m')||0)+(num('h')||0)+(num('r')||0)+(num('o')||0)+(num('p')||0)+(num('na')||0)+(num('k')||0)+crP+(num('ht')||0)+(num('le')||0)+gcsP+(num('age')||0)+(num('ch')||0);let c='Baixa gravidade',b='b-green';if(s>30){c='Muito alta — mortalidade elevada';b='b-red'}else if(s>20){c='Alta gravidade';b='b-red'}else if(s>10){c='Gravidade moderada';b='b-amber'}return{val:s,unit:'pontos',interp:c,badge:b}}},
+
+/* ---------------- PEDIATRIA ---------------- */
+{cat:'Pediatria',id:'pesoped',name:'Peso estimado (APLS)',desc:'Peso pediátrico estimado por idade.',
+ fields:`${fld('Idade',sel('u',[['m','Meses (até 12)'],['a','Anos']]))}${fld('Valor',inp('v'))}`,
+ calc(){const v=num('v');if(!v)return null;const meses=document.getElementById('u').value==='m';let kg;if(meses)kg=(0.5*v)+4;else if(v<=5)kg=(2*v)+8;else if(v<=12)kg=(3*v)+7;else return{val:'—',unit:'',interp:'Use peso aferido em adolescentes',badge:'b-amber'};return{val:fmt(kg,1),unit:'kg',interp:'Estimativa (confirme com a balança quando possível)',badge:'b-blue'}}},
+{cat:'Pediatria',id:'doseped',name:'Dose por peso (mg/kg)',desc:'Calcula a dose a partir do peso.',
+ fields:`<div class="grid2">${fld('Peso (kg)',inp('p','','0.1'))}${fld('Dose (mg/kg)',inp('d','','0.1'))}</div>${fld('Concentração (mg/mL, opcional)',inp('c','','0.1'))}`,
+ calc(){const p=num('p'),d=num('d');if(!p||!d)return null;const mg=p*d;const c=num('c');let extra='';if(c)extra=' · '+fmt(mg/c,2)+' mL';return{val:fmt(mg,1),unit:'mg/dose'+extra,interp:'Confira a dose máxima do fármaco',badge:'b-blue'}}},
+{cat:'Pediatria',id:'pews',name:'PEWS (alerta pediátrico)',desc:'Pediatric Early Warning Score.',
+ fields:`${fld('Comportamento',sel('a',[['0','Brincando/apropriado (0)'],['1','Sonolento (1)'],['2','Irritado (2)'],['3','Letárgico/confuso ou ↓resposta à dor (3)']]))}${fld('Cardiovascular',sel('b',[['0','Corado/enchimento 1–2s (0)'],['1','Pálido/enchimento 3s (1)'],['2','Cinzento/enchimento 4s ou ↑FC 20 (2)'],['3','Cinzento/moteado/enchimento ≥5s ou ↑FC 30 ou bradicardia (3)']]))}${fld('Respiratório',sel('c',[['0','Normal (0)'],['1','>10 acima do normal ou uso musculatura (1)'],['2','>20 acima ou retrações (2)'],['3','≥5 abaixo do normal c/ retrações/gemência ou FiO₂≥50% (3)']]))}`,
+ calc(){let s=(num('a')||0)+(num('b')||0)+(num('c')||0);let c='Baixo risco',b='b-green';if(s>=4){c='Alto — acionar avaliação urgente';b='b-red'}else if(s>=3){c='Atenção — reavaliar e escalonar';b='b-amber'}return{val:s,unit:'/ 9',interp:c,badge:b}}},
+{cat:'Pediatria',id:'westley',name:'Westley (crupe)',desc:'Gravidade da laringotraqueíte (crupe).',
+ fields:`${fld('Nível de consciência',sel('a',[['0','Normal (0)'],['5','Desorientado (5)']]))}${fld('Cianose',sel('b',[['0','Ausente (0)'],['4','Com agitação (4)'],['5','Em repouso (5)']]))}${fld('Estridor',sel('c',[['0','Ausente (0)'],['1','Com agitação (1)'],['2','Em repouso (2)']]))}${fld('Entrada de ar',sel('d',[['0','Normal (0)'],['1','Diminuída (1)'],['2','Muito diminuída (2)']]))}${fld('Retração',sel('e',[['0','Ausente (0)'],['1','Leve (1)'],['2','Moderada (2)'],['3','Grave (3)']]))}`,
+ calc(){let s=(num('a')||0)+(num('b')||0)+(num('c')||0)+(num('d')||0)+(num('e')||0);let c='Leve (≤2)',b='b-green';if(s>=8){c='Grave (≥8)';b='b-red'}else if(s>=3){c='Moderado (3–7)';b='b-amber'}return{val:s,unit:'pontos',interp:c,badge:b}}},
+
+/* ---------------- HEPATOLOGIA ---------------- */
+{cat:'Hepatologia',id:'maddrey',name:'Função discriminante de Maddrey',desc:'Gravidade da hepatite alcoólica.',
+ fields:`<div class="grid2">${fld('TP do paciente (s)',inp('tp','','0.1'))}${fld('TP controle (s)',inp('tc','','0.1'))}</div>${fld('Bilirrubina total (mg/dL)',inp('bil','','0.1'))}`,
+ calc(){const tp=num('tp'),tc=num('tc'),bil=num('bil');if(!tp||!tc||isNaN(bil))return null;const v=4.6*(tp-tc)+bil;let c='< 32 — leve a moderada',b='b-green';if(v>=32){c='≥ 32 — grave (considerar corticoide; avaliar Lille)';b='b-red'}return{val:fmt(v,1),unit:'',interp:c,badge:b}}},
 ];
 
 let current=CALCS[0].id;
