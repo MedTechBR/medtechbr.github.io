@@ -1,0 +1,2223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0d9488">
+<title>CondutAI — Abordagem clínica baseada em diretrizes</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%95%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+:root {
+  --bg: #f7f9fb;
+  --bg-card: #ffffff;
+  --bg-soft: #eef2f5;
+  --text: #0f172a;
+  --text-soft: #475569;
+  --text-mute: #94a3b8;
+  --border: #e2e8f0;
+  --primary: #0d9488;
+  --primary-dark: #0f766e;
+  --primary-soft: #ccfbf1;
+  --danger: #dc2626;
+  --warn: #d97706;
+  --warn-soft: #fef3c7;
+  --info: #2563eb;
+  --info-soft: #dbeafe;
+  --success: #16a34a;
+  --success-soft: #dcfce7;
+  --purple: #7c3aed;
+  --purple-soft: #ede9fe;
+  --caso: #ea580c;
+  --caso-dark: #c2410c;
+  --caso-soft: #ffedd5;
+  --shadow: 0 1px 3px rgba(15,23,42,.06), 0 1px 2px rgba(15,23,42,.04);
+  --shadow-lg: 0 10px 25px -5px rgba(15,23,42,.08), 0 8px 10px -6px rgba(15,23,42,.04);
+}
+[data-theme="dark"] {
+  --bg: #0b1220;
+  --bg-card: #111a2e;
+  --bg-soft: #1a2540;
+  --text: #f1f5f9;
+  --text-soft: #cbd5e1;
+  --text-mute: #64748b;
+  --border: #1e293b;
+  --primary: #14b8a6;
+  --primary-dark: #0d9488;
+  --primary-soft: #134e4a;
+  --warn-soft: #422006;
+  --info-soft: #1e3a8a;
+  --success-soft: #14532d;
+  --purple-soft: #3b1d6b;
+  --caso-soft: #431407;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  grid-template-rows: 60px 1fr;
+  grid-template-areas: "head head" "side main";
+  height: 100vh;
+  overflow: hidden;
+}
+header {
+  grid-area: head;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 16px;
+  box-shadow: var(--shadow);
+  z-index: 10;
+}
+.logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; color: var(--primary); }
+.logo-icon {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 18px;
+  box-shadow: 0 2px 8px rgba(13,148,136,.3);
+}
+.subtitle { color: var(--text-mute); font-size: 13px; font-weight: 400; margin-left: 4px; }
+.header-actions { margin-left: auto; display: flex; gap: 8px; }
+.icon-btn {
+  width: 38px; height: 38px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-soft);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transition: all .15s;
+}
+.icon-btn:hover { background: var(--bg-soft); color: var(--primary); }
+
+aside {
+  grid-area: side;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.side-tabs { display: flex; gap: 4px; padding: 10px 12px 0; }
+.side-tab {
+  flex: 1; padding: 7px 10px;
+  background: none; border: none;
+  font-size: 13px; font-weight: 500;
+  color: var(--text-mute); cursor: pointer;
+  border-radius: 6px;
+  transition: all .15s;
+}
+.side-tab.active { background: var(--primary-soft); color: var(--primary-dark); }
+[data-theme="dark"] .side-tab.active { color: var(--primary); }
+.side-list { flex: 1; overflow-y: auto; padding: 8px; }
+.history-item {
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 4px;
+  font-size: 13px;
+  color: var(--text-soft);
+  border: 1px solid transparent;
+  transition: all .15s;
+  display: flex; align-items: flex-start; gap: 8px;
+}
+.history-item:hover { background: var(--bg-soft); }
+.history-item.active { background: var(--primary-soft); color: var(--primary-dark); border-color: var(--primary); }
+[data-theme="dark"] .history-item.active { color: var(--text); }
+.history-content { flex: 1; min-width: 0; }
+.history-title { font-weight: 500; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
+.mode-badge {
+  font-size: 9px; font-weight: 700; padding: 1px 5px;
+  border-radius: 6px; flex-shrink: 0;
+  text-transform: uppercase; letter-spacing: .03em;
+}
+.mode-badge.direta { background: var(--primary-soft); color: var(--primary-dark); }
+.mode-badge.socratica { background: var(--purple-soft); color: var(--purple); }
+.mode-badge.caso { background: var(--caso-soft); color: var(--caso); }
+.mode-badge.protocolo { background: var(--success-soft); color: var(--success); }
+.history-date { font-size: 11px; color: var(--text-mute); margin-top: 2px; }
+.history-star {
+  background: none; border: none; cursor: pointer;
+  color: var(--text-mute); font-size: 14px;
+  padding: 0; opacity: 0; transition: opacity .15s;
+}
+.history-item:hover .history-star { opacity: 1; }
+.history-item .history-star.starred { opacity: 1; color: #f59e0b; }
+.empty-state { padding: 40px 20px; text-align: center; color: var(--text-mute); font-size: 13px; }
+
+main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
+
+.mode-toggle {
+  display: flex; gap: 6px; margin-bottom: 12px;
+  padding: 4px; background: var(--bg-soft); border-radius: 10px;
+  width: fit-content;
+}
+.mode-btn {
+  padding: 7px 14px; border: none; background: none;
+  font-size: 13px; font-weight: 600; color: var(--text-soft);
+  cursor: pointer; border-radius: 7px;
+  display: flex; align-items: center; gap: 5px;
+  transition: all .15s;
+  font-family: inherit;
+}
+.mode-btn.active { background: var(--bg-card); color: var(--primary); box-shadow: var(--shadow); }
+.mode-btn.active[data-mode="socratica"] { color: var(--purple); }
+.mode-btn.active[data-mode="caso"] { color: var(--caso); }
+.mode-btn.active[data-mode="protocolo"] { color: var(--success); }
+
+.search-box {
+  max-width: 900px;
+  margin: 0 auto 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+.search-input-wrap { display: flex; gap: 10px; }
+.search-input {
+  flex: 1; padding: 12px 16px; font-size: 15px;
+  border: 1px solid var(--border); border-radius: 10px;
+  background: var(--bg); color: var(--text);
+  font-family: inherit; resize: none; outline: none;
+  transition: border-color .15s;
+  min-height: 48px; max-height: 140px;
+}
+.search-input:focus { border-color: var(--primary); }
+.send-btn {
+  padding: 0 20px; background: var(--primary); color: white;
+  border: none; border-radius: 10px; font-weight: 600;
+  cursor: pointer; font-size: 14px;
+  transition: background .15s;
+  display: flex; align-items: center; gap: 6px;
+}
+.send-btn:hover { background: var(--primary-dark); }
+.send-btn:disabled { background: var(--text-mute); cursor: not-allowed; }
+.send-btn.socratic { background: var(--purple); }
+.send-btn.socratic:hover { background: #6d28d9; }
+.send-btn.caso { background: var(--caso); }
+.send-btn.caso:hover { background: var(--caso-dark); }
+.send-btn.protocolo { background: var(--success); }
+.send-btn.protocolo:hover { background: #15803d; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.chip {
+  padding: 5px 12px; background: var(--bg-soft);
+  border: 1px solid var(--border); border-radius: 20px;
+  font-size: 12px; color: var(--text-soft); cursor: pointer;
+  transition: all .15s;
+}
+.chip:hover { background: var(--primary-soft); color: var(--primary-dark); border-color: var(--primary); }
+
+.options-row {
+  max-width: 900px; margin: 0 auto 16px;
+  display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+}
+.option-group { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-soft); }
+.option-select {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 6px; padding: 5px 8px;
+  color: var(--text); font-size: 13px; font-family: inherit;
+}
+
+.result {
+  max-width: 900px; margin: 0 auto;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 28px 32px;
+  box-shadow: var(--shadow);
+}
+.result-header {
+  margin-bottom: 20px; padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between;
+  align-items: flex-start; gap: 12px;
+}
+.result-title { font-size: 22px; font-weight: 700; color: var(--text); }
+.result-title .badge {
+  font-size: 11px; font-weight: 700; padding: 3px 8px;
+  border-radius: 6px; margin-left: 8px; vertical-align: middle;
+  text-transform: uppercase;
+}
+.result-title .badge.direta { background: var(--primary-soft); color: var(--primary-dark); }
+.result-title .badge.socratica { background: var(--purple-soft); color: var(--purple); }
+.result-title .badge.caso { background: var(--caso-soft); color: var(--caso); }
+.result-title .badge.protocolo { background: var(--success-soft); color: var(--success); }
+.result-meta { font-size: 12px; color: var(--text-mute); margin-top: 4px; }
+.result-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.action-btn {
+  padding: 6px 12px; background: var(--bg-soft);
+  border: 1px solid var(--border); border-radius: 7px;
+  font-size: 12px; font-weight: 500; color: var(--text-soft);
+  cursor: pointer; display: flex; align-items: center; gap: 4px;
+  transition: all .15s;
+}
+.action-btn:hover { background: var(--primary-soft); color: var(--primary-dark); border-color: var(--primary); }
+
+.content h1, .content h2, .content h3 { color: var(--text); margin: 18px 0 8px; line-height: 1.3; }
+.content h1 { font-size: 22px; }
+.content h2 {
+  font-size: 17px; padding: 10px 14px;
+  background: var(--primary-soft); color: var(--primary-dark);
+  border-left: 4px solid var(--primary); border-radius: 6px;
+  margin-top: 24px;
+}
+[data-theme="dark"] .content h2 { color: var(--text); }
+.content h3 { font-size: 15px; color: var(--primary-dark); margin-top: 16px; }
+[data-theme="dark"] .content h3 { color: var(--primary); }
+.content p { margin: 8px 0; color: var(--text-soft); }
+.content ul, .content ol { margin: 8px 0 12px 22px; color: var(--text-soft); }
+.content li { margin: 4px 0; }
+.content li::marker { color: var(--primary); }
+.content strong { color: var(--text); font-weight: 600; }
+.content code {
+  background: var(--bg-soft); padding: 2px 6px;
+  border-radius: 4px; font-size: 13px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.content pre {
+  background: var(--bg-soft); padding: 12px;
+  border-radius: 8px; overflow-x: auto;
+  margin: 12px 0; border: 1px solid var(--border);
+}
+.content pre code { background: none; padding: 0; font-size: 12px; }
+.content table {
+  border-collapse: collapse; width: 100%;
+  margin: 12px 0; font-size: 13px;
+}
+.content th, .content td {
+  border: 1px solid var(--border);
+  padding: 8px 12px; text-align: left;
+}
+.content th { background: var(--bg-soft); font-weight: 600; }
+.content blockquote {
+  border-left: 4px solid var(--warn);
+  background: var(--warn-soft);
+  padding: 10px 14px; margin: 12px 0;
+  border-radius: 6px; color: var(--text);
+}
+.content hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+.content a { color: var(--primary); text-decoration: none; }
+.content a:hover { text-decoration: underline; }
+
+.mermaid-wrap {
+  background: white; border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px; margin: 16px 0;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+.mermaid-scroll {
+  overflow: auto;
+  max-height: 70vh;
+  background: white;
+  border-radius: 6px;
+  cursor: zoom-in;
+  position: relative;
+}
+.mermaid-scroll .mermaid {
+  display: inline-block;
+  min-width: 100%;
+  text-align: center;
+}
+.mermaid-scroll .mermaid svg {
+  max-width: none !important;
+  height: auto !important;
+  transform-origin: top left;
+  transition: transform .15s ease;
+}
+.mermaid-label {
+  font-size: 11px; color: var(--text-mute);
+  text-transform: uppercase; letter-spacing: .05em;
+  margin-bottom: 8px; font-weight: 600;
+  display: flex; align-items: center; gap: 6px;
+  justify-content: space-between;
+}
+.mermaid-label .hint { text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--primary); }
+[data-theme="dark"] .mermaid-wrap, [data-theme="dark"] .mermaid-scroll { background: #f8fafc; }
+
+.mermaid-controls {
+  display: flex; gap: 4px;
+}
+.mermaid-controls button {
+  background: var(--bg-card); border: 1px solid var(--border);
+  width: 30px; height: 30px; border-radius: 6px;
+  cursor: pointer; font-size: 14px; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--text-soft);
+  transition: all .15s;
+  font-family: inherit;
+}
+.mermaid-controls button:hover { background: var(--primary-soft); border-color: var(--primary); color: var(--primary-dark); }
+[data-theme="dark"] .mermaid-controls button { background: white; color: #475569; }
+
+/* ===== Modal tela cheia para fluxograma ===== */
+.mermaid-modal {
+  position: fixed; inset: 0;
+  background: rgba(15,23,42,.92);
+  z-index: 200;
+  display: flex; flex-direction: column;
+  animation: fadeIn .2s;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.mermaid-modal-bar {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 20px;
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 12px;
+}
+.mermaid-modal-title {
+  font-weight: 600; color: var(--text); font-size: 15px;
+  display: flex; align-items: center; gap: 8px;
+}
+.mermaid-modal-actions { display: flex; gap: 6px; }
+.mermaid-modal-actions button {
+  background: var(--bg-soft); border: 1px solid var(--border);
+  padding: 7px 12px; border-radius: 7px;
+  cursor: pointer; font-size: 13px; font-weight: 500;
+  color: var(--text-soft); font-family: inherit;
+  display: inline-flex; align-items: center; gap: 4px;
+  transition: all .15s;
+}
+.mermaid-modal-actions button:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
+.mermaid-modal-actions button.close { color: var(--danger); }
+.mermaid-modal-actions button.close:hover { background: #fee2e2; border-color: var(--danger); color: var(--danger); }
+.mermaid-modal-body {
+  flex: 1; overflow: auto;
+  background: white; padding: 24px;
+}
+.mermaid-modal-body .mermaid {
+  display: inline-block;
+  transform-origin: top left;
+  transition: transform .15s ease;
+}
+.mermaid-modal-body .mermaid svg { max-width: none !important; height: auto !important; }
+.mermaid-modal-zoom-badge {
+  position: fixed; bottom: 20px; right: 20px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  padding: 6px 12px; border-radius: 20px;
+  font-size: 12px; font-weight: 600; color: var(--text-soft);
+  box-shadow: var(--shadow-lg);
+}
+
+.alert {
+  padding: 12px 16px; border-radius: 10px;
+  margin: 16px 0; font-size: 13px;
+  display: flex; gap: 10px;
+}
+.alert-warn { background: var(--warn-soft); border: 1px solid #fbbf24; color: #92400e; }
+[data-theme="dark"] .alert-warn { color: #fbbf24; }
+.alert-info { background: var(--info-soft); border: 1px solid #60a5fa; color: #1e40af; }
+[data-theme="dark"] .alert-info { color: #93c5fd; }
+.alert-socratic { background: var(--purple-soft); border: 1px solid var(--purple); color: var(--purple); }
+.alert-caso { background: var(--caso-soft); border: 1px solid var(--caso); color: var(--caso-dark); }
+[data-theme="dark"] .alert-caso { color: #fb923c; }
+
+/* Destaque especial para seção "discussão com residente" no modo caso */
+.content h2.preceptor-section {
+  background: linear-gradient(90deg, var(--caso-soft) 0%, transparent 100%);
+  color: var(--caso-dark);
+  border-left: 4px solid var(--caso);
+}
+[data-theme="dark"] .content h2.preceptor-section { color: #fb923c; }
+
+.sources { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); }
+.sources-title { font-size: 13px; font-weight: 600; color: var(--text-soft); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.source-item {
+  display: block; padding: 8px 12px;
+  background: var(--bg-soft); border-radius: 6px;
+  font-size: 12px; color: var(--text-soft);
+  margin-bottom: 4px; text-decoration: none;
+  border: 1px solid var(--border);
+  transition: all .15s;
+}
+.source-item:hover { border-color: var(--primary); color: var(--primary); }
+.source-item .src-num {
+  display: inline-block; background: var(--primary); color: white;
+  width: 18px; height: 18px; border-radius: 50%;
+  text-align: center; font-size: 10px; font-weight: 700;
+  line-height: 18px; margin-right: 6px;
+}
+
+/* ===== CHAT (modo socrático) ===== */
+.chat-container { max-width: 900px; margin: 0 auto; }
+.chat-message {
+  margin-bottom: 16px; display: flex; gap: 12px;
+  animation: fadeUp .3s ease;
+}
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.chat-avatar {
+  width: 38px; height: 38px; flex-shrink: 0;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700;
+}
+.chat-message.ai .chat-avatar { background: var(--purple-soft); color: var(--purple); }
+.chat-message.user .chat-avatar { background: var(--primary-soft); color: var(--primary-dark); }
+.chat-bubble {
+  flex: 1; background: var(--bg-card);
+  border: 1px solid var(--border); border-radius: 14px;
+  padding: 16px 20px; box-shadow: var(--shadow);
+}
+.chat-message.user .chat-bubble {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+}
+[data-theme="dark"] .chat-message.user .chat-bubble { background: var(--bg-soft); }
+.chat-message.ai .chat-bubble {
+  border-left: 3px solid var(--purple);
+}
+.chat-meta { font-size: 11px; color: var(--text-mute); margin-top: 6px; }
+
+.followup-box {
+  max-width: 900px; margin: 16px auto 0;
+  background: var(--bg-card); border: 2px solid var(--purple);
+  border-radius: 14px; padding: 16px;
+  box-shadow: var(--shadow-lg);
+  position: sticky; bottom: 16px;
+}
+.followup-label {
+  font-size: 12px; font-weight: 600; color: var(--purple);
+  margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.followup-wrap { display: flex; gap: 8px; }
+.followup-input {
+  flex: 1; padding: 10px 14px; font-size: 14px;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--bg); color: var(--text);
+  font-family: inherit; resize: none; outline: none;
+  min-height: 44px; max-height: 160px;
+}
+.followup-input:focus { border-color: var(--purple); }
+.followup-actions { display: flex; flex-direction: column; gap: 6px; }
+.followup-send {
+  padding: 0 16px; background: var(--purple); color: white;
+  border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
+  font-size: 13px; min-height: 44px;
+}
+.followup-send:hover { background: #6d28d9; }
+.followup-finish {
+  padding: 6px 12px; background: var(--bg-soft); color: var(--text-soft);
+  border: 1px solid var(--border); border-radius: 8px; cursor: pointer;
+  font-size: 11px;
+}
+.followup-finish:hover { background: var(--warn-soft); color: var(--warn); border-color: var(--warn); }
+.typing-indicator {
+  display: inline-flex; gap: 3px; padding: 4px 0;
+}
+.typing-indicator span {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--purple); opacity: .4;
+  animation: typing 1.2s infinite;
+}
+.typing-indicator span:nth-child(2) { animation-delay: .15s; }
+.typing-indicator span:nth-child(3) { animation-delay: .3s; }
+@keyframes typing { 0%, 80%, 100% { opacity: .3; transform: scale(.9);} 40% { opacity: 1; transform: scale(1.1);} }
+
+.loading {
+  max-width: 900px; margin: 0 auto;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 40px; text-align: center;
+  box-shadow: var(--shadow);
+}
+.spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--bg-soft);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+.spinner.purple { border-top-color: var(--purple); }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { color: var(--text-soft); font-size: 14px; }
+.loading-sub { color: var(--text-mute); font-size: 12px; margin-top: 6px; }
+
+.welcome { max-width: 900px; margin: 40px auto 0; text-align: center; padding: 40px 20px; }
+.welcome-icon { font-size: 56px; margin-bottom: 16px; }
+.welcome h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+.welcome p { color: var(--text-soft); font-size: 15px; margin-bottom: 24px; max-width: 540px; margin-left: auto; margin-right: auto; }
+/* ===== Biblioteca de Protocolos (estilo VerisPro) ===== */
+.library {
+  max-width: 900px;
+  margin: 24px auto 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: var(--shadow);
+  text-align: left;
+}
+.library-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; gap: 10px; flex-wrap: wrap;
+}
+.library-title {
+  font-size: 15px; font-weight: 700; color: var(--text);
+  display: flex; align-items: center; gap: 8px;
+}
+.library-count {
+  font-size: 11px; color: var(--text-mute);
+  background: var(--bg-soft); padding: 2px 8px;
+  border-radius: 10px; font-weight: 600;
+  letter-spacing: .03em; text-transform: uppercase;
+}
+.library-search {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+  padding: 7px 12px; font-size: 13px; color: var(--text);
+  width: 240px; max-width: 100%; font-family: inherit; outline: none;
+  transition: border-color .15s;
+}
+.library-search:focus { border-color: var(--success); }
+.library-tabs {
+  display: flex; flex-wrap: wrap; gap: 5px;
+  margin-bottom: 12px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.library-tab {
+  padding: 5px 11px; border: 1px solid var(--border);
+  background: var(--bg); color: var(--text-soft);
+  border-radius: 18px; font-size: 12px; cursor: pointer;
+  font-weight: 500; font-family: inherit;
+  transition: all .15s;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.library-tab:hover { border-color: var(--success); color: var(--success); }
+.library-tab.active { background: var(--success); color: white; border-color: var(--success); }
+.library-grid { display: flex; flex-direction: column; gap: 5px; max-height: 480px; overflow-y: auto; padding-right: 4px; }
+.library-grid::-webkit-scrollbar { width: 6px; }
+.library-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.protocol-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all .12s ease;
+  text-align: left;
+}
+.protocol-card:hover {
+  border-color: var(--success);
+  background: var(--success-soft);
+  transform: translateX(2px);
+}
+[data-theme="dark"] .protocol-card:hover { background: rgba(22,163,74,0.12); }
+.protocol-icon {
+  font-size: 22px; flex-shrink: 0;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-card); border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.protocol-info { flex: 1; min-width: 0; }
+.protocol-name {
+  font-weight: 600; color: var(--text); font-size: 14px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.protocol-tags {
+  font-size: 11px; color: var(--text-mute); margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.protocol-badge {
+  background: var(--success-soft); color: var(--success);
+  font-size: 10px; font-weight: 700;
+  padding: 4px 9px; border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  flex-shrink: 0;
+  letter-spacing: .02em;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.protocol-badge::after { content: '✓'; font-size: 10px; opacity: .6; }
+.library-empty {
+  padding: 30px 20px; text-align: center;
+  color: var(--text-mute); font-size: 13px;
+}
+
+.welcome-features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 24px; }
+.feature {
+  background: var(--bg-card); border: 1px solid var(--border);
+  padding: 18px 16px; border-radius: 12px; text-align: left;
+}
+.feature-icon { font-size: 22px; margin-bottom: 8px; }
+.feature h3 { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: var(--text); }
+.feature p { font-size: 12px; color: var(--text-soft); margin: 0; }
+
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(15,23,42,.4);
+  z-index: 100; display: none;
+  align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.modal-backdrop.open { display: flex; }
+.modal {
+  background: var(--bg-card); border-radius: 14px;
+  padding: 24px; max-width: 460px; width: 90%;
+  box-shadow: var(--shadow-lg);
+}
+.modal h2 { font-size: 18px; margin-bottom: 8px; }
+.modal p { color: var(--text-soft); font-size: 14px; margin-bottom: 16px; }
+.modal label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--text-soft); }
+.modal input {
+  width: 100%; padding: 10px 12px;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--bg); color: var(--text);
+  font-size: 14px; font-family: inherit;
+  margin-bottom: 16px; outline: none;
+}
+.modal input:focus { border-color: var(--primary); }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.btn-primary {
+  padding: 9px 16px; background: var(--primary); color: white;
+  border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
+  font-size: 13px;
+}
+.btn-secondary {
+  padding: 9px 16px; background: var(--bg-soft); color: var(--text-soft);
+  border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer;
+  font-size: 13px;
+}
+.help-link { font-size: 12px; color: var(--primary); text-decoration: none; }
+.help-link:hover { text-decoration: underline; }
+
+@media print {
+  body { display: block; height: auto; overflow: visible; background: white; }
+  header, aside, .search-box, .options-row, .result-actions, .followup-box, .mode-toggle, .mermaid-controls, .mermaid-modal { display: none !important; }
+  main { padding: 0; overflow: visible; }
+  .result, .chat-container { border: none; box-shadow: none; padding: 0; max-width: none; }
+  .content h2 { background: none; border-left: 4px solid #0d9488; color: #0f766e; }
+  .mermaid-scroll { max-height: none !important; overflow: visible !important; }
+  .mermaid-scroll .mermaid svg { transform: none !important; max-width: 100% !important; }
+}
+@media (max-width: 860px) {
+  body { grid-template-columns: 1fr; grid-template-areas: "head" "main"; }
+  aside { display: none; }
+  main { padding: 16px; }
+  .result { padding: 20px; }
+  .welcome-features { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚕</div>
+    <div>CondutAI <span class="subtitle">— Abordagem clínica baseada em diretrizes</span></div>
+  </div>
+  <div class="header-actions">
+    <button class="icon-btn" id="newBtn" title="Nova consulta">＋</button>
+    <button class="icon-btn" id="themeBtn" title="Alternar tema">🌙</button>
+    <button class="icon-btn" id="settingsBtn" title="Configurações">⚙</button>
+  </div>
+</header>
+
+<aside>
+  <div class="side-tabs">
+    <button class="side-tab active" data-tab="history">Histórico</button>
+    <button class="side-tab" data-tab="starred">Favoritos</button>
+  </div>
+  <div class="side-list" id="sideList"></div>
+</aside>
+
+<main id="main">
+  <div id="welcomeView" class="welcome">
+    <div class="welcome-icon">🩺</div>
+    <h1>Olá, preceptor</h1>
+    <p>Escolha um <strong>protocolo da biblioteca</strong>, digite um sintoma, cole uma evolução real ou inicie uma discussão socrática — tudo com fluxograma visual e baseado nas diretrizes mais recentes.</p>
+
+    <div class="search-box">
+      <div class="mode-toggle">
+        <button class="mode-btn active" data-mode="direta">📋 Conduta direta</button>
+        <button class="mode-btn" data-mode="protocolo">📚 Protocolo passo-a-passo</button>
+        <button class="mode-btn" data-mode="socratica">🎓 Discussão socrática</button>
+        <button class="mode-btn" data-mode="caso">📄 Avaliar caso real</button>
+      </div>
+      <div class="search-input-wrap">
+        <textarea class="search-input" id="searchInput" rows="2" placeholder="Ex: dor torácica, ICFEr descompensada, sepse, AVC isquêmico em janela..."></textarea>
+        <button class="send-btn" id="sendBtn">Analisar →</button>
+      </div>
+      <div class="chips" id="chipsContainer" style="display:none;"></div>
+    </div>
+
+    <!-- Biblioteca de Protocolos -->
+    <div class="library">
+      <div class="library-header">
+        <div class="library-title">
+          📚 Biblioteca de protocolos
+          <span class="library-count" id="libCount">— protocolos</span>
+        </div>
+        <input type="text" id="librarySearch" class="library-search" placeholder="Buscar protocolo, droga, escore...">
+      </div>
+      <div class="library-tabs" id="libraryTabs"></div>
+      <div class="library-grid" id="libraryGrid"></div>
+    </div>
+
+    <div class="welcome-features">
+      <div class="feature">
+        <div class="feature-icon">📋</div>
+        <h3>Conduta direta</h3>
+        <p>Sintoma/síndrome → abordagem completa com fluxograma Mermaid, doses e diretrizes atualizadas.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🎓</div>
+        <h3>Discussão socrática</h3>
+        <p>IA cria um caso clínico fictício e conduz o residente por perguntas, avaliando cada resposta.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📄</div>
+        <h3>Avaliar caso real</h3>
+        <p>Cole a evolução do seu paciente — receba análise, abordagens possíveis e <strong>roteiro de como discutir com o residente</strong>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="resultView" style="display:none;">
+    <div class="search-box">
+      <div class="mode-toggle">
+        <button class="mode-btn active" data-mode="direta">📋 Conduta direta</button>
+        <button class="mode-btn" data-mode="protocolo">📚 Protocolo passo-a-passo</button>
+        <button class="mode-btn" data-mode="socratica">🎓 Discussão socrática</button>
+        <button class="mode-btn" data-mode="caso">📄 Avaliar caso real</button>
+      </div>
+      <div class="search-input-wrap">
+        <textarea class="search-input" id="searchInput2" rows="2" placeholder="Nova consulta..."></textarea>
+        <button class="send-btn" id="sendBtn2">Analisar →</button>
+      </div>
+    </div>
+    <div class="options-row" id="optionsRow">
+      <div class="option-group">
+        <label for="ctxSelect">Contexto:</label>
+        <select class="option-select" id="ctxSelect">
+          <option value="adulto">Adulto</option>
+          <option value="idoso">Idoso (≥65a)</option>
+          <option value="gestante">Gestante</option>
+          <option value="pediatrico">Pediátrico</option>
+        </select>
+      </div>
+      <div class="option-group">
+        <label for="cenarioSelect">Cenário:</label>
+        <select class="option-select" id="cenarioSelect">
+          <option value="emergencia">Emergência</option>
+          <option value="enfermaria">Enfermaria</option>
+          <option value="ambulatorio">Ambulatório</option>
+          <option value="uti">UTI</option>
+        </select>
+      </div>
+      <div class="option-group" id="profundidadeGroup">
+        <label for="profundidadeSelect">Detalhe:</label>
+        <select class="option-select" id="profundidadeSelect">
+          <option value="completa">Completa</option>
+          <option value="resumida">Resumida</option>
+          <option value="bullet">Bullet points</option>
+        </select>
+      </div>
+    </div>
+    <div id="resultContainer"></div>
+  </div>
+</main>
+
+<div class="modal-backdrop" id="apiModal">
+  <div class="modal">
+    <h2>Configurar API Gemini</h2>
+    <p>Cole sua chave da API Gemini abaixo. A chave fica apenas no seu navegador (localStorage).</p>
+    <label for="apiKeyInput">API Key</label>
+    <input type="password" id="apiKeyInput" placeholder="AIzaSy...">
+    <label for="modelSelect">Modelo</label>
+    <select class="option-select" id="modelSelect" style="width:100%; padding:10px 12px; margin-bottom:16px;">
+      <option value="gemini-2.5-flash">Gemini 2.5 Flash (rápido, recomendado)</option>
+      <option value="gemini-2.5-pro">Gemini 2.5 Pro (mais preciso, lento)</option>
+      <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+    </select>
+    <p style="font-size:12px;"><a class="help-link" href="https://aistudio.google.com/app/apikey" target="_blank">Obter chave grátis no Google AI Studio →</a></p>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="cancelApi">Cancelar</button>
+      <button class="btn-primary" id="saveApi">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ Mermaid setup ============
+let mermaidCounter = 0;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'default',
+  securityLevel: 'loose',
+  fontSize: 16,
+  themeVariables: {
+    fontSize: '16px',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif'
+  },
+  flowchart: {
+    useMaxWidth: false,   // renderiza no tamanho natural; o container faz scroll
+    htmlLabels: true,
+    curve: 'basis',
+    nodeSpacing: 55,
+    rankSpacing: 65,
+    padding: 18,
+    diagramPadding: 14
+  }
+});
+
+// ============ Estado ============
+const LS_KEY = 'condutai_key';
+const LS_MODEL = 'condutai_model';
+const LS_HIST = 'condutai_history';
+const LS_THEME = 'condutai_theme';
+
+let apiKey = localStorage.getItem(LS_KEY) || '';
+let model = localStorage.getItem(LS_MODEL) || 'gemini-2.5-flash';
+let history = JSON.parse(localStorage.getItem(LS_HIST) || '[]');
+let currentTab = 'history';
+let currentId = null;
+let currentMode = 'direta'; // direta | socratica
+let currentConversation = null; // {id, query, mode, messages: [{role, text, sources}], ...}
+
+// Tema
+const theme = localStorage.getItem(LS_THEME) || 'light';
+document.documentElement.setAttribute('data-theme', theme);
+document.getElementById('themeBtn').textContent = theme === 'dark' ? '☀' : '🌙';
+document.getElementById('themeBtn').onclick = () => {
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem(LS_THEME, next);
+  document.getElementById('themeBtn').textContent = next === 'dark' ? '☀' : '🌙';
+};
+
+// ============ Modal API ============
+const apiModal = document.getElementById('apiModal');
+document.getElementById('settingsBtn').onclick = openApiModal;
+function openApiModal() {
+  document.getElementById('apiKeyInput').value = apiKey;
+  document.getElementById('modelSelect').value = model;
+  apiModal.classList.add('open');
+}
+document.getElementById('cancelApi').onclick = () => apiModal.classList.remove('open');
+document.getElementById('saveApi').onclick = () => {
+  apiKey = document.getElementById('apiKeyInput').value.trim();
+  model = document.getElementById('modelSelect').value;
+  localStorage.setItem(LS_KEY, apiKey);
+  localStorage.setItem(LS_MODEL, model);
+  apiModal.classList.remove('open');
+};
+
+// ============ Biblioteca de Protocolos ============
+const SPECIALTIES = {
+  emergencia: { label: 'Emergência', icon: '🚨' },
+  cardio:     { label: 'Cardiologia', icon: '❤️' },
+  infecto:    { label: 'Infectologia', icon: '🦠' },
+  pneumo:     { label: 'Pneumologia', icon: '🫁' },
+  endocrino:  { label: 'Endocrinologia', icon: '💉' },
+  neuro:      { label: 'Neurologia', icon: '🧠' },
+  gastro:     { label: 'Gastro/Hepato', icon: '🩺' },
+  nefro:      { label: 'Nefrologia', icon: '💧' },
+  hemato:     { label: 'Hematologia', icon: '🩸' },
+  reumato:    { label: 'Reumatologia', icon: '🦴' }
+};
+
+const PROTOCOLS = [
+  // CARDIO
+  { id: 'stemi', icon: '❤️', name: 'IAM com supra ST — STEMI', tags: 'AHA/ACC · Antitrombóticos · ICP primária · Fibrinólise', specialty: 'cardio', guideline: 'AHA 2025' },
+  { id: 'nstemi', icon: '❤️', name: 'IAM sem supra ST — NSTEMI/SCA-SST', tags: 'GRACE · TIMI · Antitrombóticos · Estratégia invasiva', specialty: 'cardio', guideline: 'ESC 2023' },
+  { id: 'acls', icon: '⚡', name: 'ACLS — Parada Cardiorrespiratória', tags: 'AHA · FV/TV sem pulso · Epinefrina · Amiodarona', specialty: 'cardio', guideline: 'AHA 2025' },
+  { id: 'ic_descomp', icon: '💔', name: 'Insuficiência cardíaca aguda descompensada', tags: 'ESC · Diurético · Vasodilatador · Inotrópico', specialty: 'cardio', guideline: 'ESC 2023' },
+  { id: 'fa_rvr', icon: '〰️', name: 'Fibrilação atrial com RVR', tags: 'ESC · Controle FC · Cardioversão · Anticoagulação', specialty: 'cardio', guideline: 'ESC 2024' },
+  { id: 'crise_ht', icon: '🩸', name: 'Crise hipertensiva — emergência vs urgência', tags: 'SBC · Nitroprussiato · Esmolol · Lesão órgão-alvo', specialty: 'cardio', guideline: 'SBC 2020' },
+  { id: 'eap', icon: '💨', name: 'Edema agudo de pulmão cardiogênico', tags: 'VNI · Furosemida · Nitroglicerina · Morfina', specialty: 'cardio', guideline: 'ESC 2023' },
+  { id: 'choque_cardio', icon: '⚠️', name: 'Choque cardiogênico', tags: 'SCAI · Noradrenalina · Dobutamina · BIA/Impella', specialty: 'cardio', guideline: 'AHA 2024' },
+  { id: 'endocardite', icon: '🦠', name: 'Endocardite infecciosa', tags: 'ESC · Duke · Vancomicina · Ceftriaxone · Cirurgia', specialty: 'cardio', guideline: 'ESC 2023' },
+  { id: 'pericardite', icon: '🫀', name: 'Pericardite aguda e tamponamento', tags: 'ESC · AINE · Colchicina · Pericardiocentese', specialty: 'cardio', guideline: 'ESC 2015' },
+
+  // EMERGÊNCIA
+  { id: 'sepse', icon: '🦠', name: 'Sepse e choque séptico', tags: 'SSC · Bundle 1h · Noradrenalina · Antibiótico empírico', specialty: 'emergencia', guideline: 'SSC 2021' },
+  { id: 'anafilaxia', icon: '⚡', name: 'Anafilaxia', tags: 'WAO · Adrenalina IM · Reposição · Anti-H1', specialty: 'emergencia', guideline: 'WAO 2020' },
+  { id: 'politrauma', icon: '🚑', name: 'Politrauma — ATLS', tags: 'ATLS · ABCDE · FAST · Sangue maciço', specialty: 'emergencia', guideline: 'ATLS 2018' },
+  { id: 'choque_hipov', icon: '🩸', name: 'Choque hipovolêmico/hemorrágico', tags: 'Cristaloide · Hemocomponentes · Ac. tranexâmico', specialty: 'emergencia', guideline: 'ATLS 2018' },
+  { id: 'intox_geral', icon: '☠️', name: 'Intoxicação medicamentosa — abordagem geral', tags: 'Toxidromes · Descontaminação · Antídotos', specialty: 'emergencia', guideline: 'AACT 2023' },
+  { id: 'intox_opio', icon: '💊', name: 'Intoxicação por opioides', tags: 'Naloxona · Reversão · Suporte ventilatório', specialty: 'emergencia', guideline: 'ACMT 2021' },
+  { id: 'queimadura', icon: '🔥', name: 'Queimaduras — abordagem inicial', tags: 'Parkland · Via aérea · Analgesia · SBQ', specialty: 'emergencia', guideline: 'ABA 2023' },
+
+  // INFECTO
+  { id: 'pac', icon: '🫁', name: 'Pneumonia adquirida na comunidade (PAC)', tags: 'ATS/IDSA · CURB-65 · Ceftriaxone · Azitromicina', specialty: 'infecto', guideline: 'ATS/IDSA 2019' },
+  { id: 'pav', icon: '🏥', name: 'Pneumonia hospitalar / associada à VM', tags: 'IDSA · Piptazo · Vancomicina · MDR risk', specialty: 'infecto', guideline: 'IDSA 2016' },
+  { id: 'itu_comp', icon: '💧', name: 'ITU complicada / pielonefrite', tags: 'Ceftriaxone · Ciprofloxacino · Urocultura', specialty: 'infecto', guideline: 'IDSA 2010' },
+  { id: 'celulite', icon: '🦵', name: 'Celulite e erisipela', tags: 'IDSA · Cefalexina · Clindamicina · Drenagem', specialty: 'infecto', guideline: 'IDSA 2014' },
+  { id: 'meningite', icon: '🧠', name: 'Meningite bacteriana aguda', tags: 'Ceftriaxone · Vancomicina · Dexametasona · LCR', specialty: 'infecto', guideline: 'IDSA 2017' },
+  { id: 'tb', icon: '🫁', name: 'Tuberculose pulmonar', tags: 'RIPE · BAAR · GeneXpert · MS', specialty: 'infecto', guideline: 'MS 2019' },
+  { id: 'hiv_diag', icon: '🧬', name: 'Diagnóstico recente de HIV — abordagem inicial', tags: 'PCDT · CV · CD4 · TARV imediato', specialty: 'infecto', guideline: 'MS PCDT 2024' },
+  { id: 'leptospirose', icon: '🐀', name: 'Leptospirose grave / S. Weil', tags: 'Penicilina · Ceftriaxone · Suporte renal', specialty: 'infecto', guideline: 'MS 2023' },
+  { id: 'dengue', icon: '🦟', name: 'Dengue — classificação e manejo', tags: 'MS · Sinais alarme · Hidratação · Plaquetopenia', specialty: 'infecto', guideline: 'MS 2024' },
+
+  // PNEUMO
+  { id: 'asma_exac', icon: '🫁', name: 'Exacerbação de asma', tags: 'GINA · SABA · Corticoide · Magnésio · VNI', specialty: 'pneumo', guideline: 'GINA 2024' },
+  { id: 'dpoc_exac', icon: '🚬', name: 'Exacerbação de DPOC', tags: 'GOLD · Broncodilatador · Corticoide · ATB · VNI', specialty: 'pneumo', guideline: 'GOLD 2024' },
+  { id: 'tep', icon: '🩸', name: 'Tromboembolismo pulmonar (TEP)', tags: 'ESC · Wells · sPESI · DOAC · Trombólise', specialty: 'pneumo', guideline: 'ESC 2019' },
+  { id: 'pneumotorax', icon: '💨', name: 'Pneumotórax', tags: 'BTS · Drenagem · Punção · Espontâneo vs traumático', specialty: 'pneumo', guideline: 'BTS 2023' },
+  { id: 'derrame', icon: '💧', name: 'Derrame pleural — investigação', tags: 'Light · Toracocentese · Exsudato vs transudato', specialty: 'pneumo', guideline: 'ATS 2022' },
+
+  // ENDOCRINO
+  { id: 'cad', icon: '🍬', name: 'Cetoacidose diabética (CAD)', tags: 'ADA · Hidratação · Insulina BIC · Eletrólitos', specialty: 'endocrino', guideline: 'ADA 2024' },
+  { id: 'ehh', icon: '🍬', name: 'Estado hiperglicêmico hiperosmolar (EHH)', tags: 'ADA · Hidratação agressiva · Insulina · Osmolaridade', specialty: 'endocrino', guideline: 'ADA 2024' },
+  { id: 'hipoglicemia', icon: '⬇️', name: 'Hipoglicemia grave', tags: 'Glicose 50% · Glucagon · Causa subjacente', specialty: 'endocrino', guideline: 'ADA 2024' },
+  { id: 'crise_tireo', icon: '🦋', name: 'Crise tireotóxica (tempestade)', tags: 'PTU · Propranolol · Hidrocortisona · Iodeto', specialty: 'endocrino', guideline: 'ATA 2016' },
+  { id: 'insuf_adrenal', icon: '⬇️', name: 'Insuficiência adrenal aguda', tags: 'Hidrocortisona · Salina · Cortisol basal', specialty: 'endocrino', guideline: 'Endocrine Society 2016' },
+  { id: 'hipona', icon: '🧂', name: 'Hiponatremia — investigação e manejo', tags: 'Osmolaridade · SIADH · Salina 3% · Velocidade correção', specialty: 'endocrino', guideline: 'ESE 2014' },
+  { id: 'hipercalcemia', icon: '🦴', name: 'Hipercalcemia grave', tags: 'Hidratação · Calcitonina · Bisfosfonato · Denosumab', specialty: 'endocrino', guideline: 'Endocrine Society 2022' },
+
+  // NEURO
+  { id: 'avc_isq', icon: '🧠', name: 'AVC isquêmico em janela', tags: 'AHA · NIHSS · Alteplase · Trombectomia · ASPECTS', specialty: 'neuro', guideline: 'AHA 2024' },
+  { id: 'avc_hem', icon: '🧠', name: 'AVC hemorrágico (HIP)', tags: 'AHA · Controle PA · Reversão de anticoagulação', specialty: 'neuro', guideline: 'AHA 2022' },
+  { id: 'epileptico', icon: '⚡', name: 'Estado de mal epiléptico', tags: 'BZD · Fenitoína · Levetiracetam · Anestésico', specialty: 'neuro', guideline: 'NCS 2016' },
+  { id: 'cefaleia_trovao', icon: '⚡', name: 'Cefaleia em trovoada', tags: 'TC sem contraste · Punção lombar · HSA · RCVS', specialty: 'neuro', guideline: 'AAN 2019' },
+  { id: 'gbs', icon: '🦵', name: 'Síndrome de Guillain-Barré', tags: 'Imunoglobulina · Plasmaférese · VM precoce', specialty: 'neuro', guideline: 'EAN 2023' },
+
+  // GASTRO
+  { id: 'hda_var', icon: '🩸', name: 'HDA varicosa', tags: 'Baveno · Terlipressina · Octreotide · EDA precoce', specialty: 'gastro', guideline: 'Baveno VII 2022' },
+  { id: 'hda_naovar', icon: '🩸', name: 'HDA não-varicosa (úlcera)', tags: 'IBP · Glasgow-Blatchford · EDA terapêutica', specialty: 'gastro', guideline: 'ACG 2021' },
+  { id: 'pancreatite', icon: '🥩', name: 'Pancreatite aguda', tags: 'BISAP · Atlanta · Hidratação · Nutrição precoce', specialty: 'gastro', guideline: 'ACG 2024' },
+  { id: 'colangite', icon: '🟡', name: 'Colangite aguda', tags: 'Tokyo · Antibiótico · CPRE precoce · Drenagem', specialty: 'gastro', guideline: 'Tokyo 2018' },
+  { id: 'hep_alcool', icon: '🍷', name: 'Hepatite alcoólica grave', tags: 'Maddrey · Lille · Prednisolona · Pentoxifilina', specialty: 'gastro', guideline: 'AASLD 2020' },
+  { id: 'encef_hep', icon: '🧠', name: 'Encefalopatia hepática', tags: 'Lactulose · Rifaximina · Identificar precipitante', specialty: 'gastro', guideline: 'AASLD 2014' },
+
+  // NEFRO
+  { id: 'lra', icon: '💧', name: 'Lesão renal aguda (LRA/IRA)', tags: 'KDIGO · Pré/intra/pós · Estatificação · TRS', specialty: 'nefro', guideline: 'KDIGO 2012' },
+  { id: 'hipercalemia', icon: '🍌', name: 'Hipercalemia grave', tags: 'Gluconato Ca · Insulina + glicose · B2 · Resina · HD', specialty: 'nefro', guideline: 'KDIGO 2024' },
+  { id: 'acid_metab', icon: '⚗️', name: 'Acidose metabólica grave', tags: 'Anion gap · Lactato · Bicarbonato · Causa base', specialty: 'nefro', guideline: 'KDIGO 2018' },
+  { id: 'doenca_renal', icon: '💧', name: 'Doença renal crônica — manejo', tags: 'KDIGO · TFG · Albuminuria · IECA/BRA · SGLT2', specialty: 'nefro', guideline: 'KDIGO 2024' },
+
+  // HEMATO
+  { id: 'tvp', icon: '🩸', name: 'TVP — diagnóstico e anticoagulação', tags: 'Wells · D-dímero · DOAC · Duração', specialty: 'hemato', guideline: 'ASH 2020' },
+  { id: 'plaquetopenia', icon: '🩸', name: 'Plaquetopenia aguda — investigação', tags: 'PTI · PTT · HIT · CIVD · Transfusão', specialty: 'hemato', guideline: 'ASH 2019' },
+  { id: 'anemia_inv', icon: '🩸', name: 'Anemia — investigação inicial', tags: 'VCM · RDW · Reticulócitos · Ferro · B12/folato', specialty: 'hemato', guideline: 'ASH 2023' },
+  { id: 'reacao_transf', icon: '🩸', name: 'Reação transfusional aguda', tags: 'Parar · Hemolítica · Febril · TRALI · TACO', specialty: 'hemato', guideline: 'AABB 2023' },
+  { id: 'reversao_anticoag', icon: '🩸', name: 'Reversão de anticoagulação por sangramento', tags: 'Vitamina K · CCP · Idarucizumab · Andexanet', specialty: 'hemato', guideline: 'ASH 2018' },
+
+  // REUMATO
+  { id: 'gota', icon: '🦶', name: 'Crise gotosa aguda', tags: 'AINE · Colchicina · Corticoide · Profilaxia', specialty: 'reumato', guideline: 'ACR 2020' },
+  { id: 'artrite_sept', icon: '🦴', name: 'Artrite séptica', tags: 'Artrocentese · Vancomicina · Ceftriaxone · Drenagem', specialty: 'reumato', guideline: 'BSR 2018' },
+  { id: 'lupus_grave', icon: '🦋', name: 'Lúpus — manifestações graves', tags: 'Nefrite · Pulsoterapia · Imunossupressão', specialty: 'reumato', guideline: 'EULAR 2023' },
+];
+
+let currentProtocol = null; // protocolo selecionado da biblioteca (se for o caso)
+let libActiveSpec = 'all';
+let libSearch = '';
+
+function renderLibrary() {
+  const tabs = document.getElementById('libraryTabs');
+  const grid = document.getElementById('libraryGrid');
+  const countEl = document.getElementById('libCount');
+  if (!tabs || !grid) return;
+
+  // Tabs
+  const specKeys = Object.keys(SPECIALTIES);
+  tabs.innerHTML = `<button class="library-tab ${libActiveSpec==='all'?'active':''}" data-spec="all">Todos</button>` +
+    specKeys.map(s => `<button class="library-tab ${libActiveSpec===s?'active':''}" data-spec="${s}">${SPECIALTIES[s].icon} ${SPECIALTIES[s].label}</button>`).join('');
+  tabs.querySelectorAll('.library-tab').forEach(t => {
+    t.onclick = () => { libActiveSpec = t.dataset.spec; renderLibrary(); };
+  });
+
+  // Filter
+  const q = libSearch.trim().toLowerCase();
+  const filtered = PROTOCOLS.filter(p => {
+    if (libActiveSpec !== 'all' && p.specialty !== libActiveSpec) return false;
+    if (q) {
+      const haystack = (p.name + ' ' + p.tags + ' ' + p.guideline).toLowerCase();
+      return haystack.includes(q);
+    }
+    return true;
+  });
+
+  if (countEl) countEl.textContent = `${filtered.length} ${filtered.length === 1 ? 'protocolo' : 'protocolos'}`;
+
+  grid.innerHTML = filtered.length ? filtered.map(p => `
+    <div class="protocol-card" data-id="${p.id}">
+      <div class="protocol-icon">${p.icon}</div>
+      <div class="protocol-info">
+        <div class="protocol-name">${escapeHtml(p.name)}</div>
+        <div class="protocol-tags">${escapeHtml(p.tags)}</div>
+      </div>
+      <div class="protocol-badge">${escapeHtml(p.guideline)}</div>
+    </div>
+  `).join('') : `<div class="library-empty">Nenhum protocolo encontrado para "${escapeHtml(libSearch)}".</div>`;
+
+  grid.querySelectorAll('.protocol-card').forEach(c => {
+    c.onclick = () => runProtocol(c.dataset.id);
+  });
+}
+
+function runProtocol(id) {
+  const p = PROTOCOLS.find(x => x.id === id);
+  if (!p) return;
+  currentProtocol = p;
+  setMode('protocolo');
+  run(p.name);
+}
+
+// ============ Mode toggle ============
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  document.querySelectorAll('.send-btn').forEach(b => {
+    b.classList.remove('socratic', 'caso', 'protocolo');
+    if (mode === 'socratica') b.classList.add('socratic');
+    if (mode === 'caso') b.classList.add('caso');
+    if (mode === 'protocolo') b.classList.add('protocolo');
+    const labels = {
+      direta: 'Analisar →',
+      socratica: 'Iniciar discussão →',
+      caso: 'Analisar caso →',
+      protocolo: 'Gerar protocolo →'
+    };
+    b.textContent = labels[mode] || 'Analisar →';
+  });
+  const profGroup = document.getElementById('profundidadeGroup');
+  if (profGroup) profGroup.style.display = (mode === 'direta') ? 'flex' : 'none';
+
+  const placeholders = {
+    direta: 'Ex: dor torácica, ICFEr descompensada, sepse, AVC isquêmico em janela...',
+    socratica: 'Ex: dor torácica, ICFEr descompensada, sepse, AVC isquêmico em janela...',
+    caso: 'Cole aqui a evolução do paciente — identificação, HMA, exame físico, exames, condutas atuais. Quanto mais dados, melhor a análise.',
+    protocolo: 'Ex: sepse, STEMI, anafilaxia, CAD... (ou escolha um protocolo na biblioteca abaixo)'
+  };
+  ['searchInput', 'searchInput2'].forEach(id => {
+    const inp = document.getElementById(id);
+    if (!inp) return;
+    inp.rows = mode === 'caso' ? 10 : 2;
+    inp.style.maxHeight = mode === 'caso' ? '400px' : '140px';
+    inp.placeholder = placeholders[mode];
+  });
+}
+document.querySelectorAll('.mode-btn').forEach(b => {
+  b.onclick = () => setMode(b.dataset.mode);
+});
+
+// ============ Sidebar ============
+function renderSide() {
+  const list = document.getElementById('sideList');
+  const items = currentTab === 'starred' ? history.filter(h => h.starred) : history;
+  if (!items.length) {
+    list.innerHTML = `<div class="empty-state">${currentTab === 'starred' ? 'Nenhum favorito ainda.' : 'Nenhuma consulta ainda. Comece digitando um sintoma ou síndrome.'}</div>`;
+    return;
+  }
+  list.innerHTML = items.map(h => `
+    <div class="history-item ${h.id === currentId ? 'active' : ''}" data-id="${h.id}">
+      <div class="history-content">
+        <div class="history-title">
+          <span class="mode-badge ${h.mode || 'direta'}">${({socratica:'Soc', caso:'Caso', direta:'Dir', protocolo:'Prot'})[h.mode || 'direta']}</span>
+          ${escapeHtml(h.query)}
+        </div>
+        <div class="history-date">${formatDate(h.date)}</div>
+      </div>
+      <button class="history-star ${h.starred ? 'starred' : ''}" data-star="${h.id}" title="Favoritar">${h.starred ? '★' : '☆'}</button>
+    </div>
+  `).join('');
+  list.querySelectorAll('.history-item').forEach(el => {
+    el.onclick = e => { if (!e.target.dataset.star) loadHistoric(el.dataset.id); };
+  });
+  list.querySelectorAll('[data-star]').forEach(el => {
+    el.onclick = e => {
+      e.stopPropagation();
+      const h = history.find(x => x.id === el.dataset.star);
+      h.starred = !h.starred;
+      saveHistory();
+      renderSide();
+    };
+  });
+}
+document.querySelectorAll('.side-tab').forEach(t => {
+  t.onclick = () => {
+    document.querySelectorAll('.side-tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    currentTab = t.dataset.tab;
+    renderSide();
+  };
+});
+
+function saveHistory() {
+  if (history.length > 80) history = history.slice(0, 80);
+  localStorage.setItem(LS_HIST, JSON.stringify(history));
+}
+
+function formatDate(d) {
+  const date = new Date(d), now = new Date();
+  const diff = (now - date) / 1000 / 60;
+  if (diff < 1) return 'agora';
+  if (diff < 60) return `há ${Math.floor(diff)} min`;
+  if (diff < 1440) return `há ${Math.floor(diff/60)}h`;
+  return date.toLocaleDateString('pt-BR');
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ============ Markdown render com Mermaid ============
+function md(text) {
+  // Extrai blocos mermaid ANTES de qualquer outro processamento
+  const mermaidBlocks = [];
+  text = text.replace(/```mermaid\s*([\s\S]*?)```/g, (m, code) => {
+    const idx = mermaidBlocks.length;
+    mermaidBlocks.push(code.trim());
+    return `\n\n@@MERMAID_${idx}@@\n\n`;
+  });
+
+  let html = escapeHtml(text);
+  html = html.replace(/```([\s\S]*?)```/g, (m, c) => `<pre><code>${c.trim()}</code></pre>`);
+  html = html.replace(/^### (.*$)/gm, '<h3>$1</h3>');
+  html = html.replace(/^## (.*$)/gm, (m, txt) => {
+    // Destaca seção "discussão com residente" / "preceptor" em laranja
+    if (/residente|preceptor|discussão com|ensino|roteiro para/i.test(txt)) {
+      return `<h2 class="preceptor-section">${txt}</h2>`;
+    }
+    return `<h2>${txt}</h2>`;
+  });
+  html = html.replace(/^# (.*$)/gm, '<h1>$1</h1>');
+  html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/^---+$/gm, '<hr>');
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  html = html.replace(/(^\|.+\|\n\|[-: |]+\|\n(?:^\|.+\|\n?)+)/gm, (m) => {
+    const lines = m.trim().split('\n');
+    const head = lines[0].split('|').slice(1, -1).map(c => `<th>${c.trim()}</th>`).join('');
+    const rows = lines.slice(2).map(l => '<tr>' + l.split('|').slice(1, -1).map(c => `<td>${c.trim()}</td>`).join('') + '</tr>').join('');
+    return `<table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>`;
+  });
+  html = html.replace(/((?:^[ \t]*[-*] .+\n?)+)/gm, m => {
+    const items = m.trim().split('\n').map(l => `<li>${l.replace(/^[ \t]*[-*] /, '')}</li>`).join('');
+    return `<ul>${items}</ul>`;
+  });
+  html = html.replace(/((?:^[ \t]*\d+\. .+\n?)+)/gm, m => {
+    const items = m.trim().split('\n').map(l => `<li>${l.replace(/^[ \t]*\d+\. /, '')}</li>`).join('');
+    return `<ol>${items}</ol>`;
+  });
+  html = html.split(/\n{2,}/).map(b => {
+    if (/^<(h\d|ul|ol|table|blockquote|hr|pre)/.test(b.trim())) return b;
+    if (/@@MERMAID_\d+@@/.test(b.trim())) return b;
+    return `<p>${b.trim().replace(/\n/g, '<br>')}</p>`;
+  }).join('\n');
+
+  // Substitui placeholders por containers Mermaid com controles
+  html = html.replace(/@@MERMAID_(\d+)@@/g, (m, i) => {
+    const code = mermaidBlocks[parseInt(i)];
+    const id = `mmd_${++mermaidCounter}`;
+    return `<div class="mermaid-wrap">
+      <div class="mermaid-label">
+        <span>🔀 Fluxograma de abordagem <span class="hint">— clique para ampliar</span></span>
+        <div class="mermaid-controls">
+          <button data-act="zoomout" data-tgt="${id}" title="Reduzir">−</button>
+          <button data-act="zoomin" data-tgt="${id}" title="Aumentar">＋</button>
+          <button data-act="reset" data-tgt="${id}" title="Tamanho original">⟲</button>
+          <button data-act="fullscreen" data-tgt="${id}" title="Tela cheia">⛶</button>
+        </div>
+      </div>
+      <div class="mermaid-scroll" data-tgt="${id}">
+        <div class="mermaid" id="${id}" data-source="${escapeHtml(code)}">${escapeHtml(code)}</div>
+      </div>
+    </div>`;
+  });
+  return html;
+}
+
+// Sanitiza código Mermaid antes do render — corrige os erros mais comuns que o LLM gera.
+function sanitizeMermaid(code) {
+  const cleanInside = (content) => content
+    .replace(/\(/g, ' ')        // ( vira espaço
+    .replace(/\)/g, '')          // ) some
+    .replace(/["']/g, '')        // aspas somem
+    .replace(/\s+/g, ' ')        // colapsa espaços múltiplos
+    .trim();
+  let out = code
+    // 1) Limpa parênteses/aspas dentro de [..] e {..}
+    .replace(/\[([^\]]+)\]/g, (m, c) => '[' + cleanInside(c) + ']')
+    .replace(/\{([^\}]+)\}/g, (m, c) => '{' + cleanInside(c) + '}')
+    // 2) Corrige sintaxe invertida de class: "B class critico" → "class B critico"
+    //    Aceita também listas: "A,B class critico" → "class A,B critico"
+    .replace(/^(\s*)([A-Za-z][A-Za-z0-9_,\s]*?)\s+class\s+([A-Za-z][A-Za-z0-9_]*)\s*;?\s*$/gm,
+      (m, indent, nodes, cls) => `${indent}class ${nodes.trim()} ${cls};`)
+    // 3) Garante ; ao fim de classDef/class (alguns parsers exigem)
+    .replace(/^(\s*)(classDef\s+[^\n;]+?)\s*$/gm, (m, indent, def) => `${indent}${def};`)
+    .replace(/^(\s*)(class\s+[A-Za-z][A-Za-z0-9_,\s]*\s+[A-Za-z][A-Za-z0-9_]*)\s*$/gm,
+      (m, indent, def) => `${indent}${def};`)
+    // 4) Corrige sintaxe de aresta com label sem | : "A --Sim--> B" → "A -->|Sim| B"
+    .replace(/([A-Za-z0-9_]+)\s*--\s*([^->\n|]+?)\s*-->\s*([A-Za-z0-9_]+)/g,
+      (m, a, lbl, b) => `${a} -->|${lbl.trim()}| ${b}`);
+  return out;
+}
+
+async function renderMermaidIn(container) {
+  const blocks = container.querySelectorAll('.mermaid');
+  for (const el of blocks) {
+    const raw = el.getAttribute('data-source').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,'&');
+    const code = sanitizeMermaid(raw);
+    const id = el.id + '_svg';
+    let success = false;
+    try {
+      const { svg } = await mermaid.render(id, code);
+      el.innerHTML = svg;
+      success = true;
+    } catch (err) {
+      // 2ª tentativa: simplificar mais agressivamente
+      try {
+        const code2 = code
+          .replace(/-->\|([^|]+)\|/g, (m, t) => `-->|${t.replace(/[^a-zA-Z0-9 áéíóúâêôãõçÁÉÍÓÚÂÊÔÃÕÇ]/g,'').slice(0,18)}|`)
+          .replace(/\[([^\]]+)\]/g, (m, t) => `[${t.replace(/[^\w \-áéíóúâêôãõçÁÉÍÓÚÂÊÔÃÕÇ]/g,'').slice(0,50)}]`);
+        const { svg } = await mermaid.render(id + '_2', code2);
+        el.innerHTML = svg;
+        success = true;
+      } catch (err2) {
+        el.innerHTML = `<div style="color:var(--danger); font-size:12px; text-align:left; padding:8px;">⚠ Não foi possível renderizar o fluxograma. Mostro o código abaixo (você pode copiar e colar em <a href="https://mermaid.live" target="_blank" style="color:var(--primary)">mermaid.live</a> para editar):<br><pre style="margin-top:8px; font-size:11px; max-height:300px; overflow:auto;">${escapeHtml(code)}</pre></div>`;
+      }
+    }
+    if (success) bindMermaidControls(el, code);
+  }
+}
+
+function bindMermaidControls(mermaidEl, code) {
+  const wrap = mermaidEl.closest('.mermaid-wrap');
+  if (!wrap) return;
+  const scroll = wrap.querySelector('.mermaid-scroll');
+  mermaidEl._scale = 1;
+
+  const applyZoom = (delta) => {
+    mermaidEl._scale = Math.max(0.5, Math.min(4, +(mermaidEl._scale + delta).toFixed(2)));
+    const svg = mermaidEl.querySelector('svg');
+    if (svg) svg.style.transform = `scale(${mermaidEl._scale})`;
+    // Ajustar tamanho do container interno para o scroll funcionar com o scale
+    mermaidEl.style.transform = `scale(1)`; // placeholder, scaling SVG é melhor
+  };
+  const resetZoom = () => {
+    mermaidEl._scale = 1;
+    const svg = mermaidEl.querySelector('svg');
+    if (svg) svg.style.transform = 'scale(1)';
+    if (scroll) { scroll.scrollLeft = 0; scroll.scrollTop = 0; }
+  };
+
+  wrap.querySelectorAll('.mermaid-controls button').forEach(b => {
+    if (b._bound) return;
+    b._bound = true;
+    b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const act = b.dataset.act;
+      if (act === 'zoomin') applyZoom(0.25);
+      else if (act === 'zoomout') applyZoom(-0.25);
+      else if (act === 'reset') resetZoom();
+      else if (act === 'fullscreen') openMermaidModal(code);
+    });
+  });
+
+  // Click no diagrama → tela cheia
+  if (scroll && !scroll._bound) {
+    scroll._bound = true;
+    scroll.addEventListener('click', (e) => {
+      if (e.target.closest('button')) return;
+      openMermaidModal(code);
+    });
+    // Ctrl/Cmd + scroll para zoom dentro do container
+    scroll.addEventListener('wheel', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        applyZoom(e.deltaY < 0 ? 0.1 : -0.1);
+      }
+    }, { passive: false });
+  }
+}
+
+async function openMermaidModal(code) {
+  // Remove modal anterior se existir
+  document.querySelectorAll('.mermaid-modal').forEach(m => m.remove());
+
+  const modal = document.createElement('div');
+  modal.className = 'mermaid-modal';
+  modal.innerHTML = `
+    <div class="mermaid-modal-bar">
+      <div class="mermaid-modal-title">🔀 Fluxograma de abordagem — tela cheia</div>
+      <div class="mermaid-modal-actions">
+        <button data-act="zoomout">−</button>
+        <button data-act="zoomin">＋</button>
+        <button data-act="reset">⟲ Original</button>
+        <button data-act="fit">⊡ Ajustar</button>
+        <button class="close" data-act="close">✕ Fechar (Esc)</button>
+      </div>
+    </div>
+    <div class="mermaid-modal-body" id="mmdModalBody">
+      <div class="mermaid" id="mmd_fs_target"></div>
+    </div>
+    <div class="mermaid-modal-zoom-badge" id="mmdZoomBadge">100%</div>
+  `;
+  document.body.appendChild(modal);
+  const target = modal.querySelector('#mmd_fs_target');
+  const body = modal.querySelector('#mmdModalBody');
+  const badge = modal.querySelector('#mmdZoomBadge');
+
+  try {
+    const { svg } = await mermaid.render('mmd_fs_svg_' + Date.now(), sanitizeMermaid(code));
+    target.innerHTML = svg;
+    let scale = 1.4; // começa um pouco maior pra leitura
+    const svgEl = target.querySelector('svg');
+    const apply = () => {
+      if (svgEl) svgEl.style.transform = `scale(${scale})`;
+      badge.textContent = Math.round(scale * 100) + '%';
+    };
+    apply();
+    modal.querySelector('[data-act="zoomin"]').onclick = () => { scale = Math.min(5, +(scale + 0.2).toFixed(2)); apply(); };
+    modal.querySelector('[data-act="zoomout"]').onclick = () => { scale = Math.max(0.4, +(scale - 0.2).toFixed(2)); apply(); };
+    modal.querySelector('[data-act="reset"]').onclick = () => { scale = 1; apply(); };
+    modal.querySelector('[data-act="fit"]').onclick = () => {
+      // Calcula escala para caber largura/altura
+      const rect = svgEl.getBoundingClientRect();
+      const naturalW = svgEl.viewBox?.baseVal?.width || svgEl.getBBox().width;
+      const naturalH = svgEl.viewBox?.baseVal?.height || svgEl.getBBox().height;
+      const availW = body.clientWidth - 48;
+      const availH = body.clientHeight - 48;
+      scale = Math.min(availW / naturalW, availH / naturalH);
+      apply();
+      body.scrollTop = 0; body.scrollLeft = 0;
+    };
+    modal.querySelector('[data-act="close"]').onclick = () => modal.remove();
+    // Esc
+    const escHandler = (e) => {
+      if (e.key === 'Escape') {
+        modal.remove();
+        document.removeEventListener('keydown', escHandler);
+      }
+    };
+    document.addEventListener('keydown', escHandler);
+    // Ctrl/Cmd + scroll zoom
+    body.addEventListener('wheel', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        scale = Math.max(0.4, Math.min(5, scale + (e.deltaY < 0 ? 0.1 : -0.1)));
+        apply();
+      }
+    }, { passive: false });
+  } catch (err) {
+    target.innerHTML = `<div style="color:#dc2626; padding:20px;">Erro ao renderizar em tela cheia: ${escapeHtml(err.message || String(err))}</div>`;
+  }
+}
+
+// ============ Prompts ============
+function ctxLabels(ctx, cenario) {
+  const ctxLabel = { adulto: 'paciente adulto', idoso: 'paciente idoso (≥65 anos)', gestante: 'gestante', pediatrico: 'paciente pediátrico' }[ctx];
+  const cenLabel = { emergencia: 'serviço de emergência', enfermaria: 'enfermaria', ambulatorio: 'ambulatório', uti: 'unidade de terapia intensiva' }[cenario];
+  return { ctxLabel, cenLabel };
+}
+
+function buildPromptDireto(query, ctx, cenario, profundidade) {
+  const { ctxLabel, cenLabel } = ctxLabels(ctx, cenario);
+  const profInstr = {
+    completa: 'Resposta COMPLETA e detalhada, com explicações fisiopatológicas e justificativas.',
+    resumida: 'Resposta RESUMIDA, focando em conduta prática (bullet points curtos).',
+    bullet: 'Resposta em BULLET POINTS objetivos, com doses e exames, sem explicação fisiopatológica.'
+  }[profundidade];
+
+  return `Você é um clínico geral sênior, professor de residência em Clínica Médica no Brasil, com domínio das diretrizes nacionais e internacionais mais recentes.
+
+**TAREFA:** Para o tema "${query}" em contexto de **${ctxLabel}** em **${cenLabel}**, elabore uma abordagem clínica completa.
+
+**FONTES OBRIGATÓRIAS:** Use o Google Search para consultar as diretrizes MAIS RECENTES (último ano possível). Priorize: SBC, SBD, SBP, FBG, SBN, SBPT, AMB, MS, AHA/ACC, ESC, IDSA, ATS, GOLD, GINA, KDIGO, ADA, NICE, Surviving Sepsis. Cite o ANO da diretriz.
+
+**${profInstr}**
+
+**ESTRUTURA OBRIGATÓRIA (markdown com cabeçalhos ##):**
+
+## 1. Definição e contexto clínico
+Conceito breve, classificação relevante.
+
+## 2. Fluxograma de abordagem
+Construa um fluxograma claro da abordagem completa (diagnóstico → estratificação → conduta → desfecho).
+Use a sintaxe Mermaid \`flowchart TD\`.
+🚨 REGRAS RÍGIDAS — descumprimento QUEBRA o fluxograma:
+- ❌ ZERO parênteses dentro de \`[...]\` ou \`{...}\`. Em vez de \`EDA (após preparo)\`, escreva \`EDA após preparo\`.
+- ❌ ZERO aspas dentro dos nós.
+- ✅ Texto curto (máx 6-7 palavras por nó).
+- ✅ Arestas com rótulo: \`A -->|Sim| B\` (NUNCA \`A --Sim--> B\`).
+- ✅ Use as classes de cor: classDef alerta fill:#fef3c7,stroke:#d97706; classDef critico fill:#fee2e2,stroke:#dc2626; classDef ok fill:#dcfce7,stroke:#16a34a;
+
+Exemplo de formato correto:
+\`\`\`mermaid
+flowchart TD
+    A[Paciente com dor torácica] --> B{Sinais de gravidade?}
+    B -->|Sim| C[Estabilização ABCDE]
+    B -->|Não| D[ECG + troponina]
+    C --> D
+    D --> E{ECG alterado?}
+    E -->|STEMI| F[Reperfusão imediata]:::critico
+    E -->|Normal| G[Estratificação HEART]
+    F --> H[Cateterismo - até 90min]
+    G --> I{Risco alto?}
+    I -->|Sim| J[Internação]:::alerta
+    I -->|Não| K[Alta com retorno]:::ok
+    classDef alerta fill:#fef3c7,stroke:#d97706;
+    classDef critico fill:#fee2e2,stroke:#dc2626;
+    classDef ok fill:#dcfce7,stroke:#16a34a;
+\`\`\`
+
+## 3. Abordagem diagnóstica
+### Anamnese dirigida (sintomas-chave, fatores de risco, red flags)
+### Exame físico (achados específicos, sinais de gravidade)
+### Critérios diagnósticos (formais quando aplicáveis)
+### Exames complementares (laboratoriais + imagem, justificados)
+### Diagnósticos diferenciais
+
+## 4. Estratificação de gravidade / risco
+Escores aplicáveis (CURB-65, PESI, GRACE, TIMI, MEWS, qSOFA etc) com cortes e conduta.
+
+## 5. Tratamento
+### Medidas iniciais (ABCDE quando aplicável)
+### Tratamento farmacológico
+Tabela com: droga | dose | via | duração | observações. SEMPRE com doses específicas.
+### Tratamento não-farmacológico
+### Manejo de complicações
+
+## 6. Critérios de internação / alta / UTI
+
+## 7. Seguimento
+
+## 8. Pearls para preceptoria
+3-5 pontos de ouro para discussão com residentes (armadilhas, controvérsias, atualizações recentes — marcar com **⚠ Atualização recente:**).
+
+## 9. Referências
+Liste as diretrizes consultadas com ANO.
+
+**REGRAS:** linguagem técnica; doses específicas em mg/kg ou mg; classes de evidência quando relevante; adaptar para realidade brasileira (SUS); NÃO inventar referências.`;
+}
+
+function buildPromptSocraticoInicial(query, ctx, cenario) {
+  const { ctxLabel, cenLabel } = ctxLabels(ctx, cenario);
+  return `Você é um preceptor SÊNIOR de Clínica Médica conduzindo uma DISCUSSÃO SOCRÁTICA com um residente sobre "${query}" em contexto de ${ctxLabel} em ${cenLabel}.
+
+REGRAS DESTA PRIMEIRA MENSAGEM:
+1. NÃO entregue conduta pronta. NÃO faça lista de exames/tratamento. Conduza por perguntas.
+2. Apresente um CASO CLÍNICO REALISTA breve (3-5 linhas) com:
+   - Dados demográficos
+   - Queixa principal + HMA com dados PARCIAIS (omita propositadamente algo importante para o residente perguntar)
+   - 1-2 sinais vitais e/ou exame físico inicial
+3. Use Google Search para garantir verossimilhança com as diretrizes atuais sobre "${query}".
+4. Após o caso, faça UMA pergunta inicial aberta em **negrito** no final, do tipo: "Qual sua hipótese diagnóstica principal e o que você pediria de inicial — e por quê?"
+
+FORMATO:
+## 🩺 Caso clínico
+(narrativa do caso)
+
+**Pergunta:** (sua pergunta em negrito)
+
+Mantenha tom cordial mas técnico. 6-12 linhas no total. NÃO inclua fluxograma nesta etapa — fluxograma aparece apenas no fechamento da discussão.`;
+}
+
+function buildSocraticSystemContext(query, ctx, cenario) {
+  const { ctxLabel, cenLabel } = ctxLabels(ctx, cenario);
+  return `Você é um preceptor SÊNIOR de Clínica Médica conduzindo uma DISCUSSÃO SOCRÁTICA com um residente sobre "${query}" em ${ctxLabel} em ${cenLabel}.
+
+REGRAS A CADA RESPOSTA DO RESIDENTE:
+1. AVALIE criticamente a resposta dele em formato estruturado:
+   ✅ **Acertos:** (o que está correto)
+   ⚠️ **Lacunas/erros:** (o que faltou ou está errado, sempre com justificativa baseada em diretriz)
+   💡 **Aprofundamento:** (1-2 pontos adicionais relevantes — fisiopatologia, mecanismo, ou pearl clínica)
+2. Cite a diretriz/evidência (ano) quando aplicável. Use Google Search se necessário.
+3. AVANCE o caso revelando novos dados (resultado de exame, evolução clínica) — em bloco "## 📋 Evolução do caso" — quando fizer sentido na progressão.
+4. Faça a PRÓXIMA pergunta em **negrito** no final.
+
+PROGRESSÃO LÓGICA das perguntas (não pule etapas):
+turno 1: hipóteses + raciocínio diagnóstico
+turno 2: exames complementares + interpretação
+turno 3: estratificação de gravidade/risco (escores)
+turno 4: conduta inicial / tratamento empírico
+turno 5: reavaliação / complicações
+turno 6: critérios de internação/UTI/alta
+turno 7-8: seguimento ambulatorial
+
+QUANDO ENCERRAR (após ~6-8 turnos, ou se o residente pedir, ou se mandar "encerrar"):
+Em vez de nova pergunta, faça o **FECHAMENTO** completo:
+## 🎯 Fechamento da discussão
+### Resumo dos pontos-chave (5-7 bullets do que foi aprendido)
+### Fluxograma da abordagem
+\`\`\`mermaid
+flowchart TD
+   ...(diagrama completo, MESMA sintaxe estrita do prompt direto — sem parênteses/aspas dentro de nós, use -->|texto| para arestas rotuladas)
+\`\`\`
+### Referências utilizadas (com ANO)
+
+Linguagem técnica, cordial. Não seja arrogante; reconheça acertos. Nunca invente referência.`;
+}
+
+function buildPromptCaso(evolucao, ctx, cenario) {
+  const { ctxLabel, cenLabel } = ctxLabels(ctx, cenario);
+  return `Você é um clínico SÊNIOR, professor de residência em Clínica Médica no Brasil. Quem está te perguntando é o **PRECEPTOR** (NÃO o residente). O preceptor vai discutir o caso abaixo com o residente AGORA e precisa de orientação DIRETA do que abordar.
+
+**Contexto:** ${ctxLabel} em ${cenLabel}.
+
+**EVOLUÇÃO DO PACIENTE (colada pelo preceptor):**
+"""
+${evolucao}
+"""
+
+🚫 **REGRA-OURO ABSOLUTA:** O preceptor JÁ LEU/ESCREVEU essa evolução. Ele NÃO precisa de resumo. **NÃO** narre o caso, **NÃO** liste "identificação / HMA / exame físico", **NÃO** descreva o paciente. Vá DIRETO ao que abordar e discutir.
+
+**FONTES:** Use Google Search para checar as diretrizes mais recentes aplicáveis (SBC, SBD, AMB, MS, AHA/ACC, ESC, IDSA, ATS, GOLD, GINA, KDIGO, ADA, NICE, Surviving Sepsis). Cite ANO.
+
+**ESTRUTURA OBRIGATÓRIA — siga EXATAMENTE esta ordem, sem inventar seções extras:**
+
+## ✅ Problemas ativos identificados
+Lista curta (1 linha por item, máx 7 itens). Apenas para o preceptor conferir se a IA leu certo o caso. NÃO detalhar. Formato: \`- [Problema]: [achado-âncora de 1 frase]\`.
+
+## 🎯 O que abordar com o residente (PRIORIDADES)
+5-8 tópicos em ordem de prioridade clínica/didática. Cada um:
+- **Tópico:** uma frase objetiva (substantiva, ação)
+- **Por que discutir:** o conceito/raciocínio que o residente precisa exercitar nesse caso específico
+- **O residente deve saber/citar:** 2-3 bullets curtos do que ele precisa demonstrar
+
+## ❓ Perguntas para fazer ao residente (prontas para uso)
+6-10 perguntas DIRETAS, na 2ª pessoa, prontas para serem lidas ao residente. Em ordem progressiva. Agrupar por sub-tópico (use ### Diagnóstico, ### Exames, ### Conduta, ### Reavaliação/seguimento).
+Para cada pergunta, em itálico abaixo: *resposta esperada: [breve, 1 linha]* e *armadilha: [o que observar se ele errar]*.
+
+## ⚠️ Armadilhas específicas DESSE caso
+3-5 erros típicos que o residente pode cometer COM ESTE CASO. Para cada:
+- **O erro:** (qual)
+- **Como ele vai se manifestar:** (o que o residente vai dizer/pedir/prescrever)
+- **Correção pelo preceptor:** (intervenção curta, fala pronta se possível)
+
+## 💊 Condutas — o que está OK, o que ajustar, o que falta
+Tabela ou lista com 3 colunas/categorias claras:
+- ✅ **Adequado:** condutas atuais que estão certas (1 linha cada, com diretriz/ano)
+- 🔧 **Ajustar:** condutas que precisam ser corrigidas (dose errada, via, frequência, droga inadequada). Para cada: dose/via/frequência CORRETA + justificativa em diretriz
+- ➕ **Faltando:** condutas/exames/monitorização que deveriam ter sido feitos e não foram
+
+## 🎓 Pearls específicos deste paciente
+3-5 pontos de ouro que SÓ ESSE CASO permite ensinar bem. Evite pearls genéricos da doença — quero pearls que esse paciente em particular destaca (achado peculiar, combinação incomum, evolução atípica, decisão difícil).
+
+## 🔀 Fluxograma do raciocínio ideal para este caso
+Mermaid \`flowchart TD\` específico do caso.
+
+🚨 **REGRAS RÍGIDAS DE SINTAXE DO MERMAID** (descumprimento quebra a renderização):
+- ❌ **ZERO parênteses** dentro de \`[...]\` ou \`{...}\`. Se quiser dizer "EDA (após preparo)", escreva \`EDA após preparo\` ou \`EDA pós preparo\`.
+- ❌ **ZERO aspas** dentro dos nós.
+- ✅ Texto curto (máx 6 palavras por nó).
+- ✅ Arestas com rótulo: \`A -->|Sim| B\` (NUNCA \`A --Sim--> B\`).
+- ✅ Use classes obrigatórias ao final:
+  \`\`\`
+  classDef alerta fill:#fef3c7,stroke:#d97706;
+  classDef critico fill:#fee2e2,stroke:#dc2626;
+  classDef ok fill:#dcfce7,stroke:#16a34a;
+  \`\`\`
+
+EXEMPLO CORRETO:
+\`\`\`mermaid
+flowchart TD
+    A[Bicitopenia + anemia grave] --> B{Causa central ou periférica?}
+    B -->|Periférica| C[Coombs + reticulócitos]
+    B -->|Central| D[Mielograma]
+    C --> E{Hemólise?}
+    E -->|Sim| F[Investigar AHAI]:::alerta
+    E -->|Não| G[Pesquisar sangramento TGI]
+    G --> H[EDA + colono + SOF]:::alerta
+    classDef alerta fill:#fef3c7,stroke:#d97706;
+    classDef critico fill:#fee2e2,stroke:#dc2626;
+    classDef ok fill:#dcfce7,stroke:#16a34a;
+\`\`\`
+
+## 📚 Referências
+Diretrizes consultadas com ANO. Formato: \`- [Sociedade] Guideline [tema] [ANO]\`.
+
+**REGRAS GERAIS:**
+- Tom: clínico→clínico (técnico, direto, sem suavização nem didatismo excessivo).
+- DOSES sempre específicas (mg/kg ou mg + via + frequência + duração).
+- Se a evolução tiver erro médico óbvio (dose errada, droga contraindicada, exame esquecido), aponte na seção 💊 SEM julgamento moral, só técnico.
+- Adapte ao SUS quando aplicável (genéricos, medicações da REMUME).
+- **NÃO invente dados.** Se faltar informação crítica, sinalize na seção ⚠️ com "*informação ausente na evolução — pedir ao residente para checar*".
+- Se a evolução estiver muito pobre, diga isso de cara após a seção ✅ e siga com o que dá.`;
+}
+
+function buildPromptProtocolo(name, ctx, cenario, protocolMeta) {
+  const { ctxLabel, cenLabel } = ctxLabels(ctx, cenario);
+  const hint = protocolMeta
+    ? `O preceptor selecionou da biblioteca: **${protocolMeta.name}** (especialidade: ${SPECIALTIES[protocolMeta.specialty]?.label}). Use prioritariamente a diretriz "${protocolMeta.guideline}" mas confirme via Google Search se há atualização mais recente.`
+    : `O preceptor digitou: **${name}**. Identifique a diretriz mais atual aplicável.`;
+
+  return `Você é um clínico SÊNIOR com expertise em medicina de urgência/emergência. O usuário é um **PRECEPTOR** que precisa de um protocolo OPERACIONAL passo-a-passo para "${name}" em ${ctxLabel} em ${cenLabel}.
+
+${hint}
+
+🎯 **TIPO DE RESPOSTA:** Protocolo de execução, NÃO textbook. Estilo runbook clínico — o que fazer, na ordem certa, com **tempos**, **doses específicas** e **decisões claras**. Sem explicações fisiopatológicas longas. Direto ao ponto.
+
+**FONTES OBRIGATÓRIAS:** Google Search — use a diretriz MAIS RECENTE. Priorize sociedades reconhecidas (AHA, ACC, ESC, IDSA, ATS, GOLD, GINA, KDIGO, ADA, ATA, ACG, NICE, Surviving Sepsis, SBC, SBD, SBP, AMB, MS). **Cite o ANO** em todas as referências e fluxos de decisão.
+
+**ESTRUTURA OBRIGATÓRIA (markdown com ##, EXATAMENTE nesta ordem):**
+
+## 🏷️ Diretriz de referência
+1-2 linhas: Sociedade · Título · ANO. Se houver atualização recente importante, marque com **⚠ Atualização [ANO]:**.
+
+## ⚡ TL;DR — ações críticas (primeiros 60 minutos)
+3-6 bullets ULTRA-objetivos com ações imediatas. Cada um inclui dose/tempo/alvo quando aplicável. Ex: "Adrenalina 0,5mg IM imediatamente. Repetir a cada 5-15 min se sem resposta."
+
+## 🔍 Passo 1 — Reconhecimento e triagem
+- **Sinais de alarme (red flags):** lista bullet
+- **Critérios diagnósticos rápidos** (escores ou achados-chave)
+- **Diferenciais que mudam conduta imediata** (1 linha cada)
+
+## 🚑 Passo 2 — Estabilização (ABCDE)
+Apenas o que for relevante. Não force ABCDE em condição ambulatorial.
+- **A** — via aérea: ações concretas
+- **B** — respiração: SatO2 alvo, ofertas de O2 com fluxos
+- **C** — circulação: acessos, monitorização, fluidos
+- **D** — disfunção neurológica: Glasgow, glicemia, naloxone se aplicável
+- **E** — exposição: temperatura, prevenção
+
+## 🧪 Passo 3 — Exames complementares prioritários
+Tabela markdown obrigatória: \`| Exame | Prazo | Objetivo |\`. Em ordem de prioridade.
+
+## 📊 Passo 4 — Estratificação de risco/gravidade
+Escores aplicáveis com **pontos de corte explícitos** e **conduta por faixa** (Tabela).
+
+## 💊 Passo 5 — Tratamento de primeira linha
+Tabela obrigatória: \`| Droga | Dose | Via | Frequência/Duração | Observações/Evidência |\`
+**Doses SEMPRE específicas** (em mg, mg/kg, UI; via; intervalo; duração total). Indicar classe de evidência (I/IIa/IIb e A/B/C) quando relevante.
+
+## 🔄 Passo 6 — Reavaliações cronometradas
+Em **1h**, **6h**, **24h**: o que medir, o que fazer se piora, o que fazer se melhora.
+
+## ⚠️ Passo 7 — Quando escalar / chamar especialidade
+Critérios OBJETIVOS para acionar UTI, cirurgia, hemodinâmica, intervencionista, hematologia etc.
+
+## 🏥 Passo 8 — Critérios de internação / UTI / alta
+Lista clara dos 3.
+
+## 📅 Passo 9 — Seguimento pós-alta
+Quando reavaliar, com quem, exames de controle, ajustes terapêuticos.
+
+## 🔀 Fluxograma operacional
+Mermaid \`flowchart TD\` do protocolo todo.
+🚨 SINTAXE RÍGIDA:
+- ZERO parênteses dentro de [...] ou {...}. Em vez de "EDA (após preparo)" → "EDA após preparo".
+- ZERO aspas dentro de nós.
+- Texto curto (máx 6 palavras/nó).
+- Arestas com rótulo: \`A -->|Sim| B\` (NUNCA \`A --Sim--> B\`).
+- Classes obrigatórias ao final:
+  classDef alerta fill:#fef3c7,stroke:#d97706;
+  classDef critico fill:#fee2e2,stroke:#dc2626;
+  classDef ok fill:#dcfce7,stroke:#16a34a;
+
+## 📚 Referências
+Lista com ANO. Formato: \`- [Sociedade] Título da diretriz (ANO) — link se possível\`.
+
+**REGRAS GERAIS:**
+- Tom de protocolo (imperativo, direto). Verbos no infinitivo OK.
+- Doses sempre específicas e completas.
+- Tempos sempre explícitos (em minutos/horas).
+- SUS/realidade brasileira quando aplicável (genéricos da REMUME, escalas disponíveis).
+- Marcar com **⚠ Atualização [ANO]:** qualquer conduta que mudou nos últimos 2-3 anos.
+- NÃO inventar referências.`;
+}
+
+// ============ Chamada Gemini com retry ============
+const TRANSIENT_STATUSES = [429, 500, 502, 503, 504];
+
+async function callGemini(contents, opts = {}) {
+  if (!apiKey) {
+    openApiModal();
+    throw new Error('Configure a API key primeiro.');
+  }
+
+  const usedModel = opts.model || model;
+  const maxRetries = opts.maxRetries ?? 3;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${usedModel}:generateContent?key=${apiKey}`;
+  const body = {
+    contents,
+    tools: [{ google_search: {} }],
+    generationConfig: { temperature: 0.4, topP: 0.95, maxOutputTokens: 8192 }
+  };
+
+  let lastStatus = 0, lastErrText = '';
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    let res;
+    try {
+      res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    } catch (netErr) {
+      // erro de rede — tenta de novo
+      lastErrText = netErr.message || 'falha de rede';
+      lastStatus = 0;
+      if (attempt < maxRetries) {
+        const wait = 1500 * Math.pow(2, attempt);
+        updateLoadingSub(`⚠ Falha de rede. Tentando de novo em ${Math.round(wait/1000)}s...`);
+        await sleep(wait);
+        continue;
+      }
+      throw new Error('Falha de conexão com o Gemini: ' + lastErrText);
+    }
+
+    if (res.ok) {
+      const data = await res.json();
+      const cand = data.candidates?.[0];
+      if (!cand) throw new Error('Sem resposta do modelo (resposta vazia).');
+      const text = cand.content?.parts?.map(p => p.text).filter(Boolean).join('\n') || '';
+      const grounding = cand.groundingMetadata || {};
+      const sources = (grounding.groundingChunks || []).map(c => c.web).filter(Boolean).map(w => ({ title: w.title, uri: w.uri }));
+      return { text, sources, usedModel };
+    }
+
+    lastStatus = res.status;
+    lastErrText = await res.text();
+
+    if (TRANSIENT_STATUSES.includes(res.status) && attempt < maxRetries) {
+      const wait = Math.min(2000 * Math.pow(2, attempt), 12000);
+      updateLoadingSub(`⚠ Modelo sobrecarregado (HTTP ${res.status}). Aguardando ${Math.round(wait/1000)}s para tentar de novo (tentativa ${attempt+2}/${maxRetries+1})...`);
+      await sleep(wait);
+      continue;
+    }
+
+    break; // não-transient ou esgotou retries
+  }
+
+  // Construir mensagem friendly
+  const err = new Error(buildFriendlyError(lastStatus, lastErrText, usedModel));
+  err.status = lastStatus;
+  err.model = usedModel;
+  throw err;
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function updateLoadingSub(text) {
+  const el = document.querySelector('.loading-sub');
+  if (el) el.innerHTML = escapeHtml(text);
+}
+
+function buildFriendlyError(status, raw, usedModel) {
+  if (status === 503 || status === 429) {
+    return `O modelo "${usedModel}" está sobrecarregado no momento (HTTP ${status} — UNAVAILABLE / quota). Não é a sua chave. Sugestões: aguardar 1-2 min e refazer, OU trocar para outro modelo (botão abaixo).`;
+  }
+  if (status === 401 || status === 403) {
+    return `Chave de API rejeitada (HTTP ${status}). Confira em https://aistudio.google.com/app/apikey se a chave está ativa e tem acesso ao modelo escolhido.`;
+  }
+  if (status === 400) {
+    // Provável problema na requisição (grounding indisponível, conteúdo bloqueado, etc)
+    const safetyHint = /safety|blocked/i.test(raw) ? '\nO conteúdo pode ter sido bloqueado por filtros de segurança.' : '';
+    return `Requisição inválida (HTTP 400).${safetyHint}\nDetalhe técnico: ${raw.slice(0, 250)}`;
+  }
+  if (status === 404) {
+    return `Modelo "${usedModel}" não encontrado (HTTP 404). Talvez tenha sido descontinuado — troque nas configurações (⚙).`;
+  }
+  if (!status) return `Falha de conexão: ${raw.slice(0, 200)}`;
+  return `Erro Gemini (HTTP ${status}): ${raw.slice(0, 250)}`;
+}
+
+// ============ Render: MODO DIRETO ============
+function showLoading(query, mode) {
+  document.getElementById('welcomeView').style.display = 'none';
+  document.getElementById('resultView').style.display = 'block';
+  const spinnerCls = mode === 'socratica' ? 'spinner purple' : 'spinner';
+  const labels = {
+    direta: { title: 'Consultando diretrizes para', sub: 'Buscando guidelines mais recentes (15-40s)...' },
+    socratica: { title: 'Iniciando discussão sobre', sub: 'Preparando o caso clínico...' },
+    caso: { title: 'Analisando evolução do paciente', sub: 'Identificando problemas ativos, hipóteses e montando roteiro de discussão (20-50s)...' },
+    protocolo: { title: 'Gerando protocolo passo-a-passo para', sub: 'Consultando a diretriz mais recente e montando fluxograma operacional (20-50s)...' }
+  };
+  const { title, sub } = labels[mode] || labels.direta;
+  const displayQ = mode === 'caso' ? (query.length > 100 ? query.slice(0, 100) + '…' : query) : query;
+  document.getElementById('resultContainer').innerHTML = `
+    <div class="loading">
+      <div class="${spinnerCls}"></div>
+      <div class="loading-text"><strong>${title}${mode === 'caso' ? '' : ':'}</strong> ${mode === 'caso' ? '' : escapeHtml(displayQ)}</div>
+      <div class="loading-sub">${sub}</div>
+    </div>
+  `;
+}
+
+function renderSourcesHtml(sources) {
+  if (!sources?.length) return '';
+  return `
+    <div class="sources">
+      <div class="sources-title">📚 Fontes consultadas (Google Search)</div>
+      ${sources.map((s, i) => `
+        <a href="${escapeHtml(s.uri)}" target="_blank" rel="noopener" class="source-item">
+          <span class="src-num">${i+1}</span>${escapeHtml(s.title || s.uri)}
+        </a>`).join('')}
+    </div>
+  `;
+}
+
+async function renderResultDireto(item) {
+  const { query, text, sources, ctxLabel, cenarioLabel, date, mode, protocolMeta } = item;
+  const isCaso = mode === 'caso';
+  const isProto = mode === 'protocolo';
+  const badgeCls = isCaso ? 'caso' : isProto ? 'protocolo' : 'direta';
+  const badgeText = isCaso ? 'Análise de caso real' : isProto ? 'Protocolo passo-a-passo' : 'Conduta direta';
+  const alertCls = isCaso ? 'alert-caso' : 'alert-info';
+  const alertIcon = isCaso ? '📄' : isProto ? '📚' : 'ℹ';
+  const alertText = isCaso
+    ? 'Análise gerada por IA a partir da evolução colada. Sempre <strong>cruze com seu exame físico e contexto do paciente</strong>. A IA não vê o paciente — não substitui sua avaliação clínica.'
+    : isProto
+      ? `Protocolo gerado em tempo real com base na diretriz mais recente${protocolMeta ? ` (<strong>${escapeHtml(protocolMeta.guideline)}</strong>)` : ''}. Doses e condutas são referência — sempre adapte ao seu paciente.`
+      : 'Conteúdo gerado por IA com base em busca em tempo real. Sempre <strong>valide criticamente</strong> com a fonte primária e o contexto do paciente. Não substitui julgamento clínico.';
+  const titleDisplay = isCaso
+    ? (query.length > 80 ? escapeHtml(query.slice(0, 80)) + '…' : escapeHtml(query))
+    : escapeHtml(query);
+
+  document.getElementById('resultContainer').innerHTML = `
+    <div class="result">
+      <div class="result-header">
+        <div style="flex:1;min-width:0;">
+          <div class="result-title">${isCaso ? 'Caso clínico' : titleDisplay} <span class="badge ${badgeCls}">${badgeText}</span></div>
+          <div class="result-meta">${ctxLabel} • ${cenarioLabel} • ${formatDate(date)}${isCaso ? ` • <span title="${escapeHtml(query)}">${query.length} caracteres na evolução</span>` : ''}${isProto && protocolMeta ? ` • <strong style="color:var(--success)">${escapeHtml(protocolMeta.guideline)}</strong>` : ''}</div>
+        </div>
+        <div class="result-actions">
+          ${isCaso ? '<button class="action-btn" id="viewEvolBtn">📄 Ver evolução</button>' : ''}
+          <button class="action-btn" id="copyBtn">📋 Copiar</button>
+          <button class="action-btn" id="printBtn">🖨 PDF</button>
+          <button class="action-btn" id="refreshBtn">🔄 Refazer</button>
+        </div>
+      </div>
+      <div class="alert ${alertCls}">
+        <span>${alertIcon}</span>
+        <div>${alertText}</div>
+      </div>
+      <div class="content">${md(text)}</div>
+      ${renderSourcesHtml(sources)}
+    </div>
+  `;
+  await renderMermaidIn(document.getElementById('resultContainer'));
+  document.getElementById('copyBtn').onclick = () => {
+    navigator.clipboard.writeText(text);
+    const b = document.getElementById('copyBtn');
+    b.textContent = '✓ Copiado'; setTimeout(() => b.textContent = '📋 Copiar', 1500);
+  };
+  document.getElementById('printBtn').onclick = () => window.print();
+  document.getElementById('refreshBtn').onclick = () => run(query);
+  const ve = document.getElementById('viewEvolBtn');
+  if (ve) ve.onclick = () => {
+    alert('Evolução colada:\n\n' + query);
+  };
+}
+
+// ============ Render: MODO SOCRÁTICO ============
+async function renderSocratic(item) {
+  const { query, messages, ctxLabel, cenarioLabel, date } = item;
+  const isFinished = item.finished;
+  document.getElementById('resultContainer').innerHTML = `
+    <div class="result-header" style="max-width:900px;margin:0 auto 16px;">
+      <div>
+        <div class="result-title">${escapeHtml(query)} <span class="badge socratica">Discussão socrática</span></div>
+        <div class="result-meta">${ctxLabel} • ${cenarioLabel} • ${formatDate(date)} • ${messages.filter(m=>m.role==='user').length} respostas</div>
+      </div>
+      <div class="result-actions">
+        <button class="action-btn" id="printBtn">🖨 PDF</button>
+        <button class="action-btn" id="refreshBtn">🔄 Reiniciar</button>
+      </div>
+    </div>
+    <div class="alert alert-socratic" style="max-width:900px;margin:0 auto 16px;">
+      <span>🎓</span>
+      <div>Modo socrático ativo. Responda às perguntas como faria um residente — a IA vai avaliar suas respostas, complementar e avançar o caso até o fechamento.</div>
+    </div>
+    <div class="chat-container" id="chatContainer"></div>
+    ${isFinished ? '' : `
+    <div class="followup-box" id="followupBox">
+      <div class="followup-label">🎤 Sua resposta como residente</div>
+      <div class="followup-wrap">
+        <textarea class="followup-input" id="followupInput" rows="2" placeholder="Digite sua resposta..."></textarea>
+        <div class="followup-actions">
+          <button class="followup-send" id="followupSend">Enviar →</button>
+          <button class="followup-finish" id="followupFinish">Encerrar</button>
+        </div>
+      </div>
+    </div>`}
+  `;
+  await renderChatMessages();
+  if (!isFinished) bindFollowup();
+  document.getElementById('printBtn').onclick = () => window.print();
+  document.getElementById('refreshBtn').onclick = () => run(query);
+}
+
+async function renderChatMessages() {
+  const container = document.getElementById('chatContainer');
+  if (!container || !currentConversation) return;
+  container.innerHTML = currentConversation.messages.map((m, i) => `
+    <div class="chat-message ${m.role === 'user' ? 'user' : 'ai'}">
+      <div class="chat-avatar">${m.role === 'user' ? 'R' : '🎓'}</div>
+      <div class="chat-bubble">
+        <div class="content">${m.role === 'user' ? `<p>${escapeHtml(m.text).replace(/\n/g,'<br>')}</p>` : md(m.text)}</div>
+        ${m.role === 'ai' && m.sources?.length ? renderSourcesHtml(m.sources) : ''}
+      </div>
+    </div>
+  `).join('');
+  await renderMermaidIn(container);
+  // scroll para o último
+  setTimeout(() => container.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 50);
+}
+
+function bindFollowup() {
+  const inp = document.getElementById('followupInput');
+  const btn = document.getElementById('followupSend');
+  const fin = document.getElementById('followupFinish');
+  if (!inp) return;
+  const send = () => {
+    const txt = inp.value.trim();
+    if (!txt) return;
+    continueSocratic(txt);
+  };
+  btn.onclick = send;
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
+  fin.onclick = () => continueSocratic('Por favor encerre a discussão agora e faça o fechamento completo com resumo, fluxograma e referências.', true);
+  inp.focus();
+}
+
+async function continueSocratic(userText, isFinishing = false) {
+  if (!currentConversation) return;
+  // Adiciona mensagem do usuário
+  currentConversation.messages.push({ role: 'user', text: userText });
+  // mostra a mensagem antes de chamar API
+  await renderChatMessages();
+
+  // adiciona placeholder de "digitando"
+  const container = document.getElementById('chatContainer');
+  const typingEl = document.createElement('div');
+  typingEl.className = 'chat-message ai';
+  typingEl.innerHTML = `
+    <div class="chat-avatar">🎓</div>
+    <div class="chat-bubble">
+      <div class="typing-indicator"><span></span><span></span><span></span></div>
+      <div style="font-size:12px;color:var(--text-mute);margin-top:6px;">Analisando sua resposta e consultando diretrizes...</div>
+    </div>`;
+  container.appendChild(typingEl);
+  document.getElementById('followupInput').value = '';
+  document.getElementById('followupInput').disabled = true;
+  document.getElementById('followupSend').disabled = true;
+  typingEl.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+  // Constrói o contents para a API: sistema (na 1ª user msg) + conversa
+  const contents = [];
+  const sysCtx = buildSocraticSystemContext(currentConversation.query, currentConversation.ctx, currentConversation.cenario);
+  // Primeira mensagem do user já é o caso inicial pedido; mensagens seguintes do user são respostas reais
+  currentConversation.messages.forEach((m, i) => {
+    if (i === 0 && m.role === 'user') {
+      contents.push({ role: 'user', parts: [{ text: m.text }] });
+    } else {
+      contents.push({ role: m.role === 'ai' ? 'model' : 'user', parts: [{ text: m.text }] });
+    }
+  });
+  // Reforço de instrução no último user turn
+  if (isFinishing) {
+    contents[contents.length-1].parts[0].text += '\n\n[INSTRUÇÃO DO SISTEMA: encerre agora. Faça o FECHAMENTO completo conforme regras: resumo, fluxograma Mermaid e referências. NÃO faça mais perguntas.]';
+  } else {
+    contents[contents.length-1].parts[0].text += `\n\n[CONTEXTO SISTEMA: ${sysCtx}]`;
+  }
+
+  try {
+    const { text, sources } = await callGemini(contents);
+    currentConversation.messages.push({ role: 'ai', text, sources });
+    if (isFinishing || /## 🎯 Fechamento/i.test(text)) currentConversation.finished = true;
+    // Salva no histórico
+    const idx = history.findIndex(h => h.id === currentConversation.id);
+    if (idx >= 0) history[idx] = { ...currentConversation, date: currentConversation.date };
+    saveHistory();
+    typingEl.remove();
+    await renderSocratic(currentConversation);
+  } catch (err) {
+    typingEl.remove();
+    document.getElementById('followupInput').disabled = false;
+    document.getElementById('followupSend').disabled = false;
+    // Remove a mensagem do user que falhou para o usuário poder reenviar
+    if (currentConversation.messages[currentConversation.messages.length-1]?.role === 'user') {
+      const lastUser = currentConversation.messages.pop();
+      document.getElementById('followupInput').value = lastUser.text;
+    }
+    // Mostrar erro inline como uma mensagem temporária
+    const container = document.getElementById('chatContainer');
+    const errEl = document.createElement('div');
+    errEl.className = 'alert alert-warn';
+    errEl.style.cssText = 'margin-top:12px;';
+    const isOverload = err.status === 503 || err.status === 429;
+    const altModels = ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-2.5-pro'].filter(m => m !== model);
+    errEl.innerHTML = `
+      <span>⚠</span>
+      <div>
+        <strong>Erro:</strong> ${escapeHtml(err.message).replace(/\n/g,'<br>')}
+        <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
+          ${isOverload ? altModels.map(m => `<button class="btn-secondary" style="font-size:12px; padding:6px 10px;" data-altm="${m}">⚡ Trocar para ${m}</button>`).join('') : ''}
+        </div>
+        <div style="margin-top:6px; font-size:12px; color:var(--text-mute);">Sua resposta foi devolvida ao campo de input — é só reenviar quando trocar o modelo ou após alguns segundos.</div>
+      </div>`;
+    container.appendChild(errEl);
+    errEl.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    errEl.querySelectorAll('[data-altm]').forEach(b => {
+      b.onclick = () => {
+        model = b.dataset.altm;
+        localStorage.setItem(LS_MODEL, model);
+        errEl.remove();
+      };
+    });
+  }
+}
+
+// ============ Carregar histórico ============
+async function loadHistoric(id) {
+  const h = history.find(x => x.id === id);
+  if (!h) return;
+  currentId = id;
+  renderSide();
+  document.getElementById('welcomeView').style.display = 'none';
+  document.getElementById('resultView').style.display = 'block';
+  const m = h.mode || 'direta';
+  setMode(m);
+  if (m === 'socratica') {
+    currentConversation = h;
+    await renderSocratic(h);
+  } else {
+    // direta OU caso — ambos usam renderResultDireto (distinguidos pelo item.mode)
+    await renderResultDireto(h);
+  }
+}
+
+// ============ Run principal ============
+async function run(query) {
+  if (!query.trim()) return;
+  if (!apiKey) { openApiModal(); return; }
+
+  const ctx = document.getElementById('ctxSelect')?.value || 'adulto';
+  const cenario = document.getElementById('cenarioSelect')?.value || 'emergencia';
+  const profundidade = document.getElementById('profundidadeSelect')?.value || 'completa';
+  const ctxLabel = document.getElementById('ctxSelect')?.options[document.getElementById('ctxSelect').selectedIndex].text || 'Adulto';
+  const cenarioLabel = document.getElementById('cenarioSelect')?.options[document.getElementById('cenarioSelect').selectedIndex].text || 'Emergência';
+
+  showLoading(query, currentMode);
+
+  try {
+    if (currentMode === 'direta' || currentMode === 'caso' || currentMode === 'protocolo') {
+      let prompt;
+      if (currentMode === 'caso') prompt = buildPromptCaso(query, ctx, cenario);
+      else if (currentMode === 'protocolo') prompt = buildPromptProtocolo(query, ctx, cenario, currentProtocol);
+      else prompt = buildPromptDireto(query, ctx, cenario, profundidade);
+      const { text, sources } = await callGemini([{ role: 'user', parts: [{ text: prompt }] }]);
+      const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      const item = {
+        id, mode: currentMode, query, text, sources, ctx, cenario, ctxLabel, cenarioLabel,
+        date: new Date().toISOString(), starred: false,
+        protocolMeta: currentMode === 'protocolo' ? currentProtocol : null
+      };
+      history.unshift(item);
+      currentId = id; currentConversation = null;
+      // Reseta o protocolo selecionado depois de usar (próxima consulta começa limpa)
+      if (currentMode === 'protocolo') currentProtocol = null;
+      saveHistory(); renderSide();
+      await renderResultDireto(item);
+    } else {
+      // socrática: primeira chamada gera o caso + 1ª pergunta
+      const prompt = buildPromptSocraticoInicial(query, ctx, cenario);
+      const { text, sources } = await callGemini([{ role: 'user', parts: [{ text: prompt }] }]);
+      const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      const item = {
+        id, mode: 'socratica', query, ctx, cenario, ctxLabel, cenarioLabel,
+        date: new Date().toISOString(), starred: false, finished: false,
+        messages: [
+          { role: 'user', text: prompt },           // prompt original (não exibido — vamos esconder o 1º user)
+          { role: 'ai', text, sources }
+        ]
+      };
+      // Marca o primeiro user como invisível para não mostrar o prompt na tela:
+      item.messages[0].hidden = true;
+      history.unshift(item);
+      currentId = id; currentConversation = item;
+      saveHistory(); renderSide();
+      await renderSocratic(item);
+    }
+  } catch (err) {
+    const isOverload = err.status === 503 || err.status === 429;
+    const isAuth = err.status === 401 || err.status === 403;
+    const alternativeModels = ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-2.5-pro'].filter(m => m !== model);
+    document.getElementById('resultContainer').innerHTML = `
+      <div class="result">
+        <div class="alert alert-warn">
+          <span>⚠</span>
+          <div><strong>Não foi possível obter resposta:</strong><br>${escapeHtml(err.message).replace(/\n/g, '<br>')}</div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:14px;">
+          <button class="btn-primary" id="errRetry">🔄 Tentar de novo (mesmo modelo)</button>
+          ${isOverload ? alternativeModels.map(m => `
+            <button class="btn-secondary" data-altmodel="${m}">⚡ Tentar com ${m}</button>
+          `).join('') : ''}
+          ${isAuth ? '<button class="btn-secondary" id="errOpenSettings">⚙ Abrir configurações</button>' : ''}
+        </div>
+        <p style="color: var(--text-mute); font-size:12px; margin-top:14px;">
+          Dica: o erro 503 do Gemini é praticamente sempre temporário (sobrecarga do servidor do Google). Em horários de pico (manhã EUA), o 2.5 Flash costuma falhar; o 2.0 Flash geralmente está disponível.
+        </p>
+      </div>`;
+    document.getElementById('errRetry').onclick = () => run(query);
+    document.getElementById('errOpenSettings')?.addEventListener('click', openApiModal);
+    document.querySelectorAll('[data-altmodel]').forEach(b => {
+      b.onclick = () => {
+        model = b.dataset.altmodel;
+        localStorage.setItem(LS_MODEL, model);
+        run(query);
+      };
+    });
+  }
+}
+
+// Filtrar mensagens "hidden" na renderização do chat
+const _origRenderChat = renderChatMessages;
+renderChatMessages = async function() {
+  const container = document.getElementById('chatContainer');
+  if (!container || !currentConversation) return;
+  const visible = currentConversation.messages.filter(m => !m.hidden);
+  container.innerHTML = visible.map(m => `
+    <div class="chat-message ${m.role === 'user' ? 'user' : 'ai'}">
+      <div class="chat-avatar">${m.role === 'user' ? 'R' : '🎓'}</div>
+      <div class="chat-bubble">
+        <div class="content">${m.role === 'user' ? `<p>${escapeHtml(m.text).replace(/\n/g,'<br>')}</p>` : md(m.text)}</div>
+        ${m.role === 'ai' && m.sources?.length ? renderSourcesHtml(m.sources) : ''}
+      </div>
+    </div>
+  `).join('');
+  await renderMermaidIn(container);
+  setTimeout(() => container.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 50);
+};
+
+// ============ Eventos ============
+function bindSend(inputId, btnId) {
+  const inp = document.getElementById(inputId);
+  const btn = document.getElementById(btnId);
+  if (!inp || !btn) return;
+  btn.onclick = () => run(inp.value);
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); run(inp.value); }
+  });
+}
+bindSend('searchInput', 'sendBtn');
+bindSend('searchInput2', 'sendBtn2');
+
+document.querySelectorAll('.chip').forEach(c => { c.onclick = () => run(c.dataset.q); });
+
+document.getElementById('newBtn').onclick = () => {
+  currentId = null; currentConversation = null;
+  document.getElementById('resultView').style.display = 'none';
+  document.getElementById('welcomeView').style.display = 'block';
+  document.getElementById('searchInput').value = '';
+  renderSide();
+};
+
+// ============ Init ============
+renderSide();
+renderLibrary();
+setMode('direta');
+// Liga o input de busca da biblioteca
+const libSearchInp = document.getElementById('librarySearch');
+if (libSearchInp) libSearchInp.addEventListener('input', e => { libSearch = e.target.value; renderLibrary(); });
+if (!apiKey) setTimeout(() => { if (!apiKey) openApiModal(); }, 800);
+</script>
+</body>
+</html>
