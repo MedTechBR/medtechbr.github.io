@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlashMed — Flashcards com IA e repetição espaçada | MedTech</title>
+<meta name="description" content="FlashMed: estude com flashcards e repetição espaçada (SM-2). Crie baralhos, gere cartões com IA (Gemini) e fixe conteúdo de medicina.">
+<meta name="theme-color" content="#0E5A6D">
+<link rel="icon" type="image/png" href="favicon.png">
+<style>
+:root{--petrol:#0E5A6D;--petrol-dark:#083845;--ink:#0E2A31;--mint:#2DD4A8;--mint-dark:#14b894;--bg:#F6FAFB;--soft:#EAF3F4;--line:#dbe8ea;--muted:#5B7882;--red:#c0392b;--amber:#c97a17}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+header{background:linear-gradient(135deg,var(--petrol),var(--petrol-dark));color:#fff;padding:16px 0}
+.wrap{max-width:880px;margin:0 auto;padding:0 18px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.5px}
+.logo .mark{width:34px;height:34px;border-radius:10px;background:#2DD4A8;display:grid;place-items:center;flex:0 0 auto}
+.logo .mark svg{width:22px;height:22px}
+.logo b{color:var(--mint)}
+.top a{color:#cfe3e6;text-decoration:none;font-size:14px;font-weight:600}
+.subtitle{color:#bcd6db;font-size:12.5px;margin-top:3px}
+main{max-width:880px;margin:0 auto;padding:22px 18px}
+.btn{display:inline-flex;align-items:center;gap:7px;border:none;border-radius:10px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.btn-p{background:var(--mint);color:var(--petrol-dark)}.btn-p:hover{background:var(--mint-dark)}
+.btn-d{background:var(--petrol);color:#fff}.btn-d:hover{background:var(--petrol-dark)}
+.btn-g{background:#fff;color:var(--petrol);border:1px solid var(--line)}.btn-g:hover{background:var(--soft)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;align-items:center}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 10px 30px -22px rgba(8,56,69,.3)}
+.deck{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.deck .info h3{font-size:17px}
+.deck .info p{color:var(--muted);font-size:13.5px;margin-top:3px}
+.pill{display:inline-block;background:var(--soft);color:var(--petrol);font-weight:700;font-size:12px;padding:3px 10px;border-radius:999px;margin-left:6px}
+.pill.due{background:#fdf0e0;color:var(--amber)}
+input,select,textarea{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit;background:#fff}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--mint)}
+label{display:block;font-weight:600;font-size:14px;margin:0 0 6px}
+.field{margin-bottom:14px}
+/* estudo */
+.study{text-align:center}
+.flash{background:#fff;border:1px solid var(--line);border-radius:18px;min-height:230px;display:flex;align-items:center;justify-content:center;padding:30px;font-size:20px;line-height:1.5;cursor:pointer;box-shadow:0 16px 40px -26px rgba(8,56,69,.4);user-select:none}
+.flash .side{max-width:640px}
+.flash .q{font-weight:700}
+.flash .a{color:#28424a}
+.flash small{display:block;color:var(--muted);font-size:13px;margin-top:16px;font-weight:600}
+.rate{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.rate button{border:none;border-radius:11px;padding:13px 6px;font-weight:800;font-size:14px;cursor:pointer;color:#fff}
+.r0{background:#c0392b}.r1{background:#c97a17}.r2{background:#14b894}.r3{background:#0E5A6D}
+.rate small{display:block;font-weight:600;font-size:11px;opacity:.85;margin-top:2px}
+.prog{height:7px;background:var(--soft);border-radius:99px;overflow:hidden;margin:0 0 16px}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--mint),var(--petrol))}
+.muted{color:var(--muted);font-size:13.5px}
+.row{display:flex;gap:10px}
+.note{background:#fff8ed;border:1px solid #f4d9a8;color:#8a5a16;border-radius:12px;padding:12px 15px;font-size:13px;margin-top:8px}
+.carditem{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}
+.carditem:last-child{border-bottom:none}
+.carditem .x{color:var(--red);cursor:pointer;font-weight:800;background:none;border:none}
+.empty{text-align:center;color:var(--muted);padding:30px}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:24px}
+footer a{color:var(--petrol);font-weight:600;text-decoration:none}
+.modal{position:fixed;inset:0;background:rgba(8,56,69,.45);display:flex;align-items:center;justify-content:center;padding:18px;z-index:50}
+.modal .box{background:#fff;border-radius:16px;padding:24px;max-width:480px;width:100%;max-height:90vh;overflow:auto}
+.modal h3{margin-bottom:14px}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-3px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media(max-width:560px){.rate{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap top">
+    <div>
+      <div class="logo"><span class="mark"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#062a33" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Flash<b>Med</b></div>
+      <div class="subtitle">Flashcards com IA e repetição espaçada · por MedTech</div>
+    </div>
+    <a href="index.html">← MedTech</a>
+  </div>
+</header>
+<main id="app"></main>
+<footer>
+  Seus baralhos ficam salvos neste navegador (localStorage). A geração por IA usa a sua chave do Google Gemini.<br>
+  © 2026 <a href="index.html">MedTech</a> · <a href="privacidade.html">Privacidade</a>
+</footer>
+
+<script>
+/* ====== Estado / persistência ====== */
+const LS='flashmed_decks_v1';
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+let decks=[];
+function load(){try{decks=JSON.parse(localStorage.getItem(LS))||[];}catch(e){decks=[];}if(!decks.length)seed();}
+function save(){localStorage.setItem(LS,JSON.stringify(decks));}
+function seed(){
+  const c=(q,a)=>({id:uid(),front:q,back:a,ef:2.5,interval:0,reps:0,due:0});
+  decks=[{id:uid(),name:'Cardiologia — básico',cards:[
+   c('Primeira medida na PCR em FV/TV sem pulso?','Desfibrilação precoce + RCP de alta qualidade.'),
+   c('Dose de adrenalina na PCR?','1 mg IV/IO a cada 3–5 minutos.'),
+   c('Antiarrítmico de escolha na FV/TV refratária?','Amiodarona 300 mg (2ª dose 150 mg).'),
+   c('Escore para risco tromboembólico na FA?','CHA₂DS₂-VASc.'),
+   c('Tríade da estenose aórtica sintomática?','Angina, síncope e dispneia (IC).'),
+   c('Alteração de ECG clássica do IAM com supra?','Supradesnivelamento do segmento ST.'),
+   c('Primeira escolha de vasopressor no choque séptico?','Noradrenalina (alvo PAM ≥ 65).'),
+   c('Manobra/medicação para reverter TSV estável?','Manobra vagal → adenosina 6 mg (depois 12 mg).')
+  ]}];
+  save();
+}
+/* ====== SM-2 ====== */
+function rate(card,q){
+  let ef=(card.ef||2.5)+(0.1-(5-q)*(0.08+(5-q)*0.02));if(ef<1.3)ef=1.3;card.ef=ef;
+  if(q<3){card.reps=0;card.interval=0;card.due=Date.now();}
+  else{card.reps=(card.reps||0)+1;
+    if(card.reps===1)card.interval=1;else if(card.reps===2)card.interval=6;else card.interval=Math.max(1,Math.round((card.interval||1)*ef));
+    card.due=Date.now()+card.interval*86400000;}
+}
+const dueCount=d=>d.cards.filter(c=>(c.due||0)<=Date.now()).length;
+
+/* ====== Views ====== */
+let view={mode:'home',deck:null,queue:[],idx:0,flip:false};
+const $=s=>document.querySelector(s);
+function render(){
+  const a=document.getElementById('app');
+  if(view.mode==='home')a.innerHTML=homeView();
+  else if(view.mode==='study')a.innerHTML=studyView();
+  else if(view.mode==='manage')a.innerHTML=manageView();
+  bind();
+}
+function homeView(){
+  return `<div class="toolbar">
+    <button class="btn btn-p" onclick="newDeck()">+ Novo baralho</button>
+    <button class="btn btn-g" onclick="openAI()">✨ Gerar com IA</button>
+    <button class="btn btn-g" onclick="openKey()">⚙️ Chave Gemini</button>
+  </div>
+  ${decks.length?decks.map(d=>`<div class="card deck"><div class="info">
+     <h3>${esc(d.name)}</h3>
+     <p>${d.cards.length} cartões <span class="pill">${d.cards.length} total</span> ${dueCount(d)?`<span class="pill due">${dueCount(d)} para revisar</span>`:'<span class="pill">em dia</span>'}</p>
+    </div><div class="row">
+     <button class="btn btn-d" onclick="study('${d.id}')">Estudar</button>
+     <button class="btn btn-g" onclick="manage('${d.id}')">Cartões</button>
+     <button class="btn btn-g" onclick="delDeck('${d.id}')">🗑️</button>
+    </div></div>`).join(''):'<div class="empty">Nenhum baralho ainda. Crie um ou gere com IA.</div>'}
+  <div class="note">📌 A repetição espaçada (SM-2) agenda cada cartão para o melhor momento de revisão: quanto mais fácil, mais distante; quanto mais difícil, mais cedo.</div>`;
+}
+function study(id){const d=decks.find(x=>x.id===id);view.deck=id;view.queue=d.cards.filter(c=>(c.due||0)<=Date.now());if(!view.queue.length)view.queue=d.cards.slice();view.idx=0;view.flip=false;view.mode='study';view.total=view.queue.length;view.done=0;render();}
+function studyView(){
+  const d=decks.find(x=>x.id===view.deck);
+  if(!view.queue.length)return `<div class="card study"><h3 style="margin-bottom:8px">✅ Sessão concluída!</h3><p class="muted">Você revisou todos os cartões disponíveis de "${esc(d.name)}".</p><div style="margin-top:18px"><button class="btn btn-d" onclick="go('home')">Voltar aos baralhos</button></div></div>`;
+  const card=view.queue[0];const pct=view.total?Math.round((view.done/(view.done+view.queue.length))*100):0;
+  return `<div class="toolbar"><button class="btn btn-g" onclick="go('home')">← Baralhos</button><span class="muted">${esc(d.name)} · ${view.queue.length} na fila</span></div>
+   <div class="prog"><i style="width:${pct}%"></i></div>
+   <div class="study">
+     <div class="flash" onclick="doFlip()"><div class="side">${view.flip?`<div class="a">${esc(card.back)}</div>`:`<div class="q">${esc(card.front)}</div>`}<small>${view.flip?'como você foi?':'toque para ver a resposta'}</small></div></div>
+     ${view.flip?`<div class="rate">
+       <button class="r0" onclick="answer(2)">Errei<small>de novo</small></button>
+       <button class="r1" onclick="answer(3)">Difícil<small>logo</small></button>
+       <button class="r2" onclick="answer(4)">Bom<small>+dias</small></button>
+       <button class="r3" onclick="answer(5)">Fácil<small>++dias</small></button>
+     </div>`:`<div style="margin-top:16px"><button class="btn btn-p" onclick="doFlip()">Mostrar resposta</button></div>`}
+   </div>`;
+}
+function doFlip(){view.flip=!view.flip;render();}
+function answer(q){const card=view.queue.shift();rate(card,q);if((card.due||0)<=Date.now())view.queue.push(card);else view.done++;view.flip=false;save();render();}
+function manage(id){view.deck=id;view.mode='manage';render();}
+function manageView(){
+  const d=decks.find(x=>x.id===view.deck);
+  return `<div class="toolbar"><button class="btn btn-g" onclick="go('home')">← Baralhos</button>
+   <button class="btn btn-p" onclick="newCard()">+ Novo cartão</button>
+   <button class="btn btn-g" onclick="openAI('${d.id}')">✨ Gerar com IA</button>
+   <span class="muted">${esc(d.name)} · ${d.cards.length} cartões</span></div>
+   <div class="card">${d.cards.length?d.cards.map(c=>`<div class="carditem"><div><b>${esc(c.front)}</b><br><span class="muted">${esc(c.back)}</span></div><button class="x" onclick="delCard('${c.id}')">×</button></div>`).join(''):'<div class="empty">Sem cartões. Adicione manualmente ou gere com IA.</div>'}</div>`;
+}
+function go(m){view.mode=m;render();}
+function bind(){}
+
+/* ====== Ações ====== */
+function newDeck(){const n=prompt('Nome do baralho:');if(n&&n.trim()){decks.push({id:uid(),name:n.trim(),cards:[]});save();render();}}
+function delDeck(id){if(confirm('Excluir este baralho?')){decks=decks.filter(d=>d.id!==id);save();render();}}
+function newCard(){const d=decks.find(x=>x.id===view.deck);const f=prompt('Frente (pergunta):');if(!f)return;const b=prompt('Verso (resposta):');if(!b)return;d.cards.push({id:uid(),front:f.trim(),back:b.trim(),ef:2.5,interval:0,reps:0,due:0});save();render();}
+function delCard(id){const d=decks.find(x=>x.id===view.deck);d.cards=d.cards.filter(c=>c.id!==id);save();render();}
+function esc(s){return String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+
+/* ====== Chave Gemini ====== */
+function openKey(){
+  const cur=localStorage.getItem('flashmed_key')||'';
+  modal(`<h3>⚙️ Chave do Google Gemini</h3>
+   <div class="field"><label>API Key (fica salva só neste navegador)</label><input id="mkey" type="password" placeholder="AIza..." value="${cur}"></div>
+   <div class="field"><label>Modelo</label><input id="mmodel" value="${localStorage.getItem('flashmed_model')||'gemini-2.5-flash'}"></div>
+   <p class="muted">Crie uma chave gratuita em aistudio.google.com/app/apikey. A geração envia apenas o tema digitado ao Google Gemini.</p>
+   <div class="row" style="margin-top:14px"><button class="btn btn-p" onclick="saveKey()">Salvar</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
+}
+function saveKey(){localStorage.setItem('flashmed_key',$('#mkey').value.trim());localStorage.setItem('flashmed_model',$('#mmodel').value.trim()||'gemini-2.5-flash');closeModal();}
+
+/* ====== Geração por IA ====== */
+let aiTargetDeck=null;
+function openAI(deckId){
+  aiTargetDeck=deckId||null;
+  modal(`<h3>✨ Gerar cartões com IA</h3>
+   <div class="field"><label>Tema</label><input id="aitopic" placeholder="Ex.: insuficiência cardíaca, antibióticos, ECG..."></div>
+   <div class="field"><label>Quantos cartões</label><input id="ainum" type="number" value="10" min="3" max="30"></div>
+   ${aiTargetDeck?'':'<div class="field"><label>Salvar em</label><select id="aideck"><option value="__new">➕ Novo baralho (usa o tema como nome)</option>'+decks.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('')+'</select></div>'}
+   <div id="aimsg" class="muted"></div>
+   <div class="row" style="margin-top:14px"><button class="btn btn-p" id="aigo" onclick="runAI()">Gerar</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>
+   <div class="note">A IA é um apoio — revise os cartões gerados antes de estudar.</div>`);
+}
+async function runAI(){
+  const key=localStorage.getItem('flashmed_key');
+  const topic=$('#aitopic').value.trim();const n=Math.max(3,Math.min(30,parseInt($('#ainum').value)||10));
+  const msg=$('#aimsg');
+  if(!key){msg.innerHTML='⚠️ Configure sua chave Gemini primeiro (⚙️).';return;}
+  if(!topic){msg.innerHTML='⚠️ Digite um tema.';return;}
+  const model=localStorage.getItem('flashmed_model')||'gemini-2.5-flash';
+  $('#aigo').innerHTML='<span class="spin"></span> Gerando...';$('#aigo').disabled=true;
+  const prompt=`Gere ${n} flashcards de estudo de medicina sobre o tema: "${topic}". Responda APENAS com um array JSON válido, sem nenhum texto extra, no formato exato: [{"q":"pergunta objetiva","a":"resposta concisa e correta"}]. Em português do Brasil.`;
+  try{
+    const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});
+    if(!r.ok){const e=await r.text();throw new Error('HTTP '+r.status+' — verifique a chave/modelo. '+e.slice(0,120));}
+    const data=await r.json();
+    let text=(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts[0].text)||'';
+    text=text.replace(/```json|```/g,'').trim();
+    const arr=JSON.parse(text.slice(text.indexOf('['),text.lastIndexOf(']')+1));
+    if(!Array.isArray(arr)||!arr.length)throw new Error('A IA não retornou cartões. Tente reformular o tema.');
+    let deck;
+    if(aiTargetDeck)deck=decks.find(d=>d.id===aiTargetDeck);
+    else{const sel=$('#aideck').value;if(sel==='__new'){deck={id:uid(),name:topic.charAt(0).toUpperCase()+topic.slice(1),cards:[]};decks.push(deck);}else deck=decks.find(d=>d.id===sel);}
+    let added=0;arr.forEach(it=>{if(it.q&&it.a){deck.cards.push({id:uid(),front:String(it.q),back:String(it.a),ef:2.5,interval:0,reps:0,due:0});added++;}});
+    save();closeModal();view.mode='home';render();
+    setTimeout(()=>alert(added+' cartões adicionados ao baralho "'+deck.name+'".'),100);
+  }catch(err){msg.innerHTML='⚠️ '+esc(err.message);$('#aigo').innerHTML='Gerar';$('#aigo').disabled=false;}
+}
+
+/* ====== Modal ====== */
+function modal(html){const d=document.createElement('div');d.className='modal';d.id='modal';d.innerHTML='<div class="box">'+html+'</div>';d.onclick=e=>{if(e.target===d)closeModal();};document.body.appendChild(d);}
+function closeModal(){const m=document.getElementById('modal');if(m)m.remove();}
+
+load();render();
+</script>
+</body>
+</html>
