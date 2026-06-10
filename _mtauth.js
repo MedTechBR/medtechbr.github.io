@@ -104,6 +104,7 @@ if (PLACEHOLDER) {
   MT.ready = Promise.resolve();
   MT.save = (d) => { MT.localSet(d); MT._emit(d); return Promise.resolve(); };
   MT.signOut = () => {};
+  MT.ai = async () => { throw new Error("Entre na sua conta MedTech para usar a IA."); };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', showDemoBanner);
   else showDemoBanner();
   Promise.resolve().then(() => MT._emit(MT.localGet()));
@@ -122,6 +123,18 @@ else {
     MT._fb = { app, auth, db, A, F };
     injectCSS();
     mountAuth();
+
+    // ---- IA central da MedTech (proxy seguro do Gemini via Cloud Function) ----
+    try {
+      const Fn = await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-functions.js");
+      const functions = Fn.getFunctions(app, "southamerica-east1");
+      MT.ai = async (prompt, model = "gemini-2.5-flash") => {
+        if (!MT.user) throw new Error("Entre na sua conta MedTech para usar a IA.");
+        const callable = Fn.httpsCallable(functions, "gemini");
+        const res = await callable({ prompt, model });
+        return (res && res.data && res.data.text) || "";
+      };
+    } catch (e) { MT.ai = async () => { throw new Error("IA MedTech indisponível no momento."); }; }
 
     let unsub = null;
     A.onAuthStateChanged(auth, (u) => {

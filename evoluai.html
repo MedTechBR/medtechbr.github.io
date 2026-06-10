@@ -176,20 +176,26 @@ function stopMic(){listening=false;if(rec){try{rec.stop();}catch(e){}}updateMic(
 function updateMic(){const b=$('#micBtn');const t=$('#liveTag');if(!b)return;if(listening){b.classList.add('on');b.textContent='⏹️ Parar';if(t)t.innerHTML='<span class="live"><span class="dot"></span>ouvindo…</span>';}else{b.classList.remove('on');b.textContent='🎤 Ditar';if(t)t.innerHTML='';}}
 
 /* IA */
-async function generate(){
+async function localGemini(prompt,model){
   const key=localStorage.getItem('evoluai_key');
+  if(!key)throw new Error('IA MedTech indisponível no momento. Tente novamente em instantes (ou, se preferir, configure uma chave própria em ⚙️).');
+  const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent?key='+encodeURIComponent(key),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});
+  if(!r.ok){const e=await r.text();throw new Error('HTTP '+r.status+' — '+e.slice(0,140));}
+  const data=await r.json();
+  const text=(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts[0].text)||'';
+  if(!text)throw new Error('A IA não retornou texto. Tente novamente.');
+  return text;
+}
+async function generate(){
   const raw=$('#raw').value.trim();draft.raw=raw;
-  if(!key){alert('Configure sua chave do Gemini primeiro (⚙️).');return;}
   if(!raw){alert('Dite ou digite o caso antes de gerar.');return;}
   const fmt=$('#fmt').value;const model=localStorage.getItem('evoluai_model')||'gemini-2.5-flash';
   const g=$('#genBtn');g.innerHTML='<span class="spin"></span> Gerando...';g.disabled=true;
   const prompt='Você é um escriba clínico experiente. A partir do rascunho/ditado abaixo, produza o documento solicitado em português do Brasil, de forma concisa e profissional. REGRAS: não invente dados, exames, doses ou condutas que não foram mencionados; se algo essencial estiver faltando, escreva "[não informado]". '+FORMATS[fmt]+'\n\nRascunho:\n'+raw;
   try{
-    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent?key='+encodeURIComponent(key),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});
-    if(!r.ok){const e=await r.text();throw new Error('HTTP '+r.status+' — verifique a chave/modelo. '+e.slice(0,140));}
-    const data=await r.json();
-    const text=(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts[0].text)||'';
-    if(!text)throw new Error('A IA não retornou texto. Tente novamente.');
+    let text;
+    if(window.MT&&MT.ai){try{text=await MT.ai(prompt,model);}catch(e){text=await localGemini(prompt,model);}}
+    else{text=await localGemini(prompt,model);}
     draft.out=text.trim();$('#out').textContent=draft.out;
   }catch(err){$('#out').textContent='⚠️ '+err.message;}
   g.innerHTML='✨ Gerar com IA';g.disabled=false;
