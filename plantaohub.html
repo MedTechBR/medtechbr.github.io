@@ -244,6 +244,7 @@ function moveComp(n){const r=compRange(cur);cur=new Date(r.s);cur.setMonth(cur.g
 function setCompDay(v){state.compDay=Math.min(28,Math.max(1,parseInt(v)||1));persist();render();}
 function toggleStatus(id){const s=state.shifts.find(x=>x.id===id);s.status=s.status==='pago'?'agendado':'pago';persist();render();}
 function del(id){if(confirm('Excluir este plantão?')){state.shifts=state.shifts.filter(x=>x.id!==id);persist();render();}}
+function delFromForm(id){if(confirm('Excluir este plantão?')){state.shifts=state.shifts.filter(x=>x.id!==id);persist();closeModal();render();}}
 function dup(id){const s=state.shifts.find(x=>x.id===id);const d=new Date(s.date+'T00:00:00');d.setDate(d.getDate()+7);
   state.shifts.push({...s,id:uid(),date:d.toISOString().slice(0,10),status:'agendado'});persist();cur=new Date(d);calCur=new Date(d.getFullYear(),d.getMonth(),1);render();}
 
@@ -343,7 +344,7 @@ function openForm(id,presetDate){
    <div class="two"><div class="field"><label>Valor (R$)</label><input id="f_value" type="number" step="0.01" value="${s.value}" placeholder="0,00"></div>
    <div class="field"><label>Status</label><select id="f_status"><option value="agendado" ${s.status==='agendado'?'selected':''}>Agendado</option><option value="pago" ${s.status==='pago'?'selected':''}>Recebido</option></select></div></div>
    <div class="field"><label>Observação (opcional)</label><textarea id="f_note" placeholder="Ex.: levar carimbo, escala dupla...">${esc(s.note||'')}</textarea></div>
-   <div class="row"><button class="btn btn-p" onclick="saveForm('${id||''}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
+   <div class="row"><button class="btn btn-p" onclick="saveForm('${id||''}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button>${id?`<button class="btn" style="background:#fdeceb;color:var(--red);margin-left:auto" onclick="delFromForm('${id}')">🗑️ Excluir</button>`:''}</div>`);
 }
 function fillLocal(){const v=document.getElementById('f_local').value;const m=(state.locais||{})[v];if(m){document.getElementById('f_start').value=m.start;document.getElementById('f_end').value=m.end;if(!document.getElementById('f_value').value)document.getElementById('f_value').value=m.value;}}
 function saveForm(id){
