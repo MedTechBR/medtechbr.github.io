@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="laudAI">
+<meta name="theme-color" content="#0066cc">
+<meta name="description" content="Laudos médicos assistidos por IA — radiologia, ECG, laboratório, dermatologia e mais. Comece com 3 laudos grátis.">
+<title>laudAI — Laudos médicos com IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="stylesheet" href="laudai.css?v=1">
+<!-- Login único MedTech (mesma conta dos outros apps). IA + trial/Pro via backend
+     radioia-a61ec, autenticado com o token MedTech (generateLaudoHttp/getSubStatusHttp). -->
+<script>window.MT_APP={id:"laudai",name:"LaudAI"};</script>
+<script src="_mtfb.js?v=1"></script>
+<script type="module" src="_mtauth.js?v=1"></script>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ LANDING PAGE ============ -->
+  <div id="landingPage" class="landing">
+    <nav class="land-nav">
+      <a href="#top" class="land-brand">
+        <div class="land-brand-mark">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 4 L6 19 L18 19"/><circle cx="18.5" cy="5" r="1.5" fill="white" stroke="none"/>
+          </svg>
+        </div>
+        <span class="land-brand-text">laudAI</span>
+      </a>
+      <div class="land-nav-actions">
+        <button class="land-btn land-btn-secondary" id="land-login">Entrar</button>
+        <button class="land-btn land-btn-primary" id="land-register">Criar conta grátis</button>
+      </div>
+    </nav>
+
+    <section class="land-hero" id="top">
+      <span class="land-hero-badge">⚡ Powered by Google Gemini 2.5</span>
+      <h1>Laudos médicos em <span class="grad">segundos</span>, com IA especialista.</h1>
+      <p class="lead">Análise assistida por IA para radiologia, ECG, laboratório, dermatologia, gasometria, anatomopatológico e muito mais — estruturados como um especialista escreveria.</p>
+      <div class="land-hero-ctas">
+        <button class="land-btn land-btn-primary land-btn-lg" id="land-cta-1">Comece com 3 laudos grátis</button>
+        <a href="#como-funciona" class="land-btn land-btn-secondary land-btn-lg">Ver como funciona</a>
+      </div>
+      <div class="land-hero-note">Sem cartão. Cancela quando quiser.</div>
+
+      <div class="land-hero-mock">
+        <div class="land-mock-header"><span></span><span></span><span></span></div>
+        <div class="land-mock-content">
+          <strong>## TÉCNICA</strong><br>
+          Radiografia simples de tórax PA e perfil.<br><br>
+          <strong>## ACHADOS</strong><br>
+          • Opacidade alveolar heterogênea em lobo médio direito, sugestiva de consolidação.<br>
+          • Seios costofrênicos livres.<br>
+          • Mediastino centralizado; índice cardiotorácico normal.<br><br>
+          <strong>## IMPRESSÃO DIAGNÓSTICA</strong><br>
+          Consolidação pulmonar em lobo médio D — provável pneumonia bacteriana.<br><br>
+          <strong>## RECOMENDAÇÕES</strong><br>
+          Correlação clínica + hemograma. Controle radiológico em 4 semanas.
+        </div>
+      </div>
+    </section>
+
+    <section class="land-section" id="como-funciona">
+      <h2>Como funciona</h2>
+      <p class="land-section-sub">Do upload ao laudo estruturado em menos de 1 minuto.</p>
+      <div class="land-steps">
+        <div class="land-step">
+          <div class="land-step-num">1</div>
+          <div class="land-step-icon">📤</div>
+          <h3>Anexe o exame</h3>
+          <p>Imagem, vídeo, DICOM, ZIP de série ou texto. Inclui link de PACS Clinux via bookmarklet.</p>
+        </div>
+        <div class="land-step">
+          <div class="land-step-num">2</div>
+          <div class="land-step-icon">🧬</div>
+          <h3>Contexto clínico</h3>
+          <p>Tipo de exame, idade, sexo, indicação. Histórico da doença atual quando relevante.</p>
+        </div>
+        <div class="land-step">
+          <div class="land-step-num">3</div>
+          <div class="land-step-icon">⚡</div>
+          <h3>IA gera o laudo</h3>
+          <p>Gemini 2.5 Pro analisa e devolve um laudo estruturado com técnica, achados, impressão e conduta.</p>
+        </div>
+        <div class="land-step">
+          <div class="land-step-num">4</div>
+          <div class="land-step-icon">✅</div>
+          <h3>Você revisa</h3>
+          <p>Edita, copia, imprime ou exporta. Sua decisão clínica, com a IA como segunda opinião.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="land-section land-exams" style="max-width: none;">
+      <div style="max-width:1200px; margin: 0 auto;">
+        <h2>Suporta praticamente qualquer exame</h2>
+        <p class="land-section-sub">A IA assume o papel certo dependendo do que você manda — radiologista, cardiologista, patologista, intensivista, dermatologista.</p>
+        <div class="land-exams-grid">
+          <div class="land-exam-card"><div class="land-exam-icon">🩻</div><div><h4>Radiologia</h4><p>RX, TC, RM, US, mamografia, densitometria, PET-CT, angiografia.</p></div></div>
+          <div class="land-exam-card"><div class="land-exam-icon">❤️</div><div><h4>Cardiologia</h4><p>ECG 12 derivações, Holter 24h, MAPA.</p></div></div>
+          <div class="land-exam-card"><div class="land-exam-icon">🩸</div><div><h4>Laboratório</h4><p>Hemograma, bioquímica, coagulograma, gasometria arterial/venosa, sorologia.</p></div></div>
+          <div class="land-exam-card"><div class="land-exam-icon">🌿</div><div><h4>Dermatologia</h4><p>Lesões de pele, dermatoscopia, regra ABCDE, padrões pigmentares.</p></div></div>
+          <div class="land-exam-card"><div class="land-exam-icon">🔬</div><div><h4>Patologia</h4><p>Anatomopatológico macro/microscópico, classificações OMS.</p></div></div>
+          <div class="land-exam-card"><div class="land-exam-icon">👁️</div><div><h4>Oftalmologia</h4><p>Fundoscopia, retinografia, retinopatia diabética/hipertensiva.</p></div></div>
+          <div class="land-exam-card"><div class="land-exam-icon">🫁</div><div><h4>Pneumologia</h4><p>Espirometria com critérios GLI/SBPT, reversibilidade pós-BD.</p></div></div>
+          <div class="land-exam-card"><div class="land-exam-icon">🧠</div><div><h4>Neurologia</h4><p>EEG, ritmos de base, paroxismos, lentificações focais.</p></div></div>
+          <div class="land-exam-card"><div class="land-exam-icon">🔍</div><div><h4>Endoscopia</h4><p>EDA, colonoscopia, classificações Paris, Forrest, Los Angeles.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="land-section land-pricing">
+      <h2>Quanto custa</h2>
+      <p class="land-section-sub">Um plano simples. Cancele quando quiser.</p>
+      <div class="land-price-card">
+        <div class="land-price-badge">Mais popular</div>
+        <div class="land-price-name">Pro</div>
+        <div class="land-price-value"><span class="currency">R$</span>29,90<span class="period">/mês</span></div>
+        <ul class="land-price-features">
+          <li>Laudos ilimitados</li>
+          <li>Todos os tipos de exame</li>
+          <li>Visualizador DICOM completo (WW/WL, presets, scrubber)</li>
+          <li>Modelos Gemini 2.5 Pro / Flash</li>
+          <li>Histórico sincronizado entre dispositivos</li>
+          <li>Bookmarklet de integração PACS</li>
+          <li>Suporte por email</li>
+        </ul>
+        <button class="land-btn land-btn-primary land-btn-lg" id="land-cta-2" style="width:100%;">Comece com 3 laudos grátis</button>
+        <div class="land-price-trial">Sem cartão para o trial · Pagamento via Kiwify (PIX, cartão, boleto)</div>
+      </div>
+    </section>
+
+    <section class="land-section">
+      <h2>Perguntas frequentes</h2>
+      <p class="land-section-sub">Tudo que você precisa saber antes de começar.</p>
+      <div class="land-faq-grid">
+        <details class="land-faq-item">
+          <summary>O laudo da IA substitui o radiologista / especialista?</summary>
+          <p><strong>Não.</strong> O laudoAI é uma ferramenta de <strong>segunda opinião assistida</strong>. Toda decisão clínica é responsabilidade do médico assistente. A IA é excelente em organizar achados e levantar diferenciais, mas pode errar silenciosamente — sempre valide.</p>
+        </details>
+        <details class="land-faq-item">
+          <summary>Que modelo de IA é usado?</summary>
+          <p>Por padrão, <strong>Google Gemini 2.5 Pro</strong> — atualmente um dos modelos de visão mais avançados do mundo, com excelente raciocínio médico. Você pode trocar pra Gemini 2.5 Flash (mais rápido e barato) nas configurações.</p>
+        </details>
+        <details class="land-faq-item">
+          <summary>Meus dados estão seguros?</summary>
+          <p>Imagens e textos são processados pela API Gemini do Google. Os arquivos enviados são armazenados por até 48h nos servidores Google e depois deletados. <strong>Para dados identificáveis (PHI), remova nome/CPF/data de nascimento antes</strong> — ou use o modo "Chave própria" pra controlar você mesmo o fluxo.</p>
+        </details>
+        <details class="land-faq-item">
+          <summary>Posso cancelar quando quiser?</summary>
+          <p>Sim. A cobrança é mensal, sem fidelidade. Você cancela no painel do Kiwify com 2 cliques. Acesso continua até o fim do ciclo pago.</p>
+        </details>
+        <details class="land-faq-item">
+          <summary>Como funciona com DICOM e PACS?</summary>
+          <p>Arraste arquivos <code>.dcm</code> ou um <code>.zip</code> da série inteira — abre um visualizador com presets (osso, pulmão, mediastino, cérebro, abdome), scrubber de cortes e seleção de faixa. Para PACS Clinux, oferecemos um <strong>bookmarklet</strong> que exporta a série completa em ZIP direto da página do PACS.</p>
+        </details>
+        <details class="land-faq-item">
+          <summary>Funciona em celular?</summary>
+          <p>Sim, é uma PWA (Progressive Web App). Funciona em qualquer celular com navegador moderno. Pode "instalar" como app nativo via "Adicionar à tela inicial" no Safari/Chrome.</p>
+        </details>
+        <details class="land-faq-item">
+          <summary>Preciso ser médico para usar?</summary>
+          <p>Não exigimos comprovação de CRM. Mas a ferramenta é <strong>desenhada para médicos</strong> e a interpretação dos laudos requer conhecimento clínico. Não recomendamos uso por leigos para decisões de saúde próprias.</p>
+        </details>
+      </div>
+    </section>
+
+    <section class="land-cta">
+      <h2>Comece em 30 segundos</h2>
+      <p>Crie sua conta, gere 3 laudos grátis. Sem cartão. Sem amarração.</p>
+      <button class="land-btn land-btn-lg" id="land-cta-3">Criar conta grátis</button>
+    </section>
+
+    <footer class="land-footer">
+      <div class="land-footer-content">
+        <div>
+          <div class="land-footer-brand">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4 L6 19 L18 19"/><circle cx="18.5" cy="5" r="1.5" fill="white" stroke="none"/></svg>
+            <span class="land-footer-wordmark">laudAI</span>
+          </div>
+          <p class="land-footer-tagline">Laudos médicos assistidos por IA. Análise inteligente para o profissional de saúde brasileiro.</p>
+          <div class="land-footer-disclaimer">⚠ Ferramenta auxiliar de uso médico. Não substitui o laudo de um especialista qualificado. Toda decisão clínica é de responsabilidade do médico assistente.</div>
+        </div>
+        <div>
+          <h5>Produto</h5>
+          <ul>
+            <li><a href="#como-funciona">Como funciona</a></li>
+            <li><a href="#top">Tipos de exame</a></li>
+            <li><a href="#top">Preço</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5>Contato</h5>
+          <ul>
+            <li><a href="mailto:contato@laudai.app.br">contato@laudai.app.br</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="land-footer-bottom">© 2026 laudAI. Todos os direitos reservados.</div>
+    </footer>
+  </div>
+
+  <!-- ============ AUTH SCREEN ============ -->
+  <div id="authScreen" class="auth-screen hidden">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="logo-big">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4 L6 19 L18 19"/><circle cx="18.5" cy="5" r="1.5" fill="currentColor" stroke="none"/></svg>
+        </div>
+        <h1>laudAI</h1>
+        <p>Laudos médicos com IA</p>
+      </div>
+
+      <form id="loginForm" class="auth-form" autocomplete="on">
+        <h2>Entrar</h2>
+        <input name="cpf" data-cpf type="text" inputmode="numeric" placeholder="CPF" autocomplete="username" required>
+        <input name="password" type="password" placeholder="Senha" autocomplete="current-password" required>
+        <p class="auth-error" id="loginError"></p>
+        <button type="submit" class="primary">Entrar</button>
+        <button type="button" id="showRegister" class="link">Não tem conta? Criar conta</button>
+      </form>
+
+      <form id="registerForm" class="auth-form hidden" autocomplete="on">
+        <h2>Criar conta</h2>
+        <input name="name" type="text" placeholder="Nome completo" maxlength="80" autocomplete="name" required>
+        <input name="cpf" data-cpf type="text" inputmode="numeric" placeholder="CPF" autocomplete="username" required>
+        <input name="password" type="password" placeholder="Senha (padrão: 3 primeiros dígitos do CPF)" autocomplete="new-password" required>
+        <p class="auth-error" id="registerError"></p>
+        <label class="lgpd-consent" style="display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:#6b7a90;text-align:left;margin:4px 0">
+          <input type="checkbox" name="consent" required style="margin-top:3px;flex:0 0 auto">
+          <span>Li e aceito os <a href="https://medtechbr.github.io/termos.html" target="_blank" rel="noopener">Termos de Uso</a> e a <a href="https://medtechbr.github.io/privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>. Entendo que a geração de laudos por IA envia o conteúdo ao Google Gemini e que o laudo é assistivo — a validação e a responsabilidade final são do médico.</span>
+        </label>
+        <button type="submit" class="primary">Criar conta</button>
+        <button type="button" id="showLoginFromReg" class="link">Já tem conta? Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ MAIN APP ============ -->
+  <div id="mainApp" class="hidden">
+
+    <!-- Honeypot: absorve o autofill do Chrome/Safari (CPF salvo no password manager).
+         Posicionado fora da tela, sem foco e invisível pra acessibilidade. -->
+    <div aria-hidden="true" style="position:absolute; top:-1000px; left:-1000px; width:0; height:0; overflow:hidden; opacity:0; pointer-events:none;">
+      <input type="text" name="username" tabindex="-1" autocomplete="username">
+      <input type="password" name="password" tabindex="-1" autocomplete="current-password">
+    </div>
+
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4 L6 19 L18 19"/><circle cx="18.5" cy="5" r="1.5" fill="currentColor" stroke="none"/></svg>
+        </div>
+        <div>
+          <div class="brand-name brand-wordmark">laudAI</div>
+          <div class="brand-sub">Análise de exames • Gemini</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="subscription-badge" id="subscription-badge" title="Status da assinatura"><span style="opacity:.6">…</span></button>
+        <div class="user-chip" id="userChip">
+          <div class="avatar" id="userAvatar">?</div>
+          <span class="email" id="userEmail">…</span>
+        </div>
+        <button class="icon-btn" id="btn-history" title="Histórico de laudos">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>
+        </button>
+        <button class="icon-btn" id="btn-settings" title="Configurações">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+        <button class="icon-btn" id="btn-logout" title="Sair">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="container">
+
+      <div class="warn-ribbon">
+        <div class="ic">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="txt">
+          <strong>laudAI é uma ferramenta auxiliar.</strong> A análise gerada por IA não substitui o laudo de um médico especialista qualificado. Toda decisão clínica é de responsabilidade do médico assistente. Mídia e textos enviados são processados pela API Gemini do Google — revise a política de privacidade antes de usar com dados identificáveis.
+        </div>
+      </div>
+
+      <div class="grid">
+
+        <section>
+          <div class="card" style="margin-bottom: 16px;">
+            <div class="card-title"><span class="num">1</span> Imagens, vídeos ou DICOM <span class="opt">JPG · PNG · MP4 · DCM · ZIP</span></div>
+
+            <label class="uploader" id="uploader" for="file-input">
+              <div class="uploader-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              </div>
+              <div class="uploader-title">Clique, arraste ou cole</div>
+              <div class="uploader-hint">Imagens, vídeos, arquivos .dcm ou ZIP de série DICOM</div>
+              <div class="uploader-formats">Vídeo até 2GB · DICOM abre visualizador com WW/WL ajustável</div>
+            </label>
+            <input type="file" id="file-input" class="hidden" accept="image/*,video/*,.dcm,.dicom,.ima,.zip,application/dicom" multiple>
+
+            <div class="url-section">
+              <div class="url-row">
+                <input type="url" class="input" id="url-input" name="external-url" autocomplete="off" placeholder="Ou cole um link de imagem / PACS / OHIF aqui">
+                <button class="btn btn-ghost btn-sm" id="btn-fetch-url">Anexar</button>
+              </div>
+              <div class="url-hint">
+                Para PACS Clinux: copie o link do exame da barra de endereço. <button type="button" class="link-btn" id="btn-show-bookmarklet">Não funcionou? Use o bookmarklet →</button>
+              </div>
+            </div>
+
+            <div class="tip">
+              <strong>DICOM:</strong> arraste arquivos <code>.dcm</code> ou um <code>.zip</code> com a série inteira — abre um visualizador com presets (osso, pulmão, mediastino, cérebro, abdome), scrubber de cortes e seleção de faixa para enviar.
+              <br><strong>TC/RM como vídeo:</strong> alternativamente, exporte um cine MP4 do PACS ou grave a tela rolando a série.
+            </div>
+
+            <div class="thumbs" id="thumbs"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-title"><span class="num">2</span> Contexto clínico</div>
+
+            <div class="row">
+              <div class="field">
+                <label class="field-label">Tipo de exame <span class="req">*</span></label>
+                <select class="select" id="modality">
+                  <optgroup label="Radiologia">
+                    <option value="Radiografia (RX)">Radiografia (RX)</option>
+                    <option value="Tomografia Computadorizada (TC)">Tomografia (TC)</option>
+                    <option value="Ressonância Magnética (RM)">Ressonância (RM)</option>
+                    <option value="Ultrassonografia (US)">Ultrassonografia (US)</option>
+                    <option value="Mamografia">Mamografia</option>
+                    <option value="Densitometria óssea">Densitometria óssea</option>
+                    <option value="Medicina Nuclear / PET-CT">Medicina Nuclear / PET-CT</option>
+                    <option value="Fluoroscopia">Fluoroscopia</option>
+                    <option value="Angiografia">Angiografia</option>
+                  </optgroup>
+                  <optgroup label="Outras imagens">
+                    <option value="Dermatoscopia / Lesão de pele">Lesão de pele / Dermatoscopia</option>
+                    <option value="Endoscopia / Colonoscopia">Endoscopia / Colonoscopia</option>
+                    <option value="Fundoscopia / Retinografia">Fundoscopia / Retinografia</option>
+                    <option value="Anatomopatológico macroscópico">Anatomopatológico (macro)</option>
+                    <option value="Histopatológico (microscopia)">Histopatológico (microscopia)</option>
+                  </optgroup>
+                  <optgroup label="Traçados">
+                    <option value="Eletrocardiograma (ECG)">ECG / Eletrocardiograma</option>
+                    <option value="Holter 24h">Holter 24h</option>
+                    <option value="MAPA">MAPA</option>
+                    <option value="Eletroencefalograma (EEG)">EEG / Eletroencefalograma</option>
+                    <option value="Espirometria">Espirometria</option>
+                  </optgroup>
+                  <optgroup label="Laboratório">
+                    <option value="Hemograma">Hemograma</option>
+                    <option value="Bioquímica / Painel laboratorial">Bioquímica / Painel</option>
+                    <option value="Gasometria arterial">Gasometria arterial</option>
+                    <option value="Gasometria venosa">Gasometria venosa</option>
+                    <option value="Coagulograma">Coagulograma</option>
+                    <option value="EAS / Urina rotina">EAS / Urina rotina</option>
+                    <option value="Marcadores cardíacos">Marcadores cardíacos</option>
+                    <option value="Hormônios">Hormônios</option>
+                    <option value="Sorologia">Sorologia</option>
+                  </optgroup>
+                  <option value="Outros">Outros</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field-label">Detalhes / Região <span class="req">*</span></label>
+                <input type="text" class="input" id="region" name="region" autocomplete="off" placeholder="Ex.: Tórax PA · Lesão dorso · 12 derivações · Arterial AAA">
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="field">
+                <label class="field-label">Idade</label>
+                <input type="text" class="input" id="age" name="patient-age-xrd" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other" inputmode="numeric" placeholder="Ex.: 62a">
+              </div>
+              <div class="field">
+                <label class="field-label">Sexo</label>
+                <select class="select" id="sex">
+                  <option value="">—</option>
+                  <option value="Masculino">Masculino</option>
+                  <option value="Feminino">Feminino</option>
+                  <option value="Outro">Outro / não informado</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label">História clínica / indicação</label>
+              <textarea class="textarea" id="history" name="history" autocomplete="off" placeholder="Ex.: Tosse há 3 semanas, febre, dispneia. Tabagista 30 anos/maço."></textarea>
+            </div>
+
+            <div class="field">
+              <label class="field-label">Texto / resultados do exame (opcional)</label>
+              <textarea class="textarea" id="exam-text" name="exam-text" autocomplete="off" placeholder="Cole valores numéricos ou descrição textual. Útil para gasometria, hemograma, bioquímica, ou para complementar uma imagem. Ex.: pH 7,32 · PaCO2 48 · HCO3 24 · PaO2 65 em ar ambiente · Lactato 3,2"></textarea>
+            </div>
+
+            <button class="btn btn-primary btn-block" id="btn-generate">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              Gerar laudo
+            </button>
+          </div>
+        </section>
+
+        <section>
+          <div class="card" style="min-height: 400px;">
+            <div class="card-title">
+              <span class="num">3</span> Laudo gerado
+              <span class="opt" id="output-meta"></span>
+            </div>
+
+            <div id="output-empty" class="output-empty">
+              <div class="ic">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              </div>
+              <h3>Aguardando análise</h3>
+              <p>Anexe a mídia, preencha o contexto clínico e clique em <strong>Gerar laudo</strong>.</p>
+            </div>
+
+            <div id="output-loading" class="loader hidden">
+              <div class="spinner"></div>
+              <div class="loader-step" id="loader-step">Preparando…</div>
+              <div class="loader-bar"><div class="loader-bar-fill" id="loader-bar"></div></div>
+              <div class="loader-text">A IA está examinando a mídia e estruturando o laudo. Vídeos podem levar 1–3 minutos.</div>
+            </div>
+
+            <div id="output-result" class="hidden">
+              <div class="laudo">
+                <div class="laudo-meta" id="laudo-meta"></div>
+                <div class="laudo-content" id="laudo-content"></div>
+              </div>
+              <div class="output-actions">
+                <button class="btn btn-ghost" id="btn-copy">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  Copiar
+                </button>
+                <button class="btn btn-ghost" id="btn-print">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                  Imprimir/PDF
+                </button>
+                <button class="btn btn-ghost" id="btn-new">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Novo
+                </button>
+              </div>
+            </div>
+
+            <div id="output-error" class="hidden" style="padding: 24px; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px;">
+              <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <div style="color: var(--danger); flex-shrink: 0;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <div>
+                  <div style="font-weight: 600; color: var(--danger); margin-bottom: 4px;">Erro ao gerar laudo</div>
+                  <div id="error-msg" style="font-size: 13px; color: var(--text-dim); line-height: 1.5;"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-bg hidden" id="modal-settings">
+      <div class="modal">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Configurações</div>
+            <div class="modal-sub">Sua API Key fica no localStorage deste navegador.</div>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="field">
+            <div style="font-size: 12px; color: var(--text-faint); line-height:1.5;">A IA já vem incluída na sua conta <strong>MedTech</strong> — sem precisar de chave.</div>
+          </div>
+          <div class="field">
+            <label class="field-label">Modelo</label>
+            <select class="select" id="model">
+              <option value="gemini-2.5-pro">Gemini 2.5 Pro — máxima acurácia (recomendado)</option>
+              <option value="gemini-2.5-flash">Gemini 2.5 Flash — equilíbrio</option>
+              <option value="gemini-2.0-flash">Gemini 2.0 Flash — rápido</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label">Idioma do laudo</label>
+            <select class="select" id="language">
+              <option value="pt-BR">Português (Brasil)</option>
+              <option value="en">English</option>
+              <option value="es">Español</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label">Estilo do laudo</label>
+            <select class="select" id="style">
+              <option value="estruturado">Estruturado (técnica, achados, impressão)</option>
+              <option value="narrativo">Narrativo (texto corrido)</option>
+              <option value="acr">ACR / RSNA template-based</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" id="settings-cancel" style="flex: 1;">Cancelar</button>
+          <button class="btn btn-primary" id="settings-save" style="flex: 1;">Salvar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paywall Modal -->
+    <div class="modal-bg hidden" id="modal-paywall">
+      <div class="modal">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Continue gerando laudos</div>
+            <div class="modal-sub" id="paywall-status">Assine Pro pra acesso ilimitado.</div>
+          </div>
+          <button class="modal-close" id="paywall-close">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="paywall-hero">
+            <div class="paywall-price"><span id="paywall-price">R$ 29,90/mês</span></div>
+            <ul class="paywall-features">
+              <li>✓ Laudos ilimitados</li>
+              <li>✓ Todos os tipos: imagens, DICOM, ECG, laboratório, gasometria, etc.</li>
+              <li>✓ Visualizador DICOM completo (WW/WL, presets, scrubber)</li>
+              <li>✓ Modelos Gemini 2.5 Pro / Flash</li>
+              <li>✓ Histórico sincronizado em todos os dispositivos</li>
+              <li>✓ Cancele quando quiser</li>
+            </ul>
+          </div>
+          <a id="paywall-checkout" class="btn btn-primary btn-block" href="#" target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11V7a3 3 0 0 1 6 0v4"/><rect x="5" y="11" width="14" height="10" rx="2"/></svg>
+            Assinar Pro · checkout Kiwify
+          </a>
+          <div style="text-align:center;margin-top:14px;">
+            <button class="link-btn" id="paywall-byok" style="font-size:13px;">Tenho minha própria chave Gemini — usar modo avançado</button>
+          </div>
+          <div style="font-size:11px; color: var(--text-faint); margin-top:14px; line-height:1.5;">
+            Pagamento via Kiwify (PIX, cartão, boleto). Após confirmação, seu acesso é liberado em segundos. Para cancelar, acesse o painel do Kiwify.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Video BYOK Modal -->
+    <div class="modal-bg hidden" id="modal-video-byok">
+      <div class="modal">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Vídeo exige chave Gemini própria</div>
+            <div class="modal-sub">Limitação do plano Pro v1.</div>
+          </div>
+          <button class="modal-close" id="video-byok-close">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:13px; color: var(--text-dim); line-height:1.6; margin-bottom: 14px;">
+            Análise de vídeo (cine de TC/RM até 2GB) é uma feature pesada de banda. Por enquanto, ela só funciona com sua própria chave Gemini direta — o app não cobra você por isso.
+          </p>
+          <p style="font-size:13px; color: var(--text-dim); line-height:1.6; margin-bottom: 14px;">
+            <strong>Como ativar:</strong> obtenha grátis em <a class="link" href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a>, copie a chave (<code>AIza...</code>) e cole em Configurações.
+          </p>
+          <p style="font-size:13px; color: var(--text-dim); line-height:1.6;">
+            <strong>Alternativa:</strong> exporte cortes-chave da TC/RM como imagens JPG/PNG separadas. Imagens funcionam normalmente no Pro.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" id="video-byok-close-2" style="flex:1;" onclick="document.getElementById('modal-video-byok').classList.add('hidden')">Voltar</button>
+          <button class="btn btn-primary" id="video-byok-settings" style="flex:1;">Configurar chave</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bookmarklet Modal -->
+    <div class="modal-bg hidden" id="modal-bookmarklet">
+      <div class="modal">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Exportar PACS → RadioLaudo</div>
+            <div class="modal-sub">Baixa a série DICOM inteira como ZIP. Funciona com Clinux e qualquer viewer OHIF.</div>
+          </div>
+          <button class="modal-close" id="bookmarklet-close">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <ol style="font-size: 13px; color: var(--text-dim); line-height: 1.7; padding-left: 18px; margin-bottom: 16px;">
+            <li><strong>Mostre a barra de favoritos</strong> no Chrome/Safari (⌘⇧B).</li>
+            <li><strong>Arraste o botão abaixo</strong> para a barra de favoritos.</li>
+            <li>No PACS Clinux, abra o exame e <strong>clique no favorito</strong>.</li>
+            <li>Aguarde o download — aparece um aviso no canto da tela com o progresso (ex: <em>"Baixando 47 / 312 DICOMs…"</em>).</li>
+            <li><strong>Arraste o arquivo ZIP baixado</strong> direto na área de upload do RadioLaudo. O visualizador DICOM abre com a série completa — WW/WL ajustável, scrubber de cortes, seleção de faixa para enviar pro Gemini.</li>
+          </ol>
+          <div style="text-align: center; margin: 18px 0;">
+            <a id="bookmarklet-link" class="btn btn-primary" style="text-decoration: none; padding: 14px 22px; display: inline-flex;" href="javascript:void(0)" draggable="true">
+              📥 Exportar PACS → RadioLaudo
+            </a>
+            <div style="font-size: 11px; color: var(--text-faint); margin-top: 8px;">↑ Arraste este botão para a barra de favoritos</div>
+          </div>
+          <div style="font-size: 12px; color: var(--text-faint); line-height: 1.6; padding: 12px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px;">
+            <strong style="color: var(--text-dim);">Como funciona:</strong> o bookmarklet roda dentro do domínio do PACS, lê o manifesto OHIF da URL (<code>?json=…</code>), baixa todos os arquivos <code>.dcm</code> da série em paralelo (6 simultâneos), e empacota num ZIP. Tudo local — sem upload externo. <strong>Fallback:</strong> se não encontrar manifesto, captura até 30 canvases visíveis como PNG.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- History Modal -->
+    <div class="modal-bg hidden" id="modal-history">
+      <div class="modal">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Histórico de laudos</div>
+            <div class="modal-sub">Sincronizado com sua conta no Firestore.</div>
+          </div>
+        </div>
+        <div class="modal-list" id="history-list"></div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" id="history-clear" style="flex: 1;">Limpar tudo</button>
+          <button class="btn btn-primary" id="history-close" style="flex: 1;">Fechar</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script src="laudai.gemini.js?v=1"></script>
+<script src="laudai.dicom.js?v=1"></script>
+<script src="laudai.app.js?v=1"></script>
+</body>
+</html>
