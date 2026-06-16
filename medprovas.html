@@ -16,7 +16,7 @@
      medprovas-app, autenticado com o token MedTech (endpoints callGeminiHttp/getSubStatusHttp). -->
 <script>window.MT_APP={id:"medprovas",name:"MedProvas"};</script>
 <script src="_mtfb.js?v=1"></script>
-<script type="module" src="_mtauth.js?v=3"></script>
+<script type="module" src="_mtauth.js?v=4"></script>
 <style>
   :root {
     /* Paleta MedProvas — teal médico + navy */
@@ -1527,16 +1527,6 @@
         </div>
         <button onclick="salvarConfig()">Salvar alterações</button>
 
-        <h3 style="margin-top:24px;">Backup das provas</h3>
-        <p style="color:#6b7280; font-size:0.9em; margin-bottom:8px;">
-          Veio do MedProvas antigo? Baixe o backup lá e <strong>restaure aqui</strong> — inclui disciplinas, provas e imagens.
-        </p>
-        <div class="form-row" style="gap:8px;flex-wrap:wrap">
-          <button class="secondary" onclick="importarBackup()">⬆️ Restaurar de um backup</button>
-          <button class="secondary" onclick="exportarBackup()">⬇️ Baixar backup</button>
-          <input type="file" id="importBackupFile" accept="application/json,.json" style="display:none" onchange="aoEscolherBackup(event)">
-        </div>
-
         <h3 style="margin-top:24px;">Conta</h3>
         <button class="ghost" onclick="fazerLogout()">Sair da conta MedTech</button>
       </div>
@@ -2052,51 +2042,6 @@ function salvarConfig() {
   alert('Dados atualizados.');
 }
 
-// ===== Backup: exportar / restaurar (inclui imagens e materiais do IndexedDB) =====
-async function exportarBackup() {
-  const u = userAtual();
-  if (!u) { alert('Entre na sua conta primeiro.'); return; }
-  const imagens = {}, materiais = {};
-  for (const prova of (u.provas || [])) {
-    if (prova.id) { try { const m = await obterMateriais(prova.id); if (m && m.length) materiais[prova.id] = m; } catch (e) {} }
-    for (const q of (prova.questoes || [])) {
-      if (q.imagem && q.imagem.id) {
-        const url = q.imagem.dataUrl || await loadImagemDb(q.imagem.id);
-        if (url) imagens[q.imagem.id] = url;
-      }
-    }
-  }
-  const dump = {
-    app: 'medprovas', versao: 1, exportadoEm: new Date().toISOString(),
-    user: { nome: u.nome, email: u.email, disciplinas: u.disciplinas || [], provas: u.provas || [] },
-    imagens, materiais
-  };
-  const blob = new Blob([JSON.stringify(dump)], { type: 'application/json' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = 'medprovas-backup-' + new Date().toISOString().slice(0, 10) + '.json';
-  a.click(); URL.revokeObjectURL(a.href);
-}
-function importarBackup() { document.getElementById('importBackupFile').click(); }
-async function aoEscolherBackup(ev) {
-  const file = ev.target.files && ev.target.files[0]; ev.target.value = '';
-  if (!file) return;
-  let dump;
-  try { dump = JSON.parse(await file.text()); } catch (e) { alert('Arquivo inválido.'); return; }
-  if (dump.app && dump.app !== 'medprovas') { alert('Este backup não é do MedProvas (é de "' + dump.app + '").'); return; }
-  const src = dump.user || dump;
-  const nProvas = Array.isArray(src.provas) ? src.provas.length : 0;
-  const nDisc = Array.isArray(src.disciplinas) ? src.disciplinas.length : 0;
-  if (!confirm('Restaurar este backup?\n\n• ' + nDisc + ' disciplina(s)\n• ' + nProvas + ' prova(s)\n\nIsso SUBSTITUI as provas e disciplinas desta conta.')) return;
-  const u = userAtual();
-  if (Array.isArray(src.disciplinas)) u.disciplinas = src.disciplinas;
-  if (Array.isArray(src.provas)) u.provas = src.provas;
-  if (src.nome && !u.nome) u.nome = src.nome;
-  try { for (const [id, url] of Object.entries(dump.imagens || {})) await saveImagemDb(id, url); } catch (e) {}
-  try { for (const [pid, mats] of Object.entries(dump.materiais || {})) await salvarMateriais(pid, mats); } catch (e) {}
-  salvarEstado();
-  alert('✅ Backup restaurado!');
-  location.reload();
-}
 
 // ============================================================
 // Elaboração de prova

@@ -140,7 +140,10 @@ else {
     catch (e) { db = F.getFirestore(app); }
     MT._fb = { app, auth, db, A, F };
     injectCSS();
-    mountAuth();
+    // NÃO montamos a tela de login de cara — esperamos o onAuthStateChanged abaixo.
+    // Como todos os apps são do mesmo domínio, a sessão MedTech é compartilhada: se já
+    // está logado, entra direto (sem flash de login ao trocar de app). Só mostra login
+    // quando o usuário está realmente deslogado.
 
     // ---- IA central da MedTech (proxy seguro do Gemini via Cloud Function) ----
     try {
