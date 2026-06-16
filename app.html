@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MedTech — seus apps médicos</title>
+<meta name="description" content="Portal MedTech: todos os seus apps médicos em um só lugar, com uma conta.">
+<meta name="theme-color" content="#0E5A6D">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icone-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MedTech">
+<script>window.MT_APP={id:"portal",name:"MedTech"};</script>
+<script src="_mtfb.js?v=1"></script>
+<script type="module" src="_mtauth.js?v=1"></script>
+<style>
+:root{--petrol:#0E5A6D;--petrol-dark:#083845;--ink:#0E2A31;--mint:#2DD4A8;--mint-dark:#14b894;--bg:#F6FAFB;--soft:#EAF3F4;--line:#dbe8ea;--muted:#5B7882}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--ink);background:var(--bg);min-height:100vh}
+header{background:linear-gradient(135deg,var(--petrol),var(--petrol-dark));color:#fff;padding:16px 0;padding-top:calc(16px + env(safe-area-inset-top))}
+.wrap{max-width:980px;margin:0 auto;padding:0 18px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{display:flex;align-items:center;gap:11px;font-weight:800;font-size:22px;letter-spacing:.5px}
+.logo .mark{width:38px;height:38px;border-radius:11px;background:var(--mint);display:grid;place-items:center;flex:0 0 auto}
+.logo .mark svg{width:24px;height:24px}
+.logo b{color:var(--mint)}
+.subtitle{color:#bcd6db;font-size:12.5px;margin-top:3px}
+.usr{display:flex;align-items:center;gap:10px}
+.usr .who{font-size:12.5px;color:#cfe3e6;text-align:right;line-height:1.3;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.usr button{color:#cfe3e6;font-size:13px;font-weight:600;background:rgba(255,255,255,.12);border:none;border-radius:8px;padding:7px 11px;cursor:pointer;font-family:inherit}
+.usr button:hover{background:rgba(255,255,255,.22)}
+main{max-width:980px;margin:0 auto;padding:20px 18px calc(40px + env(safe-area-inset-bottom))}
+.hero{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.hero h1{font-size:19px;color:var(--petrol-dark)}
+.hero p{color:var(--muted);font-size:13.5px;margin-top:4px;max-width:560px}
+.hero .install{background:var(--mint);color:var(--petrol-dark);border:none;border-radius:11px;padding:11px 16px;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.hero .install:hover{background:var(--mint-dark)}
+.sec{margin-bottom:10px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.sec h2{font-size:14px;color:var(--petrol-dark);text-transform:uppercase;letter-spacing:.04em}
+.sec span{font-size:12.5px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:13px;margin-bottom:26px}
+.card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:16px;text-decoration:none;color:inherit;display:flex;align-items:center;gap:13px;transition:transform .12s,box-shadow .12s,border-color .12s;position:relative}
+.card:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(14,90,109,.12);border-color:var(--mint)}
+.card .ic{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;font-size:24px;flex:0 0 auto;background:var(--soft)}
+.card .tx .nm{font-weight:800;font-size:15.5px}
+.card .tx .nm b{color:var(--mint-dark)}
+.card .tx .ds{color:var(--muted);font-size:12.5px;margin-top:2px;line-height:1.3}
+.card .ext{position:absolute;top:10px;right:12px;color:var(--muted);font-size:13px}
+.note{background:var(--soft);border-radius:12px;padding:12px 16px;font-size:13px;color:#28424a;margin-top:4px}
+.note b{color:var(--petrol)}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:24px}
+footer a{color:var(--petrol);font-weight:600;text-decoration:none}
+@media(max-width:520px){.grid{grid-template-columns:1fr 1fr;gap:10px}.card{flex-direction:column;text-align:center;gap:9px;padding:15px 10px}.card .ext{display:none}.card .tx .ds{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap top">
+    <div>
+      <div class="logo"><span class="mark"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#062a33" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Med<b>Tech</b></div>
+      <div class="subtitle">Todos os seus apps médicos, uma conta só</div>
+    </div>
+    <div class="usr" id="usr"></div>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <div>
+      <h1 id="hello">Bem-vindo 👋</h1>
+      <p>Acesse qualquer app abaixo. Os apps da sua conta MedTech já abrem logados. Instale este portal na tela inicial para abrir como um aplicativo.</p>
+    </div>
+    <button class="install" id="btnInstall" hidden>📲 Instalar app</button>
+  </div>
+
+  <div class="sec"><h2>Sua conta MedTech</h2><span>já entram logados</span></div>
+  <div class="grid" id="grid-mt"></div>
+
+  <div class="sec"><h2>Mais apps do ecossistema</h2><span>login próprio por enquanto</span></div>
+  <div class="grid" id="grid-ext"></div>
+
+  <div class="note">📌 <b>Login único:</b> os apps da “Sua conta MedTech” compartilham a mesma conta automaticamente. Os demais ainda pedem login próprio — estamos unificando aos poucos para você entrar uma vez só em tudo.</div>
+</main>
+
+<footer>© 2026 <a href="index.html">MedTech</a> · <a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a></footer>
+
+<script>
+const BASE = 'https://medtechbr.github.io/';
+const APPS_MT = [
+  { nm:'CalcMed', ai:false, ic:'🧮', ds:'Calculadoras e escores clínicos', url:BASE+'calcmed.html' },
+  { nm:'CondutAI', ai:true, ic:'🩺', ds:'Do sintoma à conduta, com IA', url:BASE+'condutai.html' },
+  { nm:'EmergeAI', ai:true, ic:'🚨', ds:'Condutas de emergência com IA', url:BASE+'emergeai.html' },
+  { nm:'FlashMed', ai:false, ic:'🃏', ds:'Flashcards para estudar', url:BASE+'flashmed.html' },
+  { nm:'EvoluAI', ai:true, ic:'📝', ds:'Evoluções e prontuário com IA', url:BASE+'evoluai.html' },
+  { nm:'AgendaAI', ai:true, ic:'🗓️', ds:'Sua agenda médica', url:BASE+'agendaai.html' },
+  { nm:'PlantãoHub', ai:false, ic:'📅', ds:'Plantões, horas e ganhos', url:BASE+'plantaohub.html' }
+];
+const APPS_EXT = [
+  { nm:'Foco', ai:false, ic:'🎯', ds:'Produtividade e demandas', url:'https://foco-produtividade.web.app' },
+  { nm:'Granaê', ai:false, ic:'💰', ds:'Suas finanças sob controle', url:'https://granae.web.app' },
+  { nm:'LaudAI', ai:true, ic:'🩻', ds:'Laudos de exames com IA', url:'https://laudoai.web.app' },
+  { nm:'MedProvas', ai:true, ic:'📋', ds:'Provas médicas com IA', url:'https://medprovas-app.web.app' },
+  { nm:'InternaMed', ai:false, ic:'🏥', ds:'Rodízio e escala do internato', url:'https://internamed.web.app' }
+];
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+function fmtName(nm){ return /AI$/.test(nm) ? esc(nm.slice(0,-2))+'<b>AI</b>' : esc(nm); }
+function card(a){
+  return `<a class="card" href="${a.url}" target="_blank" rel="noopener">
+    <div class="ic">${a.ic}</div>
+    <div class="tx"><div class="nm">${fmtName(a.nm)}</div><div class="ds">${esc(a.ds)}</div></div>
+    <span class="ext">↗</span>
+  </a>`;
+}
+document.getElementById('grid-mt').innerHTML = APPS_MT.map(card).join('');
+document.getElementById('grid-ext').innerHTML = APPS_EXT.map(card).join('');
+
+/* saudação + sair (via login central MedTech) */
+function refreshUser(){
+  const u = window.MT && window.MT.user;
+  const el = document.getElementById('usr');
+  const hello = document.getElementById('hello');
+  if (u && !u.demo){
+    const nm = u.displayName || u.email || 'Conta';
+    el.innerHTML = `<span class="who">${esc(nm)}</span><button id="btnOut">Sair</button>`;
+    document.getElementById('btnOut').onclick = () => window.MT.signOut();
+    const first = (u.displayName||'').split(' ')[0];
+    hello.textContent = first ? ('Olá, '+first+' 👋') : 'Bem-vindo 👋';
+  } else {
+    el.innerHTML = '';
+    hello.textContent = 'Bem-vindo 👋';
+  }
+}
+(function waitMT(){ if(window.MT){ MT.onData(refreshUser); refreshUser(); } else setTimeout(waitMT,40); })();
+
+/* PWA: service worker + botão instalar */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault(); deferredPrompt = e;
+  const b = document.getElementById('btnInstall'); b.hidden = false;
+  b.onclick = async () => { b.hidden = true; deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; };
+});
+window.addEventListener('appinstalled', () => { const b=document.getElementById('btnInstall'); if(b) b.hidden=true; });
+</script>
+</body>
+</html>
