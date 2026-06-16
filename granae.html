@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Granaê – Sua grana sob controle</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&display=swap">
+  <link rel="stylesheet" href="granae.css?v=1" />
+  <!-- garante inputs claros na tela de login central, mesmo com o tema escuro do Granaê -->
+  <style>.mt-auth input{background:#fff;color:#0E2A31}.mt-auth input::placeholder{color:#8aa0a8}</style>
+  <!-- Login único MedTech + sincronização na nuvem (mesmo módulo do portal) -->
+  <script>window.MT_APP={id:"granae",name:"Granaê"};</script>
+  <script src="_mtfb.js?v=1"></script>
+  <script type="module" src="_mtauth.js?v=1"></script>
+</head>
+<body>
+  <!-- AUTH SCREEN -->
+  <div id="authScreen" class="auth-screen hidden">
+    <div class="auth-card">
+      <div class="brand-large">
+        <div class="logo-big">$</div>
+        <h1>Granaê</h1>
+        <p>Sua grana sob controle</p>
+      </div>
+      <form id="loginForm" class="auth-form hidden" autocomplete="on">
+        <h2>Entrar</h2>
+        <input name="cpf" data-cpf type="text" inputmode="numeric" placeholder="CPF" autocomplete="username" required />
+        <input name="password" type="password" placeholder="Senha" autocomplete="current-password" required />
+        <p class="auth-error" id="loginError"></p>
+        <button type="submit" class="primary big">Entrar</button>
+        <button type="button" id="showRegister" class="link">Não tem conta? Criar conta</button>
+      </form>
+      <form id="registerForm" class="auth-form" autocomplete="on">
+        <h2>Criar conta</h2>
+        <input name="name" type="text" placeholder="Nome completo" maxlength="80" autocomplete="name" required />
+        <input name="cpf" data-cpf type="text" inputmode="numeric" placeholder="CPF" autocomplete="username" required />
+        <input name="password" type="password" placeholder="Senha (mín. 6 caracteres)" minlength="6" autocomplete="new-password" required />
+        <p class="auth-error" id="registerError"></p>
+        <p class="muted small" style="margin:0">Anote sua senha em local seguro — sem email cadastrado, não há como recuperá-la.</p>
+        <label class="lgpd-consent" style="display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:#6b7a90;text-align:left;margin:4px 0">
+          <input type="checkbox" name="consent" required style="margin-top:3px;flex:0 0 auto" />
+          <span>Li e aceito os <a href="https://medtechbr.github.io/termos.html" target="_blank" rel="noopener">Termos de Uso</a> e a <a href="https://medtechbr.github.io/privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>. Entendo que recursos de IA (leitura de faturas e lançamento por voz) enviam o conteúdo ao Google Gemini para processamento.</span>
+        </label>
+        <button type="submit" class="primary big">Criar conta</button>
+        <button type="button" id="showLogin" class="link">Já tenho conta</button>
+      </form>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">$</span>
+      <div class="brand-text">
+        <h1>Granaê</h1>
+        <small class="user-name" id="userName"></small>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button id="btnInstall" class="ghost icon-btn" hidden aria-label="Instalar app">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </button>
+      <button id="btnSettings" class="ghost icon-btn" aria-label="Configurações">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="view-root">
+
+    <!-- DASHBOARD -->
+    <section class="view" data-view="dashboard">
+      <div class="month-switcher">
+        <button id="prevMonth" class="round">‹</button>
+        <h2 id="monthLabel">—</h2>
+        <button id="nextMonth" class="round">›</button>
+      </div>
+
+      <section class="month-hero">
+        <div class="hero-head">
+          <span class="card-label">Saldo do mês</span>
+          <strong id="sumBalance" class="hero-number">R$ 0,00</strong>
+        </div>
+        <div class="hero-flow">
+          <div class="flow-row">
+            <div class="flow-label-wrap">
+              <span class="flow-label">Receitas</span>
+              <span id="incomeMeta" class="flow-meta"></span>
+            </div>
+            <strong id="sumIncome" class="flow-value income">R$ 0,00</strong>
+            <div class="flow-bar" data-track><i id="incomeBar"></i></div>
+          </div>
+          <div class="flow-row">
+            <div class="flow-label-wrap">
+              <span class="flow-label">Despesas</span>
+              <span id="expenseMeta" class="flow-meta"></span>
+            </div>
+            <strong id="sumExpense" class="flow-value expense">R$ 0,00</strong>
+            <div class="flow-bar" data-track><i id="expenseBar"></i></div>
+          </div>
+        </div>
+        <div id="fixedCompareCta" class="hero-cta" hidden>
+          <button class="link" data-nav="fixos">Cadastrar fixos pra comparar →</button>
+        </div>
+        <p id="yearlyNote" class="muted small hero-yearly" hidden></p>
+        <!-- legado: renderFixedCompare antiga ainda escreve aqui se houver erro; mantemos o id pra compat -->
+        <div id="fixedCompare" hidden></div>
+      </section>
+
+      <div id="scheduledWrap" class="card alt scheduled-card" hidden>
+        <button type="button" id="scheduledToggle" class="scheduled-head" aria-expanded="false">
+          <div class="scheduled-head-left">
+            <span class="card-label">Agendados</span>
+            <span id="scheduledCount" class="muted small"></span>
+          </div>
+          <div class="scheduled-head-right">
+            <strong id="scheduledTotal">R$ 0,00</strong>
+            <svg class="scheduled-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </button>
+        <ul id="scheduledList" class="tx-list" hidden></ul>
+      </div>
+
+      <div class="card alt chart-card">
+        <div class="card-head row between">
+          <span class="card-label">Onde foi este mês</span>
+        </div>
+        <div id="chartDonut"></div>
+      </div>
+
+      <div class="section-title">
+        <h3 id="categoryBarsTitle">Gastos por categoria</h3>
+      </div>
+      <div id="categoryBars" class="bars"></div>
+
+      <div class="card alt chart-card">
+        <div class="card-head row between">
+          <span class="card-label">Últimos 6 meses</span>
+        </div>
+        <div id="chartTrend"></div>
+      </div>
+
+      <div class="section-title between">
+        <h3>Últimas transações</h3>
+        <button class="link" data-nav="transacoes">ver tudo →</button>
+      </div>
+      <ul id="recentList" class="tx-list"></ul>
+    </section>
+
+    <!-- TRANSACOES -->
+    <section class="view hidden" data-view="transacoes">
+      <div class="section-title between">
+        <h2>Transações</h2>
+        <select id="filterType">
+          <option value="all">Todas</option>
+          <option value="income">Receitas</option>
+          <option value="expense">Despesas</option>
+        </select>
+      </div>
+      <div id="txFilterChip" class="tx-filter-chip" hidden>
+        <span class="chip-label"></span>
+        <button type="button" id="clearTxFilter" aria-label="Limpar filtro">×</button>
+      </div>
+      <ul id="txList" class="tx-list"></ul>
+    </section>
+
+    <!-- CATEGORIAS -->
+    <section class="view hidden" data-view="categorias">
+      <div class="section-title between">
+        <h2>Categorias</h2>
+        <button id="addCategory" class="primary">+ Nova</button>
+      </div>
+      <div class="cat-section">
+        <h3 class="muted small uppercase">Despesas</h3>
+        <ul id="catExpenseList" class="cat-list"></ul>
+      </div>
+      <div class="cat-section">
+        <h3 class="muted small uppercase">Receitas</h3>
+        <ul id="catIncomeList" class="cat-list"></ul>
+      </div>
+    </section>
+
+    <!-- FIXOS -->
+    <section class="view hidden" data-view="fixos">
+      <div class="section-title between">
+        <h2>Fixos médios</h2>
+        <div class="row gap">
+          <label class="file-btn ghost">
+            📎 Planilha
+            <input type="file" id="fixedSheet" accept=".csv,.tsv,.xlsx,.xls,.ods,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" hidden />
+          </label>
+          <button id="addFixed" class="primary">+ Item</button>
+        </div>
+      </div>
+      <p class="muted small">Custos e receitas recorrentes para comparar com o realizado do mês.</p>
+      <div class="cat-section">
+        <h3 class="muted small uppercase">Receitas fixas</h3>
+        <ul id="fixedIncomeList" class="cat-list"></ul>
+      </div>
+      <div class="cat-section">
+        <h3 class="muted small uppercase">Despesas fixas</h3>
+        <ul id="fixedExpenseList" class="cat-list"></ul>
+      </div>
+    </section>
+
+    <!-- ANALISE IA -->
+    <section class="view hidden" data-view="ia">
+      <div class="section-title">
+        <h2>Análise IA</h2>
+      </div>
+
+      <div class="ai-tabs" role="tablist">
+        <button class="ai-tab active" data-aitab="ask" type="button">Pergunta</button>
+        <button class="ai-tab" data-aitab="file" type="button">Anexar arquivo</button>
+        <button class="ai-tab" data-aitab="deep" type="button">Análise completa</button>
+      </div>
+
+      <div class="ai-pane" data-aipane="ask">
+        <p class="muted small">Pergunte qualquer coisa sobre seus gastos — a IA enxerga todas as suas transações e seus fixos.</p>
+        <textarea id="aiQuestion" rows="3" placeholder="Ex.: onde gastei mais que o normal este mês? Quanto economizei com mercado em relação à média?"></textarea>
+        <div class="row gap" style="margin-top:8px">
+          <button class="ghost chip-suggestion" data-q="Resumo do mês atual com receitas, despesas e principais categorias">Resumo do mês</button>
+          <button class="ghost chip-suggestion" data-q="Compare meus gastos deste mês com o orçamento fixo médio">Comparar com fixos</button>
+          <button class="ghost chip-suggestion" data-q="Identifique 3 gastos atípicos ou exagerados deste mês">Gastos atípicos</button>
+        </div>
+        <button id="aiAsk" class="primary big" style="margin-top:12px">Perguntar</button>
+      </div>
+
+      <div class="ai-pane hidden" data-aipane="file">
+        <p class="muted small">Anexe uma <strong>fatura de cartão</strong>, <strong>extrato bancário</strong> ou outro documento (PDF ou imagem). A IA extrai as transações e você revisa antes de salvar.</p>
+        <label class="file-drop">
+          <input type="file" id="invoiceFile" accept="image/*,application/pdf" hidden />
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <strong>Escolher arquivo</strong>
+          <small class="muted">PDF, JPG, PNG até 20 MB</small>
+        </label>
+      </div>
+
+      <div class="ai-pane hidden" data-aipane="deep">
+        <p class="muted small">A IA analisa <strong>todas as suas transações</strong> e seus fixos pra identificar padrões, anomalias e oportunidades concretas de economia.</p>
+        <ul class="deep-list">
+          <li>Top 5 categorias onde dá pra economizar (com valor estimado)</li>
+          <li>Gastos recorrentes que talvez você nem perceba</li>
+          <li>Anomalias (gastos atípicos do mês)</li>
+          <li>Plano de ação prático com metas mensais</li>
+        </ul>
+        <button id="aiDeep" class="primary big" style="margin-top:8px">Iniciar análise completa</button>
+      </div>
+
+      <div id="aiOutput" class="ai-output" hidden></div>
+    </section>
+
+  </main>
+
+  <!-- BOTAO MIC FLUTUANTE -->
+  <button id="micBtn" class="fab" aria-label="Gravar áudio">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+  </button>
+
+  <!-- NAV INFERIOR -->
+  <nav class="bottom-nav">
+    <button data-nav="dashboard" class="active">
+      <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6" rx="1"/><rect x="12" y="8" width="3" height="10" rx="1"/><rect x="17" y="5" width="3" height="13" rx="1"/></svg>
+      <small>Resumo</small>
+    </button>
+    <button data-nav="transacoes">
+      <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-1"/><path d="M16 12a2 2 0 1 0 0 4h6v-4z"/></svg>
+      <small>Lançar</small>
+    </button>
+    <button data-nav="categorias">
+      <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor"/></svg>
+      <small>Categorias</small>
+    </button>
+    <button data-nav="fixos">
+      <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14L17 2H7z"/></svg>
+      <small>Fixos</small>
+    </button>
+    <button data-nav="ia">
+      <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.94 14.34L6.34 18l-.96-2.65-2.65-.96 3.66-3.6 1.6 1.6 1.95 1.95z"/><path d="M14 2l2 4 4 2-4 2-2 4-2-4-4-2 4-2z"/><path d="M19 14l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"/></svg>
+      <small>IA</small>
+    </button>
+  </nav>
+
+  <!-- MODAL: FORM TRANSAÇÃO -->
+  <dialog id="txDialog" class="modal">
+    <form id="txForm" method="dialog">
+      <header class="modal-head">
+        <h3 id="txDialogTitle">Nova transação</h3>
+        <button type="button" class="ghost" data-close>✕</button>
+      </header>
+      <div class="seg">
+        <label><input type="radio" name="type" value="expense" checked /><span>Despesa</span></label>
+        <label><input type="radio" name="type" value="income" /><span>Receita</span></label>
+      </div>
+      <label class="field">
+        <span>Valor</span>
+        <input name="amount" type="number" inputmode="decimal" step="0.01" min="0" required />
+      </label>
+      <label class="field">
+        <span>Descrição</span>
+        <input name="description" type="text" maxlength="120" required />
+      </label>
+      <label class="field">
+        <span>Categoria</span>
+        <select name="category" required></select>
+      </label>
+      <label class="field">
+        <span>Data</span>
+        <input name="date" type="date" required />
+      </label>
+      <p id="txScheduledHint" class="scheduled-hint" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span><strong>Agendado.</strong> Não vai contar nos totais até <span id="txScheduledDate"></span>.</span>
+      </p>
+      <footer class="modal-foot">
+        <button type="button" id="txDelete" class="danger" hidden>Excluir</button>
+        <button type="submit" class="primary">Salvar</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- MODAL: CATEGORIA -->
+  <dialog id="catDialog" class="modal">
+    <form id="catForm" method="dialog">
+      <header class="modal-head">
+        <h3 id="catDialogTitle">Nova categoria</h3>
+        <button type="button" class="ghost" data-close>✕</button>
+      </header>
+      <div class="seg">
+        <label><input type="radio" name="type" value="expense" checked /><span>Despesa</span></label>
+        <label><input type="radio" name="type" value="income" /><span>Receita</span></label>
+      </div>
+      <label class="field">
+        <span>Nome</span>
+        <input name="name" type="text" maxlength="40" required />
+      </label>
+      <label class="field">
+        <span>Ícone (emoji)</span>
+        <input name="icon" type="text" maxlength="2" value="🏷️" />
+      </label>
+      <label class="field">
+        <span>Cor</span>
+        <input name="color" type="color" value="#6366f1" />
+      </label>
+      <footer class="modal-foot">
+        <button type="button" id="catDelete" class="danger" hidden>Excluir</button>
+        <button type="submit" class="primary">Salvar</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- MODAL: FIXO -->
+  <dialog id="fixedDialog" class="modal">
+    <form id="fixedForm" method="dialog">
+      <header class="modal-head">
+        <h3 id="fixedDialogTitle">Item fixo</h3>
+        <button type="button" class="ghost" data-close>✕</button>
+      </header>
+      <div class="seg">
+        <label><input type="radio" name="type" value="expense" checked /><span>Despesa</span></label>
+        <label><input type="radio" name="type" value="income" /><span>Receita</span></label>
+      </div>
+      <label class="field">
+        <span>Nome</span>
+        <input name="name" type="text" maxlength="60" required />
+      </label>
+      <div class="seg">
+        <label><input type="radio" name="frequency" value="monthly" checked /><span>Todo mês</span></label>
+        <label><input type="radio" name="frequency" value="yearly" /><span>1× por ano</span></label>
+      </div>
+      <label class="field" id="fixedAmountField">
+        <span>Valor</span>
+        <input name="amount" type="number" inputmode="decimal" step="0.01" min="0" required />
+      </label>
+      <label class="field hidden" id="fixedMonthField">
+        <span>Mês de cobrança</span>
+        <select name="month">
+          <option value="1">Janeiro</option>
+          <option value="2">Fevereiro</option>
+          <option value="3">Março</option>
+          <option value="4">Abril</option>
+          <option value="5">Maio</option>
+          <option value="6">Junho</option>
+          <option value="7">Julho</option>
+          <option value="8">Agosto</option>
+          <option value="9">Setembro</option>
+          <option value="10">Outubro</option>
+          <option value="11">Novembro</option>
+          <option value="12">Dezembro</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>Categoria</span>
+        <select name="category"></select>
+      </label>
+      <footer class="modal-foot">
+        <button type="button" id="fixedDelete" class="danger" hidden>Excluir</button>
+        <button type="submit" class="primary">Salvar</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- MODAL: CONFIG -->
+  <dialog id="settingsDialog" class="modal">
+    <form id="settingsForm" method="dialog">
+      <header class="modal-head">
+        <h3>Configurações</h3>
+        <button type="button" class="ghost" data-close>✕</button>
+      </header>
+      <p class="muted small" style="margin:2px 0 4px">Conta <strong>MedTech</strong> — a mesma de todos os apps. A IA já vem incluída, sem precisar de chave.</p>
+      <hr />
+      <div class="row between">
+        <button type="button" id="exportData" class="ghost">Exportar dados</button>
+        <label class="file-btn ghost">
+          Importar dados
+          <input type="file" id="importData" accept="application/json" hidden />
+        </label>
+      </div>
+      <button type="button" id="wipeData" class="danger full">Apagar todos os dados</button>
+      <hr />
+      <button type="button" id="logoutBtn" class="ghost full" style="width:100%">Sair da conta</button>
+      <footer class="modal-foot">
+        <button type="submit" class="primary">Salvar</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- MODAL: AUDIO -->
+  <dialog id="audioDialog" class="modal">
+    <header class="modal-head">
+      <h3>Gravar lançamento</h3>
+      <button type="button" class="ghost" data-close>✕</button>
+    </header>
+    <div class="audio-body">
+      <div id="audioVisual" class="audio-visual">
+        <div class="pulse"></div>
+        <span id="audioTime">0:00</span>
+      </div>
+      <p id="audioHint" class="muted small">Toque para começar. Diga, por exemplo: "gastei 35 reais no almoço hoje" ou "recebi 2500 de salário".</p>
+      <div class="row center gap">
+        <button id="audioRecord" class="fab small">🎤</button>
+        <button id="audioStop" class="fab small danger" hidden>⏹</button>
+      </div>
+      <div id="audioResult" class="ai-output"></div>
+    </div>
+  </dialog>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="granae.gemini.js?v=1"></script>
+  <script src="granae.app.js?v=1"></script>
+</body>
+</html>
