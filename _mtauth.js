@@ -50,6 +50,7 @@ function injectCSS() {
   .mt-home:hover{opacity:1}
   .mt-home:active{transform:scale(.94)}
   .mt-home svg{width:13px;height:13px;flex:0 0 auto}
+  body.mt-shell{padding-top:calc(env(safe-area-inset-top) + 42px) !important}
   `;
   document.head.appendChild(s);
 }
@@ -59,12 +60,13 @@ function injectCSS() {
 function injectHomeButton() {
   if (APP.id === 'portal') return;
   if (document.getElementById('mt-home')) return;
+  document.body.classList.add('mt-shell');   // reserva uma faixa no topo p/ o botão não cobrir conteúdo
   const a = document.createElement('a');
   a.id = 'mt-home'; a.className = 'mt-home'; a.href = '/app.html'; a.title = 'Voltar ao MedTech';
   a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>MedTech';
   document.body.appendChild(a);
 }
-function removeHomeButton() { const h = document.getElementById('mt-home'); if (h) h.remove(); }
+function removeHomeButton() { const h = document.getElementById('mt-home'); if (h) h.remove(); document.body.classList.remove('mt-shell'); }
 const LOGO = `<span class="mk"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#062a33" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
 
 function authMarkup() {
