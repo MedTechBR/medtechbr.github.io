@@ -46,9 +46,25 @@ function injectCSS() {
   .mt-demobar{position:fixed;left:0;right:0;bottom:0;z-index:9000;background:#fdf0e0;color:#8a5410;font-size:13px;text-align:center;padding:9px 14px;border-top:1px solid #f0d6a8}
   .mt-demobar b{color:#0E5A6D}
   .mt-demobar button{margin-left:8px;background:#0E5A6D;color:#fff;border:none;border-radius:7px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer}
+  .mt-home{position:fixed;z-index:9500;top:calc(env(safe-area-inset-top) + 9px);left:calc(env(safe-area-inset-left) + 9px);display:inline-flex;align-items:center;gap:5px;background:rgba(8,56,69,.84);color:#fff;text-decoration:none;font:700 12px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;padding:6px 11px 6px 8px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.3);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);opacity:.6;transition:opacity .15s,transform .12s}
+  .mt-home:hover{opacity:1}
+  .mt-home:active{transform:scale(.94)}
+  .mt-home svg{width:13px;height:13px;flex:0 0 auto}
   `;
   document.head.appendChild(s);
 }
+
+/* Botão flutuante "voltar ao MedTech" — aparece nos apps (não no próprio portal),
+   só quando logado. Todos os apps carregam este módulo, então fica num lugar só. */
+function injectHomeButton() {
+  if (APP.id === 'portal') return;
+  if (document.getElementById('mt-home')) return;
+  const a = document.createElement('a');
+  a.id = 'mt-home'; a.className = 'mt-home'; a.href = '/app.html'; a.title = 'Voltar ao MedTech';
+  a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>MedTech';
+  document.body.appendChild(a);
+}
+function removeHomeButton() { const h = document.getElementById('mt-home'); if (h) h.remove(); }
 const LOGO = `<span class="mk"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#062a33" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
 
 function authMarkup() {
@@ -141,6 +157,7 @@ else {
       MT.user = u;
       if (u) {
         const el = document.getElementById('mt-auth'); if (el) el.remove();
+        injectHomeButton();
         const ref = F.doc(db, 'users', u.uid, 'apps', APP.id);
         if (unsub) unsub();
         unsub = F.onSnapshot(ref, (snap) => {
@@ -152,6 +169,7 @@ else {
         }, (err) => { console.error(err); MT._emit(MT.localGet()); });
       } else {
         if (unsub) { unsub(); unsub = null; }
+        removeHomeButton();
         if (!document.getElementById('mt-auth')) mountAuth();
       }
     });
