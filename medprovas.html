@@ -1,0 +1,4887 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedProvas · Elaboração e correção de provas com IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.7.0/mammoth.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<link rel="icon" type="image/png" href="favicon.png">
+<!-- Login único MedTech (mesma conta dos outros apps). IA + trial/Pro via backend
+     medprovas-app, autenticado com o token MedTech (endpoints callGeminiHttp/getSubStatusHttp). -->
+<script>window.MT_APP={id:"medprovas",name:"MedProvas"};</script>
+<script src="_mtfb.js?v=1"></script>
+<script type="module" src="_mtauth.js?v=1"></script>
+<style>
+  :root {
+    /* Paleta MedProvas — teal médico + navy */
+    --primary: #0d9488;
+    --primary-hover: #0f766e;
+    --primary-dark: #115e59;
+    --primary-soft: #f0fdfa;
+    --primary-soft-2: #ccfbf1;
+    --primary-border: #99f6e4;
+    --accent: #0284c7;
+    --accent-soft: #e0f2fe;
+    --bg: #f8fafc;
+    --bg-2: #f1f5f9;
+    --bg-3: #e2e8f0;
+    --surface: #ffffff;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --text: #0f172a;
+    --text-muted: #475569;
+    --text-soft: #94a3b8;
+    --success: #16a34a;
+    --success-soft: #dcfce7;
+    --danger: #dc2626;
+    --danger-soft: #fee2e2;
+    --warning: #d97706;
+    --warning-soft: #fef3c7;
+    --info-soft: #dbeafe;
+    --radius-sm: 8px;
+    --radius: 12px;
+    --radius-lg: 18px;
+    --shadow-xs: 0 1px 2px rgba(15,23,42,0.04);
+    --shadow-sm: 0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.03);
+    --shadow: 0 4px 12px rgba(15,23,42,0.06), 0 2px 4px rgba(15,23,42,0.04);
+    --shadow-md: 0 10px 24px rgba(15,23,42,0.08), 0 4px 8px rgba(15,23,42,0.04);
+    --shadow-lg: 0 20px 40px rgba(15,23,42,0.10), 0 8px 16px rgba(15,23,42,0.06);
+    --sidebar-w: 240px;
+    --topbar-h: 64px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'cv11', 'ss01';
+    line-height: 1.5;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  h2 { margin-bottom: 18px; font-size: 1.5em; font-weight: 700; }
+  h3 { margin-bottom: 12px; font-size: 1.05em; font-weight: 600; color: var(--text); }
+  p { line-height: 1.55; }
+  a { color: var(--primary); cursor: pointer; }
+  ::selection { background: var(--primary-soft-2); color: var(--primary-hover); }
+
+  /* ─────────── LAYOUT (sidebar + topbar) ─────────── */
+  #appWrapper {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) 1fr;
+    grid-template-rows: var(--topbar-h) 1fr;
+    grid-template-areas:
+      "sidebar topbar"
+      "sidebar main";
+    min-height: 100vh;
+  }
+  @media (max-width: 900px) {
+    #appWrapper {
+      grid-template-columns: 1fr;
+      grid-template-rows: var(--topbar-h) auto 1fr;
+      grid-template-areas:
+        "topbar"
+        "sidebar"
+        "main";
+    }
+    .sidebar {
+      border-right: none !important;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px !important;
+    }
+    .sidebar-nav { display: flex !important; flex-direction: row !important; overflow-x: auto; }
+    .sidebar-brand { display: none !important; }
+    .sidebar-nav .nav-item { white-space: nowrap; }
+    .sidebar-footer { display: none !important; }
+  }
+
+  /* ─────────── SIDEBAR ─────────── */
+  .sidebar {
+    grid-area: sidebar;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 8px 22px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .sidebar-brand .brand-mark {
+    width: 38px; height: 38px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 800;
+    font-size: 1.1em;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    box-shadow: 0 6px 14px rgba(13,148,136,0.25);
+    flex-shrink: 0;
+  }
+  .sidebar-brand .brand-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1.15em;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .sidebar-brand .brand-name span { color: var(--primary); }
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 9px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 0.92em;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .nav-item:hover { background: var(--bg-2); color: var(--text); }
+  .nav-item.active {
+    background: var(--primary-soft);
+    color: var(--primary-dark);
+    font-weight: 600;
+  }
+  .nav-item.active .nav-icon { color: var(--primary); }
+  .nav-icon {
+    width: 18px; height: 18px;
+    flex-shrink: 0;
+    color: var(--text-soft);
+    transition: color 0.15s;
+  }
+  .nav-item:hover .nav-icon { color: var(--text-muted); }
+  .sidebar-footer {
+    padding: 16px 4px 4px;
+    border-top: 1px solid var(--border);
+    margin-top: 12px;
+    font-size: 0.8em;
+    color: var(--text-soft);
+    text-align: center;
+  }
+
+  /* ─────────── TOPBAR ─────────── */
+  .topbar {
+    grid-area: topbar;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: saturate(180%) blur(14px);
+    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .topbar .page-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1.1em;
+    color: var(--text);
+  }
+  .topbar .user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.92em;
+    color: var(--text-muted);
+  }
+  /* ─────────── PRO BADGE ─────────── */
+  .pro-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.78em;
+    font-weight: 700;
+    margin-right: 4px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .pro-badge.pro {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    box-shadow: 0 4px 10px rgba(245,158,11,0.30);
+  }
+  .pro-badge.trial {
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #7dd3fc;
+  }
+  .pro-badge.expired {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+  }
+  .pro-badge.hidden { display: none; }
+
+  /* ─────────── PAYWALL MODAL ─────────── */
+  .paywall-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.7);
+    backdrop-filter: blur(6px);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .paywall-modal.show { display: flex; }
+  .paywall-card {
+    background: var(--surface);
+    border-radius: 20px;
+    max-width: 560px;
+    width: 100%;
+    padding: 36px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    position: relative;
+  }
+  .paywall-card .paywall-icon {
+    width: 72px; height: 72px;
+    margin: 0 auto 18px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2em;
+    box-shadow: 0 12px 28px rgba(245,158,11,0.30);
+  }
+  .paywall-card h2 {
+    font-size: 1.6em;
+    margin-bottom: 10px;
+  }
+  .paywall-card .price {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 2.6em;
+    font-weight: 800;
+    color: var(--primary-dark);
+    margin: 18px 0 4px;
+  }
+  .paywall-card .price-sub {
+    color: var(--text-muted);
+    font-size: 0.95em;
+    margin-bottom: 20px;
+  }
+  .paywall-card ul {
+    list-style: none;
+    text-align: left;
+    margin: 0 auto 24px;
+    max-width: 380px;
+    padding: 0;
+  }
+  .paywall-card ul li {
+    padding: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+    font-size: 0.95em;
+  }
+  .paywall-card ul li::before {
+    content: '✓';
+    color: var(--success);
+    font-weight: 800;
+    font-size: 1.2em;
+  }
+  .paywall-card .btn-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .paywall-card .btn-row .large {
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+  }
+
+  .avatar-circle {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.82em;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    box-shadow: 0 4px 10px rgba(13,148,136,0.25);
+  }
+
+  /* ─────────── MAIN ─────────── */
+  main.content {
+    grid-area: main;
+    padding: 32px 36px 60px;
+    overflow-x: hidden;
+  }
+  @media (max-width: 640px) {
+    main.content { padding: 20px 18px 40px; }
+  }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* ─────────── CARDS ─────────── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .page-header {
+    margin-bottom: 28px;
+  }
+  .page-header h2 {
+    margin-bottom: 6px;
+    font-size: 1.75em;
+    font-weight: 800;
+  }
+  .page-header .subtitle {
+    color: var(--text-muted);
+    font-size: 1em;
+  }
+
+  /* ─────────── DASHBOARD HERO ─────────── */
+  .dashboard-hero {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary), var(--accent));
+    border-radius: var(--radius-lg);
+    padding: 32px 36px;
+    color: white;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+  .dashboard-hero::before {
+    content: '';
+    position: absolute;
+    top: -40%; right: -10%;
+    width: 380px; height: 380px;
+    background: radial-gradient(circle, rgba(255,255,255,0.18), transparent 60%);
+    pointer-events: none;
+  }
+  .dashboard-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -50%; left: 20%;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(255,255,255,0.10), transparent 60%);
+    pointer-events: none;
+  }
+  .dashboard-hero h2 {
+    color: white;
+    font-size: 1.85em;
+    font-weight: 800;
+    margin-bottom: 6px;
+    position: relative;
+  }
+  .dashboard-hero p {
+    color: rgba(255,255,255,0.85);
+    font-size: 1.02em;
+    position: relative;
+  }
+
+  /* ─────────── DASHBOARD STATS ─────────── */
+  .dash-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .dash-stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+  }
+  .dash-stat:hover {
+    border-color: var(--primary-border);
+    box-shadow: var(--shadow-sm);
+  }
+  .dash-stat-icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .dash-stat-icon svg { width: 22px; height: 22px; }
+  .dash-stat-info { display: flex; flex-direction: column; }
+  .dash-stat-num {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.7em;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+  }
+  .dash-stat-label {
+    font-size: 0.85em;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* ─────────── SECTION HEADER ─────────── */
+  .section-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .section-title h3 {
+    margin: 0;
+    font-size: 1.15em;
+    font-weight: 700;
+  }
+
+  /* ─────────── FORMS ─────────── */
+  .form-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .form-row label {
+    font-weight: 500;
+    color: var(--text);
+    min-width: 110px;
+    font-size: 0.92em;
+  }
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="number"],
+  select,
+  textarea {
+    padding: 10px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: 9px;
+    font-size: 14px;
+    background: var(--surface);
+    font-family: inherit;
+    color: var(--text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input[type="text"], input[type="password"], input[type="email"], select, textarea { flex: 1; min-width: 200px; }
+  input[type="number"] { width: 100px; }
+  textarea { resize: vertical; min-height: 84px; line-height: 1.5; }
+  input:hover, select:hover, textarea:hover { border-color: var(--text-soft); }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(79,70,229,0.12);
+  }
+  input::placeholder, textarea::placeholder { color: var(--text-soft); }
+
+  /* ─────────── BUTTONS ─────────── */
+  button {
+    padding: 10px 18px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: var(--primary);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13.5px;
+    transition: all 0.15s ease;
+    font-family: inherit;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.05);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    line-height: 1.2;
+  }
+  button:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 10px rgba(79,70,229,0.25); }
+  button:active { transform: translateY(0); }
+  button:disabled { background: var(--border-strong); color: var(--text-muted); cursor: not-allowed; transform: none; box-shadow: none; }
+  button.secondary { background: var(--surface); color: var(--text); border-color: var(--border-strong); }
+  button.secondary:hover { background: var(--bg-2); border-color: var(--text-soft); box-shadow: var(--shadow-sm); }
+  button.danger { background: var(--danger); }
+  button.danger:hover { background: #b91c1c; box-shadow: 0 4px 10px rgba(220,38,38,0.25); }
+  button.success { background: var(--success); }
+  button.success:hover { background: #047857; box-shadow: 0 4px 10px rgba(5,150,105,0.25); }
+  button.small { padding: 6px 12px; font-size: 12px; border-radius: 7px; }
+  button.large { padding: 13px 26px; font-size: 14px; border-radius: 11px; font-weight: 700; }
+  button.ghost { background: transparent; color: var(--text-muted); border-color: transparent; box-shadow: none; }
+  button.ghost:hover { background: var(--bg-2); color: var(--text); transform: none; box-shadow: none; }
+
+  /* ─────────── AUTH ─────────── */
+  .auth-wrapper {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  @media (max-width: 900px) {
+    .auth-wrapper { grid-template-columns: 1fr; }
+    .auth-side { display: none !important; }
+  }
+  .auth-side {
+    background: linear-gradient(135deg, #0f766e 0%, #0d9488 40%, #0284c7 100%);
+    color: white;
+    padding: 60px 56px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+  .auth-side::before {
+    content: '';
+    position: absolute;
+    top: -20%; right: -20%;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(255,255,255,0.10), transparent 60%);
+    pointer-events: none;
+  }
+  .auth-side::after {
+    content: '';
+    position: absolute;
+    bottom: -30%; left: -10%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(255,255,255,0.07), transparent 60%);
+    pointer-events: none;
+  }
+  .auth-side .auth-side-brand {
+    display: flex; align-items: center; gap: 12px;
+    position: relative; z-index: 1;
+  }
+  .auth-side .brand-mark {
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: blur(10px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 800;
+    font-size: 1.2em;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    border: 1px solid rgba(255,255,255,0.25);
+  }
+  .auth-side .brand-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1.3em;
+    letter-spacing: -0.01em;
+  }
+  .auth-side-content {
+    position: relative; z-index: 1;
+    max-width: 460px;
+  }
+  .auth-side-content h2 {
+    color: white;
+    font-size: 2.4em;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+  }
+  .auth-side-content p {
+    color: rgba(255,255,255,0.85);
+    font-size: 1.08em;
+    line-height: 1.55;
+    margin-bottom: 28px;
+  }
+  .auth-side-features {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .auth-side-feature {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255,255,255,0.95);
+    font-size: 0.95em;
+  }
+  .auth-side-feature .check-icon {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .auth-side-feature .check-icon svg {
+    width: 14px; height: 14px;
+    stroke: white;
+  }
+  .auth-side-footer {
+    color: rgba(255,255,255,0.7);
+    font-size: 0.85em;
+    position: relative;
+    z-index: 1;
+  }
+  .auth-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    background: var(--bg);
+  }
+  .auth-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 44px 40px;
+    max-width: 440px;
+    width: 100%;
+    box-shadow: var(--shadow-sm);
+  }
+  .auth-logo {
+    display: none;
+  }
+  @media (max-width: 900px) {
+    .auth-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .auth-logo .brand-mark {
+      width: 56px; height: 56px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 1.8em;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      box-shadow: 0 12px 30px rgba(13,148,136,0.35);
+    }
+  }
+  .auth-card h1 {
+    margin-bottom: 6px;
+    color: var(--text);
+    font-size: 1.6em;
+    font-weight: 800;
+  }
+  .auth-card h1 .accent { color: var(--primary); }
+  .auth-card .sub {
+    color: var(--text-muted);
+    margin-bottom: 28px;
+    font-size: 0.95em;
+  }
+  .auth-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-2);
+    border-radius: 11px;
+    padding: 4px;
+    margin-bottom: 24px;
+  }
+  .auth-tab {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: all 0.15s;
+    font-size: 0.92em;
+  }
+  .auth-tab.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+  .auth-form { display: none; }
+  .auth-form.active { display: block; }
+  .auth-form .form-row { flex-direction: column; align-items: stretch; gap: 6px; }
+  .auth-form .form-row label { min-width: 0; font-size: 0.85em; color: var(--text-muted); font-weight: 500; }
+  .auth-form input { width: 100%; }
+  .auth-form button { width: 100%; margin-top: 10px; padding: 13px; font-size: 14px; }
+  .auth-error {
+    background: var(--danger-soft);
+    color: var(--danger);
+    padding: 11px 14px;
+    border-radius: 9px;
+    font-size: 0.88em;
+    margin-bottom: 14px;
+    display: none;
+    border: 1px solid rgba(220,38,38,0.15);
+  }
+  .auth-error.show { display: block; }
+  .auth-success {
+    background: var(--success-soft);
+    color: var(--success);
+    padding: 11px 14px;
+    border-radius: 9px;
+    font-size: 0.88em;
+    margin-bottom: 14px;
+    display: none;
+    border: 1px solid rgba(5,150,105,0.15);
+  }
+  .auth-success.show { display: block; }
+
+  /* ─────────── MENU PRINCIPAL ─────────── */
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+  }
+  .menu-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-align: left;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+  }
+  .menu-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent, rgba(79,70,229,0.04));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .menu-item:hover {
+    transform: translateY(-3px);
+    border-color: var(--primary-soft-2);
+    box-shadow: var(--shadow-md);
+  }
+  .menu-item:hover::before { opacity: 1; }
+  .menu-item .icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    background: var(--primary-soft);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4em;
+    margin-bottom: 14px;
+    transition: transform 0.2s;
+  }
+  .menu-item:hover .icon { transform: scale(1.05); }
+  .menu-item .title { font-weight: 700; color: var(--text); margin-bottom: 4px; font-size: 1.05em; font-family: 'Plus Jakarta Sans', sans-serif; }
+  .menu-item .desc { color: var(--text-muted); font-size: 0.88em; line-height: 1.5; }
+
+  /* ─────────── LISTAS ─────────── */
+  .lista-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .lista-item:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
+  .lista-item .info { flex: 1; min-width: 200px; }
+  .lista-item .info .titulo { font-weight: 600; color: var(--text); font-size: 1em; }
+  .lista-item .info .meta { font-size: 0.85em; color: var(--text-muted); margin-top: 3px; }
+  .lista-item .acoes { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  /* ─────────── TAGS ─────────── */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    background: var(--primary-soft);
+    color: var(--primary-hover);
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.85em;
+    font-weight: 500;
+    margin-right: 6px;
+    margin-bottom: 4px;
+    border: 1px solid var(--primary-soft-2);
+  }
+  .tag .remove {
+    margin-left: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    opacity: 0.5;
+    transition: opacity 0.15s;
+  }
+  .tag .remove:hover { color: var(--danger); opacity: 1; }
+
+  /* ─────────── FILE UPLOAD ─────────── */
+  .file-drop {
+    border: 2px dashed var(--border-strong);
+    border-radius: var(--radius);
+    padding: 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--bg);
+  }
+  .file-drop:hover { border-color: var(--primary); background: var(--primary-soft); }
+  .file-list { margin-top: 12px; }
+  .file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    margin-top: 8px;
+    font-size: 0.9em;
+  }
+
+  /* ─────────── STATUS ─────────── */
+  .status {
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin: 12px 0;
+    font-size: 14px;
+    border: 1px solid transparent;
+  }
+  .status.info { background: var(--info-soft); color: #1e40af; border-color: rgba(30,64,175,0.12); }
+  .status.success { background: var(--success-soft); color: var(--success); border-color: rgba(5,150,105,0.15); }
+  .status.warning { background: var(--warning-soft); color: var(--warning); border-color: rgba(217,119,6,0.15); }
+  .status.error { background: var(--danger-soft); color: var(--danger); border-color: rgba(220,38,38,0.15); }
+
+  /* ─────────── QUESTÕES ─────────── */
+  .questao-gerada {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 14px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .questao-gerada:hover { border-color: var(--border-strong); }
+  .questao-gerada h4 { color: var(--text); margin-bottom: 12px; font-size: 1em; font-weight: 700; }
+  .questao-gerada .enunciado {
+    color: var(--text);
+    line-height: 1.6;
+    margin-bottom: 12px;
+    white-space: pre-wrap;
+  }
+  .questao-gerada .alternativas { margin-bottom: 12px; }
+  .questao-alt {
+    padding: 9px 12px;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    cursor: pointer;
+    display: flex;
+    gap: 10px;
+    border: 1.5px solid transparent;
+    background: var(--bg);
+    transition: all 0.15s;
+  }
+  .questao-alt:hover { background: var(--bg-2); }
+  .questao-alt.gabarito {
+    background: var(--success-soft);
+    border-color: var(--success);
+    color: #064e3b;
+  }
+  .questao-alt .letra { font-weight: 700; min-width: 22px; }
+
+  /* ─────────── ALT BUTTONS (CORREÇÃO) ─────────── */
+  .alt-buttons { display: flex; gap: 4px; flex-wrap: wrap; }
+  .alt-btn {
+    flex: 1; min-width: 30px;
+    padding: 8px 6px;
+    border: 1.5px solid var(--border-strong);
+    background: var(--surface);
+    border-radius: 7px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text);
+    transition: all 0.1s;
+  }
+  .alt-btn:hover { border-color: var(--primary); background: var(--primary-soft); }
+  .alt-btn.selected { background: var(--primary); border-color: var(--primary); color: white; }
+  .questao-item.anulada .alt-btn.selected { background: var(--warning); border-color: var(--warning); }
+
+  .respostas-mini {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .resp-mini {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 6px 3px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: border-color 0.15s;
+  }
+  .resp-mini-num { color: var(--text-muted); font-weight: 600; font-size: 11px; }
+  .resp-mini-buttons { display: flex; gap: 2px; margin-top: 3px; flex-wrap: wrap; justify-content: center; }
+  .resp-mini-btn {
+    padding: 3px 6px;
+    min-width: 22px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text);
+  }
+  .resp-mini-btn:hover { border-color: var(--primary); }
+  .resp-mini-btn.selected { background: var(--primary); color: white; border-color: var(--primary); }
+  .resp-mini.correta { background: var(--success-soft); border-color: rgba(5,150,105,0.30); }
+  .resp-mini.errada { background: var(--danger-soft); border-color: rgba(220,38,38,0.30); }
+  .resp-mini.anulada { background: var(--warning-soft); border-color: rgba(217,119,6,0.30); }
+  .resp-mini-gab { font-size: 9px; color: var(--text-muted); margin-top: 2px; }
+
+  .aluno-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    padding: 18px;
+    margin-bottom: 12px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .aluno-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
+  .aluno-header {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .aluno-nome-input {
+    font-size: 1.05em;
+    font-weight: 600;
+    padding: 9px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: 9px;
+    flex: 1;
+    min-width: 200px;
+  }
+  .aluno-nota {
+    font-size: 2.2em;
+    font-weight: 800;
+    line-height: 1;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .aluno-nota.aprovado { color: var(--success); }
+  .aluno-nota.reprovado { color: var(--danger); }
+
+  /* ─────────── STATS ─────────── */
+  .resumo-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-num { font-size: 2em; font-weight: 800; color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; }
+  .stat-label { font-size: 0.82em; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
+
+  /* ─────────── BREADCRUMB ─────────── */
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 18px;
+    font-size: 0.88em;
+    color: var(--text-muted);
+  }
+  .breadcrumb a { color: var(--primary); cursor: pointer; text-decoration: none; font-weight: 500; }
+  .breadcrumb a:hover { text-decoration: underline; }
+
+  .hidden { display: none !important; }
+
+  /* ─────────── SPINNER ─────────── */
+  .spinner {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 4px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ─────────── PROVA EXPORT (PDF) ─────────── */
+  .prova-export {
+    font-family: 'Times New Roman', serif;
+    padding: 40px;
+    background: white;
+    color: black;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .prova-export h1 { text-align: center; font-size: 1.5em; margin-bottom: 8px; font-family: 'Times New Roman', serif; }
+  .prova-export .cabecalho-prova { text-align: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #000; }
+  .prova-export .questao-prova { margin-bottom: 22px; page-break-inside: avoid; }
+  .prova-export .questao-prova .q-num { font-weight: bold; margin-bottom: 6px; }
+  .prova-export .questao-prova .q-enunciado { text-align: justify; margin-bottom: 8px; white-space: pre-wrap; }
+  .prova-export .questao-prova .q-alt { margin-left: 20px; margin-bottom: 4px; }
+
+  /* ─────────── IMAGEM DA QUESTÃO ─────────── */
+  .questao-imagem {
+    margin: 10px 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+  }
+  .questao-imagem img {
+    max-width: 200px;
+    max-height: 160px;
+    border-radius: 6px;
+    object-fit: contain;
+    background: white;
+    border: 1px solid var(--border);
+  }
+  .questao-imagem .img-info {
+    flex: 1; min-width: 0;
+    font-size: 0.85em;
+    color: var(--text-muted);
+  }
+  .questao-imagem .img-titulo { font-weight: 600; color: var(--text); }
+  .questao-sem-imagem {
+    background: var(--accent-soft);
+    border: 1px dashed #93c5fd;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-size: 0.85em;
+    color: #1e40af;
+  }
+
+  /* ─────────── MODAL IMAGEM ─────────── */
+  .img-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .img-modal.show { display: flex; }
+  .img-modal-card {
+    background: var(--surface);
+    border-radius: 14px;
+    max-width: 920px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-lg);
+  }
+  .img-modal-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .img-modal-header h3 { margin: 0; font-size: 1.1em; }
+  .img-modal-body { padding: 18px 22px; overflow-y: auto; flex: 1; }
+  .img-search-row { display: flex; gap: 8px; margin-bottom: 14px; }
+  .img-search-row input { flex: 1; }
+  .img-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+  }
+  .img-result {
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 6px;
+    cursor: pointer;
+    background: var(--bg);
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .img-result:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+  .img-result img {
+    width: 100%;
+    height: 130px;
+    object-fit: contain;
+    background: white;
+    border-radius: 6px;
+  }
+  .img-result-cap {
+    font-size: 0.72em;
+    color: var(--text-muted);
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .img-modal-footer {
+    padding: 14px 22px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  details summary { outline: none; }
+  details summary::-webkit-details-marker { color: var(--text-muted); }
+
+  /* responsivo */
+  @media (max-width: 640px) {
+    .container { padding: 20px 16px 40px; }
+    .card { padding: 20px; }
+    .topbar { padding: 12px 16px; }
+    .topbar .brand-name { font-size: 1em; }
+    .menu-item { padding: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ TELA DE LOGIN/REGISTRO ============ -->
+<div id="pageLogin" class="auth-wrapper">
+  <div class="auth-side">
+    <div class="auth-side-brand">
+      <div class="brand-mark">M+</div>
+      <div class="brand-name">MedProvas</div>
+    </div>
+    <div class="auth-side-content">
+      <h2>Provas inteligentes para professores de medicina</h2>
+      <p>Crie, edite e corrija provas estilo ENARE/ENAMED em minutos, com a ajuda da IA. Tudo no seu navegador, com seus materiais.</p>
+      <div class="auth-side-features">
+        <div class="auth-side-feature">
+          <span class="check-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+          Gere questões de casos clínicos a partir dos seus PDFs
+        </div>
+        <div class="auth-side-feature">
+          <span class="check-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+          Gabarito comentado com referências bibliográficas
+        </div>
+        <div class="auth-side-feature">
+          <span class="check-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+          Corrija provas e exporte notas em segundos
+        </div>
+        <div class="auth-side-feature">
+          <span class="check-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+          Exporte em Word respeitando o seu próprio template institucional
+        </div>
+      </div>
+    </div>
+    <div class="auth-side-footer">© MedProvas · Tudo roda no seu navegador</div>
+  </div>
+  <div class="auth-main">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="brand-mark">M+</div>
+    </div>
+    <h1>Med<span class="accent">Provas</span></h1>
+    <p class="sub">Faça login para continuar.</p>
+
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="trocarAba('login')">Entrar</div>
+      <div class="auth-tab" onclick="trocarAba('registro')">Cadastrar</div>
+    </div>
+
+    <div id="authError" class="auth-error"></div>
+    <div id="authSuccess" class="auth-success"></div>
+
+    <!-- LOGIN -->
+    <div id="formLogin" class="auth-form active">
+      <div class="form-row">
+        <label>CPF (somente números)</label>
+        <input type="text" id="loginCpf" placeholder="12345678901" maxlength="14" oninput="formatarCpf(this)">
+      </div>
+      <div class="form-row">
+        <label>Senha</label>
+        <input type="password" id="loginSenha" placeholder="Senha (padrão: 6 primeiros dígitos do CPF)">
+      </div>
+      <button onclick="fazerLogin()">Entrar</button>
+    </div>
+
+    <!-- REGISTRO -->
+    <div id="formRegistro" class="auth-form">
+      <div class="form-row">
+        <label>Nome completo</label>
+        <input type="text" id="regNome" placeholder="Seu nome completo">
+      </div>
+      <div class="form-row">
+        <label>CPF</label>
+        <input type="text" id="regCpf" placeholder="12345678901" maxlength="14" oninput="formatarCpf(this)">
+      </div>
+      <div class="form-row">
+        <label>E-mail</label>
+        <input type="email" id="regEmail" placeholder="seu@email.com">
+      </div>
+      <div class="form-row">
+        <label>Disciplinas (opcional)</label>
+        <input type="text" id="regDisciplinas" placeholder="Ex: Cardiologia, Pediatria, Clínica Médica">
+      </div>
+      <p style="font-size:0.85em; color:#6b7280; margin-bottom: 12px;">
+        ℹ️ A senha padrão serão os <strong>6 primeiros dígitos do seu CPF</strong>.
+      </p>
+      <label style="display:flex;gap:8px;align-items:flex-start;font-size:0.8em;color:#6b7280;margin-bottom:12px;text-align:left">
+        <input type="checkbox" id="regConsent" style="margin-top:3px;flex:0 0 auto">
+        <span>Li e aceito os <a href="https://medtechbr.github.io/termos.html" target="_blank" rel="noopener">Termos de Uso</a> e a <a href="https://medtechbr.github.io/privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>. Entendo que os recursos de IA enviam o conteúdo ao Google Gemini para processamento.</span>
+      </label>
+      <button onclick="fazerRegistro()">Criar Conta</button>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- ============ APP (após login) ============ -->
+<div id="appWrapper" class="hidden">
+  <aside class="sidebar">
+    <div class="sidebar-brand" onclick="navegar('menu')">
+      <div class="brand-mark">M+</div>
+      <div class="brand-name">Med<span>Provas</span></div>
+    </div>
+    <nav class="sidebar-nav" id="sidebarNav">
+      <div class="nav-item" data-page="menu" onclick="navegar('menu')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3l9 9"></path><path d="M5 10v10h14V10"></path></svg>
+        Início
+      </div>
+      <div class="nav-item" data-page="disciplinas" onclick="navegar('disciplinas')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        Disciplinas
+      </div>
+      <div class="nav-item" data-page="elaborar" onclick="navegar('elaborar')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"></path></svg>
+        Elaborar prova
+      </div>
+      <div class="nav-item" data-page="provas" onclick="navegar('provas')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line></svg>
+        Minhas provas
+      </div>
+      <div class="nav-item" data-page="config" onclick="navegar('config')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.49.21.85.65 1 1.18.07.13.11.27.11.42v.4"></path></svg>
+        Configurações
+      </div>
+    </nav>
+    <div class="sidebar-footer">MedProvas · v1.0</div>
+  </aside>
+
+  <header class="topbar">
+    <div class="page-title" id="topbarPageTitle">Início</div>
+    <div class="user-info">
+      <span id="proBadge" class="pro-badge" title="Status da assinatura"></span>
+      <span class="avatar-circle" id="userAvatar"></span>
+      <span id="userInfoTopbar"></span>
+      <button class="ghost small" onclick="fazerLogout()">Sair</button>
+    </div>
+  </header>
+
+  <main class="content">
+  <div class="container">
+    <!-- MENU PRINCIPAL (DASHBOARD) -->
+    <div id="pageMenu" class="page">
+      <div class="dashboard-hero">
+        <h2>Olá, <span id="menuPrimeiroNome">professor</span> 👋</h2>
+        <p>Bem-vindo de volta ao MedProvas. Pronto para criar uma nova prova?</p>
+      </div>
+
+      <div class="dash-stats" id="dashStats"></div>
+
+      <div class="section-title">
+        <h3>O que você quer fazer?</h3>
+      </div>
+      <div class="menu-grid">
+        <div class="menu-item" onclick="navegar('elaborar')">
+          <div class="icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"></path></svg>
+          </div>
+          <div class="title">Elaborar Prova</div>
+          <div class="desc">Gere uma prova completa em minutos a partir dos seus materiais didáticos.</div>
+        </div>
+        <div class="menu-item" onclick="navegar('provas')">
+          <div class="icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+          </div>
+          <div class="title">Minhas Provas</div>
+          <div class="desc">Edite, baixe em Word/PDF ou corrija provas que você já criou.</div>
+        </div>
+        <div class="menu-item" onclick="navegar('disciplinas')">
+          <div class="icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          </div>
+          <div class="title">Minhas Disciplinas</div>
+          <div class="desc">Cadastre as disciplinas que você leciona para organizar suas provas.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DISCIPLINAS -->
+    <div id="pageDisciplinas" class="page hidden">
+      <div class="breadcrumb"><a onclick="navegar('menu')">← Menu</a></div>
+      <div class="card">
+        <h2>Minhas Disciplinas</h2>
+        <div class="form-row">
+          <input type="text" id="novaDisciplina" placeholder="Nome da disciplina (ex: Emergências Clínicas)" onkeydown="if(event.key==='Enter') adicionarDisciplina()">
+          <button onclick="adicionarDisciplina()">➕ Adicionar</button>
+        </div>
+        <div id="listaDisciplinas" style="margin-top: 16px;"></div>
+      </div>
+    </div>
+
+    <!-- ELABORAR PROVA -->
+    <div id="pageElaborar" class="page hidden">
+      <div class="breadcrumb"><a onclick="navegar('menu')">← Menu</a></div>
+      <div class="card">
+        <h2>✨ Elaborar Prova com IA</h2>
+
+        <div class="form-row">
+          <label>Disciplina</label>
+          <select id="elabDisciplina"></select>
+        </div>
+        <div class="form-row">
+          <label>Título da prova</label>
+          <input type="text" id="elabTitulo" placeholder="Ex: PR1 Emergências Clínicas - Turma 2026.1">
+        </div>
+        <div class="form-row">
+          <label>Nº de questões</label>
+          <input type="number" id="elabNumQuestoes" value="10" min="1" max="50">
+        </div>
+
+        <h3 style="margin-top:20px;">Materiais didáticos (PDF)</h3>
+        <p style="color:#6b7280; font-size:0.9em; margin-bottom:8px;">
+          Faça upload das aulas/slides/textos que servirão de base para a IA elaborar as questões.
+        </p>
+        <label for="materiaisInput" class="file-drop">
+          <p style="font-size:1.5em;">📄</p>
+          <p><strong>Clique ou arraste PDFs</strong> dos materiais didáticos</p>
+        </label>
+        <input type="file" id="materiaisInput" accept=".pdf" multiple style="display:none" onchange="adicionarMateriais(event)">
+        <div id="listaMateriais" class="file-list"></div>
+
+        <h3 style="margin-top:20px;">Instruções extras para a IA <span style="font-weight:400; color:var(--text-muted); font-size:0.85em;">(opcional)</span></h3>
+        <p style="color:var(--text-muted); font-size:0.9em; margin-bottom:8px;">
+          Escreva orientações específicas sobre como você quer a prova. Ex: "distribuir igualmente entre os tópicos X, Y e Z", "questões mais difíceis", "focar em casos pediátricos", "evitar tema X", etc.
+        </p>
+        <textarea id="elabInstrucoes" placeholder='Ex: "Quero o mesmo número de questões para cada um dos tópicos abordados nos materiais. Use casos mais complexos, com comorbidades. Evite questões puramente teóricas."' style="width:100%; min-height:90px;"></textarea>
+
+        <h3 style="margin-top:20px;">Esqueleto da prova</h3>
+        <p style="color:#6b7280; font-size:0.9em; margin-bottom:8px;">
+          PDF ou Word com o cabeçalho/instruções/formatação que servirão de modelo. As questões serão geradas no estilo desse modelo.
+        </p>
+        <label for="esqueletoInput" class="file-drop">
+          <p style="font-size:1.5em;">📋</p>
+          <p><strong>Clique ou arraste o esqueleto</strong> (PDF ou .docx)</p>
+        </label>
+        <input type="file" id="esqueletoInput" accept=".pdf,.docx" style="display:none" onchange="adicionarEsqueleto(event)">
+        <div id="esqueletoInfo" class="file-list"></div>
+
+        <div style="margin-top:24px;">
+          <button class="success large" onclick="gerarProva()" id="btnGerar">
+            ✨ Gerar Prova com IA
+          </button>
+          <span id="elabStatus" style="margin-left:12px;"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- LISTA DE PROVAS -->
+    <div id="pageProvas" class="page hidden">
+      <div class="breadcrumb"><a onclick="navegar('menu')">← Menu</a></div>
+      <div class="card">
+        <h2>📋 Minhas Provas</h2>
+        <div id="listaProvas"></div>
+      </div>
+    </div>
+
+    <!-- VER/EDITAR PROVA -->
+    <div id="pageProva" class="page hidden">
+      <div class="breadcrumb">
+        <a onclick="navegar('menu')">Menu</a> /
+        <a onclick="navegar('provas')">Provas</a> /
+        <span id="provaBreadcrumb"></span>
+      </div>
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <h2 id="provaTitulo"></h2>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="secondary small" onclick="exportarProvaDocx()" id="btnDocx">📝 Baixar Word</button>
+            <button class="secondary small" onclick="exportarProvaPDF()">📥 Baixar PDF</button>
+            <button class="secondary small" onclick="exportarGabaritoPDF()">🔑 Gabarito PDF</button>
+            <button class="success small" onclick="navegar('corrigir')">✏️ Corrigir provas</button>
+            <button class="danger small" onclick="removerProvaAtual()">🗑️ Excluir</button>
+          </div>
+        </div>
+        <p id="provaMeta" style="color:#6b7280; margin-top: 4px;"></p>
+        <div id="provaQuestoes" style="margin-top: 20px;"></div>
+        <div style="margin-top: 16px; padding: 16px; border: 2px dashed var(--border-strong); border-radius: var(--radius); background: var(--bg); display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:center;">
+          <strong style="color:var(--text-muted); margin-right:6px;">Adicionar nova questão:</strong>
+          <button class="success small" onclick="adicionarQuestaoIA()">✨ Gerar com IA</button>
+          <button class="secondary small" onclick="adicionarQuestaoManual()">✏️ Em branco</button>
+        </div>
+        <div id="addQuestaoStatus" style="margin-top:10px;"></div>
+      </div>
+    </div>
+
+    <!-- CORRIGIR PROVA -->
+    <div id="pageCorrigir" class="page hidden">
+      <div class="breadcrumb">
+        <a onclick="navegar('menu')">Menu</a> /
+        <a onclick="navegar('provas')">Provas</a> /
+        <a onclick="navegar('prova')" id="corrigirBreadcrumbProva"></a> /
+        Correção
+      </div>
+      <div class="card">
+        <h2 id="corrigirTitulo"></h2>
+        <p id="corrigirGabarito" style="color:#6b7280; margin-bottom:16px;"></p>
+
+        <div class="form-row">
+          <button class="success large" onclick="adicionarAlunoCorrecao()">➕ Adicionar Aluno</button>
+          <span style="color:#6b7280; font-size:0.9em;" id="contadorAlunosCorrecao"></span>
+        </div>
+
+        <div id="resumoCorrecao"></div>
+        <div id="listaAlunosCorrecao" style="margin-top: 12px;"></div>
+      </div>
+    </div>
+
+    <!-- CONFIG -->
+    <div id="pageConfig" class="page hidden">
+      <div class="breadcrumb"><a onclick="navegar('menu')">← Menu</a></div>
+      <div class="card">
+        <h2>⚙️ Configurações</h2>
+
+        <h3 style="margin-top:8px;">Meus dados</h3>
+        <div class="form-row">
+          <label>Nome</label>
+          <input type="text" id="configNome">
+        </div>
+        <div class="form-row">
+          <label>E-mail (conta MedTech)</label>
+          <input type="email" id="configEmail" disabled>
+        </div>
+        <button onclick="salvarConfig()">Salvar alterações</button>
+
+        <h3 style="margin-top:24px;">Backup das provas</h3>
+        <p style="color:#6b7280; font-size:0.9em; margin-bottom:8px;">
+          Veio do MedProvas antigo? Baixe o backup lá e <strong>restaure aqui</strong> — inclui disciplinas, provas e imagens.
+        </p>
+        <div class="form-row" style="gap:8px;flex-wrap:wrap">
+          <button class="secondary" onclick="importarBackup()">⬆️ Restaurar de um backup</button>
+          <button class="secondary" onclick="exportarBackup()">⬇️ Baixar backup</button>
+          <input type="file" id="importBackupFile" accept="application/json,.json" style="display:none" onchange="aoEscolherBackup(event)">
+        </div>
+
+        <h3 style="margin-top:24px;">Conta</h3>
+        <button class="ghost" onclick="fazerLogout()">Sair da conta MedTech</button>
+      </div>
+    </div>
+  </div>
+  </main>
+</div>
+
+<!-- Modal de busca de imagem -->
+<div class="img-modal" id="imgModal">
+  <div class="img-modal-card">
+    <div class="img-modal-header">
+      <h3 id="imgModalTitle">🖼️ Buscar imagem para questão</h3>
+      <button class="ghost small" onclick="fecharBuscaImagem()">✕</button>
+    </div>
+    <div class="img-modal-body">
+      <p style="color:var(--text-muted); font-size:0.9em; margin-bottom:8px;">
+        Você tem várias opções: <strong>buscar no Wikimedia</strong> (digite abaixo — pode ser em português, a IA traduz), <strong>💻 do computador</strong>, <strong>📄 página do material</strong>, ou <strong>🔗 colar URL</strong>.
+      </p>
+      <div class="img-search-row">
+        <input type="text" id="imgSearchInput" placeholder='ex: "raio-X tórax pneumonia" ou "ECG anterior STEMI"' onkeydown="if(event.key==='Enter')executarBuscaImagem()">
+        <button onclick="executarBuscaImagem()">Buscar</button>
+      </div>
+      <div id="imgSearchStatus" style="margin-bottom:10px;"></div>
+      <div class="img-results-grid" id="imgResults"></div>
+    </div>
+    <div class="img-modal-footer">
+      <button class="ghost" onclick="removerImagemAtual()">🗑️ Remover</button>
+      <button class="success" onclick="abrirGeradorECG()" title="Gere um ECG personalizado a partir de uma descrição">🫀 Gerar ECG</button>
+      <button class="success" onclick="abrirGeradorImagem()" title="Gere uma imagem médica a partir de uma descrição">🎨 Gerar imagem com IA</button>
+      <button class="secondary" onclick="recortarImagemAtualComIA()" title="Detecta e mantém só a figura médica, removendo texto da slide">✂️ Recortar com IA</button>
+      <button class="secondary" onclick="document.getElementById('imgUploadInput').click()">💻 Do computador</button>
+      <input type="file" id="imgUploadInput" accept="image/*" style="display:none" onchange="anexarImagemDoComputador(event)">
+      <button class="secondary" onclick="anexarImagemPorPaginaMaterial()">📄 Página do material</button>
+      <button class="secondary" onclick="anexarImagemPorUrl()">🔗 Colar URL</button>
+      <button class="ghost" onclick="fecharBuscaImagem()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Paywall Modal -->
+<div class="paywall-modal" id="paywallModal">
+  <div class="paywall-card">
+    <div class="paywall-icon">⭐</div>
+    <h2>Assine o MedProvas Pro</h2>
+    <p style="color:var(--text-muted);">Você usou sua prova grátis. Para continuar gerando provas com IA, ative o Pro.</p>
+    <div class="price">R$ 39,90</div>
+    <div class="price-sub">por mês · cancele quando quiser</div>
+    <ul>
+      <li>Provas ilimitadas geradas com IA</li>
+      <li>Regeneração e adição de questões ilimitadas</li>
+      <li>Imagens, ECGs e ilustrações com IA</li>
+      <li>Export Word + PDF + Gabarito comentado</li>
+      <li>Correção de provas com gabaritos editáveis</li>
+    </ul>
+    <div class="btn-row">
+      <button class="large" onclick="irParaCheckout()">Assinar Pro</button>
+      <button class="ghost" onclick="fecharPaywall()">Agora não</button>
+    </div>
+  </div>
+</div>
+
+<!-- Container para exportação PDF (oculto) -->
+<div id="exportContainer" style="position:absolute; left:-9999px; top:0;"></div>
+
+<script>
+// ============================================================
+// PDF.js worker
+// ============================================================
+if (typeof pdfjsLib !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+}
+
+// ============================================================
+// Estado da aplicação
+// ============================================================
+const STORE_KEY = 'sistemaProvasState';
+let appState = {
+  apiKey: '',
+  users: {},        // cpf -> { nome, cpf, email, senha, disciplinas, provas }
+  sessaoAtual: null // cpf do usuário logado
+};
+
+let elaboracao = {
+  materiaisPdf: [],   // [{ nome, base64, mime }]
+  esqueleto: null     // { nome, base64, mime, texto? }
+};
+
+let provaAtualId = null;
+
+const LETRAS = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+function uuid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+// ============================================================
+// IndexedDB para armazenar PDFs dos materiais (não cabem no localStorage)
+// ============================================================
+let _dbPromise = null;
+function getDb() {
+  if (!_dbPromise) {
+    _dbPromise = new Promise((resolve, reject) => {
+      const req = indexedDB.open('sistemaProvasMateriais', 2);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('materiais')) {
+          db.createObjectStore('materiais', { keyPath: 'provaId' });
+        }
+        if (!db.objectStoreNames.contains('imagens')) {
+          db.createObjectStore('imagens', { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  return _dbPromise;
+}
+
+async function saveImagemDb(id, dataUrl) {
+  try {
+    const db = await getDb();
+    return new Promise((resolve) => {
+      const tx = db.transaction('imagens', 'readwrite');
+      tx.objectStore('imagens').put({ id, dataUrl });
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => resolve(false);
+    });
+  } catch (e) { return false; }
+}
+async function loadImagemDb(id) {
+  try {
+    const db = await getDb();
+    return new Promise((resolve) => {
+      const tx = db.transaction('imagens', 'readonly');
+      const req = tx.objectStore('imagens').get(id);
+      req.onsuccess = () => resolve(req.result ? req.result.dataUrl : null);
+      req.onerror = () => resolve(null);
+    });
+  } catch (e) { return null; }
+}
+async function deleteImagemDb(id) {
+  try {
+    const db = await getDb();
+    return new Promise((resolve) => {
+      const tx = db.transaction('imagens', 'readwrite');
+      tx.objectStore('imagens').delete(id);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+    });
+  } catch (e) {}
+}
+
+// Anexa uma imagem a uma questão, salvando o dataUrl no IndexedDB
+// e mantendo apenas referência (id) + dataUrl em memória.
+async function attachImagemAQuestao(questao, imgObj) {
+  if (!imgObj || !imgObj.dataUrl) { questao.imagem = null; return; }
+  const id = imgObj.id || uuid();
+  await saveImagemDb(id, imgObj.dataUrl);
+  questao.imagem = {
+    id,
+    dataUrl: imgObj.dataUrl,
+    titulo: imgObj.titulo || '',
+    fonte: imgObj.fonte || '',
+    autor: imgObj.autor || '',
+    urlOriginal: imgObj.urlOriginal || '',
+    origem: imgObj.origem || ''
+  };
+}
+
+async function restaurarImagensCache() {
+  if (!appState.users) return;
+  for (const user of Object.values(appState.users)) {
+    for (const prova of (user.provas || [])) {
+      for (const q of (prova.questoes || [])) {
+        if (q.imagem && q.imagem.id && !q.imagem.dataUrl) {
+          const url = await loadImagemDb(q.imagem.id);
+          if (url) q.imagem.dataUrl = url;
+        }
+      }
+    }
+  }
+}
+
+async function salvarMateriais(provaId, materiais) {
+  try {
+    const db = await getDb();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('materiais', 'readwrite');
+      tx.objectStore('materiais').put({ provaId, materiais });
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (e) { console.warn('IndexedDB indisponível:', e); }
+}
+
+async function obterMateriais(provaId) {
+  try {
+    const db = await getDb();
+    return new Promise((resolve) => {
+      const tx = db.transaction('materiais', 'readonly');
+      const req = tx.objectStore('materiais').get(provaId);
+      req.onsuccess = () => resolve(req.result ? req.result.materiais : []);
+      req.onerror = () => resolve([]);
+    });
+  } catch (e) { return []; }
+}
+
+async function removerMateriais(provaId) {
+  try {
+    const db = await getDb();
+    return new Promise((resolve) => {
+      const tx = db.transaction('materiais', 'readwrite');
+      tx.objectStore('materiais').delete(provaId);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+    });
+  } catch (e) {}
+}
+
+function carregarEstado() {
+  try {
+    const saved = localStorage.getItem(STORE_KEY);
+    if (saved) {
+      const data = JSON.parse(saved);
+      Object.assign(appState, data);
+    }
+  } catch (e) { console.warn('Erro ao carregar estado:', e); }
+}
+
+function salvarEstado() {
+  try {
+    // Clona o estado e remove dataUrls das imagens (ficam só no IndexedDB)
+    // para não estourar o limite de ~5MB do localStorage.
+    const clone = JSON.parse(JSON.stringify(appState));
+    if (clone.users) {
+      for (const cpf of Object.keys(clone.users)) {
+        const u = clone.users[cpf];
+        for (const prova of (u.provas || [])) {
+          for (const q of (prova.questoes || [])) {
+            if (q.imagem && q.imagem.dataUrl) {
+              delete q.imagem.dataUrl; // o dataUrl mora no IndexedDB
+            }
+          }
+        }
+      }
+    }
+    localStorage.setItem(STORE_KEY, JSON.stringify(clone));
+  } catch (e) {
+    console.warn('Erro ao salvar estado:', e);
+    alert('Erro ao salvar: ' + e.message + '\n\nO armazenamento pode estar cheio. Considere remover provas antigas.');
+  }
+}
+
+function userAtual() {
+  if (!appState.sessaoAtual) return null;
+  return appState.users[appState.sessaoAtual];
+}
+
+// ============================================================
+// Helpers
+// ============================================================
+function formatarCpf(input) {
+  let v = input.value.replace(/\D/g, '').slice(0, 11);
+  if (v.length > 9) v = v.slice(0, 9) + '-' + v.slice(9);
+  if (v.length > 6) v = v.slice(0, 6) + '.' + v.slice(6);
+  if (v.length > 3) v = v.slice(0, 3) + '.' + v.slice(3);
+  input.value = v;
+}
+function limparCpf(v) { return (v || '').replace(/\D/g, ''); }
+
+function mostrarErro(msg) {
+  const el = document.getElementById('authError');
+  el.textContent = msg;
+  el.classList.add('show');
+  document.getElementById('authSuccess').classList.remove('show');
+}
+function mostrarSucesso(msg) {
+  const el = document.getElementById('authSuccess');
+  el.textContent = msg;
+  el.classList.add('show');
+  document.getElementById('authError').classList.remove('show');
+}
+function limparMensagens() {
+  document.getElementById('authError').classList.remove('show');
+  document.getElementById('authSuccess').classList.remove('show');
+}
+
+// ============================================================
+// Autenticação
+// ============================================================
+function trocarAba(qual) {
+  limparMensagens();
+  document.querySelectorAll('.auth-tab').forEach((t, i) => {
+    t.classList.toggle('active', (qual === 'login' && i === 0) || (qual === 'registro' && i === 1));
+  });
+  document.getElementById('formLogin').classList.toggle('active', qual === 'login');
+  document.getElementById('formRegistro').classList.toggle('active', qual === 'registro');
+}
+
+function fazerRegistro() {
+  limparMensagens();
+  const nome = document.getElementById('regNome').value.trim();
+  const cpf = limparCpf(document.getElementById('regCpf').value);
+  const email = document.getElementById('regEmail').value.trim();
+  const disciplinasRaw = document.getElementById('regDisciplinas').value.trim();
+
+  if (!nome) return mostrarErro('Informe seu nome completo.');
+  if (cpf.length !== 11) return mostrarErro('CPF inválido (precisa ter 11 dígitos).');
+  if (!email || !email.includes('@')) return mostrarErro('E-mail inválido.');
+  const consentEl = document.getElementById('regConsent');
+  if (consentEl && !consentEl.checked) return mostrarErro('Para criar a conta, aceite os Termos de Uso e a Política de Privacidade.');
+  if (appState.users[cpf]) return mostrarErro('Já existe uma conta com esse CPF. Use a aba "Entrar".');
+
+  const disciplinas = disciplinasRaw
+    ? disciplinasRaw.split(',').map(s => s.trim()).filter(s => s)
+    : [];
+
+  appState.users[cpf] = {
+    nome, cpf, email,
+    senha: cpf.slice(0, 6),
+    disciplinas,
+    provas: []
+  };
+  salvarEstado();
+  mostrarSucesso('Conta criada! Sua senha é os 6 primeiros dígitos do CPF. Faça login.');
+  document.getElementById('loginCpf').value = document.getElementById('regCpf').value;
+  document.getElementById('loginSenha').value = '';
+  setTimeout(() => trocarAba('login'), 1500);
+}
+
+function fazerLogin() {
+  limparMensagens();
+  const cpf = limparCpf(document.getElementById('loginCpf').value);
+  const senha = document.getElementById('loginSenha').value;
+  const user = appState.users[cpf];
+  if (!user) return mostrarErro('CPF não cadastrado.');
+  if (user.senha !== senha) return mostrarErro('Senha incorreta.');
+  appState.sessaoAtual = cpf;
+  salvarEstado();
+  entrarApp();
+}
+
+function fazerLogout() {
+  // Logout é da conta MedTech (o overlay do _mtauth reaparece).
+  if (window.MT && window.MT.signOut) window.MT.signOut();
+}
+
+function entrarApp() {
+  document.getElementById('pageLogin').classList.add('hidden');
+  document.getElementById('appWrapper').classList.remove('hidden');
+  const u = userAtual();
+  document.getElementById('userInfoTopbar').textContent = u.nome;
+  document.getElementById('userAvatar').textContent = iniciaisDeNome(u.nome);
+  document.getElementById('menuPrimeiroNome').textContent = primeiroNome(u.nome);
+  navegar('menu');
+}
+
+function primeiroNome(nome) {
+  return (nome || '').trim().split(/\s+/)[0] || 'professor';
+}
+
+function iniciaisDeNome(nome) {
+  const partes = (nome || '').trim().split(/\s+/).filter(Boolean);
+  if (partes.length === 0) return '?';
+  if (partes.length === 1) return partes[0][0].toUpperCase();
+  return (partes[0][0] + partes[partes.length - 1][0]).toUpperCase();
+}
+
+// ============================================================
+// Navegação
+// ============================================================
+const PAGES = ['menu', 'disciplinas', 'elaborar', 'provas', 'prova', 'corrigir', 'config'];
+const PAGE_TITLES = {
+  menu: 'Início',
+  disciplinas: 'Minhas Disciplinas',
+  elaborar: 'Elaborar Prova',
+  provas: 'Minhas Provas',
+  prova: 'Detalhes da Prova',
+  corrigir: 'Correção de Provas',
+  config: 'Configurações'
+};
+const NAV_HIGHLIGHT = {
+  menu: 'menu',
+  disciplinas: 'disciplinas',
+  elaborar: 'elaborar',
+  provas: 'provas',
+  prova: 'provas',
+  corrigir: 'provas',
+  config: 'config'
+};
+function navegar(page) {
+  PAGES.forEach(p => {
+    const el = document.getElementById('page' + p.charAt(0).toUpperCase() + p.slice(1));
+    if (el) el.classList.add('hidden');
+  });
+  const target = document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1));
+  if (target) target.classList.remove('hidden');
+
+  // Atualiza título da topbar
+  const titleEl = document.getElementById('topbarPageTitle');
+  if (titleEl) titleEl.textContent = PAGE_TITLES[page] || '';
+
+  // Atualiza item ativo da sidebar
+  const navHighlight = NAV_HIGHLIGHT[page];
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.toggle('active', item.dataset.page === navHighlight);
+  });
+
+  // Scroll para o topo ao navegar
+  const main = document.querySelector('main.content');
+  if (main) main.scrollTop = 0;
+  window.scrollTo(0, 0);
+
+  if (page === 'menu') renderDashboard();
+  if (page === 'disciplinas') renderDisciplinas();
+  if (page === 'elaborar') prepararElaboracao();
+  if (page === 'provas') renderListaProvas();
+  if (page === 'prova') renderProva();
+  if (page === 'corrigir') renderCorrigir();
+  if (page === 'config') prepararConfig();
+}
+
+function renderDashboard() {
+  const u = userAtual();
+  if (!u) return;
+  const totalProvas = u.provas.length;
+  const totalDisciplinas = u.disciplinas.length;
+  const totalAlunos = u.provas.reduce((s, p) => s + (p.alunos ? p.alunos.length : 0), 0);
+  const totalQuestoes = u.provas.reduce((s, p) => s + (p.numQuestoes || 0), 0);
+
+  const stats = [
+    { label: 'Disciplinas', num: totalDisciplinas, svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>' },
+    { label: 'Provas criadas', num: totalProvas, svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>' },
+    { label: 'Questões geradas', num: totalQuestoes, svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>' },
+    { label: 'Alunos corrigidos', num: totalAlunos, svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>' }
+  ];
+
+  document.getElementById('dashStats').innerHTML = stats.map(s => `
+    <div class="dash-stat">
+      <div class="dash-stat-icon">${s.svg}</div>
+      <div class="dash-stat-info">
+        <div class="dash-stat-num">${s.num}</div>
+        <div class="dash-stat-label">${s.label}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// Disciplinas
+// ============================================================
+function adicionarDisciplina() {
+  const input = document.getElementById('novaDisciplina');
+  const nome = input.value.trim();
+  if (!nome) return;
+  const u = userAtual();
+  if (u.disciplinas.includes(nome)) {
+    alert('Disciplina já cadastrada.');
+    return;
+  }
+  u.disciplinas.push(nome);
+  salvarEstado();
+  input.value = '';
+  renderDisciplinas();
+}
+
+function removerDisciplina(nome) {
+  if (!confirm(`Remover a disciplina "${nome}"? Provas dela continuam acessíveis.`)) return;
+  const u = userAtual();
+  u.disciplinas = u.disciplinas.filter(d => d !== nome);
+  salvarEstado();
+  renderDisciplinas();
+}
+
+function renderDisciplinas() {
+  const u = userAtual();
+  const div = document.getElementById('listaDisciplinas');
+  if (u.disciplinas.length === 0) {
+    div.innerHTML = '<p style="color:#6b7280;">Nenhuma disciplina cadastrada. Adicione a primeira acima.</p>';
+    return;
+  }
+  div.innerHTML = '';
+  u.disciplinas.forEach(d => {
+    const tag = document.createElement('span');
+    tag.className = 'tag';
+    tag.innerHTML = `${d} <span class="remove" onclick="removerDisciplina('${d.replace(/'/g, "\\'")}')">✕</span>`;
+    div.appendChild(tag);
+  });
+}
+
+// ============================================================
+// Config
+// ============================================================
+function abrirConfig() {
+  navegar('config');
+}
+
+function prepararConfig() {
+  const u = userAtual();
+  document.getElementById('configNome').value = u.nome || '';
+  document.getElementById('configEmail').value = u.email || '';
+}
+
+function salvarConfig() {
+  const u = userAtual();
+  u.nome = document.getElementById('configNome').value.trim() || u.nome;
+  salvarEstado();
+  document.getElementById('userInfoTopbar').textContent = u.nome;
+  document.getElementById('userAvatar').textContent = iniciaisDeNome(u.nome);
+  document.getElementById('menuPrimeiroNome').textContent = primeiroNome(u.nome);
+  alert('Dados atualizados.');
+}
+
+// ===== Backup: exportar / restaurar (inclui imagens e materiais do IndexedDB) =====
+async function exportarBackup() {
+  const u = userAtual();
+  if (!u) { alert('Entre na sua conta primeiro.'); return; }
+  const imagens = {}, materiais = {};
+  for (const prova of (u.provas || [])) {
+    if (prova.id) { try { const m = await obterMateriais(prova.id); if (m && m.length) materiais[prova.id] = m; } catch (e) {} }
+    for (const q of (prova.questoes || [])) {
+      if (q.imagem && q.imagem.id) {
+        const url = q.imagem.dataUrl || await loadImagemDb(q.imagem.id);
+        if (url) imagens[q.imagem.id] = url;
+      }
+    }
+  }
+  const dump = {
+    app: 'medprovas', versao: 1, exportadoEm: new Date().toISOString(),
+    user: { nome: u.nome, email: u.email, disciplinas: u.disciplinas || [], provas: u.provas || [] },
+    imagens, materiais
+  };
+  const blob = new Blob([JSON.stringify(dump)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'medprovas-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click(); URL.revokeObjectURL(a.href);
+}
+function importarBackup() { document.getElementById('importBackupFile').click(); }
+async function aoEscolherBackup(ev) {
+  const file = ev.target.files && ev.target.files[0]; ev.target.value = '';
+  if (!file) return;
+  let dump;
+  try { dump = JSON.parse(await file.text()); } catch (e) { alert('Arquivo inválido.'); return; }
+  if (dump.app && dump.app !== 'medprovas') { alert('Este backup não é do MedProvas (é de "' + dump.app + '").'); return; }
+  const src = dump.user || dump;
+  const nProvas = Array.isArray(src.provas) ? src.provas.length : 0;
+  const nDisc = Array.isArray(src.disciplinas) ? src.disciplinas.length : 0;
+  if (!confirm('Restaurar este backup?\n\n• ' + nDisc + ' disciplina(s)\n• ' + nProvas + ' prova(s)\n\nIsso SUBSTITUI as provas e disciplinas desta conta.')) return;
+  const u = userAtual();
+  if (Array.isArray(src.disciplinas)) u.disciplinas = src.disciplinas;
+  if (Array.isArray(src.provas)) u.provas = src.provas;
+  if (src.nome && !u.nome) u.nome = src.nome;
+  try { for (const [id, url] of Object.entries(dump.imagens || {})) await saveImagemDb(id, url); } catch (e) {}
+  try { for (const [pid, mats] of Object.entries(dump.materiais || {})) await salvarMateriais(pid, mats); } catch (e) {}
+  salvarEstado();
+  alert('✅ Backup restaurado!');
+  location.reload();
+}
+
+// ============================================================
+// Elaboração de prova
+// ============================================================
+function prepararElaboracao() {
+  const u = userAtual();
+  const select = document.getElementById('elabDisciplina');
+  select.innerHTML = '';
+  if (u.disciplinas.length === 0) {
+    select.innerHTML = '<option value="">(Adicione uma disciplina primeiro)</option>';
+  } else {
+    u.disciplinas.forEach(d => {
+      select.innerHTML += `<option value="${d}">${d}</option>`;
+    });
+  }
+  document.getElementById('elabTitulo').value = '';
+  document.getElementById('elabNumQuestoes').value = '10';
+  document.getElementById('elabInstrucoes').value = '';
+  elaboracao.materiaisPdf = [];
+  elaboracao.esqueleto = null;
+  renderMateriais();
+  renderEsqueleto();
+  document.getElementById('elabStatus').innerHTML = '';
+}
+
+async function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      const base64 = result.split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function adicionarMateriais(event) {
+  const files = Array.from(event.target.files || []);
+  const LIMITE_INLINE = 14 * 1024 * 1024; // > esse vai sem base64 (blob direto), pra não estourar memória do navegador
+  for (const file of files) {
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+      alert('Apenas PDFs são aceitos para materiais. Pulei "' + file.name + '".');
+      continue;
+    }
+    if (file.size > 1024 * 1024 * 1024) {
+      alert('Arquivo "' + file.name + '" é maior que 1 GB. Pulei.');
+      continue;
+    }
+    if (file.size > LIMITE_INLINE) {
+      // Arquivo grande: NÃO converte pra base64 (estouraria memória). Guarda o File direto;
+      // o upload pro Storage acontece na hora da geração.
+      elaboracao.materiaisPdf.push({ nome: file.name, blob: file, mime: 'application/pdf', tamanho: file.size });
+    } else {
+      const base64 = await fileToBase64(file);
+      elaboracao.materiaisPdf.push({ nome: file.name, base64, mime: 'application/pdf', tamanho: file.size });
+    }
+  }
+  event.target.value = '';
+  renderMateriais();
+}
+
+function removerMaterial(idx) {
+  elaboracao.materiaisPdf.splice(idx, 1);
+  renderMateriais();
+}
+
+function renderMateriais() {
+  const div = document.getElementById('listaMateriais');
+  if (elaboracao.materiaisPdf.length === 0) {
+    div.innerHTML = '';
+    return;
+  }
+  div.innerHTML = '';
+  elaboracao.materiaisPdf.forEach((m, idx) => {
+    const item = document.createElement('div');
+    item.className = 'file-item';
+    item.innerHTML = `
+      <span>📄 ${m.nome}</span>
+      <button class="danger small" onclick="removerMaterial(${idx})">✕</button>
+    `;
+    div.appendChild(item);
+  });
+}
+
+async function adicionarEsqueleto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const ext = file.name.toLowerCase().split('.').pop();
+  if (ext !== 'pdf' && ext !== 'docx') {
+    alert('Apenas PDF ou .docx.');
+    return;
+  }
+  if (file.size > 100 * 1024 * 1024) {
+    alert('Esqueleto maior que 100MB.');
+    return;
+  }
+  // Arquivo grande (> 14 MB) → guarda só o blob; senão converte pra base64
+  const LIMITE_INLINE = 14 * 1024 * 1024;
+  let base64 = null, blob = null;
+  if (file.size > LIMITE_INLINE) {
+    blob = file;
+  } else {
+    base64 = await fileToBase64(file);
+  }
+  let texto = null;
+  if (ext === 'docx') {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const result = await mammoth.extractRawText({ arrayBuffer });
+      texto = result.value;
+    } catch (e) {
+      console.warn('Falha ao extrair texto do .docx:', e);
+    }
+  }
+  elaboracao.esqueleto = {
+    nome: file.name,
+    base64,
+    blob,
+    tamanho: file.size,
+    mime: ext === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ext,
+    texto
+  };
+  event.target.value = '';
+  renderEsqueleto();
+}
+
+function removerEsqueleto() {
+  elaboracao.esqueleto = null;
+  renderEsqueleto();
+}
+
+function renderEsqueleto() {
+  const div = document.getElementById('esqueletoInfo');
+  if (!elaboracao.esqueleto) {
+    div.innerHTML = '';
+    return;
+  }
+  const e = elaboracao.esqueleto;
+  div.innerHTML = `
+    <div class="file-item">
+      <span>📋 ${e.nome}</span>
+      <button class="danger small" onclick="removerEsqueleto()">✕</button>
+    </div>
+  `;
+}
+
+// ============================================================
+// Files API do Gemini — necessário para arquivos > ~18 MB
+// (limite total de inline_data por requisição)
+// ============================================================
+function base64ToBlob(base64, mime) {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new Blob([bytes], { type: mime });
+}
+
+async function uploadParaFilesAPI(blob, displayName, apiKey) {
+  // Step 1: inicia upload resumable
+  const startResp = await fetch(
+    `https://generativelanguage.googleapis.com/upload/v1beta/files?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: {
+        'X-Goog-Upload-Protocol': 'resumable',
+        'X-Goog-Upload-Command': 'start',
+        'X-Goog-Upload-Header-Content-Length': blob.size.toString(),
+        'X-Goog-Upload-Header-Content-Type': blob.type || 'application/pdf',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ file: { display_name: displayName || 'arquivo.pdf' } })
+    }
+  );
+  if (!startResp.ok) {
+    const txt = await startResp.text();
+    throw new Error('Falha ao iniciar upload (' + startResp.status + '): ' + txt.slice(0, 200));
+  }
+  const uploadUrl = startResp.headers.get('X-Goog-Upload-URL');
+  if (!uploadUrl) throw new Error('Sem URL de upload retornada pela API');
+
+  // Step 2: envia bytes do arquivo
+  const upResp = await fetch(uploadUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Length': blob.size.toString(),
+      'X-Goog-Upload-Offset': '0',
+      'X-Goog-Upload-Command': 'upload, finalize'
+    },
+    body: blob
+  });
+  if (!upResp.ok) {
+    const txt = await upResp.text();
+    throw new Error('Falha no upload (' + upResp.status + '): ' + txt.slice(0, 200));
+  }
+  const result = await upResp.json();
+  return result.file; // { name, uri, mimeType, state, ... }
+}
+
+async function aguardarArquivoAtivo(fileName, apiKey, maxTentativas = 30) {
+  for (let i = 0; i < maxTentativas; i++) {
+    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/${fileName}?key=${apiKey}`);
+    if (!resp.ok) throw new Error('Erro ao verificar arquivo: ' + resp.status);
+    const data = await resp.json();
+    if (data.state === 'ACTIVE') return data;
+    if (data.state === 'FAILED') throw new Error('Processamento do arquivo falhou no Gemini');
+    await new Promise(r => setTimeout(r, 1500));
+  }
+  throw new Error('Tempo esgotado esperando processamento do arquivo no Gemini');
+}
+
+// Recebe lista de { nome, base64, mime } e devolve array de parts para
+// usar em generateContent. Usa inline_data se o total for pequeno, ou
+// Files API quando ultrapassar o limite seguro.
+// Sobe um Blob para o Firebase Storage no prefixo do usuário e devolve o URI gs://
+async function uploadParaStorage(blob, nomeArquivo, onProgress) {
+  if (!window.fb || !window.fb.storage) throw new Error('Firebase Storage não pronto.');
+  if (!proState.fbUser) {
+    await garantirLoginFirebase();
+    if (!proState.fbUser) throw new Error('Login do Firebase não pronto para upload.');
+  }
+  const uid = proState.fbUser.uid;
+  // Caminho único por upload pra não colidir entre provas
+  const safe = (nomeArquivo || 'material.pdf').replace(/[^a-zA-Z0-9._-]/g, '_').slice(-80);
+  const path = `users/${uid}/uploads/${Date.now()}_${Math.random().toString(36).slice(2, 8)}_${safe}`;
+  const r = window.fb.storageRef(window.fb.storage, path);
+  const task = window.fb.uploadBytesResumable(r, blob, { contentType: blob.type || 'application/pdf' });
+  return await new Promise((resolve, reject) => {
+    task.on('state_changed',
+      (snap) => {
+        if (onProgress) {
+          const pct = snap.totalBytes ? Math.floor((snap.bytesTransferred / snap.totalBytes) * 100) : 0;
+          onProgress(`Enviando "${nomeArquivo}" ${pct}%`);
+        }
+      },
+      (err) => reject(new Error('Falha no upload para Storage: ' + (err.message || err.code || 'desconhecido'))),
+      () => {
+        const bucket = task.snapshot.metadata.bucket;
+        const fullPath = task.snapshot.metadata.fullPath;
+        resolve({ gsUri: `gs://${bucket}/${fullPath}`, path: fullPath, bucket });
+      }
+    );
+  });
+}
+
+// Tamanho real do arquivo, seja em blob ou em base64
+function tamanhoMaterial(a) {
+  if (a.tamanho) return Number(a.tamanho);
+  if (a.blob) return a.blob.size;
+  if (a.base64) return Math.floor((a.base64.length * 3) / 4);
+  return 0;
+}
+
+async function prepararPartesGemini(arquivos, apiKey, onProgress) {
+  if (!arquivos || arquivos.length === 0) return [];
+  const LIMITE_INLINE_TOTAL = 14 * 1024 * 1024;   // margem de segurança sob ~20 MB da Vertex
+  const LIMITE_INLINE_UM = 14 * 1024 * 1024;
+  const total = arquivos.reduce((s, a) => s + tamanhoMaterial(a), 0);
+  const algumGrande = arquivos.some(a => tamanhoMaterial(a) > LIMITE_INLINE_UM);
+  const semBase64 = arquivos.some(a => !a.base64); // já temos arquivo grande sem base64
+  const precisaURI = total > LIMITE_INLINE_TOTAL || algumGrande || semBase64;
+
+  if (!precisaURI) {
+    return arquivos.map(a => ({ inline_data: { mime_type: a.mime, data: a.base64 } }));
+  }
+
+  // Versão MedTech (domínio central): apenas inline (≤14 MB no total). Para PDFs
+  // maiores, divida o material — não há upload p/ Storage cross-project aqui.
+  throw new Error('PDF(s) muito grandes (acima de ~14 MB no total) para esta versão. Divida o material em arquivos menores e tente de novo.');
+}
+
+async function gerarProva() {
+  const disciplina = document.getElementById('elabDisciplina').value;
+  const titulo = document.getElementById('elabTitulo').value.trim();
+  const numQuestoes = parseInt(document.getElementById('elabNumQuestoes').value);
+  const instrucoes = document.getElementById('elabInstrucoes').value.trim();
+
+  if (!disciplina) return alert('Selecione uma disciplina.');
+  if (!titulo) return alert('Informe o título da prova.');
+  if (!numQuestoes || numQuestoes < 1) return alert('Número de questões inválido.');
+  if (elaboracao.materiaisPdf.length === 0) return alert('Adicione pelo menos um PDF de material didático.');
+
+  // Confirmação explícita dos PDFs que serão usados (evita confusão se sobrou de prova anterior)
+  const listaConf = elaboracao.materiaisPdf.map((m, i) => `${i + 1}. ${m.nome}`).join('\n');
+  if (!confirm(
+    `A IA vai gerar ${numQuestoes} questão(ões) usando EXCLUSIVAMENTE estes ${elaboracao.materiaisPdf.length} PDF(s):\n\n${listaConf}\n\n${elaboracao.esqueleto ? '+ esqueleto: ' + elaboracao.esqueleto.nome + '\n\n' : ''}Confirmar?`
+  )) return;
+
+  const statusEl = document.getElementById('elabStatus');
+  const btn = document.getElementById('btnGerar');
+  btn.disabled = true;
+  statusEl.innerHTML = '<span class="spinner"></span> Gerando prova com a IA... isso pode levar 30-60 segundos.';
+
+  try {
+    const prompt = montarPromptElaboracao(disciplina, numQuestoes, instrucoes);
+
+    // Monta lista de arquivos PDF (materiais + esqueleto se for PDF) — repassa
+    // tanto base64 (pequenos) quanto blob (grandes) pro prepararPartesGemini decidir.
+    const arquivosPdf = elaboracao.materiaisPdf.map(m => ({ nome: m.nome, base64: m.base64, blob: m.blob, tamanho: m.tamanho, mime: 'application/pdf' }));
+    if (elaboracao.esqueleto && elaboracao.esqueleto.mime === 'application/pdf') {
+      arquivosPdf.push({ nome: elaboracao.esqueleto.nome, base64: elaboracao.esqueleto.base64, blob: elaboracao.esqueleto.blob, tamanho: elaboracao.esqueleto.tamanho, mime: 'application/pdf' });
+    }
+
+    statusEl.innerHTML = '<span class="spinner"></span> Preparando arquivos para envio...';
+    const partsArquivos = await prepararPartesGemini(arquivosPdf, appState.apiKey, (msg) => {
+      statusEl.innerHTML = '<span class="spinner"></span> ' + msg;
+    });
+
+    // Monta partes: PDFs + esqueleto-texto (se houver) + prompt
+    const parts = [...partsArquivos];
+    if (elaboracao.esqueleto && elaboracao.esqueleto.mime !== 'application/pdf' && elaboracao.esqueleto.texto) {
+      parts.push({ text: 'Esqueleto/modelo (texto extraído):\n' + elaboracao.esqueleto.texto });
+    }
+    parts.push({ text: prompt });
+
+    statusEl.innerHTML = '<span class="spinner"></span> Gerando prova com a IA... isso pode levar 30-60 segundos.';
+
+    const data = await chamarGeminiNoServidor({
+      parts,
+      generationConfig: { responseMimeType: 'application/json', temperature: 0.4 },
+      model: 'gemini-2.5-flash',
+      intent: 'gerarProva'
+    });
+    if (!data.candidates || !data.candidates[0]) {
+      throw new Error('Resposta da IA vazia: ' + JSON.stringify(data).slice(0, 200));
+    }
+    const texto = data.candidates[0].content.parts[0].text.trim();
+    const jsonMatch = texto.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Resposta sem JSON: ' + texto.slice(0, 200));
+
+    const resultado = JSON.parse(jsonMatch[0]);
+    if (!Array.isArray(resultado.questoes) || resultado.questoes.length === 0) {
+      throw new Error('IA não retornou questões.');
+    }
+
+    // Sanitiza e valida questões
+    const toStr = (v) => (v === null || v === undefined) ? '' : (typeof v === 'string' ? v : (typeof v === 'object' ? JSON.stringify(v) : String(v)));
+    const questoes = resultado.questoes.slice(0, numQuestoes).map(q => {
+      const alt = q.alternativas || {};
+      const gab = toStr(q.gabarito).toUpperCase().trim();
+      return {
+        enunciado: toStr(q.enunciado),
+        alternativas: {
+          A: toStr(alt.A),
+          B: toStr(alt.B),
+          C: toStr(alt.C),
+          D: toStr(alt.D)
+        },
+        gabarito: ['A', 'B', 'C', 'D'].includes(gab) ? gab : 'A',
+        explicacao: toStr(q.explicacao),
+        referencias: toStr(q.referencias),
+        imagemSugerida: toStr(q.imagem_sugerida || (Array.isArray(q.imagem_termos) ? q.imagem_termos[0] : '')).trim(),
+        imagemTermos: Array.isArray(q.imagem_termos)
+          ? q.imagem_termos.map(t => toStr(t).trim()).filter(t => t.length > 1)
+          : (toStr(q.imagem_sugerida).trim() ? [toStr(q.imagem_sugerida).trim()] : []),
+        imagemMaterial: (q.imagem_material && q.imagem_material.usar) ? {
+          usar: true,
+          materialIndice: parseInt(q.imagem_material.material_indice),
+          pagina: parseInt(q.imagem_material.pagina),
+          descricao: toStr(q.imagem_material.descricao)
+        } : null,
+        imagem: null
+      };
+    });
+
+    while (questoes.length < numQuestoes) {
+      questoes.push({
+        enunciado: '(IA não gerou esta questão — preencha manualmente)',
+        alternativas: { A: '', B: '', C: '', D: '' },
+        gabarito: 'A',
+        explicacao: '',
+        referencias: '',
+        imagemSugerida: '',
+        imagemTermos: [],
+        imagemMaterial: null,
+        imagem: null
+      });
+    }
+
+    const prova = {
+      id: uuid(),
+      titulo,
+      disciplina,
+      numQuestoes,
+      numAlternativas: 4,
+      questoes,
+      anuladas: new Array(numQuestoes).fill(false),
+      alunos: [],
+      criadoEm: new Date().toISOString(),
+      templateDocxBase64: (elaboracao.esqueleto && elaboracao.esqueleto.ext === 'docx')
+        ? elaboracao.esqueleto.base64
+        : null,
+      templateNome: elaboracao.esqueleto ? elaboracao.esqueleto.nome : null
+    };
+
+    const u = userAtual();
+    u.provas.push(prova);
+    salvarEstado();
+    provaAtualId = prova.id;
+
+    // Salva PDFs dos materiais no IndexedDB para permitir regeneração de questões depois
+    await salvarMateriais(prova.id, elaboracao.materiaisPdf);
+
+    statusEl.innerHTML = '<span style="color:#10b981;">✓ Prova gerada com sucesso!</span>';
+    setTimeout(() => navegar('prova'), 1200);
+  } catch (err) {
+    statusEl.innerHTML = `<span style="color:#ef4444;">❌ ${err.message}</span>`;
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function montarPromptElaboracao(disciplina, numQuestoes, instrucoesExtras) {
+  const materiais = elaboracao.materiaisPdf || [];
+  const listaMateriais = materiais.length > 0
+    ? '\n\nMATERIAIS FORNECIDOS (use "material_indice" exatamente conforme abaixo para referenciar páginas):\n' +
+      materiais.map((m, i) => `  - Índice ${i}: ${m.nome}`).join('\n')
+    : '';
+  const exemploExplicacao = 'Explicação detalhada e didática, em pelo menos 3 a 5 frases, justificando por que a alternativa correta é a certa E comentando individualmente cada alternativa incorreta, dizendo por que está errada.';
+  const exemploReferencias = 'Referências bibliográficas concretas usadas para fundamentar a questão. Cite autores e obras clássicas brasileiras/internacionais (ex: Goldman-Cecil Medicina; Harrison Princípios de Medicina Interna; Tratado de Cardiologia da SBC; Diretriz X da Sociedade Brasileira de Y; consensos/guidelines reconhecidos). Se possível, mencione capítulo ou tópico. Quando o material PDF fornecido for relevante, cite-o explicitamente (ex: "Material PDF fornecido - Aula sobre choque séptico").';
+  const blocoInstrucoes = (instrucoesExtras && instrucoesExtras.trim())
+    ? `\n\nINSTRUÇÕES ESPECÍFICAS DO PROFESSOR (siga rigorosamente):\n"""\n${instrucoesExtras.trim()}\n"""\n`
+    : '';
+  return `INSTRUÇÃO DE IDIOMA — OBRIGATÓRIO:
+Toda a sua resposta DEVE ser em PORTUGUÊS BRASILEIRO (pt-BR). Use exclusivamente português brasileiro nos enunciados, alternativas, gabarito e explicações. NÃO use inglês, mesmo que os materiais de referência estejam em inglês — traduza os termos técnicos para português brasileiro. Use a terminologia médica usual no Brasil.
+
+Você é um professor universitário brasileiro de medicina criando uma prova no estilo ENARE/ENAMED (provas brasileiras de residência médica).
+
+Disciplina: ${disciplina}
+Quantidade de questões a gerar: ${numQuestoes}
+
+⛔ RESTRIÇÃO ABSOLUTA DE CONTEÚDO ⛔
+As questões DEVEM ser elaboradas EXCLUSIVAMENTE com base no conteúdo dos PDFs FORNECIDOS NESTA REQUISIÇÃO específica.
+- NÃO use seu conhecimento médico geral para criar questões sobre tópicos que não estão nos PDFs anexos.
+- NÃO crie questões sobre temas que não estejam explicitamente abordados nos materiais enviados aqui.
+- Se um tópico/doença/conduta NÃO está nos PDFs desta requisição, NÃO faça questão sobre ele, mesmo que pareça relevante para a disciplina.
+- Você não tem memória de PDFs de requisições anteriores. Use APENAS os arquivos listados abaixo.
+
+Use o material didático fornecido (PDFs anexados) como ÚNICA base de conhecimento.
+${elaboracao.esqueleto ? 'Use o esqueleto/modelo fornecido para inspirar o estilo das questões.' : ''}
+${listaMateriais}
+${blocoInstrucoes}
+REGRAS RIGOROSAS:
+1. TUDO em PORTUGUÊS BRASILEIRO. Enunciados, alternativas, explicações — TUDO em pt-BR.
+2. CADA questão deve apresentar um CASO CLÍNICO realista e detalhado em português (paciente brasileiro, idade, sintomas, exames, contexto).
+3. Use nomes brasileiros para os pacientes (ex: "João, 56 anos", "Maria, 32 anos", "Sr. Carlos", "Sra. Antônia").
+4. Após o caso clínico, faça uma pergunta direta em português (ex: "Qual é o diagnóstico mais provável?", "Qual a conduta inicial?", "Qual o tratamento de primeira escolha?").
+5. Forneça exatamente 4 alternativas (A, B, C, D) em português, apenas UMA correta.
+6. As alternativas erradas (distratores) devem ser plausíveis — diagnósticos diferenciais, condutas alternativas razoáveis, medicamentos da mesma classe, etc.
+7. Evite alternativas óbvias, absurdas ou pegadinhas tipo "todas estão corretas" / "nenhuma das alternativas".
+8. Use terminologia médica brasileira (ex: "infarto agudo do miocárdio" e não "myocardial infarction"; "pressão arterial" e não "blood pressure"; "via aérea" e não "airway"; "hemograma" e não "complete blood count").
+9. Doses, medicamentos, unidades: use convenções brasileiras (mg, mL, mmHg, etc.).
+10. Cada questão deve ter uma EXPLICAÇÃO DETALHADA do gabarito em português, comentando POR QUE a correta é correta E comentando individualmente cada alternativa errada. Mínimo 3 a 5 frases.
+11. Cada questão deve ter REFERÊNCIAS bibliográficas concretas em português (livros texto, diretrizes brasileiras, sociedades, guidelines).
+12. Não repita o mesmo tema/caso entre questões — varie tópicos cobertos pelo material.
+13. Para CADA questão, avalie se ela se beneficiaria de uma IMAGEM ILUSTRATIVA (ECG, raio-X, tomografia, ressonância, ultrassom, dermatoscopia, lesão, histologia, esquema anatômico, etc.).
+
+PREFERÊNCIA ABSOLUTA: use IMAGEM DOS MATERIAIS FORNECIDOS sempre que possível.
+- Os PDFs dos materiais estão numerados (na ordem em que foram enviados, começando em 0).
+- Para cada PDF, você consegue VER cada página individualmente.
+- Identifique a página exata que contém a figura/ECG/raio-X/diagrama ideal para a questão.
+- Preencha "imagem_material" assim:
+  { "usar": true, "material_indice": 0, "pagina": 5, "descricao": "ECG mostrando supra de ST anterior" }
+  onde "material_indice" é o índice 0-based do PDF e "pagina" é o número da página (começando em 1).
+
+SOMENTE se NENHUM material tiver uma figura adequada para a questão, sugira "imagem_termos" como fallback para busca na internet — uma LISTA de 3-5 termos em INGLÊS MÉDICO, do mais específico ao mais genérico.
+
+Se a questão NÃO se beneficiaria de imagem alguma, deixe ambos campos como:
+{ "imagem_material": { "usar": false }, "imagem_termos": [] }
+
+Exemplos de "imagem_termos" (apenas quando NÃO houver imagem no material):
+- TCA com QRS alargado: ["ECG wide QRS TCA overdose", "ECG wide QRS prolongation", "ECG QRS widening", "electrocardiogram"]
+- Pneumonia lobar: ["chest x-ray lobar pneumonia", "chest x-ray pneumonia", "chest radiograph"]
+- IAM com supra: ["ECG anterior STEMI", "ECG ST elevation", "electrocardiogram"]
+
+Retorne APENAS este JSON, sem markdown, sem comentários extras. TODO O CONTEÚDO TEXTUAL DENTRO DO JSON DEVE ESTAR EM PORTUGUÊS BRASILEIRO:
+{
+  "questoes": [
+    {
+      "enunciado": "Caso clínico completo em português com a pergunta no final, também em português",
+      "alternativas": {
+        "A": "Texto da alternativa A em português",
+        "B": "Texto da alternativa B em português",
+        "C": "Texto da alternativa C em português",
+        "D": "Texto da alternativa D em português"
+      },
+      "gabarito": "A",
+      "explicacao": "${exemploExplicacao}",
+      "referencias": "${exemploReferencias}",
+      "imagem_material": { "usar": true, "material_indice": 0, "pagina": 5, "descricao": "breve descrição do que tem nessa página" },
+      "imagem_termos": []
+    }
+  ]
+}
+
+A lista "questoes" deve conter EXATAMENTE ${numQuestoes} elementos. TODOS em português brasileiro, com explicação detalhada e referências.`;
+}
+
+// ============================================================
+// Lista de provas
+// ============================================================
+function renderListaProvas() {
+  const u = userAtual();
+  const div = document.getElementById('listaProvas');
+  if (u.provas.length === 0) {
+    div.innerHTML = '<p style="color:#6b7280; text-align:center; padding:20px;">Nenhuma prova criada ainda. Use "Elaborar Prova" no menu.</p>';
+    return;
+  }
+  div.innerHTML = '';
+  // Mostra mais recentes primeiro
+  [...u.provas].reverse().forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'lista-item';
+    const dt = new Date(p.criadoEm).toLocaleDateString('pt-BR');
+    item.innerHTML = `
+      <div class="info">
+        <div class="titulo">${p.titulo}</div>
+        <div class="meta">${p.disciplina} • ${p.numQuestoes} questões • criada em ${dt} • ${p.alunos.length} aluno(s) corrigido(s)</div>
+      </div>
+      <div class="acoes">
+        <button class="secondary small" onclick="abrirProva('${p.id}')">📖 Ver</button>
+        <button class="success small" onclick="abrirProva('${p.id}'); setTimeout(()=>navegar('corrigir'), 100)">✏️ Corrigir</button>
+      </div>
+    `;
+    div.appendChild(item);
+  });
+}
+
+function abrirProva(id) {
+  provaAtualId = id;
+  navegar('prova');
+}
+
+function getProvaAtual() {
+  const u = userAtual();
+  return u.provas.find(p => p.id === provaAtualId);
+}
+
+async function removerProvaAtual() {
+  const p = getProvaAtual();
+  if (!p) return;
+  if (!confirm(`Excluir a prova "${p.titulo}"? Todas as correções de alunos serão perdidas.`)) return;
+  const u = userAtual();
+  u.provas = u.provas.filter(x => x.id !== provaAtualId);
+  salvarEstado();
+  await removerMateriais(provaAtualId);
+  navegar('provas');
+}
+
+// ============================================================
+// Ver/Editar prova
+// ============================================================
+function renderProva() {
+  const p = getProvaAtual();
+  if (!p) { navegar('provas'); return; }
+  document.getElementById('provaTitulo').textContent = p.titulo;
+  document.getElementById('provaBreadcrumb').textContent = p.titulo;
+  const tmpl = p.templateNome ? ` • template: ${p.templateNome}` : '';
+  document.getElementById('provaMeta').textContent = `${p.disciplina} • ${p.numQuestoes} questões • criada em ${new Date(p.criadoEm).toLocaleDateString('pt-BR')}${tmpl}`;
+  document.getElementById('btnDocx').style.display = p.templateDocxBase64 ? '' : 'none';
+
+  const div = document.getElementById('provaQuestoes');
+  div.innerHTML = '';
+  p.questoes.forEach((q, idx) => {
+    const card = document.createElement('div');
+    card.className = 'questao-gerada';
+    card.innerHTML = `
+      <h4>Questão ${idx + 1} ${p.anuladas[idx] ? '<span style="color:#92400e; font-size:0.85em;">(ANULADA)</span>' : ''}</h4>
+      <textarea class="enunciado-edit" style="width:100%; min-height:0; padding:12px; line-height:1.55; font-size:0.97em; overflow:hidden; resize:vertical;">${q.enunciado}</textarea>
+      <div class="alternativas" style="margin-top:10px;">
+        ${['A','B','C','D'].map(letra => `
+          <div class="questao-alt ${q.gabarito === letra ? 'gabarito' : ''}" data-letra="${letra}" onclick="alterarGabarito('${p.id}', ${idx}, '${letra}')" style="align-items:flex-start;">
+            <span class="letra" style="padding-top:4px;">${letra})</span>
+            <textarea class="alternativa-edit" data-letra="${letra}" rows="1" style="flex:1; min-height:0; border:none; background:transparent; padding:4px 0; font-family:inherit; font-size:inherit; line-height:1.5; resize:none; overflow:hidden; outline:none;" onclick="event.stopPropagation()">${escapeHtml(q.alternativas[letra] || '')}</textarea>
+          </div>
+        `).join('')}
+      </div>
+      ${renderImagemQuestao(q, idx)}
+      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:8px;">
+        <label style="font-size:0.85em; color:#92400e;">
+          <input type="checkbox" ${p.anuladas[idx] ? 'checked' : ''} onchange="toggleAnulada('${p.id}', ${idx}, this.checked)">
+          Anular questão
+        </label>
+        <span style="font-size:0.85em; color:#6b7280;">Gabarito: ${q.gabarito}</span>
+        <button class="secondary small" onclick="abrirBuscaImagem(${idx})">🖼️ ${q.imagem ? 'Trocar imagem' : 'Adicionar imagem'}</button>
+        <button class="secondary small" onclick="regenerarQuestao(${idx})" style="margin-left:auto;">🔄 Regenerar com IA</button>
+        <button class="danger small" onclick="removerQuestao(${idx})" title="Remover esta questão">🗑️</button>
+      </div>
+      ${q.explicacao ? `<details style="margin-top:8px; font-size:0.9em;"><summary style="cursor:pointer; color:#6b7280;">📘 Comentário</summary><p style="margin-top:6px; color:#4b5563; white-space:pre-wrap;">${escapeHtml(q.explicacao)}</p></details>` : ''}
+      ${q.referencias ? `<details style="margin-top:4px; font-size:0.9em;"><summary style="cursor:pointer; color:#6b7280;">📚 Referências</summary><p style="margin-top:6px; color:#4b5563; white-space:pre-wrap;">${escapeHtml(q.referencias)}</p></details>` : ''}
+    `;
+    div.appendChild(card);
+    // Auto-resize helper para qualquer textarea
+    const ajustaAltura = (ta) => {
+      ta.style.height = 'auto';
+      ta.style.height = (ta.scrollHeight + 2) + 'px';
+    };
+
+    // Bind enunciado edit + auto-resize
+    const textarea = card.querySelector('.enunciado-edit');
+    requestAnimationFrame(() => ajustaAltura(textarea));
+    textarea.addEventListener('input', () => ajustaAltura(textarea));
+    textarea.onchange = () => {
+      q.enunciado = textarea.value;
+      salvarEstado();
+    };
+
+    // Bind alternativas edit + auto-resize
+    card.querySelectorAll('.alternativa-edit').forEach(ta => {
+      requestAnimationFrame(() => ajustaAltura(ta));
+      ta.addEventListener('input', () => ajustaAltura(ta));
+      ta.onchange = () => {
+        q.alternativas[ta.dataset.letra] = ta.value;
+        salvarEstado();
+      };
+    });
+  });
+}
+
+function alterarGabarito(provaId, idx, letra) {
+  const u = userAtual();
+  const p = u.provas.find(x => x.id === provaId);
+  if (!p) return;
+  p.questoes[idx].gabarito = letra;
+  salvarEstado();
+  renderProva();
+}
+
+function editarAlternativa(provaId, idx, letra, valor) {
+  const u = userAtual();
+  const p = u.provas.find(x => x.id === provaId);
+  if (!p) return;
+  p.questoes[idx].alternativas[letra] = valor;
+  salvarEstado();
+}
+
+function toggleAnulada(provaId, idx, val) {
+  const u = userAtual();
+  const p = u.provas.find(x => x.id === provaId);
+  if (!p) return;
+  p.anuladas[idx] = val;
+  salvarEstado();
+  renderProva();
+}
+
+// ============================================================
+// Imagem por questão (Wikimedia Commons)
+// ============================================================
+let _idxImagemAtiva = null;
+
+function renderImagemQuestao(q, idx) {
+  if (q.imagem && q.imagem.dataUrl) {
+    return `
+      <div class="questao-imagem">
+        <img src="${q.imagem.dataUrl}" alt="Imagem da questão ${idx + 1}">
+        <div class="img-info">
+          <div class="img-titulo">${escapeHtml(q.imagem.titulo || 'Imagem anexada')}</div>
+          ${q.imagem.fonte ? `<div style="margin-top:4px;">Fonte: ${escapeHtml(q.imagem.fonte)}</div>` : ''}
+          ${q.imagem.autor ? `<div>Autor/licença: ${escapeHtml(q.imagem.autor)}</div>` : ''}
+        </div>
+      </div>`;
+  }
+  if (q.imagemSugerida) {
+    return `
+      <div class="questao-sem-imagem">
+        🖼️ A IA sugeriu uma imagem ilustrativa para esta questão: <em>"${escapeHtml(q.imagemSugerida)}"</em>.
+        Clique em "Adicionar imagem" abaixo para buscar e anexar.
+      </div>`;
+  }
+  return '';
+}
+
+function abrirBuscaImagem(idx) {
+  const p = getProvaAtual();
+  if (!p) return;
+  _idxImagemAtiva = idx;
+  const q = p.questoes[idx];
+  document.getElementById('imgModalTitle').textContent = `🖼️ Imagem para Questão ${idx + 1}`;
+  const input = document.getElementById('imgSearchInput');
+  input.value = q.imagemSugerida || '';
+  document.getElementById('imgResults').innerHTML = '';
+  document.getElementById('imgSearchStatus').innerHTML = '';
+  document.getElementById('imgModal').classList.add('show');
+  if (q.imagemSugerida) {
+    executarBuscaImagem();
+  } else {
+    input.focus();
+  }
+}
+
+function fecharBuscaImagem() {
+  document.getElementById('imgModal').classList.remove('show');
+  _idxImagemAtiva = null;
+}
+
+async function traduzirTermoParaIngles(termoPt) {
+  try {
+    const prompt = `Você é um tradutor de termos médicos. Traduza o termo abaixo de PORTUGUÊS para INGLÊS, usando a terminologia médica padrão internacional (do tipo usada em PubMed, Radiopaedia, Wikipedia médico).
+
+Termo em português: "${termoPt}"
+
+Exemplos de traduções esperadas:
+- "ECG infarto anterior" → ECG anterior STEMI
+- "ECG infarto inferior" → ECG inferior wall myocardial infarction
+- "raio-X tórax pneumonia" → chest x-ray pneumonia consolidation
+- "TC abdome apendicite aguda" → abdominal CT acute appendicitis
+- "TC crânio AVC isquêmico" → brain CT ischemic stroke
+- "ECG fibrilação atrial" → ECG atrial fibrillation
+- "RX tórax pneumotórax" → chest x-ray pneumothorax
+- "ECG bloqueio AV terceiro grau" → ECG third degree AV block
+
+INSTRUÇÃO: responda em UMA ÚNICA LINHA contendo APENAS o termo traduzido em inglês, sem aspas, sem explicação, sem comentário.
+
+Tradução:`;
+    const data = await chamarGemini({
+      parts: [{ text: prompt }],
+      generationConfig: {
+        temperature: 0,
+        maxOutputTokens: 200,
+        thinkingConfig: { thinkingBudget: 0 }
+      },
+      intent: 'helper'
+    });
+    const traducao = (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text) || '';
+    let limpo = traducao.replace(/^["'`*]+|["'`*]+$/g, '').replace(/[\r\n]+/g, ' ').trim();
+    // Remove prefixos comuns que o modelo às vezes adiciona
+    limpo = limpo.replace(/^(tradução:|translation:|in english:|english:)\s*/i, '').trim();
+    return (limpo.length >= 3) ? limpo : termoPt;
+  } catch (e) {
+    return termoPt;
+  }
+}
+
+function pareceuPortugues(texto) {
+  if (/[áéíóúâêîôûãõç]/i.test(texto)) return true;
+  const palavrasPt = /\b(de|da|do|das|dos|com|para|em|na|no|nas|nos|um|uma|raio|raios|infarto|pneumonia|apendicite|tomografia|ressonância|abdome|tórax|coração|pulmão|fígado|aguda|crônico|cerebral|isquêmico|hemorrágico|fibrilação|fratura|derrame|edema|estenose|fibrilac|sindrome|síndrome|atelectasia)\b/i;
+  return palavrasPt.test(texto);
+}
+
+// Recorta uma imagem (data URL) com base em bbox normalizado 0-1000 do Gemini
+// bbox format: [y_min, x_min, y_max, x_max]
+async function recortarImagemPorBbox(dataUrl, bbox, padPct = 0.04) {
+  if (!Array.isArray(bbox) || bbox.length !== 4) return dataUrl;
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const W = img.naturalWidth;
+      const H = img.naturalHeight;
+      const [yMin, xMin, yMax, xMax] = bbox.map(v => Math.max(0, Math.min(1000, Number(v) || 0)));
+      let x1 = Math.floor(xMin / 1000 * W);
+      let y1 = Math.floor(yMin / 1000 * H);
+      let x2 = Math.floor(xMax / 1000 * W);
+      let y2 = Math.floor(yMax / 1000 * H);
+      const w = x2 - x1;
+      const h = y2 - y1;
+      // Sanity check: se o bbox for muito pequeno ou muito grande, devolve a imagem inteira
+      if (w < W * 0.05 || h < H * 0.05) { resolve(dataUrl); return; }
+      if (w > W * 0.97 && h > H * 0.97) { resolve(dataUrl); return; }
+      // Adiciona margem para não cortar muito apertado
+      const padW = Math.floor(w * padPct);
+      const padH = Math.floor(h * padPct);
+      const cropX = Math.max(0, x1 - padW);
+      const cropY = Math.max(0, y1 - padH);
+      const cropW = Math.min(W - cropX, w + 2 * padW);
+      const cropH = Math.min(H - cropY, h + 2 * padH);
+      const canvas = document.createElement('canvas');
+      canvas.width = cropW;
+      canvas.height = cropH;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, cropW, cropH);
+      ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+      resolve(canvas.toDataURL('image/jpeg', 0.85));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
+// Segunda passada de IA: detecta o bbox da figura médica relevante na página renderizada
+async function detectarBboxFiguraNaPagina(pageImageDataUrl, descricao, contextoQuestao) {
+  const [meta, base64] = pageImageDataUrl.split(',');
+  const mediaType = (meta.match(/data:(.*?);/) || [])[1] || 'image/jpeg';
+  const prompt = `Você está olhando a imagem de uma slide/página de material médico (PDF de aula).
+
+Sua tarefa: encontrar o bounding box APENAS da figura médica/diagnóstica nesta página — geralmente UMA imagem retangular contendo: ECG, raio-X, tomografia (TC), ressonância (RM), ultrassom, foto clínica, lâmina histológica, dermatoscopia, ou esquema anatômico.
+
+A figura procurada é descrita como: "${descricao || 'imagem médica relevante'}"
+
+Contexto da questão que vai usar a figura (para você identificar QUAL figura é a certa, se houver mais de uma):
+"${(contextoQuestao || '').slice(0, 400)}"
+
+REGRAS:
+- Inclua apenas a área da figura/imagem em si.
+- EXCLUA títulos da slide, texto explicativo, legendas longas, listas, bullets, marca d'água, logo, números de página.
+- EXCLUA QUALQUER TEXTO QUE POSSA REVELAR A RESPOSTA (laudo, diagnóstico escrito na slide, anotações).
+- Se houver várias figuras na página, escolha a que MELHOR ilustra o contexto da questão.
+- Se NÃO houver uma figura médica clara/recortável, retorne null.
+
+Retorne APENAS este JSON, sem markdown:
+{"bbox": [y_min, x_min, y_max, x_max]}
+
+onde os 4 valores são números entre 0 e 1000 (sistema de coordenadas normalizado do Gemini, [y_min, x_min, y_max, x_max]).
+Se não houver figura: {"bbox": null}`;
+
+  try {
+    const data = await chamarGemini({
+      parts: [
+        { inline_data: { mime_type: mediaType, data: base64 } },
+        { text: prompt }
+      ],
+      generationConfig: {
+        responseMimeType: 'application/json',
+        temperature: 0,
+        thinkingConfig: { thinkingBudget: 0 }
+      },
+      intent: 'helper'
+    });
+    const text = data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
+    if (!text) return null;
+    const m = text.match(/\{[\s\S]*\}/);
+    if (!m) return null;
+    const result = JSON.parse(m[0]);
+    if (!result.bbox || !Array.isArray(result.bbox) || result.bbox.length !== 4) return null;
+    return result.bbox.map(v => Number(v));
+  } catch (e) {
+    console.warn('Falha detectar bbox:', e);
+    return null;
+  }
+}
+
+// Renderiza uma página específica de um PDF como JPEG (data URL)
+async function extrairPaginaPdfComoImagem(pdfSource, pagina, maxWidth = 1100) {
+  // pdfSource pode ser string base64 OU Blob/File. Vertex de PDFs grandes é via blob.
+  let bytes;
+  if (typeof pdfSource === 'string') {
+    bytes = Uint8Array.from(atob(pdfSource), c => c.charCodeAt(0));
+  } else if (pdfSource && typeof pdfSource.arrayBuffer === 'function') {
+    bytes = new Uint8Array(await pdfSource.arrayBuffer());
+  } else {
+    throw new Error('Fonte do PDF inválida para extração de página');
+  }
+  const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
+  const pageNum = Math.max(1, Math.min(pdf.numPages, parseInt(pagina) || 1));
+  const page = await pdf.getPage(pageNum);
+  const viewport1 = page.getViewport({ scale: 1 });
+  const scale = Math.min(1.6, maxWidth / viewport1.width);
+  const viewport = page.getViewport({ scale });
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.floor(viewport.width);
+  canvas.height = Math.floor(viewport.height);
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  await page.render({ canvasContext: ctx, viewport }).promise;
+  return canvas.toDataURL('image/jpeg', 0.78);
+}
+
+// Tenta anexar imagem extraindo do material PDF referenciado pela IA
+async function anexarImagemDeMaterial(q, materiais) {
+  if (!q.imagemMaterial || !q.imagemMaterial.usar) return null;
+  const idx = q.imagemMaterial.materialIndice;
+  const pagina = q.imagemMaterial.pagina;
+  if (idx === undefined || idx === null || idx < 0 || idx >= materiais.length) return null;
+  if (!pagina || pagina < 1) return null;
+  const mat = materiais[idx];
+  if (!mat || (!mat.base64 && !mat.blob)) return null;
+  try {
+    // 1. Renderiza a página inteira em alta resolução (aceita base64 ou blob)
+    let dataUrl = await extrairPaginaPdfComoImagem(mat.blob || mat.base64, pagina, 1400);
+
+    // 2. Detecta o bbox APENAS da figura médica e recorta (sem texto/respostas)
+    const bbox = await detectarBboxFiguraNaPagina(
+      dataUrl,
+      q.imagemMaterial.descricao,
+      q.enunciado || ''
+    );
+    if (bbox) {
+      dataUrl = await recortarImagemPorBbox(dataUrl, bbox, 0.04);
+    }
+
+    return {
+      dataUrl,
+      titulo: q.imagemMaterial.descricao || `Figura da p. ${pagina}`,
+      fonte: `Material: ${mat.nome} (p. ${pagina})`,
+      autor: 'Extraído do material da aula',
+      urlOriginal: '',
+      origem: 'material'
+    };
+  } catch (e) {
+    console.warn('Falha extrair página do PDF:', e);
+    return null;
+  }
+}
+
+// Busca no Wikimedia Commons
+async function buscarWikimedia(termoIngles) {
+  try {
+    const url = `https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrsearch=${encodeURIComponent(termoIngles + ' filetype:bitmap|drawing')}&gsrlimit=20&gsrnamespace=6&prop=imageinfo&iiprop=url|extmetadata|mime|size&iiurlwidth=600&origin=*`;
+    const resp = await fetch(url);
+    if (!resp.ok) return [];
+    const data = await resp.json();
+    const pages = (data.query && data.query.pages) ? Object.values(data.query.pages) : [];
+    return pages
+      .map(p => p.imageinfo && p.imageinfo[0] ? { titulo: p.title, ...p.imageinfo[0] } : null)
+      .filter(x => x && /^image\/(jpeg|jpg|png|gif|webp)$/i.test(x.mime))
+      .filter(x => x.size < 20 * 1024 * 1024)
+      .map(x => {
+        const meta = x.extmetadata || {};
+        const autor = (meta.Artist && meta.Artist.value) ? meta.Artist.value.replace(/<[^>]+>/g, '').slice(0, 80) : '';
+        const licenca = (meta.LicenseShortName && meta.LicenseShortName.value) || '';
+        return {
+          titulo: (x.titulo || '').replace(/^File:/, ''),
+          urlOriginal: x.url,
+          urlThumb: x.thumburl || x.url,
+          autor: (autor ? autor + ' · ' : '') + (licenca || ''),
+          fonte: 'Wikimedia Commons',
+          size: x.size
+        };
+      });
+  } catch (e) { return []; }
+}
+
+// Busca no Openverse (agregador de imagens CC: Wikimedia + Flickr CC + Smithsonian + etc.)
+async function buscarOpenverse(termoIngles) {
+  try {
+    const url = `https://api.openverse.org/v1/images/?q=${encodeURIComponent(termoIngles)}&license=cc0,by,by-sa,pdm&page_size=20&mature=false`;
+    const resp = await fetch(url);
+    if (!resp.ok) return [];
+    const data = await resp.json();
+    return (data.results || []).map(x => ({
+      titulo: x.title || 'Imagem',
+      urlOriginal: x.url,
+      urlThumb: x.thumbnail || x.url,
+      autor: [x.creator, x.license_url ? `License: ${x.license}` : x.license].filter(Boolean).join(' · '),
+      fonte: 'Openverse · ' + (x.source || 'CC'),
+      size: 0
+    }));
+  } catch (e) { return []; }
+}
+
+function pontuarCandidato(c, termo) {
+  const palavras = termo.toLowerCase().split(/\s+/).filter(p => p.length > 2 && !/^(the|and|with|for|from|that|this|some|any|its|out|over|under)$/.test(p));
+  const titulo = (c.titulo || '').toLowerCase();
+  let score = 0;
+  palavras.forEach(p => { if (titulo.includes(p)) score++; });
+  // Bônus para conteúdo claramente médico
+  if (/\b(ecg|ekg|electrocardiogram|x-?ray|radiograph|ct|mri|ultrasound|us|tomography|histology|pathology|medical|clinical|diagnosis|patient|hospital|doctor|disease|syndrome|infection|tumor|tumour|lesion|biopsy|anatomy|gross|specimen|microscopy)\b/i.test(titulo)) score += 2;
+  // Penaliza claramente não-médico
+  if (/\b(meeting|conference|secretary|commerce|deputy|airport|aircraft|airplane|train|locomotive|building|headquarters|press|government|portrait|logo|flag|cover|book|map|map of|stadium|car|vehicle|truck|plane|flag of|seal of|coat of arms|election|politician|president|minister)\b/i.test(titulo)) score -= 5;
+  return score;
+}
+
+async function buscarMelhorImagemPorTermo(termo) {
+  if (!termo || !termo.trim()) return null;
+  // Busca em paralelo as duas fontes para velocidade
+  const [wiki, openv] = await Promise.all([buscarWikimedia(termo), buscarOpenverse(termo)]);
+  const candidatos = [...wiki, ...openv];
+  if (candidatos.length === 0) return null;
+
+  const scored = candidatos
+    .map(c => ({ ...c, score: pontuarCandidato(c, termo) }))
+    .filter(c => c.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  if (scored.length === 0) return null;
+  return scored[0];
+}
+
+async function baixarComoDataUrl(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  const blob = await r.blob();
+  return await new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => resolve(fr.result);
+    fr.onerror = reject;
+    fr.readAsDataURL(blob);
+  });
+}
+
+// Tenta vários termos em sequência (específico → genérico) até achar uma imagem
+async function buscarMelhorImagemAuto(termoOuLista) {
+  let termos = [];
+  if (Array.isArray(termoOuLista)) termos = termoOuLista.filter(t => t && t.trim());
+  else if (typeof termoOuLista === 'string' && termoOuLista.trim()) termos = [termoOuLista.trim()];
+  if (termos.length === 0) return null;
+
+  for (const termo of termos) {
+    const escolhido = await buscarMelhorImagemPorTermo(termo);
+    if (escolhido) {
+      try {
+        const dataUrl = await baixarComoDataUrl(escolhido.urlThumb);
+        return {
+          dataUrl,
+          titulo: escolhido.titulo,
+          fonte: escolhido.fonte,
+          autor: escolhido.autor,
+          urlOriginal: escolhido.urlOriginal,
+          termoUsado: termo
+        };
+      } catch (e) {
+        // Continua para o próximo termo
+      }
+    }
+  }
+  return null;
+}
+
+async function anexarImagensAutomatico(prova, materiais, onProgress) {
+  let anexadas = 0;
+  const mats = materiais || (await obterMateriais(prova.id)) || [];
+  for (let i = 0; i < prova.questoes.length; i++) {
+    const q = prova.questoes[i];
+    if (q.imagem) continue;
+
+    // 1ª tentativa: imagem extraída do PDF do material
+    if (q.imagemMaterial && q.imagemMaterial.usar) {
+      if (onProgress) onProgress(i + 1, prova.questoes.length, `material p.${q.imagemMaterial.pagina}`);
+      const imgMat = await anexarImagemDeMaterial(q, mats);
+      if (imgMat) {
+        await attachImagemAQuestao(q, imgMat);
+        anexadas++;
+        continue;
+      }
+    }
+
+    // 2ª tentativa (fallback): busca na internet
+    const termos = (q.imagemTermos && q.imagemTermos.length > 0)
+      ? q.imagemTermos
+      : (q.imagemSugerida ? [q.imagemSugerida] : []);
+    if (termos.length === 0) continue;
+    if (onProgress) onProgress(i + 1, prova.questoes.length, termos[0]);
+    const img = await buscarMelhorImagemAuto(termos);
+    if (img) {
+      await attachImagemAQuestao(q, img);
+      anexadas++;
+    }
+  }
+  return anexadas;
+}
+
+async function executarBuscaImagem() {
+  const termoOriginal = document.getElementById('imgSearchInput').value.trim();
+  const status = document.getElementById('imgSearchStatus');
+  const grid = document.getElementById('imgResults');
+  if (!termoOriginal) { status.innerHTML = '<div class="status warning">Digite um termo de busca.</div>'; return; }
+  grid.innerHTML = '';
+
+  // Traduz automaticamente se parecer português
+  let termo = termoOriginal;
+  let traduzido = false;
+  if (pareceuPortugues(termoOriginal)) {
+    status.innerHTML = '<span class="spinner"></span> Traduzindo termo para inglês médico...';
+    const traducao = await traduzirTermoParaIngles(termoOriginal);
+    if (traducao && traducao.toLowerCase() !== termoOriginal.toLowerCase()) {
+      termo = traducao;
+      traduzido = true;
+    }
+  }
+
+  const aviso = traduzido
+    ? `<div style="color:var(--text-muted); font-size:0.85em; margin-bottom:8px;">🔄 Traduzido: <strong>"${escapeHtml(termoOriginal)}"</strong> → <strong>"${escapeHtml(termo)}"</strong></div>`
+    : '';
+  status.innerHTML = aviso + '<span class="spinner"></span> Buscando no Wikimedia Commons...';
+
+  try {
+    const url = `https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrsearch=${encodeURIComponent(termo + ' filetype:bitmap|drawing')}&gsrlimit=24&gsrnamespace=6&prop=imageinfo&iiprop=url|extmetadata|mime|size&iiurlwidth=400&origin=*`;
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    const pages = (data.query && data.query.pages) ? Object.values(data.query.pages) : [];
+    const imagens = pages
+      .map(p => p.imageinfo && p.imageinfo[0] ? { titulo: p.title, ...p.imageinfo[0] } : null)
+      .filter(x => x && /^image\/(jpeg|jpg|png|gif|webp)$/i.test(x.mime))
+      .filter(x => x.size < 30 * 1024 * 1024);
+
+    // Se a busca primária não retornar nada, tenta fallbacks da lista da IA
+    if (imagens.length === 0 && _idxImagemAtiva !== null) {
+      const provaAtual = getProvaAtual();
+      const qAtual = provaAtual && provaAtual.questoes[_idxImagemAtiva];
+      const fallbacks = (qAtual && qAtual.imagemTermos) ? qAtual.imagemTermos.slice(1) : [];
+      for (const termoFb of fallbacks) {
+        status.innerHTML = aviso + `<span class="spinner"></span> Sem resultados, tentando: "${escapeHtml(termoFb)}"...`;
+        const fbResp = await fetch(`https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrsearch=${encodeURIComponent(termoFb + ' filetype:bitmap|drawing')}&gsrlimit=24&gsrnamespace=6&prop=imageinfo&iiprop=url|extmetadata|mime|size&iiurlwidth=400&origin=*`);
+        if (!fbResp.ok) continue;
+        const fbData = await fbResp.json();
+        const fbPages = (fbData.query && fbData.query.pages) ? Object.values(fbData.query.pages) : [];
+        const fbImagens = fbPages
+          .map(p => p.imageinfo && p.imageinfo[0] ? { titulo: p.title, ...p.imageinfo[0] } : null)
+          .filter(x => x && /^image\/(jpeg|jpg|png|gif|webp)$/i.test(x.mime))
+          .filter(x => x.size < 30 * 1024 * 1024);
+        if (fbImagens.length > 0) {
+          imagens.push(...fbImagens);
+          termo = termoFb;
+          break;
+        }
+      }
+    }
+
+    if (imagens.length === 0) {
+      status.innerHTML = aviso + '<div class="status warning">Nenhuma imagem encontrada nem com termos alternativos. Tente reformular manualmente ou usar "Colar URL".</div>';
+      return;
+    }
+    status.innerHTML = aviso + `<div style="color:var(--text-muted); font-size:0.85em;">${imagens.length} resultado(s) para <strong>"${escapeHtml(termo)}"</strong>. Clique em uma para usar.</div>`;
+    grid.innerHTML = '';
+    for (const img of imagens) {
+      const el = document.createElement('div');
+      el.className = 'img-result';
+      const meta = img.extmetadata || {};
+      const autor = (meta.Artist && meta.Artist.value) ? meta.Artist.value.replace(/<[^>]+>/g, '').slice(0, 80) : '';
+      const licenca = (meta.LicenseShortName && meta.LicenseShortName.value) || '';
+      el.innerHTML = `
+        <img src="${img.thumburl || img.url}" loading="lazy" alt="">
+        <div class="img-result-cap">${escapeHtml(img.titulo.replace(/^File:/, ''))}<br><strong>${escapeHtml(licenca)}</strong></div>
+      `;
+      el.onclick = () => selecionarImagemBusca(img, autor, licenca);
+      grid.appendChild(el);
+    }
+  } catch (err) {
+    status.innerHTML = '<div class="status error">Erro na busca: ' + err.message + '</div>';
+  }
+}
+
+async function selecionarImagemBusca(img, autor, licenca) {
+  const status = document.getElementById('imgSearchStatus');
+  status.innerHTML = '<span class="spinner"></span> Baixando imagem...';
+  try {
+    // Baixa via thumb (menor) para caber no localStorage e ficar leve
+    const urlImg = img.thumburl || img.url;
+    const resp = await fetch(urlImg);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const blob = await resp.blob();
+    const dataUrl = await new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = reject;
+      r.readAsDataURL(blob);
+    });
+    aplicarImagemNaQuestao({
+      dataUrl,
+      titulo: img.titulo.replace(/^File:/, ''),
+      fonte: 'Wikimedia Commons',
+      autor: (autor ? autor + ' · ' : '') + (licenca || ''),
+      urlOriginal: img.url
+    });
+  } catch (err) {
+    status.innerHTML = '<div class="status error">Erro ao baixar: ' + err.message + '</div>';
+  }
+}
+
+async function recortarImagemAtualComIA() {
+  const p = getProvaAtual();
+  if (!p || _idxImagemAtiva === null) return;
+  const q = p.questoes[_idxImagemAtiva];
+  if (!q.imagem || !q.imagem.dataUrl) {
+    alert('Esta questão não tem imagem para recortar.');
+    return;
+  }
+  const status = document.getElementById('imgSearchStatus');
+  status.innerHTML = '<span class="spinner"></span> Detectando a figura médica e recortando...';
+  try {
+    const bbox = await detectarBboxFiguraNaPagina(
+      q.imagem.dataUrl,
+      (q.imagem.titulo || '') + ' ' + (q.imagemMaterial && q.imagemMaterial.descricao || ''),
+      q.enunciado || ''
+    );
+    if (!bbox) {
+      status.innerHTML = '<div class="status warning">Nenhuma figura médica recortável foi identificada nesta imagem.</div>';
+      return;
+    }
+    const novoDataUrl = await recortarImagemPorBbox(q.imagem.dataUrl, bbox, 0.04);
+    if (novoDataUrl === q.imagem.dataUrl) {
+      status.innerHTML = '<div class="status warning">O recorte sugerido foi muito pequeno ou muito grande — mantida a imagem original.</div>';
+      return;
+    }
+    await attachImagemAQuestao(q, {
+      ...q.imagem,
+      dataUrl: novoDataUrl
+    });
+    salvarEstado();
+    fecharBuscaImagem();
+    renderProva();
+  } catch (e) {
+    status.innerHTML = '<div class="status error">Erro ao recortar: ' + e.message + '</div>';
+  }
+}
+
+async function anexarImagemPorPaginaMaterial() {
+  const p = getProvaAtual();
+  if (!p) return;
+  const status = document.getElementById('imgSearchStatus');
+  status.innerHTML = '<span class="spinner"></span> Carregando materiais...';
+  const materiais = await obterMateriais(p.id);
+  if (!materiais || materiais.length === 0) {
+    status.innerHTML = '<div class="status warning">Os PDFs dos materiais desta prova não estão mais disponíveis (foram limpos ou esta é uma prova antiga). Você pode usar "Colar URL" ou buscar normalmente.</div>';
+    return;
+  }
+  const listaTxt = materiais.map((m, i) => `${i + 1}. ${m.nome || 'material.pdf'}`).join('\n');
+  const escMat = prompt(`Qual material? Digite o número:\n\n${listaTxt}`, '1');
+  if (escMat === null) { status.innerHTML = ''; return; }
+  const idxMat = parseInt(escMat) - 1;
+  if (isNaN(idxMat) || idxMat < 0 || idxMat >= materiais.length) {
+    status.innerHTML = '<div class="status warning">Número inválido.</div>';
+    return;
+  }
+  const pag = prompt(`Qual página do "${materiais[idxMat].nome}"? Digite o número da página:`, '1');
+  if (pag === null) { status.innerHTML = ''; return; }
+  const numPag = parseInt(pag);
+  if (isNaN(numPag) || numPag < 1) {
+    status.innerHTML = '<div class="status warning">Página inválida.</div>';
+    return;
+  }
+  status.innerHTML = '<span class="spinner"></span> Extraindo página...';
+  try {
+    const dataUrl = await extrairPaginaPdfComoImagem(materiais[idxMat].blob || materiais[idxMat].base64, numPag);
+    aplicarImagemNaQuestao({
+      dataUrl,
+      titulo: `Página ${numPag} de ${materiais[idxMat].nome}`,
+      fonte: `Material: ${materiais[idxMat].nome} (p. ${numPag})`,
+      autor: 'Extraído do material da aula',
+      urlOriginal: '',
+      origem: 'material'
+    });
+  } catch (e) {
+    status.innerHTML = '<div class="status error">Erro ao extrair página: ' + e.message + '</div>';
+  }
+}
+
+// ============================================================
+// GERADOR DE ECG (procedural, 12 derivações + tira de ritmo)
+// ============================================================
+// ============================================================
+// GERADOR DE IMAGEM (Pollinations.ai - gratuito, sem chave de API)
+// ============================================================
+async function abrirGeradorImagem() {
+  const descricao = prompt(
+    'Descreva a imagem que você quer gerar (em português):\n\n' +
+    'Exemplos:\n' +
+    '• "Esquema anatômico do coração mostrando as 4 câmaras"\n' +
+    '• "Mão com sinais clínicos de artrite reumatoide"\n' +
+    '• "Lesão cutânea típica de melanoma"\n' +
+    '• "Endoscopia digestiva alta mostrando úlcera gástrica"\n' +
+    '• "Anatomia do nefron"\n' +
+    '• "Vias da coagulação extrínseca e intrínseca"\n',
+    ''
+  );
+  if (!descricao || !descricao.trim()) return;
+
+  const status = document.getElementById('imgSearchStatus');
+  let promptIngles = descricao.trim();
+
+  // Refina o prompt usando IA (best-effort; cai no texto original se falhar)
+  status.innerHTML = '<span class="spinner"></span> Refinando descrição para gerar imagem...';
+  try {
+    promptIngles = await refinarPromptImagem(descricao.trim());
+  } catch (e) {
+    console.warn('Falha ao refinar prompt, usando original:', e);
+  }
+
+  status.innerHTML = '<span class="spinner"></span> Gerando imagem... (pode levar 10-30 segundos)';
+  try {
+    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(promptIngles)}?width=1024&height=1024&nologo=true&enhance=true&seed=${Math.floor(Math.random() * 1e9)}`;
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const blob = await resp.blob();
+    if (!/^image\//.test(blob.type)) throw new Error('A resposta não é uma imagem');
+    const dataUrl = await new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = reject;
+      r.readAsDataURL(blob);
+    });
+    // Reduz tamanho final pra economizar storage
+    const dataUrlReduzido = await redimensionarImagemSeNecessario(dataUrl, 1024, 0.85);
+    aplicarImagemNaQuestao({
+      dataUrl: dataUrlReduzido,
+      titulo: descricao.length > 60 ? descricao.slice(0, 60) + '...' : descricao,
+      fonte: '',
+      autor: '',
+      urlOriginal: '',
+      origem: 'imagem_gerada'
+    });
+  } catch (err) {
+    status.innerHTML = '<div class="status error">Erro ao gerar imagem: ' + err.message + '. Tente reformular a descrição.</div>';
+  }
+}
+
+async function refinarPromptImagem(descricaoPt) {
+  const prompt = `Converta esta descrição em português para um PROMPT EM INGLÊS otimizado para gerador de imagens de IA, focado em ILUSTRAÇÃO MÉDICA EDUCATIVA.
+
+Descrição em português: "${descricaoPt}"
+
+Regras OBRIGATÓRIAS:
+- Retorne APENAS o prompt em inglês, em uma única linha, sem aspas, sem markdown.
+- Use estilo "medical illustration" ou "anatomical illustration" ou "clinical photograph" conforme o caso.
+- NÃO inclua texto/labels/annotations na imagem (a imagem não deve ter palavras escritas).
+- Para anatomia/esquemas: use "medical illustration, clean, educational, white background, no text labels".
+- Para fotos clínicas: use "clinical photograph, realistic, medical reference, no annotations".
+- Para histologia: use "histology slide, microscopy, H&E stain, no text".
+- Para imagens diagnósticas (TC, RM, US, raio-X): use "medical scan, grayscale, clinical, no labels, no text overlay".
+- Seja específico e descritivo. Use 20-50 palavras.
+
+Resposta (prompt em inglês otimizado):`;
+  const data = await chamarGemini({
+    parts: [{ text: prompt }],
+    generationConfig: {
+      temperature: 0.3,
+      maxOutputTokens: 300,
+      thinkingConfig: { thinkingBudget: 0 }
+    },
+    intent: 'helper'
+  });
+  const text = data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0].text;
+  if (!text) return descricaoPt;
+  return text.replace(/[\r\n"`]/g, ' ').replace(/^(prompt|english:?)\s*/i, '').trim();
+}
+
+async function abrirGeradorECG() {
+  const descricao = prompt(
+    'Descreva o ECG que você quer gerar (em português):\n\n' +
+    'Exemplos:\n' +
+    '• "ECG com IAM de parede anterior — supra de ST de 3mm em V1 a V4, com onda Q em V1-V2"\n' +
+    '• "Fibrilação atrial com resposta ventricular alta (FC 140)"\n' +
+    '• "BAV total, FC 35, dissociação AV"\n' +
+    '• "Hipercalemia — ondas T apiculadas, QRS alargado, FC 70"\n' +
+    '• "Taquicardia ventricular monomórfica, FC 180"\n' +
+    '• "BRE típico, FC 80"\n' +
+    '• "Pericardite aguda — supra de ST difuso côncavo, infra de PR"\n',
+    ''
+  );
+  if (!descricao || !descricao.trim()) return;
+
+  const status = document.getElementById('imgSearchStatus');
+  status.innerHTML = '<span class="spinner"></span> Interpretando descrição do ECG...';
+  try {
+    const params = await interpretarDescricaoECG(descricao);
+    status.innerHTML = '<span class="spinner"></span> Desenhando ECG...';
+    const dataUrl = await renderizarECG(params);
+    aplicarImagemNaQuestao({
+      dataUrl,
+      titulo: 'ECG',
+      fonte: '',
+      autor: '',
+      urlOriginal: '',
+      origem: 'ecg_gerado'
+    });
+  } catch (err) {
+    status.innerHTML = '<div class="status error">Erro ao gerar ECG: ' + err.message + '</div>';
+  }
+}
+
+async function interpretarDescricaoECG(descricao) {
+  const prompt = `Você é um cardiologista convertendo uma descrição de ECG em PARÂMETROS NUMÉRICOS para renderização gráfica.
+
+DESCRIÇÃO DO ECG: "${descricao}"
+
+Retorne APENAS este JSON, sem markdown, sem explicação:
+{
+  "titulo": "Título curto do ECG (ex: IAM anterior STEMI)",
+  "rate": 75,
+  "rhythm": "sinus|afib|aflutter|vt|vf|paced|junctional|sinus_brady|sinus_tachy|svt",
+  "pr_ms": 160,
+  "qrs_ms": 90,
+  "qt_ms": 380,
+  "bbb": "none|lbbb|rbbb",
+  "axis": "normal|left|right|extreme",
+  "st_elevation_leads": ["V1","V2","V3","V4"],
+  "st_elevation_mm": 3,
+  "st_depression_leads": ["II","III","aVF"],
+  "st_depression_mm": 0,
+  "t_inversion_leads": [],
+  "t_apiculada_leads": [],
+  "q_leads": [],
+  "av_block": "none|first|second_mobitz1|second_mobitz2|third",
+  "notas": ""
+}
+
+Regras:
+- "rate" = frequência cardíaca em bpm (40-220).
+- "rhythm" use APENAS uma das opções listadas.
+- Use derivações como "I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6".
+- "st_elevation_mm" é o valor em mm (1-6 típico). 0 se não houver supra.
+- "st_depression_mm" é o valor em mm (positivo). 0 se não houver infra.
+- "t_apiculada_leads": ondas T apiculadas/peaked (hipercalemia, isquemia hiperaguda).
+- "q_leads": derivações com onda Q patológica.
+- "av_block": grau de BAV se houver.
+- Use seu conhecimento médico para preencher valores plausíveis a partir da descrição.`;
+
+  const data = await chamarGemini({
+    parts: [{ text: prompt }],
+    generationConfig: {
+      responseMimeType: 'application/json',
+      temperature: 0,
+      thinkingConfig: { thinkingBudget: 0 },
+      maxOutputTokens: 1024
+    },
+    intent: 'helper'
+  });
+  const text = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0].text;
+  if (!text) throw new Error('Resposta vazia da IA');
+  const m = text.match(/\{[\s\S]*\}/);
+  if (!m) throw new Error('Resposta sem JSON válido');
+  return JSON.parse(m[0]);
+}
+
+// Renderiza ECG 12 derivações em layout 3x4 + tira de ritmo (DII longo)
+async function renderizarECG(params) {
+  const W = 1400;
+  const H = 900;
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Fundo branco
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid 1mm = 5 pixels (escala)
+  const mm = 5;
+  desenharGridECG(ctx, W, H, mm);
+
+  // Marca de calibração (1mV = 10mm) — único elemento textual permitido
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(20, 70);
+  ctx.lineTo(20, 70 - 10 * mm);
+  ctx.lineTo(40, 70 - 10 * mm);
+  ctx.lineTo(40, 70);
+  ctx.stroke();
+
+  // Layout 12 derivações em 3 linhas x 4 colunas
+  const leadsLayout = [
+    ['I',   'aVR', 'V1', 'V4'],
+    ['II',  'aVL', 'V2', 'V5'],
+    ['III', 'aVF', 'V3', 'V6']
+  ];
+  const topPad = 100;
+  const leftPad = 70;
+  const colWidth = (W - leftPad - 30) / 4;
+  const rowHeight = 150;
+  const totalSegSec = colWidth / (mm * 25); // largura visível em segundos
+
+  for (let r = 0; r < 3; r++) {
+    for (let c = 0; c < 4; c++) {
+      const lead = leadsLayout[r][c];
+      const x0 = leftPad + c * colWidth;
+      const yBase = topPad + r * rowHeight + rowHeight / 2;
+      // Rótulo
+      ctx.fillStyle = '#000';
+      ctx.font = 'bold 14px Arial';
+      ctx.fillText(lead, x0 + 5, yBase - 50);
+      desenharDerivacao(ctx, lead, x0, yBase, colWidth - 10, totalSegSec, params, mm);
+    }
+  }
+
+  // Tira de ritmo (DII longo) na base
+  const rhY = topPad + 3 * rowHeight + 80;
+  ctx.fillStyle = '#000';
+  ctx.font = 'bold 14px Arial';
+  ctx.fillText('II (tira longa)', leftPad + 5, rhY - 50);
+  desenharDerivacao(ctx, 'II', leftPad, rhY, W - leftPad - 30, (W - leftPad - 30) / (mm * 25), params, mm);
+
+  return canvas.toDataURL('image/png');
+}
+
+function rotuloRitmo(r) {
+  return {
+    sinus: 'Sinusal',
+    afib: 'Fibrilação atrial',
+    aflutter: 'Flutter atrial',
+    vt: 'Taquicardia ventricular',
+    vf: 'Fibrilação ventricular',
+    paced: 'Marcapasso',
+    junctional: 'Juncional',
+    sinus_brady: 'Bradicardia sinusal',
+    sinus_tachy: 'Taquicardia sinusal',
+    svt: 'TSV'
+  }[r] || 'Sinusal';
+}
+
+function desenharGridECG(ctx, W, H, mm) {
+  // Grid pequeno (1mm = mm pixels) rosa claro
+  ctx.strokeStyle = '#ffd6d6';
+  ctx.lineWidth = 0.5;
+  for (let x = 0; x <= W; x += mm) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = 0; y <= H; y += mm) {
+    ctx.beginPath();
+    ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+  // Grid grande (5mm) rosa escuro
+  ctx.strokeStyle = '#ff9999';
+  ctx.lineWidth = 1;
+  for (let x = 0; x <= W; x += mm * 5) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = 0; y <= H; y += mm * 5) {
+    ctx.beginPath();
+    ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+}
+
+function desenharDerivacao(ctx, lead, x0, yBase, widthPx, segDurSec, params, mm) {
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 1.4;
+  ctx.beginPath();
+
+  const samplesPerSec = mm * 25; // 25mm/s
+  const totalSamples = Math.floor(widthPx);
+  const rate = Math.max(20, Math.min(250, params.rate || 75));
+  const cycleSec = 60 / rate;
+  let prevY = yBase;
+  let movedFirst = false;
+
+  // Para AFib: posicoes irregulares dos QRS
+  const qrsTimes = gerarTemposQRS(params, segDurSec);
+
+  for (let i = 0; i < totalSamples; i++) {
+    const t = i / samplesPerSec; // segundos desde início
+    const v = amplitudeECG(lead, t, params, qrsTimes); // amplitude em mm
+    const y = yBase - v * mm;
+    if (!movedFirst) { ctx.moveTo(x0 + i, y); movedFirst = true; }
+    else ctx.lineTo(x0 + i, y);
+    prevY = y;
+  }
+  ctx.stroke();
+}
+
+function gerarTemposQRS(params, segDurSec) {
+  const rate = params.rate || 75;
+  const cycleSec = 60 / rate;
+  const tempos = [];
+  let t = 0.1;
+  while (t < segDurSec + 0.5) {
+    if (params.rhythm === 'afib') {
+      // Irregularidade marcada: ±30% na duração do ciclo
+      const jitter = (Math.random() - 0.5) * 0.6 * cycleSec;
+      tempos.push(t);
+      t += cycleSec + jitter;
+    } else if (params.rhythm === 'vf') {
+      tempos.push(t);
+      t += 0.1 + Math.random() * 0.15;
+    } else {
+      tempos.push(t);
+      t += cycleSec;
+    }
+  }
+  return tempos;
+}
+
+// Retorna a amplitude (em mm, + para cima) da derivação 'lead' no tempo t (segundos)
+function amplitudeECG(lead, t, params, qrsTimes) {
+  // Direção/morfologia base por derivação
+  const dir = direcaoBaseLead(lead, params);
+
+  // Para VF: ruído caótico
+  if (params.rhythm === 'vf') {
+    return (Math.sin(t * 30) + Math.sin(t * 47) + Math.sin(t * 13)) * 3 * dir + (Math.random() - 0.5) * 2;
+  }
+
+  // Para VT: complexos largos contínuos, sem P
+  if (params.rhythm === 'vt') {
+    const cycleSec = 60 / (params.rate || 150);
+    const cyclePos = (t % cycleSec) / cycleSec;
+    return formaQRSLargo(cyclePos) * 12 * dir * 0.6;
+  }
+
+  // Encontra o ciclo (QRS) mais próximo
+  let qrsTime = qrsTimes[0] || 0;
+  let prevQrsTime = qrsTime - 0.8;
+  for (let i = 0; i < qrsTimes.length; i++) {
+    if (qrsTimes[i] > t) break;
+    prevQrsTime = qrsTime;
+    qrsTime = qrsTimes[i];
+  }
+
+  // Tempo relativo ao QRS atual
+  const dt = t - qrsTime; // 0 = pico do R
+  // Duração do QRS
+  const qrsDur = (params.qrs_ms || 90) / 1000;
+  const prMs = (params.pr_ms || 160) / 1000;
+  const qtMs = (params.qt_ms || 380) / 1000;
+  const stDur = 0.08; // segmento ST
+  const tDur = Math.max(0.12, qtMs - qrsDur - stDur);
+
+  let v = 0;
+
+  // Onda P (antes do QRS, exceto AFib/junctional)
+  if (params.rhythm !== 'afib' && params.rhythm !== 'junctional' && params.rhythm !== 'vt') {
+    const pStart = -prMs;
+    const pDur = 0.08;
+    if (dt > pStart && dt < pStart + pDur) {
+      const pT = (dt - pStart) / pDur;
+      v += Math.sin(pT * Math.PI) * 1.2 * direcaoP(lead, params);
+    }
+  } else if (params.rhythm === 'afib') {
+    // Ondas f irregulares pequenas no intervalo PR
+    if (dt < -0.04 && dt > -prMs - 0.1) {
+      v += (Math.sin(t * 60) + Math.sin(t * 47) + Math.sin(t * 95)) * 0.15;
+    }
+  }
+
+  // QRS
+  if (dt >= -qrsDur * 0.3 && dt <= qrsDur * 0.7) {
+    const qrsT = (dt + qrsDur * 0.3) / qrsDur;
+    let qrsMag = params.bbb === 'lbbb' || params.bbb === 'rbbb' ? formaQRSLargo(qrsT) : formaQRSNormal(qrsT);
+    // Para BBB, alargar
+    v += qrsMag * 11 * dir * (params.bbb !== 'none' && params.bbb ? 0.9 : 1);
+    // Q patológica
+    if (params.q_leads && params.q_leads.includes(lead) && qrsT < 0.3) {
+      v -= 3 * Math.sin((qrsT / 0.3) * Math.PI);
+    }
+  }
+
+  // Segmento ST + onda T
+  const stStart = qrsDur * 0.7;
+  if (dt > stStart && dt < stStart + stDur + tDur) {
+    // ST elevação/depressão
+    let st = 0;
+    if (params.st_elevation_leads && params.st_elevation_leads.includes(lead)) {
+      st = +(params.st_elevation_mm || 2);
+    }
+    if (params.st_depression_leads && params.st_depression_leads.includes(lead)) {
+      st = -(params.st_depression_mm || 1);
+    }
+
+    if (dt < stStart + stDur) {
+      // ST plano com elevação/depressão
+      v += st;
+    } else {
+      // Onda T
+      const tT = (dt - stStart - stDur) / tDur;
+      const tAmp = (params.t_apiculada_leads && params.t_apiculada_leads.includes(lead)) ? 6 : 2.5;
+      const tPolaridade = direcaoT(lead, params);
+      const shape = (params.t_apiculada_leads && params.t_apiculada_leads.includes(lead))
+        ? Math.pow(Math.sin(tT * Math.PI), 0.6)
+        : Math.sin(tT * Math.PI);
+      v += shape * tAmp * tPolaridade + st * (1 - tT);
+    }
+  }
+
+  return v;
+}
+
+function direcaoBaseLead(lead) {
+  // Direção/polaridade típica do QRS por derivação (valor entre -1 e 1)
+  return {
+    'I': 1, 'II': 1, 'III': 0.6,
+    'aVR': -0.9, 'aVL': 0.6, 'aVF': 0.8,
+    'V1': -0.5, 'V2': -0.2, 'V3': 0.4,
+    'V4': 0.9, 'V5': 1, 'V6': 0.9
+  }[lead] || 1;
+}
+
+function direcaoP(lead, params) {
+  if (lead === 'aVR') return -0.8;
+  return 0.8;
+}
+
+function direcaoT(lead, params) {
+  if (params.t_inversion_leads && params.t_inversion_leads.includes(lead)) return -1;
+  if (lead === 'aVR') return -0.8;
+  if (lead === 'V1') return 0.3;
+  return 1;
+}
+
+function formaQRSNormal(t) {
+  // Q-R-S simplificado, t de 0 a 1
+  if (t < 0.15) return -0.15 * Math.sin((t / 0.15) * Math.PI);
+  if (t < 0.55) return Math.sin(((t - 0.15) / 0.4) * Math.PI);
+  if (t < 1) return -0.2 * Math.sin(((t - 0.55) / 0.45) * Math.PI);
+  return 0;
+}
+
+function formaQRSLargo(t) {
+  // QRS alargado/bizarro
+  if (t < 0.2) return -0.2 * Math.sin((t / 0.2) * Math.PI);
+  if (t < 0.7) return Math.sin(((t - 0.2) / 0.5) * Math.PI);
+  if (t < 1) return -0.3 * Math.sin(((t - 0.7) / 0.3) * Math.PI);
+  return 0;
+}
+
+async function anexarImagemDoComputador(event) {
+  const file = event.target.files && event.target.files[0];
+  event.target.value = ''; // permite re-selecionar mesmo arquivo depois
+  if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    alert('Selecione um arquivo de imagem (JPG, PNG, WebP, GIF).');
+    return;
+  }
+  const status = document.getElementById('imgSearchStatus');
+  status.innerHTML = '<span class="spinner"></span> Processando imagem...';
+  try {
+    // Lê como dataURL e redimensiona para no máximo 1400px de largura (economia de espaço)
+    const dataUrlOriginal = await new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+    const dataUrl = await redimensionarImagemSeNecessario(dataUrlOriginal, 1400, 0.85);
+    aplicarImagemNaQuestao({
+      dataUrl,
+      titulo: file.name,
+      fonte: 'Arquivo do computador',
+      autor: '',
+      urlOriginal: '',
+      origem: 'upload'
+    });
+  } catch (err) {
+    status.innerHTML = '<div class="status error">Erro ao carregar imagem: ' + err.message + '</div>';
+  }
+}
+
+async function redimensionarImagemSeNecessario(dataUrl, maxWidth, quality) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      if (img.naturalWidth <= maxWidth) { resolve(dataUrl); return; }
+      const scale = maxWidth / img.naturalWidth;
+      const W = Math.round(img.naturalWidth * scale);
+      const H = Math.round(img.naturalHeight * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = W;
+      canvas.height = H;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, W, H);
+      ctx.drawImage(img, 0, 0, W, H);
+      resolve(canvas.toDataURL('image/jpeg', quality || 0.85));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
+async function anexarImagemPorUrl() {
+  const url = prompt('Cole a URL de uma imagem (jpg, png, webp):');
+  if (!url) return;
+  const status = document.getElementById('imgSearchStatus');
+  status.innerHTML = '<span class="spinner"></span> Baixando imagem...';
+  try {
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const blob = await resp.blob();
+    if (!/^image\//.test(blob.type)) throw new Error('A URL não é uma imagem');
+    const dataUrl = await new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = reject;
+      r.readAsDataURL(blob);
+    });
+    aplicarImagemNaQuestao({ dataUrl, titulo: 'Imagem externa', fonte: url, autor: '' });
+  } catch (err) {
+    status.innerHTML = '<div class="status error">Erro ao baixar: ' + err.message + '</div>';
+  }
+}
+
+async function aplicarImagemNaQuestao(imagem) {
+  const p = getProvaAtual();
+  if (!p || _idxImagemAtiva === null) return;
+  await attachImagemAQuestao(p.questoes[_idxImagemAtiva], imagem);
+  salvarEstado();
+  fecharBuscaImagem();
+  renderProva();
+}
+
+async function removerImagemAtual() {
+  const p = getProvaAtual();
+  if (!p || _idxImagemAtiva === null) return;
+  if (!confirm('Remover imagem desta questão?')) return;
+  const atual = p.questoes[_idxImagemAtiva].imagem;
+  if (atual && atual.id) await deleteImagemDb(atual.id);
+  p.questoes[_idxImagemAtiva].imagem = null;
+  salvarEstado();
+  fecharBuscaImagem();
+  renderProva();
+}
+
+function removerQuestao(idx) {
+  const p = getProvaAtual();
+  if (!p) return;
+  if (!confirm(`Remover a Questão ${idx + 1}? Esta ação não pode ser desfeita.`)) return;
+  p.questoes.splice(idx, 1);
+  p.anuladas.splice(idx, 1);
+  p.numQuestoes = p.questoes.length;
+  salvarEstado();
+  renderProva();
+}
+
+function adicionarQuestaoManual() {
+  const p = getProvaAtual();
+  if (!p) return;
+  p.questoes.push({
+    enunciado: '',
+    alternativas: { A: '', B: '', C: '', D: '' },
+    gabarito: 'A',
+    explicacao: '',
+    referencias: '',
+    imagemSugerida: '',
+    imagemTermos: [],
+    imagemMaterial: null,
+    imagem: null
+  });
+  p.anuladas.push(false);
+  p.numQuestoes = p.questoes.length;
+  salvarEstado();
+  renderProva();
+  // Rola para a nova questão
+  setTimeout(() => {
+    const cards = document.querySelectorAll('#provaQuestoes .questao-gerada');
+    const ultima = cards[cards.length - 1];
+    if (ultima) ultima.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 100);
+}
+
+async function adicionarQuestaoIA() {
+  const p = getProvaAtual();
+  if (!p) return;
+  const orientacao = prompt(
+    `Gerar nova questão para "${p.titulo}".\n\nVocê pode dar uma orientação (opcional):\n- Tema/tópico específico\n- "Mais difícil", "mais fácil"\n- "Sobre tal doença/medicamento"\n\nDeixe em branco para a IA escolher livremente um tema novo.`,
+    ''
+  );
+  if (orientacao === null) return;
+
+  const statusEl = document.getElementById('addQuestaoStatus');
+  statusEl.innerHTML = '<span class="spinner"></span> Buscando materiais e gerando questão...';
+
+  const materiais = await obterMateriais(p.id);
+  const questoesExistentes = p.questoes
+    .map((q, i) => `Q${i + 1}: ${(q.enunciado || '').slice(0, 200).replace(/\s+/g, ' ')}`)
+    .join('\n');
+  const proximoNum = p.questoes.length + 1;
+
+  const prompt2 = `Você está adicionando UMA NOVA questão a uma prova já existente, estilo ENARE/ENAMED brasileiro, em PORTUGUÊS BRASILEIRO.
+
+Disciplina: ${p.disciplina}
+Posição na prova: questão ${proximoNum} (será adicionada ao final).
+
+QUESTÕES JÁ EXISTENTES NESTA PROVA (NÃO repita temas/casos semelhantes a estes):
+${questoesExistentes || '(nenhuma ainda)'}
+
+${orientacao && orientacao.trim() ? 'ORIENTAÇÃO DO PROFESSOR PARA ESTA NOVA QUESTÃO:\n' + orientacao.trim() + '\n' : ''}
+
+REGRAS:
+- TUDO em PORTUGUÊS BRASILEIRO.
+- Caso clínico realista, com paciente de nome brasileiro.
+- 4 alternativas (A, B, C, D), apenas UMA correta.
+- Distratores plausíveis.
+- Terminologia médica brasileira.
+- Explicação DETALHADA (3-5 frases) comentando a correta E individualmente cada alternativa errada.
+- Referências bibliográficas concretas (livros texto, diretrizes brasileiras, sociedades médicas).
+- PREFERÊNCIA PARA IMAGEM: se algum material PDF contém figura ideal para a questão, referencie via "imagem_material" (índice 0-based e número da página). Caso contrário, "usar": false e use "imagem_termos" como fallback.
+
+MATERIAIS DISPONÍVEIS (índices):
+${(materiais || []).map((m, i) => `  - Índice ${i}: ${m.nome || 'material.pdf'}`).join('\n') || '  (nenhum disponível)'}
+
+Retorne APENAS este JSON, sem markdown:
+{
+  "enunciado": "Caso clínico com pergunta",
+  "alternativas": {"A": "...", "B": "...", "C": "...", "D": "..."},
+  "gabarito": "A",
+  "explicacao": "Explicação detalhada",
+  "referencias": "Referências bibliográficas",
+  "imagem_material": { "usar": true, "material_indice": 0, "pagina": 5, "descricao": "..." },
+  "imagem_termos": []
+}`;
+
+  try {
+    const arquivosMat = (materiais || []).map(m => ({ nome: m.nome || 'material.pdf', base64: m.base64, blob: m.blob, tamanho: m.tamanho, mime: m.mime || 'application/pdf' }));
+    const partsArquivos = await prepararPartesGemini(arquivosMat, appState.apiKey);
+    const parts = [...partsArquivos, { text: prompt2 }];
+
+    const data = await chamarGemini({
+      parts,
+      generationConfig: { responseMimeType: 'application/json', temperature: 0.7 },
+      intent: 'helper'
+    });
+    if (!data.candidates || !data.candidates[0]) throw new Error('Resposta vazia da IA');
+    const texto = data.candidates[0].content.parts[0].text.trim();
+    const m = texto.match(/\{[\s\S]*\}/);
+    if (!m) throw new Error('Resposta sem JSON');
+    const result = JSON.parse(m[0]);
+
+    const toStr = (v) => (v === null || v === undefined) ? '' : (typeof v === 'string' ? v : (typeof v === 'object' ? JSON.stringify(v) : String(v)));
+    const alt = result.alternativas || {};
+    const gab = toStr(result.gabarito).toUpperCase().trim();
+    const novosTermos = Array.isArray(result.imagem_termos)
+      ? result.imagem_termos.map(t => toStr(t).trim()).filter(t => t.length > 1)
+      : (toStr(result.imagem_sugerida).trim() ? [toStr(result.imagem_sugerida).trim()] : []);
+    const imagemMatAdd = (result.imagem_material && result.imagem_material.usar) ? {
+      usar: true,
+      materialIndice: parseInt(result.imagem_material.material_indice),
+      pagina: parseInt(result.imagem_material.pagina),
+      descricao: toStr(result.imagem_material.descricao)
+    } : null;
+    const novaQ = {
+      enunciado: toStr(result.enunciado),
+      alternativas: { A: toStr(alt.A), B: toStr(alt.B), C: toStr(alt.C), D: toStr(alt.D) },
+      gabarito: ['A', 'B', 'C', 'D'].includes(gab) ? gab : 'A',
+      explicacao: toStr(result.explicacao),
+      referencias: toStr(result.referencias),
+      imagemSugerida: novosTermos[0] || '',
+      imagemTermos: novosTermos,
+      imagemMaterial: imagemMatAdd,
+      imagem: null
+    };
+
+    p.questoes.push(novaQ);
+    p.anuladas.push(false);
+    p.numQuestoes = p.questoes.length;
+    salvarEstado();
+
+    // (Imagem NÃO é anexada automaticamente. Use "Adicionar imagem" se quiser.)
+
+    statusEl.innerHTML = '<span style="color:#10b981;">✓ Questão adicionada!</span>';
+    renderProva();
+    setTimeout(() => {
+      const cards = document.querySelectorAll('#provaQuestoes .questao-gerada');
+      const ultima = cards[cards.length - 1];
+      if (ultima) ultima.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.getElementById('addQuestaoStatus').innerHTML = '';
+    }, 600);
+  } catch (err) {
+    statusEl.innerHTML = `<span style="color:#ef4444;">❌ Erro: ${err.message}</span>`;
+    console.error(err);
+  }
+}
+
+async function regenerarQuestao(idx) {
+  const p = getProvaAtual();
+  if (!p) return;
+
+  const orientacao = prompt(
+    `Regenerar a Questão ${idx + 1}.\n\nVocê pode dar uma orientação (opcional):\n- Tema/tópico específico\n- "Mais difícil", "mais fácil"\n- "Sobre tal doença/medicamento"\n\nDeixe em branco para a IA escolher um novo tema livremente.`,
+    ''
+  );
+  if (orientacao === null) return; // usuário cancelou
+
+  // Busca materiais salvos no IndexedDB
+  const materiais = await obterMateriais(p.id);
+
+  const btnsAll = document.querySelectorAll('.questao-gerada button');
+  btnsAll.forEach(b => b.disabled = true);
+
+  const questoesExistentes = p.questoes
+    .map((q, i) => i === idx ? null : `Q${i + 1}: ${(q.enunciado || '').slice(0, 200).replace(/\s+/g, ' ')}`)
+    .filter(x => x)
+    .join('\n');
+
+  const prompt2 = `Você está REGENERANDO UMA ÚNICA questão dentro de uma prova existente, estilo ENARE/ENAMED brasileiro, em PORTUGUÊS BRASILEIRO.
+
+Disciplina: ${p.disciplina}
+Posição: questão ${idx + 1} de ${p.numQuestoes}
+
+QUESTÃO ATUAL (que será substituída — gere uma DIFERENTE):
+${p.questoes[idx].enunciado || '(em branco)'}
+
+OUTRAS QUESTÕES DESTA PROVA (NÃO repita temas/casos semelhantes a estes):
+${questoesExistentes || '(nenhuma)'}
+
+${orientacao && orientacao.trim() ? 'ORIENTAÇÃO DO PROFESSOR PARA A NOVA QUESTÃO:\n' + orientacao.trim() + '\n' : ''}
+
+REGRAS:
+- TUDO em PORTUGUÊS BRASILEIRO.
+- Caso clínico realista contextualizado, em português, com paciente de nome brasileiro.
+- 4 alternativas (A, B, C, D), apenas UMA correta.
+- Distratores plausíveis.
+- Use terminologia médica brasileira.
+- Inclua explicação DETALHADA (3-5 frases) comentando a alternativa correta E individualmente cada alternativa errada.
+- Inclua referências bibliográficas concretas (livros texto, diretrizes brasileiras, sociedades médicas).
+- PREFERÊNCIA PARA IMAGEM: se algum material PDF contém figura/ECG/raio-X/diagrama que ilustra a questão, referencie via "imagem_material" (índice 0-based e número da página). Caso contrário, deixe "usar": false e use "imagem_termos" como fallback.
+
+MATERIAIS DISPONÍVEIS (índices na ordem em que foram fornecidos):
+${(materiais || []).map((m, i) => `  - Índice ${i}: ${m.nome || 'material.pdf'}`).join('\n') || '  (nenhum disponível)'}
+
+Retorne APENAS este JSON, sem markdown:
+{
+  "enunciado": "Caso clínico com pergunta",
+  "alternativas": {"A": "...", "B": "...", "C": "...", "D": "..."},
+  "gabarito": "A",
+  "explicacao": "Explicação detalhada",
+  "referencias": "Referências bibliográficas",
+  "imagem_material": { "usar": true, "material_indice": 0, "pagina": 5, "descricao": "..." },
+  "imagem_termos": []
+}`;
+
+  try {
+    const arquivosMat = (materiais || []).map(m => ({ nome: m.nome || 'material.pdf', base64: m.base64, blob: m.blob, tamanho: m.tamanho, mime: m.mime || 'application/pdf' }));
+    const partsArquivos = await prepararPartesGemini(arquivosMat, appState.apiKey);
+    const parts = [...partsArquivos, { text: prompt2 }];
+
+    const data = await chamarGemini({
+      parts,
+      generationConfig: {
+        responseMimeType: 'application/json',
+        temperature: 0.7
+      },
+      intent: 'helper'
+    });
+    if (!data.candidates || !data.candidates[0]) throw new Error('Resposta vazia da IA');
+    const texto = data.candidates[0].content.parts[0].text.trim();
+    const m = texto.match(/\{[\s\S]*\}/);
+    if (!m) throw new Error('Resposta sem JSON');
+    const result = JSON.parse(m[0]);
+
+    const alt = result.alternativas || {};
+    const gab = (result.gabarito || '').toString().toUpperCase().trim();
+    const toStr = (v) => (v === null || v === undefined) ? '' : (typeof v === 'string' ? v : (typeof v === 'object' ? JSON.stringify(v) : String(v)));
+    const novoTermos = Array.isArray(result.imagem_termos)
+      ? result.imagem_termos.map(t => toStr(t).trim()).filter(t => t.length > 1)
+      : (toStr(result.imagem_sugerida).trim() ? [toStr(result.imagem_sugerida).trim()] : []);
+    const imagemMat = (result.imagem_material && result.imagem_material.usar) ? {
+      usar: true,
+      materialIndice: parseInt(result.imagem_material.material_indice),
+      pagina: parseInt(result.imagem_material.pagina),
+      descricao: toStr(result.imagem_material.descricao)
+    } : null;
+    p.questoes[idx] = {
+      enunciado: toStr(result.enunciado),
+      alternativas: {
+        A: toStr(alt.A),
+        B: toStr(alt.B),
+        C: toStr(alt.C),
+        D: toStr(alt.D)
+      },
+      gabarito: ['A', 'B', 'C', 'D'].includes(gab) ? gab : 'A',
+      explicacao: toStr(result.explicacao),
+      referencias: toStr(result.referencias),
+      imagemSugerida: novoTermos[0] || '',
+      imagemTermos: novoTermos,
+      imagemMaterial: imagemMat,
+      imagem: null  // regenerada — substitui qualquer imagem anterior
+    };
+    salvarEstado();
+    // (Imagem NÃO é anexada automaticamente. A IA mantém a sugestão
+    // — você decide se quer anexar via botão "Adicionar imagem".)
+    renderProva();
+  } catch (err) {
+    alert('Erro ao regenerar: ' + err.message);
+    console.error(err);
+  } finally {
+    btnsAll.forEach(b => b.disabled = false);
+  }
+}
+
+// ============================================================
+// Exportação PDF
+// ============================================================
+function exportarProvaPDF() {
+  const p = getProvaAtual();
+  if (!p) return;
+  const u = userAtual();
+
+  let html = `<div class="prova-export">
+    <div class="cabecalho-prova">
+      <h1>${p.titulo}</h1>
+      <p>Disciplina: ${p.disciplina}</p>
+      <p>Professor: ${u.nome}</p>
+      <p style="margin-top:10px;"><strong>Aluno(a):</strong> _______________________________________________</p>
+      <p style="margin-top:6px;"><strong>Data:</strong> ___/___/______</p>
+      <p style="margin-top:10px; font-size:0.9em; text-align:left;">Instruções: Marque APENAS uma alternativa em cada questão. Não é permitido rasurar.</p>
+    </div>`;
+
+  p.questoes.forEach((q, idx) => {
+    const imgHtml = (q.imagem && q.imagem.dataUrl)
+      ? `<div style="text-align:center; margin:10px 0;"><img src="${q.imagem.dataUrl}" style="max-width:90%; max-height:280px;"><div style="font-size:0.8em; color:#555; margin-top:4px;">${escapeHtml(q.imagem.titulo || '')}${q.imagem.fonte ? ' · ' + escapeHtml(q.imagem.fonte) : ''}</div></div>`
+      : '';
+    html += `
+      <div class="questao-prova">
+        <div class="q-num">Questão ${idx + 1}</div>
+        <div class="q-enunciado">${escapeHtml(q.enunciado)}</div>
+        ${imgHtml}
+        <div class="q-alt"><strong>A)</strong> ${escapeHtml(q.alternativas.A)}</div>
+        <div class="q-alt"><strong>B)</strong> ${escapeHtml(q.alternativas.B)}</div>
+        <div class="q-alt"><strong>C)</strong> ${escapeHtml(q.alternativas.C)}</div>
+        <div class="q-alt"><strong>D)</strong> ${escapeHtml(q.alternativas.D)}</div>
+      </div>`;
+  });
+
+  html += '</div>';
+
+  const container = document.getElementById('exportContainer');
+  container.innerHTML = html;
+  const element = container.querySelector('.prova-export');
+
+  html2pdf().set({
+    margin: 10,
+    filename: `${p.titulo.replace(/[^a-z0-9_\- ]/gi, '_')}.pdf`,
+    image: { type: 'jpeg', quality: 0.95 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['css', 'legacy'] }
+  }).from(element).save();
+}
+
+async function exportarProvaDocx() {
+  const p = getProvaAtual();
+  if (!p) return;
+  if (!p.templateDocxBase64) {
+    alert('Esta prova não tem um template .docx salvo (você enviou um PDF ou nenhum esqueleto). Use "Baixar PDF" no lugar.');
+    return;
+  }
+  try {
+    const bytes = base64ToArrayBuffer(p.templateDocxBase64);
+    const blob = await gerarDocxComTemplate(bytes, p.questoes, p.numQuestoes);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${p.titulo.replace(/[^a-z0-9_\- ]/gi, '_')}.docx`;
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error(err);
+    alert('Erro ao gerar Word: ' + err.message);
+  }
+}
+
+function base64ToArrayBuffer(base64) {
+  const binary = atob(base64);
+  const len = binary.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes.buffer;
+}
+
+async function gerarDocxComTemplate(templateArrayBuffer, questoes, numQuestoesTotal) {
+  const zip = await JSZip.loadAsync(templateArrayBuffer);
+  let docXml = await zip.file('word/document.xml').async('string');
+  let relsXml = await zip.file('word/_rels/document.xml.rels').async('string');
+  let ctXml = await zip.file('[Content_Types].xml').async('string');
+
+  // Pré-carrega dataUrls das imagens do IndexedDB (caso o cache ainda não tenha sido populado)
+  for (const q of questoes) {
+    if (q.imagem && q.imagem.id && !q.imagem.dataUrl) {
+      try {
+        const url = await loadImagemDb(q.imagem.id);
+        if (url) q.imagem.dataUrl = url;
+      } catch (e) { /* silencioso */ }
+    }
+  }
+
+  // Garante que jpeg/png estejam declarados no Content_Types
+  if (!/Extension="jpeg"/.test(ctXml)) {
+    ctXml = ctXml.replace('</Types>', '<Default Extension="jpeg" ContentType="image/jpeg"/></Types>');
+  }
+  if (!/Extension="jpg"/.test(ctXml)) {
+    ctXml = ctXml.replace('</Types>', '<Default Extension="jpg" ContentType="image/jpeg"/></Types>');
+  }
+  if (!/Extension="png"/.test(ctXml)) {
+    ctXml = ctXml.replace('</Types>', '<Default Extension="png" ContentType="image/png"/></Types>');
+  }
+
+  // Encontra próximo rId disponível
+  let nextRid = 1000 + (relsXml.match(/Id="rId(\d+)"/g) || []).reduce((max, m) =>
+    Math.max(max, parseInt(m.match(/\d+/)[0])), 0);
+
+  // Pré-processa imagens das questões (cada falha individual não derruba o resto)
+  const imagensInfo = [];
+  for (let i = 0; i < questoes.length; i++) {
+    try {
+      const q = questoes[i];
+      if (!q.imagem || !q.imagem.dataUrl) { imagensInfo.push(null); continue; }
+      const m = q.imagem.dataUrl.match(/^data:image\/(\w+);base64,(.+)$/i);
+      if (!m) { imagensInfo.push(null); continue; }
+      let ext = m[1].toLowerCase();
+      if (ext === 'jpg') ext = 'jpeg';
+      const base64Data = m[2];
+      nextRid++;
+      const rid = 'rId' + nextRid;
+      const filename = `imgQ${i + 1}.${ext === 'jpeg' ? 'jpg' : ext}`;
+      let dims;
+      try { dims = await carregarDimensoesImagem(q.imagem.dataUrl); }
+      catch (e) { dims = { width: 800, height: 600 }; }
+      imagensInfo.push({ rid, ext, filename, base64Data, ...dims });
+    } catch (e) {
+      console.warn('Falha ao preparar imagem da questão ' + (i + 1) + ':', e);
+      imagensInfo.push(null);
+    }
+  }
+
+  // Adiciona imagens ao ZIP
+  const novosRels = [];
+  imagensInfo.forEach((img) => {
+    if (!img) return;
+    zip.file(`word/media/${img.filename}`, img.base64Data, { base64: true });
+    novosRels.push(`<Relationship Id="${img.rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${img.filename}"/>`);
+  });
+  if (novosRels.length > 0) {
+    relsXml = relsXml.replace('</Relationships>', novosRels.join('') + '</Relationships>');
+  }
+
+  // Helper: encontra placeholder "N." num XML, aceitando variações de atributos no <w:t>
+  function encontrarPlaceholder(xml, num) {
+    const patterns = [
+      `<w:t>${num}.</w:t>`,
+      `<w:t xml:space="preserve">${num}.</w:t>`,
+      `<w:t xml:space="preserve"> ${num}. </w:t>`,
+      `<w:t xml:space="preserve">${num}. </w:t>`,
+      `<w:t xml:space="preserve"> ${num}.</w:t>`
+    ];
+    for (const pat of patterns) {
+      const idx = xml.lastIndexOf(pat);
+      if (idx !== -1) return { idx, len: pat.length };
+    }
+    // Regex flexível para <w:t> com qualquer atributo + número + ponto
+    const re = new RegExp(`<w:t(?:\\s+[^>]*)?>\\s*${num}\\s*\\.\\s*</w:t>`, 'g');
+    let lastMatch = null;
+    let m;
+    while ((m = re.exec(xml)) !== null) lastMatch = m;
+    if (lastMatch) return { idx: lastMatch.index, len: lastMatch[0].length };
+    return null;
+  }
+
+  // Detecta quais placeholders "N." existem no template original (1 ao 100)
+  const placeholdersExistentes = new Set();
+  for (let n = 1; n <= 100; n++) {
+    if (encontrarPlaceholder(docXml, n)) placeholdersExistentes.add(n);
+  }
+
+  // Substitui placeholders existentes pelo conteúdo das questões correspondentes
+  const semPlaceholder = []; // questões que ultrapassam o template ou falharam
+  for (let i = 0; i < questoes.length; i++) {
+    const num = i + 1;
+    const q = questoes[i];
+    try {
+      const ph = placeholdersExistentes.has(num) ? encontrarPlaceholder(docXml, num) : null;
+      if (!ph) {
+        semPlaceholder.push({ num, q, imgInfo: imagensInfo[i] });
+        continue;
+      }
+      const placeholderIdx = ph.idx;
+
+      const pStartCandidato1 = docXml.lastIndexOf('<w:p ', placeholderIdx);
+      const pStartCandidato2 = docXml.lastIndexOf('<w:p>', placeholderIdx);
+      const pStart = Math.max(pStartCandidato1, pStartCandidato2);
+      if (pStart === -1) {
+        semPlaceholder.push({ num, q, imgInfo: imagensInfo[i] });
+        continue;
+      }
+
+      const pEndMarker = '</w:p>';
+      const pEndIdx = docXml.indexOf(pEndMarker, placeholderIdx);
+      if (pEndIdx === -1) {
+        semPlaceholder.push({ num, q, imgInfo: imagensInfo[i] });
+        continue;
+      }
+      const pEnd = pEndIdx + pEndMarker.length;
+
+      const novoConteudo = construirParagrafosQuestao(num, q, imagensInfo[i]);
+      docXml = docXml.slice(0, pStart) + novoConteudo + docXml.slice(pEnd);
+    } catch (e) {
+      console.warn('Falha ao inserir questão ' + num + ':', e);
+      semPlaceholder.push({ num, q, imgInfo: imagensInfo[i] });
+    }
+  }
+
+  // Injeta no fim do documento as questões que excederam os placeholders do template
+  if (semPlaceholder.length > 0) {
+    const tituloExtras = '<w:p><w:pPr><w:pageBreakBefore/><w:spacing w:before="240" w:after="240"/><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:b/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr><w:t xml:space="preserve">QUESTÕES ADICIONAIS</w:t></w:r></w:p>';
+    let extrasXml = tituloExtras;
+    for (const ex of semPlaceholder) {
+      extrasXml += construirParagrafosQuestao(ex.num, ex.q, ex.imgInfo);
+    }
+    // Inserção segura: antes do <w:sectPr> final (ou antes de </w:body>)
+    const sectPrIdx = docXml.lastIndexOf('<w:sectPr');
+    const bodyEndIdx = docXml.lastIndexOf('</w:body>');
+    const insertPos = (sectPrIdx !== -1 && sectPrIdx < bodyEndIdx) ? sectPrIdx : bodyEndIdx;
+    if (insertPos !== -1) {
+      docXml = docXml.slice(0, insertPos) + extrasXml + docXml.slice(insertPos);
+    }
+  }
+
+  // Limpa placeholders sobrando (caso template tenha mais slots que questões)
+  for (let n = questoes.length + 1; n <= 100; n++) {
+    const re = new RegExp(`<w:t(?:\\s+[^>]*)?>\\s*${n}\\s*\\.\\s*</w:t>`, 'g');
+    docXml = docXml.replace(re, '<w:t xml:space="preserve"></w:t>');
+  }
+
+  zip.file('word/document.xml', docXml);
+  zip.file('word/_rels/document.xml.rels', relsXml);
+  zip.file('[Content_Types].xml', ctXml);
+  return await zip.generateAsync({
+    type: 'blob',
+    mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  });
+}
+
+async function carregarDimensoesImagem(dataUrl) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve({ width: img.naturalWidth || 800, height: img.naturalHeight || 600 });
+    img.onerror = reject;
+    img.src = dataUrl;
+  });
+}
+
+function construirParagrafoImagemDocx(imgInfo, num) {
+  // EMU: 914400 por polegada. Largura alvo ~14cm = 5040000 EMU.
+  const maxWidthEmu = 5040000;
+  const aspect = imgInfo.height / imgInfo.width;
+  // Converte pixels para EMU usando 96 dpi → 9525 EMU/px
+  let widthEmu = Math.min(maxWidthEmu, Math.round(imgInfo.width * 9525));
+  let heightEmu = Math.round(widthEmu * aspect);
+  const docPrId = 1000 + num;
+  return `<w:p><w:pPr><w:jc w:val="center"/><w:spacing w:before="120" w:after="120"/></w:pPr><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"><wp:extent cx="${widthEmu}" cy="${heightEmu}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="${docPrId}" name="imgQ${num}"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="${docPrId}" name="imgQ${num}"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="${imgInfo.rid}" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${widthEmu}" cy="${heightEmu}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>`;
+}
+
+function escaparXml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+function construirParagrafosQuestao(num, q, imagemInfo) {
+  const rprNormal = '<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:color w:val="000000"/><w:sz w:val="22"/><w:szCs w:val="22"/></w:rPr>';
+  const rprBold = '<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:b/><w:color w:val="000000"/><w:sz w:val="22"/><w:szCs w:val="22"/></w:rPr>';
+  const rprLegenda = '<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:i/><w:color w:val="595959"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr>';
+  const pPr = '<w:pPr><w:spacing w:after="120"/><w:jc w:val="both"/></w:pPr>';
+  const pPrCenter = '<w:pPr><w:spacing w:after="120"/><w:jc w:val="center"/></w:pPr>';
+
+  const para = (texto, rpr, customPPr) => {
+    const txt = escaparXml(texto);
+    return `<w:p>${customPPr || pPr}<w:r>${rpr}<w:t xml:space="preserve">${txt}</w:t></w:r></w:p>`;
+  };
+
+  // Helper resistente — se q.alternativas for undefined ou estranho, devolve string vazia
+  const alt = (q && q.alternativas) || {};
+  const safe = (v) => (v === null || v === undefined) ? '' : (typeof v === 'string' ? v : String(v));
+
+  let xml = para(`${num}. ${safe(q && q.enunciado)}`, rprBold);
+  if (imagemInfo) {
+    try {
+      xml += construirParagrafoImagemDocx(imagemInfo, num);
+      if (q.imagem && (q.imagem.titulo || q.imagem.fonte)) {
+        const legenda = [q.imagem.titulo, q.imagem.fonte].filter(Boolean).join(' · ');
+        if (legenda) xml += para(legenda, rprLegenda, pPrCenter);
+      }
+    } catch (e) {
+      console.warn('Falha ao injetar imagem na Q' + num + ':', e);
+    }
+  }
+  xml += para(`A) ${safe(alt.A)}`, rprNormal);
+  xml += para(`B) ${safe(alt.B)}`, rprNormal);
+  xml += para(`C) ${safe(alt.C)}`, rprNormal);
+  xml += para(`D) ${safe(alt.D)}`, rprNormal);
+  return xml;
+}
+
+function exportarGabaritoPDF() {
+  const p = getProvaAtual();
+  if (!p) return;
+  const u = userAtual();
+
+  const destacarAlt = (letra, texto) => {
+    const correta = letra === p.questoes[idx].gabarito; // será reescrito por questão
+    return `<div class="q-alt"><strong>${letra})</strong> ${escapeHtml(texto)}</div>`;
+  };
+
+  let html = `<div class="prova-export">
+    <div class="cabecalho-prova">
+      <h1>GABARITO COMENTADO — ${p.titulo}</h1>
+      <p>Disciplina: ${p.disciplina}</p>
+      <p>Professor: ${u.nome}</p>
+      <p style="margin-top:8px; font-size:0.9em;">Inclui comentários detalhados e referências bibliográficas.</p>
+    </div>`;
+
+  p.questoes.forEach((q, idx) => {
+    const linhaAlt = (letra) => {
+      const ehGab = letra === q.gabarito;
+      const txt = escapeHtml(q.alternativas[letra] || '');
+      const cor = ehGab ? 'background:#d1fae5; padding:4px 6px; border-radius:3px; font-weight:bold;' : '';
+      return `<div class="q-alt" style="${cor}"><strong>${letra})</strong> ${txt}${ehGab ? '  ← GABARITO' : ''}</div>`;
+    };
+    const imgHtmlGab = (q.imagem && q.imagem.dataUrl)
+      ? `<div style="text-align:center; margin:8px 0;"><img src="${q.imagem.dataUrl}" style="max-width:80%; max-height:240px;"><div style="font-size:0.75em; color:#555; margin-top:4px;">${escapeHtml(q.imagem.titulo || '')}${q.imagem.fonte ? ' · ' + escapeHtml(q.imagem.fonte) : ''}</div></div>`
+      : '';
+    html += `
+      <div class="questao-prova" style="border-bottom:1px solid #ddd; padding-bottom:14px;">
+        <div class="q-num">Questão ${idx + 1} ${p.anuladas[idx] ? '— (ANULADA — conta como correta para todos)' : ''} — Resposta correta: <strong>${q.gabarito}</strong></div>
+        <div class="q-enunciado">${escapeHtml(q.enunciado)}</div>
+        ${imgHtmlGab}
+        ${linhaAlt('A')}
+        ${linhaAlt('B')}
+        ${linhaAlt('C')}
+        ${linhaAlt('D')}
+        ${q.explicacao ? `<div style="margin-top:10px; padding:8px 10px; background:#eff6ff; border-left:3px solid #3b82f6; border-radius:3px;"><strong>📘 Comentário:</strong><br>${escapeHtml(q.explicacao).replace(/\n/g, '<br>')}</div>` : ''}
+        ${q.referencias ? `<div style="margin-top:8px; padding:8px 10px; background:#fef3c7; border-left:3px solid #f59e0b; border-radius:3px; font-size:0.92em;"><strong>📚 Referências:</strong><br>${escapeHtml(q.referencias).replace(/\n/g, '<br>')}</div>` : ''}
+      </div>`;
+  });
+
+  html += '</div>';
+
+  const container = document.getElementById('exportContainer');
+  container.innerHTML = html;
+  const element = container.querySelector('.prova-export');
+
+  html2pdf().set({
+    margin: 10,
+    filename: `gabarito-${p.titulo.replace(/[^a-z0-9_\- ]/gi, '_')}.pdf`,
+    image: { type: 'jpeg', quality: 0.95 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['css', 'legacy'] }
+  }).from(element).save();
+}
+
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ============================================================
+// Correção
+// ============================================================
+function renderCorrigir() {
+  const p = getProvaAtual();
+  if (!p) { navegar('provas'); return; }
+
+  document.getElementById('corrigirTitulo').textContent = `Corrigir: ${p.titulo}`;
+  document.getElementById('corrigirBreadcrumbProva').textContent = p.titulo;
+  const gabStr = p.questoes.map((q, i) => p.anuladas[i] ? '⊘' : q.gabarito).join(' ');
+  const anulCount = p.anuladas.filter(x => x).length;
+  document.getElementById('corrigirGabarito').innerHTML = `<strong>Gabarito:</strong> ${gabStr}${anulCount > 0 ? ` • ${anulCount} questão(ões) anulada(s)` : ''}`;
+
+  renderAlunosCorrecao();
+  renderResumoCorrecao();
+}
+
+function calcularNota(aluno, prova) {
+  let acertos = 0;
+  const total = prova.numQuestoes;
+  const detalhes = [];
+  for (let i = 0; i < total; i++) {
+    const gab = prova.questoes[i].gabarito;
+    const resp = aluno.respostas[i] || '';
+    let status;
+    if (prova.anuladas[i]) {
+      acertos++;
+      status = 'anulada';
+    } else if (gab && resp && gab === resp) {
+      acertos++;
+      status = 'correta';
+    } else if (!resp) {
+      status = 'vazia';
+    } else {
+      status = 'errada';
+    }
+    detalhes.push({ num: i + 1, gab, resp, status });
+  }
+  const nota = total > 0 ? (acertos / total) * 10 : 0;
+  return { nota, acertos, total, detalhes };
+}
+
+function adicionarAlunoCorrecao() {
+  const p = getProvaAtual();
+  if (!p) return;
+  p.alunos.push({
+    id: uuid(),
+    nome: '',
+    respostas: new Array(p.numQuestoes).fill('')
+  });
+  salvarEstado();
+  renderCorrigir();
+  setTimeout(() => {
+    const cards = document.querySelectorAll('#listaAlunosCorrecao .aluno-card');
+    if (cards.length > 0) {
+      cards[cards.length - 1].querySelector('.aluno-nome-input').focus();
+      cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, 50);
+}
+
+function removerAlunoCorrecao(alunoId) {
+  const p = getProvaAtual();
+  if (!p) return;
+  const a = p.alunos.find(x => x.id === alunoId);
+  if (!a) return;
+  if (!confirm(`Remover prova de ${a.nome || 'aluno sem nome'}?`)) return;
+  p.alunos = p.alunos.filter(x => x.id !== alunoId);
+  salvarEstado();
+  renderCorrigir();
+}
+
+function renderAlunosCorrecao() {
+  const p = getProvaAtual();
+  const container = document.getElementById('listaAlunosCorrecao');
+  const contador = document.getElementById('contadorAlunosCorrecao');
+  contador.textContent = p.alunos.length > 0 ? `${p.alunos.length} aluno(s)` : '';
+
+  if (p.alunos.length === 0) {
+    container.innerHTML = '<p style="color:#6b7280; padding:16px; text-align:center;">Nenhum aluno adicionado ainda. Clique em "Adicionar Aluno" para começar.</p>';
+    return;
+  }
+
+  container.innerHTML = '';
+  for (const a of p.alunos) {
+    const calc = calcularNota(a, p);
+    const card = document.createElement('div');
+    card.className = 'aluno-card';
+
+    const header = document.createElement('div');
+    header.className = 'aluno-header';
+
+    const nomeInput = document.createElement('input');
+    nomeInput.type = 'text';
+    nomeInput.className = 'aluno-nome-input';
+    nomeInput.value = a.nome || '';
+    nomeInput.placeholder = 'Nome do aluno';
+    nomeInput.oninput = () => { a.nome = nomeInput.value; salvarEstado(); };
+    nomeInput.onblur = () => renderResumoCorrecao();
+
+    const notaWrap = document.createElement('div');
+    notaWrap.style.textAlign = 'center';
+    const nota = document.createElement('div');
+    nota.className = 'aluno-nota ' + (calc.nota >= 6 ? 'aprovado' : 'reprovado');
+    nota.textContent = calc.nota.toFixed(1);
+    const det = document.createElement('div');
+    det.style.fontSize = '0.8em';
+    det.style.color = '#6b7280';
+    det.textContent = `${calc.acertos}/${calc.total}`;
+    notaWrap.appendChild(nota);
+    notaWrap.appendChild(det);
+
+    const btnDel = document.createElement('button');
+    btnDel.className = 'danger small';
+    btnDel.textContent = '✕';
+    btnDel.onclick = () => removerAlunoCorrecao(a.id);
+
+    header.appendChild(nomeInput);
+    header.appendChild(notaWrap);
+    header.appendChild(btnDel);
+
+    const respGrid = document.createElement('div');
+    respGrid.className = 'respostas-mini';
+    for (let i = 0; i < p.numQuestoes; i++) {
+      const d = calc.detalhes[i];
+      const mini = document.createElement('div');
+      mini.className = 'resp-mini ' + (d.status === 'correta' ? 'correta' : d.status === 'errada' ? 'errada' : d.status === 'anulada' ? 'anulada' : '');
+      const num = document.createElement('div');
+      num.className = 'resp-mini-num';
+      num.textContent = 'Q' + (i + 1);
+      const btns = document.createElement('div');
+      btns.className = 'resp-mini-buttons';
+      for (let j = 0; j < p.numAlternativas; j++) {
+        const btn = document.createElement('button');
+        btn.className = 'resp-mini-btn';
+        btn.textContent = LETRAS[j];
+        if (a.respostas[i] === LETRAS[j]) btn.classList.add('selected');
+        btn.onclick = () => {
+          if (a.respostas[i] === LETRAS[j]) a.respostas[i] = '';
+          else a.respostas[i] = LETRAS[j];
+          salvarEstado();
+          renderAlunosCorrecao();
+          renderResumoCorrecao();
+        };
+        btns.appendChild(btn);
+      }
+      const gabInfo = document.createElement('div');
+      gabInfo.className = 'resp-mini-gab';
+      if (d.status === 'anulada') gabInfo.textContent = 'anulada';
+      else if (d.gab) gabInfo.textContent = 'gab: ' + d.gab;
+      mini.appendChild(num);
+      mini.appendChild(btns);
+      mini.appendChild(gabInfo);
+      respGrid.appendChild(mini);
+    }
+
+    card.appendChild(header);
+    card.appendChild(respGrid);
+    container.appendChild(card);
+  }
+}
+
+function renderResumoCorrecao() {
+  const p = getProvaAtual();
+  const div = document.getElementById('resumoCorrecao');
+  if (!p || p.alunos.length === 0) { div.innerHTML = ''; return; }
+  const notas = p.alunos.map(a => calcularNota(a, p).nota);
+  const total = notas.length;
+  const media = notas.reduce((s, n) => s + n, 0) / total;
+  const aprovados = notas.filter(n => n >= 6).length;
+  const reprovados = total - aprovados;
+  div.innerHTML = `
+    <div class="resumo-stats">
+      <div class="stat-box"><div class="stat-num">${total}</div><div class="stat-label">Alunos</div></div>
+      <div class="stat-box"><div class="stat-num">${media.toFixed(1)}</div><div class="stat-label">Média</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:#10b981;">${aprovados}</div><div class="stat-label">Aprovados</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:#ef4444;">${reprovados}</div><div class="stat-label">Reprovados</div></div>
+    </div>
+    <div style="text-align:right; margin-bottom:10px;">
+      <button class="success small" onclick="exportarNotasCSV()">📥 Exportar notas (CSV)</button>
+    </div>
+  `;
+}
+
+function exportarNotasCSV() {
+  const p = getProvaAtual();
+  if (!p || p.alunos.length === 0) return;
+  let csv = `Prova,${p.titulo}\nDisciplina,${p.disciplina}\n\nNome,Nota,Acertos,Total,Percentual\n`;
+  for (const a of p.alunos) {
+    const c = calcularNota(a, p);
+    csv += `"${a.nome || 'Sem nome'}",${c.nota.toFixed(2)},${c.acertos},${c.total},${(c.nota * 10).toFixed(1)}%\n`;
+  }
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `notas-${p.titulo.replace(/[^a-z0-9_\- ]/gi, '_')}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// Drag & drop nas áreas de upload
+// ============================================================
+['materiaisInput', 'esqueletoInput'].forEach(id => {
+  // Cliques nos labels já abrem o file picker
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Configurar drop em cada area
+  const setupDrop = (dropId, inputId, handler) => {
+    const drop = document.querySelector(`label[for="${inputId}"]`);
+    if (!drop) return;
+    ['dragenter', 'dragover'].forEach(ev => {
+      drop.addEventListener(ev, e => { e.preventDefault(); drop.style.borderColor = '#3b82f6'; });
+    });
+    ['dragleave', 'drop'].forEach(ev => {
+      drop.addEventListener(ev, e => { e.preventDefault(); drop.style.borderColor = ''; });
+    });
+    drop.addEventListener('drop', e => {
+      e.preventDefault();
+      const dt = e.dataTransfer;
+      if (handler) handler({ target: { files: dt.files, value: '' } });
+    });
+  };
+  setupDrop('matDrop', 'materiaisInput', adicionarMateriais);
+  setupDrop('esqDrop', 'esqueletoInput', adicionarEsqueleto);
+});
+
+// ============================================================
+// CAMADA COMERCIAL (Pro / Trial via Firebase Auth + Cloud Functions)
+// ============================================================
+const KIWIFY_CHECKOUT_URL = 'https://pay.kiwify.com.br/REPLACE_ME';
+const SUBSCRIPTION_PRICE_LABEL = 'R$ 39,90/mês';
+
+const proState = {
+  user: null,          // usuário MedTech (window.MT.user)
+  status: null,        // { isPaid, freeRemaining, paidUntil, ... }
+};
+
+// ===== Login central MedTech =====
+// O _mtauth.js renderiza a tela de login (a mesma de todos os apps). Quando o
+// usuário entra, ligamos a sessão local (appState.users[uid]) e abrimos o app.
+let _mtEnteredUid = null;
+function onMTLogin(u) {
+  if (!u) return;
+  const uid = u.uid;
+  if (!appState.users[uid]) {
+    appState.users[uid] = {
+      nome: u.displayName || ((u.email || '').split('@')[0]) || 'Professor',
+      email: u.email || '', disciplinas: [], provas: []
+    };
+  } else {
+    if (!appState.users[uid].nome && u.displayName) appState.users[uid].nome = u.displayName;
+    if (!appState.users[uid].email && u.email) appState.users[uid].email = u.email;
+  }
+  appState.sessaoAtual = uid;
+  proState.user = u;
+  salvarEstado();
+  if (_mtEnteredUid !== uid) { _mtEnteredUid = uid; entrarApp(); }
+  atualizarStatusAssinatura();
+}
+(function waitMT() {
+  if (!window.MT) { setTimeout(waitMT, 50); return; }
+  window.MT.onData(() => { if (window.MT.user) onMTLogin(window.MT.user); });
+})();
+
+const MEDPROVAS_API = 'https://southamerica-east1-medprovas-app.cloudfunctions.net';
+async function mtIdToken() {
+  const u = window.MT && window.MT.user;
+  if (!u) throw new Error('Entre na sua conta MedTech para usar a IA.');
+  return await u.getIdToken();
+}
+
+async function atualizarStatusAssinatura() {
+  if (!(window.MT && window.MT.user)) { atualizarBadgePro(); return; }
+  try {
+    const idToken = await mtIdToken();
+    const res = await fetch(MEDPROVAS_API + '/getSubStatusHttp', { headers: { 'Authorization': 'Bearer ' + idToken } });
+    proState.status = res.ok ? await res.json() : null;
+  } catch (e) {
+    console.warn('Falha ao buscar status:', e.message);
+    proState.status = null;
+  }
+  atualizarBadgePro();
+}
+
+function atualizarBadgePro() {
+  const el = document.getElementById('proBadge');
+  if (!el) return;
+  const s = proState.status;
+  if (!s) { el.className = 'pro-badge hidden'; el.textContent = ''; el.onclick = null; return; }
+  if (s.isPaid) {
+    const dias = Math.max(0, Math.floor((s.paidUntil - Date.now()) / 86400000));
+    el.className = 'pro-badge pro';
+    el.textContent = `⭐ Pro · ${dias}d`;
+    el.onclick = null;
+  } else if (s.freeRemaining > 0) {
+    el.className = 'pro-badge trial';
+    el.textContent = `Trial · ${s.freeRemaining} grátis`;
+    el.onclick = () => abrirPaywall();
+  } else {
+    el.className = 'pro-badge expired';
+    el.textContent = 'Assinar Pro';
+    el.onclick = () => abrirPaywall();
+  }
+}
+
+function abrirPaywall() {
+  document.getElementById('paywallModal').classList.add('show');
+}
+function fecharPaywall() {
+  document.getElementById('paywallModal').classList.remove('show');
+}
+function irParaCheckout() {
+  // s1 = uid MedTech (Kiwify devolve no webhook)
+  const uid = proState.user ? proState.user.uid : '';
+  const url = KIWIFY_CHECKOUT_URL + (KIWIFY_CHECKOUT_URL.includes('?') ? '&' : '?') + 's1=' + encodeURIComponent(uid);
+  window.open(url, '_blank');
+}
+
+// Chama o Gemini através do backend medprovas-app, autenticado com o token MedTech.
+// intent='gerarProva' conta contra o trial. PDFs vão inline (≤14 MB).
+async function chamarGeminiNoServidor({ parts, generationConfig, model, intent }) {
+  let idToken;
+  try { idToken = await mtIdToken(); }
+  catch (e) { throw new Error('Entre na sua conta MedTech para usar a IA.'); }
+  const res = await fetch(MEDPROVAS_API + '/callGeminiHttp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+    body: JSON.stringify({ parts, generationConfig, model, intent })
+  });
+  let json = {};
+  try { json = await res.json(); } catch (e) {}
+  if (!res.ok) {
+    if (res.status === 403 && json.paywall) { abrirPaywall(); throw new Error('Você precisa do Pro para gerar mais provas.'); }
+    throw new Error(json.error || ('Erro da IA (HTTP ' + res.status + ').'));
+  }
+  if (json.freeRemaining !== undefined || json.isPaid !== undefined) { atualizarStatusAssinatura(); }
+  return json.data; // { candidates: [...] } no formato Gemini
+}
+
+// IA sempre pelo backend central MedTech (plano do app / trial). BYOK removido.
+async function chamarGemini({ parts, generationConfig, model = 'gemini-2.5-flash', intent = 'helper' }) {
+  return await chamarGeminiNoServidor({ parts, generationConfig, model, intent });
+}
+
+// ============================================================
+// Init
+// ============================================================
+carregarEstado();
+// Restaura imagens do IndexedDB de forma assíncrona (não bloqueia init)
+restaurarImagensCache().then(() => {
+  // Re-renderiza a página atual se for de prova/correção (imagens podem ter chegado)
+  if (typeof renderProva === 'function' && document.getElementById('pageProva') && !document.getElementById('pageProva').classList.contains('hidden')) {
+    renderProva();
+  }
+});
+// O login agora é o do MedTech (window.MT): onMTLogin() chama entrarApp() quando
+// o usuário entra. Não auto-entramos mais por sessão local/CPF.
+</script>
+</body>
+</html>
