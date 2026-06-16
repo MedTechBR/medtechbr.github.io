@@ -51,6 +51,11 @@ function injectCSS() {
   .mt-home:active{transform:scale(.94)}
   .mt-home svg{width:13px;height:13px;flex:0 0 auto}
   body.mt-shell{padding-top:calc(env(safe-area-inset-top) + 42px) !important}
+  .mt-splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:linear-gradient(135deg,#0E5A6D,#083845)}
+  .mt-splash .mk{width:62px;height:62px;border-radius:18px;background:#2DD4A8;display:grid;place-items:center}
+  .mt-splash .mk svg{width:38px;height:38px}
+  .mt-splash .sp{width:26px;height:26px;border:3px solid rgba(255,255,255,.25);border-top-color:#2DD4A8;border-radius:50%;animation:mtspin .8s linear infinite}
+  @keyframes mtspin{to{transform:rotate(360deg)}}
   `;
   document.head.appendChild(s);
 }
@@ -67,6 +72,16 @@ function injectHomeButton() {
   document.body.appendChild(a);
 }
 function removeHomeButton() { const h = document.getElementById('mt-home'); if (h) h.remove(); document.body.classList.remove('mt-shell'); }
+
+/* Splash de carregamento — cobre a tela enquanto a sessão MedTech é verificada, para
+   NÃO vazar a tela própria de cada app (ex.: login antigo) nem piscar o login ao trocar de app. */
+function mountSplash() {
+  if (!document.body || document.getElementById('mt-splash')) return;
+  const d = document.createElement('div'); d.id = 'mt-splash'; d.className = 'mt-splash';
+  d.innerHTML = '<span class="mk"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#062a33" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="sp"></span>';
+  document.body.appendChild(d);
+}
+function removeSplash() { const s = document.getElementById('mt-splash'); if (s) s.remove(); }
 const LOGO = `<span class="mk"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#062a33" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
 
 function authMarkup() {
@@ -130,6 +145,7 @@ if (PLACEHOLDER) {
 /* ================= CLOUD MODE ================= */
 else {
   MT.ready = (async () => {
+    injectCSS(); mountSplash();   // cobre a tela já, antes de qualquer await (não vaza a tela do app)
     const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js");
     const A = await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js");
     const F = await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js");
@@ -171,10 +187,13 @@ else {
           if (d === null) d = MT.localGet();
           MT.localSet(d);
           MT._emit(d);
-        }, (err) => { console.error(err); MT._emit(MT.localGet()); });
+          removeSplash();   // dados chegaram e o app já renderizou → tira o splash
+        }, (err) => { console.error(err); MT._emit(MT.localGet()); removeSplash(); });
+        setTimeout(removeSplash, 3500);   // rede de segurança (offline / lento)
       } else {
         if (unsub) { unsub(); unsub = null; }
         removeHomeButton();
+        removeSplash();
         if (!document.getElementById('mt-auth')) mountAuth();
       }
     });
