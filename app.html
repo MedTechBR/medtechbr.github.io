@@ -78,10 +78,10 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
   <div class="sec"><h2>Sua conta MedTech</h2><span>já entram logados</span></div>
   <div class="grid" id="grid-mt"></div>
 
-  <div class="sec"><h2>Mais apps do ecossistema</h2><span>login próprio por enquanto</span></div>
+  <div class="sec" id="sec-ext"><h2>Mais apps do ecossistema</h2><span>login próprio por enquanto</span></div>
   <div class="grid" id="grid-ext"></div>
 
-  <div class="note">📌 <b>Login único:</b> os apps da “Sua conta MedTech” compartilham a mesma conta automaticamente. Os demais ainda pedem login próprio — estamos unificando aos poucos para você entrar uma vez só em tudo.</div>
+  <div class="note">📌 <b>Login único:</b> entre uma vez na sua conta MedTech e <b>todos os apps abrem logados, na mesma janela</b>.</div>
 </main>
 
 <footer>© 2026 <a href="index.html">MedTech</a> · <a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a></footer>
@@ -98,22 +98,28 @@ const APPS_MT = [
   { nm:'FlashMed', ai:false, ic:'🃏', ds:'Flashcards para estudar', url:BASE+'flashmed.html' },
   { nm:'EvoluAI', ai:true, ic:'📝', ds:'Evoluções e prontuário com IA', url:BASE+'evoluai.html' },
   { nm:'AgendaAI', ai:true, ic:'🗓️', ds:'Sua agenda médica', url:BASE+'agendaai.html' },
-  { nm:'PlantãoHub', ai:false, ic:'📅', ds:'Plantões, horas e ganhos', url:BASE+'plantaohub.html' }
+  { nm:'PlantãoHub', ai:false, ic:'📅', ds:'Plantões, horas e ganhos', url:BASE+'plantaohub.html' },
+  { nm:'LaudAI', ai:true, ic:'🩻', ds:'Laudos de exames com IA', url:BASE+'laudai.html' }
 ];
-const APPS_EXT = [
-  { nm:'LaudAI', ai:true, ic:'🩻', ds:'Laudos de exames com IA', url:'https://laudoai.web.app' }
-];
+const APPS_EXT = [];
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 function fmtName(nm){ return /AI$/.test(nm) ? esc(nm.slice(0,-2))+'<b>AI</b>' : esc(nm); }
 function card(a){
-  return `<a class="card" href="${a.url}" target="_blank" rel="noopener">
+  // Mesma janela: todos os apps estão no mesmo domínio (medtechbr.github.io),
+  // então a navegação fica DENTRO do PWA, sem abrir uma nova janela.
+  return `<a class="card" href="${a.url}">
     <div class="ic">${a.ic}</div>
     <div class="tx"><div class="nm">${fmtName(a.nm)}</div><div class="ds">${esc(a.ds)}</div></div>
-    <span class="ext">↗</span>
   </a>`;
 }
 document.getElementById('grid-mt').innerHTML = APPS_MT.map(card).join('');
-document.getElementById('grid-ext').innerHTML = APPS_EXT.map(card).join('');
+if (APPS_EXT.length) {
+  document.getElementById('grid-ext').innerHTML = APPS_EXT.map(card).join('');
+} else {
+  // Tudo unificado: esconde a seção "Mais apps do ecossistema".
+  document.getElementById('sec-ext').style.display = 'none';
+  document.getElementById('grid-ext').style.display = 'none';
+}
 
 /* saudação + sair (via login central MedTech) */
 function refreshUser(){
