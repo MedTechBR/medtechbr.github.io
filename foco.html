@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0e2a31">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Foco">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" type="image/png" href="favicon.png">
+<title>Foco — Produtividade · MedTech</title>
+<!-- Login único MedTech + sincronização na nuvem (mesmo módulo do portal) -->
+<script>window.MT_APP={id:"foco",name:"Foco"};</script>
+<script src="_mtfb.js?v=1"></script>
+<script type="module" src="_mtauth.js?v=1"></script>
+<style>
+  :root{
+    --bg:#071c22; --surface:#0e2a31; --surface2:#143941; --border:#1f4a54;
+    --txt:#eaf4f3; --muted:#8aa6a9;
+    --petrol:#0E5A6D; --petrol-d:#083845; --mint:#2DD4A8; --mint-d:#14b894; --ink:#0E2A31;
+    --accent:#2DD4A8; --accent2:#5fe3c0; --on-mint:#06251d;
+    --green:#22c55e; --amber:#f59e0b; --red:#ef4444; --blue:#38bdf8;
+    --radius:16px; --shadow:0 10px 34px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    background:var(--bg); color:var(--txt); min-height:100vh; padding-bottom:90px;
+    background-image:radial-gradient(1200px 620px at 82% -12%,rgba(45,212,168,.11),transparent),
+                     radial-gradient(950px 540px at -12% 6%,rgba(14,90,109,.26),transparent);
+  }
+  header{
+    padding:22px 20px 14px; position:sticky; top:0; z-index:20;
+    background:linear-gradient(180deg,var(--bg) 70%,transparent);
+    backdrop-filter:blur(8px);
+  }
+  .greet{font-size:13px;color:var(--muted);font-weight:500}
+  .title{font-size:26px;font-weight:800;letter-spacing:-.5px;margin-top:2px}
+  .date{font-size:13px;color:var(--accent2);font-weight:600;margin-top:4px;text-transform:capitalize}
+
+  main{padding:0 16px;max-width:680px;margin:0 auto}
+  .view{display:none;animation:fade .25s ease}
+  .view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+  .section-h{display:flex;align-items:center;justify-content:space-between;margin:18px 4px 10px}
+  .section-h h2{font-size:16px;font-weight:700}
+  .section-h .count{font-size:12px;color:var(--muted);background:var(--surface2);padding:3px 9px;border-radius:20px}
+
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:6px}
+  .stat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 10px;text-align:center}
+  .stat .n{font-size:24px;font-weight:800}
+  .stat .l{font-size:11px;color:var(--muted);margin-top:2px}
+  .stat.red .n{color:var(--red)} .stat.amber .n{color:var(--amber)} .stat.green .n{color:var(--green)}
+
+  /* task item */
+  .item{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);
+        border-radius:14px;padding:13px 14px;margin-bottom:10px;position:relative;overflow:hidden}
+  .item .bar{position:absolute;left:0;top:0;bottom:0;width:4px}
+  .item.p-alta .bar{background:var(--red)} .item.p-media .bar{background:var(--amber)} .item.p-baixa .bar{background:var(--blue)}
+  .check{flex:0 0 24px;width:24px;height:24px;border-radius:50%;border:2px solid var(--muted);
+         margin-top:1px;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center}
+  .check:hover{border-color:var(--green)}
+  .check.done{background:var(--green);border-color:var(--green)}
+  .check.done::after{content:'✓';color:#fff;font-size:14px;font-weight:bold}
+  .item .body{flex:1;min-width:0}
+  .item .t{font-size:15px;font-weight:600;line-height:1.35;word-break:break-word}
+  .item.done .t{text-decoration:line-through;color:var(--muted)}
+  .item .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:7px;align-items:center}
+  .tag{font-size:11px;font-weight:600;padding:3px 8px;border-radius:8px;display:inline-flex;gap:4px;align-items:center}
+  .tag.alta{background:rgba(239,68,68,.15);color:#fca5a5}
+  .tag.media{background:rgba(245,158,11,.15);color:#fcd34d}
+  .tag.baixa{background:rgba(59,130,246,.15);color:#93c5fd}
+  .tag.prazo{background:var(--surface2);color:var(--muted)}
+  .tag.prazo.late{background:rgba(239,68,68,.15);color:#fca5a5}
+  .tag.prazo.soon{background:rgba(245,158,11,.15);color:#fcd34d}
+  .item .note{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.4}
+  .del{flex:0 0 auto;color:var(--muted);background:none;border:none;font-size:18px;cursor:pointer;padding:4px;opacity:.6}
+  .del:hover{color:var(--red);opacity:1}
+
+  /* agenda */
+  .ev{display:flex;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:14px;
+      padding:12px 14px;margin-bottom:10px;position:relative}
+  .ev .time{flex:0 0 56px;text-align:center}
+  .ev .time .h{font-size:16px;font-weight:800;color:var(--accent2)}
+  .ev .time .d{font-size:10px;color:var(--muted);text-transform:uppercase}
+  .ev .vline{width:2px;background:var(--border);border-radius:2px}
+  .ev .info{flex:1;min-width:0}
+  .ev .info .t{font-size:15px;font-weight:600}
+  .ev .info .s{font-size:12px;color:var(--muted);margin-top:3px}
+
+  /* notas */
+  .note-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;
+             cursor:pointer;position:relative;border-left:4px solid var(--mint);transition:transform .15s,border-color .2s,box-shadow .2s}
+  .note-card:hover{border-color:rgba(45,212,168,.4);box-shadow:0 6px 18px rgba(0,0,0,.25)}
+  .note-card:active{transform:scale(.99)}
+  .note-card .nt{font-size:15px;font-weight:700;margin-bottom:5px;word-break:break-word}
+  .note-card .nx{font-size:13.5px;color:var(--muted);line-height:1.5;white-space:pre-wrap;word-break:break-word;
+                 display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
+  .note-card .nd{font-size:11px;color:var(--muted);margin-top:8px;opacity:.7}
+
+  .empty{text-align:center;padding:34px 16px;color:var(--muted)}
+  .empty .ico{font-size:40px;margin-bottom:8px;opacity:.5}
+  .empty p{font-size:14px}
+
+  /* segmented filter */
+  .seg{display:flex;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:14px}
+  .seg button{flex:1;border:none;background:none;color:var(--muted);font-size:13px;font-weight:600;
+              padding:8px;border-radius:9px;cursor:pointer;transition:.15s}
+  .seg button.active{background:linear-gradient(135deg,var(--mint),var(--mint-d));color:var(--on-mint)}
+
+  /* fab + nav */
+  .fab{position:fixed;right:20px;bottom:86px;width:58px;height:58px;border-radius:50%;
+       background:linear-gradient(135deg,var(--mint),var(--mint-d));color:var(--on-mint);border:none;font-size:30px;font-weight:600;cursor:pointer;z-index:30;
+       box-shadow:0 10px 26px rgba(45,212,168,.45);display:flex;align-items:center;justify-content:center;
+       transition:transform .18s cubic-bezier(.2,.8,.2,1),box-shadow .2s}
+  .fab:hover{box-shadow:0 14px 34px rgba(45,212,168,.6)}
+  .fab:active{transform:scale(.9)}
+  .fab-mic{bottom:152px;background:linear-gradient(135deg,#f59e0b,#f97316);font-size:24px;box-shadow:0 8px 24px rgba(245,158,11,.5)}
+
+  /* gravação por voz */
+  .rec-wrap{text-align:center;padding:8px 0 4px}
+  .rec-mic{width:96px;height:96px;border-radius:50%;border:none;margin:6px auto 14px;cursor:pointer;
+           background:linear-gradient(135deg,var(--petrol),var(--mint-d));color:#fff;font-size:40px;
+           display:flex;align-items:center;justify-content:center;transition:transform .15s}
+  .rec-mic:active{transform:scale(.94)}
+  .rec-mic.recording{background:linear-gradient(135deg,#ef4444,#f97316);animation:pulse 1.3s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.5)}70%{box-shadow:0 0 0 22px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
+  .rec-timer{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;margin-bottom:4px}
+  .rec-hint{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:6px}
+  .rec-err{color:#fca5a5;font-size:13px;margin-top:10px}
+  nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);
+      display:flex;z-index:25;padding:8px 0 calc(8px + env(safe-area-inset-bottom))}
+  nav button{flex:1;background:none;border:none;color:var(--muted);font-size:11px;font-weight:600;
+             cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px}
+  nav button .ni{font-size:20px}
+  nav button.active{color:var(--accent2)}
+
+  /* modal */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40;display:none;align-items:flex-end;justify-content:center}
+  .overlay.show{display:flex;animation:fade .2s}
+  .sheet{background:var(--surface);width:100%;max-width:680px;border-radius:22px 22px 0 0;padding:20px;
+         max-height:90vh;overflow-y:auto;animation:up .28s cubic-bezier(.2,.8,.2,1)}
+  @keyframes up{from{transform:translateY(100%)}to{transform:none}}
+  .sheet h3{font-size:18px;font-weight:700;margin-bottom:16px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px}
+  .field input,.field textarea,.field select{
+    width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:11px;
+    padding:12px;color:var(--txt);font-size:15px;font-family:inherit}
+  .field textarea{resize:vertical;min-height:60px}
+  .field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--accent)}
+  .prio-pick{display:flex;gap:8px}
+  .prio-pick button{flex:1;padding:11px;border-radius:11px;border:1px solid var(--border);background:var(--surface2);
+                    color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:.15s}
+  .prio-pick button.sel.alta{background:var(--red);border-color:var(--red);color:#fff}
+  .prio-pick button.sel.media{background:var(--amber);border-color:var(--amber);color:#fff}
+  .prio-pick button.sel.baixa{background:var(--blue);border-color:var(--blue);color:#fff}
+  .row{display:flex;gap:10px}
+  .row .field{flex:1}
+  .actions{display:flex;gap:10px;margin-top:8px}
+  .btn{flex:1;padding:14px;border-radius:12px;border:none;font-size:15px;font-weight:700;cursor:pointer}
+  .btn.primary{background:linear-gradient(135deg,var(--mint),var(--mint-d));color:var(--on-mint);font-weight:800}
+  .btn.ghost{background:var(--surface2);color:var(--muted)}
+
+  .hl-card{background:linear-gradient(135deg,rgba(14,90,109,.30),rgba(45,212,168,.08));
+           border:1px solid rgba(45,212,168,.22)}
+  .hl-card .ev{background:rgba(255,255,255,.03)}
+
+  /* header layout + gear */
+  .head-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .gear{flex:0 0 auto;width:40px;height:40px;border-radius:12px;background:var(--surface);border:1px solid var(--border);
+        color:var(--muted);font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:4px}
+  .gear:active{transform:scale(.92)}
+
+  /* edit affordance */
+  .item .body{cursor:pointer}
+  .ev .info{cursor:pointer}
+  .item .acts,.ev .acts{flex:0 0 auto;display:flex;flex-direction:column;gap:2px;align-items:center}
+  .iconbtn{color:var(--muted);background:none;border:none;font-size:15px;cursor:pointer;padding:3px;opacity:.6;line-height:1}
+  .iconbtn:hover{opacity:1;color:var(--accent2)}
+  .iconbtn.del:hover{color:var(--red)}
+
+  /* AI panel */
+  .ai-card{background:linear-gradient(135deg,rgba(45,212,168,.13),rgba(14,90,109,.10));
+           border:1px solid rgba(45,212,168,.28);border-radius:var(--radius);padding:16px;margin-bottom:6px}
+  .ai-head{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+  .ai-head .t{font-size:15px;font-weight:700}
+  .ai-head .badge{font-size:10px;font-weight:800;letter-spacing:.4px;background:rgba(45,212,168,.20);color:var(--accent2);padding:2px 7px;border-radius:20px}
+  .ai-sub{font-size:12.5px;color:var(--muted);line-height:1.4;margin-bottom:12px}
+  .ai-btn{width:100%;padding:13px;border-radius:11px;border:none;background:linear-gradient(135deg,var(--mint),var(--mint-d));
+          color:var(--on-mint);font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;
+          box-shadow:0 6px 18px rgba(45,212,168,.30);transition:transform .15s,box-shadow .2s}
+  .ai-btn:hover{box-shadow:0 8px 22px rgba(45,212,168,.42)}
+  .ai-btn:active{transform:scale(.98)} .ai-btn:disabled{opacity:.6;box-shadow:none}
+  .ai-out{margin-top:14px;display:none}
+  .ai-out.show{display:block;animation:fade .3s}
+  .ai-resumo{font-size:14px;font-weight:600;line-height:1.45;background:rgba(255,255,255,.04);
+             border-left:3px solid var(--accent2);padding:10px 12px;border-radius:0 10px 10px 0;margin-bottom:12px}
+  .ai-rank{display:flex;gap:11px;padding:10px 0;border-bottom:1px solid var(--border)}
+  .ai-rank:last-child{border-bottom:none}
+  .ai-rank .num{flex:0 0 26px;height:26px;border-radius:50%;background:var(--surface2);color:var(--accent2);font-size:13px;
+                font-weight:800;display:flex;align-items:center;justify-content:center;border:1px solid var(--border)}
+  .ai-rank.top .num{background:linear-gradient(135deg,var(--mint),var(--mint-d));color:var(--on-mint);border:none;box-shadow:0 0 0 4px rgba(45,212,168,.18)}
+  .ai-rank .rb{flex:1;min-width:0}
+  .ai-rank .rt{font-size:14px;font-weight:600;line-height:1.3}
+  .ai-rank .rm{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.4}
+  .ai-alert{margin-top:12px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;
+            font-size:13px;padding:10px 12px;border-radius:10px;line-height:1.4}
+  .ai-spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;
+           display:inline-block;animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .ai-err{color:#fca5a5;font-size:13px;margin-top:10px;line-height:1.4}
+  .keyhint{font-size:12px;color:var(--accent2);text-decoration:underline;cursor:pointer;margin-top:8px;display:inline-block}
+  .link{color:var(--accent2);text-decoration:underline}
+  .btn.danger{background:rgba(239,68,68,.15);color:#fca5a5}
+
+  /* ====== microinterações & polimento ====== */
+  .title{background:linear-gradient(90deg,var(--txt),var(--accent2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .stat{transition:transform .15s,border-color .2s}
+  .stat:hover{border-color:rgba(45,212,168,.3)}
+  .item{transition:transform .15s,border-color .2s,box-shadow .2s,opacity .2s}
+  .item:hover{border-color:rgba(45,212,168,.28)}
+  .ev{transition:transform .15s,border-color .2s}
+  .ev:hover{border-color:rgba(45,212,168,.28)}
+  .check{transition:transform .15s,background .2s,border-color .2s}
+  .check:active{transform:scale(.85)}
+  .check.done{animation:checkPop .3s cubic-bezier(.2,.9,.3,1.4)}
+  @keyframes checkPop{0%{transform:scale(.5)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
+  /* conclusão satisfatória: vira verde, dá um pop e some */
+  .item.completing{animation:taskDone .42s ease forwards;pointer-events:none;overflow:hidden}
+  .item.completing .check{background:var(--green);border-color:var(--green)}
+  .item.completing .check::after{content:'✓';color:#fff;font-size:14px;font-weight:bold}
+  @keyframes taskDone{0%{transform:scale(1)}22%{transform:scale(1.015);box-shadow:0 0 0 2px rgba(34,197,94,.5) inset}100%{transform:scale(.85) translateX(40px);opacity:0;margin-bottom:-58px}}
+  nav button{transition:color .2s,transform .1s}
+  nav button:active{transform:scale(.9)}
+  nav button.active .ni{animation:navPop .3s ease}
+  @keyframes navPop{0%{transform:scale(1)}50%{transform:scale(1.22)}100%{transform:scale(1)}}
+  .gear,.iconbtn{transition:transform .15s,color .2s,opacity .2s}
+  .view.active{animation:viewIn .3s cubic-bezier(.2,.8,.2,1)}
+  @keyframes viewIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .fab-mic{transition:transform .18s cubic-bezier(.2,.8,.2,1),box-shadow .2s}
+  .fab-mic:active{transform:scale(.9)}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="head-row">
+    <div>
+      <div class="greet" id="greet">Olá 👋</div>
+      <div class="title" id="viewTitle">Hoje</div>
+      <div class="date" id="todayDate"></div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+      <button class="gear" id="acctBtn" title="Minha conta MedTech">👤</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- HOJE -->
+  <section class="view active" id="view-hoje">
+    <div class="stats">
+      <div class="stat red"><div class="n" id="st-late">0</div><div class="l">Atrasadas</div></div>
+      <div class="stat amber"><div class="n" id="st-pend">0</div><div class="l">Pendentes</div></div>
+      <div class="stat green"><div class="n" id="st-done">0</div><div class="l">Concluídas</div></div>
+    </div>
+
+    <div class="ai-card">
+      <div class="ai-head"><span style="font-size:18px">🤖</span><span class="t">Foco da IA</span><span class="badge">GEMINI</span></div>
+      <div class="ai-sub">A IA analisa suas demandas, prazos e a agenda de hoje e te diz <b>o que atacar agora</b> e por quê.</div>
+      <button class="ai-btn" id="aiBtn">✨ O que priorizar agora?</button>
+      <div class="ai-out" id="aiOut"></div>
+    </div>
+
+    <div class="section-h"><h2>📅 Compromissos de hoje</h2></div>
+    <div class="card hl-card" id="todayEvents"></div>
+
+    <div class="section-h"><h2>🔥 Prioridades de hoje</h2></div>
+    <div id="todayTasks"></div>
+  </section>
+
+  <!-- DEMANDAS -->
+  <section class="view" id="view-demandas">
+    <div class="seg" id="taskFilter">
+      <button class="active" data-f="todas">Todas</button>
+      <button data-f="alta">Alta</button>
+      <button data-f="media">Média</button>
+      <button data-f="baixa">Baixa</button>
+    </div>
+    <div id="taskList"></div>
+  </section>
+
+  <!-- AGENDA -->
+  <section class="view" id="view-agenda">
+    <div id="agendaList"></div>
+  </section>
+
+  <!-- NOTAS -->
+  <section class="view" id="view-notas">
+    <div id="notesList"></div>
+  </section>
+
+  <!-- HISTÓRICO -->
+  <section class="view" id="view-historico">
+    <div class="section-h"><h2>✅ Demandas resolvidas</h2><span class="count" id="histCount">0</span></div>
+    <div id="histList"></div>
+  </section>
+</main>
+
+<button class="fab fab-mic" id="micFab" title="Criar por voz">🎤</button>
+<button class="fab" id="fab">+</button>
+
+<nav>
+  <button class="active" data-v="hoje"><span class="ni">🏠</span>Hoje</button>
+  <button data-v="demandas"><span class="ni">📋</span>Demandas</button>
+  <button data-v="agenda"><span class="ni">🗓️</span>Agenda</button>
+  <button data-v="notas"><span class="ni">📝</span>Notas</button>
+  <button data-v="historico"><span class="ni">📁</span>Histórico</button>
+</nav>
+
+<!-- MODAL DEMANDA -->
+<div class="overlay" id="taskModal">
+  <div class="sheet">
+    <h3 id="taskModalTitle">Nova demanda</h3>
+    <div class="field"><label>O que precisa ser feito?</label>
+      <input id="t-title" placeholder="Ex: Enviar relatório mensal"></div>
+    <div class="field"><label>Detalhes (opcional)</label>
+      <textarea id="t-note" placeholder="Anotações..."></textarea></div>
+    <div class="field"><label>Prioridade</label>
+      <div class="prio-pick" id="t-prio">
+        <button data-p="alta">Alta</button>
+        <button data-p="media" class="sel media">Média</button>
+        <button data-p="baixa">Baixa</button>
+      </div></div>
+    <div class="field"><label>Prazo (opcional)</label>
+      <input type="date" id="t-due"></div>
+    <div class="actions">
+      <button class="btn ghost" id="t-cancel">Cancelar</button>
+      <button class="btn primary" id="t-save">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EVENTO -->
+<div class="overlay" id="evModal">
+  <div class="sheet">
+    <h3 id="evModalTitle">Novo compromisso</h3>
+    <div class="field"><label>Atividade</label>
+      <input id="e-title" placeholder="Ex: Reunião com equipe"></div>
+    <div class="row">
+      <div class="field"><label>Data</label><input type="date" id="e-date"></div>
+      <div class="field"><label>Hora</label><input type="time" id="e-time"></div>
+    </div>
+    <div class="field"><label>Local / detalhes (opcional)</label>
+      <input id="e-loc" placeholder="Ex: Sala 3 / Google Meet"></div>
+    <div class="actions">
+      <button class="btn ghost" id="e-cancel">Cancelar</button>
+      <button class="btn primary" id="e-save">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL VOZ -->
+<div class="overlay" id="recModal">
+  <div class="sheet">
+    <h3>🎤 Criar por voz</h3>
+    <div class="rec-wrap">
+      <button class="rec-mic" id="recMic">🎤</button>
+      <div class="rec-timer" id="recTimer" style="display:none">0:00</div>
+      <div class="rec-hint" id="recHint">Toque no microfone e fale. Ex.: <i>"Reunião com a equipe sexta às 15h na sala 3"</i> ou <i>"Entregar relatório até sexta, prioridade alta"</i>.</div>
+      <div class="rec-err" id="recErr" style="display:none"></div>
+    </div>
+    <div class="actions">
+      <button class="btn ghost" id="rec-cancel">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOTA -->
+<div class="overlay" id="noteModal">
+  <div class="sheet">
+    <h3 id="noteModalTitle">Nova nota</h3>
+    <div class="field"><label>Título (opcional)</label>
+      <input id="n-title" placeholder="Ex: Ideias, lembrete, reunião..."></div>
+    <div class="field"><label>Anotação</label>
+      <textarea id="n-text" placeholder="Escreva livremente..." style="min-height:160px"></textarea></div>
+    <div class="actions">
+      <button class="btn ghost" id="n-cancel">Cancelar</button>
+      <button class="btn primary" id="n-save">Salvar</button>
+    </div>
+    <div class="actions" id="n-delRow" style="margin-top:4px;display:none">
+      <button class="btn danger" id="n-del" style="flex:0 0 auto;font-size:13px;padding:10px 14px">Excluir nota</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONTA (login central MedTech) -->
+<div class="overlay" id="acctModal">
+  <div class="sheet">
+    <h3>👤 Minha conta MedTech</h3>
+    <div id="acct-in">
+      <div style="display:flex;align-items:center;gap:12px;background:var(--surface2);border-radius:12px;padding:14px;margin-bottom:8px">
+        <div id="acct-avatar" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--petrol),var(--mint-d));color:#fff;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:0 0 auto"></div>
+        <div style="flex:1;min-width:0">
+          <div id="acct-name" style="font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+          <div id="acct-status" style="font-size:12.5px;color:var(--green);margin-top:2px">✓ Sincronizado na conta MedTech</div>
+        </div>
+      </div>
+      <div class="ai-sub" style="margin:10px 0 16px">Suas demandas, compromissos e notas são salvos automaticamente na sua conta MedTech e aparecem em qualquer aparelho — a mesma conta de todos os apps.</div>
+      <button class="btn ghost" id="logoutBtn" style="width:100%">Sair da conta MedTech</button>
+    </div>
+    <div style="margin-top:14px;padding-top:13px;border-top:1px solid rgba(127,127,127,.18)">
+      <div class="ai-sub" style="margin-bottom:9px;font-size:12.5px"><b>Veio do Foco antigo?</b> Baixe o backup lá (☁️ → Baixar backup) e <b>restaure aqui</b> para trazer suas demandas, agenda e notas para esta conta.</div>
+      <button class="btn ghost" id="importBtn" style="width:100%;margin-bottom:8px">⬆️ Restaurar de um backup</button>
+      <button class="btn ghost" id="exportBtn" style="width:100%">⬇️ Baixar backup (.json)</button>
+      <input type="file" id="importFile" accept="application/json,.json" style="display:none">
+    </div>
+    <div class="actions" style="margin-top:14px">
+      <button class="btn ghost" id="acct-close">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+let tasks=[], events=[], notes=[];
+let curView='hoje', taskFilter='todas';
+
+const fmtDate=d=>new Date(d+'T00:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
+const todayStr=()=>{const d=new Date();return d.toISOString().slice(0,10)};
+const PRIO={alta:{l:'Alta',c:'alta',o:0},media:{l:'Média',c:'media',o:1},baixa:{l:'Baixa',c:'baixa',o:2}};
+
+/* ---------- SYNC: tudo via login central MedTech (window.MT) ---------- */
+let applyingCloud=false;
+function save(){
+  // MT.save grava no cache local (mt_foco) e na nuvem: users/{uid}/apps/foco
+  if(applyingCloud) return;
+  if(window.MT && MT.save) MT.save({tasks,events,notes});
+}
+
+/* ---------- DATA HEADER ---------- */
+function initHeader(){
+  const h=new Date().getHours();
+  $('#greet').textContent = h<12?'Bom dia ☀️':h<18?'Boa tarde 🌤️':'Boa noite 🌙';
+  $('#todayDate').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+}
+
+/* ---------- DEADLINE STATUS ---------- */
+function dueInfo(due){
+  if(!due) return null;
+  const t=todayStr();
+  const diff=Math.round((new Date(due)-new Date(t))/864e5);
+  let cls='', txt=fmtDate(due);
+  if(diff<0){cls='late';txt='Atrasada · '+fmtDate(due)}
+  else if(diff===0){cls='soon';txt='Hoje'}
+  else if(diff===1){cls='soon';txt='Amanhã'}
+  else if(diff<=3){cls='soon';txt='Em '+diff+'d · '+fmtDate(due)}
+  return {cls,txt,diff};
+}
+
+/* ---------- RENDER TASK ITEM ---------- */
+function taskHTML(t){
+  const di=dueInfo(t.due);
+  const prazoTag = di?`<span class="tag prazo ${di.cls}">⏰ ${di.txt}</span>`:'';
+  return `<div class="item p-${t.prio} ${t.done?'done':''}" data-id="${t.id}">
+    <div class="bar"></div>
+    <div class="check ${t.done?'done':''}" onclick="toggleTask('${t.id}')"></div>
+    <div class="body" onclick="editTask('${t.id}')">
+      <div class="t">${esc(t.title)}</div>
+      <div class="meta">
+        <span class="tag ${t.prio}">${PRIO[t.prio].l}</span>
+        ${prazoTag}
+      </div>
+      ${t.note?`<div class="note">${esc(t.note)}</div>`:''}
+    </div>
+    <div class="acts">
+      <button class="iconbtn" onclick="editTask('${t.id}')" title="Editar">✏️</button>
+      <button class="iconbtn del" onclick="delTask('${t.id}')" title="Excluir">✕</button>
+    </div>
+  </div>`;
+}
+const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function sortTasks(arr){
+  return arr.sort((a,b)=>{
+    const da=a.due?new Date(a.due):null, db=b.due?new Date(b.due):null;
+    if(da&&db&&+da!==+db) return da-db;
+    if(da&&!db) return -1; if(!da&&db) return 1;
+    return PRIO[a.prio].o-PRIO[b.prio].o;
+  });
+}
+
+/* ---------- RENDER VIEWS ---------- */
+function renderHoje(){
+  const pend=tasks.filter(t=>!t.done);
+  const late=pend.filter(t=>t.due&&dueInfo(t.due).diff<0).length;
+  const doneToday=tasks.filter(t=>t.done&&t.doneAt&&t.doneAt.slice(0,10)===todayStr()).length;
+  $('#st-late').textContent=late;
+  $('#st-pend').textContent=pend.length;
+  $('#st-done').textContent=doneToday;
+
+  // eventos de hoje
+  const tev=events.filter(e=>e.date===todayStr()).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+  $('#todayEvents').innerHTML = tev.length? tev.map(evHTML).join('')
+    : `<div class="empty" style="padding:18px"><div class="ico">🗓️</div><p>Nenhum compromisso hoje.<br>Aproveite o dia!</p></div>`;
+
+  // tarefas prioritárias: atrasadas + vencendo hoje/amanhã + alta prioridade
+  const prio=sortTasks(pend.filter(t=>{
+    const di=dueInfo(t.due);
+    return (di&&di.diff<=1)||t.prio==='alta';
+  })).slice(0,6);
+  $('#todayTasks').innerHTML = prio.length? prio.map(taskHTML).join('')
+    : `<div class="empty"><div class="ico">🎯</div><p>Sem prioridades urgentes.<br>Tudo sob controle!</p></div>`;
+}
+
+function renderDemandas(){
+  let arr=tasks.filter(t=>!t.done);
+  if(taskFilter!=='todas') arr=arr.filter(t=>t.prio===taskFilter);
+  arr=sortTasks(arr);
+  $('#taskList').innerHTML = arr.length? arr.map(taskHTML).join('')
+    : `<div class="empty"><div class="ico">📋</div><p>Nenhuma demanda aqui.<br>Toque em + para adicionar.</p></div>`;
+}
+
+function evHTML(e){
+  const [h,m]=(e.time||'--:--').split(':');
+  return `<div class="ev" data-id="${e.id}">
+    <div class="time"><div class="h">${h}<span style="font-size:11px">:${m||'00'}</span></div></div>
+    <div class="vline"></div>
+    <div class="info" onclick="editEvent('${e.id}')">
+      <div class="t">${esc(e.title)}</div>
+      ${e.loc?`<div class="s">📍 ${esc(e.loc)}</div>`:''}
+    </div>
+    <div class="acts">
+      <button class="iconbtn" onclick="editEvent('${e.id}')" title="Editar">✏️</button>
+      <button class="iconbtn del" onclick="delEvent('${e.id}')" title="Excluir">✕</button>
+    </div>
+  </div>`;
+}
+
+function renderAgenda(){
+  if(!events.length){
+    $('#agendaList').innerHTML=`<div class="empty"><div class="ico">🗓️</div><p>Nenhum compromisso agendado.<br>Toque em + para programar.</p></div>`;
+    return;
+  }
+  const byDate={};
+  events.forEach(e=>{(byDate[e.date]=byDate[e.date]||[]).push(e)});
+  const dates=Object.keys(byDate).sort();
+  let html='';
+  dates.forEach(d=>{
+    const isToday=d===todayStr();
+    const lbl=new Date(d+'T00:00:00').toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+    html+=`<div class="section-h"><h2 style="text-transform:capitalize">${isToday?'🔵 Hoje · ':''}${lbl}</h2></div>`;
+    html+=byDate[d].sort((a,b)=>(a.time||'').localeCompare(b.time||'')).map(evHTML).join('');
+  });
+  $('#agendaList').innerHTML=html;
+}
+
+function renderHist(){
+  const done=tasks.filter(t=>t.done).sort((a,b)=>(b.doneAt||'').localeCompare(a.doneAt||''));
+  $('#histCount').textContent=done.length;
+  $('#histList').innerHTML = done.length? done.map(t=>{
+    const when=t.doneAt?new Date(t.doneAt).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}):'';
+    return `<div class="item p-${t.prio} done" data-id="${t.id}">
+      <div class="bar"></div>
+      <div class="check done" onclick="toggleTask('${t.id}')"></div>
+      <div class="body">
+        <div class="t">${esc(t.title)}</div>
+        <div class="meta"><span class="tag prazo">✅ ${when}</span></div>
+      </div>
+      <button class="del" onclick="delTask('${t.id}')">✕</button>
+    </div>`;
+  }).join('') : `<div class="empty"><div class="ico">📁</div><p>Nada resolvido ainda.<br>Conclua demandas para vê-las aqui.</p></div>`;
+}
+
+function renderNotes(){
+  const arr=[...notes].sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  $('#notesList').innerHTML = arr.length? arr.map(n=>{
+    const when=n.updatedAt?new Date(n.updatedAt).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+    const preview=(n.text||'').trim() || '(vazia)';
+    return `<div class="note-card" onclick="editNote('${n.id}')">
+      ${n.title?`<div class="nt">${esc(n.title)}</div>`:''}
+      <div class="nx">${esc(preview)}</div>
+      <div class="nd">🕒 ${when}</div>
+    </div>`;
+  }).join('') : `<div class="empty"><div class="ico">📝</div><p>Nenhuma anotação ainda.<br>Toque em + para escrever livremente.</p></div>`;
+}
+function renderAll(){renderHoje();renderDemandas();renderAgenda();renderNotes();renderHist();clearAiFocus()}
+// Limpa o resultado do "Foco da IA" quando as demandas/agenda mudam, p/ não mostrar algo já resolvido.
+function clearAiFocus(){ const o=document.querySelector('#aiOut'); if(o){ o.className='ai-out'; o.innerHTML=''; } }
+
+/* ---------- ACTIONS ---------- */
+function toggleTask(id){
+  const t=tasks.find(x=>x.id===id); if(!t)return;
+  const concluindo=!t.done;
+  t.done=!t.done; t.doneAt=t.done?new Date().toISOString():null;
+  if(concluindo){
+    const els=document.querySelectorAll('.item[data-id="'+id+'"]');
+    if(els.length){ els.forEach(el=>el.classList.add('completing')); setTimeout(()=>{save();renderAll();},380); return; }
+  }
+  save();renderAll();
+}
+function delTask(id){
+  if(!confirm('Excluir esta demanda?'))return;
+  tasks=tasks.filter(t=>t.id!==id);save();renderAll();
+}
+function delEvent(id){
+  if(!confirm('Excluir este compromisso?'))return;
+  events=events.filter(e=>e.id!==id);save();renderAll();
+}
+
+/* ---------- NAV ---------- */
+const titles={hoje:'Hoje',demandas:'Demandas',agenda:'Agenda',notas:'Notas',historico:'Histórico'};
+$$('nav button').forEach(b=>b.onclick=()=>{
+  curView=b.dataset.v;
+  $$('nav button').forEach(x=>x.classList.toggle('active',x===b));
+  $$('.view').forEach(v=>v.classList.remove('active'));
+  $('#view-'+curView).classList.add('active');
+  $('#viewTitle').textContent=titles[curView];
+  window.scrollTo(0,0);
+});
+
+$$('#taskFilter button').forEach(b=>b.onclick=()=>{
+  taskFilter=b.dataset.f;
+  $$('#taskFilter button').forEach(x=>x.classList.toggle('active',x===b));
+  renderDemandas();
+});
+
+/* ---------- MODALS (criar + editar) ---------- */
+let selPrio='media', editingTaskId=null, editingEventId=null;
+function setPrioUI(p){selPrio=p;$$('#t-prio button').forEach(x=>{x.className='';if(x.dataset.p===p)x.classList.add('sel',p)})}
+$$('#t-prio button').forEach(b=>b.onclick=()=>setPrioUI(b.dataset.p));
+
+function openTaskModal(){
+  editingTaskId=null;
+  $('#taskModalTitle').textContent='Nova demanda';
+  $('#t-title').value='';$('#t-note').value='';$('#t-due').value='';setPrioUI('media');
+  $('#taskModal').classList.add('show');setTimeout(()=>$('#t-title').focus(),100);
+}
+function editTask(id){
+  const t=tasks.find(x=>x.id===id); if(!t)return;
+  editingTaskId=id;
+  $('#taskModalTitle').textContent='Editar demanda';
+  $('#t-title').value=t.title;$('#t-note').value=t.note||'';$('#t-due').value=t.due||'';setPrioUI(t.prio);
+  $('#taskModal').classList.add('show');
+}
+function openEvModal(){
+  editingEventId=null;
+  $('#evModalTitle').textContent='Novo compromisso';
+  $('#e-title').value='';$('#e-date').value=todayStr();$('#e-time').value='';$('#e-loc').value='';
+  $('#evModal').classList.add('show');setTimeout(()=>$('#e-title').focus(),100);
+}
+function editEvent(id){
+  const e=events.find(x=>x.id===id); if(!e)return;
+  editingEventId=id;
+  $('#evModalTitle').textContent='Editar compromisso';
+  $('#e-title').value=e.title;$('#e-date').value=e.date;$('#e-time').value=e.time||'';$('#e-loc').value=e.loc||'';
+  $('#evModal').classList.add('show');
+}
+$('#fab').onclick=()=>{ curView==='agenda'?openEvModal():curView==='notas'?openNoteModal():openTaskModal() };
+$('#t-cancel').onclick=()=>$('#taskModal').classList.remove('show');
+$('#e-cancel').onclick=()=>$('#evModal').classList.remove('show');
+$('#n-cancel').onclick=()=>$('#noteModal').classList.remove('show');
+[$('#taskModal'),$('#evModal'),$('#noteModal')].forEach(o=>o.onclick=e=>{if(e.target===o)o.classList.remove('show')});
+
+/* ---------- NOTAS ---------- */
+let editingNoteId=null;
+function openNoteModal(){
+  editingNoteId=null;
+  $('#noteModalTitle').textContent='Nova nota';
+  $('#n-title').value=''; $('#n-text').value=''; $('#n-delRow').style.display='none';
+  $('#noteModal').classList.add('show'); setTimeout(()=>$('#n-text').focus(),100);
+}
+function editNote(id){
+  const n=notes.find(x=>x.id===id); if(!n)return;
+  editingNoteId=id;
+  $('#noteModalTitle').textContent='Editar nota';
+  $('#n-title').value=n.title||''; $('#n-text').value=n.text||''; $('#n-delRow').style.display='flex';
+  $('#noteModal').classList.add('show');
+}
+$('#n-save').onclick=()=>{
+  const title=$('#n-title').value.trim(), text=$('#n-text').value.trim();
+  if(!title && !text){ $('#noteModal').classList.remove('show'); return; } // nota vazia: ignora
+  if(editingNoteId){ const n=notes.find(x=>x.id===editingNoteId); n.title=title; n.text=text; n.updatedAt=Date.now(); }
+  else { notes.push({id:uid(),title,text,updatedAt:Date.now()}); }
+  save();renderAll();$('#noteModal').classList.remove('show');
+};
+$('#n-del').onclick=()=>{
+  if(!editingNoteId)return;
+  if(!confirm('Excluir esta nota?'))return;
+  notes=notes.filter(n=>n.id!==editingNoteId);
+  save();renderAll();$('#noteModal').classList.remove('show');
+};
+
+/* ---------- CRIAR POR VOZ (áudio -> IA) ---------- */
+const recModal=$('#recModal'), recMic=$('#recMic'), recTimer=$('#recTimer'), recHint=$('#recHint'), recErr=$('#recErr');
+let mediaRec=null, recChunks=[], recStream=null, recState='idle', recTick=null, recSecs=0, recAutoStop=null;
+const REC_MAX=25; // segundos
+
+$('#micFab').onclick=openRecModal;
+$('#rec-cancel').onclick=()=>{ abortRec(); recModal.classList.remove('show'); };
+recModal.onclick=e=>{ if(e.target===recModal){ abortRec(); recModal.classList.remove('show'); } };
+recMic.onclick=()=>{ if(recState==='idle') startRec(); else if(recState==='recording') stopRec(); };
+
+function openRecModal(){
+  if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){ alert('Seu navegador não permite gravar áudio aqui. Tente pelo Chrome no computador.'); return; }
+  recState='idle'; recSecs=0; recChunks=[];
+  recMic.className='rec-mic'; recMic.textContent='🎤'; recMic.disabled=false;
+  recTimer.style.display='none'; recTimer.textContent='0:00';
+  recHint.style.display='block'; recHint.innerHTML='Toque no microfone e fale. Ex.: <i>"Reunião com a equipe sexta às 15h na sala 3"</i> ou <i>"Entregar relatório até sexta, prioridade alta"</i>.';
+  recErr.style.display='none';
+  recModal.classList.add('show');
+}
+function fmtSecs(s){ return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+async function startRec(){
+  recErr.style.display='none';
+  try{ recStream=await navigator.mediaDevices.getUserMedia({audio:true}); }
+  catch(e){ recErr.textContent='⚠ Não consegui acessar o microfone. Permita o acesso e tente de novo.'; recErr.style.display='block'; return; }
+  const mime = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm'
+             : MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '';
+  try{ mediaRec = new MediaRecorder(recStream, mime?{mimeType:mime, audioBitsPerSecond:16000}:undefined); }
+  catch(_){ mediaRec = new MediaRecorder(recStream); }
+  recChunks=[];
+  mediaRec.ondataavailable=ev=>{ if(ev.data&&ev.data.size) recChunks.push(ev.data); };
+  mediaRec.onstop=onRecStopped;
+  mediaRec.start();
+  recState='recording'; recSecs=0;
+  recMic.className='rec-mic recording'; recMic.textContent='⏸';
+  recTimer.style.display='block'; recTimer.textContent='0:00';
+  recHint.innerHTML='Gravando… toque para parar.';
+  recTick=setInterval(()=>{ recSecs++; recTimer.textContent=fmtSecs(recSecs); if(recSecs>=REC_MAX) stopRec(); },1000);
+}
+function stopRec(){
+  if(mediaRec&&mediaRec.state!=='inactive'){ recState='processing'; clearInterval(recTick); try{ mediaRec.stop(); }catch(_){} }
+}
+function stopStream(){ if(recStream){ recStream.getTracks().forEach(t=>t.stop()); recStream=null; } }
+function abortRec(){ clearInterval(recTick); clearTimeout(recAutoStop); if(mediaRec&&mediaRec.state!=='inactive'){ try{ mediaRec.onstop=null; mediaRec.stop(); }catch(_){} } stopStream(); recState='idle'; }
+
+async function onRecStopped(){
+  stopStream();
+  const blob=new Blob(recChunks,{type:(mediaRec&&mediaRec.mimeType)||'audio/webm'});
+  if(!blob.size || recSecs<1){ recErr.textContent='⚠ Áudio muito curto. Fale por alguns segundos.'; recErr.style.display='block'; recState='idle'; recMic.className='rec-mic'; recMic.textContent='🎤'; recTimer.style.display='none'; recHint.innerHTML='Toque no microfone e fale.'; return; }
+  recMic.className='rec-mic'; recMic.textContent='⏳'; recMic.disabled=true;
+  recTimer.style.display='none';
+  recHint.innerHTML='<span class="ai-spin"></span> Entendendo o que você disse…';
+  try{
+    const d=await callGeminiVoice(blob);
+    recModal.classList.remove('show'); recMic.disabled=false;
+    prefillFromVoice(d);
+  }catch(err){
+    recMic.disabled=false; recMic.textContent='🎤';
+    recHint.innerHTML='Toque no microfone e fale de novo.';
+    recErr.textContent='⚠ '+(err&&err.message||'Não consegui processar o áudio.'); recErr.style.display='block';
+    recState='idle';
+  }
+}
+
+function blobToBase64(blob){
+  return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>{ const s=r.result; res(typeof s==='string'?s.split(',')[1]:''); }; r.onerror=rej; r.readAsDataURL(blob); });
+}
+
+async function callGeminiVoice(blob){
+  const user=window.MT&&MT.user;
+  if(!user) throw new Error('Entre na sua conta MedTech para usar a criação por voz.');
+  const idToken=await user.getIdToken();
+  const base64=await blobToBase64(blob);
+  if(base64.length>56000) throw new Error('Áudio muito longo. Grave algo mais curto (até ~20s).');
+  const mimeType=blob.type||'audio/webm';
+  const today=todayStr();
+  const sys='Você converte uma fala em UMA demanda (tarefa a fazer) OU UM compromisso (evento de agenda) para um app de produtividade brasileiro. Regra: se a fala descreve um encontro/atividade com data ou horário marcado, é "evento"; se é algo a fazer/resolver/lembrar, é "demanda". Datas sempre no formato YYYY-MM-DD; horário em HH:MM (24h). Prioridade só para demanda: alta, media ou baixa (padrão media). Não invente dados não ditos: deixe vazio/null.';
+  const schema={ type:'object', properties:{
+    tipo:{type:'string', enum:['demanda','evento']},
+    titulo:{type:'string'},
+    prioridade:{type:'string', enum:['alta','media','baixa']},
+    prazo:{type:'string'}, data:{type:'string'}, hora:{type:'string'},
+    local:{type:'string'}, detalhes:{type:'string'}, transcricao:{type:'string'}
+  }, required:['tipo','titulo','transcricao'] };
+  const reqBody={
+    contents:[{role:'user',parts:[ {text:`Hoje é ${today}. Use isso para resolver "amanhã", "sexta que vem", etc. Converta a fala a seguir.`}, {inline_data:{mime_type:mimeType,data:base64}} ]}],
+    model:'gemini-2.5-flash',
+    generationConfig:{ temperature:0.2, topP:0.9, responseMimeType:'application/json', responseSchema:schema, thinkingConfig:{thinkingBudget:0} },
+    systemInstruction:{parts:[{text:sys}]}
+  };
+  let res;
+  try{ res=await fetch('https://southamerica-east1-medtech-c658c.cloudfunctions.net/aigateway',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify(reqBody)}); }
+  catch(e){ throw new Error('Falha de conexão. Verifique sua internet.'); }
+  if(!res.ok){ let em=''; try{ em=(await res.json()).error||''; }catch(_){}
+    if(res.status===401) throw new Error('Entre na sua conta (☁️) para usar a IA.');
+    throw new Error(em||('Erro da IA (HTTP '+res.status+').')); }
+  let text=''; try{ text=(await res.json()).text||''; }catch(_){}
+  if(!text) throw new Error('Não entendi o áudio. Tente falar de novo, mais devagar.');
+  let parsed; try{ parsed=JSON.parse(text); }catch(_){ const m=text.match(/\{[\s\S]*\}/); if(m){ try{ parsed=JSON.parse(m[0]); }catch(__){} } }
+  if(!parsed||!parsed.tipo||!parsed.titulo) throw new Error('Não entendi o áudio. Tente falar de novo, mais devagar.');
+  return parsed;
+}
+
+function prefillFromVoice(d){
+  if(d.tipo==='evento'){
+    openEvModal();
+    $('#e-title').value=d.titulo||'';
+    $('#e-date').value=(d.data&&/^\d{4}-\d{2}-\d{2}$/.test(d.data))?d.data:todayStr();
+    $('#e-time').value=(d.hora&&/^\d{1,2}:\d{2}$/.test(d.hora))?d.hora.padStart(5,'0'):'';
+    $('#e-loc').value=d.local||'';
+  }else{
+    openTaskModal();
+    $('#t-title').value=d.titulo||'';
+    $('#t-note').value=d.detalhes||'';
+    setPrioUI(['alta','media','baixa'].includes(d.prioridade)?d.prioridade:'media');
+    $('#t-due').value=(d.prazo&&/^\d{4}-\d{2}-\d{2}$/.test(d.prazo))?d.prazo:'';
+  }
+}
+
+$('#t-save').onclick=()=>{
+  const title=$('#t-title').value.trim();
+  if(!title){$('#t-title').focus();return}
+  const data={title,note:$('#t-note').value.trim(),prio:selPrio,due:$('#t-due').value||null};
+  if(editingTaskId){ Object.assign(tasks.find(t=>t.id===editingTaskId),data); }
+  else { tasks.push({id:uid(),...data,done:false,doneAt:null,createdAt:new Date().toISOString()}); }
+  save();renderAll();$('#taskModal').classList.remove('show');
+};
+$('#e-save').onclick=()=>{
+  const title=$('#e-title').value.trim(), date=$('#e-date').value;
+  if(!title){$('#e-title').focus();return}
+  if(!date){$('#e-date').focus();return}
+  const data={title,date,time:$('#e-time').value||'',loc:$('#e-loc').value.trim()};
+  if(editingEventId){ Object.assign(events.find(e=>e.id===editingEventId),data); }
+  else { events.push({id:uid(),...data}); }
+  save();renderAll();$('#evModal').classList.remove('show');
+};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
+/* ---------- IA (Gemini via gateway central MedTech, SEM chave) ---------- */
+let aiModel='gemini-2.5-flash';
+const aiOut=$('#aiOut'), aiBtn=$('#aiBtn');
+
+aiBtn.onclick=runAiFocus;
+async function runAiFocus(){
+  const pend=tasks.filter(t=>!t.done);
+  if(!pend.length){
+    aiOut.className='ai-out show';
+    aiOut.innerHTML='<div class="ai-resumo">🎉 Você não tem demandas pendentes. Aproveite o dia!</div>';
+    return;
+  }
+  aiBtn.disabled=true; aiBtn.innerHTML='<span class="ai-spin"></span> Analisando...';
+  aiOut.className='ai-out'; aiOut.innerHTML='';
+  try{
+    const result=await callGeminiFocus(pend);
+    renderAiFocus(result, pend);
+  }catch(err){
+    aiOut.className='ai-out show';
+    aiOut.innerHTML=`<div class="ai-err">⚠ ${esc(err.message||'Erro ao consultar a IA.')}</div>`;
+  }finally{
+    aiBtn.disabled=false; aiBtn.innerHTML='✨ O que priorizar agora?';
+  }
+}
+
+function buildFocusPrompt(pend){
+  const now=new Date();
+  const hora=now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const hoje=todayStr();
+  const tarefas=pend.map(t=>{
+    const di=t.due?dueInfo(t.due):null;
+    return {id:t.id, titulo:t.title, prioridade:t.prio, prazo:t.due||'sem prazo',
+      situacao_prazo: di?(di.diff<0?'ATRASADA':di.diff===0?'vence hoje':di.diff===1?'vence amanhã':'em '+di.diff+' dias'):'sem prazo',
+      detalhes:t.note||''};
+  });
+  const evHoje=events.filter(e=>e.date===hoje).sort((a,b)=>(a.time||'').localeCompare(b.time||''))
+    .map(e=>({hora:e.time||'sem hora', atividade:e.title, local:e.loc||''}));
+  return `Você é um assistente de produtividade objetivo e prático. Hoje é ${now.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}, agora são ${hora}.
+
+Compromissos AGENDADOS para hoje:
+${evHoje.length?JSON.stringify(evHoje,null,1):'(nenhum)'}
+
+Demandas PENDENTES do usuário:
+${JSON.stringify(tarefas,null,1)}
+
+Tarefa: decida o que o usuário deve priorizar AGORA, considerando: prazos (atrasadas e que vencem hoje/amanhã vêm primeiro), o nível de prioridade declarado, e o tempo livre entre os compromissos de hoje. Seja realista sobre quanto cabe no dia.
+
+Responda APENAS com um JSON válido (sem markdown, sem cercas de código) neste formato:
+{
+  "resumo": "1-2 frases dizendo no que focar agora e a lógica geral",
+  "ordem": [ { "id": "<id da demanda>", "motivo": "motivo curto e específico (máx 12 palavras)" } ],
+  "alerta": "aviso sobre atraso crítico ou conflito com a agenda; null se não houver"
+}
+Inclua em "ordem" no máximo as 5 demandas mais importantes, da mais urgente para a menos. Use exatamente os ids fornecidos.`;
+}
+
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+// Uma tentativa contra um modelo específico (com 1 retry interno).
+async function callGeminiOnce(prompt, model){
+  // IA central MedTech (Vertex, SEM chave): chama o portão com o login do usuário.
+  const gen={ temperature:0.3, topP:0.9, maxOutputTokens:4096, responseMimeType:'application/json', thinkingConfig:{ thinkingBudget:0 } };
+  const user=window.MT&&MT.user;
+  if(!user){ const e=new Error('Entre na sua conta MedTech para usar a IA.'); e.fatal=true; throw e; }
+  let idToken;
+  try{ idToken=await user.getIdToken(); }catch(e){ const er=new Error('Sessão expirada. Entre novamente.'); er.fatal=true; throw er; }
+  let res;
+  try{
+    res=await fetch('https://southamerica-east1-medtech-c658c.cloudfunctions.net/aigateway',{
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
+      body:JSON.stringify({ contents:[{role:'user',parts:[{text:prompt}]}], model:'gemini-2.5-flash', generationConfig:gen })
+    });
+  }catch(e){ const err=new Error('Falha de conexão. Verifique sua internet.'); err.fatal=true; throw err; }
+  if(!res.ok){
+    let em=''; try{ em=(await res.json()).error||''; }catch(_){}
+    if(res.status===401){ const e=new Error('Entre na sua conta para usar a IA.'); e.fatal=true; throw e; }
+    const e=new Error(em||('HTTP '+res.status)); if(res.status>=500) e.tryNext=true; else e.fatal=true; throw e;
+  }
+  let text=''; try{ text=(await res.json()).text||''; }catch(_){}
+  if(!text){ const e=new Error('resposta vazia'); e.tryNext=true; throw e; }
+  let parsed;
+  try{ parsed=JSON.parse(text); }
+  catch(_){ const m=text.match(/\{[\s\S]*\}/); if(m){ try{ parsed=JSON.parse(m[0]); }catch(__){} } }
+  if(!parsed||!Array.isArray(parsed.ordem)){ const e=new Error('formato inesperado'); e.tryNext=true; throw e; }
+  return parsed;
+}
+
+// Tenta o modelo escolhido e, se estiver sobrecarregado (503 etc.), cai para outros.
+async function callGeminiFocus(pend){
+  const prompt=buildFocusPrompt(pend);
+  const chain=[...new Set([aiModel,'gemini-2.0-flash','gemini-2.5-flash-lite','gemini-2.5-flash'])];
+  for(let i=0;i<chain.length;i++){
+    if(i>0) aiBtn.innerHTML='<span class="ai-spin"></span> Tentando outro modelo...';
+    try{ return await callGeminiOnce(prompt, chain[i]); }
+    catch(e){ if(e.fatal) throw e; /* senão, tenta o próximo modelo da lista */ }
+  }
+  throw new Error('Os modelos do Gemini estão sobrecarregados agora. Tente de novo em alguns instantes.');
+}
+
+function renderAiFocus(r, pend){
+  const byId=Object.fromEntries(pend.map(t=>[t.id,t]));
+  let html='';
+  if(r.resumo) html+=`<div class="ai-resumo">🎯 ${esc(r.resumo)}</div>`;
+  r.ordem.forEach((o,i)=>{
+    const t=byId[o.id]; if(!t) return;
+    html+=`<div class="ai-rank ${i===0?'top':''}" onclick="editTask('${t.id}')">
+      <div class="num">${i+1}</div>
+      <div class="rb"><div class="rt">${esc(t.title)}</div><div class="rm">${esc(o.motivo||'')}</div></div>
+    </div>`;
+  });
+  if(r.alerta && r.alerta!=='null' && String(r.alerta).trim()) html+=`<div class="ai-alert">⚠ ${esc(r.alerta)}</div>`;
+  aiOut.className='ai-out show';
+  aiOut.innerHTML=html||'<div class="ai-resumo">Tudo sob controle por enquanto.</div>';
+}
+
+/* ---------- CONTA (login central MedTech via window.MT) ---------- */
+const acctModal=$('#acctModal');
+$('#acctBtn').onclick=openAcct;
+$('#acct-close').onclick=()=>acctModal.classList.remove('show');
+acctModal.onclick=e=>{if(e.target===acctModal)acctModal.classList.remove('show')};
+$('#logoutBtn').onclick=()=>{ acctModal.classList.remove('show'); if(window.MT&&MT.signOut) MT.signOut(); };
+function openAcct(){ refreshAcct(); acctModal.classList.add('show'); }
+function refreshAcct(){
+  const u=window.MT&&MT.user;
+  const nm=(u&&(u.displayName||u.email))||'Minha conta';
+  const av=$('#acct-avatar'), nmEl=$('#acct-name');
+  if(av) av.textContent=(nm||'?').charAt(0).toUpperCase();
+  if(nmEl) nmEl.textContent=nm;
+  const first=((u&&u.displayName)||'').split(' ')[0];
+  $('#greet').textContent = first ? ('Olá, '+first+' 👋') : 'Olá 👋';
+}
+
+/* ---------- BACKUP: exportar / restaurar (rede de segurança dos dados) ---------- */
+$('#exportBtn').onclick=()=>{
+  const data={ app:'foco', versao:1, exportadoEm:new Date().toISOString(), tasks, events, notes };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='foco-backup-'+todayStr()+'.json'; a.click(); URL.revokeObjectURL(a.href);
+};
+$('#importBtn').onclick=()=>$('#importFile').click();
+$('#importFile').onchange=e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(d.app && d.app!=='foco'){ alert('Este backup não é do Foco (é de "'+d.app+'").'); return; }
+      const nt=Array.isArray(d.tasks)?d.tasks.length:0, ne=Array.isArray(d.events)?d.events.length:0, nn=Array.isArray(d.notes)?d.notes.length:0;
+      if(!confirm('Restaurar este backup na sua conta MedTech?\n\n• '+nt+' demanda(s)\n• '+ne+' compromisso(s)\n• '+nn+' nota(s)\n\nIsso SUBSTITUI o que estiver nesta conta.')) return;
+      if(Array.isArray(d.tasks)) tasks=d.tasks;
+      if(Array.isArray(d.events)) events=d.events;
+      if(Array.isArray(d.notes)) notes=d.notes;
+      save(); renderAll();
+      acctModal.classList.remove('show');
+      alert('✅ Backup restaurado e sincronizado na sua conta MedTech.');
+    }catch(err){ alert('Arquivo inválido: '+(err&&err.message||err)); }
+  };
+  r.readAsText(f);
+  e.target.value='';
+};
+
+/* ---------- DADOS vindos da nuvem MedTech (window.MT) ---------- */
+let firstLoad=true;
+function applyData(d){
+  d=d||{};
+  applyingCloud=true;
+  tasks=Array.isArray(d.tasks)?d.tasks:[];
+  events=Array.isArray(d.events)?d.events:[];
+  notes=Array.isArray(d.notes)?d.notes:[];
+  applyingCloud=false;
+  if(firstLoad){
+    firstLoad=false;
+    // Primeiro acesso numa conta MedTech vazia: 2 demandas de boas-vindas.
+    if(!tasks.length && !events.length && !notes.length && !localStorage.getItem('foco_seed_mt')){
+      localStorage.setItem('foco_seed_mt','1');
+      tasks=[
+        {id:uid(),title:'Explorar o app Foco 👀',note:'Toque no círculo para concluir uma demanda — ela vai para o Histórico.',prio:'media',due:todayStr(),done:false,doneAt:null,createdAt:new Date().toISOString()},
+        {id:uid(),title:'Veio do Foco antigo? Toque em 👤 → Restaurar de um backup',prio:'alta',due:null,done:false,doneAt:null,createdAt:new Date().toISOString()}
+      ];
+      save();
+    }
+  }
+  renderAll();
+  refreshAcct();
+}
+
+/* ---------- BOOT: liga no login central MedTech ---------- */
+initHeader(); renderAll();
+(function waitMT(){ if(window.MT){ MT.onData(applyData); refreshAcct(); } else setTimeout(waitMT,40); })();
+</script>
+</body>
+</html>
