@@ -13,7 +13,7 @@
 <!-- Login único MedTech + sincronização na nuvem (mesmo módulo do portal) -->
 <script>window.MT_APP={id:"foco",name:"Foco"};</script>
 <script src="_mtfb.js?v=1"></script>
-<script type="module" src="_mtauth.js?v=3"></script>
+<script type="module" src="_mtauth.js?v=4"></script>
 <style>
   :root{
     --bg:#071c22; --surface:#0e2a31; --surface2:#143941; --border:#1f4a54;
@@ -413,12 +413,6 @@
       </div>
       <div class="ai-sub" style="margin:10px 0 16px">Suas demandas, compromissos e notas são salvos automaticamente na sua conta MedTech e aparecem em qualquer aparelho — a mesma conta de todos os apps.</div>
       <button class="btn ghost" id="logoutBtn" style="width:100%">Sair da conta MedTech</button>
-    </div>
-    <div style="margin-top:14px;padding-top:13px;border-top:1px solid rgba(127,127,127,.18)">
-      <div class="ai-sub" style="margin-bottom:9px;font-size:12.5px"><b>Veio do Foco antigo?</b> Baixe o backup lá (☁️ → Baixar backup) e <b>restaure aqui</b> para trazer suas demandas, agenda e notas para esta conta.</div>
-      <button class="btn ghost" id="importBtn" style="width:100%;margin-bottom:8px">⬆️ Restaurar de um backup</button>
-      <button class="btn ghost" id="exportBtn" style="width:100%">⬇️ Baixar backup (.json)</button>
-      <input type="file" id="importFile" accept="application/json,.json" style="display:none">
     </div>
     <div class="actions" style="margin-top:14px">
       <button class="btn ghost" id="acct-close">Fechar</button>
@@ -965,34 +959,6 @@ function refreshAcct(){
   $('#greet').textContent = first ? ('Olá, '+first+' 👋') : 'Olá 👋';
 }
 
-/* ---------- BACKUP: exportar / restaurar (rede de segurança dos dados) ---------- */
-$('#exportBtn').onclick=()=>{
-  const data={ app:'foco', versao:1, exportadoEm:new Date().toISOString(), tasks, events, notes };
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='foco-backup-'+todayStr()+'.json'; a.click(); URL.revokeObjectURL(a.href);
-};
-$('#importBtn').onclick=()=>$('#importFile').click();
-$('#importFile').onchange=e=>{
-  const f=e.target.files[0]; if(!f) return;
-  const r=new FileReader();
-  r.onload=()=>{
-    try{
-      const d=JSON.parse(r.result);
-      if(d.app && d.app!=='foco'){ alert('Este backup não é do Foco (é de "'+d.app+'").'); return; }
-      const nt=Array.isArray(d.tasks)?d.tasks.length:0, ne=Array.isArray(d.events)?d.events.length:0, nn=Array.isArray(d.notes)?d.notes.length:0;
-      if(!confirm('Restaurar este backup na sua conta MedTech?\n\n• '+nt+' demanda(s)\n• '+ne+' compromisso(s)\n• '+nn+' nota(s)\n\nIsso SUBSTITUI o que estiver nesta conta.')) return;
-      if(Array.isArray(d.tasks)) tasks=d.tasks;
-      if(Array.isArray(d.events)) events=d.events;
-      if(Array.isArray(d.notes)) notes=d.notes;
-      save(); renderAll();
-      acctModal.classList.remove('show');
-      alert('✅ Backup restaurado e sincronizado na sua conta MedTech.');
-    }catch(err){ alert('Arquivo inválido: '+(err&&err.message||err)); }
-  };
-  r.readAsText(f);
-  e.target.value='';
-};
 
 /* ---------- DADOS vindos da nuvem MedTech (window.MT) ---------- */
 let firstLoad=true;
@@ -1010,7 +976,7 @@ function applyData(d){
       localStorage.setItem('foco_seed_mt','1');
       tasks=[
         {id:uid(),title:'Explorar o app Foco 👀',note:'Toque no círculo para concluir uma demanda — ela vai para o Histórico.',prio:'media',due:todayStr(),done:false,doneAt:null,createdAt:new Date().toISOString()},
-        {id:uid(),title:'Veio do Foco antigo? Toque em 👤 → Restaurar de um backup',prio:'alta',due:null,done:false,doneAt:null,createdAt:new Date().toISOString()}
+        {id:uid(),title:'Adicionar minha primeira demanda real',prio:'alta',due:null,done:false,doneAt:null,createdAt:new Date().toISOString()}
       ];
       save();
     }

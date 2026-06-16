@@ -1168,30 +1168,6 @@ settingsForm.addEventListener('submit', e => {
   settingsDialog.close();
 });
 
-document.getElementById('exportData').addEventListener('click', () => {
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `custos-export-${todayISO()}.json`;
-  a.click();
-  URL.revokeObjectURL(a.href);
-});
-document.getElementById('importData').addEventListener('change', async e => {
-  const file = e.target.files?.[0];
-  e.target.value = '';
-  if (!file) return;
-  if (!confirm('Substituir todos os dados pelos do arquivo?')) return;
-  try {
-    const data = JSON.parse(await file.text());
-    Object.assign(state, defaultState(), data);
-    saveState();
-    settingsDialog.close();
-    refreshAll();
-    toast('Dados importados');
-  } catch {
-    toast('Arquivo inválido');
-  }
-});
 document.getElementById('wipeData').addEventListener('click', () => {
   if (!confirm('Apagar TODOS os dados? Esta ação não pode ser desfeita.')) return;
   Object.assign(state, defaultState());
