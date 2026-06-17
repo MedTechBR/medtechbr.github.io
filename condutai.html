@@ -811,6 +811,13 @@ main, #main { display: block !important; height: auto !important; overflow: visi
 .wb-bigsearch { display: flex; gap: 8px; margin-top: 6px; }
 .wb-bigsearch input { flex: 1; border: 1px solid var(--border); border-radius: 12px; padding: 13px 14px; font-size: 15px; font-family: inherit; background: var(--bg-card); color: var(--text); }
 .wb-bigsearch button { background: var(--primary); color: #fff; border: 0; border-radius: 12px; padding: 0 18px; font-weight: 700; font-size: 14px; cursor: pointer; font-family: inherit; }
+/* Interpretador de gasometria */
+.gaso-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.gaso-form label { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; font-weight: 600; color: var(--text-soft); }
+.gaso-form input { border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px; font-size: 16px; font-family: inherit; background: var(--bg-card); color: var(--text); }
+.gaso-form input:focus { outline: none; border-color: var(--primary); }
+.gaso-btn { margin-top: 14px; width: 100%; background: var(--primary); color: #fff; border: 0; border-radius: 12px; padding: 13px; font-weight: 700; font-size: 15px; cursor: pointer; font-family: inherit; }
+.gaso-btn:hover { background: var(--primary-dark); }
 
 /* Lista Histórico/Favoritos como view */
 #listView .side-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
@@ -932,6 +939,10 @@ main, #main { display: block !important; height: auto !important; overflow: visi
           <span class="ic" style="background:var(--warn-soft);color:var(--warn)">📝</span>
           <span class="ttl">Provas & Questões</span><span class="sub">MedProvas</span>
         </a>
+        <button class="wb-card" data-go="gaso">
+          <span class="ic" style="background:#fee2e2;color:#dc2626">🩸</span>
+          <span class="ttl">Gasometria</span><span class="sub">Interpretador ácido-base</span>
+        </button>
       </div>
     </div>
 
@@ -1023,6 +1034,24 @@ main, #main { display: block !important; height: auto !important; overflow: visi
     </div>
     <div class="wb-quick" id="invQuick"></div>
     <div id="invResult" style="margin-top:16px"></div>
+  </section>
+
+  <!-- ===================== GASOMETRIA (interpretador, offline) ===================== -->
+  <section id="gasoView" class="wb-view" hidden>
+    <div class="wb-view-head"><span class="vic">🩸</span><h2>Interpretador de Gasometria</h2></div>
+    <p class="wb-view-intro">Preencha os parâmetros (gasometria arterial) e toque em Interpretar — distúrbio ácido-base primário, compensação esperada, ânion-gap e delta-delta. Cálculo local, sem IA.</p>
+    <div class="gaso-form">
+      <label>pH<input id="g_ph" type="number" step="0.01" inputmode="decimal" placeholder="7,40"></label>
+      <label>pCO₂ (mmHg)<input id="g_pco2" type="number" step="0.1" inputmode="decimal" placeholder="40"></label>
+      <label>HCO₃⁻ (mEq/L)<input id="g_hco3" type="number" step="0.1" inputmode="decimal" placeholder="24"></label>
+      <label>Na⁺ (mEq/L)<input id="g_na" type="number" step="1" inputmode="decimal" placeholder="140"></label>
+      <label>Cl⁻ (mEq/L)<input id="g_cl" type="number" step="1" inputmode="decimal" placeholder="104"></label>
+      <label>Albumina (g/dL)<input id="g_alb" type="number" step="0.1" inputmode="decimal" placeholder="4,0"></label>
+      <label>pO₂ (mmHg)<input id="g_po2" type="number" step="1" inputmode="decimal" placeholder="opcional"></label>
+      <label>Lactato (mmol/L)<input id="g_lac" type="number" step="0.1" inputmode="decimal" placeholder="opcional"></label>
+    </div>
+    <button id="gasoGo" class="gaso-btn">🔬 Interpretar</button>
+    <div id="gasoResult" style="margin-top:16px"></div>
   </section>
 
   <!-- ===================== HISTÓRICO / FAVORITOS ===================== -->
@@ -6757,10 +6786,10 @@ document.getElementById('newBtn').onclick = () => {
 //  Navegação estilo Whitebook (views + bottom nav)
 // ============================================================
 function showView(name) {
-  const map = { home:'homeView', condutas:'condutasView', ia:'iaView', bulas:'bulasView', investigacao:'investigacaoView', favoritos:'listView', historico:'listView', result:'resultView' };
+  const map = { home:'homeView', condutas:'condutasView', ia:'iaView', bulas:'bulasView', investigacao:'investigacaoView', gaso:'gasoView', favoritos:'listView', historico:'listView', result:'resultView' };
   const id = map[name] || 'homeView';
   document.querySelectorAll('.wb-view').forEach(v => { v.hidden = (v.id !== id); });
-  const navMap = { home:'home', condutas:'condutas', ia:'ia', favoritos:'favoritos', historico:'historico', bulas:'home', investigacao:'home', result:'home' };
+  const navMap = { home:'home', condutas:'condutas', ia:'ia', favoritos:'favoritos', historico:'historico', bulas:'home', investigacao:'home', gaso:'home', result:'home' };
   const navT = navMap[name] || 'home';
   document.querySelectorAll('#wbNav button').forEach(b => b.classList.toggle('active', b.dataset.go === navT));
   if (name === 'favoritos' || name === 'historico') {
@@ -6926,6 +6955,80 @@ if (_bs) _bs.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preve
 const _ig = document.getElementById('invGo'), _is = document.getElementById('invSearch');
 if (_ig) _ig.onclick = () => runInv(_is.value);
 if (_is) _is.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); runInv(_is.value); } });
+
+// ============ Interpretador de gasometria (offline, determinístico) ============
+function interpretarGaso() {
+  const val = id => { const x = parseFloat((document.getElementById(id).value || '').replace(',', '.')); return isNaN(x) ? null : x; };
+  const ph = val('g_ph'), pco2 = val('g_pco2'), hco3 = val('g_hco3'), na = val('g_na'), cl = val('g_cl'), alb = val('g_alb'), po2 = val('g_po2'), lac = val('g_lac');
+  const box = document.getElementById('gasoResult');
+  if (ph == null || pco2 == null || hco3 == null) {
+    box.innerHTML = '<div class="alert alert-warn"><span>⚠</span><div>Informe ao menos <b>pH</b>, <b>pCO₂</b> e <b>HCO₃⁻</b>.</div></div>';
+    return;
+  }
+  const r = x => Math.round(x * 10) / 10;
+  const L = [];
+  L.push(`# Interpretação da gasometria`);
+  L.push(`**Inseridos:** pH ${ph} · pCO₂ ${pco2} · HCO₃⁻ ${hco3}` + (na != null && cl != null ? ` · Na ${na} · Cl ${cl}` : '') + (alb != null ? ` · Alb ${alb}` : ''));
+
+  let estado = ph < 7.35 ? '**Acidemia** (pH < 7,35)' : ph > 7.45 ? '**Alcalemia** (pH > 7,45)' : 'pH na faixa normal (pode haver distúrbio compensado ou misto)';
+  L.push(`## ⚖️ Estado\n- ${estado}`);
+
+  let prim = '', exp = '', misto = '';
+  if (ph < 7.35) {
+    if (hco3 < 22) {
+      prim = 'Acidose metabólica';
+      const e = 1.5 * hco3 + 8;
+      exp = `Compensação esperada (fórmula de Winter): pCO₂ ≈ **${r(e - 2)}–${r(e + 2)}** mmHg.`;
+      misto = pco2 > e + 2 ? '➕ pCO₂ acima do esperado → **acidose respiratória associada** (distúrbio misto).'
+        : pco2 < e - 2 ? '➕ pCO₂ abaixo do esperado → **alcalose respiratória associada** (distúrbio misto).'
+        : '✅ Compensação respiratória adequada.';
+    } else if (pco2 > 45) {
+      prim = 'Acidose respiratória';
+      exp = 'Esperado: HCO₃⁻ sobe ~1 (aguda) a ~3,5 (crônica) por 10 mmHg de pCO₂ acima de 40.';
+    } else { prim = 'Acidemia sem causa óbvia nos parâmetros — revise os valores'; }
+  } else if (ph > 7.45) {
+    if (hco3 > 26) {
+      prim = 'Alcalose metabólica';
+      const e = 0.7 * hco3 + 21;
+      exp = `Compensação esperada: pCO₂ ≈ **${r(e - 2)}–${r(e + 2)}** mmHg.`;
+      misto = pco2 < e - 2 ? '➕ pCO₂ abaixo do esperado → alcalose respiratória associada.'
+        : pco2 > e + 2 ? '➕ pCO₂ acima do esperado → acidose respiratória associada.'
+        : '✅ Compensação respiratória adequada.';
+    } else if (pco2 < 35) {
+      prim = 'Alcalose respiratória';
+      exp = 'Esperado: HCO₃⁻ cai ~2 (aguda) a ~4–5 (crônica) por 10 mmHg de pCO₂ abaixo de 40.';
+    } else { prim = 'Alcalemia sem causa óbvia — revise os valores'; }
+  } else {
+    if (pco2 > 45 && hco3 > 26) prim = 'pH normal com pCO₂ e HCO₃⁻ altos → acidose respiratória crônica compensada (ou distúrbio misto)';
+    else if (pco2 < 35 && hco3 < 22) prim = 'pH normal com pCO₂ e HCO₃⁻ baixos → alcalose respiratória crônica compensada (ou distúrbio misto)';
+    else prim = 'Sem distúrbio ácido-base evidente';
+  }
+  L.push(`## 🔎 Distúrbio primário\n- **${prim}**` + (exp ? `\n- ${exp}` : '') + (misto ? `\n- ${misto}` : ''));
+
+  if (na != null && cl != null) {
+    let ag = na - (cl + hco3);
+    let s = `**Ânion-gap = ${r(ag)}** (referência 8–12).`;
+    if (alb != null) { ag = ag + 2.5 * (4 - alb); s += ` Corrigido para albumina: **${r(ag)}**.`; }
+    s += ag > 12 ? ' → **AG aumentado** (lactato, cetoácidos, uremia, intoxicações).' : ag < 8 ? ' → AG baixo.' : ' → AG normal (se houver acidose, é hiperclorêmica).';
+    let dd = '';
+    if (ag > 12 && hco3 < 24) {
+      const ratio = (ag - 12) / (24 - hco3);
+      dd = `\n- **Delta-delta (ΔAG/ΔHCO₃⁻) ≈ ${r(ratio)}**: ` + (ratio < 1 ? 'há também **acidose metabólica de AG normal (hiperclorêmica)** associada.' : ratio > 2 ? 'há também **alcalose metabólica** (ou acidose respiratória crônica prévia) associada.' : 'acidose metabólica de AG alto pura.');
+    }
+    L.push(`## 🧮 Ânion-gap\n- ${s}${dd}`);
+  }
+  const extra = [];
+  if (po2 != null) extra.push(`PaO₂ ${po2} mmHg — ` + (po2 < 60 ? '**hipoxemia** (< 60).' : po2 < 80 ? 'levemente reduzida.' : 'adequada.'));
+  if (lac != null) extra.push(`Lactato ${lac} mmol/L — ` + (lac > 2 ? '**elevado** (hipoperfusão/choque?).' : 'normal.'));
+  if (extra.length) L.push(`## 🫁 Oxigenação / perfusão\n` + extra.map(x => '- ' + x).join('\n'));
+
+  L.push(`---\n*Apoio automático — sempre correlacione com a clínica e a história. Referências arteriais padrão.*`);
+  box.innerHTML = `<div class="result">${md(L.join('\n\n'))}</div>`;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+const _gg = document.getElementById('gasoGo');
+if (_gg) _gg.onclick = interpretarGaso;
+
 showView('home');
 
 /* IA agora é keyless (gateway central MedTech) — não pedimos mais chave de API. */
