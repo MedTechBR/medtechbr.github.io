@@ -2297,22 +2297,69 @@ function tamanhoMaterial(a) {
   return 0;
 }
 
+// Extrai TODO o texto de um PDF no próprio navegador (pdf.js já carregado).
+// Aceita base64 (string) ou Blob/File. Retorna '' se não houver texto (PDF escaneado).
+async function extrairTextoPdf(source, onPage) {
+  let bytes;
+  if (typeof source === 'string') bytes = Uint8Array.from(atob(source), c => c.charCodeAt(0));
+  else if (source && typeof source.arrayBuffer === 'function') bytes = new Uint8Array(await source.arrayBuffer());
+  else return '';
+  const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
+  const partes = [];
+  for (let p = 1; p <= pdf.numPages; p++) {
+    if (onPage) onPage(p, pdf.numPages);
+    const page = await pdf.getPage(p);
+    const tc = await page.getTextContent();
+    const txt = tc.items.map(it => it.str).join(' ').replace(/[ \t]+/g, ' ').trim();
+    if (txt) partes.push(txt);
+    page.cleanup && page.cleanup();
+  }
+  return partes.join('\n\n');
+}
+
 async function prepararPartesGemini(arquivos, apiKey, onProgress) {
   if (!arquivos || arquivos.length === 0) return [];
   const LIMITE_INLINE_TOTAL = 14 * 1024 * 1024;   // margem de segurança sob ~20 MB da Vertex
   const LIMITE_INLINE_UM = 14 * 1024 * 1024;
   const total = arquivos.reduce((s, a) => s + tamanhoMaterial(a), 0);
   const algumGrande = arquivos.some(a => tamanhoMaterial(a) > LIMITE_INLINE_UM);
-  const semBase64 = arquivos.some(a => !a.base64); // já temos arquivo grande sem base64
+  const semBase64 = arquivos.some(a => !a.base64); // arquivo grande guardado só como blob
   const precisaURI = total > LIMITE_INLINE_TOTAL || algumGrande || semBase64;
 
   if (!precisaURI) {
+    // Pequenos: manda o PDF inline (preserva figuras/ECGs para a IA "ver").
     return arquivos.map(a => ({ inline_data: { mime_type: a.mime, data: a.base64 } }));
   }
 
-  // Versão MedTech (domínio central): apenas inline (≤14 MB no total). Para PDFs
-  // maiores, divida o material — não há upload p/ Storage cross-project aqui.
-  throw new Error('PDF(s) muito grandes (acima de ~14 MB no total) para esta versão. Divida o material em arquivos menores e tente de novo.');
+  // PDF(s) grandes (inclusive > 100 MB): extrai o TEXTO no navegador e envia como texto —
+  // sem o limite de ~14 MB do envio inline. PDFs digitalizados (sem texto) e pequenos voltam
+  // a inline; digitalizados e grandes são sinalizados (precisariam de OCR).
+  const parts = [];
+  const escaneadosGrandes = [];
+  for (let i = 0; i < arquivos.length; i++) {
+    const a = arquivos[i];
+    if (onProgress) onProgress(`Lendo o texto de "${a.nome}" (${i + 1}/${arquivos.length})…`);
+    let texto = '';
+    if (a.mime === 'application/pdf') {
+      try {
+        texto = await extrairTextoPdf(a.base64 || a.blob, (p, n) => {
+          if (onProgress && n > 40 && p % 20 === 0) onProgress(`Lendo "${a.nome}": página ${p}/${n}…`);
+        });
+      } catch (e) { texto = ''; }
+    }
+    if (texto && texto.length > 200) {
+      parts.push({ text: `=== MATERIAL: ${a.nome} ===\n${texto}` });
+    } else if (a.base64 && tamanhoMaterial(a) <= LIMITE_INLINE_UM) {
+      parts.push({ inline_data: { mime_type: a.mime, data: a.base64 } }); // provável escaneado, mas cabe inline
+    } else {
+      escaneadosGrandes.push(a.nome);
+    }
+  }
+  if (escaneadosGrandes.length) {
+    throw new Error('Este(s) PDF(s) parecem ser digitalizados (imagem, sem texto selecionável) e são grandes demais: ' + escaneadosGrandes.join(', ') + '. Para PDFs digitalizados, reduza o tamanho/qualidade ou divida em partes. PDFs com texto (a maioria) podem ter qualquer tamanho.');
+  }
+  if (!parts.length) throw new Error('Não consegui ler o conteúdo do(s) PDF(s).');
+  return parts;
 }
 
 async function gerarProva() {
