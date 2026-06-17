@@ -146,6 +146,19 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 .rx-x{background:#fff;border:1px solid var(--line);border-radius:8px;width:32px;height:32px;font-size:19px;line-height:1;cursor:pointer;color:var(--red);flex:0 0 auto}
 .rx-pos{width:100%;margin-top:7px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:13.5px;min-height:46px;resize:vertical;background:#fff;color:#243b41}
 .rx-nome:focus,.rx-pos:focus{outline:none;border-color:var(--mint)}
+.mcal{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px}
+.mhead{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:5px}
+.mhead div{text-align:center;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;padding:3px 0}
+.mgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.mcell{min-height:62px;border:1px solid var(--line);border-radius:9px;padding:6px 7px;cursor:pointer;display:flex;flex-direction:column;gap:4px;background:#fff;transition:.1s}
+.mcell:hover{border-color:var(--mint);background:var(--soft)}
+.mcell.off{background:#fafcfc}
+.mcell.off .mnum{color:#b8c9cd}
+.mcell.today{border-color:var(--petrol);box-shadow:inset 0 0 0 1px var(--petrol)}
+.mnum{font-size:13px;font-weight:700;color:var(--ink)}
+.mcell.today .mnum{color:var(--petrol)}
+.mcount{font-size:10.5px;font-weight:800;color:#fff;background:var(--mint-dark);border-radius:999px;padding:1px 8px;align-self:flex-start}
+@media(max-width:680px){.mcell{min-height:48px;padding:4px}.mhead div{font-size:9.5px}.mnum{font-size:12px}.mcount{padding:0 6px;font-size:9.5px}}
 </style>
 </head>
 <body>
@@ -320,7 +333,7 @@ const MED_DB=[
  {n:'Cetoconazol 2% xampu',p:'aplicar no couro cabeludo 2x/semana, deixar agir 5 min'}
 ];
 
-let state={patients:[],appts:[],records:[],prescriptions:[],docs:[],cfg:{medico:'',clinica:'',crm:'',esp:'',endereco:'',telefone:''},migratedEvoluai:false};
+let state={patients:[],appts:[],records:[],prescriptions:[],documentos:[],docs:[],cfg:{medico:'',clinica:'',crm:'',esp:'',rqe:'',endereco:'',telefone:''},migratedEvoluai:false};
 let cur=new Date();cur.setHours(0,0,0,0);
 let view='agenda', aTab='dia', busca='', curPac=null, pTab='evol', pSearch='';
 
@@ -348,11 +361,11 @@ function sampleSeed(){const f=ymd(cur);const p1=uid(),p2=uid();
    {id:uid(),pacId:null,pac:'Ana Costa',fone:'',date:f,time:'10:00',dur:30,type:'tel',status:'agendado',obs:''}
  ],records:[
    {id:uid(),pacId:p1,date:nowISO(),tipo:'soap',titulo:'Consulta de rotina',texto:'S: Refere cefaleia ocasional, sem outras queixas.\nO: PA 130x85, FC 76, ACV/AR sem alterações.\nA: HAS controlada.\nP: Mantém losartana; retorno em 3 meses.'}
- ],prescriptions:[],docs:[],cfg:{medico:'',clinica:'',crm:'',esp:'',endereco:'',telefone:''},migratedEvoluai:true};
+ ],prescriptions:[],documentos:[],docs:[],cfg:{medico:'',clinica:'',crm:'',esp:'',rqe:'',endereco:'',telefone:''},migratedEvoluai:true};
 }
 function normalize(d){d=d&&typeof d==='object'?d:{};
- return {patients:d.patients||[],appts:d.appts||[],records:d.records||[],prescriptions:d.prescriptions||[],docs:d.docs||[],
-   cfg:Object.assign({medico:'',clinica:'',crm:'',esp:'',endereco:'',telefone:''},d.cfg||{}),migratedEvoluai:!!d.migratedEvoluai};}
+ return {patients:d.patients||[],appts:d.appts||[],records:d.records||[],prescriptions:d.prescriptions||[],documentos:d.documentos||[],docs:d.docs||[],
+   cfg:Object.assign({medico:'',clinica:'',crm:'',esp:'',rqe:'',endereco:'',telefone:''},d.cfg||{}),migratedEvoluai:!!d.migratedEvoluai};}
 
 function whenMT(cb){if(window.MT){cb();}else{setTimeout(()=>whenMT(cb),30);}}
 whenMT(()=>{MT.onData(d=>{
@@ -399,12 +412,37 @@ function renderAgenda(){
   let html=`<div class="subtabs">
     <button class="${aTab==='dia'?'on':''}" onclick="setATab('dia')">Dia</button>
     <button class="${aTab==='sem'?'on':''}" onclick="setATab('sem')">Semana</button>
+    <button class="${aTab==='mes'?'on':''}" onclick="setATab('mes')">Mês</button>
     <button class="${aTab==='busca'?'on':''}" onclick="setATab('busca')">Buscar</button>
   </div><div id="aview"></div>`;
   document.getElementById('view').innerHTML=html;
-  if(aTab==='dia')renderDay();else if(aTab==='sem')renderWeek();else renderSearch();
+  if(aTab==='dia')renderDay();else if(aTab==='sem')renderWeek();else if(aTab==='mes')renderMonth();else renderSearch();
 }
 function setATab(t){aTab=t;renderAgenda();}
+function goDay(ds){cur=new Date(ds+'T00:00:00');aTab='dia';renderAgenda();}
+function renderMonth(){
+  const y=cur.getFullYear(),m=cur.getMonth();
+  const first=new Date(y,m,1);const startDow=first.getDay();
+  const daysInMonth=new Date(y,m+1,0).getDate();
+  const weeks=Math.ceil((startDow+daysInMonth)/7);
+  const gridStart=new Date(y,m,1-startDow);
+  const today=new Date();today.setHours(0,0,0,0);
+  const total=state.appts.filter(a=>{const d=new Date(a.date+'T00:00:00');return d.getFullYear()===y&&d.getMonth()===m&&a.status!=='cancelado';}).length;
+  let html=`<div class="bar">
+    <div class="nav"><button class="arr" onclick="moveMonth(-1)">‹</button><h2>${MES[m]} de ${y}</h2><button class="arr" onclick="moveMonth(1)">›</button><button class="todaybtn" onclick="goToday()">Este mês</button></div>
+    <div class="right"><span style="color:var(--muted);font-size:13px;font-weight:600">${total} consulta(s) no mês</span><button class="btn btn-p btn-sm" onclick="openForm()">+ Consulta</button></div>
+  </div>
+  <div class="mcal"><div class="mhead">${['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d=>'<div>'+d+'</div>').join('')}</div><div class="mgrid">`;
+  for(let i=0;i<weeks*7;i++){const d=new Date(gridStart);d.setDate(gridStart.getDate()+i);
+    const inM=d.getMonth()===m;const ds=ymd(d);
+    const n=state.appts.filter(a=>a.date===ds&&a.status!=='cancelado').length;
+    const isToday=d.getTime()===today.getTime();
+    html+=`<div class="mcell${inM?'':' off'}${isToday?' today':''}" onclick="goDay('${ds}')"><div class="mnum">${d.getDate()}</div>${n?`<div class="mcount">${n}</div>`:''}</div>`;
+  }
+  html+='</div></div><div class="hint" style="margin-top:8px">Toque em um dia para abrir a agenda daquele dia.</div>';
+  document.getElementById('aview').innerHTML=html;
+}
+function moveMonth(n){cur=new Date(cur.getFullYear(),cur.getMonth()+n,1);cur.setHours(0,0,0,0);renderAgenda();}
 
 function apptCard(a){const ty=TYPES[a.type]||TYPES.con;const st=STATUS[a.status]||STATUS.agendado;const nm=pacNome(a);const fone=pacFone(a);
   return `<div class="appt">
@@ -602,6 +640,7 @@ function renderPaciente(){
   <div class="subtabs">
     <button class="${pTab==='evol'?'on':''}" onclick="setPTab('evol')">📋 Evoluções</button>
     <button class="${pTab==='rx'?'on':''}" onclick="setPTab('rx')">💊 Receituários</button>
+    <button class="${pTab==='docs'?'on':''}" onclick="setPTab('docs')">📄 Documentos</button>
     <button class="${pTab==='cons'?'on':''}" onclick="setPTab('cons')">📅 Consultas</button>
   </div><div id="pbody"></div>`;
   document.getElementById('view').innerHTML=head;
@@ -626,7 +665,15 @@ function renderPBody(){
     h+=rxs.length?rxs.map(r=>`<div class="rec"><div class="rh"><div class="rt"><span class="chip">${r.tipo==='especial'?'Controle especial':'Receituário'}</span></div><div class="rd">${fmtDT(r.date)}</div></div>
         <div class="rbody">${esc(r.texto)}</div>${r.obs?`<div class="rbody" style="color:var(--muted);font-size:13px">Obs.: ${esc(r.obs)}</div>`:''}
         <div class="racts"><button onclick="printRx('${r.id}')">🖨️ Imprimir</button><button onclick="openRx('${r.id}')">✏️ Editar</button><button onclick="delRx('${r.id}')">🗑️ Excluir</button></div></div>`).join('')
-      :'<div class="empty">Nenhum receituário emitido.<br>Toque em <b>+ Novo receituário</b> (digite as medicações e a IA organiza; depois imprima).</div>';
+      :'<div class="empty">Nenhum receituário emitido.<br>Toque em <b>+ Novo receituário</b> (busque o medicamento e a posologia vem pronta; depois imprima).</div>';
+    box.innerHTML=h;
+  } else if(pTab==='docs'){
+    const docs=state.documentos.filter(r=>r.pacId===curPac).sort((a,b)=>b.date.localeCompare(a.date));
+    let h=`<div class="bar"><div></div><div class="right"><button class="btn btn-p btn-sm" onclick="openAtestado()">+ Atestado</button><button class="btn btn-p btn-sm" onclick="openExames()">+ Solicitação de exames</button></div></div>`;
+    h+=docs.length?docs.map(r=>`<div class="rec"><div class="rh"><div class="rt"><span class="chip">${r.tipo==='atestado'?'Atestado':'Exames'}</span> ${esc(r.titulo||'')}</div><div class="rd">${fmtDT(r.date)}</div></div>
+        <div class="rbody">${esc(r.texto)}${r.obs?('\n\n'+esc(r.obs)):''}</div>
+        <div class="racts"><button onclick="printDocu2('${r.id}')">🖨️ Imprimir</button><button onclick="${r.tipo==='atestado'?`openAtestado('${r.id}')`:`openExames('${r.id}')`}">✏️ Editar</button><button onclick="delDocu('${r.id}')">🗑️ Excluir</button></div></div>`).join('')
+      :'<div class="empty">Nenhum atestado ou solicitação de exames.<br>Use <b>+ Atestado</b> ou <b>+ Solicitação de exames</b> acima.</div>';
     box.innerHTML=h;
   } else {
     const cs=apptsSorted(state.appts.filter(a=>a.pacId===curPac)).reverse();
@@ -745,16 +792,16 @@ function printHTML(title,bodyHTML){
   w.document.write('<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>'+esc(title)+'</title><style>@page{size:A4;margin:18mm}body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#111;font-size:14px;line-height:1.55}.hd{border-bottom:2px solid #0E5A6D;padding-bottom:10px;margin-bottom:6px}.hd .cli{font-size:18px;font-weight:800;color:#0E5A6D}.hd .med{font-size:12.5px;color:#333;margin-top:2px}.ttl{font-size:15px;font-weight:800;text-align:center;margin:18px 0 12px;text-transform:uppercase;letter-spacing:.06em}.pac{margin:8px 0 14px;font-size:14px;border-bottom:1px dashed #ccc;padding-bottom:8px}.body{white-space:pre-wrap;min-height:120px}.sig{margin-top:64px;text-align:center}.sig .line{width:300px;border-top:1px solid #333;margin:0 auto 5px}.ft{margin-top:26px;font-size:11px;color:#888;text-align:center;border-top:1px solid #eee;padding-top:8px}</style></head><body>'+bodyHTML+'<scr'+'ipt>window.onload=function(){setTimeout(function(){window.print();},250);}<\/scr'+'ipt></body></html>');
   w.document.close();
 }
-function cabecalho(){const c=state.cfg;
-  const linha2=[c.medico?('Dr(a). '+c.medico):'',c.esp||'',c.crm?('CRM '+c.crm):''].filter(Boolean).join(' · ');
-  const linha3=[c.endereco||'',c.telefone||''].filter(Boolean).join(' · ');
+function cabecalho(full){const c=state.cfg;
+  const linha2=[c.medico?('Dr(a). '+c.medico):'',c.esp||'',c.crm?('CRM '+c.crm):'',c.rqe?('RQE '+c.rqe):''].filter(Boolean).join(' · ');
+  const linha3=full?[c.endereco||'',c.telefone||''].filter(Boolean).join(' · '):'';
   return '<div class="hd"><div class="cli">'+esc(c.clinica||c.medico||'ConsultAI')+'</div>'+(linha2?'<div class="med">'+esc(linha2)+'</div>':'')+(linha3?'<div class="med">'+esc(linha3)+'</div>':'')+'</div>';
 }
-function assinatura(){const c=state.cfg;const nome=c.medico?('Dr(a). '+c.medico):'Assinatura';return '<div class="sig"><div class="line"></div>'+esc(nome)+(c.crm?(' — CRM '+esc(c.crm)):'')+'</div>';}
+function assinatura(){const c=state.cfg;const nome=c.medico?('Dr(a). '+c.medico):'Assinatura';const ids=[c.crm?('CRM '+c.crm):'',c.rqe?('RQE '+c.rqe):''].filter(Boolean).join(' · ');return '<div class="sig"><div class="line"></div>'+esc(nome)+(ids?(' — '+esc(ids)):'')+'</div>';}
 function pacLinha(p){return '<div class="pac"><b>Paciente:</b> '+esc(p?p.nome:'')+(p&&age(p.nasc)!==''?(' · '+age(p.nasc)+' anos'):'')+(p&&p.convenio?(' · '+esc(p.convenio)):'')+'</div>';}
-function doPrintRx(r){const p=patientById(r.pacId);
-  const ttl=r.tipo==='especial'?'Receituário de Controle Especial':'Receituário';
-  const body=cabecalho()+'<div class="ttl">'+ttl+'</div>'+pacLinha(p)+'<div class="body">'+esc(r.texto)+(r.obs?('\n\nOrientações: '+esc(r.obs)):'')+'</div>'+assinatura()+'<div class="ft">Emitido em '+fmtDate(r.date||nowISO())+' · ConsultAI / MedTech</div>';
+function doPrintRx(r){const p=patientById(r.pacId);const esp=r.tipo==='especial';
+  const ttl=esp?'Receituário de Controle Especial':'Receituário';
+  const body=cabecalho(esp)+'<div class="ttl">'+ttl+'</div>'+pacLinha(p)+'<div class="body">'+esc(r.texto)+(r.obs?('\n\nOrientações: '+esc(r.obs)):'')+'</div>'+assinatura()+'<div class="ft">Emitido em '+fmtDate(r.date||nowISO())+' · ConsultAI / MedTech</div>';
   printHTML(ttl+' — '+(p?p.nome:''),body);
 }
 function printRx(id){const r=state.prescriptions.find(x=>x.id===id);if(!r)return;doPrintRx(r);}
@@ -769,6 +816,80 @@ function printEvol(id){const r=state.records.find(x=>x.id===id);if(!r)return;con
   const body=cabecalho()+'<div class="ttl">'+esc(f.l==='SOAP'?'Evolução clínica (SOAP)':f.l)+'</div>'+pacLinha(p)+'<div class="body">'+esc(r.texto)+'</div>'+assinatura()+'<div class="ft">Emitido em '+fmtDT(r.date)+' · ConsultAI / MedTech</div>';
   printHTML((f.l)+' — '+(p?p.nome:''),body);
 }
+
+/* ===== Documentos: atestado e solicitação de exames ===== */
+const EXAMES_COMUNS=['Hemograma completo','Glicemia de jejum','Hemoglobina glicada (HbA1c)','Colesterol total e frações','Triglicerídeos','TSH','T4 livre','Ureia e creatinina','TGO/TGP','Ácido úrico','EAS (urina tipo 1)','Urocultura','Sódio e potássio','Vitamina D','Vitamina B12','Ferritina','PCR','ECG','Raio-X de tórax','USG de abdome total','Beta-HCG'];
+function dataExtenso(iso){const d=iso?new Date(iso):new Date();return d.getDate()+' de '+MES[d.getMonth()]+' de '+d.getFullYear();}
+function printDocu(d){const p=patientById(d.pacId);
+  const ttl=d.tipo==='atestado'?'Atestado Médico':(d.tipo==='exames'?'Solicitação de Exames':'Documento');
+  const body=cabecalho(false)+'<div class="ttl">'+ttl+'</div>'+pacLinha(p)+'<div class="body">'+esc(d.texto)+(d.obs?('\n\n'+esc(d.obs)):'')+'</div><div style="text-align:right;margin-top:24px">'+esc(dataExtenso(d.date))+'</div>'+assinatura()+'<div class="ft">ConsultAI / MedTech</div>';
+  printHTML(ttl+' — '+(p?p.nome:''),body);
+}
+function printDocu2(id){const d=state.documentos.find(x=>x.id===id);if(d)printDocu(d);}
+function delDocu(id){if(confirm('Excluir este documento?')){state.documentos=state.documentos.filter(x=>x.id!==id);persist();renderPBody();}}
+/* Atestado */
+function openAtestado(id){
+  const d=id?state.documentos.find(x=>x.id===id):null;
+  const sub=d?(d.subtipo||'afastamento'):'afastamento';
+  const dias=d&&d.dias?d.dias:1;
+  const dataI=d&&d.dataInicio?d.dataInicio:ymd(new Date());
+  const cid=d?(d.cid||''):'';
+  const texto=d?(d.texto||''):'';
+  modal(`<div class="box wide"><h3>${id?'Editar':'Novo'} atestado</h3>
+   <div class="two"><div class="field"><label>Tipo</label><select id="at_sub" onchange="atToggle();atGerar()"><option value="afastamento" ${sub==='afastamento'?'selected':''}>Afastamento</option><option value="comparecimento" ${sub==='comparecimento'?'selected':''}>Comparecimento</option></select></div>
+     <div class="field" id="at_diasWrap"><label>Dias de afastamento</label><input id="at_dias" type="number" min="1" value="${dias}" onchange="atGerar()"></div></div>
+   <div class="two"><div class="field"><label>Data de início</label><input id="at_data" type="date" value="${dataI}" onchange="atGerar()"></div>
+     <div class="field"><label>CID-10 (opcional)</label><input id="at_cid" value="${esc(cid)}" placeholder="Ex.: J11" onchange="atGerar()"></div></div>
+   <div class="field"><label>Texto do atestado <button class="btn btn-g btn-sm" style="float:right;margin-top:-3px" onclick="atGerar()">↻ Gerar a partir dos campos</button></label>
+     <textarea id="at_texto" style="min-height:120px" placeholder="O texto é gerado a partir dos campos — edite livremente.">${esc(texto)}</textarea>
+     <div class="hint">O CID-10 é opcional e só deve constar com autorização do paciente.</div></div>
+   <div class="row"><button class="btn btn-p" onclick="saveAtestado('${id||''}',false)">💾 Salvar</button><button class="btn btn-p" onclick="saveAtestado('${id||''}',true)">💾 Salvar e imprimir</button><button class="btn btn-g" onclick="atImprimir()">🖨️ Imprimir</button><button class="btn btn-g" onclick="closeModalMic()">Cancelar</button></div></div>`);
+  atToggle(); if(!texto)atGerar();
+}
+function atToggle(){const s=document.getElementById('at_sub');const w=document.getElementById('at_diasWrap');if(s&&w)w.style.display=(s.value==='afastamento')?'':'none';}
+function atTextoFromFields(){const p=patientById(curPac)||{};const sub=document.getElementById('at_sub').value;const dias=parseInt(document.getElementById('at_dias').value)||1;const dataI=document.getElementById('at_data').value;const cid=document.getElementById('at_cid').value.trim();
+  const dt=dataI?fmtDate(dataI+'T00:00:00'):fmtDate(nowISO());
+  let t;
+  if(sub==='afastamento'){t='Atesto, para os devidos fins, que o(a) paciente '+(p.nome||'')+' esteve sob meus cuidados médicos e necessita de afastamento de suas atividades por '+dias+' ('+(dias===1?'um':dias)+') dia(s), a partir de '+dt+'.';}
+  else{t='Atesto, para os devidos fins, que o(a) paciente '+(p.nome||'')+' compareceu a atendimento médico nesta data ('+dt+').';}
+  if(cid)t+=' CID-10: '+cid+'.';
+  return t;
+}
+function atGerar(){const ta=document.getElementById('at_texto');if(ta)ta.value=atTextoFromFields();}
+function atColetar(id){return {pacId:curPac,date:nowISO(),tipo:'atestado',subtipo:document.getElementById('at_sub').value,dias:parseInt(document.getElementById('at_dias').value)||null,dataInicio:document.getElementById('at_data').value,cid:document.getElementById('at_cid').value.trim(),texto:document.getElementById('at_texto').value.trim(),titulo:(document.getElementById('at_sub').value==='afastamento'?'Atestado de afastamento':'Atestado de comparecimento')};}
+function saveAtestado(id,andPrint){
+  const o=atColetar(id);
+  if(!o.texto){alert('Gere ou escreva o texto do atestado.');return;}
+  let rid=id;
+  if(id){Object.assign(state.documentos.find(x=>x.id===id),o);}else{rid=uid();state.documentos.push({id:rid,...o});}
+  persist();closeModalMic();renderPBody();
+  if(andPrint)printDocu(state.documentos.find(x=>x.id===rid));
+}
+function atImprimir(){const o=atColetar();if(!o.texto){alert('Gere ou escreva o texto do atestado.');return;}printDocu(o);}
+/* Solicitação de exames */
+function openExames(id){
+  const d=id?state.documentos.find(x=>x.id===id):null;
+  const exames=d?(d.exames||''):'';
+  const ind=d?(d.ind||''):'';
+  modal(`<div class="box wide"><h3>${id?'Editar':'Nova'} solicitação de exames</h3>
+   <div class="field"><label>Exames mais pedidos</label><div class="wa-tpls">${EXAMES_COMUNS.map(e=>`<button onclick="exAdd('${e.replace(/'/g,'')}')">+ ${e}</button>`).join('')}</div></div>
+   <div class="field"><label>Exames solicitados (um por linha)</label><textarea id="ex_lista" style="min-height:140px" placeholder="Ex.: Hemograma completo&#10;Glicemia de jejum&#10;TSH, T4 livre">${esc(exames)}</textarea></div>
+   <div class="field"><label>Indicação clínica / hipótese diagnóstica (opcional)</label><textarea id="ex_ind" placeholder="Ex.: investigação de fadiga; HAS em acompanhamento">${esc(ind)}</textarea></div>
+   <div class="row"><button class="btn btn-p" onclick="saveExames('${id||''}',false)">💾 Salvar</button><button class="btn btn-p" onclick="saveExames('${id||''}',true)">💾 Salvar e imprimir</button><button class="btn btn-g" onclick="exImprimir()">🖨️ Imprimir</button><button class="btn btn-g" onclick="closeModalMic()">Cancelar</button></div></div>`);
+}
+function exAdd(e){const ta=document.getElementById('ex_lista');if(!ta)return;const c=ta.value.trim();ta.value=(c?c+'\n':'')+e;ta.focus();}
+function exColetar(id){const exames=document.getElementById('ex_lista').value.trim();const ind=document.getElementById('ex_ind').value.trim();
+  const texto=exames.split('\n').map(s=>s.trim()).filter(Boolean).map(s=>'• '+s).join('\n');
+  return {pacId:curPac,date:nowISO(),tipo:'exames',exames,ind,texto,obs:ind?('Indicação clínica / hipótese diagnóstica: '+ind):'',titulo:'Solicitação de exames'};}
+function saveExames(id,andPrint){
+  const o=exColetar(id);
+  if(!o.exames){alert('Liste ao menos um exame.');return;}
+  let rid=id;
+  if(id){Object.assign(state.documentos.find(x=>x.id===id),o);}else{rid=uid();state.documentos.push({id:rid,...o});}
+  persist();closeModalMic();renderPBody();
+  if(andPrint)printDocu(state.documentos.find(x=>x.id===rid));
+}
+function exImprimir(){const o=exColetar();if(!o.exames){alert('Liste ao menos um exame.');return;}printDocu(o);}
 
 /* ===== voz (ditado) ===== */
 let rec=null,listening=false,micTarget=null;
@@ -802,10 +923,12 @@ function renderConfig(){const c=state.cfg;
    <div class="sub" style="color:var(--muted);font-size:13px;margin-bottom:14px">Usados no cabeçalho dos receituários/documentos impressos e na assinatura das mensagens de WhatsApp.</div>
    <div class="two"><div class="field"><label>Seu nome</label><input id="c_med" value="${esc(c.medico)}" placeholder="Ex.: Marina Lima"></div>
     <div class="field"><label>CRM</label><input id="c_crm" value="${esc(c.crm)}" placeholder="Ex.: 123456/SP"></div></div>
-   <div class="two"><div class="field"><label>Especialidade</label><input id="c_esp" value="${esc(c.esp)}" placeholder="Ex.: Clínica Médica"></div>
-    <div class="field"><label>Clínica / consultório</label><input id="c_cli" value="${esc(c.clinica)}" placeholder="Ex.: Clínica Vida"></div></div>
+   <div class="two"><div class="field"><label>RQE</label><input id="c_rqe" value="${esc(c.rqe)}" placeholder="Registro de Qualificação de Especialista"></div>
+    <div class="field"><label>Especialidade</label><input id="c_esp" value="${esc(c.esp)}" placeholder="Ex.: Clínica Médica"></div></div>
+   <div class="field"><label>Clínica / consultório</label><input id="c_cli" value="${esc(c.clinica)}" placeholder="Ex.: Clínica Vida"></div>
    <div class="two"><div class="field"><label>Endereço</label><input id="c_end" value="${esc(c.endereco)}" placeholder="Rua, nº — cidade"></div>
     <div class="field"><label>Telefone</label><input id="c_tel" value="${esc(c.telefone)}" placeholder="(11) 3333-3333"></div></div>
+   <div class="hint">Nome, CRM, RQE e especialidade saem em <b>todos</b> os documentos. Endereço e telefone saem no <b>receituário de controle especial</b>.</div>
    <div class="row"><button class="btn btn-p" onclick="saveCfg()">Salvar dados</button></div></div>
    ${docsHtml}
    <div class="phead" style="margin-top:14px;border-color:#f3c2c2;background:#fef6f6">
@@ -815,7 +938,7 @@ function renderConfig(){const c=state.cfg;
    </div>`;
 }
 function saveCfg(){
-  state.cfg={medico:document.getElementById('c_med').value.trim(),crm:document.getElementById('c_crm').value.trim(),esp:document.getElementById('c_esp').value.trim(),clinica:document.getElementById('c_cli').value.trim(),endereco:document.getElementById('c_end').value.trim(),telefone:document.getElementById('c_tel').value.trim()};
+  state.cfg={medico:document.getElementById('c_med').value.trim(),crm:document.getElementById('c_crm').value.trim(),rqe:document.getElementById('c_rqe').value.trim(),esp:document.getElementById('c_esp').value.trim(),clinica:document.getElementById('c_cli').value.trim(),endereco:document.getElementById('c_end').value.trim(),telefone:document.getElementById('c_tel').value.trim()};
   persist();const b=event.target;const o=b.textContent;b.textContent='✓ Salvo';setTimeout(()=>b.textContent=o,1500);
 }
 function copyDoc(i){const d=state.docs[i];if(d&&navigator.clipboard)navigator.clipboard.writeText(d.out||'');}
