@@ -825,6 +825,15 @@ main, #main { display: block !important; height: auto !important; overflow: visi
 .esc-pts { margin-left: auto; color: var(--text-mute); font-size: 12px; font-weight: 600; }
 .esc-form .esc-sel { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; font-weight: 600; color: var(--text-soft); }
 .esc-form .esc-sel select { border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px; font-size: 16px; font-family: inherit; background: var(--bg-card); color: var(--text); }
+/* Seções recolhíveis (acordeão) das condutas — estilo Whitebook */
+.content .wb-acc { border: 1px solid var(--border); border-radius: 12px; margin: 8px 0; overflow: hidden; background: var(--bg-card); }
+.content .wb-acc > summary { list-style: none; cursor: pointer; padding: 13px 15px; font-weight: 700; font-size: 15px; color: var(--text); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.content .wb-acc > summary::-webkit-details-marker { display: none; }
+.content .wb-acc > summary::after { content: '⌄'; font-size: 18px; line-height: 1; color: var(--text-mute); transition: transform .15s; }
+.content .wb-acc[open] > summary::after { transform: rotate(180deg); }
+.content .wb-acc[open] > summary { border-bottom: 1px solid var(--border); }
+.content .wb-acc .wb-acc-body { padding: 2px 15px 14px; }
+.content .wb-acc .wb-acc-body > :first-child { margin-top: 10px; }
 
 /* Lista Histórico/Favoritos como view */
 #listView .side-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
@@ -6450,6 +6459,19 @@ function renderSourcesHtml(sources) {
   `;
 }
 
+// Converte as seções "## ..." (já renderizadas como <h2>) em blocos recolhíveis (estilo acordeão).
+// O conteúdo antes do 1º <h2> (título + resumo) fica sempre visível; a 1ª seção abre por padrão.
+function accordionize(html) {
+  const parts = html.split(/(?=<h2)/);
+  if (parts.length <= 1) return html;
+  return parts.map((p, i) => {
+    const m = p.match(/^<h2[^>]*>([\s\S]*?)<\/h2>([\s\S]*)$/);
+    if (!m) return p;
+    const open = (i === 1) ? ' open' : '';
+    return `<details class="wb-acc"${open}><summary>${m[1]}</summary><div class="wb-acc-body">${m[2]}</div></details>`;
+  }).join('');
+}
+
 async function renderResultDireto(item) {
   const { query, text, sources, ctxLabel, cenarioLabel, date, mode, protocolMeta } = item;
   const isCaso = mode === 'caso';
@@ -6485,7 +6507,7 @@ async function renderResultDireto(item) {
         <span>${item.offline ? '📚' : alertIcon}</span>
         <div>${item.offline ? 'Conteúdo do <strong>banco MedTech</strong> (offline, sem IA) — referência rápida. Confira doses e adapte ao paciente. Toque em 🔄 <strong>Refazer</strong> para a versão detalhada com IA.' : alertText}</div>
       </div>
-      <div class="content">${md(text)}</div>
+      <div class="content">${accordionize(md(text))}</div>
       ${renderSourcesHtml(sources)}
     </div>
   `;
@@ -6866,22 +6888,23 @@ function renderBulaQuick() {
   el.dataset.done = '1';
 }
 function buildPromptBula(drug) {
-  return `Você é farmacêutico clínico e médico. Escreva uma BULA PRÁTICA e OBJETIVA do medicamento "${drug}" para uso à beira do leito por médicos no Brasil, em Markdown, sem enrolação, com números concretos (mg, mcg/kg, intervalos). Seções (título em negrito):
+  return `Você é farmacêutico clínico e médico. Escreva uma BULA PRÁTICA e OBJETIVA do medicamento "${drug}" para uso à beira do leito por médicos no Brasil, em Markdown, com números concretos (mg, mcg/kg, intervalos). Use EXATAMENTE estes cabeçalhos de seção começando com "## ":
 
-**${drug}**
-- **Classe / mecanismo**
-- **Indicações principais**
-- **Posologia (adulto)** — dose por indicação, via, intervalo
-- **Apresentações no Brasil**
-- **Ajuste renal** (por faixa de ClCr)
-- **Ajuste hepático**
-- **Contraindicações**
-- **Efeitos adversos principais**
-- **Interações relevantes**
-- **Gestação / lactação**
-- **Pérolas práticas** (diluição, monitorização, reversão)
+# ${drug}
 
-Responda em português do Brasil. Não invente apresentações inexistentes.`;
+## 💊 Classe e mecanismo
+## ✅ Indicações principais
+## 📐 Posologia (adulto) — dose por indicação, via e intervalo
+## 💉 Apresentações no Brasil
+## 🫘 Ajuste renal (por faixa de ClCr)
+## 🫄 Ajuste hepático
+## 🚫 Contraindicações
+## ⚠️ Efeitos adversos principais
+## 🔗 Interações relevantes
+## 🤰 Gestação / lactação
+## 💡 Pérolas práticas (diluição, monitorização, reversão)
+
+Sob cada cabeçalho, escreva o conteúdo em bullets curtos. Responda em português do Brasil. Não invente apresentações inexistentes.`;
 }
 async function runBula(q) {
   q = (q || '').trim(); if (!q) return;
@@ -6890,7 +6913,7 @@ async function runBula(q) {
   box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Buscando bula:</strong> ${escapeHtml(q)}</div><div class="loading-sub">Posologia, ajustes e interações…</div></div>`;
   try {
     const { text } = await callGemini([{ role:'user', parts:[{ text: buildPromptBula(q) }] }]);
-    box.innerHTML = `<div class="result">${md(text)}<div class="alert alert-info" style="margin-top:14px"><span>ℹ</span><div>Gerado por IA — confirme doses e ajustes na bula oficial/ANVISA antes de prescrever.</div></div></div>`;
+    box.innerHTML = `<div class="result content">${accordionize(md(text))}<div class="alert alert-info" style="margin-top:14px"><span>ℹ</span><div>Gerado por IA — confirme doses e ajustes na bula oficial/ANVISA antes de prescrever.</div></div></div>`;
     await renderMermaidIn(box);
     window.scrollTo({ top: 0, behavior:'smooth' });
   } catch (err) {
@@ -6910,17 +6933,19 @@ function renderInvQuick() {
   el.dataset.done = '1';
 }
 function buildPromptInvestigacao(finding) {
-  return `Você é clínico experiente e preceptor. Monte um ROTEIRO DE INVESTIGAÇÃO prático para o achado "${finding}" em adulto, no Brasil, em Markdown. Seções (título em negrito):
+  return `Você é clínico experiente e preceptor. Monte um ROTEIRO DE INVESTIGAÇÃO prático para o achado "${finding}" em adulto, no Brasil, em Markdown. Use EXATAMENTE estes cabeçalhos começando com "## ":
 
-**Investigação: ${finding}**
-- **Quando valorizar** (1-2 linhas)
-- **Diagnóstico diferencial** — agrupado por mecanismo, do mais comum ao mais grave
-- **Anamnese e exame dirigidos**
-- **Exames de 1ª linha** (ordem racional)
-- **Exames de 2ª linha / conforme suspeita**
-- **Sinais de alarme / quando internar**
+# Investigação: ${finding}
 
-Depois inclua um fluxograma na sintaxe Mermaid em um bloco \`\`\`mermaid (flowchart TD) com a sequência de decisão. Nos rótulos dos nós, NÃO use os caracteres ( ) < > ; & — escreva por extenso (ex.: "menor que"). Responda em português do Brasil.`;
+## 🎯 Quando valorizar
+## 🔀 Diagnóstico diferencial
+## 🩺 Anamnese e exame dirigidos
+## 🧪 Exames de 1ª linha
+## 🔬 Exames de 2ª linha / conforme suspeita
+## 🚩 Sinais de alarme / quando internar
+## 🗺️ Fluxograma de investigação
+
+Sob cada cabeçalho, escreva o conteúdo em bullets curtos. Na seção "Fluxograma de investigação", inclua um bloco \`\`\`mermaid (flowchart TD) com a sequência de decisão; nos rótulos dos nós NÃO use os caracteres ( ) < > ; & — escreva por extenso (ex.: "menor que"). Responda em português do Brasil.`;
 }
 async function runInv(q) {
   q = (q || '').trim(); if (!q) return;
@@ -6929,7 +6954,8 @@ async function runInv(q) {
   box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Investigando:</strong> ${escapeHtml(q)}</div><div class="loading-sub">Hipóteses, exames e fluxograma…</div></div>`;
   try {
     const { text } = await callGemini([{ role:'user', parts:[{ text: buildPromptInvestigacao(q) }] }]);
-    box.innerHTML = `<div class="result">${md(text)}<div class="alert alert-info" style="margin-top:14px"><span>ℹ</span><div>Roteiro gerado por IA — adapte ao contexto do paciente e às diretrizes locais.</div></div></div>`;
+    box.innerHTML = `<div class="result content">${accordionize(md(text))}<div class="alert alert-info" style="margin-top:14px"><span>ℹ</span><div>Roteiro gerado por IA — adapte ao contexto do paciente e às diretrizes locais.</div></div></div>`;
+    await renderMermaidIn(box);
     await renderMermaidIn(box);
     window.scrollTo({ top: 0, behavior:'smooth' });
   } catch (err) {
