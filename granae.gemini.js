@@ -32,7 +32,10 @@ const Gemini = (() => {
     if (!user) throw new Error('Entre na sua conta MedTech para usar a IA.');
     const idToken = await user.getIdToken();
 
-    const generationConfig = { temperature, topP: 0.95 };
+    // maxOutputTokens + thinkingBudget 0: o gemini-2.5-flash às vezes gastava todo o
+    // orçamento de tokens no "thinking" e devolvia texto vazio (erro "IA 502: A IA não
+    // retornou texto"). Sem thinking e com teto generoso, a saída vem garantida.
+    const generationConfig = { temperature, topP: 0.95, maxOutputTokens: 8192, thinkingConfig: { thinkingBudget: 0 } };
     if (jsonMode) {
       generationConfig.responseMimeType = 'application/json';
       if (responseSchema) generationConfig.responseSchema = responseSchema;
