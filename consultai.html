@@ -693,11 +693,12 @@ function openEvol(id){
   modal(`<div class="box wide"><h3>${id?'Editar':'Nova'} evolução</h3>
    <div class="two"><div class="field"><label>Formato</label><select id="e_fmt">${fopt}</select></div>
     <div class="field"><label>Título (opcional)</label><input id="e_titulo" value="${esc(r.titulo||'')}" placeholder="Ex.: Consulta de retorno"></div></div>
-   <div class="field"><label>Rascunho / ditado</label>
-     <div class="toolbar"><button class="btn btn-mic btn-sm" id="micBtn" onclick="toggleMic('e_raw')">🎤 Ditar</button><span id="liveTag"></span>
-       <button class="btn btn-g btn-sm" onclick="document.getElementById('e_raw').value='';">Limpar</button>
+   <div class="field"><label>Gravação / ditado</label>
+     <div class="toolbar"><button class="btn btn-mic btn-sm" id="recBtn" onclick="toggleConsulta()">🔴 Gravar consulta</button><button class="btn btn-mic btn-sm" id="micBtn" onclick="toggleMic('e_raw')">🎤 Ditar</button><span id="liveTag"></span>
+       <button class="btn btn-g btn-sm" onclick="if(confirm('Limpar o rascunho?'))document.getElementById('e_raw').value='';">Limpar</button>
        <button class="btn btn-p btn-sm" id="aiBtn" onclick="genEvol()">✨ Estruturar com IA</button></div>
-     <textarea id="e_raw" placeholder="Dite ou digite o caso aqui...">${esc(id?'':'')}</textarea>
+     <textarea id="e_raw" placeholder="🔴 Gravar consulta: grave o atendimento inteiro — ao parar, a IA gera a evolução automaticamente. Ou 🎤 Ditar / digitar o caso."></textarea>
+     <div class="hint">Para a evolução completa, toque em <b>Gravar consulta</b> e deixe rodando durante todo o atendimento; ao parar, a IA gera a evolução sozinha. Funciona melhor no Chrome — grave com o consentimento do paciente.</div>
    </div>
    <div class="field"><label>Texto da evolução (revise antes de salvar)</label><textarea id="e_out" style="min-height:160px" placeholder="O texto estruturado aparece aqui. Você pode editar livremente.">${esc(r.texto||'')}</textarea></div>
    <div class="hint">⚠️ A IA é apoio e não inventa dados. Revise sempre antes de salvar/assinar.${MT.mode==='demo'?' <b>Entre na conta MedTech para usar a IA.</b>':''}</div>
@@ -708,7 +709,7 @@ async function genEvol(){
   if(!raw){alert('Dite ou digite o caso antes de gerar.');return;}
   const fmt=document.getElementById('e_fmt').value;
   const b=document.getElementById('aiBtn');b.innerHTML='<span class="spin"></span> Gerando...';b.disabled=true;
-  const prompt='Você é um escriba clínico experiente. A partir do rascunho/ditado abaixo, produza o documento em português do Brasil, conciso e profissional. REGRAS: não invente dados, exames, doses ou condutas não mencionados; se algo essencial faltar, escreva "[não informado]". '+(REC_FMT[fmt]||REC_FMT.evolucao).ai+'\n\nRascunho:\n'+raw;
+  const prompt='Você é um escriba clínico experiente. O texto abaixo pode ser a TRANSCRIÇÃO de uma consulta inteira (fala do médico e do paciente, linguagem coloquial, com repetições e possíveis ruídos) ou um rascunho/ditado. Extraia apenas as informações clinicamente relevantes e produza um documento em português do Brasil, completo, organizado e objetivo. REGRAS: não invente dados, exames, doses ou condutas que não foram ditos; ignore conversas irrelevantes; padronize termos médicos; se algo essencial faltar, escreva "[não informado]". '+(REC_FMT[fmt]||REC_FMT.evolucao).ai+'\n\nTranscrição/rascunho:\n'+raw;
   try{const text=await MT.ai(prompt);document.getElementById('e_out').value=(text||'').trim();}
   catch(e){alert('⚠️ '+e.message);}
   b.innerHTML='✨ Estruturar com IA';b.disabled=false;
@@ -891,24 +892,36 @@ function saveExames(id,andPrint){
 }
 function exImprimir(){const o=exColetar();if(!o.exames){alert('Liste ao menos um exame.');return;}printDocu(o);}
 
-/* ===== voz (ditado) ===== */
-let rec=null,listening=false,micTarget=null;
-function toggleMic(targetId){
-  micTarget=targetId;
-  if(listening){stopMic();return;}
+/* ===== voz: ditado curto e GRAVAÇÃO DA CONSULTA (áudios longos) ===== */
+let rec=null,listening=false,micTarget=null,recMode=null,recSecs=0,recTimer=null;
+function startRec(targetId,mode){
+  micTarget=targetId;recMode=mode;
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){alert('Seu navegador não suporta ditado por voz. Use o Google Chrome ou digite o texto.');return;}
+  if(!SR){alert('Seu navegador não suporta gravação/ditado por voz. Use o Google Chrome (no computador ou no celular).');return false;}
   rec=new SR();rec.lang='pt-BR';rec.continuous=true;rec.interimResults=true;
   rec.onresult=e=>{let fin='';for(let i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)fin+=e.results[i][0].transcript;}
-    if(fin){const ta=document.getElementById(micTarget);if(ta){ta.value=(ta.value?ta.value.replace(/\s*$/,'')+' ':'')+fin.trim();}}};
-  rec.onerror=ev=>{if(ev.error==='not-allowed')alert('Permita o acesso ao microfone para ditar.');};
-  rec.onend=()=>{if(listening){try{rec.start();}catch(e){}}};
-  try{rec.start();listening=true;updateMic();}catch(e){alert('Não foi possível iniciar o microfone.');}
+    if(fin){const ta=document.getElementById(micTarget);if(ta){ta.value=(ta.value?ta.value.replace(/\s*$/,'')+' ':'')+fin.trim();ta.scrollTop=ta.scrollHeight;}}};
+  rec.onerror=ev=>{if(ev.error==='not-allowed'||ev.error==='service-not-allowed')alert('Permita o acesso ao microfone.');};
+  rec.onend=()=>{if(listening){try{rec.start();}catch(e){}}};  /* reinicia sozinho: sustenta gravações longas e pausas */
+  try{rec.start();listening=true;}catch(e){alert('Não foi possível iniciar o microfone.');return false;}
+  if(mode==='consulta'){recSecs=0;if(recTimer)clearInterval(recTimer);recTimer=setInterval(()=>{recSecs++;updateRecUI();},1000);}
+  updateRecUI();return true;
 }
-function stopMic(){listening=false;if(rec){try{rec.stop();}catch(e){}}updateMic();}
-function updateMic(){const b=document.getElementById('micBtn');const t=document.getElementById('liveTag');if(!b)return;
-  if(listening){b.classList.add('on');b.textContent='⏹️ Parar';if(t)t.innerHTML='<span class="live"><span class="dot"></span>ouvindo…</span>';}
-  else{b.classList.remove('on');b.textContent='🎤 Ditar';if(t)t.innerHTML='';}}
+function stopRec(){listening=false;if(rec){try{rec.stop();}catch(e){}}if(recTimer){clearInterval(recTimer);recTimer=null;}updateRecUI();}
+function stopMic(){stopRec();}
+function fmtSecs(s){const m=Math.floor(s/60),x=s%60;return (m<10?'0':'')+m+':'+(x<10?'0':'')+x;}
+function updateRecUI(){
+  const mic=document.getElementById('micBtn'),recb=document.getElementById('recBtn'),t=document.getElementById('liveTag');
+  if(mic){const on=listening&&recMode==='dictate';mic.classList.toggle('on',on);mic.textContent=on?'⏹️ Parar ditado':'🎤 Ditar';}
+  if(recb){const on=listening&&recMode==='consulta';recb.classList.toggle('on',on);recb.textContent=on?'⏹️ Parar e gerar evolução':'🔴 Gravar consulta';}
+  if(t){if(listening&&recMode==='consulta')t.innerHTML='<span class="live"><span class="dot"></span>gravando '+fmtSecs(recSecs)+'</span>';else if(listening)t.innerHTML='<span class="live"><span class="dot"></span>ouvindo…</span>';else t.innerHTML='';}
+}
+function toggleMic(targetId){if(listening&&recMode==='dictate'){stopRec();return;}if(listening)stopRec();startRec(targetId,'dictate');}
+function toggleConsulta(){
+  if(listening&&recMode==='consulta'){stopRec();const ta=document.getElementById('e_raw');if(ta&&ta.value.trim())genEvol();return;}
+  if(listening)stopRec();
+  startRec('e_raw','consulta');
+}
 
 /* ===== CONFIG ===== */
 function renderConfig(){const c=state.cfg;
