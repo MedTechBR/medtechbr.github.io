@@ -294,13 +294,14 @@ main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
   margin: 12px 0; border: 1px solid var(--border);
 }
 .content pre code { background: none; padding: 0; font-size: 12px; }
+.content .tbl-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 12px 0; border: 1px solid var(--border); border-radius: 8px; }
 .content table {
-  border-collapse: collapse; width: 100%;
-  margin: 12px 0; font-size: 13px;
+  border-collapse: collapse; width: 100%; font-size: 13px;
 }
+.content .tbl-scroll table { margin: 0; }
 .content th, .content td {
   border: 1px solid var(--border);
-  padding: 8px 12px; text-align: left;
+  padding: 8px 10px; text-align: left; vertical-align: top;
 }
 .content th { background: var(--bg-soft); font-weight: 600; }
 .content blockquote {
@@ -627,11 +628,12 @@ main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
 .protocol-info { flex: 1; min-width: 0; }
 .protocol-name {
   font-weight: 600; color: var(--text); font-size: 14px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  line-height: 1.3;
 }
 .protocol-tags {
-  font-size: 11px; color: var(--text-mute); margin-top: 2px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-size: 11px; color: var(--text-mute); margin-top: 3px;
+  line-height: 1.3;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .protocol-badge {
   background: var(--success-soft); color: var(--success);
@@ -823,6 +825,13 @@ main, #main { display: block !important; height: auto !important; overflow: visi
 /* Esconde resíduos do layout antigo */
 .mode-btn[data-mode="socratica"], #histBtn { display: none !important; }
 .welcome-features, .welcome-icon { display: none !important; }
+/* No resultado, conteúdo primeiro — a caixa de nova busca fica no botão + e na aba IA */
+#resultView > .search-box { display: none !important; }
+@media (max-width: 560px) {
+  .result-header { flex-direction: column; align-items: stretch; gap: 10px; }
+  .result-title { font-size: 19px; line-height: 1.25; }
+  .result-actions { flex-wrap: wrap; }
+}
 </style>
 </head>
 <body>
@@ -1475,6 +1484,234 @@ function renderLibrary() {
 
 /* ===== Banco MedTech — conteúdo OFFLINE de protocolos-chave (abre sem IA) ===== */
 const OFFLINE = {
+ic_cronica: `# Insuficiência Cardíaca Crônica
+
+> Síndrome de congestão e/ou baixo débito por disfunção do coração. Classificada pela fração de ejeção: **ICFEr ≤40%**, **ICFElr 41–49%**, **ICFEp ≥50%**.
+
+## 🔬 Fisiopatologia
+- Lesão miocárdica (isquêmica, hipertensiva, valvar, Chagas) → queda do débito → ativação neuro-hormonal (SRAA e simpático) → retenção de sódio/água, remodelamento e fibrose → ciclo de piora progressiva.
+
+## 🩺 Quadro clínico
+- Dispneia aos esforços, ortopneia, dispneia paroxística noturna, fadiga.
+- Congestão: edema de MMII, turgência jugular, estertores, B3, hepatomegalia.
+- Classificar a limitação funcional em NYHA I–IV.
+
+## ✅ Diagnóstico
+- Clínica compatível + **BNP > 35 / NT-proBNP > 125 pg/mL** + **ecocardiograma** (FE, estrutura, função diastólica).
+- ECG e RX de tórax. Investigar a etiologia (coronariana; no Brasil, sempre sorologia para Chagas).
+
+## 🔀 Diagnósticos diferenciais
+- DPOC, TEP, anemia, doença renal/hepática com edema, hipotireoidismo, pericardite constritiva, SAOS.
+
+## 🧪 Exames complementares
+| Exame | Objetivo |
+| --- | --- |
+| BNP / NT-proBNP | Diagnóstico e prognóstico |
+| Ecocardiograma | FE, estrutura, diastólica, valvas |
+| ECG | Arritmia, BRE, isquemia |
+| Função renal, Na, K | Antes e durante a terapia |
+| Ferritina/sat. transferrina, TSH, Chagas | Comorbidade e etiologia |
+
+## 💊 Tratamento (com doses)
+**ICFEr (FE ≤40%) — 4 pilares, iniciar todos e titular:**
+- **IECA/ARNI:** Sacubitril-valsartana 24/26 → 97/103 mg 12/12h (preferencial); ou Enalapril 2,5 → 10–20 mg 12/12h.
+- **Betabloqueador:** Carvedilol 3,125 → 25 mg 12/12h; ou Bisoprolol 1,25 → 10 mg/dia.
+- **Antagonista mineralocorticoide:** Espironolactona 25 → 50 mg/dia (vigiar K⁺ e creatinina).
+- **iSGLT2:** Dapagliflozina 10 mg/dia ou Empagliflozina 10 mg/dia.
+- **Diurético de alça** (congestão): Furosemida 20–40 mg/dia, ajustar pelos sintomas.
+- Dispositivos: CDI/TRC se FE ≤35% sintomático apesar de terapia otimizada. Hidralazina + nitrato se intolerância a IECA/ARNI.
+
+**ICFEp:** iSGLT2 (reduz hospitalização) + diurético para congestão + controle rigoroso de HAS, FA e comorbidades.
+
+## 📌 Quando encaminhar/internar
+- IC avançada, descompensações de repetição, FE muito reduzida, candidatos a dispositivo/transplante.`,
+
+hipona: `# Hiponatremia
+
+> Na⁺ < 135 mEq/L. A gravidade depende do **valor**, dos **sintomas** e da **velocidade de instalação** — não só do número. Abordagem por osmolalidade → volemia.
+
+## 🔬 Fisiopatologia
+- Excesso de água livre em relação ao sódio (distúrbio da água, não do sal). Mecanismo central: ADH inapropriadamente elevado (SIADH, hipovolemia, IC/cirrose).
+
+## 🩺 Quadro clínico
+- Leve: náusea, cefaleia, lentificação.
+- Grave (geralmente Na < 120 ou agudo): vômitos, confusão, convulsão, coma, parada respiratória.
+
+## ✅ Diagnóstico (passo a passo)
+1. **Osmolalidade sérica:** normal/alta → pseudo-hiponatremia (lípides/proteínas) ou translocacional (hiperglicemia, manitol).
+2. Se **hipotônica (< 275):** avaliar a **volemia**:
+   - **Hipovolêmica:** Na urinário < 20 (perda extrarrenal) vs > 20 (renal/diurético).
+   - **Euvolêmica → SIADH:** osm urinária > 100, Na urinário > 30, tireoide/adrenal normais.
+   - **Hipervolêmica:** IC, cirrose, síndrome nefrótica, DRC.
+
+## 🔀 Diagnósticos diferenciais
+- Pseudo-hiponatremia; hiperglicemia (corrigir Na: +1,6 por 100 mg/dL de glicose acima de 100); hipotireoidismo; insuficiência adrenal; polidipsia; baixa ingesta de soluto.
+
+## 🧪 Exames complementares
+| Exame | Para quê |
+| --- | --- |
+| Osmolalidade sérica e urinária | Classificar |
+| Sódio urinário | Volemia / causa |
+| Glicemia, lípides, proteínas | Excluir pseudo/translocacional |
+| TSH, cortisol | Excluir hipotireoidismo/adrenal |
+| Função renal | Causa renal |
+
+## 💊 Tratamento (com doses)
+- **Sintomática grave (convulsão/coma):** **NaCl 3% 100–150 mL IV em 10 min**, repetir até 2–3x. Meta: subir Na 4–6 mEq/L nas primeiras horas.
+- **Limite de correção: ≤ 8 mEq/L em 24h** (risco de mielinólise pontina); mais cauteloso em etilistas, desnutridos e hipocalemia.
+- **Hipovolêmica:** SF 0,9%.
+- **SIADH:** restrição hídrica (≤ 800–1000 mL/dia); considerar sal + furosemida; ureia/tolvaptana em casos selecionados.
+- **Hipervolêmica:** restrição hídrica + tratar a causa + diurético de alça.
+
+## ⚠️ Cuidado
+- Correção rápida demais → desmielinização osmótica. Reavaliar o Na de 2/2h na fase aguda.`,
+
+dm2_amb: `# Diabetes Mellitus tipo 2 — Manejo ambulatorial
+
+> Hiperglicemia crônica por resistência insulínica + falência progressiva da célula β. Tratar a glicemia **e** o risco cardiovascular/renal.
+
+## 🔬 Fisiopatologia
+- Resistência periférica à insulina + secreção pancreática insuficiente; contribuem fígado (gliconeogênese), incretinas e rim (reabsorção de glicose).
+
+## ✅ Diagnóstico
+- Glicemia de jejum ≥ 126, ou 2h no TOTG ≥ 200, ou HbA1c ≥ 6,5%, ou glicemia aleatória ≥ 200 com sintomas. Confirmar em 2ª amostra (exceto sintomático inequívoco).
+
+## 🩺 Avaliação inicial
+- HbA1c, perfil lipídico, função renal + **albuminúria (RAC)**, fundo de olho, exame dos pés, PA, peso/IMC.
+
+## 🔀 Diagnósticos diferenciais
+- DM1/LADA (magros, cetose, autoanticorpos), MODY, diabetes secundário (corticoide, pancreatopatia, Cushing).
+
+## 🧪 Exames complementares
+| Exame | Frequência |
+| --- | --- |
+| HbA1c | 3–6 meses |
+| Creatinina/TFG + RAC | Anual |
+| Lípides | Anual |
+| Fundo de olho e pés | Anual |
+
+## 💊 Tratamento (com doses)
+- **1ª linha — Metformina** 500 mg/dia → 850 mg 2–3x/dia (máx 2,55 g). Reduzir/suspender se TFG < 30.
+- **2º agente pelo perfil:**
+  - **DCV / IC / DRC:** **iSGLT2** (dapagliflozina 10 mg, empagliflozina 10 mg) e/ou **GLP-1** (semaglutida, liraglutida) — benefício CV/renal.
+  - **Perda de peso:** GLP-1.
+  - **Custo/amplo uso:** sulfonilureia (gliclazida MR 30–120 mg/dia) — atenção à hipoglicemia.
+- **Insulina** se HbA1c > 10% ou sintomas catabólicos: basal (NPH/glargina) 10 U ou 0,1–0,2 U/kg à noite, titular.
+
+## 🎯 Metas
+- HbA1c < 7% (individualizar: < 6,5% jovens; < 8% idosos frágeis). PA < 130/80. Estatina conforme risco.
+
+## 📌 Encaminhar
+- Suspeita de DM1, gestação, complicações avançadas, controle difícil.`,
+
+fa_cronica: `# Fibrilação Atrial — Manejo crônico
+
+> Arritmia sustentada mais comum. Pilares: **anticoagulação (CHA₂DS₂-VASc)**, **controle de frequência vs ritmo** e tratamento da causa.
+
+## 🔬 Fisiopatologia
+- Múltiplos circuitos de reentrada atrial / focos ectópicos (veias pulmonares) → contração atrial inefetiva → estase (risco de trombo no apêndice atrial) e resposta ventricular irregular.
+
+## ✅ Diagnóstico
+- ECG: intervalo RR irregular e ausência de onda P. Holter se paroxística.
+
+## 🩺 Avaliação
+- **CHA₂DS₂-VASc** (risco de AVC) e **HAS-BLED** (sangramento). TSH, eletrólitos, ecocardiograma, função renal/hepática.
+
+## 🔀 Diagnósticos diferenciais
+- Flutter atrial, taquicardia atrial multifocal, TPSV, extrassístoles frequentes.
+
+## 🧪 Exames complementares
+| Exame | Objetivo |
+| --- | --- |
+| ECG / Holter | Confirmar e caracterizar |
+| Ecocardiograma | Estrutura, valvas, átrio, FE |
+| TSH, eletrólitos | Causa reversível |
+| Função renal/hepática | Escolha do anticoagulante |
+
+## 💊 Tratamento (com doses)
+**Anticoagulação** (CHA₂DS₂-VASc ≥ 2 em homens / ≥ 3 em mulheres; considerar se 1):
+- **DOAC preferencial:** Rivaroxabana 20 mg/dia (15 se ClCr 15–49); Apixabana 5 mg 12/12h (2,5 se ≥ 2: idade ≥ 80, peso ≤ 60 kg, Cr ≥ 1,5); Dabigatrana 150 mg 12/12h.
+- **Varfarina** (INR 2–3) se estenose mitral moderada-grave ou prótese mecânica.
+
+**Controle de frequência** (meta FC < 110 em repouso):
+- Betabloqueador (metoprolol, bisoprolol) ou diltiazem/verapamil (evitar em ICFEr); digoxina como adjuvante.
+
+**Controle de ritmo** (sintomático, jovem, IC): amiodarona; propafenona (sem cardiopatia estrutural); ou ablação por cateter.
+
+## 📌 Encaminhar
+- Candidatos a cardioversão/ablação, FA + IC, controle de ritmo.`,
+
+dengue: `# Dengue — Classificação e manejo
+
+> Arbovirose (Aedes aegypti). O risco está no **extravasamento plasmático**, que piora na **defervescência (3º–7º dia)** — a queda da febre é o momento crítico.
+
+## 🔬 Fisiopatologia
+- Infecção viral → resposta imune → aumento da permeabilidade capilar (extravasamento de plasma) e plaquetopenia/coagulopatia → hemoconcentração, hipovolemia e choque nas formas graves.
+
+## 🩺 Quadro clínico
+- Febre + ≥ 2 de: mialgia, cefaleia/dor retro-orbitária, exantema, prostração, náusea.
+
+## ✅ Classificação (MS) e estratificação
+- **Grupo A:** sem sinais de alarme, sem comorbidade/risco → ambulatorial.
+- **Grupo B:** sangramento espontâneo de pele OU comorbidade/risco → observação + hemograma.
+- **Grupo C:** **sinais de alarme** → internar + hidratação IV.
+- **Grupo D:** dengue grave (choque, sangramento grave, disfunção orgânica) → UTI.
+- **Sinais de alarme:** dor abdominal intensa, vômitos persistentes, letargia, hepatomegalia > 2 cm, sangramento de mucosa, aumento do Ht com queda de plaquetas, acúmulo de líquidos.
+
+## 🔀 Diagnósticos diferenciais
+- Chikungunya (artralgia intensa), Zika (exantema/prurido), leptospirose, malária, COVID-19, outras viroses.
+
+## 🧪 Exames complementares
+| Exame | Quando |
+| --- | --- |
+| Hemograma (Ht, plaquetas) | Grupos B, C, D — seriado |
+| NS1 (até 5º dia) / IgM (≥ 6º dia) | Confirmação |
+| Função hepática, albumina | Grupos C/D |
+
+## 💊 Tratamento (com doses)
+- **Grupo A:** hidratação oral **60 mL/kg/dia** (1/3 com SRO) + sintomáticos. **Evitar AAS e AINEs.** Paracetamol para febre/dor.
+- **Grupo C:** SF 0,9% **10 mL/kg em 1h**, reavaliar (Ht, diurese, sinais vitais); repetir até 3x conforme resposta.
+- **Grupo D (choque):** SF 0,9% **20 mL/kg em até 20 min**, reavaliar; coloide se refratário; UTI.
+- Não transfundir plaquetas de rotina (apenas sangramento grave).
+
+## ⚠️ Retorno
+- Orientar os sinais de alarme; retorno **imediato** na queda da febre.`,
+
+hipercalcemia: `# Hipercalcemia
+
+> Ca total > 10,5 mg/dL (corrigir pela albumina: +0,8 por g/dL abaixo de 4) ou Ca iônico elevado. Sintomas geralmente > 12 mg/dL; emergência > 14 mg/dL.
+
+## 🔬 Fisiopatologia / causas (≈90%)
+- **Hiperparatireoidismo primário** (ambulatorial, PTH alto) e **malignidade** (internado, PTH baixo — PTHrP, metástases, mieloma).
+- Outras: intoxicação por vitamina D, doenças granulomatosas, tiazídico, lítio, imobilização, tireotoxicose.
+
+## 🩺 Quadro clínico
+- "Stones, bones, groans, psychiatric overtones": litíase renal, dor óssea, constipação/dor abdominal, poliúria, confusão, fraqueza. ECG: QT curto.
+
+## ✅ Diagnóstico
+- Ca iônico/corrigido + **PTH** (divide a investigação): PTH alto/normal-alto → hiperparatireoidismo; PTH baixo → investigar malignidade (PTHrP, eletroforese, imagem) e vitamina D.
+
+## 🔀 Diagnósticos diferenciais
+- Pseudo-hipercalcemia (hiperalbuminemia/hemoconcentração), hipercalcemia hipocalciúrica familiar.
+
+## 🧪 Exames complementares
+| Exame | Para quê |
+| --- | --- |
+| Ca iônico, albumina | Confirmar |
+| PTH | Dividir a causa |
+| Fósforo, função renal, ECG | Repercussão |
+| PTHrP, eletroforese, 25-OH-vit D | Conforme o PTH |
+
+## 💊 Tratamento (com doses) — Ca > 14 ou sintomático
+1. **Hidratação:** SF 0,9% **200–300 mL/h** (manter diurese 100–150 mL/h); ajustar em IC/DRC.
+2. **Bisfosfonato:** ácido zoledrônico **4 mg IV** (ou pamidronato 60–90 mg) — pico em 2–4 dias.
+3. **Calcitonina** 4 UI/kg SC/IM 12/12h (rápida, transitória, taquifilaxia).
+4. **Corticoide** se granulomatose/linfoma (prednisona 20–40 mg/dia).
+5. Diálise se grave refratária/DRC. **Furosemida apenas após restaurar a volemia.**
+
+## 📌 Encaminhar
+- Hiperparatireoidismo primário (cirurgia), malignidade, casos refratários.`,
+
 anafilaxia: `## Reconhecimento
 Início agudo (minutos a horas):
 - Pele/mucosa (urticária, angioedema, prurido) **+** comprometimento respiratório (dispneia, sibilos, estridor, hipoxemia) **ou** hipotensão/hipoperfusão; **ou**
@@ -1857,11 +2094,15 @@ function md(text) {
   html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
   html = html.replace(/^---+$/gm, '<hr>');
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-  html = html.replace(/(^\|.+\|\n\|[-: |]+\|\n(?:^\|.+\|\n?)+)/gm, (m) => {
-    const lines = m.trim().split('\n');
-    const head = lines[0].split('|').slice(1, -1).map(c => `<th>${c.trim()}</th>`).join('');
-    const rows = lines.slice(2).map(l => '<tr>' + l.split('|').slice(1, -1).map(c => `<td>${c.trim()}</td>`).join('') + '</tr>').join('');
-    return `<table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>`;
+  // Tabelas markdown — tolerante: aceita pipes de borda opcionais, separador com
+  // qualquer nº de traços, linhas sem pipe final. Tabela larga vira rolável no mobile.
+  html = html.replace(/(?:^[ \t]*\|.*(?:\n|$))+/gm, block => {
+    const lines = block.replace(/\s+$/, '').split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length < 2 || !/^\|?[\s:|-]*-[\s:|-]*\|?$/.test(lines[1])) return block; // 2ª linha = separador
+    const cells = l => l.replace(/^\s*\|/, '').replace(/\|\s*$/, '').split('|').map(c => c.trim());
+    const head = cells(lines[0]).map(c => `<th>${c}</th>`).join('');
+    const body = lines.slice(2).map(l => `<tr>${cells(l).map(c => `<td>${c}</td>`).join('')}</tr>`).join('');
+    return `<div class="tbl-scroll"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
   });
   html = html.replace(/((?:^[ \t]*[-*] .+\n?)+)/gm, m => {
     const items = m.trim().split('\n').map(l => `<li>${l.replace(/^[ \t]*[-*] /, '')}</li>`).join('');
@@ -1872,7 +2113,7 @@ function md(text) {
     return `<ol>${items}</ol>`;
   });
   html = html.split(/\n{2,}/).map(b => {
-    if (/^<(h\d|ul|ol|table|blockquote|hr|pre)/.test(b.trim())) return b;
+    if (/^<(h\d|ul|ol|table|div|blockquote|hr|pre)/.test(b.trim())) return b;
     if (/@@MERMAID_\d+@@/.test(b.trim())) return b;
     return `<p>${b.trim().replace(/\n/g, '<br>')}</p>`;
   }).join('\n');
