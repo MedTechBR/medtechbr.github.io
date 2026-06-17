@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AgendaAI — Agenda de consultas | MedTech</title>
-<meta name="description" content="AgendaAI: agenda de consultas com visão por dia e semana, busca de pacientes e confirmação/lembrete por WhatsApp em um toque. Com login e sincronização na nuvem.">
+<title>ConsultAI — Atendimento ambulatorial completo | MedTech</title>
+<meta name="description" content="ConsultAI: sistema de atendimento ambulatorial completo — cadastro de pacientes, prontuário eletrônico, evolução por voz com IA, receituários e agenda com confirmação por WhatsApp. Login e nuvem MedTech.">
 <meta name="theme-color" content="#0E5A6D">
 <link rel="icon" type="image/png" href="favicon.png">
 <script src="_mtfb.js?v=1"></script>
-<script>window.MT_APP={id:"agendaai",name:"AgendaAI"};</script>
+<script>window.MT_APP={id:"agendaai",name:"ConsultAI"};</script>
 <script type="module" src="_mtauth.js?v=5"></script>
 <style>
 :root{--petrol:#0E5A6D;--petrol-dark:#083845;--ink:#0E2A31;--mint:#2DD4A8;--mint-dark:#14b894;--bg:#F6FAFB;--soft:#EAF3F4;--line:#dbe8ea;--muted:#5B7882;--green:#14794f;--green-bg:#e7f7f1;--amber:#c97a17;--amber-bg:#fdf0e0;--red:#c0392b;--red-bg:#fdecea;--blue:#2563a8;--blue-bg:#e8f1fb;--violet:#6b46c1;--violet-bg:#efe9fb;--wa:#25D366}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--ink);background:var(--bg)}
 header{background:linear-gradient(135deg,var(--petrol),var(--petrol-dark));color:#fff;padding:14px 0}
-.wrap{max-width:980px;margin:0 auto;padding:0 18px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 18px}
 .top{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.5px}
 .logo .mark{width:34px;height:34px;border-radius:10px;background:#2DD4A8;display:grid;place-items:center;flex:0 0 auto}
@@ -26,10 +26,13 @@ header{background:linear-gradient(135deg,var(--petrol),var(--petrol-dark));color
 .usr .who{font-size:12.5px;color:#cfe3e6;text-align:right;line-height:1.3;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .usr a,.usr button{color:#cfe3e6;text-decoration:none;font-size:13px;font-weight:600;background:rgba(255,255,255,.12);border:none;border-radius:8px;padding:7px 11px;cursor:pointer;font-family:inherit}
 .usr button:hover{background:rgba(255,255,255,.22)}
-main{max-width:980px;margin:0 auto;padding:18px 18px 60px}
-.tabs{display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:5px;margin-bottom:16px;width:fit-content}
-.tabs button{border:none;background:none;padding:9px 18px;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;color:var(--muted);font-family:inherit}
+main{max-width:1040px;margin:0 auto;padding:18px 18px 60px}
+.tabs{display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:5px;margin-bottom:16px;width:fit-content;max-width:100%;overflow:auto}
+.tabs button{border:none;background:none;padding:9px 18px;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;color:var(--muted);font-family:inherit;white-space:nowrap}
 .tabs button.on{background:var(--petrol);color:#fff}
+.subtabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.subtabs button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-weight:700;font-size:13px;cursor:pointer;color:var(--muted);font-family:inherit}
+.subtabs button.on{background:var(--soft);color:var(--petrol);border-color:var(--mint)}
 .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap}
 .bar .nav{display:flex;align-items:center;gap:9px}
 .bar h2{font-size:17px;text-transform:capitalize}
@@ -42,6 +45,7 @@ input.search,input.datep{padding:9px 12px;border:1px solid var(--line);border-ra
 .btn-g{background:#fff;color:var(--petrol);border:1px solid var(--line)}
 .btn-wa{background:var(--wa);color:#fff}
 .btn-sm{padding:8px 12px;font-size:13px;border-radius:9px}
+.btn-dn{background:var(--red-bg);color:var(--red)}
 .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:16px}
 .kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}
 .kpi .l{font-size:11.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.03em}
@@ -49,12 +53,14 @@ input.search,input.datep{padding:9px 12px;border:1px solid var(--line);border-ra
 .kpi.green .v{color:var(--green)}.kpi.blue .v{color:var(--blue)}.kpi.amber .v{color:var(--amber)}
 .daygrp{margin-bottom:8px}
 .daygrp .dh{font-size:13px;font-weight:800;color:var(--petrol-dark);text-transform:capitalize;margin:14px 2px 8px}
+.dh{font-size:13px;font-weight:800;color:var(--petrol-dark)}
 .appt{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 15px;margin-bottom:9px;display:flex;align-items:flex-start;gap:13px}
 .appt .time{text-align:center;min-width:54px;padding-top:2px}
 .appt .time .t{font-size:17px;font-weight:800;line-height:1;color:var(--petrol)}
 .appt .time .dur{font-size:11px;color:var(--muted);margin-top:3px}
 .appt .mid{flex:1;min-width:0}
 .appt .mid .pac{font-weight:700;font-size:15px}
+.appt .mid .pac a{color:var(--petrol);text-decoration:none;border-bottom:1px dashed var(--line)}
 .appt .mid .det{color:var(--muted);font-size:13px;margin-top:3px}
 .appt .mid .obs{font-size:12.5px;color:#41606a;margin-top:4px;background:var(--soft);padding:4px 9px;border-radius:7px;display:inline-block}
 .tag{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:999px;margin-right:6px;vertical-align:middle}
@@ -65,33 +71,74 @@ input.search,input.datep{padding:9px 12px;border:1px solid var(--line);border-ra
 .appt .acts .ic{display:flex;gap:6px}
 .appt .acts .ic button{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 9px;cursor:pointer;font-size:13px}
 .empty{text-align:center;color:var(--muted);padding:40px;background:#fff;border:1px dashed var(--line);border-radius:14px}
+.plist{display:flex;flex-direction:column;gap:9px}
+.pcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:13px;cursor:pointer}
+.pcard:hover{border-color:var(--mint)}
+.pcard .av{width:42px;height:42px;border-radius:50%;background:var(--soft);color:var(--petrol);display:grid;place-items:center;font-weight:800;font-size:16px;flex:0 0 auto}
+.pcard .pmid{flex:1;min-width:0}
+.pcard .pname{font-weight:700;font-size:15px}
+.pcard .pmeta{color:var(--muted);font-size:12.5px;margin-top:3px;display:flex;gap:6px;flex-wrap:wrap}
+.chip{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:999px;background:var(--soft);color:var(--petrol)}
+.chip.warn{background:var(--red-bg);color:var(--red)}
+.pcard .pgo{color:var(--muted);font-size:20px}
+.phead{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px}
+.phead .ptop{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.phead .av{width:52px;height:52px;border-radius:50%;background:var(--petrol);color:#fff;display:grid;place-items:center;font-weight:800;font-size:20px;flex:0 0 auto}
+.phead .pn{flex:1;min-width:0}
+.phead .pn h2{font-size:20px}
+.phead .pn .sub{color:var(--muted);font-size:13.5px;margin-top:3px}
+.phead .pacts{display:flex;gap:8px;flex-wrap:wrap}
+.pinfo{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.pinfo .ib{background:var(--soft);border-radius:11px;padding:10px 13px;font-size:13.5px}
+.pinfo .ib .il{font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);letter-spacing:.03em;margin-bottom:3px}
+.pinfo .ib.alerta{background:var(--red-bg);color:#7a2018}
+.pinfo .ib.alerta .il{color:var(--red)}
+.rec{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin-bottom:9px}
+.rec .rh{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.rec .rh .rt{font-weight:700;font-size:14.5px}
+.rec .rh .rd{color:var(--muted);font-size:12.5px}
+.rec .rbody{white-space:pre-wrap;font-size:14px;line-height:1.55;margin-top:8px;color:#243b41}
+.rec .racts{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.rec .racts button{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 11px;cursor:pointer;font-size:12.5px;font-weight:700;color:var(--petrol);font-family:inherit}
 .note{background:var(--soft);border-radius:12px;padding:13px 16px;font-size:13px;color:#28424a;margin-top:16px;line-height:1.6}
 .note b{color:var(--petrol)}
 .modal{position:fixed;inset:0;background:rgba(8,56,69,.45);display:flex;align-items:center;justify-content:center;padding:18px;z-index:60}
-.modal .box{background:#fff;border-radius:16px;padding:24px;max-width:470px;width:100%;max-height:92vh;overflow:auto}
+.modal .box{background:#fff;border-radius:16px;padding:24px;max-width:560px;width:100%;max-height:92vh;overflow:auto}
+.modal .box.wide{max-width:760px}
 .modal h3{margin-bottom:16px}
 .field{margin-bottom:13px}.field label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
 .field input,.field select,.field textarea{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit;background:#fff}
 .field textarea{resize:vertical;min-height:54px}
 .field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--mint)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 .row{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap}
 .hint{font-size:12px;color:var(--muted);margin-top:4px}
+.aiout{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:13px;font-size:14px;line-height:1.6;white-space:pre-wrap;min-height:90px;margin-top:6px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 8px}
+.btn-mic{background:#fff;color:var(--petrol);border:1px solid var(--line)}
+.btn-mic.on{background:#fde8e8;color:var(--red);border-color:#f3c2c2}
+.live{display:inline-flex;align-items:center;gap:6px;color:var(--red);font-size:12.5px;font-weight:700}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--red);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.spin{display:inline-block;width:15px;height:15px;border:2px solid var(--petrol-dark);border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
+@keyframes sp{to{transform:rotate(360deg)}}
 .wa-tpls{display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 10px}
 .wa-tpls button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--petrol)}
 .wa-tpls button.on{background:var(--wa);color:#fff;border-color:var(--wa)}
 .wa-preview{background:#e6f6ec;border:1px solid #bfe6cd;border-radius:12px;padding:13px 15px;font-size:13.5px;color:#1c3a28;white-space:pre-wrap;line-height:1.5;margin:6px 0 14px}
+.back{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--petrol);font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;margin-bottom:10px;padding:4px 0}
 footer{text-align:center;color:var(--muted);font-size:13px;padding:24px}
 footer a{color:var(--petrol);font-weight:600;text-decoration:none}
-@media(max-width:680px){.cards{grid-template-columns:1fr 1fr}.appt{flex-wrap:wrap}.appt .acts{flex-direction:row;width:100%;justify-content:space-between;margin-top:4px}}
+@media(max-width:680px){.cards{grid-template-columns:1fr 1fr}.appt{flex-wrap:wrap}.appt .acts{flex-direction:row;width:100%;justify-content:space-between;margin-top:4px}.pinfo,.two,.three{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header>
   <div class="wrap top">
     <div>
-      <div class="logo"><span class="mark"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#062a33" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Agenda<b>AI</b></div>
-      <div class="subtitle">Agenda de consultas + confirmação por WhatsApp · por MedTech</div>
+      <div class="logo"><span class="mark"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#062a33" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Consult<b>AI</b></div>
+      <div class="subtitle">Atendimento ambulatorial · pacientes, prontuário, receituários e agenda · por MedTech</div>
     </div>
     <div class="usr" id="usr"></div>
   </div>
@@ -99,12 +146,12 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 
 <main>
   <div class="tabs">
-    <button id="tab-dia" class="on" onclick="setTab('dia')">Dia</button>
-    <button id="tab-sem" onclick="setTab('sem')">Semana</button>
-    <button id="tab-busca" onclick="setTab('busca')">Buscar</button>
+    <button id="tab-agenda" class="on" onclick="setView('agenda')">📅 Agenda</button>
+    <button id="tab-pacientes" onclick="setView('pacientes')">👥 Pacientes</button>
+    <button id="tab-config" onclick="setView('config')">⚙️ Configurações</button>
   </div>
   <div id="view"></div>
-  <div class="note">📌 <b id="storenote">Carregando…</b> O botão <b>WhatsApp</b> abre o app com a mensagem pronta (confirmação, lembrete, remarcar ou resultado) — você revisa e envia. <span style="color:var(--muted)">(Em breve: confirmação automática e agenda online para o paciente marcar sozinho.)</span></div>
+  <div class="note" id="storenote">Carregando…</div>
 </main>
 
 <footer>© 2026 <a href="index.html">MedTech</a> · <a href="privacidade.html">Privacidade</a></footer>
@@ -116,54 +163,115 @@ const WDL=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira
 const TYPES={con:{l:'Consulta',c:'t-con'},ret:{l:'Retorno',c:'t-ret'},tel:{l:'Telemedicina',c:'t-tel'},pro:{l:'Procedimento',c:'t-pro'},exa:{l:'Exame',c:'t-exa'}};
 const STATUS={agendado:{l:'Agendado',c:'s-ag'},confirmado:{l:'Confirmado',c:'s-cf'},atendido:{l:'Atendido',c:'s-at'},faltou:{l:'Faltou',c:'s-fa'},cancelado:{l:'Cancelado',c:'s-ca'}};
 const SORDER=['agendado','confirmado','atendido','faltou','cancelado'];
-let state={appts:[],cfg:{medico:'',clinica:''}};
+const SEXO={M:'Masculino',F:'Feminino',O:'Outro'};
+const REC_FMT={
+ evolucao:{l:'Evolução',ai:'Organize o texto em uma evolução médica clara, concisa e profissional, mantendo apenas as informações fornecidas.'},
+ soap:{l:'SOAP',ai:'Organize em evolução médica no formato SOAP — S (Subjetivo), O (Objetivo: exame físico, sinais vitais, exames), A (Avaliação / impressão diagnóstica), P (Plano / conduta).'},
+ anamnese:{l:'Anamnese',ai:'Organize em anamnese estruturada: Identificação, Queixa principal, História da doença atual, Antecedentes pessoais e familiares, Hábitos, Medicações em uso, Exame físico, Hipóteses diagnósticas e Conduta.'},
+ alta:{l:'Alta',ai:'Organize em resumo de alta: Diagnósticos, Resumo do atendimento, Procedimentos, Medicações de alta, Orientações e Seguimento.'},
+ encaminhamento:{l:'Encaminhamento',ai:'Organize em carta de encaminhamento/parecer: especialidade de destino, resumo do caso, hipótese diagnóstica, exames relevantes e motivo do encaminhamento.'}
+};
+
+let state={patients:[],appts:[],records:[],prescriptions:[],docs:[],cfg:{medico:'',clinica:'',crm:'',esp:'',endereco:'',telefone:''},migratedEvoluai:false};
 let cur=new Date();cur.setHours(0,0,0,0);
-let tab='dia';let busca='';
+let view='agenda', aTab='dia', busca='', curPac=null, pTab='evol', pSearch='';
 
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
 function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function minutesOf(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
+function minutesOf(t){const[h,m]=(t||'0:0').split(':').map(Number);return h*60+m;}
 function fmtEnd(t,dur){const tot=minutesOf(t)+Number(dur||0);const h=Math.floor(tot/60)%24,m=tot%60;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');}
-function sampleSeed(){const f=ymd(cur);return {appts:[
-   {id:uid(),date:f,time:'08:30',dur:30,pac:'Maria Oliveira',fone:'',type:'con',status:'confirmado',obs:'Primeira consulta — dor torácica'},
-   {id:uid(),date:f,time:'09:15',dur:20,pac:'João Pereira',fone:'',type:'ret',status:'agendado',obs:'Retorno exames de tireoide'},
-   {id:uid(),date:f,time:'10:00',dur:30,pac:'Ana Costa',fone:'',type:'tel',status:'agendado',obs:''},
-   {id:uid(),date:f,time:'14:00',dur:45,pac:'Carlos Souza',fone:'',type:'pro',status:'atendido',obs:'Infiltração'}
-  ],cfg:{medico:'',clinica:''}};}
+function nowISO(){return new Date().toISOString();}
+function fmtDate(iso){const d=new Date(iso);return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();}
+function fmtDT(iso){const d=new Date(iso);return fmtDate(iso)+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+function age(nasc){if(!nasc)return '';const b=new Date(nasc+'T00:00:00');if(isNaN(b))return '';const n=new Date();let a=n.getFullYear()-b.getFullYear();const m=n.getMonth()-b.getMonth();if(m<0||(m===0&&n.getDate()<b.getDate()))a--;return a;}
+function initials(nm){return (nm||'?').trim().split(/\s+/).slice(0,2).map(s=>s[0]||'').join('').toUpperCase()||'?';}
+function patientById(id){return state.patients.find(p=>p.id===id)||null;}
+function pacNome(a){if(a.pacId){const p=patientById(a.pacId);if(p)return p.nome;}return a.pac||'Paciente';}
+function pacFone(a){if(a.pacId){const p=patientById(a.pacId);if(p&&p.fone)return p.fone;}return a.fone||'';}
 
-/* boot */
+/* ===== boot ===== */
+function sampleSeed(){const f=ymd(cur);const p1=uid(),p2=uid();
+ return {patients:[
+   {id:p1,nome:'Maria Oliveira',nasc:'1979-04-12',sexo:'F',cpf:'',fone:'',email:'',convenio:'Unimed',endereco:'',alergias:'Dipirona',problemas:'Hipertensão arterial',meds:'Losartana 50mg 1x/dia',obs:'',criadoEm:nowISO()},
+   {id:p2,nome:'João Pereira',nasc:'1965-09-30',sexo:'M',cpf:'',fone:'',email:'',convenio:'Particular',endereco:'',alergias:'',problemas:'Hipotireoidismo',meds:'Levotiroxina 75mcg',obs:'',criadoEm:nowISO()}
+ ],appts:[
+   {id:uid(),pacId:p1,date:f,time:'08:30',dur:30,type:'con',status:'confirmado',obs:'Primeira consulta — dor torácica'},
+   {id:uid(),pacId:p2,date:f,time:'09:15',dur:20,type:'ret',status:'agendado',obs:'Retorno exames de tireoide'},
+   {id:uid(),pacId:null,pac:'Ana Costa',fone:'',date:f,time:'10:00',dur:30,type:'tel',status:'agendado',obs:''}
+ ],records:[
+   {id:uid(),pacId:p1,date:nowISO(),tipo:'soap',titulo:'Consulta de rotina',texto:'S: Refere cefaleia ocasional, sem outras queixas.\nO: PA 130x85, FC 76, ACV/AR sem alterações.\nA: HAS controlada.\nP: Mantém losartana; retorno em 3 meses.'}
+ ],prescriptions:[],docs:[],cfg:{medico:'',clinica:'',crm:'',esp:'',endereco:'',telefone:''},migratedEvoluai:true};
+}
+function normalize(d){d=d&&typeof d==='object'?d:{};
+ return {patients:d.patients||[],appts:d.appts||[],records:d.records||[],prescriptions:d.prescriptions||[],docs:d.docs||[],
+   cfg:Object.assign({medico:'',clinica:'',crm:'',esp:'',endereco:'',telefone:''},d.cfg||{}),migratedEvoluai:!!d.migratedEvoluai};}
+
 function whenMT(cb){if(window.MT){cb();}else{setTimeout(()=>whenMT(cb),30);}}
 whenMT(()=>{MT.onData(d=>{
-  if(d&&typeof d==='object'&&d.appts){state={appts:d.appts||[],cfg:d.cfg||{medico:'',clinica:''}};}
-  else{state=(MT.mode==='demo')?sampleSeed():{appts:[],cfg:{medico:'',clinica:''}};if(MT.mode==='demo')MT.save(state);}
+  if(d&&typeof d==='object'&&(d.patients||d.appts||d.records||d.cfg)){state=normalize(d);}
+  else{state=(MT.mode==='demo')?sampleSeed():normalize(null);if(MT.mode==='demo')MT.save(state);}
   renderUser();render();
+  migrateEvoluai();
 });renderUser();});
 function persist(){MT.save(state);}
+
+/* migra histórico do EvoluAI (app aposentado) uma única vez */
+async function migrateEvoluai(){
+  if(state.migratedEvoluai)return;
+  try{
+    let docs=null;
+    if(MT.mode==='demo'){try{docs=(JSON.parse(localStorage.getItem('mt_evoluai'))||{}).docs;}catch(e){}}
+    else if(MT._fb&&MT._fb.F&&MT.user){const {db,F}=MT._fb;const snap=await F.getDoc(F.doc(db,'users',MT.user.uid,'apps','evoluai'));
+      if(snap.exists()){const raw=snap.data();const dd=raw&&raw.json?JSON.parse(raw.json):null;docs=dd&&dd.docs;}}
+    if(docs&&docs.length){state.docs=(state.docs||[]).concat(docs);}
+    state.migratedEvoluai=true;persist();render();
+  }catch(e){state.migratedEvoluai=true;}
+}
+
 function renderUser(){const el=document.getElementById('usr');if(!el)return;
-  document.getElementById('storenote').textContent=(MT.mode==='demo')?'Modo demonstração — dados salvos neste navegador.':'Conectado — sua agenda sincroniza na nuvem.';
+  const sn=document.getElementById('storenote');
+  if(sn)sn.innerHTML=(MT.mode==='demo')?'🔧 <b>Modo demonstração</b> — dados salvos só neste navegador. Entre na conta MedTech para sincronizar e usar a IA.':'☁️ Conectado — seus pacientes, prontuários e agenda sincronizam na nuvem MedTech.';
   if(MT.mode==='demo'){el.innerHTML='<span class="who">Modo demo</span><a href="index.html">← MedTech</a>';return;}
   const u=MT.user;const nm=u?(u.displayName||u.email||'Conta'):'';
   el.innerHTML=`<span class="who">${esc(nm)}</span><button onclick="MT.signOut()">Sair</button>`;}
 
-function setTab(t){tab=t;['dia','sem','busca'].forEach(x=>document.getElementById('tab-'+x).className=(x===t?'on':''));render();}
-function render(){if(tab==='dia')renderDay();else if(tab==='sem')renderWeek();else renderSearch();}
+/* ===== navegação ===== */
+function setView(v){view=v;curPac=null;['agenda','pacientes','config'].forEach(x=>{const b=document.getElementById('tab-'+x);if(b)b.className=(x===v?'on':'');});render();}
+function render(){
+  ['agenda','pacientes','config'].forEach(x=>{const b=document.getElementById('tab-'+x);if(b)b.className=((view===x||(view==='paciente'&&x==='pacientes'))?'on':'');});
+  if(view==='agenda')renderAgenda();
+  else if(view==='pacientes')renderPacientes();
+  else if(view==='paciente')renderPaciente();
+  else if(view==='config')renderConfig();
+}
 const apptsSorted=list=>list.slice().sort((a,b)=>a.date.localeCompare(b.date)||minutesOf(a.time)-minutesOf(b.time));
 
-function apptCard(a){const ty=TYPES[a.type]||TYPES.con;const st=STATUS[a.status]||STATUS.agendado;
+/* ===== AGENDA ===== */
+function renderAgenda(){
+  let html=`<div class="subtabs">
+    <button class="${aTab==='dia'?'on':''}" onclick="setATab('dia')">Dia</button>
+    <button class="${aTab==='sem'?'on':''}" onclick="setATab('sem')">Semana</button>
+    <button class="${aTab==='busca'?'on':''}" onclick="setATab('busca')">Buscar</button>
+  </div><div id="aview"></div>`;
+  document.getElementById('view').innerHTML=html;
+  if(aTab==='dia')renderDay();else if(aTab==='sem')renderWeek();else renderSearch();
+}
+function setATab(t){aTab=t;renderAgenda();}
+
+function apptCard(a){const ty=TYPES[a.type]||TYPES.con;const st=STATUS[a.status]||STATUS.agendado;const nm=pacNome(a);const fone=pacFone(a);
   return `<div class="appt">
     <div class="time"><div class="t">${a.time}</div><div class="dur">${fmtEnd(a.time,a.dur)} · ${a.dur}min</div></div>
     <div class="mid">
-      <div class="pac"><span class="tag ${ty.c}">${ty.l}</span>${esc(a.pac)}</div>
-      <div class="det">${a.fone?('📱 '+esc(a.fone)+' · '):''}<button class="stat ${st.c}" onclick="cycleStatus('${a.id}')">${st.l}</button></div>
+      <div class="pac"><span class="tag ${ty.c}">${ty.l}</span>${a.pacId?`<a onclick="openPac('${a.pacId}')" style="cursor:pointer">${esc(nm)}</a>`:esc(nm)}</div>
+      <div class="det">${fone?('📱 '+esc(fone)+' · '):''}<button class="stat ${st.c}" onclick="cycleStatus('${a.id}')">${st.l}</button></div>
       ${a.obs?`<div class="obs">${esc(a.obs)}</div>`:''}
     </div>
     <div class="acts">
       <button class="btn btn-wa btn-sm" onclick="waMenu('${a.id}')">WhatsApp</button>
-      <div class="ic"><button onclick="openForm('${a.id}')">✏️</button><button onclick="del('${a.id}')">🗑️</button></div>
+      <div class="ic">${a.pacId?`<button title="Prontuário" onclick="openPac('${a.pacId}')">📋</button>`:''}<button onclick="openForm('${a.id}')">✏️</button><button onclick="del('${a.id}')">🗑️</button></div>
     </div>
   </div>`;}
 
-/* DIA */
 function renderDay(){
   const ds=apptsSorted(state.appts.filter(a=>a.date===ymd(cur)));
   const ativos=ds.filter(a=>a.status!=='cancelado');
@@ -172,7 +280,7 @@ function renderDay(){
   const tel=ds.filter(a=>a.type==='tel'&&a.status!=='cancelado').length;
   let html=`<div class="bar">
     <div class="nav"><button class="arr" onclick="moveDay(-1)">‹</button><h2>${cur.getDate()} de ${MES[cur.getMonth()]} · ${WDL[cur.getDay()]}</h2><button class="arr" onclick="moveDay(1)">›</button><button class="todaybtn" onclick="goToday()">Hoje</button></div>
-    <div class="right"><input class="datep" type="date" value="${ymd(cur)}" onchange="pickDate(this.value)"><button class="btn btn-p btn-sm" onclick="openForm()">+ Nova consulta</button></div>
+    <div class="right"><input class="datep" type="date" value="${ymd(cur)}" onchange="pickDate(this.value)"><button class="btn btn-p btn-sm" onclick="openForm()">+ Consulta</button></div>
   </div>
   <div class="cards">
     <div class="kpi"><div class="l">Consultas hoje</div><div class="v">${ativos.length}</div></div>
@@ -180,62 +288,60 @@ function renderDay(){
     <div class="kpi amber"><div class="l">A confirmar</div><div class="v">${aguard}</div></div>
     <div class="kpi blue"><div class="l">Telemedicina</div><div class="v">${tel}</div></div>
   </div>`;
-  html+=ds.length?ds.map(apptCard).join(''):'<div class="empty">Nenhuma consulta neste dia.<br>Toque em <b>+ Nova consulta</b> para começar.</div>';
-  document.getElementById('view').innerHTML=html;
+  html+=ds.length?ds.map(apptCard).join(''):'<div class="empty">Nenhuma consulta neste dia.<br>Toque em <b>+ Consulta</b> para começar.</div>';
+  document.getElementById('aview').innerHTML=html;
 }
-function moveDay(n){cur.setDate(cur.getDate()+n);render();}
-function goToday(){cur=new Date();cur.setHours(0,0,0,0);render();}
-function pickDate(v){if(v){cur=new Date(v+'T00:00:00');render();}}
+function moveDay(n){cur.setDate(cur.getDate()+n);renderAgenda();}
+function goToday(){cur=new Date();cur.setHours(0,0,0,0);renderAgenda();}
+function pickDate(v){if(v){cur=new Date(v+'T00:00:00');renderAgenda();}}
 
-/* SEMANA */
 function renderWeek(){
   const start=new Date(cur);start.setDate(start.getDate()-start.getDay());
   const end=new Date(start);end.setDate(end.getDate()+6);
   const days=[];for(let i=0;i<7;i++){const d=new Date(start);d.setDate(d.getDate()+i);days.push(d);}
   const total=state.appts.filter(a=>a.date>=ymd(start)&&a.date<=ymd(end)&&a.status!=='cancelado').length;
   let html=`<div class="bar">
-    <div class="nav"><button class="arr" onclick="moveWeek(-1)">‹</button><h2>${start.getDate()}/${start.getMonth()+1} – ${end.getDate()}/${end.getMonth()+1}</h2><button class="arr" onclick="moveWeek(1)">›</button><button class="todaybtn" onclick="goToday2()">Esta semana</button></div>
-    <div class="right"><span style="color:var(--muted);font-size:13px;font-weight:600">${total} consulta(s) na semana</span><button class="btn btn-p btn-sm" onclick="openForm()">+ Nova consulta</button></div>
+    <div class="nav"><button class="arr" onclick="moveWeek(-1)">‹</button><h2>${start.getDate()}/${start.getMonth()+1} – ${end.getDate()}/${end.getMonth()+1}</h2><button class="arr" onclick="moveWeek(1)">›</button><button class="todaybtn" onclick="goToday()">Esta semana</button></div>
+    <div class="right"><span style="color:var(--muted);font-size:13px;font-weight:600">${total} consulta(s) na semana</span><button class="btn btn-p btn-sm" onclick="openForm()">+ Consulta</button></div>
   </div>`;
   let any=false;
   days.forEach(d=>{const ds=apptsSorted(state.appts.filter(a=>a.date===ymd(d)));if(!ds.length)return;any=true;
     html+=`<div class="daygrp"><div class="dh">${WDL[d.getDay()]}, ${d.getDate()}/${d.getMonth()+1}</div>${ds.map(apptCard).join('')}</div>`;});
   if(!any)html+='<div class="empty">Nenhuma consulta nesta semana.</div>';
-  document.getElementById('view').innerHTML=html;
+  document.getElementById('aview').innerHTML=html;
 }
-function moveWeek(n){cur.setDate(cur.getDate()+7*n);render();}
-function goToday2(){cur=new Date();cur.setHours(0,0,0,0);render();}
+function moveWeek(n){cur.setDate(cur.getDate()+7*n);renderAgenda();}
 
-/* BUSCA */
 function renderSearch(){
-  let html=`<div class="bar"><div class="nav"><input class="search" id="sin" placeholder="Buscar por paciente ou observação..." value="${esc(busca)}" oninput="busca=this.value;renderSearchList()" style="min-width:280px"></div><div class="right"><button class="btn btn-p btn-sm" onclick="openForm()">+ Nova consulta</button></div></div><div id="slist"></div>`;
-  document.getElementById('view').innerHTML=html;
+  let html=`<div class="bar"><div class="nav"><input class="search" id="sin" placeholder="Buscar por paciente ou observação..." value="${esc(busca)}" oninput="busca=this.value;renderSearchList()" style="min-width:280px"></div><div class="right"><button class="btn btn-p btn-sm" onclick="openForm()">+ Consulta</button></div></div><div id="slist"></div>`;
+  document.getElementById('aview').innerHTML=html;
   const inp=document.getElementById('sin');if(inp){inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length);}
   renderSearchList();
 }
 function renderSearchList(){
   const q=busca.trim().toLowerCase();const box=document.getElementById('slist');if(!box)return;
   if(!q){box.innerHTML='<div class="empty">Digite o nome de um paciente para buscar em toda a agenda.</div>';return;}
-  const res=apptsSorted(state.appts.filter(a=>(a.pac||'').toLowerCase().includes(q)||(a.obs||'').toLowerCase().includes(q))).reverse();
+  const res=apptsSorted(state.appts.filter(a=>(pacNome(a)||'').toLowerCase().includes(q)||(a.obs||'').toLowerCase().includes(q))).reverse();
   if(!res.length){box.innerHTML='<div class="empty">Nenhuma consulta encontrada para "'+esc(busca)+'".</div>';return;}
   let html='';let lastDate='';
   res.forEach(a=>{if(a.date!==lastDate){lastDate=a.date;const d=new Date(a.date+'T00:00:00');html+=`<div class="dh" style="margin-top:14px">${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} · ${WDL[d.getDay()]}</div>`;}html+=apptCard(a);});
   box.innerHTML=html;
 }
-
 function cycleStatus(id){const a=state.appts.find(x=>x.id===id);const i=SORDER.indexOf(a.status);a.status=SORDER[(i+1)%SORDER.length];persist();render();}
 function del(id){if(confirm('Excluir esta consulta?')){state.appts=state.appts.filter(x=>x.id!==id);persist();render();}}
 
-function pacList(){const seen={};state.appts.forEach(a=>{if(a.pac&&!seen[a.pac])seen[a.pac]=a.fone||'';});return seen;}
-function openForm(id){
-  const a=id?state.appts.find(x=>x.id===id):{date:ymd(cur),time:'08:00',dur:30,pac:'',fone:'',type:'con',status:'agendado',obs:''};
+/* form de consulta (com vínculo a paciente) */
+function openForm(id,prefillPacId){
+  const a=id?state.appts.find(x=>x.id===id):{date:ymd(cur),time:'08:00',dur:30,pacId:prefillPacId||null,pac:'',fone:'',type:'con',status:'agendado',obs:''};
   const topt=Object.entries(TYPES).map(([k,v])=>`<option value="${k}" ${a.type===k?'selected':''}>${v.l}</option>`).join('');
   const sopt=SORDER.map(k=>`<option value="${k}" ${a.status===k?'selected':''}>${STATUS[k].l}</option>`).join('');
-  const dl=Object.keys(pacList()).map(p=>`<option value="${esc(p)}">`).join('');
+  const dl=state.patients.slice().sort((x,y)=>x.nome.localeCompare(y.nome)).map(p=>`<option value="${esc(p.nome)}">`).join('');
+  const nomeAtual=a.pacId?(patientById(a.pacId)||{}).nome||'':(a.pac||'');
+  const foneAtual=a.pacId?(patientById(a.pacId)||{}).fone||'':(a.fone||'');
   modal(`<h3>${id?'Editar':'Nova'} consulta</h3>
-   <div class="field"><label>Paciente</label><input id="f_pac" list="pacdl" value="${esc(a.pac)}" placeholder="Nome do paciente" oninput="fillPac()"><datalist id="pacdl">${dl}</datalist></div>
+   <div class="field"><label>Paciente</label><input id="f_pac" list="pacdl" value="${esc(nomeAtual)}" placeholder="Nome do paciente" oninput="fillPac()"><datalist id="pacdl">${dl}</datalist><div class="hint">Se já existir ficha com esse nome, a consulta fica vinculada ao prontuário.</div></div>
    <div class="two"><div class="field"><label>Data</label><input id="f_date" type="date" value="${a.date}"></div>
-   <div class="field"><label>Telefone (WhatsApp)</label><input id="f_fone" value="${esc(a.fone)}" placeholder="(11) 99999-9999"></div></div>
+   <div class="field"><label>Telefone (WhatsApp)</label><input id="f_fone" value="${esc(foneAtual)}" placeholder="(11) 99999-9999"></div></div>
    <div class="two"><div class="field"><label>Horário</label><input id="f_time" type="time" value="${a.time}"></div>
    <div class="field"><label>Duração (min)</label><input id="f_dur" type="number" min="5" step="5" value="${a.dur}"></div></div>
    <div class="two"><div class="field"><label>Tipo</label><select id="f_type">${topt}</select></div>
@@ -243,20 +349,296 @@ function openForm(id){
    <div class="field"><label>Observações</label><textarea id="f_obs" placeholder="Motivo, convênio, lembrete...">${esc(a.obs)}</textarea></div>
    <div class="row"><button class="btn btn-p" onclick="saveForm('${id||''}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
 }
-function fillPac(){const v=document.getElementById('f_pac').value;const m=pacList();if(m[v]&&!document.getElementById('f_fone').value)document.getElementById('f_fone').value=m[v];}
+function fillPac(){const v=document.getElementById('f_pac').value.trim().toLowerCase();const p=state.patients.find(x=>x.nome.trim().toLowerCase()===v);if(p&&p.fone&&!document.getElementById('f_fone').value)document.getElementById('f_fone').value=p.fone;}
 function saveForm(id){
-  const o={date:document.getElementById('f_date').value,time:document.getElementById('f_time').value||'08:00',dur:parseInt(document.getElementById('f_dur').value)||30,pac:document.getElementById('f_pac').value.trim()||'Paciente',fone:document.getElementById('f_fone').value.trim(),type:document.getElementById('f_type').value,status:document.getElementById('f_status').value,obs:document.getElementById('f_obs').value.trim()};
+  const nome=document.getElementById('f_pac').value.trim()||'Paciente';
+  const p=state.patients.find(x=>x.nome.trim().toLowerCase()===nome.toLowerCase());
+  const o={date:document.getElementById('f_date').value,time:document.getElementById('f_time').value||'08:00',dur:parseInt(document.getElementById('f_dur').value)||30,pacId:p?p.id:null,pac:p?'':nome,fone:document.getElementById('f_fone').value.trim(),type:document.getElementById('f_type').value,status:document.getElementById('f_status').value,obs:document.getElementById('f_obs').value.trim()};
   if(!o.date){alert('Informe a data.');return;}
   if(id){Object.assign(state.appts.find(x=>x.id===id),o);}else{state.appts.push({id:uid(),...o});}
-  persist();closeModal();if(tab==='dia')cur=new Date(o.date+'T00:00:00');render();
+  persist();closeModal();
+  if(view==='agenda'&&aTab==='dia')cur=new Date(o.date+'T00:00:00');
+  render();
 }
 
-/* WhatsApp */
+/* ===== PACIENTES ===== */
+function renderPacientes(){
+  const q=pSearch.trim().toLowerCase();
+  let list=state.patients.slice().sort((a,b)=>a.nome.localeCompare(b.nome));
+  if(q)list=list.filter(p=>p.nome.toLowerCase().includes(q)||(p.cpf||'').includes(q)||(p.convenio||'').toLowerCase().includes(q));
+  let html=`<div class="bar"><div class="nav"><input class="search" id="pq" placeholder="Buscar paciente (nome, CPF, convênio)..." value="${esc(pSearch)}" oninput="pSearch=this.value;renderPacListOnly()" style="min-width:280px"></div>
+    <div class="right"><span style="color:var(--muted);font-size:13px;font-weight:600">${state.patients.length} paciente(s)</span><button class="btn btn-p btn-sm" onclick="openPacForm()">+ Novo paciente</button></div></div>
+    <div id="paclist"></div>`;
+  document.getElementById('view').innerHTML=html;
+  const inp=document.getElementById('pq');if(inp&&q){inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length);}
+  renderPacListOnly();
+}
+function renderPacListOnly(){
+  const box=document.getElementById('paclist');if(!box)return;
+  const q=pSearch.trim().toLowerCase();
+  let list=state.patients.slice().sort((a,b)=>a.nome.localeCompare(b.nome));
+  if(q)list=list.filter(p=>p.nome.toLowerCase().includes(q)||(p.cpf||'').includes(q)||(p.convenio||'').toLowerCase().includes(q));
+  if(!list.length){box.innerHTML=state.patients.length?'<div class="empty">Nenhum paciente encontrado.</div>':'<div class="empty">Nenhum paciente cadastrado ainda.<br>Toque em <b>+ Novo paciente</b>.</div>';return;}
+  box.innerHTML='<div class="plist">'+list.map(p=>{
+    const nev=state.records.filter(r=>r.pacId===p.id).length;
+    const ulta=apptsSorted(state.appts.filter(a=>a.pacId===p.id)).slice(-1)[0];
+    const idade=age(p.nasc);
+    return `<div class="pcard" onclick="openPac('${p.id}')">
+      <div class="av">${esc(initials(p.nome))}</div>
+      <div class="pmid"><div class="pname">${esc(p.nome)}</div>
+        <div class="pmeta">${idade!==''?`<span>${idade} anos</span>`:''}${p.sexo?`<span>· ${SEXO[p.sexo]||''}</span>`:''}${p.convenio?`<span class="chip">${esc(p.convenio)}</span>`:''}${nev?`<span class="chip">${nev} evolução(ões)</span>`:''}${p.alergias?`<span class="chip warn">⚠ alergia</span>`:''}</div></div>
+      <div class="pgo">›</div></div>`;
+  }).join('')+'</div>';
+}
+function openPacForm(id){
+  const p=id?patientById(id):{nome:'',nasc:'',sexo:'',cpf:'',fone:'',email:'',convenio:'',endereco:'',alergias:'',problemas:'',meds:'',obs:''};
+  const sx=['','M','F','O'].map(k=>`<option value="${k}" ${p.sexo===k?'selected':''}>${k?SEXO[k]:'—'}</option>`).join('');
+  modal(`<h3>${id?'Editar':'Novo'} paciente</h3>
+   <div class="field"><label>Nome completo *</label><input id="p_nome" value="${esc(p.nome)}" placeholder="Nome do paciente"></div>
+   <div class="three"><div class="field"><label>Nascimento</label><input id="p_nasc" type="date" value="${esc(p.nasc)}"></div>
+    <div class="field"><label>Sexo</label><select id="p_sexo">${sx}</select></div>
+    <div class="field"><label>Convênio</label><input id="p_conv" value="${esc(p.convenio)}" placeholder="Ex.: Unimed / Particular"></div></div>
+   <div class="three"><div class="field"><label>CPF</label><input id="p_cpf" value="${esc(p.cpf)}" placeholder="000.000.000-00"></div>
+    <div class="field"><label>Telefone (WhatsApp)</label><input id="p_fone" value="${esc(p.fone)}" placeholder="(11) 99999-9999"></div>
+    <div class="field"><label>E-mail</label><input id="p_email" value="${esc(p.email)}" placeholder="email@exemplo.com"></div></div>
+   <div class="field"><label>Endereço</label><input id="p_end" value="${esc(p.endereco)}" placeholder="Rua, nº, bairro, cidade"></div>
+   <div class="field"><label>⚠ Alergias</label><input id="p_alg" value="${esc(p.alergias)}" placeholder="Ex.: Dipirona, penicilina"></div>
+   <div class="two"><div class="field"><label>Problemas / comorbidades</label><textarea id="p_prob" placeholder="Lista de problemas ativos">${esc(p.problemas)}</textarea></div>
+    <div class="field"><label>Medicações em uso</label><textarea id="p_meds" placeholder="Uma por linha">${esc(p.meds)}</textarea></div></div>
+   <div class="field"><label>Observações</label><textarea id="p_obs" placeholder="Anotações gerais">${esc(p.obs)}</textarea></div>
+   <div class="row"><button class="btn btn-p" onclick="savePac('${id||''}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
+}
+function savePac(id){
+  const nome=document.getElementById('p_nome').value.trim();
+  if(!nome){alert('Informe o nome do paciente.');return;}
+  const o={nome,nasc:document.getElementById('p_nasc').value,sexo:document.getElementById('p_sexo').value,cpf:document.getElementById('p_cpf').value.trim(),fone:document.getElementById('p_fone').value.trim(),email:document.getElementById('p_email').value.trim(),convenio:document.getElementById('p_conv').value.trim(),endereco:document.getElementById('p_end').value.trim(),alergias:document.getElementById('p_alg').value.trim(),problemas:document.getElementById('p_prob').value.trim(),meds:document.getElementById('p_meds').value.trim(),obs:document.getElementById('p_obs').value.trim()};
+  if(id){Object.assign(patientById(id),o);}else{const np={id:uid(),criadoEm:nowISO(),...o};state.patients.push(np);id=np.id;}
+  persist();closeModal();
+  if(view==='paciente'){renderPaciente();}else{openPac(id);}
+}
+function delPac(id){const p=patientById(id);if(!p)return;
+  const nev=state.records.filter(r=>r.pacId===id).length,nrx=state.prescriptions.filter(r=>r.pacId===id).length;
+  if(!confirm(`Excluir ${p.nome} e seus ${nev} prontuário(s) e ${nrx} receituário(s)? As consultas ficam na agenda sem vínculo.`))return;
+  state.patients=state.patients.filter(x=>x.id!==id);
+  state.records=state.records.filter(r=>r.pacId!==id);
+  state.prescriptions=state.prescriptions.filter(r=>r.pacId!==id);
+  state.appts.forEach(a=>{if(a.pacId===id){a.pac=p.nome;a.fone=a.fone||p.fone||'';a.pacId=null;}});
+  persist();setView('pacientes');
+}
+function openPac(id){curPac=id;view='paciente';pTab='evol';render();}
+
+/* ===== PRONTUÁRIO (detalhe do paciente) ===== */
+function renderPaciente(){
+  const p=patientById(curPac);
+  if(!p){setView('pacientes');return;}
+  const idade=age(p.nasc);
+  const head=`<button class="back" onclick="setView('pacientes')">‹ Voltar aos pacientes</button>
+  <div class="phead"><div class="ptop">
+    <div class="av">${esc(initials(p.nome))}</div>
+    <div class="pn"><h2>${esc(p.nome)}</h2>
+      <div class="sub">${idade!==''?idade+' anos · ':''}${p.sexo?(SEXO[p.sexo]+' · '):''}${p.nasc?('Nasc. '+fmtDate(p.nasc+'T00:00:00')):''}</div>
+      <div class="sub">${p.fone?('📱 '+esc(p.fone)+'  '):''}${p.convenio?('🏥 '+esc(p.convenio)):''}${p.cpf?('  · CPF '+esc(p.cpf)):''}</div>
+    </div>
+    <div class="pacts">
+      <button class="btn btn-g btn-sm" onclick="openPacForm('${p.id}')">✏️ Editar ficha</button>
+      <button class="btn btn-g btn-sm" onclick="openForm(null,'${p.id}')">📅 Agendar</button>
+      <button class="btn btn-dn btn-sm" onclick="delPac('${p.id}')">🗑️ Excluir</button>
+    </div></div>
+    <div class="pinfo">
+      ${p.alergias?`<div class="ib alerta"><div class="il">⚠ Alergias</div>${esc(p.alergias)}</div>`:`<div class="ib"><div class="il">Alergias</div>Nenhuma registrada</div>`}
+      <div class="ib"><div class="il">Problemas / comorbidades</div>${p.problemas?esc(p.problemas):'—'}</div>
+      <div class="ib"><div class="il">Medicações em uso</div>${p.meds?esc(p.meds):'—'}</div>
+      <div class="ib"><div class="il">Observações</div>${p.obs?esc(p.obs):'—'}</div>
+    </div>
+  </div>
+  <div class="subtabs">
+    <button class="${pTab==='evol'?'on':''}" onclick="setPTab('evol')">📋 Evoluções</button>
+    <button class="${pTab==='rx'?'on':''}" onclick="setPTab('rx')">💊 Receituários</button>
+    <button class="${pTab==='cons'?'on':''}" onclick="setPTab('cons')">📅 Consultas</button>
+  </div><div id="pbody"></div>`;
+  document.getElementById('view').innerHTML=head;
+  renderPBody();
+}
+function setPTab(t){pTab=t;renderPBody();}
+function renderPBody(){
+  const box=document.getElementById('pbody');if(!box)return;
+  const p=patientById(curPac);
+  if(pTab==='evol'){
+    const recs=state.records.filter(r=>r.pacId===curPac).sort((a,b)=>b.date.localeCompare(a.date));
+    let h=`<div class="bar"><div></div><div class="right"><button class="btn btn-p btn-sm" onclick="openEvol()">+ Nova evolução</button></div></div>`;
+    h+=recs.length?recs.map(r=>{const f=REC_FMT[r.tipo]||REC_FMT.evolucao;
+      return `<div class="rec"><div class="rh"><div class="rt"><span class="chip">${f.l}</span> ${esc(r.titulo||'Evolução')}</div><div class="rd">${fmtDT(r.date)}</div></div>
+        <div class="rbody">${esc(r.texto)}</div>
+        <div class="racts"><button onclick="openEvol('${r.id}')">✏️ Editar</button><button onclick="printEvol('${r.id}')">🖨️ Imprimir</button><button onclick="copyRec('${r.id}')">📋 Copiar</button><button onclick="delRec('${r.id}')">🗑️ Excluir</button></div></div>`;
+    }).join(''):'<div class="empty">Nenhuma evolução registrada.<br>Toque em <b>+ Nova evolução</b> (pode ditar por voz e a IA estrutura em SOAP).</div>';
+    box.innerHTML=h;
+  } else if(pTab==='rx'){
+    const rxs=state.prescriptions.filter(r=>r.pacId===curPac).sort((a,b)=>b.date.localeCompare(a.date));
+    let h=`<div class="bar"><div></div><div class="right"><button class="btn btn-p btn-sm" onclick="openRx()">+ Novo receituário</button></div></div>`;
+    h+=rxs.length?rxs.map(r=>`<div class="rec"><div class="rh"><div class="rt"><span class="chip">${r.tipo==='especial'?'Controle especial':'Receituário'}</span></div><div class="rd">${fmtDT(r.date)}</div></div>
+        <div class="rbody">${esc(r.texto)}</div>${r.obs?`<div class="rbody" style="color:var(--muted);font-size:13px">Obs.: ${esc(r.obs)}</div>`:''}
+        <div class="racts"><button onclick="printRx('${r.id}')">🖨️ Imprimir</button><button onclick="openRx('${r.id}')">✏️ Editar</button><button onclick="delRx('${r.id}')">🗑️ Excluir</button></div></div>`).join('')
+      :'<div class="empty">Nenhum receituário emitido.<br>Toque em <b>+ Novo receituário</b> (digite as medicações e a IA organiza; depois imprima).</div>';
+    box.innerHTML=h;
+  } else {
+    const cs=apptsSorted(state.appts.filter(a=>a.pacId===curPac)).reverse();
+    let h=`<div class="bar"><div></div><div class="right"><button class="btn btn-p btn-sm" onclick="openForm(null,'${curPac}')">+ Agendar consulta</button></div></div>`;
+    h+=cs.length?cs.map(apptCard).join(''):'<div class="empty">Nenhuma consulta para este paciente.</div>';
+    box.innerHTML=h;
+  }
+}
+function copyRec(id){const r=state.records.find(x=>x.id===id);if(r&&navigator.clipboard)navigator.clipboard.writeText(r.texto);}
+function delRec(id){if(confirm('Excluir esta evolução do prontuário?')){state.records=state.records.filter(x=>x.id!==id);persist();renderPBody();}}
+function delRx(id){if(confirm('Excluir este receituário?')){state.prescriptions=state.prescriptions.filter(x=>x.id!==id);persist();renderPBody();}}
+
+/* ===== EVOLUÇÃO (editor + IA + voz) ===== */
+function openEvol(id){
+  const r=id?state.records.find(x=>x.id===id):{tipo:'soap',texto:'',titulo:''};
+  const fopt=Object.keys(REC_FMT).map(k=>`<option value="${k}" ${r.tipo===k?'selected':''}>${REC_FMT[k].l}</option>`).join('');
+  modal(`<div class="box wide"><h3>${id?'Editar':'Nova'} evolução</h3>
+   <div class="two"><div class="field"><label>Formato</label><select id="e_fmt">${fopt}</select></div>
+    <div class="field"><label>Título (opcional)</label><input id="e_titulo" value="${esc(r.titulo||'')}" placeholder="Ex.: Consulta de retorno"></div></div>
+   <div class="field"><label>Rascunho / ditado</label>
+     <div class="toolbar"><button class="btn btn-mic btn-sm" id="micBtn" onclick="toggleMic('e_raw')">🎤 Ditar</button><span id="liveTag"></span>
+       <button class="btn btn-g btn-sm" onclick="document.getElementById('e_raw').value='';">Limpar</button>
+       <button class="btn btn-p btn-sm" id="aiBtn" onclick="genEvol()">✨ Estruturar com IA</button></div>
+     <textarea id="e_raw" placeholder="Dite ou digite o caso aqui...">${esc(id?'':'')}</textarea>
+   </div>
+   <div class="field"><label>Texto da evolução (revise antes de salvar)</label><textarea id="e_out" style="min-height:160px" placeholder="O texto estruturado aparece aqui. Você pode editar livremente.">${esc(r.texto||'')}</textarea></div>
+   <div class="hint">⚠️ A IA é apoio e não inventa dados. Revise sempre antes de salvar/assinar.${MT.mode==='demo'?' <b>Entre na conta MedTech para usar a IA.</b>':''}</div>
+   <div class="row"><button class="btn btn-p" onclick="saveEvol('${id||''}')">💾 Salvar no prontuário</button><button class="btn btn-g" onclick="closeModalMic()">Cancelar</button></div></div>`);
+}
+async function genEvol(){
+  const raw=document.getElementById('e_raw').value.trim();
+  if(!raw){alert('Dite ou digite o caso antes de gerar.');return;}
+  const fmt=document.getElementById('e_fmt').value;
+  const b=document.getElementById('aiBtn');b.innerHTML='<span class="spin"></span> Gerando...';b.disabled=true;
+  const prompt='Você é um escriba clínico experiente. A partir do rascunho/ditado abaixo, produza o documento em português do Brasil, conciso e profissional. REGRAS: não invente dados, exames, doses ou condutas não mencionados; se algo essencial faltar, escreva "[não informado]". '+(REC_FMT[fmt]||REC_FMT.evolucao).ai+'\n\nRascunho:\n'+raw;
+  try{const text=await MT.ai(prompt);document.getElementById('e_out').value=(text||'').trim();}
+  catch(e){alert('⚠️ '+e.message);}
+  b.innerHTML='✨ Estruturar com IA';b.disabled=false;
+}
+function saveEvol(id){
+  const texto=document.getElementById('e_out').value.trim();
+  if(!texto){alert('Escreva ou gere o texto da evolução antes de salvar.');return;}
+  const tipo=document.getElementById('e_fmt').value;
+  let titulo=document.getElementById('e_titulo').value.trim();
+  if(!titulo){titulo=(texto.split('\n').map(s=>s.trim()).find(s=>s)||'Evolução').replace(/^[#*•\-\s]+/,'').slice(0,60);}
+  if(id){Object.assign(state.records.find(x=>x.id===id),{tipo,titulo,texto});}
+  else{state.records.push({id:uid(),pacId:curPac,date:nowISO(),tipo,titulo,texto});}
+  persist();closeModalMic();renderPBody();
+}
+
+/* ===== RECEITUÁRIO (editor + IA + impressão) ===== */
+function openRx(id){
+  const r=id?state.prescriptions.find(x=>x.id===id):{tipo:'simples',texto:'',obs:''};
+  modal(`<div class="box wide"><h3>${id?'Editar':'Novo'} receituário</h3>
+   <div class="field"><label>Tipo</label><select id="r_tipo"><option value="simples" ${r.tipo==='simples'?'selected':''}>Receituário simples</option><option value="especial" ${r.tipo==='especial'?'selected':''}>Receituário de controle especial</option></select></div>
+   <div class="field"><label>Medicações (uma por linha)</label>
+     <div class="toolbar"><button class="btn btn-mic btn-sm" id="micBtn" onclick="toggleMic('r_out')">🎤 Ditar</button><span id="liveTag"></span>
+       <button class="btn btn-p btn-sm" id="rxAiBtn" onclick="genRx()">✨ Organizar com IA</button></div>
+     <textarea id="r_out" style="min-height:170px" placeholder="Ex.: dipirona 1g, 1 comprimido de 6/6h por 3 dias se dor&#10;Ou digite livremente e use 'Organizar com IA'.">${esc(r.texto||'')}</textarea>
+   </div>
+   <div class="field"><label>Orientações / observações (opcional)</label><textarea id="r_obs" placeholder="Ex.: retorno em 7 dias, repouso...">${esc(r.obs||'')}</textarea></div>
+   <div class="hint">A IA apenas organiza o que você escreveu — não acrescenta fármacos.${MT.mode==='demo'?' <b>Entre na conta MedTech para usar a IA.</b>':''}</div>
+   <div class="row"><button class="btn btn-p" onclick="saveRx('${id||''}',false)">💾 Salvar</button><button class="btn btn-g" onclick="saveRx('${id||''}',true)">💾 Salvar e imprimir</button><button class="btn btn-g" onclick="closeModalMic()">Cancelar</button></div></div>`);
+}
+async function genRx(){
+  const raw=document.getElementById('r_out').value.trim();
+  if(!raw){alert('Digite as medicações antes de organizar.');return;}
+  const b=document.getElementById('rxAiBtn');b.innerHTML='<span class="spin"></span> Organizando...';b.disabled=true;
+  const prompt='Organize as medicações citadas em um receituário claro, em português do Brasil, uma medicação por linha no formato "Medicamento concentração — posologia (via, frequência, duração)". Liste apenas o que foi mencionado; não acrescente fármacos nem doses. Não inclua cabeçalho, nome do paciente nem assinatura.\n\nMedicações:\n'+raw;
+  try{const text=await MT.ai(prompt);document.getElementById('r_out').value=(text||'').trim();}
+  catch(e){alert('⚠️ '+e.message);}
+  b.innerHTML='✨ Organizar com IA';b.disabled=false;
+}
+function saveRx(id,andPrint){
+  const texto=document.getElementById('r_out').value.trim();
+  if(!texto){alert('Escreva as medicações antes de salvar.');return;}
+  const tipo=document.getElementById('r_tipo').value;const obs=document.getElementById('r_obs').value.trim();
+  let rid=id;
+  if(id){Object.assign(state.prescriptions.find(x=>x.id===id),{tipo,texto,obs});}
+  else{rid=uid();state.prescriptions.push({id:rid,pacId:curPac,date:nowISO(),tipo,texto,obs});}
+  persist();closeModalMic();renderPBody();
+  if(andPrint)printRx(rid);
+}
+
+/* ===== impressão (A4) ===== */
+function printHTML(title,bodyHTML){
+  const w=window.open('','_blank');
+  if(!w){alert('Permita pop-ups para imprimir/salvar em PDF.');return;}
+  w.document.write('<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>'+esc(title)+'</title><style>@page{size:A4;margin:18mm}body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#111;font-size:14px;line-height:1.55}.hd{border-bottom:2px solid #0E5A6D;padding-bottom:10px;margin-bottom:6px}.hd .cli{font-size:18px;font-weight:800;color:#0E5A6D}.hd .med{font-size:12.5px;color:#333;margin-top:2px}.ttl{font-size:15px;font-weight:800;text-align:center;margin:18px 0 12px;text-transform:uppercase;letter-spacing:.06em}.pac{margin:8px 0 14px;font-size:14px;border-bottom:1px dashed #ccc;padding-bottom:8px}.body{white-space:pre-wrap;min-height:120px}.sig{margin-top:64px;text-align:center}.sig .line{width:300px;border-top:1px solid #333;margin:0 auto 5px}.ft{margin-top:26px;font-size:11px;color:#888;text-align:center;border-top:1px solid #eee;padding-top:8px}</style></head><body>'+bodyHTML+'<scr'+'ipt>window.onload=function(){setTimeout(function(){window.print();},250);}<\/scr'+'ipt></body></html>');
+  w.document.close();
+}
+function cabecalho(){const c=state.cfg;
+  const linha2=[c.medico?('Dr(a). '+c.medico):'',c.esp||'',c.crm?('CRM '+c.crm):''].filter(Boolean).join(' · ');
+  const linha3=[c.endereco||'',c.telefone||''].filter(Boolean).join(' · ');
+  return '<div class="hd"><div class="cli">'+esc(c.clinica||c.medico||'ConsultAI')+'</div>'+(linha2?'<div class="med">'+esc(linha2)+'</div>':'')+(linha3?'<div class="med">'+esc(linha3)+'</div>':'')+'</div>';
+}
+function assinatura(){const c=state.cfg;const nome=c.medico?('Dr(a). '+c.medico):'Assinatura';return '<div class="sig"><div class="line"></div>'+esc(nome)+(c.crm?(' — CRM '+esc(c.crm)):'')+'</div>';}
+function pacLinha(p){return '<div class="pac"><b>Paciente:</b> '+esc(p?p.nome:'')+(p&&age(p.nasc)!==''?(' · '+age(p.nasc)+' anos'):'')+(p&&p.convenio?(' · '+esc(p.convenio)):'')+'</div>';}
+function printRx(id){const r=state.prescriptions.find(x=>x.id===id);if(!r)return;const p=patientById(r.pacId);
+  const ttl=r.tipo==='especial'?'Receituário de Controle Especial':'Receituário';
+  const body=cabecalho()+'<div class="ttl">'+ttl+'</div>'+pacLinha(p)+'<div class="body">'+esc(r.texto)+(r.obs?('\n\nOrientações: '+esc(r.obs)):'')+'</div>'+assinatura()+'<div class="ft">Emitido em '+fmtDate(r.date)+' · ConsultAI / MedTech</div>';
+  printHTML(ttl+' — '+(p?p.nome:''),body);
+}
+function printEvol(id){const r=state.records.find(x=>x.id===id);if(!r)return;const p=patientById(r.pacId);const f=REC_FMT[r.tipo]||REC_FMT.evolucao;
+  const body=cabecalho()+'<div class="ttl">'+esc(f.l==='SOAP'?'Evolução clínica (SOAP)':f.l)+'</div>'+pacLinha(p)+'<div class="body">'+esc(r.texto)+'</div>'+assinatura()+'<div class="ft">Emitido em '+fmtDT(r.date)+' · ConsultAI / MedTech</div>';
+  printHTML((f.l)+' — '+(p?p.nome:''),body);
+}
+
+/* ===== voz (ditado) ===== */
+let rec=null,listening=false,micTarget=null;
+function toggleMic(targetId){
+  micTarget=targetId;
+  if(listening){stopMic();return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert('Seu navegador não suporta ditado por voz. Use o Google Chrome ou digite o texto.');return;}
+  rec=new SR();rec.lang='pt-BR';rec.continuous=true;rec.interimResults=true;
+  rec.onresult=e=>{let fin='';for(let i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)fin+=e.results[i][0].transcript;}
+    if(fin){const ta=document.getElementById(micTarget);if(ta){ta.value=(ta.value?ta.value.replace(/\s*$/,'')+' ':'')+fin.trim();}}};
+  rec.onerror=ev=>{if(ev.error==='not-allowed')alert('Permita o acesso ao microfone para ditar.');};
+  rec.onend=()=>{if(listening){try{rec.start();}catch(e){}}};
+  try{rec.start();listening=true;updateMic();}catch(e){alert('Não foi possível iniciar o microfone.');}
+}
+function stopMic(){listening=false;if(rec){try{rec.stop();}catch(e){}}updateMic();}
+function updateMic(){const b=document.getElementById('micBtn');const t=document.getElementById('liveTag');if(!b)return;
+  if(listening){b.classList.add('on');b.textContent='⏹️ Parar';if(t)t.innerHTML='<span class="live"><span class="dot"></span>ouvindo…</span>';}
+  else{b.classList.remove('on');b.textContent='🎤 Ditar';if(t)t.innerHTML='';}}
+
+/* ===== CONFIG ===== */
+function renderConfig(){const c=state.cfg;
+  let docsHtml='';
+  if(state.docs&&state.docs.length){
+    docsHtml=`<div class="phead" style="margin-top:14px"><h2 style="font-size:16px;margin-bottom:4px">Documentos importados do EvoluAI (${state.docs.length})</h2>
+    <div class="sub" style="color:var(--muted);font-size:13px;margin-bottom:10px">Histórico migrado do app anterior. Abra para copiar e, se quiser, cole no prontuário do paciente.</div>`+
+    state.docs.map((d,i)=>`<div class="rec"><div class="rh"><div class="rt">${esc(d.title||'Documento')}</div><div class="rd">${d.date?fmtDT(d.date):''}</div></div><div class="rbody">${esc(d.out||'')}</div><div class="racts"><button onclick="copyDoc(${i})">📋 Copiar</button><button onclick="delDoc(${i})">🗑️ Excluir</button></div></div>`).join('')+`</div>`;
+  }
+  document.getElementById('view').innerHTML=`
+   <div class="phead"><h2 style="font-size:17px;margin-bottom:4px">Dados do profissional / clínica</h2>
+   <div class="sub" style="color:var(--muted);font-size:13px;margin-bottom:14px">Usados no cabeçalho dos receituários/documentos impressos e na assinatura das mensagens de WhatsApp.</div>
+   <div class="two"><div class="field"><label>Seu nome</label><input id="c_med" value="${esc(c.medico)}" placeholder="Ex.: Marina Lima"></div>
+    <div class="field"><label>CRM</label><input id="c_crm" value="${esc(c.crm)}" placeholder="Ex.: 123456/SP"></div></div>
+   <div class="two"><div class="field"><label>Especialidade</label><input id="c_esp" value="${esc(c.esp)}" placeholder="Ex.: Clínica Médica"></div>
+    <div class="field"><label>Clínica / consultório</label><input id="c_cli" value="${esc(c.clinica)}" placeholder="Ex.: Clínica Vida"></div></div>
+   <div class="two"><div class="field"><label>Endereço</label><input id="c_end" value="${esc(c.endereco)}" placeholder="Rua, nº — cidade"></div>
+    <div class="field"><label>Telefone</label><input id="c_tel" value="${esc(c.telefone)}" placeholder="(11) 3333-3333"></div></div>
+   <div class="row"><button class="btn btn-p" onclick="saveCfg()">Salvar dados</button></div></div>
+   ${docsHtml}`;
+}
+function saveCfg(){
+  state.cfg={medico:document.getElementById('c_med').value.trim(),crm:document.getElementById('c_crm').value.trim(),esp:document.getElementById('c_esp').value.trim(),clinica:document.getElementById('c_cli').value.trim(),endereco:document.getElementById('c_end').value.trim(),telefone:document.getElementById('c_tel').value.trim()};
+  persist();const b=event.target;const o=b.textContent;b.textContent='✓ Salvo';setTimeout(()=>b.textContent=o,1500);
+}
+function copyDoc(i){const d=state.docs[i];if(d&&navigator.clipboard)navigator.clipboard.writeText(d.out||'');}
+function delDoc(i){if(confirm('Excluir este documento importado?')){state.docs.splice(i,1);persist();renderConfig();}}
+
+/* ===== WhatsApp ===== */
 function onlyDigits(s){return String(s||'').replace(/\D/g,'');}
 function waNumber(fone){let d=onlyDigits(fone);if(!d)return '';if(d.length<=11&&!d.startsWith('55'))d='55'+d;return d;}
 function dataLonga(iso){const d=new Date(iso+'T00:00:00');return d.getDate()+' de '+MES[d.getMonth()]+' ('+WDL[d.getDay()]+')';}
 function waText(a,kind){
-  const nome=(a.pac||'').split(' ')[0];
+  const nome=(pacNome(a)||'').split(' ')[0];
   const onde=state.cfg.clinica?(' na '+state.cfg.clinica):'';
   const quem=state.cfg.medico?('Dr(a). '+state.cfg.medico):'';
   const ass=state.cfg.medico?('\n\n— '+(state.cfg.clinica||quem)):'';
@@ -269,10 +651,10 @@ function waText(a,kind){
 }
 function waMenu(id){
   const a=state.appts.find(x=>x.id===id);
-  modal(`<h3>WhatsApp · ${esc(a.pac)}</h3>
+  modal(`<h3>WhatsApp · ${esc(pacNome(a))}</h3>
     ${!state.cfg.medico?`<div class="field"><label>Seu nome (assinatura)</label><input id="wa_med" value="${esc(state.cfg.medico)}" placeholder="Ex.: Marina Lima"></div>
     <div class="field"><label>Clínica / consultório (opcional)</label><input id="wa_cli" value="${esc(state.cfg.clinica)}" placeholder="Ex.: Clínica Vida"></div>`:''}
-    <div class="field"><label>Telefone do paciente</label><input id="wa_fone" value="${esc(a.fone)}" placeholder="(11) 99999-9999"><div class="hint">Com DDD. O 55 é adicionado automaticamente se faltar.</div></div>
+    <div class="field"><label>Telefone do paciente</label><input id="wa_fone" value="${esc(pacFone(a))}" placeholder="(11) 99999-9999"><div class="hint">Com DDD. O 55 é adicionado automaticamente se faltar.</div></div>
     <label style="font-weight:600;font-size:14px">Modelo de mensagem</label>
     <div class="wa-tpls" id="wa_tpls">
       <button data-k="confirm" class="on" onclick="setKind('${id}','confirm')">Confirmar</button>
@@ -292,15 +674,19 @@ function waSend(id){
   const a=state.appts.find(x=>x.id===id);
   const med=document.getElementById('wa_med');if(med)state.cfg.medico=med.value.trim();
   const cli=document.getElementById('wa_cli');if(cli)state.cfg.clinica=cli.value.trim();
-  const ff=document.getElementById('wa_fone');if(ff)a.fone=ff.value.trim();
+  const ff=document.getElementById('wa_fone');if(ff){if(a.pacId){const p=patientById(a.pacId);if(p&&!p.fone)p.fone=ff.value.trim();}else{a.fone=ff.value.trim();}}
   persist();
-  const num=waNumber(a.fone);const txt=waText(a,window.__waKind||'confirm');
+  const num=waNumber(ff?ff.value:pacFone(a));const txt=waText(a,window.__waKind||'confirm');
   window.open((num?('https://wa.me/'+num):'https://wa.me/')+'?text='+encodeURIComponent(txt),'_blank');
   closeModal();render();
 }
 
-function modal(html){const d=document.createElement('div');d.className='modal';d.id='modal';d.innerHTML='<div class="box">'+html+'</div>';d.onclick=e=>{if(e.target===d)closeModal();};document.body.appendChild(d);}
+/* ===== modal ===== */
+function modal(html){const d=document.createElement('div');d.className='modal';d.id='modal';d.innerHTML='<div class="box">'+html+'</div>';
+  if(/<div class="box wide"/.test(html)){d.innerHTML=html;}
+  d.onclick=e=>{if(e.target===d)closeModalMic();};document.body.appendChild(d);}
 function closeModal(){const m=document.getElementById('modal');if(m)m.remove();}
+function closeModalMic(){stopMic();closeModal();}
 </script>
 </body>
 </html>
