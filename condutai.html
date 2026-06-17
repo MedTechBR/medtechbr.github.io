@@ -1746,16 +1746,28 @@ function md(text) {
 
 // Sanitiza código Mermaid antes do render — corrige os erros mais comuns que o LLM gera.
 function sanitizeMermaid(code) {
+  // Remove TODO caractere que quebra o parser quando está dentro de um label
+  // (nós [..] {..} (..) e labels de aresta |..|). O grande vilão eram < e >
+  // (ex.: {Hb < 7 g/dL?}) e colchetes/chaves/pipes/; aninhados.
   const cleanInside = (content) => content
-    .replace(/\(/g, ' ')        // ( vira espaço
-    .replace(/\)/g, '')          // ) some
-    .replace(/["']/g, '')        // aspas somem
-    .replace(/\s+/g, ' ')        // colapsa espaços múltiplos
+    .replace(/[()]/g, ' ')              // parênteses
+    .replace(/["'`]/g, '')              // aspas e crase
+    .replace(/≥/g, ' maior ou igual a ')
+    .replace(/≤/g, ' menor ou igual a ')
+    .replace(/</g, ' menor que ')       // < vira "tag" no parser → quebra
+    .replace(/>/g, ' maior que ')       // > idem
+    .replace(/\|/g, ' / ')              // | separa label de aresta
+    .replace(/;/g, ',')                 // ; encerra statement
+    .replace(/&/g, ' e ')               // & encadeia nós
+    .replace(/[\[\]{}]/g, ' ')          // colchetes/chaves aninhados
+    .replace(/#/g, '')                  // # vira entidade/comentário
+    .replace(/\s+/g, ' ')
     .trim();
   let out = code
-    // 1) Limpa parênteses/aspas dentro de [..] e {..}
+    // 1) Limpa caracteres perigosos dentro de [..], {..} e labels de aresta |..|
     .replace(/\[([^\]]+)\]/g, (m, c) => '[' + cleanInside(c) + ']')
     .replace(/\{([^\}]+)\}/g, (m, c) => '{' + cleanInside(c) + '}')
+    .replace(/\|([^|\n]+)\|/g, (m, c) => '|' + cleanInside(c) + '|')
     // 2) Corrige sintaxe invertida de class: "B class critico" → "class B critico"
     //    Aceita também listas: "A,B class critico" → "class A,B critico"
     .replace(/^(\s*)([A-Za-z][A-Za-z0-9_,\s]*?)\s+class\s+([A-Za-z][A-Za-z0-9_]*)\s*;?\s*$/gm,
@@ -1766,7 +1778,7 @@ function sanitizeMermaid(code) {
       (m, indent, def) => `${indent}${def};`)
     // 4) Corrige sintaxe de aresta com label sem | : "A --Sim--> B" → "A -->|Sim| B"
     .replace(/([A-Za-z0-9_]+)\s*--\s*([^->\n|]+?)\s*-->\s*([A-Za-z0-9_]+)/g,
-      (m, a, lbl, b) => `${a} -->|${lbl.trim()}| ${b}`);
+      (m, a, lbl, b) => `${a} -->|${cleanInside(lbl)}| ${b}`);
   return out;
 }
 
@@ -1784,9 +1796,11 @@ async function renderMermaidIn(container) {
     } catch (err) {
       // 2ª tentativa: simplificar mais agressivamente
       try {
+        const strip = (t, n) => t.replace(/[^\w \-áéíóúâêôãõçÁÉÍÓÚÂÊÔÃÕÇ]/g,'').replace(/\s+/g,' ').trim().slice(0, n);
         const code2 = code
-          .replace(/-->\|([^|]+)\|/g, (m, t) => `-->|${t.replace(/[^a-zA-Z0-9 áéíóúâêôãõçÁÉÍÓÚÂÊÔÃÕÇ]/g,'').slice(0,18)}|`)
-          .replace(/\[([^\]]+)\]/g, (m, t) => `[${t.replace(/[^\w \-áéíóúâêôãõçÁÉÍÓÚÂÊÔÃÕÇ]/g,'').slice(0,50)}]`);
+          .replace(/\|([^|\n]+)\|/g, (m, t) => `|${strip(t, 20)}|`)
+          .replace(/\[([^\]]+)\]/g, (m, t) => `[${strip(t, 50)}]`)
+          .replace(/\{([^\}]+)\}/g, (m, t) => `{${strip(t, 50)}}`);
         const { svg } = await mermaid.render(id + '_2', code2);
         el.innerHTML = svg;
         success = true;
