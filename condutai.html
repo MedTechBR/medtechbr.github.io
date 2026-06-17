@@ -818,6 +818,13 @@ main, #main { display: block !important; height: auto !important; overflow: visi
 .gaso-form input:focus { outline: none; border-color: var(--primary); }
 .gaso-btn { margin-top: 14px; width: 100%; background: var(--primary); color: #fff; border: 0; border-radius: 12px; padding: 13px; font-weight: 700; font-size: 15px; cursor: pointer; font-family: inherit; }
 .gaso-btn:hover { background: var(--primary-dark); }
+/* Escores clínicos clicáveis */
+.esc-form { display: flex; flex-direction: column; gap: 8px; }
+.esc-form .esc-check { flex-direction: row; align-items: center; gap: 10px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; font-size: 13.5px; font-weight: 500; color: var(--text); cursor: pointer; }
+.esc-form .esc-check input { width: 18px; height: 18px; flex: 0 0 auto; accent-color: var(--primary); }
+.esc-pts { margin-left: auto; color: var(--text-mute); font-size: 12px; font-weight: 600; }
+.esc-form .esc-sel { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; font-weight: 600; color: var(--text-soft); }
+.esc-form .esc-sel select { border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px; font-size: 16px; font-family: inherit; background: var(--bg-card); color: var(--text); }
 
 /* Lista Histórico/Favoritos como view */
 #listView .side-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
@@ -931,10 +938,10 @@ main, #main { display: block !important; height: auto !important; overflow: visi
           <span class="ic" style="background:#d1fae5;color:#047857">✨</span>
           <span class="ttl">CondutAI IA</span><span class="sub">Conduta sob medida</span>
         </button>
-        <a class="wb-card" href="calcmed.html">
+        <button class="wb-card" data-go="escores">
           <span class="ic" style="background:var(--info-soft);color:var(--info)">🧮</span>
-          <span class="ttl">Escores & Cálculos</span><span class="sub">CalcMed</span>
-        </a>
+          <span class="ttl">Escores clínicos</span><span class="sub">CHA₂DS₂-VA, Wells, CURB-65…</span>
+        </button>
         <a class="wb-card" href="medprovas.html">
           <span class="ic" style="background:var(--warn-soft);color:var(--warn)">📝</span>
           <span class="ttl">Provas & Questões</span><span class="sub">MedProvas</span>
@@ -1052,6 +1059,15 @@ main, #main { display: block !important; height: auto !important; overflow: visi
     </div>
     <button id="gasoGo" class="gaso-btn">🔬 Interpretar</button>
     <div id="gasoResult" style="margin-top:16px"></div>
+  </section>
+
+  <!-- ===================== ESCORES CLÍNICOS (calculadoras clicáveis, offline) ===================== -->
+  <section id="escoresView" class="wb-view" hidden>
+    <div class="wb-view-head"><span class="vic">🧮</span><h2>Escores clínicos</h2></div>
+    <p class="wb-view-intro">Escolha um escore, marque os itens e toque em Calcular — pontuação e conduta na hora, sem IA. <a href="calcmed.html" style="color:var(--primary)">Mais calculadoras no CalcMed →</a></p>
+    <div class="wb-quick" id="escoreList"></div>
+    <div id="escoreForm" style="margin-top:14px"></div>
+    <div id="escoreResult" style="margin-top:14px"></div>
   </section>
 
   <!-- ===================== HISTÓRICO / FAVORITOS ===================== -->
@@ -6794,10 +6810,10 @@ document.getElementById('newBtn').onclick = () => {
 //  Navegação estilo Whitebook (views + bottom nav)
 // ============================================================
 function showView(name) {
-  const map = { home:'homeView', condutas:'condutasView', ia:'iaView', bulas:'bulasView', investigacao:'investigacaoView', gaso:'gasoView', favoritos:'listView', historico:'listView', result:'resultView' };
+  const map = { home:'homeView', condutas:'condutasView', ia:'iaView', bulas:'bulasView', investigacao:'investigacaoView', gaso:'gasoView', escores:'escoresView', favoritos:'listView', historico:'listView', result:'resultView' };
   const id = map[name] || 'homeView';
   document.querySelectorAll('.wb-view').forEach(v => { v.hidden = (v.id !== id); });
-  const navMap = { home:'home', condutas:'condutas', ia:'ia', favoritos:'favoritos', historico:'historico', bulas:'home', investigacao:'home', gaso:'home', result:'home' };
+  const navMap = { home:'home', condutas:'condutas', ia:'ia', favoritos:'favoritos', historico:'historico', bulas:'home', investigacao:'home', gaso:'home', escores:'home', result:'home' };
   const navT = navMap[name] || 'home';
   document.querySelectorAll('#wbNav button').forEach(b => b.classList.toggle('active', b.dataset.go === navT));
   if (name === 'favoritos' || name === 'historico') {
@@ -6808,6 +6824,7 @@ function showView(name) {
   }
   if (name === 'bulas') renderBulaQuick();
   if (name === 'investigacao') renderInvQuick();
+  if (name === 'escores') renderEscoreList();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 window.showView = showView;
@@ -7036,6 +7053,72 @@ function interpretarGaso() {
 }
 const _gg = document.getElementById('gasoGo');
 if (_gg) _gg.onclick = interpretarGaso;
+
+// ============ Escores clínicos clicáveis (offline, determinístico) ============
+const SCORES = {
+  chadsva: {
+    nome: 'CHA₂DS₂-VA (FA — risco de AVC)',
+    itens: [
+      { t:'check', label:'Insuficiência cardíaca / disfunção de VE', pts:1 },
+      { t:'check', label:'Hipertensão arterial', pts:1 },
+      { t:'sel', label:'Idade', opts:[['< 65 anos',0],['65–74 anos',1],['≥ 75 anos',2]] },
+      { t:'check', label:'Diabetes mellitus', pts:1 },
+      { t:'check', label:'AVC / AIT / tromboembolismo prévio', pts:2 },
+      { t:'check', label:'Doença vascular (IAM, DAP, placa aórtica)', pts:1 },
+    ],
+    interpreta: s => (s>=2 ? `**${s} pontos → anticoagular.**` : s===1 ? `**1 ponto → considerar** anticoagulação (individualizar).` : `**0 ponto → não anticoagular.**`)
+      + (s>=1 ? `\n- Preferir **DOAC** (exceto estenose mitral moderada-grave/prótese mecânica → varfarina).` : '')
+      + `\n\n*Escore sexo-neutro (ESC 2024).*`
+  },
+  wells_tep: {
+    nome: 'Wells (TEP)',
+    itens: [
+      { t:'check', label:'Sinais/sintomas de TVP', pts:3 },
+      { t:'check', label:'TEP é o diagnóstico mais provável', pts:3 },
+      { t:'check', label:'FC > 100 bpm', pts:1.5 },
+      { t:'check', label:'Imobilização ≥ 3 dias ou cirurgia nas últimas 4 semanas', pts:1.5 },
+      { t:'check', label:'TVP/TEP prévios', pts:1.5 },
+      { t:'check', label:'Hemoptise', pts:1 },
+      { t:'check', label:'Câncer ativo (tratamento/paliativo/últimos 6 meses)', pts:1 },
+    ],
+    interpreta: s => `**${s} pontos** — ` + (s<=4
+      ? `TEP **improvável** → **D-dímero**: negativo exclui; positivo → angio-TC de tórax.`
+      : `TEP **provável** → **angio-TC de tórax** (não usar D-dímero para excluir).`)
+  },
+  curb65: {
+    nome: 'CURB-65 (pneumonia — gravidade)',
+    itens: [
+      { t:'check', label:'Confusão mental nova', pts:1 },
+      { t:'check', label:'Ureia > 50 mg/dL', pts:1 },
+      { t:'check', label:'Frequência respiratória ≥ 30 irpm', pts:1 },
+      { t:'check', label:'PAS < 90 ou PAD ≤ 60 mmHg', pts:1 },
+      { t:'check', label:'Idade ≥ 65 anos', pts:1 },
+    ],
+    interpreta: s => `**${s} pontos** — ` + (s<=1 ? `baixo risco → **tratamento ambulatorial**.` : s===2 ? `risco intermediário → **considerar internação**.` : `alto risco → **internar**; 4–5 → **avaliar UTI**.`)
+  }
+};
+function renderEscoreList() {
+  const el = document.getElementById('escoreList'); if (!el || el.dataset.done) return;
+  el.innerHTML = Object.entries(SCORES).map(([k, v]) => `<button data-k="${k}">${escapeHtml(v.nome)}</button>`).join('');
+  el.querySelectorAll('button').forEach(b => b.onclick = () => abrirEscore(b.dataset.k));
+  el.dataset.done = '1';
+}
+function abrirEscore(k) {
+  const s = SCORES[k]; const f = document.getElementById('escoreForm');
+  document.getElementById('escoreResult').innerHTML = '';
+  f.innerHTML = `<div class="esc-form">` + s.itens.map((it, i) => {
+    if (it.t === 'sel') return `<label class="esc-sel">${escapeHtml(it.label)}<select class="esc-in" data-i="${i}">` + it.opts.map(o => `<option value="${o[1]}">${escapeHtml(o[0])}</option>`).join('') + `</select></label>`;
+    return `<label class="esc-check"><input type="checkbox" class="esc-in" data-pts="${it.pts}"><span>${escapeHtml(it.label)}</span><span class="esc-pts">+${it.pts}</span></label>`;
+  }).join('') + `</div><button class="gaso-btn" id="escCalc">Calcular</button>`;
+  document.getElementById('escCalc').onclick = () => {
+    let total = 0;
+    f.querySelectorAll('.esc-in').forEach(el => { if (el.type === 'checkbox') { if (el.checked) total += parseFloat(el.dataset.pts); } else total += parseFloat(el.value) || 0; });
+    total = Math.round(total * 10) / 10;
+    document.getElementById('escoreResult').innerHTML = `<div class="result">${md(`### ${s.nome}\n\n` + s.interpreta(total))}</div>`;
+    document.getElementById('escoreResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+  f.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
 
 showView('home');
 
