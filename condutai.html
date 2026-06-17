@@ -734,6 +734,14 @@ main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
 </head>
 <body>
 
+<!-- Honeypot: o Chrome ignora autocomplete=off em campos de texto e tenta preencher
+     o login salvo no primeiro campo que "parecer" usuário/senha. Estes campos ocultos
+     servem de isca para ele preencher AQUI, e não na busca de protocolos. -->
+<div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden;opacity:0">
+  <input type="text" name="username" autocomplete="username" tabindex="-1">
+  <input type="password" name="password" autocomplete="current-password" tabindex="-1">
+</div>
+
 <header>
   <div class="logo">
     <div class="logo-icon">⚕</div>
@@ -1275,7 +1283,12 @@ function renderLibrary() {
     t.onclick = () => { libActiveSpec = t.dataset.spec; renderLibrary(); };
   });
 
-  // Filter
+  // Filter — ignora autofill de e-mail do navegador (uma busca real nunca contém "@")
+  if (libSearch.includes('@')) {
+    libSearch = '';
+    const _si = document.getElementById('librarySearch');
+    if (_si && _si.value.includes('@')) _si.value = '';
+  }
   const q = libSearch.trim().toLowerCase();
   const filtered = PROTOCOLS.filter(p => {
     if (libActiveSpec !== 'all' && p.specialty !== libActiveSpec) return false;
@@ -2690,7 +2703,20 @@ renderLibrary();
 setMode('direta');
 // Liga o input de busca da biblioteca
 const libSearchInp = document.getElementById('librarySearch');
-if (libSearchInp) libSearchInp.addEventListener('input', e => { libSearch = e.target.value; renderLibrary(); });
+if (libSearchInp) {
+  libSearchInp.addEventListener('input', e => {
+    let v = e.target.value;
+    if (v.includes('@')) { v = ''; e.target.value = ''; }   // bloqueia autofill de e-mail do Chrome
+    libSearch = v; renderLibrary();
+  });
+  // Chrome às vezes injeta o e-mail/login no campo DEPOIS do load (sem disparar input):
+  // limpa em alguns instantes para os protocolos não sumirem nem o e-mail ficar visível.
+  const _clearAutofill = () => {
+    if (libSearchInp.value.includes('@')) { libSearchInp.value = ''; libSearch = ''; renderLibrary(); }
+  };
+  [200, 600, 1200, 2500, 5000].forEach(ms => setTimeout(_clearAutofill, ms));
+  libSearchInp.addEventListener('focus', _clearAutofill);   // ao ir digitar, limpa e-mail autopreenchido
+}
 /* IA agora é keyless (gateway central MedTech) — não pedimos mais chave de API. */
 </script>
 </body>
