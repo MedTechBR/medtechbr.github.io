@@ -9,7 +9,7 @@
 <link rel="icon" type="image/png" href="favicon.png">
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"agendaai",name:"ConsultAI"};</script>
-<script type="module" src="_mtauth.js?v=5"></script>
+<script type="module" src="_mtauth.js?v=6"></script>
 <style>
 :root{--petrol:#0E5A6D;--petrol-dark:#083845;--ink:#0E2A31;--mint:#2DD4A8;--mint-dark:#14b894;--bg:#F6FAFB;--soft:#EAF3F4;--line:#dbe8ea;--muted:#5B7882;--green:#14794f;--green-bg:#e7f7f1;--amber:#c97a17;--amber-bg:#fdf0e0;--red:#c0392b;--red-bg:#fdecea;--blue:#2563a8;--blue-bg:#e8f1fb;--violet:#6b46c1;--violet-bg:#efe9fb;--wa:#25D366}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -698,7 +698,7 @@ function openEvol(id){
        <button class="btn btn-g btn-sm" onclick="if(confirm('Limpar o rascunho?'))document.getElementById('e_raw').value='';">Limpar</button>
        <button class="btn btn-p btn-sm" id="aiBtn" onclick="genEvol()">✨ Estruturar com IA</button></div>
      <textarea id="e_raw" placeholder="🔴 Gravar consulta: grave o atendimento inteiro — ao parar, a IA gera a evolução automaticamente. Ou 🎤 Ditar / digitar o caso."></textarea>
-     <div class="hint">Para a evolução completa, toque em <b>Gravar consulta</b> e deixe rodando durante todo o atendimento; ao parar, a IA gera a evolução sozinha. Funciona melhor no Chrome — grave com o consentimento do paciente.</div>
+     <div class="hint"><b>Gravar consulta</b> grava o áudio do atendimento inteiro; ao parar, a IA transcreve e gera a evolução (leva alguns segundos). Precisa de conta MedTech e microfone — grave com o consentimento do paciente. <b>Ditar</b> faz transcrição rápida ao vivo no navegador.</div>
    </div>
    <div class="field"><label>Texto da evolução (revise antes de salvar)</label><textarea id="e_out" style="min-height:160px" placeholder="O texto estruturado aparece aqui. Você pode editar livremente.">${esc(r.texto||'')}</textarea></div>
    <div class="hint">⚠️ A IA é apoio e não inventa dados. Revise sempre antes de salvar/assinar.${MT.mode==='demo'?' <b>Entre na conta MedTech para usar a IA.</b>':''}</div>
@@ -893,7 +893,7 @@ function saveExames(id,andPrint){
 function exImprimir(){const o=exColetar();if(!o.exames){alert('Liste ao menos um exame.');return;}printDocu(o);}
 
 /* ===== voz: ditado curto e GRAVAÇÃO DA CONSULTA (áudios longos) ===== */
-let rec=null,listening=false,micTarget=null,recMode=null,recSecs=0,recTimer=null;
+let rec=null,listening=false,micTarget=null,recMode=null,recSecs=0,recTimer=null,mediaRec=null,mediaChunks=[],mediaStream=null,consultaAbort=false;
 function startRec(targetId,mode){
   micTarget=targetId;recMode=mode;
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -916,11 +916,43 @@ function updateRecUI(){
   if(recb){const on=listening&&recMode==='consulta';recb.classList.toggle('on',on);recb.textContent=on?'⏹️ Parar e gerar evolução':'🔴 Gravar consulta';}
   if(t){if(listening&&recMode==='consulta')t.innerHTML='<span class="live"><span class="dot"></span>gravando '+fmtSecs(recSecs)+'</span>';else if(listening)t.innerHTML='<span class="live"><span class="dot"></span>ouvindo…</span>';else t.innerHTML='';}
 }
-function toggleMic(targetId){if(listening&&recMode==='dictate'){stopRec();return;}if(listening)stopRec();startRec(targetId,'dictate');}
-function toggleConsulta(){
-  if(listening&&recMode==='consulta'){stopRec();const ta=document.getElementById('e_raw');if(ta&&ta.value.trim())genEvol();return;}
+function toggleMic(targetId){if(mediaRec&&mediaRec.state==='recording'){alert('Pare a gravação da consulta antes de ditar.');return;}if(listening&&recMode==='dictate'){stopRec();return;}if(listening)stopRec();startRec(targetId,'dictate');}
+/* Gravar consulta = ÁUDIO REAL (MediaRecorder) → MT.aiAudio (servidor) → evolução */
+function pickAudioMime(){const c=['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg;codecs=opus','audio/ogg'];for(const t of c){if(window.MediaRecorder&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))return t;}return '';}
+function stopStream(){if(mediaStream){mediaStream.getTracks().forEach(t=>{try{t.stop();}catch(e){}});mediaStream=null;}}
+function blobToB64(blob){return new Promise((res,rej)=>{const r=new FileReader();r.onloadend=()=>{const s=String(r.result||'');const i=s.indexOf(',');res(i>=0?s.slice(i+1):s);};r.onerror=rej;r.readAsDataURL(blob);});}
+async function toggleConsulta(){
+  if(mediaRec&&mediaRec.state==='recording'){if(recTimer){clearInterval(recTimer);recTimer=null;}listening=false;updateRecUI();try{mediaRec.stop();}catch(e){}return;}
   if(listening)stopRec();
-  startRec('e_raw','consulta');
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){alert('Seu navegador não permite gravar áudio. Use o Google Chrome.');return;}
+  if(MT.mode!=='cloud'||!MT.aiAudio){alert('Para gravar a consulta em áudio e gerar a evolução, entre na sua conta MedTech.');return;}
+  try{mediaStream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true}});}
+  catch(e){alert('Permita o acesso ao microfone.');return;}
+  const mime=pickAudioMime();mediaChunks=[];consultaAbort=false;
+  try{mediaRec=new MediaRecorder(mediaStream, mime?{mimeType:mime,audioBitsPerSecond:24000}:{audioBitsPerSecond:24000});}
+  catch(e){try{mediaRec=new MediaRecorder(mediaStream);}catch(e2){alert('Não foi possível iniciar a gravação.');stopStream();return;}}
+  mediaRec.ondataavailable=e=>{if(e.data&&e.data.size)mediaChunks.push(e.data);};
+  mediaRec.onstop=()=>{stopStream();processConsultaAudio();};
+  mediaRec.start(1000);
+  recMode='consulta';listening=true;recSecs=0;if(recTimer)clearInterval(recTimer);recTimer=setInterval(()=>{recSecs++;updateRecUI();},1000);
+  updateRecUI();
+}
+async function processConsultaAudio(){
+  if(consultaAbort){consultaAbort=false;return;}
+  const blob=new Blob(mediaChunks,{type:(mediaChunks[0]&&mediaChunks[0].type)||'audio/webm'});
+  const recb=document.getElementById('recBtn'),out=document.getElementById('e_out');
+  if(!blob.size){updateRecUI();return;}
+  if(recb){recb.disabled=true;recb.innerHTML='<span class="spin"></span> Transcrevendo e gerando…';}
+  try{
+    const b64=await blobToB64(blob);
+    if(b64.length>9400000){alert('A gravação ficou muito longa para enviar de uma vez (~30–40 min é o limite por bloco). Grave em partes menores ou use 🎤 Ditar.');return;}
+    const fmt=(document.getElementById('e_fmt')||{}).value||'soap';
+    const prompt='Você recebeu o ÁUDIO de uma consulta médica (fala do médico e do paciente). Transcreva internamente e produza um documento clínico em português do Brasil, completo, organizado e objetivo, extraindo só o que é clinicamente relevante. REGRAS: não invente dados, exames, doses ou condutas que não foram ditos; padronize termos médicos; se algo essencial faltar, escreva "[não informado]". '+(REC_FMT[fmt]||REC_FMT.evolucao).ai;
+    const mt=(blob.type||'audio/webm').split(';')[0];
+    const text=await MT.aiAudio(b64,mt,prompt);
+    if(out)out.value=(text||'').trim();
+  }catch(e){alert('⚠️ '+(e.message||'Falha ao processar o áudio.'));}
+  finally{const rb=document.getElementById('recBtn');if(rb)rb.disabled=false;updateRecUI();}
 }
 
 /* ===== CONFIG ===== */
@@ -1005,7 +1037,7 @@ function modal(html){const d=document.createElement('div');d.className='modal';d
   if(/<div class="box wide"/.test(html)){d.innerHTML=html;}
   d.onclick=e=>{if(e.target===d)closeModalMic();};document.body.appendChild(d);}
 function closeModal(){const m=document.getElementById('modal');if(m)m.remove();}
-function closeModalMic(){stopMic();closeModal();}
+function closeModalMic(){stopRec();if(mediaRec&&mediaRec.state==='recording'){consultaAbort=true;try{mediaRec.stop();}catch(e){}}stopStream();if(recTimer){clearInterval(recTimer);recTimer=null;}closeModal();}
 </script>
 </body>
 </html>
