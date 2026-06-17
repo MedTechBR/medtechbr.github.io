@@ -1219,7 +1219,8 @@ const SPECIALTIES = {
   uro:        { label: 'Urologia', icon: '🚹' },
   olho_orl:   { label: 'Oftalmo/ORL', icon: '👁️' },
   geriatria:  { label: 'Geriatria', icon: '👴' },
-  onco_pal:   { label: 'Onco/Paliativos', icon: '🎗️' }
+  onco_pal:   { label: 'Onco/Paliativos', icon: '🎗️' },
+  raras:      { label: 'Doenças Raras', icon: '🧬' }
 };
 
 const PROTOCOLS = [
@@ -1517,6 +1518,21 @@ const PROTOCOLS = [
   { id: 'nausea_pal', icon: '🤢', name: 'Náuseas em cuidados paliativos', tags: 'Causa · Metoclopramida · Haloperidol · Ondansetrona', specialty: 'onco_pal', guideline: 'NCCN 2024' },
   { id: 'dispneia_pal', icon: '😮‍💨', name: 'Dispneia em cuidados paliativos', tags: 'Morfina baixa dose · O2 · Ventilador · Ansiolítico', specialty: 'onco_pal', guideline: 'NCCN 2024' },
   { id: 'const_pal', icon: '🩺', name: 'Constipação em paliativos', tags: 'Profilaxia em opioide · Laxante osmótico+estimulante · Metilnaltrexona', specialty: 'onco_pal', guideline: 'NCCN 2024' },
+
+  // ====== DOENÇAS RARAS ======
+  { id: 'wilson', icon: '🧬', name: 'Doença de Wilson', tags: 'Ceruloplasmina · Cobre urinário · Kayser-Fleischer · Quelante', specialty: 'raras', guideline: 'EASL/AASLD' },
+  { id: 'porfiria', icon: '🧬', name: 'Porfiria Aguda Intermitente', tags: 'Dor abdominal · Neuro/psiq · PBG urinário · Heme/glicose', specialty: 'raras', guideline: 'Consenso' },
+  { id: 'hlh', icon: '🧬', name: 'Linfo-histiocitose Hemofagocítica (HLH)', tags: 'Febre · Citopenias · Ferritina · HScore', specialty: 'raras', guideline: 'HLH-2004' },
+  { id: 'angioedema_h', icon: '🧬', name: 'Angioedema Hereditário', tags: 'C1-INH · C4 baixo · Sem urticária · Icatibanto', specialty: 'raras', guideline: 'WAO/EAACI' },
+  { id: 'ela', icon: '🧬', name: 'Esclerose Lateral Amiotrófica (ELA)', tags: 'NMS+NMI · Riluzol · VNI · Suporte', specialty: 'raras', guideline: 'Consenso' },
+  { id: 'behcet', icon: '🧬', name: 'Doença de Behçet', tags: 'Aftas orais+genitais · Uveíte · Patergia', specialty: 'raras', guideline: 'EULAR 2018' },
+  { id: 'amiloidose', icon: '🧬', name: 'Amiloidose', tags: 'Vermelho Congo · AL/ATTR · Órgão-alvo', specialty: 'raras', guideline: 'Consenso' },
+  { id: 'hemocromatose', icon: '🧬', name: 'Hemocromatose Hereditária', tags: 'Ferritina · Sat. transferrina · HFE · Flebotomia', specialty: 'raras', guideline: 'AASLD' },
+  { id: 'fabry', icon: '🧬', name: 'Doença de Fabry', tags: 'Ligada ao X · Alfa-galactosidase A · TRE', specialty: 'raras', guideline: 'Consenso' },
+  { id: 'acromegalia', icon: '🧬', name: 'Acromegalia', tags: 'IGF-1 · GH no TOTG · Adenoma · Cirurgia', specialty: 'raras', guideline: 'Endocrine Society' },
+  { id: 'paget_osseo', icon: '🧬', name: 'Doença de Paget Óssea', tags: 'Fosfatase alcalina · Dor óssea · Bifosfonato', specialty: 'raras', guideline: 'Consenso' },
+  { id: 'goodpasture', icon: '🧬', name: 'Doença Anti-MBG (Goodpasture)', tags: 'Pulmão-rim · Anti-MBG · Plasmaférese', specialty: 'raras', guideline: 'KDIGO' },
+  { id: 'takayasu', icon: '🧬', name: 'Arterite de Takayasu', tags: 'Grandes vasos · Mulher jovem · Pulsos ausentes · Corticoide', specialty: 'raras', guideline: 'EULAR/ACR' },
 ];
 
 let currentProtocol = null; // protocolo selecionado da biblioteca (se for o caso)
@@ -1573,6 +1589,347 @@ function renderLibrary() {
 
 /* ===== Banco MedTech — conteúdo OFFLINE de protocolos-chave (abre sem IA) ===== */
 const OFFLINE = {
+wilson: `# Doença de Wilson
+
+> Acúmulo de **cobre** (mutação ATP7B) no fígado, cérebro e olhos. **Rara mas tratável** — pensar em hepatopatia/distúrbio do movimento no jovem.
+
+## 🩺 Quadro clínico
+- **Hepático:** hepatite, cirrose, insuficiência hepática aguda (com anemia hemolítica Coombs-negativa). **Neuropsiquiátrico:** tremor, distonia, disartria, parkinsonismo, alterações de comportamento. **Anéis de Kayser-Fleischer** (córnea).
+
+## ✅ Diagnóstico
+- **Ceruloplasmina baixa**, **cobre urinário 24h alto**, cobre sérico livre alto; **Kayser-Fleischer** na lâmpada de fenda; cobre hepático na biópsia; teste genético. (Ceruloplasmina normal não exclui.)
+
+## 🧪 Exames complementares
+| Exame | Objetivo |
+| --- | --- |
+| Ceruloplasmina | Triagem (baixa) |
+| Cobre urinário 24h | Confirmar |
+| Lâmpada de fenda | Kayser-Fleischer |
+| RM de crânio, biópsia hepática | Acometimento/confirmação |
+
+## 💊 Tratamento (com doses)
+- **Quelantes de cobre:** **D-penicilamina** ou **trientina**; **zinco** (bloqueia a absorção, manutenção); dieta pobre em cobre (evitar fígado, frutos do mar, nozes, chocolate).
+- **Insuficiência hepática aguda fulminante → transplante hepático.**
+- Tratamento **vitalício**; rastrear familiares.
+
+## 💡 Pérolas
+- Hepatopatia + distúrbio do movimento no jovem = pensar Wilson.
+- Doença tratável e hereditária — diagnóstico precoce muda o prognóstico; investigar irmãos.`,
+
+porfiria: `# Porfiria Aguda Intermitente
+
+> Defeito na síntese do heme → crises com **dor abdominal intensa + sintomas neuropsiquiátricos + autonômicos**. "Grande simuladora".
+
+## 🧬 Gatilhos das crises
+- **Drogas** (barbitúricos, muitos anticonvulsivantes, sulfas, álcool), jejum/dietas, infecções, hormônios (crises perimenstruais), estresse.
+
+## 🩺 Quadro clínico
+- **Dor abdominal difusa intensa sem sinais peritoneais**, vômitos, constipação; **neuropatia** (fraqueza), convulsões, confusão/psicose; taquicardia, HAS, **hiponatremia (SIADH)**; **urina que escurece** ao repouso/luz.
+
+## ✅ Diagnóstico
+- **Porfobilinogênio (PBG) e ALA urinários elevados** na crise (teste-chave); confirmação enzimática/genética.
+
+## 🧪 Exames complementares
+| Exame | Objetivo |
+| --- | --- |
+| PBG e ALA urinários | Diagnóstico na crise |
+| Sódio | Hiponatremia (SIADH) |
+
+## 💊 Tratamento (com doses)
+- **Suspender os gatilhos** (drogas porfirinogênicas).
+- **Carga de carboidrato** (glicose IV) nas crises leves; **hemina/arginato de heme IV** nas moderadas/graves (suprime a via).
+- Analgesia (opioide), antiemético, controle de PA/arritmia, manejo seguro de convulsão, corrigir hiponatremia.
+
+## 💡 Pérolas
+- Dor abdominal intensa sem achados ao exame + neuro/psiquiátrico + hiponatremia = pensar porfiria (dosar PBG urinário).
+- Muitos anticonvulsivantes são gatilho — cuidado ao tratar a convulsão.`,
+
+hlh: `# Linfo-histiocitose Hemofagocítica (HLH)
+
+> Hiperinflamação descontrolada (tempestade de citocinas) com ativação macrofágica. Primária (genética) ou **secundária** (infecção/EBV, neoplasia, autoimune — "síndrome de ativação macrofágica").
+
+## 🩺 Quadro clínico
+- **Febre alta persistente**, **citopenias**, **hepatoesplenomegalia**, disfunção hepática, coagulopatia, sintomas neurológicos; pode evoluir para falência de múltiplos órgãos.
+
+## ✅ Critérios diagnósticos (HLH-2004 — ≥ 5 de 8)
+- Febre; esplenomegalia; **citopenia em ≥ 2 linhagens**; **hipertrigliceridemia e/ou hipofibrinogenemia**; **ferritina ≥ 500** (em geral muito alta); **hemofagocitose** na medula; **atividade NK baixa**; **CD25 solúvel (IL-2R) alto**. (HScore auxilia.)
+
+## 🧪 Exames complementares
+| Exame | Objetivo |
+| --- | --- |
+| Ferritina | Marcador-chave (muito alta) |
+| Triglicerídeos, fibrinogênio | Critério |
+| Mielograma | Hemofagocitose |
+| Investigar gatilho (EBV, neoplasia) | Causa secundária |
+
+## 💊 Tratamento
+- **Tratar o gatilho** (infecção/neoplasia/autoimune) + **imunossupressão**: corticoide (dexametasona), **etoposídeo** (protocolo HLH-94), ± ciclosporina/IVIG; anakinra na forma reumatológica (SAM).
+- Suporte intensivo; encaminhamento à hematologia.
+
+## 💡 Pérolas
+- Febre + citopenias + ferritina muito alta + esplenomegalia = pensar HLH.
+- Quanto antes a imunossupressão, melhor — HLH não tratada é fatal.`,
+
+angioedema_h: `# Angioedema Hereditário (AEH)
+
+> Angioedema recorrente por deficiência/disfunção do **inibidor de C1 (C1-INH)** → excesso de **bradicinina**. **Sem urticária** e **não responde a anti-histamínico/corticoide/adrenalina**.
+
+## 🩺 Quadro clínico
+- Crises de edema **sem urticária e sem prurido**: face, extremidades, **laringe (risco de morte)** e **dor abdominal** recorrente (edema de alça — simula abdome agudo). Gatilhos: trauma, estresse, estrogênio, IECA.
+
+## ✅ Diagnóstico
+- **C4 baixo** (triagem), **C1-INH baixo (tipo I) ou disfuncional (tipo II)**; história familiar. Diferente do angioedema histaminérgico/alérgico.
+
+## 🧪 Exames complementares
+| Exame | Objetivo |
+| --- | --- |
+| C4 | Triagem (baixo) |
+| C1-INH (nível e função) | Confirmar tipo I/II |
+
+## 💊 Tratamento (com doses)
+- **Crise aguda:** **concentrado de C1-INH**, **icatibanto** (antagonista de bradicinina) ou ecalantida; plasma fresco se indisponível. **Proteger a via aérea** no edema de laringe.
+- **Profilaxia:** C1-INH, **lanadelumabe**, andrógeno atenuado (danazol) em casos selecionados; **evitar IECA e estrogênio**.
+
+## 💡 Pérolas
+- Angioedema sem urticária que não melhora com anti-H1/corticoide/adrenalina = pensar AEH (bradicinina).
+- Crises abdominais recorrentes simulam abdome agudo; edema de laringe é a emergência.`,
+
+ela: `# Esclerose Lateral Amiotrófica (ELA)
+
+> Doença degenerativa do **neurônio motor superior (NMS) e inferior (NMI)**, progressiva e fatal. Diagnóstico tardio é comum.
+
+## 🩺 Quadro clínico
+- **NMI** (fraqueza, atrofia, **fasciculações**, cãibras) + **NMS** (espasticidade, hiperreflexia, Babinski); início focal (membro ou **bulbar** — disartria/disfagia) com progressão; **sem** alteração sensitiva, esfincteriana ou ocular típicas.
+
+## ✅ Diagnóstico
+- Clínico + **eletroneuromiografia** (denervação difusa); **excluir mimetizadores tratáveis** (espondilose cervical, neuropatia motora multifocal, miastenia, tireoide). RM, exames laboratoriais.
+
+## 🧪 Exames complementares
+| Exame | Objetivo |
+| --- | --- |
+| ENMG | Denervação (NMI difuso) |
+| RM coluna/crânio | Excluir compressão/mimetizadores |
+| TSH, B12, anti-GM1 | Excluir tratáveis |
+
+## 💊 Tratamento
+- **Riluzol** (prolonga modestamente a sobrevida); **edaravona** em casos selecionados.
+- **Suporte multidisciplinar (essencial):** **VNI** (ganho de sobrevida/qualidade), suporte nutricional (gastrostomia), fono, fisioterapia, manejo de sialorreia/espasticidade/cãibras, comunicação; **cuidados paliativos** e diretivas antecipadas.
+
+## 💡 Pérolas
+- NMS + NMI progressivos sem sintomas sensitivos = suspeitar de ELA → ENMG e excluir tratáveis.
+- VNI e suporte nutricional impactam sobrevida e qualidade de vida.`,
+
+behcet: `# Doença de Behçet
+
+> Vasculite de vasos de todos os calibres, recorrente. Clássica na "rota da seda". Marca: **aftas orais e genitais recorrentes**.
+
+## ✅ Critérios (úlceras orais recorrentes + 2)
+- **Aftas orais recorrentes** (obrigatória) + 2 de: **úlceras genitais**, **lesões oculares (uveíte)**, lesões cutâneas (eritema nodoso, pseudofoliculite), **teste de patergia positivo**.
+
+## 🩺 Manifestações
+- Aftas dolorosas; **uveíte** (risco de cegueira); cutâneas; articulares; **vasculares (trombose, aneurisma)**; neurológicas (neuro-Behçet); gastrointestinais.
+
+## 🧪 Exames complementares
+| Exame | Objetivo |
+| --- | --- |
+| Clínico (critérios) | Diagnóstico |
+| Teste de patergia | Apoio |
+| Avaliação oftalmológica | Uveíte |
+| HLA-B51 | Associação (não diagnóstico) |
+
+## 💊 Tratamento (com doses)
+- **Aftas/cutâneo-articular:** colchicina, corticoide tópico; AINE.
+- **Grave (ocular, neurológico, vascular):** **corticoide sistêmico + imunossupressor** (azatioprina, ciclosporina) e/ou **anti-TNF (infliximabe/adalimumabe)**; uveíte posterior grave exige tratamento agressivo precoce.
+
+## 💡 Pérolas
+- Aftas orais + genitais recorrentes + uveíte = Behçet.
+- Acometimento ocular/neuro/vascular muda o tratamento para imunossupressão agressiva (preservar a visão).`,
+
+amiloidose: `# Amiloidose
+
+> Depósito extracelular de proteínas mal dobradas (fibrilas) em órgãos. Principais: **AL** (cadeias leves — discrasia de plasmócitos) e **ATTR** (transtirretina).
+
+## 🩺 Quadro clínico (multissistêmico)
+- **Cardíaca** (IC com parede espessa, baixa voltagem no ECG), **renal** (proteinúria/síndrome nefrótica), **neuropatia periférica e autonômica**, **macroglossia**, hepatomegalia, **equimose periorbital**, túnel do carpo bilateral.
+
+## ✅ Diagnóstico
+- **Biópsia** (gordura abdominal/órgão) com **vermelho Congo (birrefringência verde-maçã)**; **tipagem da fibrila** (essencial — AL × ATTR muda o tratamento); pesquisar discrasia (eletroforese/imunofixação, cadeias leves livres); cintilografia óssea (ATTR cardíaca).
+
+## 🧪 Exames complementares
+| Exame | Objetivo |
+| --- | --- |
+| Biópsia + vermelho Congo | Confirmar amiloide |
+| Tipagem (IHQ/espectrometria) | AL × ATTR |
+| Cadeias leves, imunofixação | Discrasia (AL) |
+| Eco/RM cardíaca, cintilografia | Cardíaca/ATTR |
+
+## 💊 Tratamento
+- **AL:** tratar a discrasia de plasmócitos (esquemas com daratumumabe/bortezomibe) — hematologia.
+- **ATTR:** **estabilizadores (tafamidis)** e silenciadores gênicos; ATTR hereditária → considerar transplante.
+- Suporte de órgão (IC, renal); cautela com certas drogas na forma cardíaca.
+
+## 💡 Pérolas
+- IC com parede espessa + baixa voltagem no ECG = suspeitar de amiloidose cardíaca.
+- Tipar a fibrila é obrigatório (AL e ATTR têm tratamentos totalmente diferentes).`,
+
+hemocromatose: `# Hemocromatose Hereditária
+
+> Sobrecarga de **ferro** (em geral mutação HFE/C282Y) com depósito em órgãos. Tratável — quanto antes, melhor.
+
+## 🩺 Quadro clínico
+- Fadiga, artralgia (2ª/3ª metacarpofalângicas), **hepatopatia** (cirrose, risco de hepatocarcinoma), **diabetes** ("diabetes bronzeado"), **hiperpigmentação**, hipogonadismo, miocardiopatia/arritmia.
+
+## ✅ Diagnóstico
+- **Saturação de transferrina elevada (> 45%)** + **ferritina alta** = triagem; **teste genético HFE** confirma; RM hepática (quantifica o ferro)/biópsia em casos selecionados.
+
+## 🧪 Exames complementares
+| Exame | Objetivo |
+| --- | --- |
+| Saturação de transferrina, ferritina | Triagem |
+| Genética HFE | Confirmar |
+| RM hepática | Sobrecarga/fibrose |
+| Glicemia, função hepática | Órgão-alvo |
+
+## 💊 Tratamento
+- **Flebotomia (sangria) periódica** — pilar; alvo de ferritina baixo-normal; depois manutenção.
+- **Quelante de ferro** (deferasirox) se flebotomia inviável (ex.: anemia).
+- Evitar álcool, suplemento de ferro e excesso de vitamina C; rastrear carcinoma hepatocelular se cirrose; rastrear familiares.
+
+## 💡 Pérolas
+- Ferritina alta + saturação de transferrina alta = investigar hemocromatose (genética HFE).
+- Flebotomia precoce previne cirrose, diabetes e miocardiopatia.`,
+
+fabry: `# Doença de Fabry
+
+> Doença de depósito lisossômico **ligada ao X** (deficiência de **alfa-galactosidase A**) → acúmulo de globotriaosilceramida em vasos/órgãos.
+
+## 🩺 Quadro clínico
+- **Acroparestesias** (dor em queimação em mãos/pés, desencadeada por calor/exercício/febre), **angioqueratomas**, hipohidrose, córnea verticilata; tardio: **doença renal** (proteinúria → DRC), **cardíaca** (hipertrofia, arritmia), **AVC precoce**.
+
+## ✅ Diagnóstico
+- **Homens: dosagem da enzima alfa-galactosidase A (baixa)**; **mulheres: teste genético** (a enzima pode ser normal); lyso-Gb3 como biomarcador.
+
+## 🧪 Exames complementares
+| Exame | Objetivo |
+| --- | --- |
+| Alfa-galactosidase A | Diagnóstico (homens) |
+| Teste genético GLA | Confirmar (esp. mulheres) |
+| Proteinúria, função renal | Órgão-alvo |
+| ECG/eco | Cardíaco |
+
+## 💊 Tratamento
+- **Terapia de reposição enzimática** (agalsidase) ou **chaperona oral (migalastate)** em mutações suscetíveis.
+- Suporte: IECA/BRA para a proteinúria, manejo cardíaco/AVC, analgesia das crises (evitar gatilhos); aconselhamento genético familiar.
+
+## 💡 Pérolas
+- Dor neuropática em mãos/pés desde a juventude + proteinúria/hipertrofia cardíaca/AVC precoce = pensar Fabry.
+- Mulheres podem ter enzima normal — confirmar por genética.`,
+
+acromegalia: `# Acromegalia
+
+> Excesso de **GH** (quase sempre **adenoma hipofisário**), com aumento de IGF-1. Instalação insidiosa — o diagnóstico costuma demorar anos.
+
+## 🩺 Quadro clínico
+- Crescimento de **extremidades** (mãos, pés), **traços faciais grosseiros** (prognatismo, aumento de nariz/lábios), macroglossia, sudorese, artralgia, **túnel do carpo**, apneia do sono; HAS, **diabetes**, miocardiopatia; cefaleia e **alteração do campo visual** (efeito de massa).
+
+## ✅ Diagnóstico
+- **IGF-1 elevado** (triagem) + **GH que não suprime no TOTG** (confirma); depois **RM de hipófise** (adenoma). Avaliar campo visual e demais eixos hipofisários.
+
+## 🧪 Exames complementares
+| Exame | Objetivo |
+| --- | --- |
+| IGF-1 | Triagem |
+| GH no TOTG | Confirmar (não suprime) |
+| RM de hipófise | Adenoma |
+| Campimetria | Compressão do quiasma |
+
+## 💊 Tratamento
+- **Cirurgia transesfenoidal** (1ª linha) do adenoma.
+- **Medicamentoso** (doença residual/inoperável): **análogos da somatostatina** (octreotida/lanreotida), **pegvisomanto** (antagonista de GH), cabergolina; radioterapia em casos selecionados.
+- Tratar comorbidades (diabetes, HAS, apneia); rastrear pólipos colônicos.
+
+## 💡 Pérolas
+- Aumento de extremidades + traços faciais + túnel do carpo + diabetes = dosar IGF-1.
+- Confirma-se pela não supressão do GH no TOTG (não por uma dosagem isolada de GH).`,
+
+paget_osseo: `# Doença de Paget Óssea
+
+> Remodelação óssea desorganizada e acelerada → ossos aumentados, deformados e frágeis. Comum em idosos; muitas vezes **assintomática** (achado de fosfatase alcalina alta).
+
+## 🩺 Quadro clínico
+- **Dor óssea**, deformidades (tíbia em sabre, aumento do crânio), fraturas, artrose secundária; **hipoacusia** (acometimento do crânio), compressão nervosa; raramente IC de alto débito e degeneração sarcomatosa.
+
+## ✅ Diagnóstico
+- **Fosfatase alcalina elevada** (marcador de atividade) com cálcio em geral normal; **RX** (lesões líticas/blásticas, espessamento cortical); **cintilografia óssea** mapeia a extensão.
+
+## 🧪 Exames complementares
+| Exame | Objetivo |
+| --- | --- |
+| Fosfatase alcalina | Atividade |
+| RX dos ossos | Padrão típico |
+| Cintilografia óssea | Extensão |
+| Cálcio, vitamina D | Antes do bifosfonato |
+
+## 💊 Tratamento (com doses)
+- **Bifosfonato** é o tratamento de escolha — **ácido zoledrônico IV em dose única** é muito eficaz (normaliza a fosfatase alcalina por longos períodos); corrigir vitamina D/cálcio antes.
+- Indicado se sintomático ou sítio de risco (crânio, perto de articulação, ossos de carga); analgesia, suporte ortopédico/audiológico.
+
+## 💡 Pérolas
+- Fosfatase alcalina isolada muito alta com cálcio normal no idoso = pensar Paget.
+- Ácido zoledrônico em dose única controla a doença por anos.`,
+
+goodpasture: `# Doença Anti-MBG (Síndrome de Goodpasture)
+
+> Autoanticorpos contra a **membrana basal glomerular e alveolar** → **glomerulonefrite rapidamente progressiva (GNRP) + hemorragia alveolar**. Emergência.
+
+## 🩺 Quadro clínico
+- **Síndrome pulmão-rim:** hemoptise/hemorragia alveolar (dispneia, infiltrados, anemia) + **GNRP** (hematúria, proteinúria, lesão renal aguda em dias-semanas). Tabagismo/infecção podem precipitar o componente pulmonar.
+
+## ✅ Diagnóstico
+- **Anticorpo anti-MBG** sérico positivo; **biópsia renal** (crescentes + **depósito linear de IgG** na imunofluorescência). Pesquisar ANCA associado (sobreposição).
+
+## 🧪 Exames complementares
+| Exame | Objetivo |
+| --- | --- |
+| Anti-MBG | Diagnóstico |
+| Biópsia renal | Crescentes / IgG linear |
+| ANCA | Sobreposição |
+| Função renal, hemograma | Gravidade/anemia |
+
+## 💊 Tratamento (com doses) — não atrasar
+- **Plasmaférese** (remove anticorpos) + **corticoide + ciclofosfamida** (imunossupressão).
+- Suporte: hemorragia alveolar (O₂/ventilação), diálise se necessário.
+- O prognóstico renal depende de iniciar **antes** de creatinina muito alta/dependência de diálise.
+
+## 💡 Pérolas
+- Hemoptise + lesão renal aguda com hematúria = síndrome pulmão-rim → dosar anti-MBG já.
+- Plasmaférese + imunossupressão precoces salvam o rim (e a vida).`,
+
+takayasu: `# Arterite de Takayasu
+
+> Vasculite granulomatosa de **grandes vasos** (aorta e ramos), típica de **mulher jovem (< 40 anos)**. "Doença sem pulso".
+
+## 🩺 Quadro clínico
+- Fase sistêmica (febre, mal-estar, perda de peso) → fase vascular: **claudicação de membros**, **pulsos assimétricos/ausentes**, **diferença de PA entre os braços**, sopros arteriais, HAS (estenose de artéria renal), tontura/síncope, isquemia.
+
+## ✅ Diagnóstico
+- **Angio-TC/angio-RM ou PET** dos grandes vasos (espessamento parietal, estenoses, dilatações); VHS/PCR (atividade). Diferenciar de arterite de células gigantes (idade mais avançada).
+
+## 🧪 Exames complementares
+| Exame | Objetivo |
+| --- | --- |
+| Angio-TC/RM / PET de aorta | Estenose/espessamento |
+| VHS, PCR | Atividade inflamatória |
+| PA nos 4 membros | Assimetria |
+
+## 💊 Tratamento
+- **Corticoide** (alta dose) é a base; **imunossupressor poupador** (metotrexato, azatioprina) e **anti-TNF/tocilizumabe** em refratários.
+- **Revascularização** (angioplastia/cirurgia) em estenoses críticas — idealmente com a doença controlada; controlar HAS e fatores de risco.
+
+## 💡 Pérolas
+- Mulher jovem com pulsos/PA assimétricos, claudicação e VHS alto = Takayasu.
+- Controlar a inflamação antes de revascularizar (reduz reestenose).`,
+
 neutropenia_febril: `# Neutropenia Febril
 
 > **Emergência oncológica.** Febre em paciente neutropênico (pós-quimio) — pode evoluir rápido para choque. ATB de amplo espectro em < 1h.
