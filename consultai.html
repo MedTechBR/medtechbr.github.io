@@ -624,7 +624,12 @@ function renderConfig(){const c=state.cfg;
    <div class="two"><div class="field"><label>Endereço</label><input id="c_end" value="${esc(c.endereco)}" placeholder="Rua, nº — cidade"></div>
     <div class="field"><label>Telefone</label><input id="c_tel" value="${esc(c.telefone)}" placeholder="(11) 3333-3333"></div></div>
    <div class="row"><button class="btn btn-p" onclick="saveCfg()">Salvar dados</button></div></div>
-   ${docsHtml}`;
+   ${docsHtml}
+   <div class="phead" style="margin-top:14px;border-color:#f3c2c2;background:#fef6f6">
+     <h2 style="font-size:16px;margin-bottom:4px;color:var(--red)">⚠️ Zona de risco</h2>
+     <div class="sub" style="color:var(--muted);font-size:13px;margin-bottom:12px">Apaga definitivamente <b>todos os pacientes, prontuários, receituários, agendamentos e documentos importados</b>. Suas configurações de médico/clínica são mantidas. Não há como desfazer.</div>
+     <button class="btn" style="background:var(--red);color:#fff" onclick="wipeData()">🗑️ Apagar todos os dados</button>
+   </div>`;
 }
 function saveCfg(){
   state.cfg={medico:document.getElementById('c_med').value.trim(),crm:document.getElementById('c_crm').value.trim(),esp:document.getElementById('c_esp').value.trim(),clinica:document.getElementById('c_cli').value.trim(),endereco:document.getElementById('c_end').value.trim(),telefone:document.getElementById('c_tel').value.trim()};
@@ -632,6 +637,13 @@ function saveCfg(){
 }
 function copyDoc(i){const d=state.docs[i];if(d&&navigator.clipboard)navigator.clipboard.writeText(d.out||'');}
 function delDoc(i){if(confirm('Excluir este documento importado?')){state.docs.splice(i,1);persist();renderConfig();}}
+function wipeData(){
+  if(!confirm('Apagar TODOS os pacientes, prontuários, receituários, agendamentos e documentos importados?\n\nSuas configurações de médico/clínica serão mantidas. Esta ação NÃO pode ser desfeita.'))return;
+  if(!confirm('Confirma a exclusão definitiva de todos os dados clínicos?'))return;
+  state={patients:[],appts:[],records:[],prescriptions:[],docs:[],cfg:state.cfg,migratedEvoluai:true};
+  persist();curPac=null;setView('config');
+  setTimeout(()=>alert('Pronto — todos os dados foram apagados.'),60);
+}
 
 /* ===== WhatsApp ===== */
 function onlyDigits(s){return String(s||'').replace(/\D/g,'');}
