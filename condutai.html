@@ -929,90 +929,311 @@ const SPECIALTIES = {
   gastro:     { label: 'Gastro/Hepato', icon: '🩺' },
   nefro:      { label: 'Nefrologia', icon: '💧' },
   hemato:     { label: 'Hematologia', icon: '🩸' },
-  reumato:    { label: 'Reumatologia', icon: '🦴' }
+  reumato:    { label: 'Reumatologia', icon: '🦴' },
+  gineco:     { label: 'Gineco/Obstetrícia', icon: '🤰' },
+  psiq:       { label: 'Psiquiatria', icon: '🧩' },
+  derm:       { label: 'Dermatologia', icon: '🧴' },
+  uro:        { label: 'Urologia', icon: '🚹' },
+  olho_orl:   { label: 'Oftalmo/ORL', icon: '👁️' },
+  geriatria:  { label: 'Geriatria', icon: '👴' },
+  onco_pal:   { label: 'Onco/Paliativos', icon: '🎗️' }
 };
 
 const PROTOCOLS = [
-  // CARDIO
+  // ====== CARDIO ======
   { id: 'stemi', icon: '❤️', name: 'IAM com supra ST — STEMI', tags: 'AHA/ACC · Antitrombóticos · ICP primária · Fibrinólise', specialty: 'cardio', guideline: 'AHA 2025' },
   { id: 'nstemi', icon: '❤️', name: 'IAM sem supra ST — NSTEMI/SCA-SST', tags: 'GRACE · TIMI · Antitrombóticos · Estratégia invasiva', specialty: 'cardio', guideline: 'ESC 2023' },
   { id: 'acls', icon: '⚡', name: 'ACLS — Parada Cardiorrespiratória', tags: 'AHA · FV/TV sem pulso · Epinefrina · Amiodarona', specialty: 'cardio', guideline: 'AHA 2025' },
   { id: 'ic_descomp', icon: '💔', name: 'Insuficiência cardíaca aguda descompensada', tags: 'ESC · Diurético · Vasodilatador · Inotrópico', specialty: 'cardio', guideline: 'ESC 2023' },
+  { id: 'ic_cronica', icon: '❤️', name: 'IC crônica — manejo (ICFEr/ICFEp)', tags: 'ESC · IECA/ARNI · BB · MRA · SGLT2', specialty: 'cardio', guideline: 'ESC 2023' },
   { id: 'fa_rvr', icon: '〰️', name: 'Fibrilação atrial com RVR', tags: 'ESC · Controle FC · Cardioversão · Anticoagulação', specialty: 'cardio', guideline: 'ESC 2024' },
+  { id: 'fa_cronica', icon: '〰️', name: 'FA crônica — anticoagulação e ritmo', tags: 'CHA2DS2-VASc · HAS-BLED · DOAC · Ablação', specialty: 'cardio', guideline: 'ESC 2024' },
+  { id: 'flutter', icon: '〰️', name: 'Flutter atrial', tags: 'Cardioversão · Ablação · Anticoagulação', specialty: 'cardio', guideline: 'ESC 2024' },
+  { id: 'tpsv', icon: '⚡', name: 'Taquicardia supraventricular (TPSV)', tags: 'Manobra vagal · Adenosina · Verapamil · Cardioversão', specialty: 'cardio', guideline: 'ESC 2019' },
+  { id: 'tv_sustent', icon: '⚡', name: 'TV sustentada (com pulso)', tags: 'Amiodarona · Procainamida · Cardioversão sincronizada', specialty: 'cardio', guideline: 'AHA 2017' },
+  { id: 'bradiarritmia', icon: '🐢', name: 'Bradiarritmias e BAV', tags: 'Atropina · Dopamina · MP transcutâneo · Transvenoso', specialty: 'cardio', guideline: 'ESC 2021' },
   { id: 'crise_ht', icon: '🩸', name: 'Crise hipertensiva — emergência vs urgência', tags: 'SBC · Nitroprussiato · Esmolol · Lesão órgão-alvo', specialty: 'cardio', guideline: 'SBC 2020' },
+  { id: 'hipertensao_resist', icon: '🩺', name: 'Hipertensão arterial resistente', tags: 'MAPA · Espironolactona · Causas secundárias', specialty: 'cardio', guideline: 'AHA 2018' },
   { id: 'eap', icon: '💨', name: 'Edema agudo de pulmão cardiogênico', tags: 'VNI · Furosemida · Nitroglicerina · Morfina', specialty: 'cardio', guideline: 'ESC 2023' },
   { id: 'choque_cardio', icon: '⚠️', name: 'Choque cardiogênico', tags: 'SCAI · Noradrenalina · Dobutamina · BIA/Impella', specialty: 'cardio', guideline: 'AHA 2024' },
+  { id: 'dissecao_aorta', icon: '🆘', name: 'Dissecção aguda de aorta', tags: 'PA <120 · Esmolol · Stanford A vs B · Cirurgia', specialty: 'cardio', guideline: 'AHA 2022' },
   { id: 'endocardite', icon: '🦠', name: 'Endocardite infecciosa', tags: 'ESC · Duke · Vancomicina · Ceftriaxone · Cirurgia', specialty: 'cardio', guideline: 'ESC 2023' },
   { id: 'pericardite', icon: '🫀', name: 'Pericardite aguda e tamponamento', tags: 'ESC · AINE · Colchicina · Pericardiocentese', specialty: 'cardio', guideline: 'ESC 2015' },
+  { id: 'miocardite', icon: '🫀', name: 'Miocardite aguda', tags: 'RM cardíaca · Biópsia · Suporte hemodinâmico', specialty: 'cardio', guideline: 'AHA 2021' },
+  { id: 'cmh', icon: '🫀', name: 'Cardiomiopatia hipertrófica', tags: 'CDI · Mavacanteno · Septectomia', specialty: 'cardio', guideline: 'AHA 2020' },
+  { id: 'cmd', icon: '🫀', name: 'Cardiomiopatia dilatada', tags: 'Investigação etiológica · TMO · CDI/TRC', specialty: 'cardio', guideline: 'ESC 2023' },
+  { id: 'takotsubo', icon: '💔', name: 'Síndrome de Takotsubo', tags: 'Apical ballooning · Suporte · Anticoagulação se trombo', specialty: 'cardio', guideline: 'ESC 2024' },
+  { id: 'hap', icon: '🫁', name: 'Hipertensão pulmonar', tags: 'Classificação · Cateterismo · Vasodilatador pulmonar', specialty: 'cardio', guideline: 'ESC 2022' },
+  { id: 'chagas', icon: '🪲', name: 'Cardiopatia chagásica crônica', tags: 'ECG · Holter · CDI · Tripanocida', specialty: 'cardio', guideline: 'SBC 2023' },
+  { id: 'sincope', icon: '😵', name: 'Síncope — investigação e estratificação', tags: 'San Francisco · Canadian · Tilt · Holter', specialty: 'cardio', guideline: 'ESC 2018' },
+  { id: 'apneia_sono_cv', icon: '😴', name: 'Apneia obstrutiva do sono', tags: 'STOP-BANG · Polissonografia · CPAP · Risco CV', specialty: 'cardio', guideline: 'AASM 2024' },
 
-  // EMERGÊNCIA
+  // ====== EMERGÊNCIA ======
   { id: 'sepse', icon: '🦠', name: 'Sepse e choque séptico', tags: 'SSC · Bundle 1h · Noradrenalina · Antibiótico empírico', specialty: 'emergencia', guideline: 'SSC 2021' },
   { id: 'anafilaxia', icon: '⚡', name: 'Anafilaxia', tags: 'WAO · Adrenalina IM · Reposição · Anti-H1', specialty: 'emergencia', guideline: 'WAO 2020' },
   { id: 'politrauma', icon: '🚑', name: 'Politrauma — ATLS', tags: 'ATLS · ABCDE · FAST · Sangue maciço', specialty: 'emergencia', guideline: 'ATLS 2018' },
   { id: 'choque_hipov', icon: '🩸', name: 'Choque hipovolêmico/hemorrágico', tags: 'Cristaloide · Hemocomponentes · Ac. tranexâmico', specialty: 'emergencia', guideline: 'ATLS 2018' },
   { id: 'intox_geral', icon: '☠️', name: 'Intoxicação medicamentosa — abordagem geral', tags: 'Toxidromes · Descontaminação · Antídotos', specialty: 'emergencia', guideline: 'AACT 2023' },
   { id: 'intox_opio', icon: '💊', name: 'Intoxicação por opioides', tags: 'Naloxona · Reversão · Suporte ventilatório', specialty: 'emergencia', guideline: 'ACMT 2021' },
+  { id: 'intox_paracet', icon: '💊', name: 'Intoxicação por paracetamol', tags: 'N-acetilcisteína · Nomograma Rumack-Matthew', specialty: 'emergencia', guideline: 'AAPCC 2023' },
+  { id: 'intox_benzo', icon: '💊', name: 'Intoxicação por benzodiazepínicos', tags: 'Flumazenil · Suporte · Risco convulsão', specialty: 'emergencia', guideline: 'ACMT 2022' },
+  { id: 'intox_tca', icon: '💊', name: 'Intoxicação por antidepressivo tricíclico', tags: 'Bicarbonato · Lipídio EV · Convulsão · Arritmia', specialty: 'emergencia', guideline: 'AACT 2017' },
+  { id: 'intox_metanol', icon: '⚗️', name: 'Intoxicação por metanol/etilenoglicol', tags: 'Fomepizol · Etanol · Hemodiálise · Acidose', specialty: 'emergencia', guideline: 'AACT 2018' },
+  { id: 'intox_cocaina', icon: '⚗️', name: 'Intoxicação por cocaína/anfetaminas', tags: 'BZD · Hipertermia · Síndrome coronariana · Evitar BB', specialty: 'emergencia', guideline: 'AHA 2008' },
+  { id: 'intox_orgfos', icon: '⚗️', name: 'Intoxicação por organofosforado', tags: 'Atropina · Pralidoxima · Síndrome muscarínica', specialty: 'emergencia', guideline: 'WHO 2020' },
+  { id: 'intox_co', icon: '☁️', name: 'Intoxicação por monóxido de carbono', tags: 'O2 100% · O2 hiperbárico · COHb · Sequelas tardias', specialty: 'emergencia', guideline: 'UHMS 2019' },
+  { id: 'mordedura_anim', icon: '🐕', name: 'Mordedura animal — abordagem e raiva', tags: 'Profilaxia raiva · Antibiótico · MS · Tétano', specialty: 'emergencia', guideline: 'MS 2022' },
+  { id: 'picada_cobra', icon: '🐍', name: 'Picada de cobra peçonhenta', tags: 'Soro antiveneno · Bothrops/Crotalus · MS', specialty: 'emergencia', guideline: 'MS 2019' },
+  { id: 'picada_escorp', icon: '🦂', name: 'Picada de escorpião', tags: 'Soro antiescorpiônico · Suporte cardiovascular', specialty: 'emergencia', guideline: 'MS 2019' },
+  { id: 'picada_aranha', icon: '🕷️', name: 'Picada de aranha (Loxosceles/Phoneutria)', tags: 'Soro · Lesão cutânea · Hemólise · Suporte', specialty: 'emergencia', guideline: 'MS 2019' },
   { id: 'queimadura', icon: '🔥', name: 'Queimaduras — abordagem inicial', tags: 'Parkland · Via aérea · Analgesia · SBQ', specialty: 'emergencia', guideline: 'ABA 2023' },
+  { id: 'afogamento', icon: '🌊', name: 'Afogamento', tags: 'Classificação Szpilman · O2 · VM · Hipotermia', specialty: 'emergencia', guideline: 'SOBRASA 2020' },
+  { id: 'hipotermia', icon: '🥶', name: 'Hipotermia grave', tags: 'Reaquecimento ativo · ECMO · Arritmias', specialty: 'emergencia', guideline: 'Wilderness 2019' },
+  { id: 'heatstroke', icon: '🥵', name: 'Hipertermia maligna / heat stroke', tags: 'Resfriamento agressivo · Dantroleno · Rabdomiólise', specialty: 'emergencia', guideline: 'ACSM 2023' },
+  { id: 'eletrocussao', icon: '⚡', name: 'Lesão por eletricidade', tags: 'Rabdomiólise · Arritmia · Queimadura profunda', specialty: 'emergencia', guideline: 'ABA 2022' },
+  { id: 'ovace', icon: '🆘', name: 'Obstrução de via aérea por corpo estranho', tags: 'Heimlich · Adulto vs criança · Inconsciente', specialty: 'emergencia', guideline: 'AHA 2025' },
+  { id: 'sd_compart', icon: '🦵', name: 'Síndrome compartimental aguda', tags: 'Pressão >30mmHg · Fasciotomia · Rabdomiólise', specialty: 'emergencia', guideline: 'AAOS 2018' },
+  { id: 'rabdomio', icon: '💪', name: 'Rabdomiólise', tags: 'CPK · LRA · Hidratação · Bicarbonato', specialty: 'emergencia', guideline: 'KDIGO 2020' },
 
-  // INFECTO
+  // ====== INFECTO ======
   { id: 'pac', icon: '🫁', name: 'Pneumonia adquirida na comunidade (PAC)', tags: 'ATS/IDSA · CURB-65 · Ceftriaxone · Azitromicina', specialty: 'infecto', guideline: 'ATS/IDSA 2019' },
   { id: 'pav', icon: '🏥', name: 'Pneumonia hospitalar / associada à VM', tags: 'IDSA · Piptazo · Vancomicina · MDR risk', specialty: 'infecto', guideline: 'IDSA 2016' },
   { id: 'itu_comp', icon: '💧', name: 'ITU complicada / pielonefrite', tags: 'Ceftriaxone · Ciprofloxacino · Urocultura', specialty: 'infecto', guideline: 'IDSA 2010' },
+  { id: 'itu_naocomp', icon: '💧', name: 'Cistite não complicada', tags: 'Nitrofurantoína · SMX-TMP · Fosfomicina', specialty: 'infecto', guideline: 'IDSA 2011' },
   { id: 'celulite', icon: '🦵', name: 'Celulite e erisipela', tags: 'IDSA · Cefalexina · Clindamicina · Drenagem', specialty: 'infecto', guideline: 'IDSA 2014' },
+  { id: 'fascite_necr', icon: '🆘', name: 'Fascite necrosante', tags: 'LRINEC · Cirurgia urgente · Piptazo + Clinda', specialty: 'infecto', guideline: 'IDSA 2014' },
+  { id: 'choque_toxico', icon: '🦠', name: 'Síndrome do choque tóxico (TSS)', tags: 'Streptococos · Staphylococcus · Clindamicina · IVIG', specialty: 'infecto', guideline: 'IDSA 2014' },
+  { id: 'osteomielite', icon: '🦴', name: 'Osteomielite aguda e crônica', tags: 'Biópsia · Vancomicina · Cirurgia · Imagem', specialty: 'infecto', guideline: 'IDSA 2015' },
   { id: 'meningite', icon: '🧠', name: 'Meningite bacteriana aguda', tags: 'Ceftriaxone · Vancomicina · Dexametasona · LCR', specialty: 'infecto', guideline: 'IDSA 2017' },
-  { id: 'tb', icon: '🫁', name: 'Tuberculose pulmonar', tags: 'RIPE · BAAR · GeneXpert · MS', specialty: 'infecto', guideline: 'MS 2019' },
-  { id: 'hiv_diag', icon: '🧬', name: 'Diagnóstico recente de HIV — abordagem inicial', tags: 'PCDT · CV · CD4 · TARV imediato', specialty: 'infecto', guideline: 'MS PCDT 2024' },
-  { id: 'leptospirose', icon: '🐀', name: 'Leptospirose grave / S. Weil', tags: 'Penicilina · Ceftriaxone · Suporte renal', specialty: 'infecto', guideline: 'MS 2023' },
+  { id: 'tb_pulm', icon: '🫁', name: 'Tuberculose pulmonar', tags: 'RIPE · BAAR · GeneXpert · MS', specialty: 'infecto', guideline: 'MS 2019' },
+  { id: 'tb_extra', icon: '🦴', name: 'Tuberculose extrapulmonar', tags: 'Meníngea · Ganglionar · Pleural · MS', specialty: 'infecto', guideline: 'MS 2019' },
+  { id: 'hiv_diag', icon: '🧬', name: 'Diagnóstico recente de HIV', tags: 'PCDT · CV · CD4 · TARV imediato', specialty: 'infecto', guideline: 'MS PCDT 2024' },
+  { id: 'hiv_avancado', icon: '🧬', name: 'HIV avançado / doenças oportunistas', tags: 'PCP · Toxo · Cripto · IRIS · CD4 baixo', specialty: 'infecto', guideline: 'MS PCDT 2024' },
+  { id: 'sifilis', icon: '🧬', name: 'Sífilis (todas as fases)', tags: 'VDRL/FTA · Penicilina benzatina · Acompanhamento', specialty: 'infecto', guideline: 'MS 2022' },
+  { id: 'hep_b_aguda', icon: '🟡', name: 'Hepatite B aguda', tags: 'HBsAg/AntiHBc · Suporte · Critérios para tratar', specialty: 'infecto', guideline: 'AASLD 2018' },
+  { id: 'hep_b_cron', icon: '🟡', name: 'Hepatite B crônica', tags: 'Tenofovir · Entecavir · CV · Cirrose', specialty: 'infecto', guideline: 'AASLD 2018' },
+  { id: 'hep_c', icon: '🟡', name: 'Hepatite C crônica', tags: 'Sofosbuvir/Velpatasvir · PCR · Cura virológica', specialty: 'infecto', guideline: 'AASLD 2023' },
+  { id: 'hep_a', icon: '🟡', name: 'Hepatite A aguda', tags: 'Suporte · Hepatite fulminante · Vacinação', specialty: 'infecto', guideline: 'CDC 2023' },
+  { id: 'leptospirose', icon: '🐀', name: 'Leptospirose / Síndrome de Weil', tags: 'Penicilina · Ceftriaxone · Suporte renal', specialty: 'infecto', guideline: 'MS 2023' },
   { id: 'dengue', icon: '🦟', name: 'Dengue — classificação e manejo', tags: 'MS · Sinais alarme · Hidratação · Plaquetopenia', specialty: 'infecto', guideline: 'MS 2024' },
+  { id: 'chikungunya', icon: '🦟', name: 'Chikungunya', tags: 'Artralgia · Sintomático · Diferencial dengue', specialty: 'infecto', guideline: 'MS 2023' },
+  { id: 'zika', icon: '🦟', name: 'Zika', tags: 'Gestante · Microcefalia · GBS · Diferencial dengue', specialty: 'infecto', guideline: 'MS 2023' },
+  { id: 'malaria', icon: '🦟', name: 'Malária', tags: 'Falciparum vs vivax · Artemeter · Primaquina', specialty: 'infecto', guideline: 'MS 2020' },
+  { id: 'febre_amarela', icon: '🦟', name: 'Febre amarela', tags: 'Suporte · Insuficiência hepática · Vacinação', specialty: 'infecto', guideline: 'MS 2022' },
+  { id: 'covid_grave', icon: '😷', name: 'COVID-19 grave (hospitalar)', tags: 'Dexametasona · Anticoagulação · Remdesivir · Oxigênio', specialty: 'infecto', guideline: 'WHO 2024' },
+  { id: 'influenza', icon: '🤧', name: 'Influenza grave', tags: 'Oseltamivir · Suporte · Coinfecção bacteriana', specialty: 'infecto', guideline: 'IDSA 2018' },
+  { id: 'mono', icon: '🦠', name: 'Mononucleose infecciosa', tags: 'EBV · Linfocitose atípica · Esplenomegalia', specialty: 'infecto', guideline: 'IDSA 2024' },
+  { id: 'toxoplasmose', icon: '🧠', name: 'Toxoplasmose cerebral (HIV)', tags: 'Sulfadiazina · Pirimetamina · Ácido folínico', specialty: 'infecto', guideline: 'IDSA 2020' },
+  { id: 'criptococose', icon: '🧠', name: 'Criptococose meníngea', tags: 'Anfotericina B · Flucitosina · Fluconazol', specialty: 'infecto', guideline: 'IDSA 2010' },
+  { id: 'pneumocistose', icon: '🫁', name: 'Pneumocistose (PCP)', tags: 'SMX-TMP · Corticoide · LDH · TC tórax', specialty: 'infecto', guideline: 'CDC/IDSA 2024' },
+  { id: 'histoplasmose', icon: '🦠', name: 'Histoplasmose disseminada', tags: 'Anfotericina · Itraconazol · HIV', specialty: 'infecto', guideline: 'IDSA 2007' },
+  { id: 'pcm', icon: '🦠', name: 'Paracoccidioidomicose', tags: 'Itraconazol · SMX-TMP · Anfotericina · Crônica', specialty: 'infecto', guideline: 'SBI 2017' },
+  { id: 'tetano', icon: '🦠', name: 'Tétano', tags: 'Soro antitetânico · Metronidazol · BZD · Sedação', specialty: 'infecto', guideline: 'MS 2019' },
 
-  // PNEUMO
+  // ====== PNEUMO ======
   { id: 'asma_exac', icon: '🫁', name: 'Exacerbação de asma', tags: 'GINA · SABA · Corticoide · Magnésio · VNI', specialty: 'pneumo', guideline: 'GINA 2024' },
   { id: 'dpoc_exac', icon: '🚬', name: 'Exacerbação de DPOC', tags: 'GOLD · Broncodilatador · Corticoide · ATB · VNI', specialty: 'pneumo', guideline: 'GOLD 2024' },
   { id: 'tep', icon: '🩸', name: 'Tromboembolismo pulmonar (TEP)', tags: 'ESC · Wells · sPESI · DOAC · Trombólise', specialty: 'pneumo', guideline: 'ESC 2019' },
   { id: 'pneumotorax', icon: '💨', name: 'Pneumotórax', tags: 'BTS · Drenagem · Punção · Espontâneo vs traumático', specialty: 'pneumo', guideline: 'BTS 2023' },
   { id: 'derrame', icon: '💧', name: 'Derrame pleural — investigação', tags: 'Light · Toracocentese · Exsudato vs transudato', specialty: 'pneumo', guideline: 'ATS 2022' },
+  { id: 'empiema', icon: '🫁', name: 'Empiema pleural', tags: 'Drenagem torácica · Antibiótico · Fibrinolítico intrapleural', specialty: 'pneumo', guideline: 'BTS 2023' },
+  { id: 'sdra', icon: '🫁', name: 'SARA / SDRA (ARDS)', tags: 'Berlin · VT baixo · PEEP · Prona · ECMO', specialty: 'pneumo', guideline: 'ATS 2023' },
+  { id: 'vni_criterios', icon: '😮‍💨', name: 'VNI — critérios, indicação e ajuste', tags: 'BiPAP/CPAP · IPAP/EPAP · Falha · Intubação', specialty: 'pneumo', guideline: 'ERS 2017' },
+  { id: 'hemoptise', icon: '🩸', name: 'Hemoptise maciça', tags: 'Volume crítico · Broncoscopia · Embolização arterial', specialty: 'pneumo', guideline: 'BTS 2019' },
+  { id: 'bronquiec', icon: '🫁', name: 'Bronquiectasia', tags: 'BronchiectaSever · ATB suprimido · Fisioterapia', specialty: 'pneumo', guideline: 'ERS 2017' },
+  { id: 'fpi', icon: '🫁', name: 'Fibrose pulmonar idiopática (FPI)', tags: 'Pirfenidona · Nintedanibe · TCAR · Exacerbação', specialty: 'pneumo', guideline: 'ATS 2022' },
+  { id: 'sarcoidose', icon: '🫁', name: 'Sarcoidose', tags: 'Adenomegalias hilares · Granuloma · Corticoide', specialty: 'pneumo', guideline: 'ATS 2020' },
+  { id: 'aspergilose', icon: '🍄', name: 'Aspergilose pulmonar', tags: 'Voriconazol · Galactomanana · Invasiva vs ABPA', specialty: 'pneumo', guideline: 'IDSA 2016' },
+  { id: 'ca_pulmao', icon: '🫁', name: 'Carcinoma de pulmão — apresentação', tags: 'TC tórax · Biópsia · Estadiamento · Driver mutations', specialty: 'pneumo', guideline: 'NCCN 2024' },
 
-  // ENDOCRINO
+  // ====== ENDOCRINO ======
   { id: 'cad', icon: '🍬', name: 'Cetoacidose diabética (CAD)', tags: 'ADA · Hidratação · Insulina BIC · Eletrólitos', specialty: 'endocrino', guideline: 'ADA 2024' },
   { id: 'ehh', icon: '🍬', name: 'Estado hiperglicêmico hiperosmolar (EHH)', tags: 'ADA · Hidratação agressiva · Insulina · Osmolaridade', specialty: 'endocrino', guideline: 'ADA 2024' },
   { id: 'hipoglicemia', icon: '⬇️', name: 'Hipoglicemia grave', tags: 'Glicose 50% · Glucagon · Causa subjacente', specialty: 'endocrino', guideline: 'ADA 2024' },
+  { id: 'dm2_amb', icon: '🍬', name: 'DM2 — manejo ambulatorial', tags: 'Metformina · iSGLT2 · GLP-1 · Insulinização', specialty: 'endocrino', guideline: 'ADA 2024' },
   { id: 'crise_tireo', icon: '🦋', name: 'Crise tireotóxica (tempestade)', tags: 'PTU · Propranolol · Hidrocortisona · Iodeto', specialty: 'endocrino', guideline: 'ATA 2016' },
-  { id: 'insuf_adrenal', icon: '⬇️', name: 'Insuficiência adrenal aguda', tags: 'Hidrocortisona · Salina · Cortisol basal', specialty: 'endocrino', guideline: 'Endocrine Society 2016' },
+  { id: 'coma_mixed', icon: '🦋', name: 'Coma mixedematoso', tags: 'Levotiroxina EV · Hidrocortisona · UTI', specialty: 'endocrino', guideline: 'ATA 2014' },
+  { id: 'tireoidite', icon: '🦋', name: 'Tireoidites (subaguda, Hashimoto, pós-parto)', tags: 'AINE · Corticoide · BB · TSH/T4', specialty: 'endocrino', guideline: 'ATA 2016' },
+  { id: 'insuf_adrenal', icon: '⬇️', name: 'Insuficiência adrenal aguda', tags: 'Hidrocortisona · Salina · Cortisol basal', specialty: 'endocrino', guideline: 'ES 2016' },
+  { id: 'cushing', icon: '⬆️', name: 'Síndrome de Cushing — investigação', tags: 'Cortisol salivar · 1mg dexa · ACTH · RM hipofisária', specialty: 'endocrino', guideline: 'ES 2008' },
+  { id: 'feocromo', icon: '⚡', name: 'Feocromocitoma', tags: 'Metanefrinas · Bloqueio α antes β · Imagem', specialty: 'endocrino', guideline: 'ES 2014' },
+  { id: 'hiperaldo', icon: '🧂', name: 'Hiperaldosteronismo primário', tags: 'Aldosterona/renina · Cateterismo · Espironolactona', specialty: 'endocrino', guideline: 'ES 2016' },
+  { id: 'di', icon: '💧', name: 'Diabetes insipidus', tags: 'Central vs nefrogênico · DDAVP · Privação de água', specialty: 'endocrino', guideline: 'ES 2022' },
   { id: 'hipona', icon: '🧂', name: 'Hiponatremia — investigação e manejo', tags: 'Osmolaridade · SIADH · Salina 3% · Velocidade correção', specialty: 'endocrino', guideline: 'ESE 2014' },
-  { id: 'hipercalcemia', icon: '🦴', name: 'Hipercalcemia grave', tags: 'Hidratação · Calcitonina · Bisfosfonato · Denosumab', specialty: 'endocrino', guideline: 'Endocrine Society 2022' },
+  { id: 'hiperna', icon: '🧂', name: 'Hipernatremia', tags: 'Cálculo deficit · Velocidade correção · DI', specialty: 'endocrino', guideline: 'KDIGO 2024' },
+  { id: 'hipocalemia', icon: '🍌', name: 'Hipocalemia', tags: 'KCl oral vs EV · Mg associado · ECG', specialty: 'endocrino', guideline: 'KDIGO 2024' },
+  { id: 'hipercalcemia', icon: '🦴', name: 'Hipercalcemia grave', tags: 'Hidratação · Calcitonina · Bisfosfonato · Denosumab', specialty: 'endocrino', guideline: 'ES 2022' },
+  { id: 'hipocalcemia', icon: '🦴', name: 'Hipocalcemia grave', tags: 'Gluconato Ca · Vitamina D · Magnésio', specialty: 'endocrino', guideline: 'ES 2016' },
+  { id: 'hipomag', icon: '⚗️', name: 'Hipomagnesemia', tags: 'Sulfato Mg · Causas farmacológicas · ECG', specialty: 'endocrino', guideline: 'KDIGO 2024' },
+  { id: 'hipofosf', icon: '⚗️', name: 'Hipofosfatemia', tags: 'Refeeding · Reposição EV · Rabdomiólise', specialty: 'endocrino', guideline: 'ASPEN 2020' },
 
-  // NEURO
+  // ====== NEURO ======
   { id: 'avc_isq', icon: '🧠', name: 'AVC isquêmico em janela', tags: 'AHA · NIHSS · Alteplase · Trombectomia · ASPECTS', specialty: 'neuro', guideline: 'AHA 2024' },
   { id: 'avc_hem', icon: '🧠', name: 'AVC hemorrágico (HIP)', tags: 'AHA · Controle PA · Reversão de anticoagulação', specialty: 'neuro', guideline: 'AHA 2022' },
+  { id: 'ait', icon: '🧠', name: 'AIT — abordagem e estratificação', tags: 'ABCD2 · Imagem · Antiplaquetário · Estatina', specialty: 'neuro', guideline: 'AHA 2021' },
+  { id: 'hsa', icon: '🧠', name: 'Hemorragia subaracnóidea (HSA)', tags: 'Hunt-Hess · TC · PL · Nimodipina · Aneurisma', specialty: 'neuro', guideline: 'AHA 2023' },
+  { id: 'tce_grave', icon: '🤕', name: 'Trauma cranioencefálico grave', tags: 'Glasgow · TC · PIC · Salina 3% · Cirurgia', specialty: 'neuro', guideline: 'BTF 2017' },
   { id: 'epileptico', icon: '⚡', name: 'Estado de mal epiléptico', tags: 'BZD · Fenitoína · Levetiracetam · Anestésico', specialty: 'neuro', guideline: 'NCS 2016' },
+  { id: 'crise_conv', icon: '⚡', name: 'Crise convulsiva primária — abordagem', tags: 'BZD · Investigação · Antiepiléptico · Direção', specialty: 'neuro', guideline: 'AAN 2015' },
   { id: 'cefaleia_trovao', icon: '⚡', name: 'Cefaleia em trovoada', tags: 'TC sem contraste · Punção lombar · HSA · RCVS', specialty: 'neuro', guideline: 'AAN 2019' },
+  { id: 'cefaleia_prim', icon: '🤕', name: 'Cefaleias primárias (migrânea/tensional/cluster)', tags: 'Triptanos · Profilaxia · Anti-CGRP', specialty: 'neuro', guideline: 'AAN 2024' },
   { id: 'gbs', icon: '🦵', name: 'Síndrome de Guillain-Barré', tags: 'Imunoglobulina · Plasmaférese · VM precoce', specialty: 'neuro', guideline: 'EAN 2023' },
+  { id: 'miastenia_crise', icon: '👁️', name: 'Crise miastênica', tags: 'IVIG · Plasmaférese · Piridostigmina · UTI', specialty: 'neuro', guideline: 'MGFA 2021' },
+  { id: 'em_surto', icon: '🧠', name: 'Surto de esclerose múltipla', tags: 'Pulsoterapia · Plasmaférese · TMO modificadora', specialty: 'neuro', guideline: 'AAN 2018' },
+  { id: 'parkinson', icon: '🧠', name: 'Doença de Parkinson — manejo', tags: 'Levodopa · Agonistas · Sintomas não motores', specialty: 'neuro', guideline: 'IPMDS 2021' },
+  { id: 'delirium', icon: '🌀', name: 'Delirium — investigação e manejo', tags: 'CAM · Causa subjacente · Haloperidol · Não-farmacológico', specialty: 'neuro', guideline: 'NICE 2023' },
+  { id: 'demencia_inv', icon: '🧠', name: 'Demência — investigação inicial', tags: 'MEEM · MoCA · Imagem · Reversíveis · Alzheimer', specialty: 'neuro', guideline: 'AAN 2024' },
+  { id: 'vertigem', icon: '🌀', name: 'Vertigem aguda — central vs periférico', tags: 'HINTS · Dix-Hallpike · Manobra Epley · AVC', specialty: 'neuro', guideline: 'AAN 2017' },
+  { id: 'mielite', icon: '🧠', name: 'Mielite transversa aguda', tags: 'RM medular · Pulsoterapia · NMO · Plasmaférese', specialty: 'neuro', guideline: 'EAN 2022' },
+  { id: 'cauda_eq', icon: '🦵', name: 'Síndrome da cauda equina', tags: 'RM emergencial · Cirurgia descompressiva · 48h', specialty: 'neuro', guideline: 'AANS 2022' },
 
-  // GASTRO
+  // ====== GASTRO/HEPATO ======
   { id: 'hda_var', icon: '🩸', name: 'HDA varicosa', tags: 'Baveno · Terlipressina · Octreotide · EDA precoce', specialty: 'gastro', guideline: 'Baveno VII 2022' },
   { id: 'hda_naovar', icon: '🩸', name: 'HDA não-varicosa (úlcera)', tags: 'IBP · Glasgow-Blatchford · EDA terapêutica', specialty: 'gastro', guideline: 'ACG 2021' },
+  { id: 'hdb', icon: '🩸', name: 'Hemorragia digestiva baixa', tags: 'TC angio · Colonoscopia · Embolização · Diverticular', specialty: 'gastro', guideline: 'ACG 2023' },
   { id: 'pancreatite', icon: '🥩', name: 'Pancreatite aguda', tags: 'BISAP · Atlanta · Hidratação · Nutrição precoce', specialty: 'gastro', guideline: 'ACG 2024' },
   { id: 'colangite', icon: '🟡', name: 'Colangite aguda', tags: 'Tokyo · Antibiótico · CPRE precoce · Drenagem', specialty: 'gastro', guideline: 'Tokyo 2018' },
+  { id: 'colecistite', icon: '🟢', name: 'Colecistite aguda', tags: 'Tokyo · Antibiótico · Colecistectomia · USG', specialty: 'gastro', guideline: 'Tokyo 2018' },
+  { id: 'coledoco', icon: '🟢', name: 'Coledocolitíase', tags: 'CPRE · Esfincterotomia · Colangiografia', specialty: 'gastro', guideline: 'ESGE 2019' },
+  { id: 'apendicite', icon: '🆘', name: 'Apendicite aguda', tags: 'Alvarado · TC · Cirurgia · ATB', specialty: 'gastro', guideline: 'WSES 2020' },
+  { id: 'diverticulite', icon: '🩺', name: 'Diverticulite aguda', tags: 'Hinchey · ATB · Drenagem · Cirurgia', specialty: 'gastro', guideline: 'ASCRS 2020' },
+  { id: 'obstrucao_int', icon: '🩺', name: 'Obstrução intestinal', tags: 'TC · SNG · Cirurgia · Volvo · Brida', specialty: 'gastro', guideline: 'WSES 2018' },
+  { id: 'isq_mesent', icon: '🆘', name: 'Isquemia mesentérica aguda', tags: 'AngioTC · Heparinização · Cirurgia · Reperfusão', specialty: 'gastro', guideline: 'WSES 2017' },
   { id: 'hep_alcool', icon: '🍷', name: 'Hepatite alcoólica grave', tags: 'Maddrey · Lille · Prednisolona · Pentoxifilina', specialty: 'gastro', guideline: 'AASLD 2020' },
   { id: 'encef_hep', icon: '🧠', name: 'Encefalopatia hepática', tags: 'Lactulose · Rifaximina · Identificar precipitante', specialty: 'gastro', guideline: 'AASLD 2014' },
+  { id: 'pbe', icon: '🩸', name: 'Peritonite bacteriana espontânea (PBE)', tags: 'Paracentese · Ceftriaxone · Albumina · Profilaxia', specialty: 'gastro', guideline: 'AASLD 2021' },
+  { id: 'sd_hepatorrenal', icon: '💧', name: 'Síndrome hepatorrenal', tags: 'Albumina · Terlipressina · Noradrenalina · TIPS', specialty: 'gastro', guideline: 'AASLD 2021' },
+  { id: 'ascite', icon: '💧', name: 'Ascite — investigação e manejo', tags: 'GASA · Paracentese · Espironolactona · Furosemida', specialty: 'gastro', guideline: 'AASLD 2021' },
+  { id: 'cirrose_inicial', icon: '🟡', name: 'Cirrose hepática — avaliação inicial', tags: 'Child-Pugh · MELD · Rastreio CHC · Profilaxias', specialty: 'gastro', guideline: 'AASLD 2018' },
+  { id: 'nash', icon: '🟡', name: 'Esteatohepatite (NAFLD/NASH/MAFLD)', tags: 'FIB-4 · Elastografia · Estilo de vida · Resmetirom', specialty: 'gastro', guideline: 'AASLD 2024' },
+  { id: 'chc', icon: '🟡', name: 'Carcinoma hepatocelular — diagnóstico', tags: 'BCLC · TC trifásica · AFP · Transplante', specialty: 'gastro', guideline: 'AASLD 2023' },
+  { id: 'doenca_celiaca', icon: '🌾', name: 'Doença celíaca', tags: 'Antitransglutaminase · Biópsia · Glúten zero', specialty: 'gastro', guideline: 'ACG 2023' },
+  { id: 'drge', icon: '🔥', name: 'DRGE — abordagem', tags: 'IBP · Endoscopia · Sinais alarme · Refratário', specialty: 'gastro', guideline: 'ACG 2022' },
+  { id: 'ulcera_pep', icon: '🩺', name: 'Doença ulcerosa péptica e H. pylori', tags: 'Esquema tripla · Quadrupla · Resistência claritro', specialty: 'gastro', guideline: 'ACG 2022' },
+  { id: 'crohn_surto', icon: '🩺', name: 'Doença de Crohn — surto agudo', tags: 'Corticoide · Biológicos · Cirurgia · Estenose/fístula', specialty: 'gastro', guideline: 'AGA 2024' },
+  { id: 'rcu_surto', icon: '🩺', name: 'Retocolite ulcerativa — surto', tags: 'Mesalazina · Corticoide · Anti-TNF · Megacólon', specialty: 'gastro', guideline: 'AGA 2024' },
 
-  // NEFRO
-  { id: 'lra', icon: '💧', name: 'Lesão renal aguda (LRA/IRA)', tags: 'KDIGO · Pré/intra/pós · Estatificação · TRS', specialty: 'nefro', guideline: 'KDIGO 2012' },
-  { id: 'hipercalemia', icon: '🍌', name: 'Hipercalemia grave', tags: 'Gluconato Ca · Insulina + glicose · B2 · Resina · HD', specialty: 'nefro', guideline: 'KDIGO 2024' },
+  // ====== NEFRO ======
+  { id: 'lra', icon: '💧', name: 'Lesão renal aguda (LRA/IRA)', tags: 'KDIGO · Pré/intra/pós · Estadiamento · TRS', specialty: 'nefro', guideline: 'KDIGO 2012' },
+  { id: 'hipercalemia', icon: '🍌', name: 'Hipercalemia grave', tags: 'Gluconato Ca · Insulina+glicose · B2 · Resina · HD', specialty: 'nefro', guideline: 'KDIGO 2024' },
   { id: 'acid_metab', icon: '⚗️', name: 'Acidose metabólica grave', tags: 'Anion gap · Lactato · Bicarbonato · Causa base', specialty: 'nefro', guideline: 'KDIGO 2018' },
   { id: 'doenca_renal', icon: '💧', name: 'Doença renal crônica — manejo', tags: 'KDIGO · TFG · Albuminuria · IECA/BRA · SGLT2', specialty: 'nefro', guideline: 'KDIGO 2024' },
+  { id: 'colica_renal', icon: '🪨', name: 'Cólica renal / litíase', tags: 'AINE · TC sem contraste · Tamsulosina · Cirurgia', specialty: 'nefro', guideline: 'EAU 2023' },
+  { id: 'hematuria', icon: '🔴', name: 'Hematúria — investigação', tags: 'Glomerular vs não · Cito urinária · Imagem · Cisto', specialty: 'nefro', guideline: 'AUA 2020' },
+  { id: 'gnrp', icon: '💧', name: 'Glomerulonefrite rapidamente progressiva', tags: 'ANCA · Anti-MBG · Pulso · Plasmaférese · Rituximabe', specialty: 'nefro', guideline: 'KDIGO 2021' },
+  { id: 'sd_nefrot', icon: '💧', name: 'Síndrome nefrótica', tags: 'Proteinúria · Biópsia · Membranosa · Lesão mínima', specialty: 'nefro', guideline: 'KDIGO 2021' },
+  { id: 'sd_nefrit', icon: '💧', name: 'Síndrome nefrítica', tags: 'Hematúria · Hipertensão · Pós-estrepto · IgA', specialty: 'nefro', guideline: 'KDIGO 2021' },
+  { id: 'nefrite_int', icon: '💧', name: 'Nefrite intersticial aguda', tags: 'Drogas · Eosinofilia · Corticoide · Biópsia', specialty: 'nefro', guideline: 'KDIGO 2021' },
+  { id: 'nefropatia_diab', icon: '💧', name: 'Nefropatia diabética', tags: 'Albuminúria · iSGLT2 · Finerenona · IECA/BRA', specialty: 'nefro', guideline: 'KDIGO 2024' },
 
-  // HEMATO
+  // ====== HEMATO ======
   { id: 'tvp', icon: '🩸', name: 'TVP — diagnóstico e anticoagulação', tags: 'Wells · D-dímero · DOAC · Duração', specialty: 'hemato', guideline: 'ASH 2020' },
   { id: 'plaquetopenia', icon: '🩸', name: 'Plaquetopenia aguda — investigação', tags: 'PTI · PTT · HIT · CIVD · Transfusão', specialty: 'hemato', guideline: 'ASH 2019' },
   { id: 'anemia_inv', icon: '🩸', name: 'Anemia — investigação inicial', tags: 'VCM · RDW · Reticulócitos · Ferro · B12/folato', specialty: 'hemato', guideline: 'ASH 2023' },
+  { id: 'anemia_ferro', icon: '🩸', name: 'Anemia ferropriva', tags: 'Ferritina <30 · Ferro EV · Investigação TGI', specialty: 'hemato', guideline: 'BSH 2021' },
+  { id: 'anemia_megalo', icon: '🩸', name: 'Anemia megaloblástica', tags: 'B12 · Folato · Schilling · Causa absorção', specialty: 'hemato', guideline: 'BSH 2014' },
+  { id: 'anemia_hemolit', icon: '🩸', name: 'Anemia hemolítica autoimune', tags: 'Coombs · Corticoide · Rituximabe · Esplenectomia', specialty: 'hemato', guideline: 'BSH 2017' },
+  { id: 'falcemia_crise', icon: '🩸', name: 'Crise vaso-oclusiva (anemia falciforme)', tags: 'Hidratação · Opioide · Hidroxiureia · Transfusão', specialty: 'hemato', guideline: 'ASH 2020' },
+  { id: 'civd', icon: '🩸', name: 'Coagulação intravascular disseminada', tags: 'ISTH score · Causa base · Hemocomponentes · Heparina', specialty: 'hemato', guideline: 'ISTH 2018' },
+  { id: 'leucemia_aguda', icon: '🩸', name: 'Leucemia aguda — apresentação inicial', tags: 'Mielograma · Citometria · Lise tumoral · Suporte', specialty: 'hemato', guideline: 'NCCN 2024' },
+  { id: 'linfoma_inic', icon: '🩸', name: 'Linfoma — investigação inicial', tags: 'Biópsia · PET-TC · LDH · Estadiamento', specialty: 'hemato', guideline: 'NCCN 2024' },
+  { id: 'mieloma_inic', icon: '🦴', name: 'Mieloma múltiplo — apresentação', tags: 'CRAB · Eletroforese · Cadeias leves · Biópsia MO', specialty: 'hemato', guideline: 'IMWG 2023' },
+  { id: 'lise_tumoral', icon: '⚠️', name: 'Síndrome de lise tumoral', tags: 'Rasburicase · Alopurinol · Hidratação · K/PO4', specialty: 'hemato', guideline: 'BSH 2015' },
   { id: 'reacao_transf', icon: '🩸', name: 'Reação transfusional aguda', tags: 'Parar · Hemolítica · Febril · TRALI · TACO', specialty: 'hemato', guideline: 'AABB 2023' },
   { id: 'reversao_anticoag', icon: '🩸', name: 'Reversão de anticoagulação por sangramento', tags: 'Vitamina K · CCP · Idarucizumab · Andexanet', specialty: 'hemato', guideline: 'ASH 2018' },
+  { id: 'sd_antifosf', icon: '🩸', name: 'Síndrome antifosfolípide', tags: 'aCL · LAC · β2GP1 · Warfarina · CAPS', specialty: 'hemato', guideline: 'EULAR 2019' },
 
-  // REUMATO
+  // ====== REUMATO ======
   { id: 'gota', icon: '🦶', name: 'Crise gotosa aguda', tags: 'AINE · Colchicina · Corticoide · Profilaxia', specialty: 'reumato', guideline: 'ACR 2020' },
   { id: 'artrite_sept', icon: '🦴', name: 'Artrite séptica', tags: 'Artrocentese · Vancomicina · Ceftriaxone · Drenagem', specialty: 'reumato', guideline: 'BSR 2018' },
   { id: 'lupus_grave', icon: '🦋', name: 'Lúpus — manifestações graves', tags: 'Nefrite · Pulsoterapia · Imunossupressão', specialty: 'reumato', guideline: 'EULAR 2023' },
+  { id: 'ar', icon: '🤲', name: 'Artrite reumatoide — manejo', tags: 'Metotrexato · Anti-TNF · DAS28 · Treat-to-target', specialty: 'reumato', guideline: 'EULAR 2023' },
+  { id: 'espondilo', icon: '🦴', name: 'Espondiloartrite axial', tags: 'BASDAI · Anti-TNF · HLA-B27 · Sacroileíte', specialty: 'reumato', guideline: 'ASAS-EULAR 2022' },
+  { id: 'vasculite_anca', icon: '🩸', name: 'Vasculites ANCA-associadas', tags: 'GPA · MPA · Rituximabe · Pulso · Plasmaférese', specialty: 'reumato', guideline: 'EULAR 2022' },
+  { id: 'arterite_temp', icon: '👴', name: 'Arterite de células gigantes', tags: 'VHS/PCR · Corticoide imediato · Biópsia · Tocilizumabe', specialty: 'reumato', guideline: 'ACR 2021' },
+  { id: 'polimialgia', icon: '👴', name: 'Polimialgia reumática', tags: 'Corticoide baixa dose · Ombros/quadril · VHS', specialty: 'reumato', guideline: 'ACR 2015' },
+  { id: 'sjogren', icon: '👁️', name: 'Síndrome de Sjögren', tags: 'Anti-Ro/La · Biópsia salivar · Sicca · Linfoma', specialty: 'reumato', guideline: 'EULAR 2020' },
+  { id: 'esclero', icon: '🤲', name: 'Esclerodermia / esclerose sistêmica', tags: 'Crise renal · IECA · MMF · Capilaroscopia', specialty: 'reumato', guideline: 'EULAR 2024' },
+  { id: 'fibromialgia', icon: '😣', name: 'Fibromialgia', tags: 'Diagnóstico clínico · Antidepressivos · Pregabalina · Exercício', specialty: 'reumato', guideline: 'EULAR 2017' },
+
+  // ====== GINECO/OBSTETRÍCIA ======
+  { id: 'pre_eclampsia', icon: '🤰', name: 'Pré-eclâmpsia', tags: 'PA · Proteinúria · MgSO4 · Anti-hipertensivo · Parto', specialty: 'gineco', guideline: 'ACOG 2024' },
+  { id: 'eclampsia', icon: '🤰', name: 'Eclâmpsia', tags: 'MgSO4 · Controle PA · Estabilização · Parto', specialty: 'gineco', guideline: 'ACOG 2024' },
+  { id: 'hellp', icon: '🤰', name: 'Síndrome HELLP', tags: 'Hemólise · LFT · Plaquetopenia · Parto · Corticoide', specialty: 'gineco', guideline: 'ACOG 2024' },
+  { id: 'gestacao_ectop', icon: '🤰', name: 'Gestação ectópica', tags: 'βHCG · USG · Metotrexato · Cirurgia', specialty: 'gineco', guideline: 'ACOG 2023' },
+  { id: 'hemorragia_pp', icon: '🩸', name: 'Hemorragia pós-parto', tags: 'Ocitocina · Misoprostol · Ergometrina · Balão · Histerectomia', specialty: 'gineco', guideline: 'WHO 2023' },
+  { id: 'tpp', icon: '🤰', name: 'Trabalho de parto prematuro', tags: 'Tocólise · Corticoide · MgSO4 neuroproteção', specialty: 'gineco', guideline: 'ACOG 2023' },
+  { id: 'aborto', icon: '🤰', name: 'Aborto — manejo', tags: 'Misoprostol · AMIU · Curetagem · Imunoglobulina anti-D', specialty: 'gineco', guideline: 'ACOG 2023' },
+  { id: 'dmg', icon: '🤰', name: 'Diabetes gestacional', tags: 'TOTG · Dieta · Insulina · Metformina · Macrossomia', specialty: 'gineco', guideline: 'ADA 2024' },
+  { id: 'itu_gestante', icon: '💧', name: 'ITU na gestação', tags: 'Bacteriúria · Cefalexina · Nitrofurantoína · Profilaxia', specialty: 'gineco', guideline: 'ACOG 2024' },
+  { id: 'tep_gestante', icon: '🩸', name: 'TEP / TVP na gestação', tags: 'HBPM · YEARS adaptado · D-dímero · Imagem segura', specialty: 'gineco', guideline: 'ESC 2019' },
+  { id: 'sua', icon: '🩸', name: 'Sangramento uterino anormal', tags: 'PALM-COEIN · USG · Histeroscopia · Hormonal', specialty: 'gineco', guideline: 'FEBRASGO 2022' },
+  { id: 'dip', icon: '🤰', name: 'Doença inflamatória pélvica', tags: 'Ceftriaxone · Doxiciclina · Metronidazol · Internação', specialty: 'gineco', guideline: 'CDC 2021' },
+  { id: 'cisto_torcao', icon: '⚠️', name: 'Cisto ovariano roto / torção anexial', tags: 'USG Doppler · Cirurgia urgente · Diferencial', specialty: 'gineco', guideline: 'ACOG 2022' },
+  { id: 'mola', icon: '🤰', name: 'Doença trofoblástica gestacional', tags: 'βHCG · USG · Esvaziamento · Quimio em coriocarcinoma', specialty: 'gineco', guideline: 'FIGO 2021' },
+
+  // ====== PSIQUIATRIA ======
+  { id: 'tent_suicid', icon: '🆘', name: 'Tentativa de suicídio — manejo', tags: 'Estratificação · Internação · Antídotos · Acompanhamento', specialty: 'psiq', guideline: 'APA 2024' },
+  { id: 'surto_psic', icon: '🌀', name: 'Surto psicótico agudo', tags: 'Haloperidol · Olanzapina · Contenção · Internação', specialty: 'psiq', guideline: 'APA 2020' },
+  { id: 'agitacao', icon: '⚡', name: 'Agitação psicomotora — contenção', tags: 'Verbal · Química · Mecânica · Haldol+Prometazina', specialty: 'psiq', guideline: 'WPA 2023' },
+  { id: 'depressao_grave', icon: '😔', name: 'Depressão grave / risco suicida', tags: 'ISRS · Internação · ECT · Risco-tempo', specialty: 'psiq', guideline: 'APA 2023' },
+  { id: 'mania', icon: '⚡', name: 'Episódio maníaco', tags: 'Lítio · Valproato · Antipsicótico · Internação', specialty: 'psiq', guideline: 'APA 2024' },
+  { id: 'panico', icon: '😨', name: 'Crise de pânico — manejo agudo', tags: 'Reasseguramento · BZD curto · TCC · ISRS profilaxia', specialty: 'psiq', guideline: 'APA 2023' },
+  { id: 'abst_etanol', icon: '🍷', name: 'Síndrome de abstinência alcoólica / DT', tags: 'CIWA-Ar · BZD · Tiamina · Eletrólitos', specialty: 'psiq', guideline: 'ASAM 2020' },
+  { id: 'abst_opio', icon: '💊', name: 'Abstinência de opioide', tags: 'COWS · Buprenorfina · Metadona · Clonidina', specialty: 'psiq', guideline: 'SAMHSA 2021' },
+  { id: 'abst_benzo', icon: '💊', name: 'Abstinência de benzodiazepínico', tags: 'Redução gradual · Convulsão · Substituição', specialty: 'psiq', guideline: 'BAP 2014' },
+  { id: 'snm', icon: '⚠️', name: 'Síndrome neuroléptica maligna', tags: 'Suspender neuroléptico · Dantroleno · Bromocriptina', specialty: 'psiq', guideline: 'APA 2020' },
+  { id: 'serotoninerg', icon: '⚠️', name: 'Síndrome serotoninérgica', tags: 'Hunter · Ciproheptadina · Suporte · BZD', specialty: 'psiq', guideline: 'AACT 2019' },
+  { id: 'catatonia', icon: '🧠', name: 'Catatonia', tags: 'Bush-Francis · Lorazepam teste · ECT · Diferencial', specialty: 'psiq', guideline: 'APA 2023' },
+  { id: 'intox_etanol_ag', icon: '🍷', name: 'Intoxicação alcoólica aguda', tags: 'Glicose · Tiamina · Suporte · Diferencial', specialty: 'psiq', guideline: 'ASAM 2020' },
+
+  // ====== DERMATO ======
+  { id: 'sjs_net', icon: '🔥', name: 'Stevens-Johnson / NET', tags: 'SCORTEN · Suspender droga · Suporte UTI · IVIG', specialty: 'derm', guideline: 'IDSC 2023' },
+  { id: 'dress', icon: '🔥', name: 'DRESS syndrome', tags: 'Eosinofilia · Hepatite · Corticoide sistêmico · RegiSCAR', specialty: 'derm', guideline: 'EADV 2022' },
+  { id: 'penfigo', icon: '🫧', name: 'Pênfigo / penfigoide', tags: 'Biópsia + IFD · Corticoide · Rituximabe', specialty: 'derm', guideline: 'EADV 2022' },
+  { id: 'eritrodermia', icon: '🔥', name: 'Eritrodermia', tags: 'Suporte · Termorregulação · Causa subjacente', specialty: 'derm', guideline: 'EADV 2021' },
+  { id: 'psoriase_grave', icon: '🩷', name: 'Psoríase grave / generalizada', tags: 'PASI · Biológicos · MTX · Apremilaste', specialty: 'derm', guideline: 'AAD 2024' },
+  { id: 'urticaria', icon: '🌸', name: 'Urticária aguda', tags: 'Anti-H1 · Corticoide · Diferenciar anafilaxia', specialty: 'derm', guideline: 'EAACI 2022' },
+  { id: 'celulite_facial', icon: '🦷', name: 'Celulite facial / Ludwig', tags: 'Ceftriaxone+Clinda · Via aérea · Drenagem', specialty: 'derm', guideline: 'IDSA 2014' },
+  { id: 'herpes_zoster', icon: '🌿', name: 'Herpes zoster', tags: 'Aciclovir · Gabapentina · Neuralgia pós-herpética', specialty: 'derm', guideline: 'CDC 2023' },
+
+  // ====== URO ======
+  { id: 'retencao_uri', icon: '💧', name: 'Retenção urinária aguda', tags: 'Sondagem · Causa obstrutiva · α-bloqueador', specialty: 'uro', guideline: 'AUA 2023' },
+  { id: 'torcao_test', icon: '🆘', name: 'Torção testicular', tags: 'Doppler · 6h · Cirurgia urgente · Distorsão manual', specialty: 'uro', guideline: 'EAU 2023' },
+  { id: 'priapismo', icon: '⚠️', name: 'Priapismo isquêmico', tags: 'Aspiração · Fenilefrina intracavernosa · 4h crítico', specialty: 'uro', guideline: 'AUA 2022' },
+  { id: 'prostatite_ag', icon: '🚹', name: 'Prostatite aguda', tags: 'Ciprofloxacino · SMX-TMP · Drenagem se abscesso', specialty: 'uro', guideline: 'EAU 2023' },
+  { id: 'epididimite', icon: '🚹', name: 'Epididimite aguda', tags: 'Ceftriaxone+Doxi · Doppler diferencial torção', specialty: 'uro', guideline: 'CDC 2021' },
+  { id: 'escroto_agudo', icon: '🆘', name: 'Escroto agudo — abordagem', tags: 'Torção vs epididimite · Doppler · Cirurgia', specialty: 'uro', guideline: 'EAU 2023' },
+
+  // ====== OFTALMO/ORL ======
+  { id: 'glaucoma_ag', icon: '👁️', name: 'Glaucoma agudo de ângulo fechado', tags: 'Pilocarpina · Acetazolamida · Iridotomia laser', specialty: 'olho_orl', guideline: 'AAO 2024' },
+  { id: 'oclusao_art', icon: '👁️', name: 'Oclusão da artéria central da retina', tags: 'Massagem ocular · IOP baixa · 90 min crítico', specialty: 'olho_orl', guideline: 'AAO 2024' },
+  { id: 'desc_retina', icon: '👁️', name: 'Descolamento de retina', tags: 'Cirurgia · Vitrectomia · Fotocoagulação', specialty: 'olho_orl', guideline: 'AAO 2024' },
+  { id: 'trauma_ocular', icon: '👁️', name: 'Trauma ocular', tags: 'Perfurante vs contuso · TC · Encaminhamento urgente', specialty: 'olho_orl', guideline: 'AAO 2023' },
+  { id: 'uveite_ag', icon: '👁️', name: 'Uveíte aguda', tags: 'Corticoide tópico · Cicloplégico · Investigar sistêmica', specialty: 'olho_orl', guideline: 'AAO 2024' },
+  { id: 'epistaxe', icon: '👃', name: 'Epistaxe grave', tags: 'Compressão · Tamponamento · Cauterização · Embolização', specialty: 'olho_orl', guideline: 'AAO-HNSF 2020' },
+  { id: 'abscesso_peri', icon: '🦠', name: 'Abscesso periamigdaliano', tags: 'Drenagem · Ceftriaxone+Clinda · Via aérea', specialty: 'olho_orl', guideline: 'AAO-HNSF 2021' },
+  { id: 'oem', icon: '👂', name: 'Otite externa maligna', tags: 'Pseudomonas · Ciprofloxacino · Diabéticos · TC base crânio', specialty: 'olho_orl', guideline: 'AAO-HNSF 2014' },
+  { id: 'vertigem_perif', icon: '🌀', name: 'Vertigem periférica (BPPV/Ménière)', tags: 'Dix-Hallpike · Epley · Betahistina · Diferencial central', specialty: 'olho_orl', guideline: 'AAO-HNSF 2017' },
+
+  // ====== GERIATRIA ======
+  { id: 'quedas', icon: '👴', name: 'Quedas no idoso — avaliação e prevenção', tags: 'Multifatorial · Timed Up & Go · Polifarmácia · Vitamina D', specialty: 'geriatria', guideline: 'AGS 2024' },
+  { id: 'polifarmacia', icon: '💊', name: 'Polifarmácia — desprescrição', tags: 'Beers · STOPP/START · Revisão sistemática', specialty: 'geriatria', guideline: 'AGS 2023' },
+  { id: 'sd_imobil', icon: '🛏️', name: 'Síndrome do imobilismo', tags: 'Úlcera pressão · TVP · Mobilização precoce', specialty: 'geriatria', guideline: 'SBGG 2023' },
+  { id: 'fragilidade', icon: '👴', name: 'Sarcopenia / fragilidade', tags: 'Fried · SARC-F · Proteína · Exercício resistido', specialty: 'geriatria', guideline: 'EWGSOP 2019' },
+  { id: 'delirium_idoso', icon: '🌀', name: 'Delirium no idoso', tags: 'CAM · Não-farmacológico · Haloperidol baixa dose', specialty: 'geriatria', guideline: 'AGS 2024' },
+  { id: 'demencia_av', icon: '🧠', name: 'Demência avançada — cuidados', tags: 'Conforto · Anorexia · Comunicação · Família', specialty: 'geriatria', guideline: 'AGS 2023' },
+  { id: 'aga', icon: '👴', name: 'Avaliação geriátrica ampla', tags: 'Funcional · Cognitiva · Humor · Social · Nutrição', specialty: 'geriatria', guideline: 'SBGG 2022' },
+
+  // ====== ONCO/PALIATIVOS ======
+  { id: 'neutropenia_febril', icon: '🩸', name: 'Neutropenia febril', tags: 'MASCC · Piptazo · Cefepima · Vanco · Antifúngico', specialty: 'onco_pal', guideline: 'IDSA 2024' },
+  { id: 'comp_medular', icon: '⚠️', name: 'Compressão medular metastática', tags: 'Dexametasona · RM urgente · Radioterapia · Cirurgia', specialty: 'onco_pal', guideline: 'NCCN 2024' },
+  { id: 'sd_vcs', icon: '⚠️', name: 'Síndrome da veia cava superior', tags: 'Posicionamento · Corticoide · RT · Stent · Trombólise', specialty: 'onco_pal', guideline: 'NCCN 2024' },
+  { id: 'dor_oncol', icon: '💊', name: 'Dor oncológica — manejo', tags: 'Escada OMS · Morfina · Adjuvantes · Rotação opioide', specialty: 'onco_pal', guideline: 'NCCN 2024' },
+  { id: 'fim_vida', icon: '🕊️', name: 'Cuidados no fim de vida', tags: 'Conforto · Sedação paliativa · Família · KOMI', specialty: 'onco_pal', guideline: 'WHO 2024' },
+  { id: 'nausea_pal', icon: '🤢', name: 'Náuseas em cuidados paliativos', tags: 'Causa · Metoclopramida · Haloperidol · Ondansetrona', specialty: 'onco_pal', guideline: 'NCCN 2024' },
+  { id: 'dispneia_pal', icon: '😮‍💨', name: 'Dispneia em cuidados paliativos', tags: 'Morfina baixa dose · O2 · Ventilador · Ansiolítico', specialty: 'onco_pal', guideline: 'NCCN 2024' },
+  { id: 'const_pal', icon: '🩺', name: 'Constipação em paliativos', tags: 'Profilaxia em opioide · Laxante osmótico+estimulante · Metilnaltrexona', specialty: 'onco_pal', guideline: 'NCCN 2024' },
 ];
 
 let currentProtocol = null; // protocolo selecionado da biblioteca (se for o caso)
@@ -1062,12 +1283,179 @@ function renderLibrary() {
   });
 }
 
+/* ===== Banco MedTech — conteúdo OFFLINE de protocolos-chave (abre sem IA) ===== */
+const OFFLINE = {
+anafilaxia: `## Reconhecimento
+Início agudo (minutos a horas):
+- Pele/mucosa (urticária, angioedema, prurido) **+** comprometimento respiratório (dispneia, sibilos, estridor, hipoxemia) **ou** hipotensão/hipoperfusão; **ou**
+- Hipotensão/broncoespasmo/sintomas laríngeos após exposição a alérgeno provável.
+
+## Conduta imediata
+1. **Adrenalina IM já** — 0,5 mg (0,01 mg/kg; máx 0,5 mg) no vasto lateral da coxa. **Repetir a cada 5–15 min** se sem melhora.
+2. Decúbito dorsal com membros inferiores elevados (não levantar o paciente bruscamente).
+3. **O₂** alto fluxo; prepare via aérea se estridor/edema de glote.
+4. **Volume**: SF 0,9% 1–2 L IV em bolus (20 mL/kg) se hipotensão.
+5. Adjuvantes (NÃO substituem adrenalina): anti-H1 (difenidramina 25–50 mg IV), corticoide (hidrocortisona 200 mg IV ou metilprednisolona 1–2 mg/kg).
+
+## Refratário
+- **Adrenalina IV em BIC** 0,05–0,1 mcg/kg/min titulada.
+- Em uso de betabloqueador: **glucagon** 1–5 mg IV em 5 min.
+
+## Depois
+Observar 4–6 h (até 12–24 h se grave/bifásica). Alta com **adrenalina autoinjetável**, plano escrito e encaminhamento ao alergista.`,
+acls: `## Ritmo chocável (FV / TV sem pulso)
+1. **RCP de alta qualidade** (100–120/min, 5–6 cm, retorno total do tórax, interrupções <10 s).
+2. **Desfibrilar** (bifásico 200 J) e reassumir RCP por 2 min imediatamente.
+3. **Adrenalina 1 mg IV/IO** após o 2º choque e a cada 3–5 min.
+4. **Amiodarona** 300 mg IV (2ª dose 150 mg) após o 3º choque — ou lidocaína 1–1,5 mg/kg.
+5. Via aérea avançada + capnografia (ETCO₂) quando possível.
+
+## Ritmo NÃO chocável (AESP / assistolia)
+- RCP contínua; **adrenalina 1 mg IV/IO assim que possível** e a cada 3–5 min. Não desfibrila.
+
+## A cada 2 min
+Checar ritmo/pulso e trocar quem comprime.
+
+## Causas reversíveis (5H/5T)
+Hipóxia, Hipovolemia, H⁺ (acidose), Hipo/Hipercalemia, Hipotermia · Pneumotórax hiperTensivo, Tamponamento, Toxinas, Trombose (coronária/pulmonar).
+
+## Pós-PCR (RCE)
+PAM ≥65, SpO₂ 92–98%, normocapnia, ECG 12 derivações (CAT se STEMI), controle de temperatura (32–37,5 °C), tratar a causa.`,
+sepse: `## Reconhecimento
+Infecção suspeita + disfunção orgânica. **qSOFA** (≥2 de: FR ≥22, PAS ≤100, alteração mental). Lactato como marcador de hipoperfusão.
+
+## Pacote da 1ª hora (Surviving Sepsis)
+1. **Lactato** (repetir em 2–4 h se >2 mmol/L).
+2. **Hemoculturas** (2 pares) **antes** do antibiótico — sem atrasar o ATB.
+3. **Antibiótico de amplo espectro IV** na 1ª hora (empírico conforme foco e perfil local).
+4. **Cristaloide 30 mL/kg IV** em até 3 h se hipotensão ou lactato ≥4.
+5. **Vasopressor** se hipotensão refratária à volemia — **noradrenalina** 1ª escolha, alvo **PAM ≥65**.
+
+## Reavaliação
+Perfusão (PA, diurese, lactato, enchimento capilar, nível de consciência). **Controle do foco** (drenagem/cirurgia) o quanto antes. Vasopressina como 2ª droga; hidrocortisona 200 mg/dia se choque refratário.`,
+cad: `## Diagnóstico
+Glicemia >250, **pH <7,3** e/ou HCO₃ <18, com cetonemia/cetonúria.
+
+## 1) Volume
+- SF 0,9% **1 L na 1ª hora** (15–20 mL/kg); depois 250–500 mL/h ajustando ao Na corrigido.
+- Glicemia **<200–250** → trocar para **SG 5%** (mantendo SF) e glicemia 150–200 até resolver a acidose.
+
+## 2) Potássio (ANTES da insulina)
+- K <3,3 → **repor K e adiar insulina**.
+- K 3,3–5,2 → insulina + **20–30 mEq de K/L**.
+- K >5,2 → não repor; monitorar.
+
+## 3) Insulina
+- **Regular IV** 0,1 U/kg/h em BIC. Meta de queda 50–75 mg/dL/h.
+- Manter até **resolução da acidose** (pH >7,3, HCO₃ ≥15, ânion-gap normal) — não só pela glicemia.
+
+## Observações
+Bicarbonato só se pH <6,9. Procurar o precipitante (infecção, má adesão, IAM). Transição p/ insulina SC com sobreposição de 1–2 h.`,
+hipercalemia: `## Gravidade
+Leve 5,5–5,9 · moderada 6,0–6,4 · **grave ≥6,5 ou alterações no ECG** (T apiculada, PR longo, QRS alargado, sinusoidal). **ECG imediato.**
+
+## Conduta (grave / ECG alterado)
+1. **Estabilizar a membrana**: **gluconato de cálcio 10% 10–20 mL IV** em 2–3 min (repetir se ECG persistir). Protege o coração — não baixa o K.
+2. **Shift intracelular**:
+   - **Insulina regular 10 U IV + glicose** (25 g / SG 50% 50 mL) — monitorar hipoglicemia.
+   - **Beta-2 nebulizado** (salbutamol 10–20 mg).
+   - Bicarbonato só se acidose metabólica.
+3. **Remover K**: diurético de alça (se volemia/função permitirem); **resina** (poliestireno) VO/retal; **diálise** se refratário ou IRA/IRC oligúrica.
+
+## Sempre
+Suspender fontes de K (dieta, IECA/BRA, espironolactona, AINE). Reavaliar K e ECG.`,
+hipoglicemia: `## Definição
+Glicemia <70 mg/dL com sintomas; **grave** quando exige terceiros (rebaixamento, convulsão).
+
+## Consciente, deglutindo
+- **15 g de carboidrato VO** (150 mL de suco/refrigerante comum, 3 balas, 1 colher de açúcar). Repetir em 15 min se mantém <70 ("regra dos 15").
+
+## Rebaixado / sem via oral
+- **Glicose IV**: SG 50% 40–60 mL (0,5–1 g/kg) em bolus; reavaliar e repetir.
+- Sem acesso venoso: **glucagon 1 mg IM/SC**.
+- Manter **SG 10%** em infusão se causa prolongada (sulfonilureia, insulina basal).
+
+## Depois
+Glicemia capilar seriada. Investigar causa (jejum, dose, etilismo, sepse, IR/insuf. adrenal). Sulfonilureia → internar (recorrência); considerar octreotida.`,
+avc_isq: `## Tempo é cérebro
+- **NIHSS**, glicemia, **TC de crânio sem contraste** imediata (afastar hemorragia).
+- Definir o **horário de início** (ou último horário visto bem).
+
+## Trombólise IV
+- Janela **até 4,5 h** (até 9 h / wake-up com mismatch em centros com neuroimagem avançada).
+- **Alteplase 0,9 mg/kg** (máx 90 mg): 10% em bolus, resto em 1 h. (Tenecteplase 0,25 mg/kg em bolus é alternativa.)
+- **PA <185/110** antes de trombolisar (labetalol/nicardipina); manter <180/105 por 24 h.
+- Checar contraindicações (sangramento, cirurgia recente, plaquetas <100 mil, INR >1,7…).
+
+## Trombectomia mecânica
+- **Oclusão de grande vaso** (circ. anterior): até **6 h**; **6–24 h** se mismatch favorável (DAWN/DEFUSE-3). Acionar neuro/hemodinâmica cedo — não atrasa a trombólise.
+
+## Geral
+Se não trombolisar, tolerar PA até ~220/120. AAS após 24 h (ou após excluir trombólise). Avaliar deglutição; profilaxia de TEV.`,
+epileptico: `## Definição
+Crise ≥5 min, ou crises sem recuperação da consciência entre elas. Emergência.
+
+## 0–5 min — estabilização
+ABC, O₂, monitor, **glicemia capilar** (se baixa: glicose IV ± tiamina), acesso venoso, coleta (eletrólitos, drogas).
+
+## 5–20 min — benzodiazepínico (1ª linha)
+- **Diazepam 0,15–0,2 mg/kg IV** (máx 10 mg), pode repetir; **ou midazolam 10 mg IM** (sem acesso); ou lorazepam 0,1 mg/kg IV.
+
+## 20–40 min — 2ª linha (antiepiléptico IV)
+- **Fenitoína 20 mg/kg IV** (máx 50 mg/min) **ou** valproato 40 mg/kg **ou** levetiracetam 60 mg/kg.
+
+## >40 min — refratário
+- **IOT + anestésico em BIC** (midazolam, propofol ou tiopental) com EEG contínuo, em UTI.
+
+## Sempre
+Buscar causa: hipoglicemia, distúrbio hidroeletrolítico, infecção do SNC, abstinência, intoxicação, suspensão de antiepiléptico.`,
+asma_exac: `## Gravidade
+Frases curtas, FR alta, musculatura acessória, **SpO₂**, pico de fluxo. Sinais graves: sonolência, **tórax silencioso**, bradicardia, SpO₂ <90%.
+
+## Conduta
+1. **O₂** para SpO₂ 93–95%.
+2. **Beta-2 de curta (salbutamol)**: spray + espaçador 4–10 jatos **ou** neb 2,5–5 mg, **repetir a cada 20 min na 1ª hora**.
+3. **Ipratrópio** associado nas crises moderadas/graves (0,5 mg neb).
+4. **Corticoide sistêmico precoce**: prednisolona 40–50 mg VO **ou** hidrocortisona 200 mg IV (manter 5–7 dias).
+5. Grave/refratária: **sulfato de magnésio 2 g IV** em 20 min; considerar salbutamol contínuo.
+
+## Exaustão / não melhora
+VNI com cautela; **IOT** se rebaixamento/exaustão/hipercapnia progressiva (ventilação com tempo expiratório longo p/ evitar auto-PEEP).
+
+## Alta
+Manter beta-2 + corticoide VO, revisar técnica inalatória e plano de ação, iniciar/ajustar corticoide inalatório.`,
+stemi: `## Diagnóstico
+Dor isquêmica + **supra de ST** ≥1 mm em 2 derivações contíguas (≥2 mm em V2–V3 homens / ≥1,5 mm mulheres) ou BRE novo. **ECG em <10 min** da chegada.
+
+## Reperfusão — o mais rápido possível
+- **ICP primária** preferida se disponível em **≤120 min** do primeiro contato (porta-balão ≤90 min).
+- **Fibrinólise** se ICP indisponível nesse prazo e sem contraindicação (sintomas <12 h) → depois encaminhar p/ CAT (estratégia fármaco-invasiva, 2–24 h).
+
+## Antitrombóticos
+- **AAS 150–300 mg** mastigado.
+- **2º antiagregante**: ticagrelor 180 mg (ou prasugrel; clopidogrel 300–600 mg se fibrinólise/idoso).
+- **Anticoagulante**: heparina (HNF/enoxaparina) conforme a estratégia.
+
+## Cuidados
+O₂ só se SpO₂ <90%. Nitrato/morfina p/ sintomas (evitar nitrato em IAM de VD, hipotensão ou uso de inibidor de PDE5). Betabloqueador e estatina de alta potência precoces se sem contraindicação. Monitor + desfibrilador à beira-leito.`
+};
 function runProtocol(id) {
   const p = PROTOCOLS.find(x => x.id === id);
   if (!p) return;
   currentProtocol = p;
+  if (OFFLINE[id]) { showOfflineProtocol(p); return; }  // conteúdo do banco, sem IA
   setMode('protocolo');
   run(p.name);
+}
+function showOfflineProtocol(p) {
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const item = { id, mode: 'protocolo', offline: true, query: p.name, text: OFFLINE[p.id], sources: [], ctx: 'adulto', cenario: 'emergencia', ctxLabel: 'Banco MedTech', cenarioLabel: 'Offline', date: new Date().toISOString(), starred: false, protocolMeta: p };
+  history.unshift(item); currentId = id; currentConversation = null; currentProtocol = null;
+  saveHistory(); renderSide();
+  document.getElementById('welcomeView').style.display = 'none';
+  document.getElementById('resultView').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  renderResultDireto(item);
 }
 
 // ============ Mode toggle ============
@@ -1732,66 +2120,43 @@ Lista com ANO. Formato: \`- [Sociedade] Título da diretriz (ANO) — link se po
 const TRANSIENT_STATUSES = [429, 500, 502, 503, 504];
 
 async function callGemini(contents, opts = {}) {
-  if (!apiKey) {
-    openApiModal();
-    throw new Error('Configure a API key primeiro.');
-  }
-
-  const usedModel = opts.model || model;
-  const maxRetries = opts.maxRetries ?? 3;
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${usedModel}:generateContent?key=${apiKey}`;
-  const body = {
-    contents,
-    tools: [{ google_search: {} }],
-    generationConfig: { temperature: 0.4, topP: 0.95, maxOutputTokens: 8192 }
-  };
-
+  // IA central MedTech (Vertex via gateway seguro, SEM chave) — usa o login MedTech.
+  const u = window.MT && window.MT.user;
+  if (!u) throw new Error('Entre na sua conta MedTech para usar a IA.');
+  let idToken;
+  try { idToken = await u.getIdToken(); } catch (e) { throw new Error('Sessão expirada — entre novamente.'); }
+  const usedModel = 'gemini-2.5-flash'; // o gateway central aceita só gemini-2.5-flash*
+  const maxRetries = opts.maxRetries ?? 2;
+  const body = { contents, model: usedModel, generationConfig: { temperature: 0.4, topP: 0.95, maxOutputTokens: 8192 } };
   let lastStatus = 0, lastErrText = '';
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     let res;
     try {
-      res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      res = await fetch('https://southamerica-east1-medtech-c658c.cloudfunctions.net/aigateway', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+        body: JSON.stringify(body)
+      });
     } catch (netErr) {
-      // erro de rede — tenta de novo
-      lastErrText = netErr.message || 'falha de rede';
-      lastStatus = 0;
-      if (attempt < maxRetries) {
-        const wait = 1500 * Math.pow(2, attempt);
-        updateLoadingSub(`⚠ Falha de rede. Tentando de novo em ${Math.round(wait/1000)}s...`);
-        await sleep(wait);
-        continue;
-      }
-      throw new Error('Falha de conexão com o Gemini: ' + lastErrText);
+      lastErrText = netErr.message || 'falha de rede'; lastStatus = 0;
+      if (attempt < maxRetries) { const wait = 1500 * Math.pow(2, attempt); updateLoadingSub(`⚠ Falha de rede. Tentando de novo em ${Math.round(wait/1000)}s...`); await sleep(wait); continue; }
+      throw new Error('Falha de conexão com a IA: ' + lastErrText);
     }
-
     if (res.ok) {
       const data = await res.json();
-      const cand = data.candidates?.[0];
-      if (!cand) throw new Error('Sem resposta do modelo (resposta vazia).');
-      const text = cand.content?.parts?.map(p => p.text).filter(Boolean).join('\n') || '';
-      const grounding = cand.groundingMetadata || {};
-      const sources = (grounding.groundingChunks || []).map(c => c.web).filter(Boolean).map(w => ({ title: w.title, uri: w.uri }));
-      return { text, sources, usedModel };
+      const text = (data && data.text) || '';
+      if (!text) throw new Error('Sem resposta do modelo (resposta vazia).');
+      return { text, sources: [], usedModel };
     }
-
-    lastStatus = res.status;
-    lastErrText = await res.text();
-
-    if (TRANSIENT_STATUSES.includes(res.status) && attempt < maxRetries) {
-      const wait = Math.min(2000 * Math.pow(2, attempt), 12000);
-      updateLoadingSub(`⚠ Modelo sobrecarregado (HTTP ${res.status}). Aguardando ${Math.round(wait/1000)}s para tentar de novo (tentativa ${attempt+2}/${maxRetries+1})...`);
-      await sleep(wait);
-      continue;
+    lastStatus = res.status; lastErrText = await res.text().catch(() => '');
+    if ((res.status === 429 || res.status === 502 || res.status === 503) && attempt < maxRetries) {
+      const wait = Math.min(2000 * Math.pow(2, attempt), 10000);
+      updateLoadingSub(`⚠ IA sobrecarregada (HTTP ${res.status}). Tentando de novo em ${Math.round(wait/1000)}s...`);
+      await sleep(wait); continue;
     }
-
-    break; // não-transient ou esgotou retries
+    break;
   }
-
-  // Construir mensagem friendly
-  const err = new Error(buildFriendlyError(lastStatus, lastErrText, usedModel));
-  err.status = lastStatus;
-  err.model = usedModel;
-  throw err;
+  let msg = ''; try { msg = JSON.parse(lastErrText).error || ''; } catch (e) {}
+  const err = new Error(msg || `Erro da IA (HTTP ${lastStatus || '—'}).`); err.status = lastStatus; throw err;
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
@@ -1824,6 +2189,7 @@ function buildFriendlyError(status, raw, usedModel) {
 function showLoading(query, mode) {
   document.getElementById('welcomeView').style.display = 'none';
   document.getElementById('resultView').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
   const spinnerCls = mode === 'socratica' ? 'spinner purple' : 'spinner';
   const labels = {
     direta: { title: 'Consultando diretrizes para', sub: 'Buscando guidelines mais recentes (15-40s)...' },
@@ -1876,7 +2242,7 @@ async function renderResultDireto(item) {
     <div class="result">
       <div class="result-header">
         <div style="flex:1;min-width:0;">
-          <div class="result-title">${isCaso ? 'Caso clínico' : titleDisplay} <span class="badge ${badgeCls}">${badgeText}</span></div>
+          <div class="result-title">${isCaso ? 'Caso clínico' : titleDisplay} <span class="badge ${badgeCls}">${item.offline ? '📚 Banco MedTech' : badgeText}</span></div>
           <div class="result-meta">${ctxLabel} • ${cenarioLabel} • ${formatDate(date)}${isCaso ? ` • <span title="${escapeHtml(query)}">${query.length} caracteres na evolução</span>` : ''}${isProto && protocolMeta ? ` • <strong style="color:var(--success)">${escapeHtml(protocolMeta.guideline)}</strong>` : ''}</div>
         </div>
         <div class="result-actions">
@@ -1887,8 +2253,8 @@ async function renderResultDireto(item) {
         </div>
       </div>
       <div class="alert ${alertCls}">
-        <span>${alertIcon}</span>
-        <div>${alertText}</div>
+        <span>${item.offline ? '📚' : alertIcon}</span>
+        <div>${item.offline ? 'Conteúdo do <strong>banco MedTech</strong> (offline, sem IA) — referência rápida. Confira doses e adapte ao paciente. Toque em 🔄 <strong>Refazer</strong> para a versão detalhada com IA.' : alertText}</div>
       </div>
       <div class="content">${md(text)}</div>
       ${renderSourcesHtml(sources)}
@@ -2089,7 +2455,7 @@ async function loadHistoric(id) {
 // ============ Run principal ============
 async function run(query) {
   if (!query.trim()) return;
-  if (!apiKey) { openApiModal(); return; }
+  if (!(window.MT && window.MT.user)) { return; }
 
   const ctx = document.getElementById('ctxSelect')?.value || 'adulto';
   const cenario = document.getElementById('cenarioSelect')?.value || 'emergencia';

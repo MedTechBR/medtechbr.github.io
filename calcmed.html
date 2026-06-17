@@ -340,6 +340,17 @@ const CALCS=[
 {cat:'Hepatologia',id:'maddrey',name:'Função discriminante de Maddrey',desc:'Gravidade da hepatite alcoólica.',
  fields:`<div class="grid2">${fld('TP do paciente (s)',inp('tp','','0.1'))}${fld('TP controle (s)',inp('tc','','0.1'))}</div>${fld('Bilirrubina total (mg/dL)',inp('bil','','0.1'))}`,
  calc(){const tp=num('tp'),tc=num('tc'),bil=num('bil');if(!tp||!tc||isNaN(bil))return null;const v=4.6*(tp-tc)+bil;let c='< 32 — leve a moderada',b='b-green';if(v>=32){c='≥ 32 — grave (considerar corticoide; avaliar Lille)';b='b-red'}return{val:fmt(v,1),unit:'',interp:c,badge:b}}},
+
+/* ---------------- HEMATOLOGIA ---------------- */
+{cat:'Hematologia',id:'hscore',name:'HScore (hemofagocitose / LHH)',desc:'Probabilidade de linfo-histiocitose hemofagocítica (Fardet, 2014).',
+ fields:`${fld('Imunossupressão conhecida (HIV, imunossupressores)',sel('imu',[['0','Não (0)'],['18','Sim (18)']]))}${fld('Temperatura (°C)',sel('t',[['0','< 38,4 (0)'],['33','38,4–39,4 (33)'],['49','> 39,4 (49)']]))}${fld('Organomegalia',sel('org',[['0','Ausente (0)'],['23','Hepato OU esplenomegalia (23)'],['38','Hepato E esplenomegalia (38)']]))}${fld('Nº de citopenias (Hb≤9,2 / Leuco≤5.000 / Plaq≤110.000)',sel('cit',[['0','1 linhagem (0)'],['24','2 linhagens (24)'],['34','3 linhagens (34)']]))}${fld('Ferritina (ng/mL)',sel('fer',[['0','< 2.000 (0)'],['35','2.000–6.000 (35)'],['50','> 6.000 (50)']]))}${fld('Triglicerídeos (mg/dL)',sel('tg',[['0','< 133 (0)'],['44','133–354 (44)'],['64','> 354 (64)']]))}${fld('Fibrinogênio (mg/dL)',sel('fib',[['0','> 250 (0)'],['30','≤ 250 (30)']]))}${fld('AST / TGO (U/L)',sel('ast',[['0','< 30 (0)'],['19','≥ 30 (19)']]))}${fld('Hemofagocitose no aspirado de medula',sel('hemo',[['0','Não (0)'],['35','Sim (35)']]))}`,
+ calc(){let s=0;['imu','t','org','cit','fer','tg','fib','ast','hemo'].forEach(i=>s+=num(i)||0);let c,b;if(s<=90){c='Baixa probabilidade de LHH (< 1%)';b='b-green'}else if(s<169){c='Probabilidade intermediária';b='b-amber'}else{c='Alta probabilidade de LHH (≈ 88–99%)';b='b-red'}return{val:s,unit:'pontos',interp:c,badge:b}}},
+{cat:'Hematologia',id:'plasmic',name:'PLASMIC (PTT)',desc:'Probabilidade de deficiência grave de ADAMTS13 (PTT) na microangiopatia trombótica.',
+ fields:`<div class="checks">${chk('p1','Plaquetas < 30.000/µL')}${chk('p2','Hemólise (reticulócitos > 2,5%, haptoglobina indetectável ou bilirrubina indireta > 2 mg/dL)')}${chk('p3','Ausência de câncer ativo')}${chk('p4','Sem transplante de órgão sólido ou de medula')}${chk('p5','VCM < 90 fL')}${chk('p6','INR < 1,5')}${chk('p7','Creatinina < 2,0 mg/dL')}</div>`,
+ calc(){let s=0;['p1','p2','p3','p4','p5','p6','p7'].forEach(i=>{if(checked(i))s++});let c,b;if(s<=4){c='Baixo risco de PTT (deficiência grave de ADAMTS13 improvável)';b='b-green'}else if(s===5){c='Risco intermediário';b='b-amber'}else{c='Alto risco de PTT — considere plasmaférese empírica';b='b-red'}return{val:s,unit:'/ 7',interp:c,badge:b}}},
+{cat:'Hematologia',id:'quatrots',name:'4Ts (HIT / plaquetopenia por heparina)',desc:'Probabilidade pré-teste de trombocitopenia induzida por heparina.',
+ fields:`${fld('Trombocitopenia (queda)',sel('a1',[['2','Queda > 50% e nadir ≥ 20.000 (2)'],['1','Queda 30–50% ou nadir 10–19.000 (1)'],['0','Queda < 30% ou nadir < 10.000 (0)']]))}${fld('Tempo da queda',sel('a2',[['2','5–10 dias, ou ≤ 1 dia com heparina recente (≤30d) (2)'],['1','> 10 dias ou incerto (1)'],['0','< 4 dias sem exposição recente (0)']]))}${fld('Trombose / sequelas',sel('a3',[['2','Nova trombose, necrose cutânea ou reação sistêmica (2)'],['1','Trombose progressiva/recorrente ou eritema (1)'],['0','Nenhuma (0)']]))}${fld('OuTras causas de plaquetopenia',sel('a4',[['2','Nenhuma aparente (2)'],['1','Possível (1)'],['0','Definida (0)']]))}`,
+ calc(){const s=(num('a1')||0)+(num('a2')||0)+(num('a3')||0)+(num('a4')||0);let c,b;if(s<=3){c='Baixa probabilidade de HIT (≈ 1%) — suspende anticoagulação não é necessária só por isso';b='b-green'}else if(s<=5){c='Probabilidade intermediária (≈ 10–14%)';b='b-amber'}else{c='Alta probabilidade de HIT (≈ 64%) — suspender heparina e anticoagular com não-heparínico';b='b-red'}return{val:s,unit:'pontos',interp:c,badge:b}}},
 ];
 
 let current=CALCS[0].id;
@@ -348,7 +359,7 @@ function renderMenu(filter=''){
   const m=document.getElementById('menu');m.innerHTML='';let lastCat='';
   CALCS.filter(c=>(c.name+c.desc+c.cat).toLowerCase().includes(filter.toLowerCase())).forEach(c=>{
     if(c.cat!==lastCat){const d=document.createElement('div');d.className='cat';d.textContent=c.cat;m.appendChild(d);lastCat=c.cat;}
-    const b=document.createElement('button');b.textContent=c.name;b.className=(c.id===current?'active':'');b.onclick=()=>{current=c.id;renderMenu(filter);renderPanel();window.scrollTo({top:0,behavior:'smooth'});};m.appendChild(b);
+    const b=document.createElement('button');b.textContent=c.name;b.className=(c.id===current?'active':'');b.onclick=()=>{current=c.id;renderMenu(filter);renderPanel();if(window.innerWidth<=860){const el=document.getElementById('panel');window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-64,behavior:'smooth'});}else{window.scrollTo({top:0,behavior:'smooth'});}};m.appendChild(b);
   });
 }
 function filterList(){renderMenu(document.getElementById('search').value)}
