@@ -849,11 +849,6 @@ document.getElementById('fixedSheet').addEventListener('change', async e => {
   const file = e.target.files?.[0];
   e.target.value = '';
   if (!file) return;
-  if (!Gemini.getKey()) {
-    toast('Configure sua Gemini API Key');
-    document.getElementById('settingsDialog').showModal();
-    return;
-  }
   toast('Analisando planilha…', 6000);
   try {
     const { items } = await Gemini.analyzeFixedSheet(file, state.categories);
@@ -912,11 +907,6 @@ document.getElementById('aiAsk').addEventListener('click', () => {
 document.getElementById('aiDeep').addEventListener('click', () => runDeepAnalysis());
 
 async function runAnalysis(question = '') {
-  if (!Gemini.getKey()) {
-    toast('Configure sua Gemini API Key');
-    document.getElementById('settingsDialog').showModal();
-    return;
-  }
   showAIOutput(`<p class="muted">Analisando…</p>`);
   try {
     const text = await Gemini.analyzeMonth({
@@ -933,11 +923,6 @@ async function runAnalysis(question = '') {
 }
 
 async function runDeepAnalysis() {
-  if (!Gemini.getKey()) {
-    toast('Configure sua Gemini API Key');
-    document.getElementById('settingsDialog').showModal();
-    return;
-  }
   if (!state.transactions.length) {
     showAIOutput(`<p>Você ainda não tem transações. Lance alguns gastos primeiro.</p>`);
     return;
@@ -968,11 +953,6 @@ document.getElementById('invoiceFile').addEventListener('change', async e => {
   const file = e.target.files?.[0];
   e.target.value = '';
   if (!file) return;
-  if (!Gemini.getKey()) {
-    toast('Configure sua Gemini API Key');
-    document.getElementById('settingsDialog').showModal();
-    return;
-  }
   showAIOutput(`<p class="muted">Lendo arquivo… (pode levar até 30s)</p>`);
   try {
     const { items } = await Gemini.analyzeInvoice(file, state.categories);
@@ -1048,12 +1028,6 @@ audioRecord.addEventListener('click', startRecording);
 audioStop.addEventListener('click', stopRecording);
 
 async function startRecording() {
-  if (!Gemini.getKey()) {
-    toast('Configure sua Gemini API Key');
-    audioDialog.close();
-    document.getElementById('settingsDialog').showModal();
-    return;
-  }
   try {
     // Constraints de áudio mono + sample rate baixo já reduzem tamanho final
     const stream = await navigator.mediaDevices.getUserMedia({

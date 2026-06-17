@@ -271,16 +271,42 @@ const Gemini = (() => {
 
 Use markdown com seções (\`##\`), bullets, valores em R$ (formato brasileiro). Seja direto, sem floreio. Tom amigável mas profissional.`;
 
-    const data = {
-      categories: categories.map(c => ({ name: c.name, type: c.type })),
-      fixedItems: fixedItems.map(f => ({ name: f.name, type: f.type, amount: f.amount, category: f.category })),
-      transactions: transactions.map(t => ({
-        type: t.type, amount: t.amount, category: t.category, description: t.description, date: t.date,
-      })),
+    // IMPORTANTE: agregamos no cliente antes de enviar. Mandar TODAS as transações cruas
+    // estourava o tamanho/tempo da requisição (causava "Failed to fetch" em quem tem muitos
+    // lançamentos). O resumo agregado é leve e dá à IA exatamente o que ela precisa.
+    const num = v => Number(v) || 0;
+    const monthOf = t => (t.date || '').slice(0, 7) || 'sem-data';
+    const byMonth = {}, byCat = {}, recur = {};
+    let totIn = 0, totOut = 0;
+    for (const t of transactions) {
+      const m = monthOf(t);
+      const amt = num(t.amount);
+      const isOut = t.type === 'expense';
+      byMonth[m] = byMonth[m] || { entradas: 0, saidas: 0 };
+      if (isOut) { byMonth[m].saidas += amt; totOut += amt; } else { byMonth[m].entradas += amt; totIn += amt; }
+      if (isOut) {
+        const c = t.category || 'Sem categoria';
+        byCat[c] = byCat[c] || { total: 0, n: 0 };
+        byCat[c].total += amt; byCat[c].n++;
+        const key = (t.description || '').toLowerCase().trim().replace(/\d+/g, '').replace(/\s+/g, ' ').slice(0, 30);
+        if (key) { recur[key] = recur[key] || { total: 0, n: 0, desc: (t.description || '').trim() }; recur[key].total += amt; recur[key].n++; }
+      }
+    }
+    const nMonths = Math.max(1, Object.keys(byMonth).filter(k => k !== 'sem-data').length);
+    const r1 = v => Math.round(v);
+    const resumo = {
+      periodo: { meses: nMonths, totalEntradas: r1(totIn), totalSaidas: r1(totOut), saldoTotal: r1(totIn - totOut) },
+      mediaMensal: { entradas: r1(totIn / nMonths), saidas: r1(totOut / nMonths), saldo: r1((totIn - totOut) / nMonths) },
+      porMes: Object.entries(byMonth).sort().map(([mes, v]) => ({ mes, entradas: r1(v.entradas), saidas: r1(v.saidas), saldo: r1(v.entradas - v.saidas) })),
+      gastoPorCategoria: Object.entries(byCat).map(([categoria, v]) => ({ categoria, totalGasto: r1(v.total), mediaMensal: r1(v.total / nMonths), transacoes: v.n })).sort((a, b) => b.totalGasto - a.totalGasto).slice(0, 15),
+      maioresGastos: transactions.filter(t => t.type === 'expense').sort((a, b) => num(b.amount) - num(a.amount)).slice(0, 20).map(t => ({ valor: r1(num(t.amount)), categoria: t.category, descricao: (t.description || '').slice(0, 40), data: t.date })),
+      possiveisRecorrentes: Object.values(recur).filter(x => x.n >= 3).map(x => ({ descricao: x.desc.slice(0, 40), vezes: x.n, total: r1(x.total), mediaMensal: r1(x.total / nMonths) })).sort((a, b) => b.total - a.total).slice(0, 15),
+      orcamentoFixo: fixedItems.map(f => ({ name: f.name, type: f.type, amount: f.amount, category: f.category })),
+      totalTransacoes: transactions.length,
     };
 
     const { text } = await call({
-      parts: [{ text: `Dados completos:\n\`\`\`json\n${JSON.stringify(data)}\n\`\`\`\n\nFaça a análise completa conforme as instruções.` }],
+      parts: [{ text: `Resumo financeiro agregado de ${transactions.length} lançamentos (JSON, valores em R$):\n\`\`\`json\n${JSON.stringify(resumo)}\n\`\`\`\n\nFaça a análise completa conforme as instruções.` }],
       systemInstruction: sys,
       temperature: 0.45,
     });
