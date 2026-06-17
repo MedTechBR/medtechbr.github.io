@@ -251,29 +251,35 @@ function dup(id){const s=state.shifts.find(x=>x.id===id);const d=new Date(s.date
 /* ---------- CALENDÁRIO (com copiar/colar dia) ---------- */
 function shiftsOn(dstr){return state.shifts.filter(s=>s.date===dstr).sort((a,b)=>(a.start||'').localeCompare(b.start||''));}
 function renderCal(){
-  const y=calCur.getFullYear(),m=calCur.getMonth();
-  const gridStart=new Date(y,m,1);gridStart.setDate(1-gridStart.getDay());
+  const r=compRange(cur);                                   // mesma competência da aba Competência
+  const gs=new Date(r.s);gs.setDate(gs.getDate()-gs.getDay());        // domingo na/antes do início
+  const ge=new Date(r.e);ge.setDate(ge.getDate()+(6-ge.getDay()));    // sábado na/após o fim
+  const nCells=Math.round((ge-gs)/86400000)+1;
   const today=ymd(new Date());
-  const mm=state.shifts.filter(s=>s.date.slice(0,7)===monthKey(calCur));
+  const sYmd=ymd(r.s),eYmd=ymd(r.e);
+  const mm=state.shifts.filter(s=>inComp(s,r));
   const horas=mm.reduce((s,x)=>s+hoursOf(x),0);
   const prev=mm.reduce((s,x)=>s+Number(x.value||0),0);
   const receb=mm.filter(x=>x.status==='pago').reduce((s,x)=>s+Number(x.value||0),0);
   let cells='';
-  for(let i=0;i<42;i++){
-    const d=new Date(gridStart);d.setDate(gridStart.getDate()+i);
-    const ds=ymd(d);const out=d.getMonth()!==m;
+  for(let i=0;i<nCells;i++){
+    const d=new Date(gs);d.setDate(gs.getDate()+i);
+    const ds=ymd(d);const out=ds<sYmd||ds>eYmd;             // fora da competência → esmaecido
     const sh=shiftsOn(ds);
-    const chips=sh.map(s=>`<div class="chip ${s.status==='pago'?'c-pg':'c-ag'}" title="${esc(s.local)} · ${s.start}–${s.end} · ${money(s.value)}" onclick="event.stopPropagation();openForm('${s.id}')">${esc((s.local||'').split('—')[0].trim()).slice(0,16)}</div>`).join('');
+    const chips=sh.map(s=>`<div class="chip ${s.status==='pago'?'c-pg':'c-ag'}" title="${esc(s.local)} · ${s.start}–${s.end} · ${money(s.value)} — toque para editar" onclick="event.stopPropagation();openForm('${s.id}')">${esc((s.local||'').split('—')[0].trim()).slice(0,16)}</div>`).join('');
     const cp=sh.length?`<button class="cp" title="Copiar este dia" onclick="event.stopPropagation();copyDay('${ds}')">⧉</button>`:'';
-    cells+=`<div class="cell ${out?'out':''} ${ds===today?'today':''}" onclick="cellClick('${ds}')"><div class="dn">${d.getDate()}</div>${cp}${chips}</div>`;
+    cells+=`<div class="cell ${out?'out':''} ${ds===today?'today':''}" onclick="event.stopPropagation();cellClick('${ds}')"><div class="dn">${d.getDate()}</div>${cp}${chips}</div>`;
   }
   const heads=WD.map(w=>`<div class="hd">${w}</div>`).join('');
+  const cd=compDayVal();
+  const cutOpts=['<option value="1"'+(cd===1?' selected':'')+'>Mês civil (dia 1)</option>'].concat(
+     Array.from({length:27},(_,i)=>i+2).map(n=>`<option value="${n}" ${cd===n?'selected':''}>fecha dia ${n}</option>`)).join('');
   let clip='';
   if(dayClip){const fd=new Date(dayClip.from+'T00:00:00');
-    clip=`<div class="clipbar"><span>📋 Copiado: ${dayClip.shifts.length} plantão(ões) de ${pad2(fd.getDate())}/${pad2(fd.getMonth()+1)} — toque num dia para colar.</span><button onclick="clearClip()">Limpar</button></div>`;}
+    clip=`<div class="clipbar"><span>📋 Copiado: ${dayClip.shifts.length} plantão(ões) de ${pad2(fd.getDate())}/${pad2(fd.getMonth()+1)} — toque num dia para colar. Clique fora do calendário para cancelar.</span><button onclick="clearClip()">Limpar</button></div>`;}
   let html=`<div class="bar">
-    <div class="nav"><button class="arr" onclick="moveCal(-1)">‹</button><h2>${MES[m]} ${y}</h2><button class="arr" onclick="moveCal(1)">›</button></div>
-    <div class="right"><button class="btn btn-p btn-sm" onclick="openForm()">+ Novo plantão</button></div>
+    <div class="nav"><button class="arr" onclick="moveComp(-1)">‹</button><h2>${r.label}</h2><button class="arr" onclick="moveComp(1)">›</button></div>
+    <div class="right"><select class="flt" title="Período da competência" onchange="setCompDay(this.value)">${cutOpts}</select><button class="btn btn-p btn-sm" onclick="openForm()">+ Novo plantão</button></div>
   </div>
   ${clip}
   <div class="cards">
@@ -284,7 +290,7 @@ function renderCal(){
     <div class="kpi red"><div class="l">A receber</div><div class="v" style="font-size:18px">${money0(prev-receb)}</div></div>
   </div>
   <div class="cal ${dayClip?'pasting':''}">${heads}${cells}</div>
-  <div class="note" style="margin-top:12px">Dica: toque em <b>⧉</b> num dia para copiá-lo e depois toque em outros dias para colar — ótimo para plantões fixos (ex.: toda segunda no mesmo local). Toque num dia vazio para adicionar um plantão.</div>`;
+  <div class="note" style="margin-top:12px">Dica: toque numa <b>etiqueta</b> do dia para editar/excluir o plantão. Toque em <b>⧉</b> para copiar o dia e depois em outros dias para colar (ótimo para plantões fixos) — clique fora do calendário para cancelar. Toque num dia vazio para adicionar.</div>`;
   document.getElementById('view').innerHTML=html;
 }
 function moveCal(n){calCur.setMonth(calCur.getMonth()+n);render();}
@@ -368,6 +374,10 @@ function exportCSV(year){
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);a.download=fname+'.csv';a.click();URL.revokeObjectURL(a.href);
 }
+
+/* Clicar FORA do calendário desativa o modo copiar/colar (os cliques dentro do
+   calendário dão stopPropagation, então só cliques externos chegam aqui). */
+document.addEventListener('click',e=>{ if(dayClip && !e.target.closest('.clipbar')) clearClip(); });
 </script>
 </body>
 </html>
