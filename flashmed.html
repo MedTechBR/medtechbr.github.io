@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FlashMed — Flashcards com IA e repetição espaçada | MedTech</title>
-<meta name="description" content="FlashMed: estude com flashcards e repetição espaçada (SM-2). Crie baralhos, gere cartões com IA (Gemini) e fixe conteúdo de medicina.">
+<title>FlashMed — Flashcards prontos com repetição espaçada | MedTech</title>
+<meta name="description" content="FlashMed: baralhos prontos de medicina (nível avançado) com repetição espaçada (SM-2). A IA verifica periodicamente se os cartões estão atualizados.">
 <meta name="theme-color" content="#0E5A6D">
 <link rel="icon" type="image/png" href="favicon.png">
 <script src="_mtfb.js?v=1"></script>
@@ -28,24 +28,26 @@ main{max-width:880px;margin:0 auto;padding:22px 18px}
 .btn-p{background:var(--mint);color:var(--petrol-dark)}.btn-p:hover{background:var(--mint-dark)}
 .btn-d{background:var(--petrol);color:#fff}.btn-d:hover{background:var(--petrol-dark)}
 .btn-g{background:#fff;color:var(--petrol);border:1px solid var(--line)}.btn-g:hover{background:var(--soft)}
+.btn-sm{padding:8px 12px;font-size:13px}
 .toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;align-items:center}
 .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 10px 30px -22px rgba(8,56,69,.3)}
-.deck{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.deck{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .deck .info h3{font-size:17px}
-.deck .info p{color:var(--muted);font-size:13.5px;margin-top:3px}
-.pill{display:inline-block;background:var(--soft);color:var(--petrol);font-weight:700;font-size:12px;padding:3px 10px;border-radius:999px;margin-left:6px}
+.deck .info p{color:var(--muted);font-size:13px;margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pill{display:inline-block;background:var(--soft);color:var(--petrol);font-weight:700;font-size:12px;padding:3px 10px;border-radius:999px}
 .pill.due{background:#fdf0e0;color:var(--amber)}
+.pill.bi{background:#e7f7f1;color:var(--mint-dark)}
 input,select,textarea{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit;background:#fff}
 input:focus,textarea:focus,select:focus{outline:none;border-color:var(--mint)}
 label{display:block;font-weight:600;font-size:14px;margin:0 0 6px}
 .field{margin-bottom:14px}
-/* estudo */
 .study{text-align:center}
-.flash{background:#fff;border:1px solid var(--line);border-radius:18px;min-height:230px;display:flex;align-items:center;justify-content:center;padding:30px;font-size:20px;line-height:1.5;cursor:pointer;box-shadow:0 16px 40px -26px rgba(8,56,69,.4);user-select:none}
-.flash .side{max-width:640px}
+.flash{background:#fff;border:1px solid var(--line);border-radius:18px;min-height:230px;display:flex;align-items:center;justify-content:center;padding:30px;font-size:19px;line-height:1.55;cursor:pointer;box-shadow:0 16px 40px -26px rgba(8,56,69,.4);user-select:none}
+.flash .side{max-width:680px}
 .flash .q{font-weight:700}
-.flash .a{color:#28424a}
-.flash small{display:block;color:var(--muted);font-size:13px;margin-top:16px;font-weight:600}
+.flash .a{color:#28424a;text-align:left}
+.flash small{display:block;color:var(--muted);font-size:13px;margin-top:16px;font-weight:600;text-align:center}
+.flash .ref{display:block;color:var(--mint-dark);font-size:12px;margin-top:10px;font-weight:700;text-align:center}
 .rate{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
 .rate button{border:none;border-radius:11px;padding:13px 6px;font-weight:800;font-size:14px;cursor:pointer;color:#fff}
 .r0{background:#c0392b}.r1{background:#c97a17}.r2{background:#14b894}.r3{background:#0E5A6D}
@@ -53,7 +55,7 @@ label{display:block;font-weight:600;font-size:14px;margin:0 0 6px}
 .prog{height:7px;background:var(--soft);border-radius:99px;overflow:hidden;margin:0 0 16px}
 .prog i{display:block;height:100%;background:linear-gradient(90deg,var(--mint),var(--petrol))}
 .muted{color:var(--muted);font-size:13.5px}
-.row{display:flex;gap:10px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
 .note{background:#fff8ed;border:1px solid #f4d9a8;color:#8a5a16;border-radius:12px;padding:12px 15px;font-size:13px;margin-top:8px}
 .carditem{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}
 .carditem:last-child{border-bottom:none}
@@ -62,8 +64,9 @@ label{display:block;font-weight:600;font-size:14px;margin:0 0 6px}
 footer{text-align:center;color:var(--muted);font-size:13px;padding:24px}
 footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 .modal{position:fixed;inset:0;background:rgba(8,56,69,.45);display:flex;align-items:center;justify-content:center;padding:18px;z-index:50}
-.modal .box{background:#fff;border-radius:16px;padding:24px;max-width:480px;width:100%;max-height:90vh;overflow:auto}
+.modal .box{background:#fff;border-radius:16px;padding:24px;max-width:560px;width:100%;max-height:90vh;overflow:auto}
 .modal h3{margin-bottom:14px}
+.verify-out{white-space:pre-wrap;font-size:14px;line-height:1.6;background:var(--soft);border-radius:12px;padding:14px;margin-top:10px}
 .spin{display:inline-block;width:16px;height:16px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-3px}
 @keyframes sp{to{transform:rotate(360deg)}}
 @media(max-width:560px){.rate{grid-template-columns:1fr 1fr}}
@@ -74,82 +77,147 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
   <div class="wrap top">
     <div>
       <div class="logo"><span class="mark"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#062a33" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Flash<b>Med</b></div>
-      <div class="subtitle">Flashcards com IA e repetição espaçada · por MedTech</div>
+      <div class="subtitle">Baralhos prontos (nível avançado) + repetição espaçada · por MedTech</div>
     </div>
     <a href="index.html">← MedTech</a>
   </div>
 </header>
 <main id="app"></main>
 <footer>
-  Seus baralhos sincronizam na sua conta MedTech. A IA já vem integrada — você não precisa de chave.<br>
+  Baralhos prontos do MedTech com repetição espaçada (SM-2). A IA verifica se o conteúdo está atualizado — você não precisa de chave.<br>
   © 2026 <a href="index.html">MedTech</a> · <a href="privacidade.html">Privacidade</a>
 </footer>
 
 <script>
-/* ====== Estado / persistência ====== */
-const LS='flashmed_decks_v1';
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const $=s=>document.querySelector(s);
+
+/* ============================================================
+   BARALHOS PRONTOS (built-in) — conteúdo AVANÇADO/difícil.
+   ids estáveis: ao atualizar o conteúdo aqui, o ensureBuiltin()
+   atualiza o cartão do usuário preservando o progresso (SM-2).
+   ============================================================ */
+const BUILTIN = [
+{ id:'b-emerg', name:'Emergência & UTI — avançado', cards:[
+  {id:'e1', q:'Alvo de temperatura no controle direcionado pós-PCR na diretriz atual — e por que mudou?', a:'Manter entre 32–37,5 °C evitando ativamente a febre. O TTM2 não mostrou benefício de 33 vs 37,5 °C → o foco passou a ser PREVENIR hipertermia, não hipotermia profunda obrigatória.', ref:'ILCOR/AHA'},
+  {id:'e2', q:'Ventilação protetora na SDRA: volume corrente, platô e driving pressure?', a:'VC 4–6 mL/kg de peso PREDITO; pressão de platô <30 cmH₂O; driving pressure <15 cmH₂O; PEEP titulada. Prona >12 h/dia se PaO₂/FiO₂ <150.', ref:'ARDS'},
+  {id:'e3', q:'Sequência correta no tratamento da hipercalemia grave?', a:'1) Gluconato de cálcio (estabiliza a membrana, não baixa o K); 2) insulina+glicose e beta-2 (shift intracelular); 3) diurético/resina/diálise (remove o K).', ref:''},
+  {id:'e4', q:'Choque séptico: 2ª droga após noradrenalina e quando entrar corticoide?', a:'Vasopressina 0,03 U/min (poupador de catecolamina). Hidrocortisona 200 mg/dia se choque refratário (necessidade crescente de vasopressor).', ref:'SSC'},
+  {id:'e5', q:'Hipertermia maligna × síndrome neuroléptica maligna — manejo específico?', a:'HM (anestésicos halogenados/succinilcolina) → dantroleno. SNM (antipsicóticos / retirada de dopaminérgico) → suspender o agente, resfriar, dantroleno/bromocriptina, suporte.', ref:''},
+  {id:'e6', q:'Antídoto e alvo clínico da atropina na intoxicação por organofosforado?', a:'Atropina dobrando a dose até SECAR as secreções brônquicas (alvo = ausculta limpa, sem broncorreia). Pralidoxima para a crise nicotínica.', ref:''},
+  {id:'e7', q:'Indicações de diálise de urgência (mnemônico AEIOU)?', a:'Acidose refratária; Eletrólitos (hipercalemia refratária); Intoxicações dialisáveis; Overload (EAP refratário); Uremia (encefalopatia/pericardite).', ref:''},
+  {id:'e8', q:'PPC e alvos na hipertensão intracraniana?', a:'PPC = PAM − PIC. Manter PPC 60–70 mmHg e PIC <22 mmHg.', ref:''},
+  {id:'e9', q:'Na anafilaxia, via e local corretos da adrenalina (e por quê)?', a:'IM no VASTO LATERAL da coxa (absorção mais rápida e previsível que SC/deltoide), 0,5 mg, repetir a cada 5–15 min. IV só em refratário/em BIC.', ref:''},
+  {id:'e10', q:'Bicarbonato na acidose da PCR/choque — quando?', a:'Em geral NÃO. Considerar em hipercalemia grave ou intoxicação por tricíclicos / bloqueador de canal de sódio. pH <6,9 é exceção controversa.', ref:''}
+]},
+{ id:'b-cardio', name:'Cardiologia — avançado', cards:[
+  {id:'c1', q:'FA <48 h × ≥48 h: diferença na cardioversão?', a:'<48 h: pode cardioverter com anticoagulação periprocedimento. ≥48 h ou tempo incerto: 3 semanas de anticoagulação OU ECO transesofágico afastando trombo antes; + 4 semanas após.', ref:''},
+  {id:'c2', q:'Critérios de Sgarbossa para IAM no BRE/ritmo de marcapasso?', a:'Supra ST ≥1 mm concordante (5 pts); infra ST ≥1 mm em V1–V3 (3 pts); supra ST ≥5 mm discordante (2 pts). Sgarbossa modificada: razão ST/S ≤ −0,25.', ref:''},
+  {id:'c3', q:'Quando NÃO usar nitrato no IAM?', a:'IAM de VD/parede inferior dependente de pré-carga, hipotensão, ou uso de inibidor de PDE5 (sildenafila) nas últimas 24–48 h.', ref:''},
+  {id:'c4', q:'Quatro pilares da ICFEr?', a:'IECA/ARNI + betabloqueador + antagonista mineralocorticoide + iSGLT2 — titular às doses-alvo conforme PA, FC, K e função renal.', ref:'ESC/AHA'},
+  {id:'c5', q:'Síndrome de Wellens: achado no ECG e conduta proibida?', a:'Ondas T bifásicas ou profundamente invertidas em V2–V3 (estenose crítica de DA proximal). NÃO fazer teste ergométrico — encaminhar a cateterismo.', ref:''},
+  {id:'c6', q:'CDI para prevenção primária na ICFEr — critérios?', a:'FE ≤35%, NYHA II–III, apesar de terapia otimizada por ≥3 meses, com expectativa de vida >1 ano e bom estado funcional.', ref:''},
+  {id:'c7', q:'Emergência × urgência hipertensiva — meta de redução?', a:'Emergência (lesão de órgão-alvo): reduzir PAM ~10–20% na 1ª hora com IV (nitroprussiato/nicardipina). Urgência: VO em horas/dias, sem queda abrupta.', ref:''},
+  {id:'c8', q:'Pericardite × IAM no ECG?', a:'Pericardite: supra ST DIFUSO côncavo + infra do segmento PR, SEM imagem em espelho; evolui em 4 estágios. IAM: supra localizado com recíproca.', ref:''},
+  {id:'c9', q:'TV monomórfica sustentada: estável × instável?', a:'Instável (hipotensão, dor, IC, rebaixamento) → cardioversão SINCRONIZADA. Estável → amiodarona ou procainamida e preparar cardioversão.', ref:''},
+  {id:'c10', q:'TAVI × troca cirúrgica na estenose aórtica grave?', a:'Decisão do heart team. TAVI favorecida em idosos / risco cirúrgico alto-intermediário e anatomia favorável; cirurgia em jovens / baixo risco / anatomia desfavorável.', ref:''}
+]},
+{ id:'b-nefro', name:'Nefrologia & Eletrólitos — avançado', cards:[
+  {id:'n1', q:'Taxa máxima de correção do sódio na hiponatremia crônica e o risco?', a:'≤8 mEq/L/24 h (≤6 se alto risco) para evitar mielinólise pontina/desmielinização osmótica. Na hipo aguda sintomática grave: salina 3% 100–150 mL em bolus.', ref:''},
+  {id:'n2', q:'Fórmula do déficit de água livre na hipernatremia?', a:'Déficit = ACT × (Na atual / Na desejado − 1), com ACT = 0,6×peso (0,5 em mulher/idoso). Corrigir ≤10 mEq/L/24 h.', ref:''},
+  {id:'n3', q:'LRA pré-renal × NTA pela FeNa e FeUreia?', a:'Pré-renal: FeNa <1%, FeUreia <35%. NTA: FeNa >2%. Use a FeUreia quando o paciente está em uso de diurético.', ref:''},
+  {id:'n4', q:'Critérios KDIGO de LRA?', a:'↑Creatinina ≥0,3 mg/dL em 48 h; OU ↑ ≥1,5× o basal em 7 dias; OU diurese <0,5 mL/kg/h por ≥6 h.', ref:'KDIGO'},
+  {id:'n5', q:'ATR tipo 1 (distal) × tipo 2 (proximal) — K e pH urinário?', a:'Tipo 1: hipocalemia, pH urinário >5,5, nefrolitíase/nefrocalcinose. Tipo 2: hipocalemia, bicarbonatúria, síndrome de Fanconi, pH urinário variável.', ref:''},
+  {id:'n6', q:'PTT × SHU atípica — o que muda no tratamento?', a:'PTT (ADAMTS13 <10%) → plasmaférese de urgência ± corticoide/rituximabe/caplacizumabe. SHU atípica (complemento) → eculizumab. SHU típica (Shiga) → suporte.', ref:''},
+  {id:'n7', q:'Ânion-gap e para que serve o delta-gap?', a:'AG = Na − (Cl + HCO₃), normal 8–12 (corrigir pela albumina). Delta-gap (ΔAG vs ΔHCO₃) detecta distúrbio ácido-base MISTO associado.', ref:''}
+]},
+{ id:'b-infecto', name:'Infectologia & Antibióticos — avançado', cards:[
+  {id:'i1', q:'Esquema empírico da meningite bacteriana no adulto e quando associar ampicilina?', a:'Ceftriaxona + vancomicina. Associar ampicilina se >50 anos ou imunossuprimido (cobertura de Listeria). Dexametasona antes/junto da 1ª dose de ATB.', ref:''},
+  {id:'i2', q:'Quando o corticoide melhora desfecho: meningite e PCP?', a:'Meningite pneumocócica (dexametasona ANTES do ATB). PCP com PaO₂ <70 mmHg ou gradiente A-a >35 → prednisona antes do anti-PCP.', ref:''},
+  {id:'i3', q:'Cite 4 antibióticos com cobertura para Pseudomonas.', a:'Piperacilina-tazobactam, cefepime, meropenem, ciprofloxacino/levofloxacino (também ceftazidima, aztreonam, amicacina).', ref:''},
+  {id:'i4', q:'Endocardite por S. aureus em válvula nativa: MSSA × MRSA?', a:'MSSA → oxacilina ou cefazolina. MRSA → vancomicina ou daptomicina. Duração 4–6 semanas.', ref:''},
+  {id:'i5', q:'Indicações de cirurgia precoce na endocardite?', a:'IC por disfunção valvar; infecção não controlada (abscesso, vegetação persistente); risco embólico (vegetação >10 mm com embolia, ou >15 mm).', ref:''},
+  {id:'i6', q:'Profilaxia primária de oportunistas no HIV por CD4?', a:'<200 → SMX-TMP (PCP, também cobre toxoplasmose). <50 → considerar MAC (azitromicina), hoje menos usada com TARV precoce.', ref:''},
+  {id:'i7', q:'Neutropenia febril de alto risco: conduta e tempo?', a:'ATB IV antipseudomonas em <1 h (cefepime / pip-tazo / meropenem). MASCC <21 = alto risco → internar. Adicionar cobertura para Gram+ se instabilidade/cateter/mucosite.', ref:''}
+]},
+{ id:'b-endo', name:'Endócrino & Metabólico — avançado', cards:[
+  {id:'d1', q:'CAD × estado hiperosmolar (EHH) — critérios que diferenciam?', a:'CAD: glicemia >250, pH <7,3, HCO₃ <18, cetose. EHH: glicemia >600, osmolaridade >320, pH >7,3, sem cetose significativa, rebaixamento.', ref:''},
+  {id:'d2', q:'Por que repor K antes da insulina na CAD e os cortes?', a:'A insulina joga K para dentro da célula → hipocalemia grave/arritmia. K <3,3 → adiar insulina e repor; K 3,3–5,2 → repor junto (20–30 mEq/L); K >5,2 → não repor.', ref:''},
+  {id:'d3', q:'Crise tireotóxica: ordem das drogas?', a:'1) Betabloqueador (propranolol); 2) tionamida (PTU); 3) iodo (Lugol) ≥1 h DEPOIS da tionamida; 4) hidrocortisona. Tratar o fator desencadeante.', ref:''},
+  {id:'d4', q:'Insuficiência adrenal: diagnóstico e cuidado na crise?', a:'Cortisol basal baixo + teste de estímulo com cortrosina. Na crise, NÃO atrasar a hidrocortisona por causa da coleta — tratar empiricamente.', ref:''},
+  {id:'d5', q:'Rastreio e confirmação do hiperaldosteronismo primário?', a:'HAS resistente/hipocalemia → relação aldosterona/renina elevada (rastreio); confirmar com teste de sobrecarga salina; TC de adrenais + cateterismo de veias adrenais p/ lateralizar.', ref:''},
+  {id:'d6', q:'Alvo de HbA1c — quando relaxar?', a:'<7% em geral; <6,5% em jovem sem comorbidade/hipoglicemia; <8% em idoso frágil, expectativa limitada ou hipoglicemia recorrente.', ref:'ADA'},
+  {id:'d7', q:'Incidentaloma adrenal: o que sempre investigar?', a:'Funcionalidade (cortisol pós-1 mg dexametasona, metanefrinas plasmáticas, aldo/renina se HAS) e risco de malignidade (tamanho >4 cm, washout/atenuação na TC).', ref:''}
+]}
+];
+
+/* ====== Estado / persistência ====== */
 let decks=[];
-function load(){try{decks=JSON.parse(localStorage.getItem(LS))||[];}catch(e){decks=[];}if(!decks.length)seed();}
-function save(){if(window.MT){MT.save({decks});}else{localStorage.setItem(LS,JSON.stringify(decks));}}
-function seed(){
-  const c=(q,a)=>({id:uid(),front:q,back:a,ef:2.5,interval:0,reps:0,due:0});
-  decks=[{id:uid(),name:'Cardiologia — básico',cards:[
-   c('Primeira medida na PCR em FV/TV sem pulso?','Desfibrilação precoce + RCP de alta qualidade.'),
-   c('Dose de adrenalina na PCR?','1 mg IV/IO a cada 3–5 minutos.'),
-   c('Antiarrítmico de escolha na FV/TV refratária?','Amiodarona 300 mg (2ª dose 150 mg).'),
-   c('Escore para risco tromboembólico na FA?','CHA₂DS₂-VASc.'),
-   c('Tríade da estenose aórtica sintomática?','Angina, síncope e dispneia (IC).'),
-   c('Alteração de ECG clássica do IAM com supra?','Supradesnivelamento do segmento ST.'),
-   c('Primeira escolha de vasopressor no choque séptico?','Noradrenalina (alvo PAM ≥ 65).'),
-   c('Manobra/medicação para reverter TSV estável?','Manobra vagal → adenosina 6 mg (depois 12 mg).')
-  ]}];
-  save();
+let mtReady=false;
+function save(){ if(window.MT&&MT.save){ MT.save({decks}); } }
+// Mescla os baralhos prontos no estado do usuário: cria os que faltam, atualiza
+// o conteúdo dos cartões prontos e PRESERVA o progresso (ef/intervalo/due).
+function ensureBuiltin(){
+  BUILTIN.forEach(bd=>{
+    let d=decks.find(x=>x.id===bd.id);
+    if(!d){ d={id:bd.id,name:bd.name,builtin:true,cards:[],checkedAt:0}; decks.unshift(d); }
+    d.builtin=true; d.name=bd.name;
+    bd.cards.forEach(bc=>{
+      let c=d.cards.find(x=>x.id===bc.id);
+      if(!c){ d.cards.push({id:bc.id,front:bc.q,back:bc.a,ref:bc.ref||'',builtin:true,ef:2.5,interval:0,reps:0,due:0}); }
+      else { c.front=bc.q; c.back=bc.a; c.ref=bc.ref||''; c.builtin=true; }
+    });
+  });
 }
+
 /* ====== SM-2 ====== */
 function rate(card,q){
-  let ef=(card.ef||2.5)+(0.1-(5-q)*(0.08+(5-q)*0.02));if(ef<1.3)ef=1.3;card.ef=ef;
+  let ef=(card.ef||2.5)+(0.1-(5-q)*(0.08+(5-q)*0.02)); if(ef<1.3)ef=1.3; card.ef=ef;
   if(q<3){card.reps=0;card.interval=0;card.due=Date.now();}
   else{card.reps=(card.reps||0)+1;
     if(card.reps===1)card.interval=1;else if(card.reps===2)card.interval=6;else card.interval=Math.max(1,Math.round((card.interval||1)*ef));
     card.due=Date.now()+card.interval*86400000;}
 }
 const dueCount=d=>d.cards.filter(c=>(c.due||0)<=Date.now()).length;
+const daysAgo=t=>t?Math.floor((Date.now()-t)/86400000):null;
 
 /* ====== Views ====== */
 let view={mode:'home',deck:null,queue:[],idx:0,flip:false};
-const $=s=>document.querySelector(s);
 function render(){
   const a=document.getElementById('app');
-  if(view.mode==='home')a.innerHTML=homeView();
-  else if(view.mode==='study')a.innerHTML=studyView();
+  if(view.mode==='study')a.innerHTML=studyView();
   else if(view.mode==='manage')a.innerHTML=manageView();
-  bind();
+  else a.innerHTML=homeView();
 }
 function homeView(){
   return `<div class="toolbar">
-    <button class="btn btn-p" onclick="newDeck()">+ Novo baralho</button>
-    <button class="btn btn-g" onclick="openAI()">✨ Gerar com IA</button>
+    <button class="btn btn-p" onclick="newDeck()">+ Meu baralho</button>
+    <span class="muted">${decks.length} baralho(s) · prontos do MedTech + os seus</span>
   </div>
-  ${decks.length?decks.map(d=>`<div class="card deck"><div class="info">
-     <h3>${esc(d.name)}</h3>
-     <p>${d.cards.length} cartões <span class="pill">${d.cards.length} total</span> ${dueCount(d)?`<span class="pill due">${dueCount(d)} para revisar</span>`:'<span class="pill">em dia</span>'}</p>
+  ${decks.map(d=>{
+    const dc=daysAgo(d.checkedAt);
+    const chk=d.builtin?`<span class="pill ${dc===null||dc>30?'due':''}">${dc===null?'nunca verificado':('verificado há '+dc+'d')}</span>`:'';
+    return `<div class="card deck"><div class="info">
+     <h3>${esc(d.name)} ${d.builtin?'<span class="pill bi">pronto</span>':''}</h3>
+     <p><span class="pill">${d.cards.length} cartões</span> ${dueCount(d)?`<span class="pill due">${dueCount(d)} para revisar</span>`:'<span class="pill">em dia</span>'} ${chk}</p>
     </div><div class="row">
-     <button class="btn btn-d" onclick="study('${d.id}')">Estudar</button>
-     <button class="btn btn-g" onclick="manage('${d.id}')">Cartões</button>
-     <button class="btn btn-g" onclick="delDeck('${d.id}')">🗑️</button>
-    </div></div>`).join(''):'<div class="empty">Nenhum baralho ainda. Crie um ou gere com IA.</div>'}
-  <div class="note">📌 A repetição espaçada (SM-2) agenda cada cartão para o melhor momento de revisão: quanto mais fácil, mais distante; quanto mais difícil, mais cedo.</div>`;
+     <button class="btn btn-d btn-sm" onclick="study('${d.id}')">Estudar</button>
+     <button class="btn btn-g btn-sm" onclick="manage('${d.id}')">Cartões</button>
+     ${d.builtin?`<button class="btn btn-g btn-sm" onclick="verifyDeck('${d.id}')">✨ Verificar (IA)</button>`:`<button class="btn btn-g btn-sm" onclick="delDeck('${d.id}')">🗑️</button>`}
+    </div></div>`;
+  }).join('')}
+  <div class="note">📌 <b>Repetição espaçada (SM-2):</b> cada cartão volta no melhor momento — quanto mais fácil, mais distante. Os baralhos "prontos" são de nível avançado e a <b>IA verifica</b> se continuam atualizados (botão ✨).</div>`;
 }
-function study(id){const d=decks.find(x=>x.id===id);view.deck=id;view.queue=d.cards.filter(c=>(c.due||0)<=Date.now());if(!view.queue.length)view.queue=d.cards.slice();view.idx=0;view.flip=false;view.mode='study';view.total=view.queue.length;view.done=0;render();}
+function study(id){const d=decks.find(x=>x.id===id);if(!d)return;view.deck=id;view.queue=d.cards.filter(c=>(c.due||0)<=Date.now());if(!view.queue.length)view.queue=d.cards.slice();view.idx=0;view.flip=false;view.mode='study';view.done=0;render();window.scrollTo({top:0,behavior:'smooth'});}
 function studyView(){
   const d=decks.find(x=>x.id===view.deck);
-  if(!view.queue.length)return `<div class="card study"><h3 style="margin-bottom:8px">✅ Sessão concluída!</h3><p class="muted">Você revisou todos os cartões disponíveis de "${esc(d.name)}".</p><div style="margin-top:18px"><button class="btn btn-d" onclick="go('home')">Voltar aos baralhos</button></div></div>`;
-  const card=view.queue[0];const pct=view.total?Math.round((view.done/(view.done+view.queue.length))*100):0;
-  return `<div class="toolbar"><button class="btn btn-g" onclick="go('home')">← Baralhos</button><span class="muted">${esc(d.name)} · ${view.queue.length} na fila</span></div>
+  if(!view.queue.length)return `<div class="card study"><h3 style="margin-bottom:8px">✅ Sessão concluída!</h3><p class="muted">Você revisou os cartões disponíveis de "${esc(d.name)}".</p><div style="margin-top:18px"><button class="btn btn-d" onclick="go('home')">Voltar aos baralhos</button></div></div>`;
+  const card=view.queue[0];const pct=Math.round((view.done/(view.done+view.queue.length))*100);
+  return `<div class="toolbar"><button class="btn btn-g btn-sm" onclick="go('home')">← Baralhos</button><span class="muted">${esc(d.name)} · ${view.queue.length} na fila</span></div>
    <div class="prog"><i style="width:${pct}%"></i></div>
    <div class="study">
-     <div class="flash" onclick="doFlip()"><div class="side">${view.flip?`<div class="a">${esc(card.back)}</div>`:`<div class="q">${esc(card.front)}</div>`}<small>${view.flip?'como você foi?':'toque para ver a resposta'}</small></div></div>
+     <div class="flash" onclick="doFlip()"><div class="side">${view.flip?`<div class="a">${esc(card.back)}</div>${card.ref?`<span class="ref">📚 ${esc(card.ref)}</span>`:''}<small>como você foi?</small>`:`<div class="q">${esc(card.front)}</div><small>toque para ver a resposta</small>`}</div></div>
      ${view.flip?`<div class="rate">
        <button class="r0" onclick="answer(2)">Errei<small>de novo</small></button>
        <button class="r1" onclick="answer(3)">Difícil<small>logo</small></button>
@@ -160,89 +228,56 @@ function studyView(){
 }
 function doFlip(){view.flip=!view.flip;render();}
 function answer(q){const card=view.queue.shift();rate(card,q);if((card.due||0)<=Date.now())view.queue.push(card);else view.done++;view.flip=false;save();render();}
-function manage(id){view.deck=id;view.mode='manage';render();}
+function manage(id){view.deck=id;view.mode='manage';render();window.scrollTo({top:0,behavior:'smooth'});}
 function manageView(){
   const d=decks.find(x=>x.id===view.deck);
-  return `<div class="toolbar"><button class="btn btn-g" onclick="go('home')">← Baralhos</button>
-   <button class="btn btn-p" onclick="newCard()">+ Novo cartão</button>
-   <button class="btn btn-g" onclick="openAI('${d.id}')">✨ Gerar com IA</button>
+  return `<div class="toolbar"><button class="btn btn-g btn-sm" onclick="go('home')">← Baralhos</button>
+   ${d.builtin?`<button class="btn btn-g btn-sm" onclick="verifyDeck('${d.id}')">✨ Verificar atualização (IA)</button>`:`<button class="btn btn-p btn-sm" onclick="newCard()">+ Novo cartão</button>`}
    <span class="muted">${esc(d.name)} · ${d.cards.length} cartões</span></div>
-   <div class="card">${d.cards.length?d.cards.map(c=>`<div class="carditem"><div><b>${esc(c.front)}</b><br><span class="muted">${esc(c.back)}</span></div><button class="x" onclick="delCard('${c.id}')">×</button></div>`).join(''):'<div class="empty">Sem cartões. Adicione manualmente ou gere com IA.</div>'}</div>`;
+   <div class="card">${d.cards.length?d.cards.map(c=>`<div class="carditem"><div><b>${esc(c.front)}</b><br><span class="muted">${esc(c.back)}</span>${c.ref?`<br><span style="color:var(--mint-dark);font-size:12px;font-weight:700">📚 ${esc(c.ref)}</span>`:''}</div>${d.builtin?'':`<button class="x" onclick="delCard('${c.id}')">×</button>`}</div>`).join(''):'<div class="empty">Sem cartões.</div>'}</div>`;
 }
 function go(m){view.mode=m;render();}
-function bind(){}
 
-/* ====== Ações ====== */
-function newDeck(){const n=prompt('Nome do baralho:');if(n&&n.trim()){decks.push({id:uid(),name:n.trim(),cards:[]});save();render();}}
+/* ====== Ações (baralhos pessoais) ====== */
+function newDeck(){const n=prompt('Nome do seu baralho:');if(n&&n.trim()){decks.push({id:uid(),name:n.trim(),cards:[]});save();render();}}
 function delDeck(id){if(confirm('Excluir este baralho?')){decks=decks.filter(d=>d.id!==id);save();render();}}
 function newCard(){const d=decks.find(x=>x.id===view.deck);const f=prompt('Frente (pergunta):');if(!f)return;const b=prompt('Verso (resposta):');if(!b)return;d.cards.push({id:uid(),front:f.trim(),back:b.trim(),ef:2.5,interval:0,reps:0,due:0});save();render();}
 function delCard(id){const d=decks.find(x=>x.id===view.deck);d.cards=d.cards.filter(c=>c.id!==id);save();render();}
-function esc(s){return String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
 
-/* ====== Chave Gemini ====== */
-function openKey(){
-  const cur=localStorage.getItem('flashmed_key')||'';
-  modal(`<h3>⚙️ Chave do Google Gemini</h3>
-   <div class="field"><label>API Key (fica salva só neste navegador)</label><input id="mkey" type="password" placeholder="AIza..." value="${cur}"></div>
-   <div class="field"><label>Modelo</label><input id="mmodel" value="${localStorage.getItem('flashmed_model')||'gemini-2.5-flash'}"></div>
-   <p class="muted">Crie uma chave gratuita em aistudio.google.com/app/apikey. A geração envia apenas o tema digitado ao Google Gemini.</p>
-   <div class="row" style="margin-top:14px"><button class="btn btn-p" onclick="saveKey()">Salvar</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
-}
-function saveKey(){localStorage.setItem('flashmed_key',$('#mkey').value.trim());localStorage.setItem('flashmed_model',$('#mmodel').value.trim()||'gemini-2.5-flash');closeModal();}
-
-/* ====== Geração por IA ====== */
-let aiTargetDeck=null;
-function openAI(deckId){
-  aiTargetDeck=deckId||null;
-  modal(`<h3>✨ Gerar cartões com IA</h3>
-   <div class="field"><label>Tema</label><input id="aitopic" placeholder="Ex.: insuficiência cardíaca, antibióticos, ECG..."></div>
-   <div class="field"><label>Quantos cartões</label><input id="ainum" type="number" value="10" min="3" max="30"></div>
-   ${aiTargetDeck?'':'<div class="field"><label>Salvar em</label><select id="aideck"><option value="__new">➕ Novo baralho (usa o tema como nome)</option>'+decks.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('')+'</select></div>'}
-   <div id="aimsg" class="muted"></div>
-   <div class="row" style="margin-top:14px"><button class="btn btn-p" id="aigo" onclick="runAI()">Gerar</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>
-   <div class="note">A IA é um apoio — revise os cartões gerados antes de estudar.</div>`);
-}
-async function localGeminiFM(prompt,model){
-  const key=localStorage.getItem('flashmed_key');
-  if(!key)throw new Error('IA MedTech indisponível no momento. Tente novamente em instantes (ou configure uma chave própria em ⚙️).');
-  const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});
-  if(!r.ok){const e=await r.text();throw new Error('HTTP '+r.status+' — '+e.slice(0,120));}
-  const data=await r.json();
-  const text=(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts[0].text)||'';
-  if(!text)throw new Error('A IA não retornou texto.');
-  return text;
-}
-async function aiText(prompt,model){
-  if(window.MT&&MT.ai){try{return await MT.ai(prompt,model);}catch(e){return await localGeminiFM(prompt,model);}}
-  return await localGeminiFM(prompt,model);
-}
-async function runAI(){
-  const topic=$('#aitopic').value.trim();const n=Math.max(3,Math.min(30,parseInt($('#ainum').value)||10));
-  const msg=$('#aimsg');
-  if(!topic){msg.innerHTML='⚠️ Digite um tema.';return;}
-  const model=localStorage.getItem('flashmed_model')||'gemini-2.5-flash';
-  $('#aigo').innerHTML='<span class="spin"></span> Gerando...';$('#aigo').disabled=true;
-  const prompt=`Gere ${n} flashcards de estudo de medicina sobre o tema: "${topic}". Responda APENAS com um array JSON válido, sem nenhum texto extra, no formato exato: [{"q":"pergunta objetiva","a":"resposta concisa e correta"}]. Em português do Brasil.`;
+/* ====== Verificação de atualização pela IA ====== */
+async function verifyDeck(id){
+  const d=decks.find(x=>x.id===id); if(!d)return;
+  modal(`<h3>✨ Verificar atualização — ${esc(d.name)}</h3>
+    <p class="muted">A IA confere se as respostas continuam corretas e atualizadas segundo a literatura médica atual. Pode levar 15–40 s.</p>
+    <div id="vout" class="verify-out"><span class="spin"></span> Analisando ${d.cards.length} cartões…</div>
+    <div class="row" style="margin-top:14px"><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
+  const lista=d.cards.map((c,i)=>`${i+1}. P: ${c.front}\n   R: ${c.back}`).join('\n');
+  const prompt=`Você é um revisor médico sênior. Abaixo há flashcards de estudo (Pergunta/Resposta) de "${d.name}". Verifique se cada RESPOSTA está CORRETA e ATUALIZADA segundo as diretrizes e a literatura médica vigentes. Liste APENAS os cartões com problema, no formato "Nº — problema e correção sugerida". Se estiver tudo certo, responda exatamente: "✅ Todos os cartões estão corretos e atualizados.". Seja específico e cite a diretriz quando possível.\n\nCartões:\n${lista}`;
   try{
-    let text=await aiText(prompt,model);
-    text=text.replace(/```json|```/g,'').trim();
-    const arr=JSON.parse(text.slice(text.indexOf('['),text.lastIndexOf(']')+1));
-    if(!Array.isArray(arr)||!arr.length)throw new Error('A IA não retornou cartões. Tente reformular o tema.');
-    let deck;
-    if(aiTargetDeck)deck=decks.find(d=>d.id===aiTargetDeck);
-    else{const sel=$('#aideck').value;if(sel==='__new'){deck={id:uid(),name:topic.charAt(0).toUpperCase()+topic.slice(1),cards:[]};decks.push(deck);}else deck=decks.find(d=>d.id===sel);}
-    let added=0;arr.forEach(it=>{if(it.q&&it.a){deck.cards.push({id:uid(),front:String(it.q),back:String(it.a),ef:2.5,interval:0,reps:0,due:0});added++;}});
-    save();closeModal();view.mode='home';render();
-    setTimeout(()=>alert(added+' cartões adicionados ao baralho "'+deck.name+'".'),100);
-  }catch(err){msg.innerHTML='⚠️ '+esc(err.message);$('#aigo').innerHTML='Gerar';$('#aigo').disabled=false;}
+    if(!(window.MT&&MT.ai)) throw new Error('IA indisponível — entre na sua conta MedTech.');
+    const out=await MT.ai(prompt);
+    const el=document.getElementById('vout'); if(el) el.textContent=out||'Sem retorno da IA.';
+    d.checkedAt=Date.now(); save();
+  }catch(err){
+    const el=document.getElementById('vout'); if(el) el.textContent='⚠ '+(err.message||'Falha ao verificar.');
+  }
 }
 
 /* ====== Modal ====== */
 function modal(html){const d=document.createElement('div');d.className='modal';d.id='modal';d.innerHTML='<div class="box">'+html+'</div>';d.onclick=e=>{if(e.target===d)closeModal();};document.body.appendChild(d);}
 function closeModal(){const m=document.getElementById('modal');if(m)m.remove();}
 
+/* ====== Boot (login central MedTech) ====== */
 function whenMT(cb){if(window.MT){cb();}else{setTimeout(()=>whenMT(cb),30);}}
-whenMT(()=>{MT.onData(function(d){if(d&&d.decks){decks=d.decks;render();}else{seed();render();}});});
+whenMT(()=>{
+  MT.onData(function(d){
+    decks=(d&&Array.isArray(d.decks))?d.decks:[];
+    ensureBuiltin();
+    if(!mtReady){mtReady=true;}
+    render();
+  });
+});
+render();
 </script>
 </body>
 </html>
