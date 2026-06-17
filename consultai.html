@@ -131,6 +131,21 @@ input.search,input.datep{padding:9px 12px;border:1px solid var(--line);border-ra
 footer{text-align:center;color:var(--muted);font-size:13px;padding:24px}
 footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 @media(max-width:680px){.cards{grid-template-columns:1fr 1fr}.appt{flex-wrap:wrap}.appt .acts{flex-direction:row;width:100%;justify-content:space-between;margin-top:4px}.pinfo,.two,.three{grid-template-columns:1fr}}
+.rx-sug{position:absolute;left:0;right:0;top:100%;z-index:5;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 32px -10px rgba(8,56,69,.32);max-height:300px;overflow:auto;margin-top:3px}
+.rx-sug-item{padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--soft)}
+.rx-sug-item:last-child{border-bottom:none}
+.rx-sug-item:hover{background:var(--soft)}
+.rx-sug-item b{display:block;font-size:13.5px;color:var(--ink);font-weight:700}
+.rx-sug-item span{display:block;font-size:12px;color:var(--muted);margin-top:1px}
+.rx-sug-empty{padding:11px 13px;color:var(--muted);font-size:13px}
+.rx-tag{display:inline-block;font-size:9.5px;font-weight:800;padding:1px 6px;border-radius:999px;background:var(--amber-bg);color:var(--amber);vertical-align:middle;text-transform:uppercase;letter-spacing:.03em}
+.rx-item{background:var(--soft);border:1px solid var(--line);border-radius:11px;padding:10px 12px;margin-bottom:8px}
+.rx-item-h{display:flex;gap:8px;align-items:center}
+.rx-num{width:22px;height:22px;flex:0 0 auto;border-radius:50%;background:var(--petrol);color:#fff;font-size:12px;font-weight:800;display:grid;place-items:center}
+.rx-nome{flex:1;min-width:0;font-weight:700;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:14px;background:#fff}
+.rx-x{background:#fff;border:1px solid var(--line);border-radius:8px;width:32px;height:32px;font-size:19px;line-height:1;cursor:pointer;color:var(--red);flex:0 0 auto}
+.rx-pos{width:100%;margin-top:7px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:13.5px;min-height:46px;resize:vertical;background:#fff;color:#243b41}
+.rx-nome:focus,.rx-pos:focus{outline:none;border-color:var(--mint)}
 </style>
 </head>
 <body>
@@ -171,6 +186,139 @@ const REC_FMT={
  alta:{l:'Alta',ai:'Organize em resumo de alta: Diagnósticos, Resumo do atendimento, Procedimentos, Medicações de alta, Orientações e Seguimento.'},
  encaminhamento:{l:'Encaminhamento',ai:'Organize em carta de encaminhamento/parecer: especialidade de destino, resumo do caso, hipótese diagnóstica, exames relevantes e motivo do encaminhamento.'}
 };
+
+/* Banco de medicamentos (estilo Memed): nome+apresentação e posologia padrão (adulto). c:1 = controle especial. Posologia é sugestão — ajustar por caso. */
+const MED_DB=[
+ // Analgésicos / antitérmicos / AINEs
+ {n:'Dipirona 1g comprimido',p:'1 comprimido via oral de 6/6h se dor ou febre (máx. 4g/dia) — por 3 dias'},
+ {n:'Dipirona 500mg/mL solução oral (gotas)',p:'20 a 40 gotas via oral de 6/6h se dor ou febre'},
+ {n:'Paracetamol 750mg comprimido',p:'1 comprimido via oral de 6/6h se dor ou febre (máx. 4g/dia)'},
+ {n:'Ibuprofeno 600mg comprimido',p:'1 comprimido via oral de 8/8h após as refeições — por 3 a 5 dias'},
+ {n:'Naproxeno 500mg comprimido',p:'1 comprimido via oral de 12/12h após as refeições — por 5 dias'},
+ {n:'Nimesulida 100mg comprimido',p:'1 comprimido via oral de 12/12h após as refeições — por 5 dias'},
+ {n:'Diclofenaco sódico 50mg comprimido',p:'1 comprimido via oral de 8/8h após as refeições — por 3 a 5 dias'},
+ {n:'Cetoprofeno 100mg comprimido',p:'1 comprimido via oral de 12/12h após as refeições — por 3 dias'},
+ {n:'Cetorolaco 10mg comprimido',p:'1 comprimido via oral de 8/8h se dor (máx. 5 dias)'},
+ {n:'Tramadol 50mg cápsula',p:'1 cápsula via oral de 8/8h se dor intensa',c:1},
+ {n:'Codeína 30mg + Paracetamol 500mg comprimido',p:'1 comprimido via oral de 6/6h se dor moderada',c:1},
+ {n:'Ciclobenzaprina 5mg comprimido',p:'1 comprimido via oral à noite — por 7 dias'},
+ {n:'Escopolamina + dipirona (Buscopan composto) comprimido',p:'1 comprimido via oral de 6/6h se cólica'},
+ {n:'Butilbrometo de escopolamina 10mg comprimido',p:'1 comprimido via oral de 8/8h se cólica'},
+ // Antibióticos / antimicrobianos
+ {n:'Amoxicilina 500mg cápsula',p:'1 cápsula via oral de 8/8h — por 7 dias'},
+ {n:'Amoxicilina + Clavulanato 875+125mg comprimido',p:'1 comprimido via oral de 12/12h — por 7 dias'},
+ {n:'Azitromicina 500mg comprimido',p:'1 comprimido via oral 1x/dia — por 3 a 5 dias'},
+ {n:'Cefalexina 500mg cápsula',p:'1 cápsula via oral de 6/6h — por 7 dias'},
+ {n:'Cefuroxima 500mg comprimido',p:'1 comprimido via oral de 12/12h — por 7 dias'},
+ {n:'Ciprofloxacino 500mg comprimido',p:'1 comprimido via oral de 12/12h — por 7 dias'},
+ {n:'Levofloxacino 500mg comprimido',p:'1 comprimido via oral 1x/dia — por 7 dias'},
+ {n:'Sulfametoxazol + Trimetoprima 800+160mg comprimido',p:'1 comprimido via oral de 12/12h — por 7 dias'},
+ {n:'Doxiciclina 100mg comprimido',p:'1 comprimido via oral de 12/12h — por 7 dias'},
+ {n:'Metronidazol 400mg comprimido',p:'1 comprimido via oral de 8/8h — por 7 dias'},
+ {n:'Nitrofurantoína 100mg cápsula',p:'1 cápsula via oral de 6/6h — por 5 a 7 dias'},
+ {n:'Fosfomicina trometamol 3g sachê',p:'1 sachê via oral em dose única, à noite, com a bexiga vazia'},
+ {n:'Claritromicina 500mg comprimido',p:'1 comprimido via oral de 12/12h — por 7 dias'},
+ {n:'Clindamicina 300mg cápsula',p:'1 cápsula via oral de 8/8h — por 7 dias'},
+ {n:'Penicilina G benzatina 1.200.000 UI',p:'aplicar 1.200.000 UI por via intramuscular em dose única'},
+ {n:'Aciclovir 400mg comprimido',p:'1 comprimido via oral de 8/8h — por 7 dias'},
+ {n:'Fluconazol 150mg cápsula',p:'1 cápsula via oral em dose única'},
+ {n:'Nistatina 100.000 UI/mL suspensão oral',p:'bochechar e engolir 5 mL de 6/6h — por 14 dias'},
+ {n:'Ivermectina 6mg comprimido',p:'conforme peso (200 mcg/kg) via oral em dose única, repetir em 7 dias'},
+ {n:'Albendazol 400mg comprimido',p:'1 comprimido via oral em dose única'},
+ {n:'Mebendazol 100mg comprimido',p:'1 comprimido via oral de 12/12h — por 3 dias'},
+ // Anti-hipertensivos / cardiovascular
+ {n:'Losartana 50mg comprimido',p:'1 comprimido via oral 1x/dia (pode 12/12h)'},
+ {n:'Valsartana 160mg comprimido',p:'1 comprimido via oral 1x/dia'},
+ {n:'Enalapril 10mg comprimido',p:'1 comprimido via oral de 12/12h'},
+ {n:'Captopril 25mg comprimido',p:'1 comprimido via oral de 8/8h'},
+ {n:'Ramipril 5mg comprimido',p:'1 comprimido via oral 1x/dia'},
+ {n:'Anlodipino 5mg comprimido',p:'1 comprimido via oral 1x/dia'},
+ {n:'Nifedipino retard 20mg comprimido',p:'1 comprimido via oral de 12/12h'},
+ {n:'Hidroclorotiazida 25mg comprimido',p:'1 comprimido via oral pela manhã'},
+ {n:'Clortalidona 25mg comprimido',p:'1 comprimido via oral pela manhã'},
+ {n:'Furosemida 40mg comprimido',p:'1 comprimido via oral pela manhã'},
+ {n:'Espironolactona 25mg comprimido',p:'1 comprimido via oral 1x/dia'},
+ {n:'Atenolol 50mg comprimido',p:'1 comprimido via oral 1x/dia'},
+ {n:'Metoprolol succinato 50mg comprimido',p:'1 comprimido via oral 1x/dia'},
+ {n:'Carvedilol 6,25mg comprimido',p:'1 comprimido via oral de 12/12h'},
+ {n:'Propranolol 40mg comprimido',p:'1 comprimido via oral de 12/12h'},
+ {n:'Metildopa 250mg comprimido',p:'1 comprimido via oral de 8/8h'},
+ {n:'Sinvastatina 20mg comprimido',p:'1 comprimido via oral à noite'},
+ {n:'Atorvastatina 20mg comprimido',p:'1 comprimido via oral 1x/dia'},
+ {n:'Rosuvastatina 10mg comprimido',p:'1 comprimido via oral 1x/dia'},
+ {n:'Ezetimiba 10mg comprimido',p:'1 comprimido via oral 1x/dia'},
+ {n:'AAS 100mg comprimido',p:'1 comprimido via oral 1x/dia após o almoço'},
+ {n:'Clopidogrel 75mg comprimido',p:'1 comprimido via oral 1x/dia'},
+ {n:'Rivaroxabana 20mg comprimido',p:'1 comprimido via oral 1x/dia com alimento'},
+ {n:'Varfarina 5mg comprimido',p:'via oral 1x/dia, dose conforme INR'},
+ {n:'Isossorbida mononitrato 20mg comprimido',p:'1 comprimido via oral de 12/12h'},
+ {n:'Digoxina 0,25mg comprimido',p:'1 comprimido via oral 1x/dia'},
+ // Endócrino / diabetes / tireoide
+ {n:'Metformina 850mg comprimido',p:'1 comprimido via oral de 12/12h após as refeições'},
+ {n:'Metformina XR 500mg comprimido',p:'2 comprimidos via oral 1x/dia (jantar)'},
+ {n:'Glibenclamida 5mg comprimido',p:'1 comprimido via oral antes do café da manhã'},
+ {n:'Gliclazida MR 30mg comprimido',p:'1 comprimido via oral pela manhã'},
+ {n:'Dapagliflozina 10mg comprimido',p:'1 comprimido via oral 1x/dia'},
+ {n:'Empagliflozina 25mg comprimido',p:'1 comprimido via oral 1x/dia'},
+ {n:'Sitagliptina 100mg comprimido',p:'1 comprimido via oral 1x/dia'},
+ {n:'Insulina NPH (frasco/refil)',p:'aplicar via subcutânea conforme esquema prescrito'},
+ {n:'Insulina regular (frasco/refil)',p:'aplicar via subcutânea conforme esquema prescrito'},
+ {n:'Levotiroxina 50mcg comprimido',p:'1 comprimido via oral em jejum, 30 min antes do café'},
+ {n:'Prednisona 20mg comprimido',p:'1 comprimido via oral 1x/dia pela manhã — por 5 dias'},
+ {n:'Prednisolona 20mg comprimido',p:'1 comprimido via oral 1x/dia pela manhã'},
+ {n:'Dexametasona 4mg comprimido',p:'1 comprimido via oral 1x/dia'},
+ // Trato gastrointestinal
+ {n:'Omeprazol 20mg cápsula',p:'1 cápsula via oral em jejum 1x/dia — por 4 semanas'},
+ {n:'Pantoprazol 40mg comprimido',p:'1 comprimido via oral em jejum 1x/dia'},
+ {n:'Esomeprazol 40mg comprimido',p:'1 comprimido via oral em jejum 1x/dia'},
+ {n:'Domperidona 10mg comprimido',p:'1 comprimido via oral de 8/8h, 30 min antes das refeições'},
+ {n:'Metoclopramida 10mg comprimido',p:'1 comprimido via oral de 8/8h se náusea'},
+ {n:'Bromoprida 10mg comprimido',p:'1 comprimido via oral de 8/8h antes das refeições'},
+ {n:'Ondansetrona 8mg comprimido',p:'1 comprimido via oral de 8/8h se náusea/vômito'},
+ {n:'Simeticona 40mg comprimido',p:'1 a 2 comprimidos via oral após as refeições e ao deitar'},
+ {n:'Loperamida 2mg comprimido',p:'2 comprimidos via oral no início, depois 1 após cada evacuação (máx. 8/dia)'},
+ {n:'Lactulona (lactulose) 667mg/mL xarope',p:'15 a 30 mL via oral 1 a 2x/dia'},
+ {n:'Sais para reidratação oral (SRO) sachê',p:'diluir 1 sachê em 1 L de água; oferecer conforme as perdas'},
+ // Respiratório / alergia
+ {n:'Salbutamol spray 100mcg/dose',p:'2 jatos inalatórios de 6/6h se falta de ar'},
+ {n:'Budesonida + Formoterol 200/6mcg inalador',p:'1 inalação de 12/12h'},
+ {n:'Beclometasona spray 250mcg/dose',p:'1 jato inalatório de 12/12h'},
+ {n:'Brometo de ipratrópio 0,25mg/mL solução',p:'inalar 20 a 40 gotas de 6/6h se necessário'},
+ {n:'Loratadina 10mg comprimido',p:'1 comprimido via oral 1x/dia'},
+ {n:'Desloratadina 5mg comprimido',p:'1 comprimido via oral 1x/dia'},
+ {n:'Cetirizina 10mg comprimido',p:'1 comprimido via oral 1x/dia à noite'},
+ {n:'Fexofenadina 180mg comprimido',p:'1 comprimido via oral 1x/dia'},
+ {n:'Dexclorfeniramina 2mg comprimido',p:'1 comprimido via oral de 8/8h'},
+ {n:'Budesonida spray nasal 32mcg/dose',p:'2 jatos em cada narina 1x/dia'},
+ // Psiquiatria / neurologia
+ {n:'Sertralina 50mg comprimido',p:'1 comprimido via oral pela manhã'},
+ {n:'Fluoxetina 20mg cápsula',p:'1 cápsula via oral pela manhã'},
+ {n:'Escitalopram 10mg comprimido',p:'1 comprimido via oral 1x/dia'},
+ {n:'Venlafaxina 75mg comprimido',p:'1 comprimido via oral 1x/dia pela manhã'},
+ {n:'Amitriptilina 25mg comprimido',p:'1 comprimido via oral à noite'},
+ {n:'Clonazepam 2mg comprimido',p:'1 comprimido via oral à noite',c:1},
+ {n:'Diazepam 10mg comprimido',p:'1 comprimido via oral à noite',c:1},
+ {n:'Alprazolam 0,5mg comprimido',p:'1 comprimido via oral à noite',c:1},
+ {n:'Zolpidem 10mg comprimido',p:'1 comprimido via oral ao deitar',c:1},
+ {n:'Quetiapina 25mg comprimido',p:'1 comprimido via oral à noite',c:1},
+ {n:'Gabapentina 300mg cápsula',p:'1 cápsula via oral de 8/8h'},
+ {n:'Pregabalina 75mg cápsula',p:'1 cápsula via oral de 12/12h'},
+ {n:'Carbamazepina 200mg comprimido',p:'1 comprimido via oral de 12/12h',c:1},
+ {n:'Levetiracetam 500mg comprimido',p:'1 comprimido via oral de 12/12h'},
+ // Reumato / outros
+ {n:'Alopurinol 300mg comprimido',p:'1 comprimido via oral 1x/dia após refeição'},
+ {n:'Colchicina 0,5mg comprimido',p:'1 comprimido via oral de 12/12h'},
+ {n:'Carbonato de cálcio 600mg + Vitamina D comprimido',p:'1 comprimido via oral 1x/dia'},
+ {n:'Vitamina D 50.000 UI cápsula',p:'1 cápsula via oral 1x/semana — por 8 semanas'},
+ {n:'Sulfato ferroso 40mg Fe comprimido',p:'1 comprimido via oral em jejum 1x/dia com vitamina C'},
+ {n:'Ácido fólico 5mg comprimido',p:'1 comprimido via oral 1x/dia'},
+ {n:'Tansulosina 0,4mg cápsula',p:'1 cápsula via oral 1x/dia após a mesma refeição'},
+ {n:'Finasterida 5mg comprimido',p:'1 comprimido via oral 1x/dia'},
+ {n:'Dimenidrinato 50mg + Piridoxina comprimido',p:'1 comprimido via oral de 6/6h se náusea/tontura'},
+ {n:'Betaistina 24mg comprimido',p:'1 comprimido via oral de 12/12h'},
+ {n:'Permetrina 5% loção',p:'aplicar do pescoço para baixo, deixar 8 a 14h, repetir em 7 dias'},
+ {n:'Cetoconazol 2% xampu',p:'aplicar no couro cabeludo 2x/semana, deixar agir 5 min'}
+];
 
 let state={patients:[],appts:[],records:[],prescriptions:[],docs:[],cfg:{medico:'',clinica:'',crm:'',esp:'',endereco:'',telefone:''},migratedEvoluai:false};
 let cur=new Date();cur.setHours(0,0,0,0);
@@ -530,35 +678,62 @@ function saveEvol(id){
 }
 
 /* ===== RECEITUÁRIO (editor + IA + impressão) ===== */
+let rxItens=[], rxEditId=null;
+function norm(s){return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');}
 function openRx(id){
-  const r=id?state.prescriptions.find(x=>x.id===id):{tipo:'simples',texto:'',obs:''};
+  rxEditId=id||null;
+  const r=id?state.prescriptions.find(x=>x.id===id):null;
+  let tipo='simples',obs='';rxItens=[];
+  if(r){tipo=r.tipo||'simples';obs=r.obs||'';
+    if(Array.isArray(r.itens)&&r.itens.length){rxItens=r.itens.map(it=>({nome:it.nome||'',pos:it.pos||''}));}
+    else if(r.texto){rxItens=r.texto.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{const i=l.indexOf(' — ');return i>=0?{nome:l.slice(0,i),pos:l.slice(i+3)}:{nome:l,pos:''};});}
+  }
   modal(`<div class="box wide"><h3>${id?'Editar':'Novo'} receituário</h3>
-   <div class="field"><label>Tipo</label><select id="r_tipo"><option value="simples" ${r.tipo==='simples'?'selected':''}>Receituário simples</option><option value="especial" ${r.tipo==='especial'?'selected':''}>Receituário de controle especial</option></select></div>
-   <div class="field"><label>Medicações (uma por linha)</label>
-     <div class="toolbar"><button class="btn btn-mic btn-sm" id="micBtn" onclick="toggleMic('r_out')">🎤 Ditar</button><span id="liveTag"></span>
-       <button class="btn btn-p btn-sm" id="rxAiBtn" onclick="genRx()">✨ Organizar com IA</button></div>
-     <textarea id="r_out" style="min-height:170px" placeholder="Ex.: dipirona 1g, 1 comprimido de 6/6h por 3 dias se dor&#10;Ou digite livremente e use 'Organizar com IA'.">${esc(r.texto||'')}</textarea>
+   <div class="field"><label>Tipo</label><select id="r_tipo"><option value="simples" ${tipo==='simples'?'selected':''}>Receituário simples</option><option value="especial" ${tipo==='especial'?'selected':''}>Receituário de controle especial</option></select></div>
+   <div class="field" style="position:relative"><label>Adicionar medicamento</label>
+     <input id="r_busca" autocomplete="off" placeholder="Digite o nome (ex.: amoxicilina, losartana, dipirona)..." oninput="rxSug(this.value)" onfocus="rxSug(this.value)" onblur="setTimeout(function(){var s=document.getElementById('r_sug');if(s)s.style.display='none';},150)">
+     <div id="r_sug" class="rx-sug" style="display:none"></div>
+     <div class="hint">Selecione da lista e a posologia vem preenchida — ajuste se quiser. Ou <a onclick="rxAddManual()" style="color:var(--petrol);cursor:pointer;font-weight:700">adicione manualmente</a>.</div>
    </div>
-   <div class="field"><label>Orientações / observações (opcional)</label><textarea id="r_obs" placeholder="Ex.: retorno em 7 dias, repouso...">${esc(r.obs||'')}</textarea></div>
-   <div class="hint">A IA apenas organiza o que você escreveu — não acrescenta fármacos.${MT.mode==='demo'?' <b>Entre na conta MedTech para usar a IA.</b>':''}</div>
-   <div class="row"><button class="btn btn-p" onclick="saveRx('${id||''}',false)">💾 Salvar</button><button class="btn btn-g" onclick="saveRx('${id||''}',true)">💾 Salvar e imprimir</button><button class="btn btn-g" onclick="closeModalMic()">Cancelar</button></div></div>`);
+   <div id="r_itens"></div>
+   <div class="field" style="margin-top:10px"><label>Orientações / observações (opcional)</label><textarea id="r_obs" placeholder="Ex.: retorno em 7 dias, repouso...">${esc(obs)}</textarea></div>
+   <div class="row"><button class="btn btn-p" onclick="saveRx2(false)">💾 Salvar</button><button class="btn btn-g" onclick="saveRx2(true)">💾 Salvar e imprimir</button><button class="btn btn-g" onclick="closeModalMic()">Cancelar</button></div></div>`);
+  renderRxItens();
 }
-async function genRx(){
-  const raw=document.getElementById('r_out').value.trim();
-  if(!raw){alert('Digite as medicações antes de organizar.');return;}
-  const b=document.getElementById('rxAiBtn');b.innerHTML='<span class="spin"></span> Organizando...';b.disabled=true;
-  const prompt='Organize as medicações citadas em um receituário claro, em português do Brasil, uma medicação por linha no formato "Medicamento concentração — posologia (via, frequência, duração)". Liste apenas o que foi mencionado; não acrescente fármacos nem doses. Não inclua cabeçalho, nome do paciente nem assinatura.\n\nMedicações:\n'+raw;
-  try{const text=await MT.ai(prompt);document.getElementById('r_out').value=(text||'').trim();}
-  catch(e){alert('⚠️ '+e.message);}
-  b.innerHTML='✨ Organizar com IA';b.disabled=false;
+function rxSug(q){
+  const box=document.getElementById('r_sug');if(!box)return;
+  const nq=norm(q).trim();
+  if(nq.length<2){box.style.display='none';box.innerHTML='';return;}
+  const terms=nq.split(/\s+/);
+  const res=MED_DB.map((m,idx)=>({m,idx,k:norm(m.n)})).filter(o=>terms.every(t=>o.k.includes(t))).slice(0,12);
+  if(!res.length){box.innerHTML='<div class="rx-sug-empty">Nenhum medicamento. Use “adicionar manualmente”.</div>';box.style.display='block';return;}
+  box.innerHTML=res.map(o=>`<div class="rx-sug-item" onmousedown="rxPick(${o.idx})"><b>${esc(o.m.n)}${o.m.c?' <span class="rx-tag">controlado</span>':''}</b><span>${esc(o.m.p)}</span></div>`).join('');
+  box.style.display='block';
 }
-function saveRx(id,andPrint){
-  const texto=document.getElementById('r_out').value.trim();
-  if(!texto){alert('Escreva as medicações antes de salvar.');return;}
+function rxPick(idx){const m=MED_DB[idx];if(!m)return;rxItens.push({nome:m.n,pos:m.p});
+  const b=document.getElementById('r_busca');if(b)b.value='';
+  const s=document.getElementById('r_sug');if(s){s.style.display='none';s.innerHTML='';}
+  if(m.c){const sel=document.getElementById('r_tipo');if(sel&&sel.value==='simples')sel.value='especial';}
+  renderRxItens();if(b)b.focus();
+}
+function rxAddManual(){rxItens.push({nome:'',pos:''});renderRxItens();const c=document.querySelectorAll('#r_itens .rx-nome');if(c.length)c[c.length-1].focus();}
+function rxDel(i){rxItens.splice(i,1);renderRxItens();}
+function renderRxItens(){
+  const box=document.getElementById('r_itens');if(!box)return;
+  if(!rxItens.length){box.innerHTML='<div class="empty" style="padding:18px">Nenhum medicamento adicionado.<br>Busque acima e selecione — a posologia vem pronta.</div>';return;}
+  box.innerHTML=rxItens.map((it,i)=>`<div class="rx-item">
+     <div class="rx-item-h"><span class="rx-num">${i+1}</span><input class="rx-nome" value="${esc(it.nome)}" placeholder="Medicamento e concentração" oninput="rxItens[${i}].nome=this.value"><button class="rx-x" title="Remover" onclick="rxDel(${i})">×</button></div>
+     <textarea class="rx-pos" placeholder="Posologia (via, dose, frequência, duração)" oninput="rxItens[${i}].pos=this.value">${esc(it.pos)}</textarea>
+   </div>`).join('');
+}
+function saveRx2(andPrint){
+  const itens=rxItens.map(it=>({nome:(it.nome||'').trim(),pos:(it.pos||'').trim()})).filter(it=>it.nome);
+  if(!itens.length){alert('Adicione ao menos um medicamento.');return;}
   const tipo=document.getElementById('r_tipo').value;const obs=document.getElementById('r_obs').value.trim();
-  let rid=id;
-  if(id){Object.assign(state.prescriptions.find(x=>x.id===id),{tipo,texto,obs});}
-  else{rid=uid();state.prescriptions.push({id:rid,pacId:curPac,date:nowISO(),tipo,texto,obs});}
+  const texto=itens.map(it=>it.pos?(it.nome+' — '+it.pos):it.nome).join('\n');
+  let rid=rxEditId;
+  if(rxEditId){Object.assign(state.prescriptions.find(x=>x.id===rxEditId),{tipo,itens,texto,obs});}
+  else{rid=uid();state.prescriptions.push({id:rid,pacId:curPac,date:nowISO(),tipo,itens,texto,obs});}
   persist();closeModalMic();renderPBody();
   if(andPrint)printRx(rid);
 }
