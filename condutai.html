@@ -730,6 +730,99 @@ main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
   .library-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
   .library-tab { flex: 0 0 auto; white-space: nowrap; }
 }
+
+/* ============================================================
+   REDESIGN ESTILO WHITEBOOK (override — aplicado por último)
+   ============================================================ */
+html { background: var(--bg-soft); }
+body {
+  display: block !important;
+  grid-template: none !important;
+  max-width: 560px;
+  margin: 0 auto;
+  min-height: 100vh;
+  height: auto !important;
+  overflow: visible !important;
+  background: var(--bg);
+  box-shadow: 0 0 60px rgba(15,23,42,.07);
+  padding-bottom: calc(78px + env(safe-area-inset-bottom));
+}
+aside, .aside-backdrop { display: none !important; }
+
+/* Header: saudação + busca grande */
+header {
+  display: block !important;
+  position: static !important;
+  background: linear-gradient(160deg, #0c343d 0%, #0d9488 145%);
+  color: #fff;
+  padding: calc(18px + env(safe-area-inset-top)) 18px 20px !important;
+  border: 0 !important;
+  border-radius: 0 0 22px 22px;
+  box-shadow: 0 6px 22px rgba(12,52,61,.18);
+}
+header .logo, header > .header-actions { display: none !important; }
+.wb-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.wb-hi { font-size: 22px; font-weight: 800; letter-spacing: -.3px; line-height: 1.2; color:#fff; }
+.wb-hi small { display: block; font-size: 12.5px; font-weight: 500; opacity: .82; margin-top: 3px; }
+.wb-headbtns { display: flex; gap: 8px; flex: 0 0 auto; }
+.wb-headbtns button { background: rgba(255,255,255,.16); color: #fff; border: 0; width: 38px; height: 38px; border-radius: 11px; font-size: 17px; cursor: pointer; transition: background .12s; }
+.wb-headbtns button:hover { background: rgba(255,255,255,.28); }
+.wb-search { margin-top: 16px; background: #fff; border-radius: 14px; display: flex; align-items: center; gap: 10px; padding: 0 14px; box-shadow: 0 8px 20px rgba(0,0,0,.14); }
+.wb-search span { color: #0d9488; font-size: 18px; }
+.wb-search input { flex: 1; border: 0; outline: 0; background: transparent; padding: 15px 0; font-size: 15px; color: #0f172a; font-family: inherit; }
+
+/* Main vira coluna scrollável */
+main, #main { display: block !important; height: auto !important; overflow: visible !important; padding: 16px 16px 8px !important; max-width: none !important; }
+
+/* Views */
+.wb-view[hidden] { display: none !important; }
+.wb-section { margin-top: 20px; }
+.wb-section.first { margin-top: 8px; }
+.wb-section-title { font-size: 12.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--text-soft); margin: 4px 2px 12px; }
+
+/* Banner IA em destaque */
+.wb-hero { background: linear-gradient(135deg, #0d9488, #0f766e); color: #fff; border-radius: 18px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; cursor: pointer; box-shadow: 0 10px 24px rgba(13,148,136,.28); }
+.wb-hero .he-ic { font-size: 30px; flex: 0 0 auto; }
+.wb-hero h3 { font-size: 16px; font-weight: 800; }
+.wb-hero p { font-size: 12.5px; opacity: .92; margin-top: 2px; line-height: 1.35; }
+.wb-hero .he-go { margin-left: auto; font-size: 20px; opacity: .9; }
+
+/* Grade de cards (estilo "WB +") */
+.wb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.wb-card { display: flex; flex-direction: column; gap: 10px; text-align: left; background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 15px; cursor: pointer; text-decoration: none; color: inherit; position: relative; transition: transform .1s, box-shadow .12s; min-height: 102px; }
+.wb-card:active { transform: scale(.97); }
+.wb-card:hover { box-shadow: var(--shadow-lg); border-color: var(--primary-soft); }
+.wb-card .ic { width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center; font-size: 22px; }
+.wb-card .ttl { font-weight: 750; font-size: 14.5px; line-height: 1.2; color: var(--text); }
+.wb-card .sub { font-size: 11px; color: var(--text-mute); line-height: 1.3; margin-top: -4px; }
+.wb-badge { position: absolute; top: 11px; right: 11px; font-size: 9.5px; font-weight: 800; padding: 3px 8px; border-radius: 20px; background: var(--info-soft); color: var(--info); letter-spacing: .02em; }
+.wb-badge.new { background: var(--success-soft); color: var(--success); }
+
+/* Cabeçalho interno de view (Bulas, Investigação, etc.) */
+.wb-view-head { display: flex; align-items: center; gap: 10px; margin: 2px 0 4px; }
+.wb-view-head .vic { font-size: 24px; }
+.wb-view-head h2 { font-size: 20px; font-weight: 800; }
+.wb-view-intro { font-size: 13px; color: var(--text-soft); margin: 2px 0 14px; line-height: 1.45; }
+.wb-quick { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.wb-quick button { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 8px 14px; font-size: 13px; cursor: pointer; color: var(--text); font-family: inherit; }
+.wb-quick button:hover { border-color: var(--primary); color: var(--primary); }
+.wb-bigsearch { display: flex; gap: 8px; margin-top: 6px; }
+.wb-bigsearch input { flex: 1; border: 1px solid var(--border); border-radius: 12px; padding: 13px 14px; font-size: 15px; font-family: inherit; background: var(--bg-card); color: var(--text); }
+.wb-bigsearch button { background: var(--primary); color: #fff; border: 0; border-radius: 12px; padding: 0 18px; font-weight: 700; font-size: 14px; cursor: pointer; font-family: inherit; }
+
+/* Lista Histórico/Favoritos como view */
+#listView .side-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+
+/* Bottom navigation */
+.wb-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 560px; background: var(--bg-card); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: flex-end; padding: 7px 6px calc(7px + env(safe-area-inset-bottom)); z-index: 60; box-shadow: 0 -4px 18px rgba(15,23,42,.06); }
+.wb-nav button { background: none; border: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; color: var(--text-mute); cursor: pointer; font-family: inherit; flex: 1; padding: 2px 0; }
+.wb-nav button .nic { font-size: 19px; line-height: 1; }
+.wb-nav button.active { color: var(--primary); font-weight: 700; }
+.wb-nav button.center .nic { background: linear-gradient(135deg, #0d9488, #0f766e); color: #fff; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; margin-top: -24px; box-shadow: 0 6px 16px rgba(13,148,136,.45); font-size: 23px; }
+
+/* Esconde resíduos do layout antigo */
+.mode-btn[data-mode="socratica"], #histBtn { display: none !important; }
+.welcome-features, .welcome-icon { display: none !important; }
 </style>
 </head>
 <body>
@@ -743,48 +836,69 @@ main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
 </div>
 
 <header>
-  <div class="logo">
-    <div class="logo-icon">⚕</div>
-    <div>CondutAI <span class="subtitle">— Abordagem clínica baseada em diretrizes</span></div>
+  <div class="wb-top">
+    <div class="wb-hi">Olá, <span id="wbName">médico(a)</span><small>O que você precisa consultar hoje?</small></div>
+    <div class="wb-headbtns">
+      <button id="newBtn" title="Nova consulta">＋</button>
+      <button id="themeBtn" title="Alternar tema">🌙</button>
+    </div>
   </div>
-  <div class="header-actions">
-    <button class="icon-btn only-mobile" id="histBtn" title="Histórico" onclick="var a=document.querySelector('aside');var o=a.classList.toggle('open');a.style.display=o?'flex':'';document.getElementById('asideBackdrop').classList.toggle('show')">🕘</button>
-    <button class="icon-btn" id="newBtn" title="Nova consulta">＋</button>
-    <button class="icon-btn" id="themeBtn" title="Alternar tema">🌙</button>
-    <button class="icon-btn" id="settingsBtn" title="Configurações" style="display:none">⚙</button>
+  <div class="wb-search">
+    <span>🔍</span>
+    <input id="globalSearch" type="search" placeholder="Busque conduta, doença ou escore" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="wb_busca" data-lpignore="true" data-1p-ignore enterkeyhint="search">
   </div>
 </header>
 
-<aside>
-  <div class="side-tabs">
-    <button class="side-tab active" data-tab="history">Histórico</button>
-    <button class="side-tab" data-tab="starred">Favoritos</button>
-  </div>
-  <div class="side-list" id="sideList" onclick="if(window.innerWidth<=860){var a=document.querySelector('aside');a.classList.remove('open');a.style.display='';document.getElementById('asideBackdrop').classList.remove('show')}"></div>
-</aside>
-<div class="aside-backdrop" id="asideBackdrop" onclick="var a=document.querySelector('aside');a.classList.remove('open');a.style.display='';this.classList.remove('show')"></div>
-
 <main id="main">
-  <div id="welcomeView" class="welcome">
-    <div class="welcome-icon">🩺</div>
-    <h1>Olá, preceptor</h1>
-    <p>Escolha um <strong>protocolo da biblioteca</strong>, digite um sintoma, cole uma evolução real ou inicie uma discussão socrática — tudo com fluxograma visual e baseado nas diretrizes mais recentes.</p>
 
-    <div class="search-box">
-      <div class="mode-toggle">
-        <button class="mode-btn active" data-mode="direta">📋 Conduta direta</button>
-        <button class="mode-btn" data-mode="protocolo">📚 Protocolo passo-a-passo</button>
-        <button class="mode-btn" data-mode="socratica">🎓 Discussão socrática</button>
-        <button class="mode-btn" data-mode="caso">📄 Avaliar caso real</button>
-      </div>
-      <div class="search-input-wrap">
-        <textarea class="search-input" id="searchInput" rows="2" autocomplete="off" autocorrect="off" data-lpignore="true" data-1p-ignore placeholder="Ex: dor torácica, ICFEr descompensada, sepse, AVC isquêmico em janela..."></textarea>
-        <button class="send-btn" id="sendBtn">Analisar →</button>
-      </div>
-      <div class="chips" id="chipsContainer" style="display:none;"></div>
+  <!-- ===================== INÍCIO ===================== -->
+  <section id="homeView" class="wb-view">
+    <div class="wb-hero" data-go="ia">
+      <span class="he-ic">✨</span>
+      <div><h3>CondutAI IA</h3><p>Descreva o caso e receba a conduta completa, com fluxograma e doses.</p></div>
+      <span class="he-go">→</span>
     </div>
 
-    <!-- Biblioteca de Protocolos -->
+    <div class="wb-section first">
+      <div class="wb-section-title">Ferramentas</div>
+      <div class="wb-grid">
+        <button class="wb-card" data-go="condutas">
+          <span class="ic" style="background:var(--primary-soft);color:var(--primary-dark)">🩺</span>
+          <span class="ttl">Condutas</span><span class="sub">Protocolos por especialidade</span>
+        </button>
+        <button class="wb-card" data-go="bulas">
+          <span class="wb-badge new">Novo</span>
+          <span class="ic" style="background:var(--info-soft);color:var(--info)">💊</span>
+          <span class="ttl">Bulas</span><span class="sub">Doses, ajustes, interações</span>
+        </button>
+        <button class="wb-card" data-go="investigacao">
+          <span class="wb-badge new">Novo</span>
+          <span class="ic" style="background:var(--purple-soft);color:var(--purple)">🔬</span>
+          <span class="ttl">Investigação</span><span class="sub">Sintoma → exames → Dx</span>
+        </button>
+        <button class="wb-card" data-go="ia">
+          <span class="ic" style="background:#d1fae5;color:#047857">✨</span>
+          <span class="ttl">CondutAI IA</span><span class="sub">Conduta sob medida</span>
+        </button>
+        <a class="wb-card" href="calcmed.html">
+          <span class="ic" style="background:var(--info-soft);color:var(--info)">🧮</span>
+          <span class="ttl">Escores & Cálculos</span><span class="sub">CalcMed</span>
+        </a>
+        <a class="wb-card" href="medprovas.html">
+          <span class="ic" style="background:var(--warn-soft);color:var(--warn)">📝</span>
+          <span class="ttl">Provas & Questões</span><span class="sub">MedProvas</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="wb-section">
+      <div class="wb-section-title">Condutas em destaque</div>
+      <div class="library-grid" id="homeFeatured"></div>
+    </div>
+  </section>
+
+  <!-- ===================== CONDUTAS (biblioteca) ===================== -->
+  <section id="condutasView" class="wb-view" hidden>
     <div class="library">
       <div class="library-header">
         <div class="library-title">
@@ -796,70 +910,111 @@ main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
       <div class="library-tabs" id="libraryTabs"></div>
       <div class="library-grid" id="libraryGrid"></div>
     </div>
+  </section>
 
-    <div class="welcome-features">
-      <div class="feature">
-        <div class="feature-icon">📋</div>
-        <h3>Conduta direta</h3>
-        <p>Sintoma/síndrome → abordagem completa com fluxograma Mermaid, doses e diretrizes atualizadas.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">🎓</div>
-        <h3>Discussão socrática</h3>
-        <p>IA cria um caso clínico fictício e conduz o residente por perguntas, avaliando cada resposta.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">📄</div>
-        <h3>Avaliar caso real</h3>
-        <p>Cole a evolução do seu paciente — receba análise, abordagens possíveis e <strong>roteiro de como discutir com o residente</strong>.</p>
-      </div>
-    </div>
-  </div>
-
-  <div id="resultView" style="display:none;">
+  <!-- ===================== IA ===================== -->
+  <section id="iaView" class="wb-view" hidden>
+    <div class="wb-view-head"><span class="vic">✨</span><h2>CondutAI IA</h2></div>
+    <p class="wb-view-intro">Digite um sintoma/síndrome para a conduta completa, ou cole a evolução do paciente para análise crítica.</p>
     <div class="search-box">
       <div class="mode-toggle">
-        <button class="mode-btn active" data-mode="direta">📋 Conduta direta</button>
-        <button class="mode-btn" data-mode="protocolo">📚 Protocolo passo-a-passo</button>
-        <button class="mode-btn" data-mode="socratica">🎓 Discussão socrática</button>
-        <button class="mode-btn" data-mode="caso">📄 Avaliar caso real</button>
+        <button class="mode-btn active" data-mode="direta">📋 Conduta</button>
+        <button class="mode-btn" data-mode="caso">📄 Avaliar caso</button>
+        <button class="mode-btn" data-mode="protocolo">📚 Protocolo</button>
+      </div>
+      <div class="search-input-wrap">
+        <textarea class="search-input" id="searchInput" rows="2" autocomplete="off" autocorrect="off" data-lpignore="true" data-1p-ignore placeholder="Ex: dor torácica, sepse, CAD, AVC isquêmico em janela..."></textarea>
+        <button class="send-btn" id="sendBtn">Analisar →</button>
+      </div>
+      <div class="options-row" id="optionsRow">
+        <div class="option-group">
+          <label for="ctxSelect">Contexto:</label>
+          <select class="option-select" id="ctxSelect">
+            <option value="adulto">Adulto</option>
+            <option value="idoso">Idoso (≥65a)</option>
+            <option value="gestante">Gestante</option>
+            <option value="pediatrico">Pediátrico</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label for="cenarioSelect">Cenário:</label>
+          <select class="option-select" id="cenarioSelect">
+            <option value="emergencia">Emergência</option>
+            <option value="enfermaria">Enfermaria</option>
+            <option value="ambulatorio">Ambulatório</option>
+            <option value="uti">UTI</option>
+          </select>
+        </div>
+        <div class="option-group" id="profundidadeGroup">
+          <label for="profundidadeSelect">Detalhe:</label>
+          <select class="option-select" id="profundidadeSelect">
+            <option value="completa">Completa</option>
+            <option value="resumida">Resumida</option>
+            <option value="bullet">Bullet points</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== BULAS ===================== -->
+  <section id="bulasView" class="wb-view" hidden>
+    <div class="wb-view-head"><span class="vic">💊</span><h2>Bulas</h2></div>
+    <p class="wb-view-intro">Busque um medicamento e veja indicações, posologia, ajuste renal/hepático, contraindicações e principais interações — objetivo, para a beira do leito.</p>
+    <div class="wb-bigsearch">
+      <input id="bulaSearch" type="search" placeholder="Ex: enoxaparina, vancomicina, amiodarona..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore enterkeyhint="search">
+      <button id="bulaGo">Buscar</button>
+    </div>
+    <div class="wb-quick" id="bulaQuick"></div>
+    <div id="bulaResult" style="margin-top:16px"></div>
+  </section>
+
+  <!-- ===================== INVESTIGAÇÃO ===================== -->
+  <section id="investigacaoView" class="wb-view" hidden>
+    <div class="wb-view-head"><span class="vic">🔬</span><h2>Investigação de doenças</h2></div>
+    <p class="wb-view-intro">Descreva um achado (sintoma, sinal ou alteração laboratorial) e receba o raciocínio: hipóteses principais, exames na ordem certa e critérios diagnósticos.</p>
+    <div class="wb-bigsearch">
+      <input id="invSearch" type="search" placeholder="Ex: hiponatremia, dispneia, ↑transaminases..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore enterkeyhint="search">
+      <button id="invGo">Investigar</button>
+    </div>
+    <div class="wb-quick" id="invQuick"></div>
+    <div id="invResult" style="margin-top:16px"></div>
+  </section>
+
+  <!-- ===================== HISTÓRICO / FAVORITOS ===================== -->
+  <section id="listView" class="wb-view" hidden>
+    <div class="wb-view-head"><span class="vic">🕘</span><h2 id="listTitle">Histórico</h2></div>
+    <div class="side-tabs">
+      <button class="side-tab active" data-tab="history">Histórico</button>
+      <button class="side-tab" data-tab="starred">Favoritos</button>
+    </div>
+    <div class="side-list" id="sideList"></div>
+  </section>
+
+  <!-- ===================== RESULTADO ===================== -->
+  <section id="resultView" class="wb-view" hidden>
+    <div class="search-box">
+      <div class="mode-toggle">
+        <button class="mode-btn active" data-mode="direta">📋 Conduta</button>
+        <button class="mode-btn" data-mode="caso">📄 Avaliar caso</button>
+        <button class="mode-btn" data-mode="protocolo">📚 Protocolo</button>
       </div>
       <div class="search-input-wrap">
         <textarea class="search-input" id="searchInput2" rows="2" autocomplete="off" autocorrect="off" data-lpignore="true" data-1p-ignore placeholder="Nova consulta..."></textarea>
         <button class="send-btn" id="sendBtn2">Analisar →</button>
       </div>
     </div>
-    <div class="options-row" id="optionsRow">
-      <div class="option-group">
-        <label for="ctxSelect">Contexto:</label>
-        <select class="option-select" id="ctxSelect">
-          <option value="adulto">Adulto</option>
-          <option value="idoso">Idoso (≥65a)</option>
-          <option value="gestante">Gestante</option>
-          <option value="pediatrico">Pediátrico</option>
-        </select>
-      </div>
-      <div class="option-group">
-        <label for="cenarioSelect">Cenário:</label>
-        <select class="option-select" id="cenarioSelect">
-          <option value="emergencia">Emergência</option>
-          <option value="enfermaria">Enfermaria</option>
-          <option value="ambulatorio">Ambulatório</option>
-          <option value="uti">UTI</option>
-        </select>
-      </div>
-      <div class="option-group" id="profundidadeGroup">
-        <label for="profundidadeSelect">Detalhe:</label>
-        <select class="option-select" id="profundidadeSelect">
-          <option value="completa">Completa</option>
-          <option value="resumida">Resumida</option>
-          <option value="bullet">Bullet points</option>
-        </select>
-      </div>
-    </div>
     <div id="resultContainer"></div>
-  </div>
+  </section>
 </main>
+
+<nav class="wb-nav" id="wbNav">
+  <button data-go="home" class="active"><span class="nic">🏠</span>Início</button>
+  <button data-go="condutas"><span class="nic">🩺</span>Condutas</button>
+  <button data-go="ia" class="center"><span class="nic">✨</span>IA</button>
+  <button data-go="favoritos"><span class="nic">⭐</span>Favoritos</button>
+  <button data-go="historico"><span class="nic">🕘</span>Histórico</button>
+</nav>
 
 <div class="modal-backdrop" id="apiModal">
   <div class="modal">
@@ -932,7 +1087,8 @@ document.getElementById('themeBtn').onclick = () => {
 
 // ============ Modal API ============
 const apiModal = document.getElementById('apiModal');
-document.getElementById('settingsBtn').onclick = openApiModal;
+const _settingsBtn = document.getElementById('settingsBtn');
+if (_settingsBtn) _settingsBtn.onclick = openApiModal;
 function openApiModal() {
   document.getElementById('apiKeyInput').value = apiKey;
   document.getElementById('modelSelect').value = model;
@@ -1570,8 +1726,7 @@ function showOfflineProtocol(p) {
   const item = { id, mode: 'protocolo', offline: true, query: p.name, text: OFFLINE[p.id], sources: [], ctx: 'adulto', cenario: 'emergencia', ctxLabel: 'Banco MedTech', cenarioLabel: 'Offline', date: new Date().toISOString(), starred: false, protocolMeta: p };
   history.unshift(item); currentId = id; currentConversation = null; currentProtocol = null;
   saveHistory(); renderSide();
-  document.getElementById('welcomeView').style.display = 'none';
-  document.getElementById('resultView').style.display = 'block';
+  showView('result');
   window.scrollTo({ top: 0, behavior: 'smooth' });
   renderResultDireto(item);
 }
@@ -2319,8 +2474,7 @@ function buildFriendlyError(status, raw, usedModel) {
 
 // ============ Render: MODO DIRETO ============
 function showLoading(query, mode) {
-  document.getElementById('welcomeView').style.display = 'none';
-  document.getElementById('resultView').style.display = 'block';
+  showView('result');
   window.scrollTo({ top: 0, behavior: 'smooth' });
   const spinnerCls = mode === 'socratica' ? 'spinner purple' : 'spinner';
   const labels = {
@@ -2571,8 +2725,7 @@ async function loadHistoric(id) {
   if (!h) return;
   currentId = id;
   renderSide();
-  document.getElementById('welcomeView').style.display = 'none';
-  document.getElementById('resultView').style.display = 'block';
+  showView('result');
   const m = h.mode || 'direta';
   setMode(m);
   if (m === 'socratica') {
@@ -2705,15 +2858,146 @@ document.querySelectorAll('.chip').forEach(c => { c.onclick = () => run(c.datase
 
 document.getElementById('newBtn').onclick = () => {
   currentId = null; currentConversation = null;
-  document.getElementById('resultView').style.display = 'none';
-  document.getElementById('welcomeView').style.display = 'block';
-  document.getElementById('searchInput').value = '';
+  const si = document.getElementById('searchInput'); if (si) si.value = '';
   renderSide();
+  showView('ia');
 };
+
+// ============================================================
+//  Navegação estilo Whitebook (views + bottom nav)
+// ============================================================
+function showView(name) {
+  const map = { home:'homeView', condutas:'condutasView', ia:'iaView', bulas:'bulasView', investigacao:'investigacaoView', favoritos:'listView', historico:'listView', result:'resultView' };
+  const id = map[name] || 'homeView';
+  document.querySelectorAll('.wb-view').forEach(v => { v.hidden = (v.id !== id); });
+  const navMap = { home:'home', condutas:'condutas', ia:'ia', favoritos:'favoritos', historico:'historico', bulas:'home', investigacao:'home', result:'home' };
+  const navT = navMap[name] || 'home';
+  document.querySelectorAll('#wbNav button').forEach(b => b.classList.toggle('active', b.dataset.go === navT));
+  if (name === 'favoritos' || name === 'historico') {
+    currentTab = (name === 'favoritos') ? 'starred' : 'history';
+    document.querySelectorAll('#listView .side-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === currentTab));
+    const lt = document.getElementById('listTitle'); if (lt) lt.textContent = (name === 'favoritos') ? 'Favoritos' : 'Histórico';
+    renderSide();
+  }
+  if (name === 'bulas') renderBulaQuick();
+  if (name === 'investigacao') renderInvQuick();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+window.showView = showView;
+
+// Saudação com o nome do usuário (login central MedTech)
+function setGreeting() {
+  const u = window.MT && window.MT.user;
+  const nm = u && (u.displayName || u.email);
+  const el = document.getElementById('wbName');
+  if (el && nm) {
+    const first = String(nm).split(/[ @.]/)[0];
+    if (first) el.textContent = first.charAt(0).toUpperCase() + first.slice(1);
+  }
+}
+(function pollName(n){ setGreeting(); if (!(window.MT && window.MT.user) && n > 0) setTimeout(() => pollName(n-1), 400); })(20);
+
+// Condutas em destaque na home (instantâneas, do banco offline)
+function renderHomeFeatured() {
+  const el = document.getElementById('homeFeatured'); if (!el) return;
+  const ids = ['sepse','stemi','anafilaxia','cad','avc_isq','tep'];
+  const items = ids.map(id => PROTOCOLS.find(p => p.id === id)).filter(Boolean);
+  el.innerHTML = items.map(p => `
+    <div class="protocol-card" data-id="${p.id}">
+      <div class="protocol-icon">${p.icon}</div>
+      <div class="protocol-info"><div class="protocol-name">${escapeHtml(p.name)}</div><div class="protocol-tags">${escapeHtml(p.tags)}</div></div>
+      <div class="protocol-badge">${escapeHtml(p.guideline)}</div>
+    </div>`).join('');
+  el.querySelectorAll('.protocol-card').forEach(c => c.onclick = () => runProtocol(c.dataset.id));
+}
+
+// ============================================================
+//  BULAS (IA)
+// ============================================================
+const BULA_COMUNS = ['Enoxaparina','Noradrenalina','Vancomicina','Amiodarona','Insulina regular','Furosemida','Ceftriaxona','Dexametasona','Ácido tranexâmico','Metoprolol'];
+function renderBulaQuick() {
+  const el = document.getElementById('bulaQuick'); if (!el || el.dataset.done) return;
+  el.innerHTML = '<span style="font-size:12px;color:var(--text-mute);width:100%;margin-bottom:2px">Comuns:</span>' + BULA_COMUNS.map(d => `<button data-q="${escapeHtml(d)}">${escapeHtml(d)}</button>`).join('');
+  el.querySelectorAll('button').forEach(b => b.onclick = () => { document.getElementById('bulaSearch').value = b.dataset.q; runBula(b.dataset.q); });
+  el.dataset.done = '1';
+}
+function buildPromptBula(drug) {
+  return `Você é farmacêutico clínico e médico. Escreva uma BULA PRÁTICA e OBJETIVA do medicamento "${drug}" para uso à beira do leito por médicos no Brasil, em Markdown, sem enrolação, com números concretos (mg, mcg/kg, intervalos). Seções (título em negrito):
+
+**${drug}**
+- **Classe / mecanismo**
+- **Indicações principais**
+- **Posologia (adulto)** — dose por indicação, via, intervalo
+- **Apresentações no Brasil**
+- **Ajuste renal** (por faixa de ClCr)
+- **Ajuste hepático**
+- **Contraindicações**
+- **Efeitos adversos principais**
+- **Interações relevantes**
+- **Gestação / lactação**
+- **Pérolas práticas** (diluição, monitorização, reversão)
+
+Responda em português do Brasil. Não invente apresentações inexistentes.`;
+}
+async function runBula(q) {
+  q = (q || '').trim(); if (!q) return;
+  const box = document.getElementById('bulaResult');
+  if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span>⚠</span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
+  box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Buscando bula:</strong> ${escapeHtml(q)}</div><div class="loading-sub">Posologia, ajustes e interações…</div></div>`;
+  try {
+    const { text } = await callGemini([{ role:'user', parts:[{ text: buildPromptBula(q) }] }]);
+    box.innerHTML = `<div class="result">${md(text)}<div class="alert alert-info" style="margin-top:14px"><span>ℹ</span><div>Gerado por IA — confirme doses e ajustes na bula oficial/ANVISA antes de prescrever.</div></div></div>`;
+    await renderMermaidIn(box);
+    window.scrollTo({ top: 0, behavior:'smooth' });
+  } catch (err) {
+    box.innerHTML = `<div class="alert alert-warn"><span>⚠</span><div>Não foi possível buscar agora: ${escapeHtml(err.message||'erro')}.</div></div>`;
+    const r = document.createElement('button'); r.className='btn-primary'; r.style.marginTop='10px'; r.textContent='🔄 Tentar de novo'; r.onclick=()=>runBula(q); box.appendChild(r);
+  }
+}
+
+// ============================================================
+//  INVESTIGAÇÃO (IA)
+// ============================================================
+const INV_COMUNS = ['Hiponatremia','Hipercalemia','Anemia','Dispneia','Dor torácica','Transaminases elevadas','Plaquetopenia','Lesão renal aguda','Hipercalcemia','Febre sem foco'];
+function renderInvQuick() {
+  const el = document.getElementById('invQuick'); if (!el || el.dataset.done) return;
+  el.innerHTML = '<span style="font-size:12px;color:var(--text-mute);width:100%;margin-bottom:2px">Comuns:</span>' + INV_COMUNS.map(d => `<button data-q="${escapeHtml(d)}">${escapeHtml(d)}</button>`).join('');
+  el.querySelectorAll('button').forEach(b => b.onclick = () => { document.getElementById('invSearch').value = b.dataset.q; runInv(b.dataset.q); });
+  el.dataset.done = '1';
+}
+function buildPromptInvestigacao(finding) {
+  return `Você é clínico experiente e preceptor. Monte um ROTEIRO DE INVESTIGAÇÃO prático para o achado "${finding}" em adulto, no Brasil, em Markdown. Seções (título em negrito):
+
+**Investigação: ${finding}**
+- **Quando valorizar** (1-2 linhas)
+- **Diagnóstico diferencial** — agrupado por mecanismo, do mais comum ao mais grave
+- **Anamnese e exame dirigidos**
+- **Exames de 1ª linha** (ordem racional)
+- **Exames de 2ª linha / conforme suspeita**
+- **Sinais de alarme / quando internar**
+
+Depois inclua um fluxograma na sintaxe Mermaid em um bloco \`\`\`mermaid (flowchart TD) com a sequência de decisão. Nos rótulos dos nós, NÃO use os caracteres ( ) < > ; & — escreva por extenso (ex.: "menor que"). Responda em português do Brasil.`;
+}
+async function runInv(q) {
+  q = (q || '').trim(); if (!q) return;
+  const box = document.getElementById('invResult');
+  if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span>⚠</span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
+  box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Investigando:</strong> ${escapeHtml(q)}</div><div class="loading-sub">Hipóteses, exames e fluxograma…</div></div>`;
+  try {
+    const { text } = await callGemini([{ role:'user', parts:[{ text: buildPromptInvestigacao(q) }] }]);
+    box.innerHTML = `<div class="result">${md(text)}<div class="alert alert-info" style="margin-top:14px"><span>ℹ</span><div>Roteiro gerado por IA — adapte ao contexto do paciente e às diretrizes locais.</div></div></div>`;
+    await renderMermaidIn(box);
+    window.scrollTo({ top: 0, behavior:'smooth' });
+  } catch (err) {
+    box.innerHTML = `<div class="alert alert-warn"><span>⚠</span><div>Não foi possível investigar agora: ${escapeHtml(err.message||'erro')}.</div></div>`;
+    const r = document.createElement('button'); r.className='btn-primary'; r.style.marginTop='10px'; r.textContent='🔄 Tentar de novo'; r.onclick=()=>runInv(q); box.appendChild(r);
+  }
+}
 
 // ============ Init ============
 renderSide();
 renderLibrary();
+renderHomeFeatured();
 setMode('direta');
 // Liga o input de busca da biblioteca
 const libSearchInp = document.getElementById('librarySearch');
@@ -2731,6 +3015,29 @@ if (libSearchInp) {
   [200, 600, 1200, 2500, 5000].forEach(ms => setTimeout(_clearAutofill, ms));
   libSearchInp.addEventListener('focus', _clearAutofill);   // ao ir digitar, limpa e-mail autopreenchido
 }
+// ---- Navegação / atalhos / busca global (redesign Whitebook) ----
+document.querySelectorAll('#wbNav button[data-go], .wb-card[data-go], .wb-hero[data-go]').forEach(el => {
+  el.addEventListener('click', () => showView(el.dataset.go));
+});
+const _gs = document.getElementById('globalSearch');
+if (_gs) {
+  const runGlobal = () => {
+    let v = _gs.value; if (v.includes('@')) { v = ''; _gs.value = ''; }
+    libSearch = v; renderLibrary();
+    const ls = document.getElementById('librarySearch'); if (ls) ls.value = v;
+    if (document.getElementById('condutasView').hidden) showView('condutas');
+  };
+  _gs.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); if (_gs.value.trim()) runGlobal(); } });
+  _gs.addEventListener('input', () => { if (_gs.value.trim().length >= 2) runGlobal(); });
+}
+const _bg = document.getElementById('bulaGo'), _bs = document.getElementById('bulaSearch');
+if (_bg) _bg.onclick = () => runBula(_bs.value);
+if (_bs) _bs.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); runBula(_bs.value); } });
+const _ig = document.getElementById('invGo'), _is = document.getElementById('invSearch');
+if (_ig) _ig.onclick = () => runInv(_is.value);
+if (_is) _is.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); runInv(_is.value); } });
+showView('home');
+
 /* IA agora é keyless (gateway central MedTech) — não pedimos mais chave de API. */
 </script>
 </body>
