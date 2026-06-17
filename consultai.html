@@ -697,7 +697,7 @@ function openRx(id){
    </div>
    <div id="r_itens"></div>
    <div class="field" style="margin-top:10px"><label>Orientações / observações (opcional)</label><textarea id="r_obs" placeholder="Ex.: retorno em 7 dias, repouso...">${esc(obs)}</textarea></div>
-   <div class="row"><button class="btn btn-p" onclick="saveRx2(false)">💾 Salvar</button><button class="btn btn-g" onclick="saveRx2(true)">💾 Salvar e imprimir</button><button class="btn btn-g" onclick="closeModalMic()">Cancelar</button></div></div>`);
+   <div class="row"><button class="btn btn-p" onclick="saveRx2(false)">💾 Salvar</button><button class="btn btn-p" onclick="saveRx2(true)">💾 Salvar e imprimir</button><button class="btn btn-g" onclick="printRxDraft()">🖨️ Imprimir</button><button class="btn btn-g" onclick="closeModalMic()">Cancelar</button></div></div>`);
   renderRxItens();
 }
 function rxSug(q){
@@ -752,10 +752,18 @@ function cabecalho(){const c=state.cfg;
 }
 function assinatura(){const c=state.cfg;const nome=c.medico?('Dr(a). '+c.medico):'Assinatura';return '<div class="sig"><div class="line"></div>'+esc(nome)+(c.crm?(' — CRM '+esc(c.crm)):'')+'</div>';}
 function pacLinha(p){return '<div class="pac"><b>Paciente:</b> '+esc(p?p.nome:'')+(p&&age(p.nasc)!==''?(' · '+age(p.nasc)+' anos'):'')+(p&&p.convenio?(' · '+esc(p.convenio)):'')+'</div>';}
-function printRx(id){const r=state.prescriptions.find(x=>x.id===id);if(!r)return;const p=patientById(r.pacId);
+function doPrintRx(r){const p=patientById(r.pacId);
   const ttl=r.tipo==='especial'?'Receituário de Controle Especial':'Receituário';
-  const body=cabecalho()+'<div class="ttl">'+ttl+'</div>'+pacLinha(p)+'<div class="body">'+esc(r.texto)+(r.obs?('\n\nOrientações: '+esc(r.obs)):'')+'</div>'+assinatura()+'<div class="ft">Emitido em '+fmtDate(r.date)+' · ConsultAI / MedTech</div>';
+  const body=cabecalho()+'<div class="ttl">'+ttl+'</div>'+pacLinha(p)+'<div class="body">'+esc(r.texto)+(r.obs?('\n\nOrientações: '+esc(r.obs)):'')+'</div>'+assinatura()+'<div class="ft">Emitido em '+fmtDate(r.date||nowISO())+' · ConsultAI / MedTech</div>';
   printHTML(ttl+' — '+(p?p.nome:''),body);
+}
+function printRx(id){const r=state.prescriptions.find(x=>x.id===id);if(!r)return;doPrintRx(r);}
+function printRxDraft(){
+  const itens=rxItens.map(it=>({nome:(it.nome||'').trim(),pos:(it.pos||'').trim()})).filter(it=>it.nome);
+  if(!itens.length){alert('Adicione ao menos um medicamento para imprimir.');return;}
+  const tipo=document.getElementById('r_tipo').value;const obs=document.getElementById('r_obs').value.trim();
+  const texto=itens.map(it=>it.pos?(it.nome+' — '+it.pos):it.nome).join('\n');
+  doPrintRx({pacId:curPac,date:nowISO(),tipo,itens,texto,obs});
 }
 function printEvol(id){const r=state.records.find(x=>x.id===id);if(!r)return;const p=patientById(r.pacId);const f=REC_FMT[r.tipo]||REC_FMT.evolucao;
   const body=cabecalho()+'<div class="ttl">'+esc(f.l==='SOAP'?'Evolução clínica (SOAP)':f.l)+'</div>'+pacLinha(p)+'<div class="body">'+esc(r.texto)+'</div>'+assinatura()+'<div class="ft">Emitido em '+fmtDT(r.date)+' · ConsultAI / MedTech</div>';
