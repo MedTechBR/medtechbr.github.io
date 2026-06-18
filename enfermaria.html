@@ -166,9 +166,9 @@ function ptCard(p){
     <div class="leito"><div class="ln">${esc(p.leito||'—')}</div>${p.setor?`<div class="ls">${esc(p.setor)}</div>`:''}</div>
     <div class="pt-main">
       <div class="pt-top"><span class="nome">${esc(p.nome||'Paciente')}</span>${meta?`<span class="meta">${esc(meta)}</span>`:''}</div>
-      ${p.diagnosticos?`<div class="pt-field"><b>Dx:</b> ${esc(p.diagnosticos)}</div>`:''}
-      ${p.exames?`<div class="pt-field"><b>Exames:</b> ${esc(p.exames)}</div>`:''}
-      ${p.condutas?`<div class="pt-field"><b>Condutas:</b> ${esc(p.condutas)}</div>`:''}
+      ${p.diagnosticos?`<div class="pt-field"><b>Dx:</b>\n${esc(bullets(p.diagnosticos))}</div>`:''}
+      ${p.exames?`<div class="pt-field"><b>Exames:</b>\n${esc(bullets(p.exames))}</div>`:''}
+      ${p.condutas?`<div class="pt-field"><b>Condutas:</b>\n${esc(bullets(p.condutas))}</div>`:''}
       ${pendHtml}
       ${p.obs?`<div class="pt-obs">📝 ${esc(p.obs)}</div>`:''}
     </div>
@@ -266,6 +266,7 @@ function delPac(id){const p=state.pacientes.find(x=>x.id===id);if(!p)return;
 function reabrir(id){const p=state.pacientes.find(x=>x.id===id);if(!p)return;p.status='ativo';delete p.saida;persist();render();}
 function togglePend(pid,itemId){const p=state.pacientes.find(x=>x.id===pid);if(!p)return;const it=(p.pendencias||[]).find(x=>x.id===itemId);if(!it)return;it.done=!it.done;persist();renderAtivos();}
 function oneLine(s){return String(s||'').replace(/\s*\n\s*/g,'; ').trim();}
+function bullets(s){return String(s||'').split('\n').map(x=>x.trim()).filter(Boolean).map(x=>/^[-•*]/.test(x)?('- '+x.replace(/^[-•*]\s*/,'')):('- '+x)).join('\n');}
 function resumoPlantao(){
   const list=ativos();
   if(!list.length){alert('Não há pacientes internados para resumir.');return;}
@@ -273,11 +274,11 @@ function resumoPlantao(){
   let txt='PASSAGEM DE PLANTÃO — '+fmtData(ymd())+' ('+list.length+' internado(s))\n';
   grupoKeys(g).forEach(k=>{txt+='\n== '+k+' ('+g[k].length+') ==\n';
     g[k].forEach(p=>{txt+='\n['+(p.leito||'—')+'] '+(p.nome||'Paciente')+(p.idade?(', '+p.idade):'')+'\n';
-      if(p.diagnosticos)txt+='Dx: '+oneLine(p.diagnosticos)+'\n';
-      if(p.exames)txt+='Exames: '+oneLine(p.exames)+'\n';
-      if(p.condutas)txt+='Condutas: '+oneLine(p.condutas)+'\n';
+      if(p.diagnosticos)txt+='Dx:\n'+bullets(p.diagnosticos)+'\n';
+      if(p.exames)txt+='Exames:\n'+bullets(p.exames)+'\n';
+      if(p.condutas)txt+='Condutas:\n'+bullets(p.condutas)+'\n';
       const pend=(p.pendencias||[]).filter(x=>!x.done);
-      if(pend.length)txt+='Pendências: '+pend.map(x=>x.t).join('; ')+'\n';
+      if(pend.length)txt+='Pendências:\n'+pend.map(x=>'- '+x.t).join('\n')+'\n';
       if(p.obs)txt+='Obs: '+oneLine(p.obs)+'\n';});});
   modal(`<h3>📋 Passar plantão</h3><div class="hint" style="margin-bottom:8px">Resumo dos ${list.length} internado(s), agrupado por setor (só pendências em aberto). Revise e copie.</div><div class="field"><textarea id="resumoTa" style="min-height:320px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.55">${esc(txt)}</textarea></div><div class="row"><button class="btn btn-p" id="copyResBtn" onclick="copyResumo()">📋 Copiar tudo</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
 }
