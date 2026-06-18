@@ -1033,7 +1033,7 @@ function waSend(id){
 }
 
 /* ===== modal ===== */
-function modal(html){const d=document.createElement('div');d.className='modal';d.id='modal';d.innerHTML='<div class="box">'+html+'</div>';
+function modal(html){document.querySelectorAll('.modal').forEach(m=>m.remove());const d=document.createElement('div');d.className='modal';d.id='modal';d.innerHTML='<div class="box">'+html+'</div>';
   if(/<div class="box wide"/.test(html)){d.innerHTML=html;}
   d.onclick=e=>{if(e.target===d)closeModalMic();};document.body.appendChild(d);}
 function closeModal(){const m=document.getElementById('modal');if(m)m.remove();}
