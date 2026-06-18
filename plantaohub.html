@@ -80,7 +80,9 @@ table.yr tr.tot td{background:#f0f7f8;font-weight:800;color:var(--petrol-dark)}
 .cal .cell.today .dn{background:var(--petrol);color:#fff;border-radius:6px;padding:0 6px}
 .cal .cell .cp{position:absolute;top:5px;right:5px;font-size:12px;background:var(--soft);border:1px solid var(--line);border-radius:7px;padding:0 6px;cursor:pointer;opacity:0;transition:opacity .12s;color:var(--petrol)}
 .cal .cell:hover .cp{opacity:1}
-.cal .chip{font-size:10.5px;font-weight:700;border-radius:6px;padding:2px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.cal .chip{font-size:10.5px;font-weight:700;border-radius:6px;padding:2px 6px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;line-height:1.25}
+.cal .chip .ch-h{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal .chip .ch-l{font-weight:600;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cal .chip.c-ag{background:var(--amber-bg);color:var(--amber)}
 .cal .chip.c-pg{background:var(--green-bg);color:var(--green)}
 .cal.pasting .cell{border-style:dashed;border-color:var(--mint)}
@@ -249,6 +251,7 @@ function dup(id){const s=state.shifts.find(x=>x.id===id);const d=new Date(s.date
   state.shifts.push({...s,id:uid(),date:d.toISOString().slice(0,10),status:'agendado'});persist();cur=new Date(d);calCur=new Date(d.getFullYear(),d.getMonth(),1);render();}
 
 /* ---------- CALENDÁRIO (com copiar/colar dia) ---------- */
+function fmtH(t){t=t||'';return /:00$/.test(t)?t.slice(0,2)+'h':t;}
 function shiftsOn(dstr){return state.shifts.filter(s=>s.date===dstr).sort((a,b)=>(a.start||'').localeCompare(b.start||''));}
 function renderCal(){
   const r=compRange(cur);                                   // mesma competência da aba Competência
@@ -266,7 +269,7 @@ function renderCal(){
     const d=new Date(gs);d.setDate(gs.getDate()+i);
     const ds=ymd(d);const out=ds<sYmd||ds>eYmd;             // fora da competência → esmaecido
     const sh=shiftsOn(ds);
-    const chips=sh.map(s=>`<div class="chip ${s.status==='pago'?'c-pg':'c-ag'}" title="${esc(s.local)} · ${s.start}–${s.end} · ${money(s.value)} — toque para editar" onclick="event.stopPropagation();openForm('${s.id}')">${esc((s.local||'').split('—')[0].trim()).slice(0,16)}</div>`).join('');
+    const chips=sh.map(s=>{const t=(s.start||s.end)?`<span class="ch-h">${esc(fmtH(s.start))}–${esc(fmtH(s.end))}</span>`:'';return `<div class="chip ${s.status==='pago'?'c-pg':'c-ag'}" title="${esc(s.local)} · ${s.start}–${s.end} · ${money(s.value)} — toque para editar" onclick="event.stopPropagation();openForm('${s.id}')">${t}<span class="ch-l">${esc((s.local||'').split('—')[0].trim()).slice(0,18)}</span></div>`;}).join('');
     const cp=sh.length?`<button class="cp" title="Copiar este dia" onclick="event.stopPropagation();copyDay('${ds}')">⧉</button>`:'';
     cells+=`<div class="cell ${out?'out':''} ${ds===today?'today':''}" onclick="event.stopPropagation();cellClick('${ds}')"><div class="dn">${d.getDate()}</div>${cp}${chips}</div>`;
   }
