@@ -83,6 +83,13 @@ input.search{padding:9px 12px;border:1px solid var(--line);border-radius:9px;fon
 .note b{color:var(--petrol)}
 footer{text-align:center;color:var(--muted);font-size:13px;padding:24px}
 footer a{color:var(--petrol);font-weight:600;text-decoration:none}
+.setor-h{font-size:12px;font-weight:800;color:var(--petrol-dark);text-transform:uppercase;letter-spacing:.04em;margin:16px 2px 8px;display:flex;align-items:center;gap:8px}
+.setor-h span{background:var(--soft);color:var(--petrol);border-radius:999px;padding:1px 9px;font-size:11px}
+.pt-pend{margin-top:6px;background:var(--amber-bg);border-radius:9px;padding:7px 10px}
+.pt-pend>b{color:var(--amber);font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;display:block;margin-bottom:3px}
+.pend-item{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;color:#6b4413;padding:2px 0;cursor:pointer}
+.pend-item input{margin-top:2px;flex:0 0 auto;width:16px;height:16px;accent-color:var(--mint-dark);cursor:pointer}
+.pend-item.done span{text-decoration:line-through;color:#9aa8a0}
 @media(max-width:680px){.cards{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}.pt-acts{flex-direction:row}}
 </style>
 </head>
@@ -123,8 +130,8 @@ function getVal(id){const e=document.getElementById(id);return e?e.value.trim():
 
 /* ===== boot ===== */
 function sampleSeed(){return {pacientes:[
-  {id:uid(),leito:'12A',setor:'Enfermaria',nome:'Maria Souza',idade:'74 anos',sexo:'F',diagnosticos:'Pneumonia adquirida na comunidade\nHAS, DM2',exames:'RX tórax: consolidação em base direita\nLeucograma 15.000 com desvio · PCR 180 · Creatinina 1,3',condutas:'Ceftriaxona + azitromicina (D2)\nPendência: hemocultura, controle de PCR em 48h',obs:'',status:'ativo',criadoEm:nowISO()},
-  {id:uid(),leito:'UTI 3',setor:'UTI',nome:'João Lima',idade:'61 anos',sexo:'M',diagnosticos:'IAM sem supra (NSTEMI)\nIC descompensada',exames:'Troponina em curva ascendente\nECG: infra de ST em V4-V6 · Eco: FE 35%',condutas:'AAS + clopidogrel + enoxaparina\nPendência: CAT amanhã; ajustar diurético',obs:'Aguardando vaga em hemodinâmica.',status:'ativo',criadoEm:nowISO()}
+  {id:uid(),leito:'12A',setor:'Enfermaria',nome:'Maria Souza',idade:'74 anos',sexo:'F',diagnosticos:'Pneumonia adquirida na comunidade\nHAS, DM2',exames:'RX tórax: consolidação em base direita\nLeucograma 15.000 com desvio · PCR 180 · Creatinina 1,3',condutas:'Ceftriaxona + azitromicina (D2)',pendencias:[{id:uid(),t:'Colher hemocultura',done:false},{id:uid(),t:'Controle de PCR em 48h',done:false}],obs:'',status:'ativo',criadoEm:nowISO()},
+  {id:uid(),leito:'UTI 3',setor:'UTI',nome:'João Lima',idade:'61 anos',sexo:'M',diagnosticos:'IAM sem supra (NSTEMI)\nIC descompensada',exames:'Troponina em curva ascendente\nECG: infra de ST em V4-V6 · Eco: FE 35%',condutas:'AAS + clopidogrel + enoxaparina',pendencias:[{id:uid(),t:'CAT amanhã',done:false},{id:uid(),t:'Ajustar diurético',done:false}],obs:'Aguardando vaga em hemodinâmica.',status:'ativo',criadoEm:nowISO()}
 ]};}
 function normalize(d){d=d&&typeof d==='object'?d:{};return {pacientes:Array.isArray(d.pacientes)?d.pacientes:[]};}
 
@@ -153,13 +160,16 @@ function matchBusca(p){const q=busca.trim().toLowerCase();if(!q)return true;retu
 
 function ptCard(p){
   const meta=[p.idade||'',p.sexo||'',p.setor||''].filter(Boolean).join(' · ');
+  const pend=(p.pendencias||[]);
+  const pendHtml=pend.length?`<div class="pt-pend"><b>Pendências</b>${pend.map(it=>`<label class="pend-item${it.done?' done':''}"><input type="checkbox" ${it.done?'checked':''} onclick="togglePend('${p.id}','${it.id}')"><span>${esc(it.t)}</span></label>`).join('')}</div>`:'';
   return `<div class="pt-card">
     <div class="leito"><div class="ln">${esc(p.leito||'—')}</div>${p.setor?`<div class="ls">${esc(p.setor)}</div>`:''}</div>
     <div class="pt-main">
       <div class="pt-top"><span class="nome">${esc(p.nome||'Paciente')}</span>${meta?`<span class="meta">${esc(meta)}</span>`:''}</div>
       ${p.diagnosticos?`<div class="pt-field"><b>Dx:</b> ${esc(p.diagnosticos)}</div>`:''}
       ${p.exames?`<div class="pt-field"><b>Exames:</b> ${esc(p.exames)}</div>`:''}
-      ${p.condutas?`<div class="pt-field pend"><b>Pendências / condutas:</b> ${esc(p.condutas)}</div>`:''}
+      ${p.condutas?`<div class="pt-field"><b>Condutas:</b> ${esc(p.condutas)}</div>`:''}
+      ${pendHtml}
       ${p.obs?`<div class="pt-obs">📝 ${esc(p.obs)}</div>`:''}
     </div>
     <div class="pt-acts">
@@ -174,7 +184,7 @@ function renderAtivos(){
   const list=ativos().slice().sort(leitoSort).filter(matchBusca);
   const tot=ativos().length;
   const uti=ativos().filter(p=>/uti/i.test(p.setor||'')||/uti/i.test(p.leito||'')).length;
-  const comPend=ativos().filter(p=>(p.condutas||'').trim()).length;
+  const comPend=ativos().filter(p=>(p.pendencias||[]).some(x=>!x.done)).length;
   let html=`<div class="cards">
     <div class="kpi"><div class="l">Internados</div><div class="v">${tot}</div></div>
     <div class="kpi blue"><div class="l">Em UTI</div><div class="v">${uti}</div></div>
@@ -183,17 +193,20 @@ function renderAtivos(){
   </div>
   <div class="bar">
     <input class="search" id="sin" placeholder="Buscar leito, nome ou diagnóstico..." value="${esc(busca)}" oninput="busca=this.value;renderListOnly()">
-    <div class="right"><button class="btn btn-p btn-sm" onclick="openForm()">+ Novo paciente</button></div>
+    <div class="right"><button class="btn btn-g btn-sm" onclick="resumoPlantao()">📋 Passar plantão</button><button class="btn btn-p btn-sm" onclick="openForm()">+ Novo paciente</button></div>
   </div><div id="ptlist"></div>`;
   document.getElementById('view').innerHTML=html;
   const inp=document.getElementById('sin');if(inp&&busca){inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length);}
   renderListOnly();
 }
+function grupoKeys(groups){return Object.keys(groups).sort((a,b)=>a==='Sem setor'?1:b==='Sem setor'?-1:a.localeCompare(b,'pt'));}
+function agrupaPorSetor(list){const g={};list.forEach(p=>{const k=(p.setor||'').trim()||'Sem setor';(g[k]=g[k]||[]).push(p);});Object.keys(g).forEach(k=>g[k].sort((a,b)=>String(a.leito||'').localeCompare(String(b.leito||''),'pt',{numeric:true})));return g;}
 function renderListOnly(){
   const box=document.getElementById('ptlist');if(!box)return;
-  const list=ativos().slice().sort(leitoSort).filter(matchBusca);
+  const list=ativos().filter(matchBusca);
   if(!list.length){box.innerHTML=ativos().length?'<div class="empty">Nenhum paciente encontrado para a busca.</div>':'<div class="empty">Nenhum paciente internado.<br>Toque em <b>+ Novo paciente</b> — você pode colar a evolução e a IA preenche os campos.</div>';return;}
-  box.innerHTML=list.map(ptCard).join('');
+  const g=agrupaPorSetor(list);
+  box.innerHTML=grupoKeys(g).map(k=>`<div class="setor-h">🏥 ${esc(k)} <span>${g[k].length}</span></div>`+g[k].map(ptCard).join('')).join('');
 }
 
 function renderSaidas(){
@@ -234,12 +247,15 @@ function openForm(id){
      <div class="field"><label>Sexo</label><select id="f_sexo">${sx}</select></div></div>
    <div class="field"><label>Diagnósticos / hipóteses</label><textarea id="f_dx" placeholder="Um por linha">${esc(p.diagnosticos)}</textarea></div>
    <div class="field"><label>Principais exames</label><textarea id="f_exames" placeholder="Imagem e laboratório investigativos (um por linha)">${esc(p.exames)}</textarea></div>
-   <div class="field"><label>Pendências / condutas atuais</label><textarea id="f_condutas" placeholder="Condutas e o que está pendente (um por linha)">${esc(p.condutas)}</textarea></div>
+   <div class="field"><label>Condutas atuais</label><textarea id="f_condutas" placeholder="Tratamento em curso / plano">${esc(p.condutas)}</textarea></div>
+   <div class="field"><label>Pendências <span style="color:var(--muted);font-weight:400">(uma por linha — você marca como feitas na lista)</span></label><textarea id="f_pend" placeholder="Ex.: colher hemocultura&#10;controle de PCR em 48h&#10;avaliar com a cirurgia">${esc((p.pendencias||[]).map(x=>x.t).join('\n'))}</textarea></div>
    <div class="field"><label>Observações</label><textarea id="f_obs" placeholder="Anotações livres">${esc(p.obs)}</textarea></div>
    <div class="row"><button class="btn btn-p" onclick="saveForm('${id||''}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
 }
 function saveForm(id){
-  const o={leito:getVal('f_leito'),setor:getVal('f_setor'),nome:getVal('f_nome'),idade:getVal('f_idade'),sexo:getVal('f_sexo'),diagnosticos:getVal('f_dx'),exames:getVal('f_exames'),condutas:getVal('f_condutas'),obs:getVal('f_obs')};
+  const oldP=id?((state.pacientes.find(x=>x.id===id)||{}).pendencias||[]):[];
+  const pend=getVal('f_pend').split('\n').map(s=>s.trim()).filter(Boolean).map(t=>{const ex=oldP.find(o=>o.t===t);return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});
+  const o={leito:getVal('f_leito'),setor:getVal('f_setor'),nome:getVal('f_nome'),idade:getVal('f_idade'),sexo:getVal('f_sexo'),diagnosticos:getVal('f_dx'),exames:getVal('f_exames'),condutas:getVal('f_condutas'),pendencias:pend,obs:getVal('f_obs')};
   if(!o.leito&&!o.nome){alert('Informe ao menos o leito ou o nome do paciente.');return;}
   if(id){Object.assign(state.pacientes.find(x=>x.id===id),o);}
   else{state.pacientes.push({id:uid(),status:'ativo',criadoEm:nowISO(),...o});}
@@ -248,6 +264,24 @@ function saveForm(id){
 function delPac(id){const p=state.pacientes.find(x=>x.id===id);if(!p)return;
   if(confirm(`Excluir definitivamente ${p.nome||'este paciente'} (leito ${p.leito||'—'})?`)){state.pacientes=state.pacientes.filter(x=>x.id!==id);persist();render();}}
 function reabrir(id){const p=state.pacientes.find(x=>x.id===id);if(!p)return;p.status='ativo';delete p.saida;persist();render();}
+function togglePend(pid,itemId){const p=state.pacientes.find(x=>x.id===pid);if(!p)return;const it=(p.pendencias||[]).find(x=>x.id===itemId);if(!it)return;it.done=!it.done;persist();renderAtivos();}
+function oneLine(s){return String(s||'').replace(/\s*\n\s*/g,'; ').trim();}
+function resumoPlantao(){
+  const list=ativos();
+  if(!list.length){alert('Não há pacientes internados para resumir.');return;}
+  const g=agrupaPorSetor(list);
+  let txt='PASSAGEM DE PLANTÃO — '+fmtData(ymd())+' ('+list.length+' internado(s))\n';
+  grupoKeys(g).forEach(k=>{txt+='\n== '+k+' ('+g[k].length+') ==\n';
+    g[k].forEach(p=>{txt+='\n['+(p.leito||'—')+'] '+(p.nome||'Paciente')+(p.idade?(', '+p.idade):'')+'\n';
+      if(p.diagnosticos)txt+='Dx: '+oneLine(p.diagnosticos)+'\n';
+      if(p.exames)txt+='Exames: '+oneLine(p.exames)+'\n';
+      if(p.condutas)txt+='Condutas: '+oneLine(p.condutas)+'\n';
+      const pend=(p.pendencias||[]).filter(x=>!x.done);
+      if(pend.length)txt+='Pendências: '+pend.map(x=>x.t).join('; ')+'\n';
+      if(p.obs)txt+='Obs: '+oneLine(p.obs)+'\n';});});
+  modal(`<h3>📋 Passar plantão</h3><div class="hint" style="margin-bottom:8px">Resumo dos ${list.length} internado(s), agrupado por setor (só pendências em aberto). Revise e copie.</div><div class="field"><textarea id="resumoTa" style="min-height:320px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.55">${esc(txt)}</textarea></div><div class="row"><button class="btn btn-p" id="copyResBtn" onclick="copyResumo()">📋 Copiar tudo</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
+}
+function copyResumo(){const t=document.getElementById('resumoTa');if(!t)return;t.focus();t.select();try{document.execCommand('copy');}catch(e){}if(navigator.clipboard){try{navigator.clipboard.writeText(t.value);}catch(e){}}const b=document.getElementById('copyResBtn');if(b){const o=b.textContent;b.textContent='✓ Copiado';setTimeout(()=>b.textContent=o,1500);}}
 
 /* ===== saída (alta / óbito / transferência) ===== */
 function openSaida(id){
@@ -274,7 +308,7 @@ async function extrairEvol(){
   const raw=getVal('f_evol');
   if(!raw){alert('Cole a evolução do paciente antes de extrair.');return;}
   const b=document.getElementById('extrairBtn');b.innerHTML='<span class="spin"></span> Extraindo...';b.disabled=true;
-  const prompt='Você é um assistente clínico. A partir da evolução/prontuário abaixo, extraia os dados e responda APENAS um objeto JSON válido (sem markdown e sem comentários) com EXATAMENTE estas chaves: "nome" (string), "idade" (string, ex.: "67 anos"), "diagnosticos" (string com as hipóteses/diagnósticos, uma por linha separada por \\n), "exames" (string com os principais exames de imagem e laboratoriais investigativos e seus resultados, um por linha), "condutas" (string com as condutas e pendências atuais, uma por linha). Não invente nada; se algo não estiver no texto, use string vazia. Use português do Brasil.\n\nEvolução:\n'+raw;
+  const prompt='Você é um assistente clínico. A partir da evolução/prontuário abaixo, extraia os dados e responda APENAS um objeto JSON válido (sem markdown e sem comentários) com EXATAMENTE estas chaves: "nome" (string), "idade" (string, ex.: "67 anos"), "diagnosticos" (string com as hipóteses/diagnósticos, uma por linha separada por \\n), "exames" (string com os principais exames de imagem e laboratoriais investigativos e seus resultados, um por linha), "condutas" (string com o tratamento/condutas em curso, uma por linha), "pendencias" (array de strings curtas com as pendências e o que falta fazer — exames a colher, avaliações de especialidades, decisões). Não invente nada; se algo não estiver no texto, use string vazia ou array vazio. Use português do Brasil.\n\nEvolução:\n'+raw;
   try{
     const txt=await MT.ai(prompt);
     const data=parseJsonLoose(txt);
@@ -285,6 +319,7 @@ async function extrairEvol(){
       setVal('f_dx',data.diagnosticos||'');
       setVal('f_exames',data.exames||'');
       setVal('f_condutas',data.condutas||'');
+      setVal('f_pend',Array.isArray(data.pendencias)?data.pendencias.join('\n'):(data.pendencias||''));
       const okN=(data.nome||'')?'':' (nome não encontrado)';
       const bb=document.getElementById('extrairBtn');if(bb){bb.innerHTML='✓ Campos preenchidos'+okN;setTimeout(()=>{bb.innerHTML='✨ Extrair dados da evolução';bb.disabled=false;},1800);}
       return;
