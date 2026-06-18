@@ -308,7 +308,14 @@ async function extrairEvol(){
   const raw=getVal('f_evol');
   if(!raw){alert('Cole a evolução do paciente antes de extrair.');return;}
   const b=document.getElementById('extrairBtn');b.innerHTML='<span class="spin"></span> Extraindo...';b.disabled=true;
-  const prompt='Você é um assistente clínico. A partir da evolução/prontuário abaixo, extraia os dados e responda APENAS um objeto JSON válido (sem markdown e sem comentários) com EXATAMENTE estas chaves: "nome" (string), "idade" (string, ex.: "67 anos"), "diagnosticos" (string com as hipóteses/diagnósticos, uma por linha separada por \\n), "exames" (string com os principais exames de imagem e laboratoriais investigativos e seus resultados, um por linha), "condutas" (string com o tratamento/condutas em curso, uma por linha), "pendencias" (array de strings curtas com as pendências e o que falta fazer — exames a colher, avaliações de especialidades, decisões). Não invente nada; se algo não estiver no texto, use string vazia ou array vazio. Use português do Brasil.\n\nEvolução:\n'+raw;
+  const prompt='Você é um assistente clínico extraindo dados de uma evolução de paciente INTERNADO para um painel de enfermaria. Responda APENAS um objeto JSON válido (sem markdown, sem comentários) com EXATAMENTE estas chaves:\n'
+   +'- "nome" (string)\n'
+   +'- "idade" (string, ex.: "47 anos")\n'
+   +'- "diagnosticos" (string): SOMENTE o MOTIVO DA INTERNAÇÃO / a hipótese principal que justificou a internação (costuma vir logo após a identificação do paciente). NÃO liste comorbidades nem diagnósticos prévios de rotina (HAS, DM2, etc.), a não ser que sejam o motivo da internação.\n'
+   +'- "exames" (string, um por linha): SOMENTE os exames INVESTIGATIVOS do quadro atual (pedidos para investigar ou acompanhar o problema que motivou a internação), com os resultados relevantes. NÃO inclua exames de rotina/controle de praxe.\n'
+   +'- "condutas" (string, uma por linha): SOMENTE o que aparece APÓS a linha/título "CONDUTA" (ou "CONDUTAS"/"PLANO") e que está em curso ou pendente — ou seja, o que mantém o paciente internado / impede a alta no momento. Ignore condutas já resolvidas e o que não impede a alta.\n'
+   +'- "pendencias" (array de strings curtas): o que IMPEDE A ALTA neste momento (ex.: aguardar resultado de exame, avaliação de especialidade, melhora clínica, vaga, ajuste de medicação).\n'
+   +'Não invente nada; se algo não estiver no texto, use string vazia ou array vazio. Use português do Brasil.\n\nEvolução:\n'+raw;
   try{
     const txt=await MT.ai(prompt);
     const data=parseJsonLoose(txt);
