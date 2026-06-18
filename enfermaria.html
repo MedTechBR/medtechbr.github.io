@@ -245,17 +245,17 @@ function openForm(id){
      <div class="field"><label>Idade</label><input id="f_idade" value="${esc(p.idade)}" placeholder="74 anos"></div></div>
    <div class="two"><div class="field"><label>Setor / unidade</label><input id="f_setor" value="${esc(p.setor)}" placeholder="Enfermaria, UTI, etc."></div>
      <div class="field"><label>Sexo</label><select id="f_sexo">${sx}</select></div></div>
-   <div class="field"><label>Diagnósticos / hipóteses</label><textarea id="f_dx" placeholder="Um por linha">${esc(p.diagnosticos)}</textarea></div>
-   <div class="field"><label>Principais exames</label><textarea id="f_exames" placeholder="Imagem e laboratório investigativos (um por linha)">${esc(p.exames)}</textarea></div>
-   <div class="field"><label>Condutas atuais</label><textarea id="f_condutas" placeholder="Tratamento em curso / plano">${esc(p.condutas)}</textarea></div>
-   <div class="field"><label>Pendências <span style="color:var(--muted);font-weight:400">(uma por linha — você marca como feitas na lista)</span></label><textarea id="f_pend" placeholder="Ex.: colher hemocultura&#10;controle de PCR em 48h&#10;avaliar com a cirurgia">${esc((p.pendencias||[]).map(x=>x.t).join('\n'))}</textarea></div>
+   <div class="field"><label>Diagnósticos / hipóteses <span style="color:var(--muted);font-weight:400">(um por linha)</span></label><textarea id="f_dx" placeholder="- um por linha">${esc(bullets(p.diagnosticos))}</textarea></div>
+   <div class="field"><label>Principais exames <span style="color:var(--muted);font-weight:400">(um por linha)</span></label><textarea id="f_exames" placeholder="- imagem e laboratório investigativos (um por linha)">${esc(bullets(p.exames))}</textarea></div>
+   <div class="field"><label>Condutas atuais <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="f_condutas" placeholder="- tratamento em curso / plano">${esc(bullets(p.condutas))}</textarea></div>
+   <div class="field"><label>Pendências <span style="color:var(--muted);font-weight:400">(uma por linha — você marca como feitas na lista)</span></label><textarea id="f_pend" placeholder="- colher hemocultura&#10;- controle de PCR em 48h&#10;- avaliar com a cirurgia">${esc((p.pendencias||[]).map(x=>'- '+x.t).join('\n'))}</textarea></div>
    <div class="field"><label>Observações</label><textarea id="f_obs" placeholder="Anotações livres">${esc(p.obs)}</textarea></div>
    <div class="row"><button class="btn btn-p" onclick="saveForm('${id||''}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
 }
 function saveForm(id){
   const oldP=id?((state.pacientes.find(x=>x.id===id)||{}).pendencias||[]):[];
-  const pend=getVal('f_pend').split('\n').map(s=>s.trim()).filter(Boolean).map(t=>{const ex=oldP.find(o=>o.t===t);return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});
-  const o={leito:getVal('f_leito'),setor:getVal('f_setor'),nome:getVal('f_nome'),idade:getVal('f_idade'),sexo:getVal('f_sexo'),diagnosticos:getVal('f_dx'),exames:getVal('f_exames'),condutas:getVal('f_condutas'),pendencias:pend,obs:getVal('f_obs')};
+  const pend=getVal('f_pend').split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>o.t===t);return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});
+  const o={leito:getVal('f_leito'),setor:getVal('f_setor'),nome:getVal('f_nome'),idade:getVal('f_idade'),sexo:getVal('f_sexo'),diagnosticos:bullets(getVal('f_dx')),exames:bullets(getVal('f_exames')),condutas:bullets(getVal('f_condutas')),pendencias:pend,obs:getVal('f_obs')};
   if(!o.leito&&!o.nome){alert('Informe ao menos o leito ou o nome do paciente.');return;}
   if(id){Object.assign(state.pacientes.find(x=>x.id===id),o);}
   else{state.pacientes.push({id:uid(),status:'ativo',criadoEm:nowISO(),...o});}
@@ -324,10 +324,10 @@ async function extrairEvol(){
     else{
       setVal('f_nome',data.nome||'');
       setVal('f_idade',data.idade||'');
-      setVal('f_dx',data.diagnosticos||'');
-      setVal('f_exames',data.exames||'');
-      setVal('f_condutas',data.condutas||'');
-      setVal('f_pend',Array.isArray(data.pendencias)?data.pendencias.join('\n'):(data.pendencias||''));
+      setVal('f_dx',bullets(data.diagnosticos||''));
+      setVal('f_exames',bullets(data.exames||''));
+      setVal('f_condutas',bullets(data.condutas||''));
+      setVal('f_pend',bullets(Array.isArray(data.pendencias)?data.pendencias.join('\n'):(data.pendencias||'')));
       const okN=(data.nome||'')?'':' (nome não encontrado)';
       const bb=document.getElementById('extrairBtn');if(bb){bb.innerHTML='✓ Campos preenchidos'+okN;setTimeout(()=>{bb.innerHTML='✨ Extrair dados da evolução';bb.disabled=false;},1800);}
       return;
