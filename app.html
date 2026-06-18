@@ -45,6 +45,20 @@ main{max-width:980px;margin:0 auto;padding:18px 18px calc(28px + env(safe-area-i
 .card .nm b{color:var(--mint-dark)}
 .note{background:var(--soft);border-radius:12px;padding:11px 15px;font-size:12.5px;color:#28424a;margin-top:22px}
 .note b{color:var(--petrol)}
+.ghost{background:rgba(14,90,109,.08);color:var(--petrol);border:1px solid var(--line);border-radius:10px;padding:9px 13px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.ghost:hover{background:rgba(14,90,109,.14)}
+.sug-modal{position:fixed;inset:0;background:rgba(8,56,69,.45);display:flex;align-items:center;justify-content:center;padding:18px;z-index:80}
+.sug-box{background:#fff;border-radius:16px;padding:22px;max-width:460px;width:100%;max-height:92vh;overflow:auto}
+.sug-box h3{margin-bottom:6px;color:var(--ink)}
+.sug-box p.sub{color:var(--muted);font-size:13px;margin-bottom:8px;line-height:1.5}
+.sug-box label{display:block;font-weight:600;font-size:13.5px;margin:10px 0 5px;color:var(--ink)}
+.sug-box select,.sug-box input,.sug-box textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit;background:#fff;color:var(--ink)}
+.sug-box textarea{min-height:110px;resize:vertical;line-height:1.5}
+.sug-box select:focus,.sug-box input:focus,.sug-box textarea:focus{outline:none;border-color:var(--mint)}
+.sug-row{display:flex;gap:10px;margin-top:16px}
+.sug-row .b{flex:1;border:none;border-radius:10px;padding:11px;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit}
+.sug-row .ok{background:var(--mint);color:var(--petrol-dark)}.sug-row .ok:hover{background:var(--mint-dark)}
+.sug-row .cancel{background:#fff;color:var(--petrol);border:1px solid var(--line)}
 footer{text-align:center;color:var(--muted);font-size:12.5px;padding:20px}
 footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 @media(max-width:560px){
@@ -74,7 +88,10 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 <main>
   <div class="hello-row">
     <h1 id="hello">Bem-vindo 👋</h1>
-    <button class="install" id="btnInstall" hidden>📲 Instalar</button>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="ghost" id="btnSug" onclick="openSug()">💡 Sugestão</button>
+      <button class="install" id="btnInstall" hidden>📲 Instalar</button>
+    </div>
   </div>
 
   <div class="grid" id="grid"></div>
@@ -109,6 +126,38 @@ function card(a){
   </a>`;
 }
 document.getElementById('grid').innerHTML = APPS.map(card).join('');
+
+/* ===== Sugestões de funções (vão por e-mail para a equipe MedTech) ===== */
+const SUG_EMAIL = 'matheusparente1@gmail.com';
+function openSug(){
+  const u = window.MT && window.MT.user;
+  const opts = ['Geral / portal'].concat(APPS.map(a=>a.nm)).map(n=>`<option>${esc(n)}</option>`).join('');
+  const wrap = document.createElement('div'); wrap.className='sug-modal'; wrap.id='sugModal';
+  wrap.innerHTML = `<div class="sug-box">
+    <h3>💡 Sugerir uma função</h3>
+    <p class="sub">Conte o que você gostaria de ver nos apps MedTech. Sua ideia vai direto para a equipe.</p>
+    <label>App</label><select id="sugApp">${opts}</select>
+    <label>Sua sugestão</label><textarea id="sugTxt" placeholder="Ex.: no EnfermarIA, poder ordenar os leitos por gravidade..."></textarea>
+    <label>Seu contato (opcional)</label><input id="sugContato" value="${esc((u&&u.email)||'')}" placeholder="e-mail ou WhatsApp para retorno">
+    <p class="sub" style="margin:10px 0 0">Ao enviar, abre seu app de e-mail com a mensagem já pronta — é só tocar em enviar.</p>
+    <div class="sug-row"><button class="b ok" onclick="enviarSug()">Enviar sugestão</button><button class="b cancel" onclick="closeSug()">Cancelar</button></div>
+  </div>`;
+  wrap.onclick = e => { if(e.target===wrap) closeSug(); };
+  document.body.appendChild(wrap);
+  setTimeout(()=>{const t=document.getElementById('sugTxt'); if(t) t.focus();},50);
+}
+function closeSug(){ const m=document.getElementById('sugModal'); if(m) m.remove(); }
+function enviarSug(){
+  const app = document.getElementById('sugApp').value;
+  const txt = document.getElementById('sugTxt').value.trim();
+  const contato = document.getElementById('sugContato').value.trim();
+  if(!txt){ alert('Escreva sua sugestão antes de enviar.'); return; }
+  const u = window.MT && window.MT.user;
+  const subject = 'Sugestão MedTech — ' + app;
+  const body = 'App: '+app+'\n\nSugestão:\n'+txt+'\n\nContato: '+(contato||'(não informado)')+'\nUsuário logado: '+((u&&u.email)||'(não logado)');
+  window.location.href = 'mailto:'+SUG_EMAIL+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+  closeSug();
+}
 
 /* saudação + sair (via login central MedTech) */
 function refreshUser(){
