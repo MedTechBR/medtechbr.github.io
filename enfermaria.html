@@ -90,6 +90,12 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 .pend-item{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;color:#6b4413;padding:2px 0;cursor:pointer}
 .pend-item input{margin-top:2px;flex:0 0 auto;width:16px;height:16px;accent-color:var(--mint-dark);cursor:pointer}
 .pend-item.done span{text-decoration:line-through;color:#9aa8a0}
+.mini-ed{background:none;border:none;cursor:pointer;font-size:12px;opacity:.55;padding:0 4px;vertical-align:middle;font-family:inherit}
+.mini-ed:hover{opacity:1}
+.pt-pend-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pt-pend-h b{color:var(--amber);font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.03em}
+.pend-empty{font-size:13px;color:var(--muted);padding:2px 0}
+.pt-muted{color:#9aa8a0}
 @media(max-width:680px){.cards{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}.pt-acts{flex-direction:row}}
 </style>
 </head>
@@ -161,23 +167,40 @@ function matchBusca(p){const q=busca.trim().toLowerCase();if(!q)return true;retu
 function ptCard(p){
   const meta=[p.idade||'',p.sexo||'',p.setor||''].filter(Boolean).join(' · ');
   const pend=(p.pendencias||[]);
-  const pendHtml=pend.length?`<div class="pt-pend"><b>Pendências</b>${pend.map(it=>`<label class="pend-item${it.done?' done':''}"><input type="checkbox" ${it.done?'checked':''} onclick="togglePend('${p.id}','${it.id}')"><span>${esc(it.t)}</span></label>`).join('')}</div>`:'';
+  const edBtn=campo=>`<button class="mini-ed" onclick="editCampo('${p.id}','${campo}')">✏️</button>`;
+  const pendHtml=`<div class="pt-pend"><div class="pt-pend-h"><b>Pendências</b>${edBtn('pendencias')}</div>${pend.length?pend.map(it=>`<label class="pend-item${it.done?' done':''}"><input type="checkbox" ${it.done?'checked':''} onclick="togglePend('${p.id}','${it.id}')"><span>${esc(it.t)}</span></label>`).join(''):'<div class="pend-empty">Nenhuma pendência.</div>'}</div>`;
   return `<div class="pt-card">
     <div class="leito"><div class="ln">${esc(p.leito||'—')}</div>${p.setor?`<div class="ls">${esc(p.setor)}</div>`:''}</div>
     <div class="pt-main">
       <div class="pt-top"><span class="nome">${esc(p.nome||'Paciente')}</span>${meta?`<span class="meta">${esc(meta)}</span>`:''}</div>
-      ${p.diagnosticos?`<div class="pt-field"><b>Dx:</b>\n${esc(bullets(p.diagnosticos))}</div>`:''}
-      ${p.exames?`<div class="pt-field"><b>Exames:</b>\n${esc(bullets(p.exames))}</div>`:''}
-      ${p.condutas?`<div class="pt-field"><b>Condutas:</b>\n${esc(bullets(p.condutas))}</div>`:''}
+      <div class="pt-field"><b>Dx:</b> ${edBtn('dx')}${p.diagnosticos?('\n'+esc(bullets(p.diagnosticos))):' <span class="pt-muted">—</span>'}</div>
+      <div class="pt-field"><b>Exames:</b> ${edBtn('exames')}${p.exames?('\n'+esc(bullets(p.exames))):' <span class="pt-muted">—</span>'}</div>
       ${pendHtml}
       ${p.obs?`<div class="pt-obs">📝 ${esc(p.obs)}</div>`:''}
     </div>
     <div class="pt-acts">
-      <button onclick="openForm('${p.id}')">✏️ Editar</button>
+      <button onclick="openForm('${p.id}')">✏️ Ficha</button>
       <button class="saida" onclick="openSaida('${p.id}')">🚪 Saída</button>
       <button onclick="delPac('${p.id}')">🗑️</button>
     </div>
   </div>`;
+}
+function editCampo(pid,campo){
+  const p=state.pacientes.find(x=>x.id===pid);if(!p)return;
+  const M={dx:{l:'Diagnósticos / hipóteses',v:bullets(p.diagnosticos)},exames:{l:'Principais exames',v:bullets(p.exames)},pendencias:{l:'Pendências',v:(p.pendencias||[]).map(x=>'- '+x.t).join('\n')}}[campo];
+  if(!M)return;
+  modal(`<h3>Editar ${M.l}</h3><div class="hint" style="margin-bottom:8px">${esc(p.nome||'Paciente')} · leito ${esc(p.leito||'—')} — um item por linha</div>
+   <div class="field"><textarea id="ec_txt" style="min-height:170px" placeholder="- um por linha">${esc(M.v)}</textarea></div>
+   <div class="row"><button class="btn btn-p" onclick="saveCampo('${pid}','${campo}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
+  const t=document.getElementById('ec_txt');if(t){t.focus();t.setSelectionRange(t.value.length,t.value.length);}
+}
+function saveCampo(pid,campo){
+  const p=state.pacientes.find(x=>x.id===pid);if(!p)return;
+  const v=getVal('ec_txt');
+  if(campo==='dx')p.diagnosticos=bullets(v);
+  else if(campo==='exames')p.exames=bullets(v);
+  else if(campo==='pendencias'){const oldP=p.pendencias||[];p.pendencias=v.split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>o.t===t);return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});}
+  persist();closeModal();render();
 }
 
 function renderAtivos(){
@@ -247,7 +270,6 @@ function openForm(id){
      <div class="field"><label>Sexo</label><select id="f_sexo">${sx}</select></div></div>
    <div class="field"><label>Diagnósticos / hipóteses <span style="color:var(--muted);font-weight:400">(um por linha)</span></label><textarea id="f_dx" placeholder="- um por linha">${esc(bullets(p.diagnosticos))}</textarea></div>
    <div class="field"><label>Principais exames <span style="color:var(--muted);font-weight:400">(um por linha)</span></label><textarea id="f_exames" placeholder="- imagem e laboratório investigativos (um por linha)">${esc(bullets(p.exames))}</textarea></div>
-   <div class="field"><label>Condutas atuais <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="f_condutas" placeholder="- tratamento em curso / plano">${esc(bullets(p.condutas))}</textarea></div>
    <div class="field"><label>Pendências <span style="color:var(--muted);font-weight:400">(uma por linha — você marca como feitas na lista)</span></label><textarea id="f_pend" placeholder="- colher hemocultura&#10;- controle de PCR em 48h&#10;- avaliar com a cirurgia">${esc((p.pendencias||[]).map(x=>'- '+x.t).join('\n'))}</textarea></div>
    <div class="field"><label>Observações</label><textarea id="f_obs" placeholder="Anotações livres">${esc(p.obs)}</textarea></div>
    <div class="row"><button class="btn btn-p" onclick="saveForm('${id||''}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
@@ -255,7 +277,7 @@ function openForm(id){
 function saveForm(id){
   const oldP=id?((state.pacientes.find(x=>x.id===id)||{}).pendencias||[]):[];
   const pend=getVal('f_pend').split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>o.t===t);return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});
-  const o={leito:getVal('f_leito'),setor:getVal('f_setor'),nome:getVal('f_nome'),idade:getVal('f_idade'),sexo:getVal('f_sexo'),diagnosticos:bullets(getVal('f_dx')),exames:bullets(getVal('f_exames')),condutas:bullets(getVal('f_condutas')),pendencias:pend,obs:getVal('f_obs')};
+  const o={leito:getVal('f_leito'),setor:getVal('f_setor'),nome:getVal('f_nome'),idade:getVal('f_idade'),sexo:getVal('f_sexo'),diagnosticos:bullets(getVal('f_dx')),exames:bullets(getVal('f_exames')),pendencias:pend,obs:getVal('f_obs')};
   if(!o.leito&&!o.nome){alert('Informe ao menos o leito ou o nome do paciente.');return;}
   if(id){Object.assign(state.pacientes.find(x=>x.id===id),o);}
   else{state.pacientes.push({id:uid(),status:'ativo',criadoEm:nowISO(),...o});}
@@ -276,7 +298,6 @@ function resumoPlantao(){
     g[k].forEach(p=>{txt+='\n['+(p.leito||'—')+'] '+(p.nome||'Paciente')+(p.idade?(', '+p.idade):'')+'\n';
       if(p.diagnosticos)txt+='Dx:\n'+bullets(p.diagnosticos)+'\n';
       if(p.exames)txt+='Exames:\n'+bullets(p.exames)+'\n';
-      if(p.condutas)txt+='Condutas:\n'+bullets(p.condutas)+'\n';
       const pend=(p.pendencias||[]).filter(x=>!x.done);
       if(pend.length)txt+='Pendências:\n'+pend.map(x=>'- '+x.t).join('\n')+'\n';
       if(p.obs)txt+='Obs: '+oneLine(p.obs)+'\n';});});
@@ -314,8 +335,7 @@ async function extrairEvol(){
    +'- "idade" (string, ex.: "47 anos")\n'
    +'- "diagnosticos" (ARRAY de strings): SOMENTE o MOTIVO DA INTERNAÇÃO / as hipóteses que justificaram a internação (costuma vir logo após a identificação). CADA hipótese/diagnóstico em um ITEM SEPARADO do array. NUNCA junte duas hipóteses no mesmo item (não use "e" nem vírgula para unir hipóteses distintas — separe em itens). NÃO liste comorbidades/diagnósticos prévios de rotina (HAS, DM2, etc.), a não ser que sejam o motivo da internação.\n'
    +'- "exames" (ARRAY de strings): SOMENTE os exames INVESTIGATIVOS do quadro atual, UM exame por item, com o resultado relevante. NÃO inclua exames de rotina/controle de praxe.\n'
-   +'- "condutas" (ARRAY de strings): SOMENTE o que aparece APÓS a linha/título "CONDUTA" (ou "CONDUTAS"/"PLANO") e que mantém o paciente internado / impede a alta no momento. UMA conduta por item. Ignore condutas já resolvidas e o que não impede a alta.\n'
-   +'- "pendencias" (ARRAY de strings curtas): o que IMPEDE A ALTA neste momento, UMA por item (ex.: aguardar resultado de exame, avaliação de especialidade, melhora clínica, vaga, ajuste de medicação).\n'
+   +'- "pendencias" (ARRAY de strings curtas): o que IMPEDE A ALTA neste momento — extraído sobretudo do que aparece APÓS a linha/título "CONDUTA"/"PLANO". UMA por item (ex.: aguardar resultado de exame, avaliação de especialidade, conclusão de antibiótico, melhora clínica, vaga). Ignore o que já foi resolvido.\n'
    +'Cada array deve ter um item por elemento (a interface mostra um por linha). Não invente nada; se algo não estiver no texto, use array vazio. Use português do Brasil.\n\nEvolução:\n'+raw;
   try{
     const txt=await MT.ai(prompt);
@@ -327,7 +347,6 @@ async function extrairEvol(){
       setVal('f_idade',data.idade||'');
       setVal('f_dx',bullets(toLines(data.diagnosticos)));
       setVal('f_exames',bullets(toLines(data.exames)));
-      setVal('f_condutas',bullets(toLines(data.condutas)));
       setVal('f_pend',bullets(toLines(data.pendencias)));
       const okN=(data.nome||'')?'':' (nome não encontrado)';
       const bb=document.getElementById('extrairBtn');if(bb){bb.innerHTML='✓ Campos preenchidos'+okN;setTimeout(()=>{bb.innerHTML='✨ Extrair dados da evolução';bb.disabled=false;},1800);}
