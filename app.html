@@ -59,6 +59,11 @@ main{max-width:980px;margin:0 auto;padding:18px 18px calc(28px + env(safe-area-i
 .sug-row .b{flex:1;border:none;border-radius:10px;padding:11px;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit}
 .sug-row .ok{background:var(--mint);color:var(--petrol-dark)}.sug-row .ok:hover{background:var(--mint-dark)}
 .sug-row .cancel{background:#fff;color:var(--petrol);border:1px solid var(--line)}
+.cfg-sec{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.cfg-sec h4{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.cfg-sec .desc{font-size:12.5px;color:var(--muted);margin:2px 0 8px;line-height:1.5}
+.cfg-msg{font-size:12.5px;margin-top:8px;min-height:14px;line-height:1.5}
+.cfg-msg.ok{color:#14794f}.cfg-msg.err{color:#c0392b}
 footer{text-align:center;color:var(--muted);font-size:12.5px;padding:20px}
 footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 @media(max-width:560px){
@@ -159,6 +164,98 @@ function enviarSug(){
   closeSug();
 }
 
+/* ===== Configurações (perfil, senha, assinatura) ===== */
+const KIWIFY_PORTAL_URL = ''; // portal do cliente Kiwify (definir quando os pagamentos forem configurados)
+const SUPORTE_EMAIL = 'medtechbr1@gmail.com';
+function cfgVal(id){ const e = document.getElementById(id); return e ? e.value.trim() : ''; }
+function openCfg(){
+  const u = window.MT && window.MT.user;
+  if (!u || u.demo){ alert('Entre na sua conta MedTech para acessar as configurações.'); return; }
+  const perfil = (window.MT && MT._data && MT._data.perfil) || {};
+  const wrap = document.createElement('div'); wrap.className='sug-modal'; wrap.id='cfgModal';
+  wrap.innerHTML = `<div class="sug-box">
+    <h3>⚙️ Configurações</h3>
+    <div class="cfg-sec">
+      <h4>👤 Perfil e cadastro</h4>
+      <div class="desc">Seu nome aparece em todos os apps MedTech.</div>
+      <label>Nome</label><input id="cfgNome" value="${esc(u.displayName||'')}" placeholder="Seu nome">
+      <label>E-mail (login)</label><input value="${esc(u.email||'')}" disabled style="opacity:.65">
+      <label>Telefone / WhatsApp</label><input id="cfgFone" value="${esc(perfil.fone||'')}" placeholder="(11) 99999-9999">
+      <label>CRM</label><input id="cfgCrm" value="${esc(perfil.crm||'')}" placeholder="Ex.: 123456/SP">
+      <label>Especialidade</label><input id="cfgEsp" value="${esc(perfil.esp||'')}" placeholder="Ex.: Clínica Médica">
+      <label>Instituição</label><input id="cfgInst" value="${esc(perfil.inst||'')}" placeholder="Hospital / faculdade">
+      <div class="sug-row"><button class="b ok" onclick="salvarPerfil()">Salvar perfil</button></div>
+      <div class="cfg-msg" id="cfgPerfilMsg"></div>
+    </div>
+    <div class="cfg-sec">
+      <h4>🔒 Senha</h4>
+      <div class="desc">Defina uma nova senha (mín. 6 caracteres) ou receba um link de redefinição por e-mail.</div>
+      <label>Nova senha</label><input id="cfgPass1" type="password" placeholder="Nova senha" autocomplete="new-password">
+      <label>Confirmar nova senha</label><input id="cfgPass2" type="password" placeholder="Repita a nova senha" autocomplete="new-password">
+      <div class="sug-row"><button class="b ok" onclick="alterarSenha()">Alterar senha</button><button class="b cancel" onclick="enviarResetSenha()">Link por e-mail</button></div>
+      <div class="cfg-msg" id="cfgSenhaMsg"></div>
+    </div>
+    <div class="cfg-sec">
+      <h4>💳 Assinatura e pagamento</h4>
+      <div class="desc">Seu pagamento é processado com segurança pela Kiwify. Para trocar o cartão, ver faturas ou cancelar, use o portal do cliente — <b>nunca pedimos o número do cartão aqui</b>.</div>
+      <div class="sug-row"><button class="b ok" onclick="abrirPagamento()">Gerenciar assinatura / pagamento</button></div>
+      <div class="cfg-msg" id="cfgPagMsg"></div>
+    </div>
+    <div class="sug-row"><button class="b cancel" onclick="closeCfg()">Fechar</button></div>
+  </div>`;
+  wrap.onclick = e => { if (e.target===wrap) closeCfg(); };
+  document.body.appendChild(wrap);
+}
+function closeCfg(){ const m=document.getElementById('cfgModal'); if (m) m.remove(); }
+async function salvarPerfil(){
+  const msg=document.getElementById('cfgPerfilMsg'); msg.className='cfg-msg'; msg.textContent='Salvando…';
+  try{
+    const nome=cfgVal('cfgNome');
+    if (window.MT && MT._fb && MT.user && nome && nome!==(MT.user.displayName||'')) { await MT._fb.A.updateProfile(MT.user, {displayName:nome}); }
+    const perfil={fone:cfgVal('cfgFone'),crm:cfgVal('cfgCrm'),esp:cfgVal('cfgEsp'),inst:cfgVal('cfgInst')};
+    const base=(window.MT && MT._data && typeof MT._data==='object')?MT._data:{};
+    if (window.MT && MT.save) await MT.save(Object.assign({}, base, {perfil}));
+    msg.className='cfg-msg ok'; msg.textContent='✓ Perfil salvo.';
+    refreshUser();
+  }catch(e){ msg.className='cfg-msg err'; msg.textContent='Erro ao salvar: '+(e.message||e); }
+}
+async function alterarSenha(){
+  const msg=document.getElementById('cfgSenhaMsg'); msg.className='cfg-msg';
+  const p1=cfgVal('cfgPass1'), p2=cfgVal('cfgPass2');
+  if (p1.length<6){ msg.className='cfg-msg err'; msg.textContent='A senha deve ter ao menos 6 caracteres.'; return; }
+  if (p1!==p2){ msg.className='cfg-msg err'; msg.textContent='As senhas não conferem.'; return; }
+  if (!(window.MT && MT._fb && MT.user)){ msg.className='cfg-msg err'; msg.textContent='Sessão indisponível.'; return; }
+  const A=MT._fb.A; msg.textContent='Alterando…';
+  try{
+    await A.updatePassword(MT.user, p1);
+    msg.className='cfg-msg ok'; msg.textContent='✓ Senha alterada com sucesso.';
+    document.getElementById('cfgPass1').value=''; document.getElementById('cfgPass2').value='';
+  }catch(e){
+    if (e && e.code==='auth/requires-recent-login'){
+      const cur=prompt('Por segurança, confirme sua senha ATUAL para concluir a alteração:');
+      if (!cur){ msg.className='cfg-msg err'; msg.textContent='Alteração cancelada.'; return; }
+      try{
+        const cred=A.EmailAuthProvider.credential(MT.user.email, cur);
+        await A.reauthenticateWithCredential(MT.user, cred);
+        await A.updatePassword(MT.user, p1);
+        msg.className='cfg-msg ok'; msg.textContent='✓ Senha alterada com sucesso.';
+        document.getElementById('cfgPass1').value=''; document.getElementById('cfgPass2').value='';
+      }catch(e2){ const w=(e2.code==='auth/wrong-password'||e2.code==='auth/invalid-credential'); msg.className='cfg-msg err'; msg.textContent=w?'Senha atual incorreta.':('Não foi possível: '+(e2.message||e2)); }
+    } else { msg.className='cfg-msg err'; msg.textContent='Não foi possível: '+(e.message||e); }
+  }
+}
+async function enviarResetSenha(){
+  const msg=document.getElementById('cfgSenhaMsg'); msg.className='cfg-msg';
+  if (!(window.MT && MT._fb && MT.user)){ msg.className='cfg-msg err'; msg.textContent='Sessão indisponível.'; return; }
+  try{ await MT._fb.A.sendPasswordResetEmail(MT._fb.auth, MT.user.email); msg.className='cfg-msg ok'; msg.textContent='✓ Link enviado para '+MT.user.email+'.'; }
+  catch(e){ msg.className='cfg-msg err'; msg.textContent='Erro: '+(e.message||e); }
+}
+function abrirPagamento(){
+  const msg=document.getElementById('cfgPagMsg');
+  if (KIWIFY_PORTAL_URL){ window.open(KIWIFY_PORTAL_URL,'_blank','noopener'); return; }
+  msg.className='cfg-msg'; msg.innerHTML='A área de assinatura está sendo finalizada. Para trocar pagamento, ver faturas ou cancelar, fale com a gente: <a href="mailto:'+SUPORTE_EMAIL+'?subject=Assinatura%20MedTech" style="color:var(--petrol);font-weight:700">'+SUPORTE_EMAIL+'</a>.';
+}
+
 /* saudação + sair (via login central MedTech) */
 function refreshUser(){
   const u = window.MT && window.MT.user;
@@ -166,8 +263,9 @@ function refreshUser(){
   const hello = document.getElementById('hello');
   if (u && !u.demo){
     const nm = u.displayName || u.email || 'Conta';
-    el.innerHTML = `<span class="who">${esc(nm)}</span><button id="btnOut">Sair</button>`;
+    el.innerHTML = `<span class="who">${esc(nm)}</span><button id="btnCfg" title="Configurações">⚙️</button><button id="btnOut">Sair</button>`;
     document.getElementById('btnOut').onclick = () => window.MT.signOut();
+    document.getElementById('btnCfg').onclick = openCfg;
     const first = (u.displayName||'').split(' ')[0];
     hello.textContent = first ? ('Olá, '+first+' 👋') : 'Bem-vindo 👋';
   } else {
