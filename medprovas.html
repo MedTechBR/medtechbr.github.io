@@ -2527,6 +2527,26 @@ function montarPromptElaboracao(disciplina, numQuestoes, instrucoesExtras) {
   const blocoInstrucoes = (instrucoesExtras && instrucoesExtras.trim())
     ? `\n\nINSTRUÇÕES ESPECÍFICAS DO PROFESSOR (siga rigorosamente):\n"""\n${instrucoesExtras.trim()}\n"""\n`
     : '';
+  let blocoAnteriores = '';
+  try {
+    const _u = (typeof userAtual === 'function') ? userAtual() : null;
+    const _ant = [];
+    const _disc = (disciplina || '').trim().toLowerCase();
+    if (_u && Array.isArray(_u.provas)) {
+      _u.provas.forEach(p => {
+        if (!Array.isArray(p.questoes)) return;
+        if (_disc && (p.disciplina || '').trim().toLowerCase() !== _disc) return;
+        p.questoes.forEach(q => {
+          const e = (q.enunciado || '').replace(/\s+/g, ' ').trim();
+          if (e && !/IA não gerou/.test(e)) _ant.push(e.slice(0, 220));
+        });
+      });
+    }
+    const _ult = _ant.slice(-150);
+    if (_ult.length) {
+      blocoAnteriores = `\n\n🚫 QUESTÕES JÁ CRIADAS ANTERIORMENTE (NÃO REPETIR):\nVocê já criou as ${_ult.length} questões abaixo (mesma disciplina). As NOVAS questões DEVEM ser INÉDITAS — temas, cenários clínicos, perguntas e respostas-chave DIFERENTES destas. Não reaproveite o mesmo caso, a mesma doença com a mesma abordagem, nem a mesma pergunta. Explore subtópicos e ângulos ainda não cobertos:\n` + _ult.map((e, i) => `${i + 1}. ${e}`).join('\n') + '\n';
+    }
+  } catch (e) {}
   return `INSTRUÇÃO DE IDIOMA — OBRIGATÓRIO:
 Toda a sua resposta DEVE ser em PORTUGUÊS BRASILEIRO (pt-BR). Use exclusivamente português brasileiro nos enunciados, alternativas, gabarito e explicações. NÃO use inglês, mesmo que os materiais de referência estejam em inglês — traduza os termos técnicos para português brasileiro. Use a terminologia médica usual no Brasil.
 
@@ -2545,10 +2565,10 @@ As questões DEVEM ser elaboradas EXCLUSIVAMENTE com base no conteúdo dos PDFs 
 Use o material didático fornecido (PDFs anexados) como ÚNICA base de conhecimento.
 ${elaboracao.esqueleto ? 'Use o esqueleto/modelo fornecido para inspirar o estilo das questões.' : ''}
 ${listaMateriais}
-${blocoInstrucoes}
+${blocoInstrucoes}${blocoAnteriores}
 REGRAS RIGOROSAS:
 1. TUDO em PORTUGUÊS BRASILEIRO. Enunciados, alternativas, explicações — TUDO em pt-BR.
-2. CADA questão deve apresentar um CASO CLÍNICO realista e detalhado em português (paciente brasileiro, idade, sintomas, exames, contexto).
+2. CADA questão deve apresentar um CASO CLÍNICO realista, LONGO e detalhado em português (8 a 15 linhas): identificação do paciente brasileiro (idade/sexo), queixa principal e história da doença atual com evolução no tempo, antecedentes relevantes, exame físico com sinais vitais e achados, e exames complementares pertinentes (laboratório e/ou imagem com valores). Quanto mais rico e contextualizado o enunciado, melhor — evite enunciados curtos.
 3. Use nomes brasileiros para os pacientes (ex: "João, 56 anos", "Maria, 32 anos", "Sr. Carlos", "Sra. Antônia").
 4. Após o caso clínico, faça uma pergunta direta em português (ex: "Qual é o diagnóstico mais provável?", "Qual a conduta inicial?", "Qual o tratamento de primeira escolha?").
 5. Forneça exatamente 4 alternativas (A, B, C, D) em português, apenas UMA correta.
@@ -2559,7 +2579,8 @@ REGRAS RIGOROSAS:
 10. Cada questão deve ter uma EXPLICAÇÃO DETALHADA do gabarito em português, comentando POR QUE a correta é correta E comentando individualmente cada alternativa errada. Mínimo 3 a 5 frases.
 11. Cada questão deve ter REFERÊNCIAS bibliográficas concretas em português (livros texto, diretrizes brasileiras, sociedades, guidelines).
 12. Não repita o mesmo tema/caso entre questões — varie tópicos cobertos pelo material.
-13. Para CADA questão, avalie se ela se beneficiaria de uma IMAGEM ILUSTRATIVA (ECG, raio-X, tomografia, ressonância, ultrassom, dermatoscopia, lesão, histologia, esquema anatômico, etc.).
+13. NÍVEL DE DIFICULDADE ALTO (prova de residência muito concorrida): as questões devem exigir RACIOCÍNIO CLÍNICO e integração de vários dados — diagnóstico diferencial, interpretação de exames, conduta baseada em diretriz, próximo passo no manejo. EVITE perguntas triviais de definição/decoreba. Os distratores devem ser MUITO plausíveis (erros sutis), de modo que apenas quem domina o tema acerte.
+14. Para CADA questão, avalie se ela se beneficiaria de uma IMAGEM ILUSTRATIVA (ECG, raio-X, tomografia, ressonância, ultrassom, dermatoscopia, lesão, histologia, esquema anatômico, etc.).
 
 PREFERÊNCIA ABSOLUTA: use IMAGEM DOS MATERIAIS FORNECIDOS sempre que possível.
 - Os PDFs dos materiais estão numerados (na ordem em que foram enviados, começando em 0).
@@ -3939,6 +3960,19 @@ async function adicionarQuestaoIA() {
   statusEl.innerHTML = '<span class="spinner"></span> Buscando materiais e gerando questão...';
 
   const materiais = await obterMateriais(p.id);
+  const _u = userAtual();
+  const _disc = (p.disciplina || '').trim().toLowerCase();
+  const _outras = [];
+  if (_u && Array.isArray(_u.provas)) {
+    _u.provas.forEach(pv => {
+      if (pv.id === p.id || !Array.isArray(pv.questoes)) return;
+      if (_disc && (pv.disciplina || '').trim().toLowerCase() !== _disc) return;
+      pv.questoes.forEach(q => { const e = (q.enunciado || '').replace(/\s+/g, ' ').trim(); if (e && !/IA não gerou/.test(e)) _outras.push(e.slice(0, 200)); });
+    });
+  }
+  const blocoOutrasProvas = _outras.length
+    ? `\n\nQUESTÕES DE PROVAS ANTERIORES DA MESMA DISCIPLINA (TAMBÉM NÃO REPETIR — devem ser INÉDITAS em relação a estas):\n` + _outras.slice(-120).map((e, i) => `${i + 1}. ${e}`).join('\n')
+    : '';
   const questoesExistentes = p.questoes
     .map((q, i) => `Q${i + 1}: ${(q.enunciado || '').slice(0, 200).replace(/\s+/g, ' ')}`)
     .join('\n');
@@ -3950,15 +3984,16 @@ Disciplina: ${p.disciplina}
 Posição na prova: questão ${proximoNum} (será adicionada ao final).
 
 QUESTÕES JÁ EXISTENTES NESTA PROVA (NÃO repita temas/casos semelhantes a estes):
-${questoesExistentes || '(nenhuma ainda)'}
+${questoesExistentes || '(nenhuma ainda)'}${blocoOutrasProvas}
 
 ${orientacao && orientacao.trim() ? 'ORIENTAÇÃO DO PROFESSOR PARA ESTA NOVA QUESTÃO:\n' + orientacao.trim() + '\n' : ''}
 
 REGRAS:
 - TUDO em PORTUGUÊS BRASILEIRO.
-- Caso clínico realista, com paciente de nome brasileiro.
+- Caso clínico realista, LONGO e detalhado (8 a 15 linhas): identificação, história da doença atual com evolução no tempo, antecedentes relevantes, exame físico com sinais vitais e exames complementares pertinentes (com valores). Paciente de nome brasileiro. Evite enunciados curtos.
+- NÍVEL DE DIFICULDADE ALTO (prova de residência concorrida): exija raciocínio clínico e integração de dados (diagnóstico diferencial, interpretação de exames, conduta por diretriz, próximo passo). Evite questões triviais de definição/decoreba.
 - 4 alternativas (A, B, C, D), apenas UMA correta.
-- Distratores plausíveis.
+- Distratores MUITO plausíveis (erros sutis), de modo que apenas quem domina o tema acerte.
 - Terminologia médica brasileira.
 - Explicação DETALHADA (3-5 frases) comentando a correta E individualmente cada alternativa errada.
 - Referências bibliográficas concretas (livros texto, diretrizes brasileiras, sociedades médicas).
@@ -4060,6 +4095,20 @@ async function regenerarQuestao(idx) {
     .filter(x => x)
     .join('\n');
 
+  const _u2 = userAtual();
+  const _disc2 = (p.disciplina || '').trim().toLowerCase();
+  const _outras2 = [];
+  if (_u2 && Array.isArray(_u2.provas)) {
+    _u2.provas.forEach(pv => {
+      if (pv.id === p.id || !Array.isArray(pv.questoes)) return;
+      if (_disc2 && (pv.disciplina || '').trim().toLowerCase() !== _disc2) return;
+      pv.questoes.forEach(q => { const e = (q.enunciado || '').replace(/\s+/g, ' ').trim(); if (e && !/IA não gerou/.test(e)) _outras2.push(e.slice(0, 200)); });
+    });
+  }
+  const blocoOutrasProvas2 = _outras2.length
+    ? `\n\nQUESTÕES DE PROVAS ANTERIORES DA MESMA DISCIPLINA (TAMBÉM NÃO REPETIR):\n` + _outras2.slice(-120).map((e, i) => `${i + 1}. ${e}`).join('\n')
+    : '';
+
   const prompt2 = `Você está REGENERANDO UMA ÚNICA questão dentro de uma prova existente, estilo ENARE/ENAMED brasileiro, em PORTUGUÊS BRASILEIRO.
 
 Disciplina: ${p.disciplina}
@@ -4069,15 +4118,16 @@ QUESTÃO ATUAL (que será substituída — gere uma DIFERENTE):
 ${p.questoes[idx].enunciado || '(em branco)'}
 
 OUTRAS QUESTÕES DESTA PROVA (NÃO repita temas/casos semelhantes a estes):
-${questoesExistentes || '(nenhuma)'}
+${questoesExistentes || '(nenhuma)'}${blocoOutrasProvas2}
 
 ${orientacao && orientacao.trim() ? 'ORIENTAÇÃO DO PROFESSOR PARA A NOVA QUESTÃO:\n' + orientacao.trim() + '\n' : ''}
 
 REGRAS:
 - TUDO em PORTUGUÊS BRASILEIRO.
-- Caso clínico realista contextualizado, em português, com paciente de nome brasileiro.
+- Caso clínico realista, LONGO e detalhado (8 a 15 linhas): identificação, história da doença atual com evolução no tempo, antecedentes relevantes, exame físico com sinais vitais e exames complementares pertinentes (com valores). Paciente de nome brasileiro. Evite enunciados curtos.
+- NÍVEL DE DIFICULDADE ALTO (prova de residência concorrida): exija raciocínio clínico e integração de dados (diagnóstico diferencial, interpretação de exames, conduta por diretriz, próximo passo). Evite questões triviais de definição/decoreba.
 - 4 alternativas (A, B, C, D), apenas UMA correta.
-- Distratores plausíveis.
+- Distratores MUITO plausíveis (erros sutis), de modo que apenas quem domina o tema acerte.
 - Use terminologia médica brasileira.
 - Inclua explicação DETALHADA (3-5 frases) comentando a alternativa correta E individualmente cada alternativa errada.
 - Inclua referências bibliográficas concretas (livros texto, diretrizes brasileiras, sociedades médicas).
