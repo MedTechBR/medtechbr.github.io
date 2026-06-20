@@ -1151,6 +1151,10 @@ document.getElementById('wipeData').addEventListener('click', () => {
   toast('Dados apagados');
 });
 
+// Botão "+ Lançar" no Resumo (primeira aba) — abre o lançamento direto
+const _dashLancar = document.getElementById('dashLancar');
+if (_dashLancar) _dashLancar.addEventListener('click', () => openTxDialog(null));
+
 // FAB de "+ transação" através da nav inferior (botão Lançar)
 document.querySelector('.bottom-nav button[data-nav="transacoes"]').addEventListener('dblclick', () => openTxDialog(null));
 // Garantir que clicar em "Lançar" também abre o diálogo ao já estar na view
