@@ -99,6 +99,7 @@ input.search{padding:11px 12px;border:1px solid var(--line);border-radius:9px;fo
 .thumb-ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:22px;color:var(--petrol);background:#e8f1f2}
 .thumb-ph span{font-size:9px;font-weight:800;letter-spacing:.04em}
 .thumbs-n{flex:1 0 100%;font-size:12px;font-weight:800;color:var(--green)}
+.thumbs-err{flex:1 0 100%;font-size:12px;font-weight:600;color:var(--red);background:var(--red-bg);border-radius:8px;padding:7px 9px;line-height:1.45}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid var(--petrol-dark);border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
 @keyframes sp{to{transform:rotate(360deg)}}
 .note{background:var(--soft);border-radius:12px;padding:12px 15px;font-size:13px;color:#28424a;margin-top:16px;line-height:1.6}
@@ -160,7 +161,7 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const SAIDA={alta:{l:'Alta',c:'b-alta'},obito:{l:'Óbito',c:'b-obito'},transferencia:{l:'Transferência',c:'b-transf'}};
 const EF_TEMPLATE='- NEURO: \n- AC: \n- AP: \n- ABDOME: \n- EXT: \n- PELE: ';
 let state={pacientes:[]};
-let tab='ativos', busca='', visitaImgs=[];
+let tab='ativos', busca='', visitaImgs=[], visitaImgErrs=[];
 
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
 function nowISO(){return new Date().toISOString();}
@@ -345,7 +346,7 @@ function gtbul(s){return String(s||'').split('\n').map(x=>x.trim()).filter(Boole
 /* ===== visita beira-leito ===== */
 function openVisita(id){
   const p=state.pacientes.find(x=>x.id===id);if(!p)return;
-  visitaImgs=[];
+  visitaImgs=[];visitaImgErrs=[];
   const ef=(p.exameFisico&&p.exameFisico.trim())?p.exameFisico:EF_TEMPLATE;
   modal(`<h3>👨‍⚕️ Visita · ${esc(p.nome||'Paciente')}</h3>
    <div class="hint" style="margin-bottom:6px">Leito ${esc(p.leito||'—')}${p.idade?(' · '+esc(p.idade)):''}. Atualize a evolução do dia — o exame físico já vem do dia anterior, edite só o que mudou.</div>
@@ -378,29 +379,40 @@ function saveVisita(id,gerar){
 
 /* fotos dos parâmetros */
 function guessMime(name){const n=(name||'').toLowerCase();if(/\.png$/.test(n))return 'image/png';if(/\.webp$/.test(n))return 'image/webp';if(/\.(heic|heif)$/.test(n))return 'image/heic';return 'image/jpeg';}
+function readFileRetry(f,tries,onok,onfail){
+  const go=n=>{
+    const r=new FileReader();
+    r.onload=()=>onok(String(r.result||''));
+    r.onerror=()=>{if(n<tries)setTimeout(()=>go(n+1),900);else onfail();}; // retry: acessar de novo pode forçar o download do iCloud
+    try{r.readAsDataURL(f);}catch(e){if(n<tries)setTimeout(()=>go(n+1),900);else onfail();}
+  };
+  go(0);
+}
 function addParamImgs(input){
   const files=[...(input.files||[])];
   if(!files.length)return;
+  visitaImgErrs=[];
   let pending=files.length;
   const doneOne=()=>{if(--pending<=0){try{input.value='';}catch(e){}}};
   files.forEach(f=>{
     const origMime=f.type||guessMime(f.name);
-    let blob=f;try{blob=f.slice(0,f.size,f.type||origMime);}catch(e){blob=f;} // cópia independente do input
-    const r=new FileReader();
-    r.onload=()=>{
-      const dataUrl=String(r.result||'');if(!dataUrl){doneOne();return;}
+    readFileRetry(f,2,dataUrl=>{
+      if(!dataUrl){visitaImgErrs.push(f.name||'imagem');renderThumbs();doneOne();return;}
       downscale(dataUrl,1600,.82,(outUrl,outMime)=>{
         const url=outUrl||dataUrl, mime=outMime||origMime||'image/jpeg', b64=(url.split(',')[1]||'');
-        if(b64){visitaImgs.push({data:b64,mimeType:mime,thumb:url,heic:/heic|heif/i.test(mime)});renderThumbs();}
-        doneOne();
+        if(b64)visitaImgs.push({data:b64,mimeType:mime,thumb:url,heic:/heic|heif/i.test(mime)});
+        else visitaImgErrs.push(f.name||'imagem');
+        renderThumbs();doneOne();
       });
-    };
-    r.onerror=()=>{doneOne();alert('Não consegui ler '+(f.name||'a imagem')+'. Se a foto estiver no iCloud, abra-a no app Fotos primeiro p/ baixar, ou tire uma foto nova.');};
-    r.readAsDataURL(blob);
+    },()=>{visitaImgErrs.push(f.name||'imagem');renderThumbs();doneOne();});
   });
+  renderThumbs();
 }
 function renderThumbs(){const box=document.getElementById('v_thumbs');if(!box)return;
-  box.innerHTML=(visitaImgs.length?`<div class="thumbs-n">✓ ${visitaImgs.length} foto(s) anexada(s)</div>`:'')+visitaImgs.map((im,i)=>`<div class="thumb">${im.heic?'<div class="thumb-ph">📄<span>FOTO</span></div>':`<img src="${im.thumb}" onerror="this.parentNode.innerHTML='<div class=\\'thumb-ph\\'>📄<span>FOTO</span></div>'+this.parentNode.innerHTML">`}<button onclick="rmThumb(${i})">✕</button></div>`).join('');}
+  let h=(visitaImgs.length?`<div class="thumbs-n">✓ ${visitaImgs.length} foto(s) anexada(s)</div>`:'');
+  h+=visitaImgs.map((im,i)=>`<div class="thumb">${im.heic?'<div class="thumb-ph">📄<span>FOTO</span></div>':`<img src="${im.thumb}" onerror="this.style.opacity=0">`}<button onclick="rmThumb(${i})">✕</button></div>`).join('');
+  if(visitaImgErrs.length)h+=`<div class="thumbs-err">⚠️ Não consegui ler: ${esc(visitaImgErrs.join(', '))}. No Mac, fotos do iPhone podem estar no iCloud sem download — abra a foto no app Fotos (ou arraste pra Mesa) e tente de novo. No celular, tire a foto na hora.</div>`;
+  box.innerHTML=h;}
 function rmThumb(i){visitaImgs.splice(i,1);renderThumbs();}
 function downscale(dataUrl,maxDim,q,cb){
   const img=new Image();let done=false;const finish=(u,m)=>{if(done)return;done=true;cb(u,m);};
