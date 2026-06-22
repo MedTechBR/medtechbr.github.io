@@ -95,7 +95,10 @@ input.search{padding:11px 12px;border:1px solid var(--line);border-radius:9px;fo
 .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
 .thumb{position:relative;width:76px;height:76px;border-radius:9px;overflow:hidden;border:1px solid var(--line);background:#f0f0f0}
 .thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.thumb button{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:12px;line-height:1;padding:0;min-height:0}
+.thumb button{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:12px;line-height:1;padding:0;min-height:0;z-index:2}
+.thumb-ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:22px;color:var(--petrol);background:#e8f1f2}
+.thumb-ph span{font-size:9px;font-weight:800;letter-spacing:.04em}
+.thumbs-n{flex:1 0 100%;font-size:12px;font-weight:800;color:var(--green)}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid var(--petrol-dark);border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
 @keyframes sp{to{transform:rotate(360deg)}}
 .note{background:var(--soft);border-radius:12px;padding:12px 15px;font-size:13px;color:#28424a;margin-top:16px;line-height:1.6}
@@ -350,7 +353,7 @@ function openVisita(id){
    <div class="ai-box">
      <div class="ai-h">📷 Parâmetros das últimas 24h (foto)</div>
      <div class="hint">Tire foto do controle hemodinâmico e, se tiver, da folha de diurese/balanço hídrico. A IA transcreve para a linha de parâmetros.</div>
-     <input class="file-in" type="file" id="v_imgs" accept="image/*" multiple onchange="addParamImgs(event)">
+     <input class="file-in" type="file" id="v_imgs" accept="image/*,.heic,.heif,.jpg,.jpeg,.png" multiple onchange="addParamImgs(this)">
      <div id="v_thumbs" class="thumbs"></div>
      <div class="row"><button class="btn btn-p btn-sm" id="transBtn" onclick="transcreverParams()">✨ Transcrever parâmetros</button></div>
    </div>
@@ -374,14 +377,37 @@ function saveVisita(id,gerar){
 }
 
 /* fotos dos parâmetros */
-function addParamImgs(ev){
-  const files=[...(ev.target.files||[])];
-  files.forEach(f=>{if(!/^image\//.test(f.type))return;const r=new FileReader();r.onload=()=>downscale(r.result,1600,.82,(dataUrl)=>{visitaImgs.push({data:dataUrl.split(',')[1],mimeType:'image/jpeg',thumb:dataUrl});renderThumbs();});r.readAsDataURL(f);});
-  ev.target.value='';
+function guessMime(name){const n=(name||'').toLowerCase();if(/\.png$/.test(n))return 'image/png';if(/\.webp$/.test(n))return 'image/webp';if(/\.(heic|heif)$/.test(n))return 'image/heic';return 'image/jpeg';}
+function addParamImgs(input){
+  const files=[...(input.files||[])];
+  input.value='';
+  if(!files.length)return;
+  files.forEach(f=>{
+    const r=new FileReader();
+    r.onload=()=>{
+      const dataUrl=String(r.result||'');if(!dataUrl)return;
+      const origMime=f.type||guessMime(f.name);
+      downscale(dataUrl,1600,.82,(outUrl,outMime)=>{
+        const url=outUrl||dataUrl, mime=outMime||origMime||'image/jpeg', b64=(url.split(',')[1]||'');
+        if(!b64)return;
+        visitaImgs.push({data:b64,mimeType:mime,thumb:url,heic:/heic|heif/i.test(mime)});
+        renderThumbs();
+      });
+    };
+    r.onerror=()=>alert('Não consegui ler '+(f.name||'a imagem')+'. Tente outra foto.');
+    r.readAsDataURL(f);
+  });
 }
-function renderThumbs(){const box=document.getElementById('v_thumbs');if(!box)return;box.innerHTML=visitaImgs.map((im,i)=>`<div class="thumb"><img src="${im.thumb}"><button onclick="rmThumb(${i})">✕</button></div>`).join('');}
+function renderThumbs(){const box=document.getElementById('v_thumbs');if(!box)return;
+  box.innerHTML=(visitaImgs.length?`<div class="thumbs-n">✓ ${visitaImgs.length} foto(s) anexada(s)</div>`:'')+visitaImgs.map((im,i)=>`<div class="thumb">${im.heic?'<div class="thumb-ph">📄<span>FOTO</span></div>':`<img src="${im.thumb}" onerror="this.parentNode.innerHTML='<div class=\\'thumb-ph\\'>📄<span>FOTO</span></div>'+this.parentNode.innerHTML">`}<button onclick="rmThumb(${i})">✕</button></div>`).join('');}
 function rmThumb(i){visitaImgs.splice(i,1);renderThumbs();}
-function downscale(dataUrl,maxDim,q,cb){const img=new Image();img.onload=()=>{let w=img.width,h=img.height;const sc=Math.min(1,maxDim/Math.max(w,h));const cw=Math.max(1,Math.round(w*sc)),ch=Math.max(1,Math.round(h*sc));const c=document.createElement('canvas');c.width=cw;c.height=ch;c.getContext('2d').drawImage(img,0,0,cw,ch);try{cb(c.toDataURL('image/jpeg',q));}catch(e){cb(dataUrl);}};img.onerror=()=>cb(dataUrl);img.src=dataUrl;}
+function downscale(dataUrl,maxDim,q,cb){
+  const img=new Image();let done=false;const finish=(u,m)=>{if(done)return;done=true;cb(u,m);};
+  img.onload=()=>{try{const w=img.naturalWidth||img.width,h=img.naturalHeight||img.height;if(!w||!h)return finish(null,null);const sc=Math.min(1,maxDim/Math.max(w,h));const cw=Math.max(1,Math.round(w*sc)),ch=Math.max(1,Math.round(h*sc));const c=document.createElement('canvas');c.width=cw;c.height=ch;c.getContext('2d').drawImage(img,0,0,cw,ch);finish(c.toDataURL('image/jpeg',q),'image/jpeg');}catch(e){finish(null,null);}};
+  img.onerror=()=>finish(null,null);
+  setTimeout(()=>finish(null,null),6000);
+  img.src=dataUrl;
+}
 const PARAM_PROMPT='Você recebe FOTO(S) manuscritas: uma folha de CONTROLE HEMODINÂMICO (sinais vitais) e, possivelmente, uma folha SEPARADA de CONTROLE HÍDRICO (diurese/balanço hídrico) das últimas 24h de um paciente internado. Transcreva os sinais vitais e calcule as faixas mínimo–máximo do dia. Responda APENAS UMA LINHA, em MAIÚSCULAS, exatamente neste formato, sem o rótulo "PARÂMETROS:" e sem nenhum texto extra:\n'
  +'PA [sis_min-sis_max] X [dia_min-dia_max] MMHG // FC [min-max] BPM // FR [min-max] IRPM // T [min-max] ºC // SPO2 [min-max]% // DX [valores em ordem de horário separados por hífen, sem espaços] MG/DL // DIURESE [valor] ML // BH [valor com sinal] ML\n'
  +'REGRAS: (0) A folha hemodinâmica costuma ter, ABAIXO dos valores, uma GRADE DE ESCORE (MEWS/alerta precoce) com números 0, 1, 2 e 3 nas células — IGNORE completamente esses escores; use SEMPRE os valores REAIS medidos. '
