@@ -239,7 +239,7 @@ const Gemini = (() => {
   }
 
   async function analyzeMonth({ transactions, categories, fixedItems, monthLabel, customQuestion }) {
-    const sys = `Você é um consultor financeiro pessoal direto e prático, em português do Brasil. Responda em markdown curto e útil, com seções, bullets e números. Identifique padrões, exageros, oportunidades de economia e compare o realizado com o orçamento fixo médio quando relevante.`;
+    const sys = `Você é um consultor financeiro pessoal direto e prático, em português do Brasil. Responda em markdown curto e útil, com seções, bullets e números. **Leia a DESCRIÇÃO de cada lançamento (campo "description") — o que foi efetivamente comprado/pago — e analise item a item, não só por categoria.** Identifique padrões, exageros, supérfluos, duplicidades e oportunidades de economia, **citando os gastos específicos pelo nome (descrição)**, e compare o realizado com o orçamento fixo médio quando relevante.`;
 
     const summary = {
       monthLabel,
@@ -264,7 +264,7 @@ const Gemini = (() => {
   }
 
   async function deepAnalysis({ transactions, categories, fixedItems }) {
-    const sys = `Você é um consultor financeiro pessoal brasileiro especialista em redução de custos e construção de hábitos. Receberá TODAS as transações do usuário (vários meses, possivelmente) e o orçamento fixo médio. Sua tarefa:
+    const sys = `Você é um consultor financeiro pessoal brasileiro especialista em redução de custos e construção de hábitos. Receberá o orçamento fixo médio e a lista "gastos" com a DESCRIÇÃO de cada despesa individual (o que a pessoa de fato comprou/pagou). **ANALISE o que está ESCRITO em cada gasto, item a item — não fique só nas categorias.** Entenda do que se trata cada despesa pela descrição, agrupe gastos parecidos, identifique supérfluos/duplicados/assinaturas e **cite gastos específicos pelo nome (descrição)** ao apontar exageros e recomendar economias. Sua tarefa:
 
 1. **Visão geral** — média mensal de receitas, despesas e saldo; tendência ao longo dos meses se houver mais de um.
 2. **Top 5 categorias com potencial de economia** — para cada uma: valor médio gasto/mês, quanto seria razoável reduzir (R$ e %), 2-3 ações concretas e práticas.
@@ -302,7 +302,7 @@ Use markdown com seções (\`##\`), bullets, valores em R$ (formato brasileiro).
       mediaMensal: { entradas: r1(totIn / nMonths), saidas: r1(totOut / nMonths), saldo: r1((totIn - totOut) / nMonths) },
       porMes: Object.entries(byMonth).sort().map(([mes, v]) => ({ mes, entradas: r1(v.entradas), saidas: r1(v.saidas), saldo: r1(v.entradas - v.saidas) })),
       gastoPorCategoria: Object.entries(byCat).map(([categoria, v]) => ({ categoria, totalGasto: r1(v.total), mediaMensal: r1(v.total / nMonths), transacoes: v.n })).sort((a, b) => b.totalGasto - a.totalGasto).slice(0, 15),
-      maioresGastos: transactions.filter(t => t.type === 'expense').sort((a, b) => num(b.amount) - num(a.amount)).slice(0, 20).map(t => ({ valor: r1(num(t.amount)), categoria: t.category, descricao: (t.description || '').slice(0, 40), data: t.date })),
+      gastos: transactions.filter(t => t.type === 'expense').sort((a, b) => num(b.amount) - num(a.amount)).slice(0, 500).map(t => ({ valor: r1(num(t.amount)), categoria: t.category, descricao: (t.description || '(sem descrição)').slice(0, 80), data: t.date })),
       possiveisRecorrentes: Object.values(recur).filter(x => x.n >= 3).map(x => ({ descricao: x.desc.slice(0, 40), vezes: x.n, total: r1(x.total), mediaMensal: r1(x.total / nMonths) })).sort((a, b) => b.total - a.total).slice(0, 15),
       orcamentoFixo: fixedItems.map(f => ({ name: f.name, type: f.type, amount: f.amount, category: f.category })),
       totalTransacoes: transactions.length,
