@@ -476,18 +476,26 @@ function lineToHtml(line){
   if(/^- /.test(line)||/^> /.test(line))return '<b>'+esc(line)+'</b>'; // tópicos (itens) em negrito
   return esc(line);
 }
-function gerarEvolucaoHtml(p){return '<div>'+gerarEvolucao(p).split('\n').map(lineToHtml).join('<br>')+'</div>';}
-async function copyEvoFmt(id,btnId){
+function gerarEvolucaoHtml(p){return gerarEvolucao(p).split('\n').map(l=>'<div>'+(lineToHtml(l)||'<br>')+'</div>').join('');}
+function copyEvoFmt(id,btnId){
   const p=state.pacientes.find(x=>x.id===id);if(!p)return;
   const html=gerarEvolucaoHtml(p), text=gerarEvolucao(p);
   let ok=false;
+  // método clássico: selecionar um contenteditable com o HTML e copiar (rico, sem depender de permissão)
   try{
-    if(navigator.clipboard&&window.ClipboardItem){
-      await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([text],{type:'text/plain'})})]);
-      ok=true;
-    }
-  }catch(e){}
-  if(!ok){const t=document.getElementById('evoTa');if(t){t.focus();t.select();try{document.execCommand('copy');ok=true;}catch(e){}}}
+    const d=document.createElement('div');
+    d.contentEditable='true';
+    d.setAttribute('style','position:fixed;left:-9999px;top:0;opacity:0;white-space:pre-wrap');
+    d.innerHTML=html;
+    document.body.appendChild(d);
+    const sel=window.getSelection();const range=document.createRange();
+    range.selectNodeContents(d);sel.removeAllRanges();sel.addRange(range);
+    ok=document.execCommand('copy');
+    sel.removeAllRanges();document.body.removeChild(d);
+  }catch(e){ok=false;}
+  // reforço assíncrono (alguns navegadores)
+  if(window.ClipboardItem&&navigator.clipboard){try{navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([text],{type:'text/plain'})})]);ok=true;}catch(e){}}
+  if(!ok){const t=document.getElementById('evoTa');if(t){t.focus();t.select();try{ok=document.execCommand('copy');}catch(e){}}}
   const b=document.getElementById(btnId);if(b){b.textContent=ok?'✓ Copiado (formatado)':'Selecione e copie manualmente';setTimeout(()=>b.textContent='📋 Copiar p/ o sistema',2000);}
 }
 function verEvolucao(id){
