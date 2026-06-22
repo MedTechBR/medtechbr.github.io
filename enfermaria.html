@@ -473,6 +473,7 @@ function lineToHtml(line){
     return '<div><b>'+esc(line)+'</b></div>';
   const m=line.match(/^((?:#|>) (?:ID|COMORBIDADES|ALERGIAS|MUC|HDA|EVOLUÇÃO|PARÂMETROS):)([\s\S]*)$/);
   if(m)return '<div><b>'+esc(m[1])+'</b>'+esc(m[2])+'</div>';
+  if(/^- /.test(line)||/^> /.test(line))return '<div><b>'+esc(line)+'</b></div>'; // tópicos (itens) em negrito
   return '<div>'+esc(line)+'</div>';
 }
 function gerarEvolucaoHtml(p){return gerarEvolucao(p).split('\n').map(lineToHtml).join('');}
