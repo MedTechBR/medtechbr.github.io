@@ -139,6 +139,7 @@ if (PLACEHOLDER) {
   MT.signOut = () => {};
   MT.ai = async () => { throw new Error("Entre na sua conta MedTech para usar a IA."); };
   MT.aiAudio = async () => { throw new Error("Entre na sua conta MedTech para usar a IA."); };
+  MT.aiImage = async () => { throw new Error("Entre na sua conta MedTech para usar a IA."); };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', showDemoBanner);
   else showDemoBanner();
   Promise.resolve().then(() => MT._emit(MT.localGet()));
@@ -178,7 +179,13 @@ else {
         const res = await callable({ audio, mimeType, prompt, model });
         return (res && res.data && res.data.text) || "";
       };
-    } catch (e) { MT.ai = async () => { throw new Error("IA MedTech indisponível no momento."); }; MT.aiAudio = async () => { throw new Error("IA MedTech indisponível no momento."); }; }
+      MT.aiImage = async (images, prompt, model = "gemini-2.5-flash") => {
+        if (!MT.user) throw new Error("Entre na sua conta MedTech para usar a IA.");
+        const callable = Fn.httpsCallable(functions, "geminiImage");
+        const res = await callable({ images, prompt, model });
+        return (res && res.data && res.data.text) || "";
+      };
+    } catch (e) { MT.ai = async () => { throw new Error("IA MedTech indisponível no momento."); }; MT.aiAudio = async () => { throw new Error("IA MedTech indisponível no momento."); }; MT.aiImage = async () => { throw new Error("IA MedTech indisponível no momento."); }; }
 
     let unsub = null;
     A.onAuthStateChanged(auth, (u) => {

@@ -2,19 +2,26 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1">
 <title>EnfermarIA — Gestão de pacientes internados | MedTech</title>
-<meta name="description" content="EnfermarIA: gestão de pacientes internados — leito, diagnósticos, exames e pendências, com extração automática da evolução por IA e registro de alta, óbito ou transferência.">
+<meta name="description" content="EnfermarIA: gestão de pacientes internados e visita beira-leito — evolução do dia, exame físico, transcrição de parâmetros por foto e evolução pronta para colar no sistema do hospital.">
 <meta name="theme-color" content="#0E5A6D">
 <link rel="icon" type="image/png" href="favicon.png">
+<link rel="manifest" href="enfermaria.webmanifest">
+<link rel="apple-touch-icon" href="icone-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="EnfermarIA">
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"enfermaria",name:"EnfermarIA"};</script>
-<script type="module" src="_mtauth.js?v=6"></script>
+<script type="module" src="_mtauth.js?v=7"></script>
 <style>
 :root{--petrol:#0E5A6D;--petrol-dark:#083845;--ink:#0E2A31;--mint:#2DD4A8;--mint-dark:#14b894;--bg:#F6FAFB;--soft:#EAF3F4;--line:#dbe8ea;--muted:#5B7882;--green:#14794f;--green-bg:#e7f7f1;--amber:#c97a17;--amber-bg:#fdf0e0;--red:#c0392b;--red-bg:#fdecea;--blue:#2563a8;--blue-bg:#e8f1fb;--violet:#6b46c1;--violet-bg:#efe9fb}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--ink);background:var(--bg)}
-header{background:linear-gradient(135deg,var(--petrol),var(--petrol-dark));color:#fff;padding:14px 0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--ink);background:var(--bg);-webkit-tap-highlight-color:transparent}
+header{background:linear-gradient(135deg,var(--petrol),var(--petrol-dark));color:#fff;padding:calc(14px + env(safe-area-inset-top)) 0 14px;position:sticky;top:0;z-index:40}
 .wrap{max-width:980px;margin:0 auto;padding:0 18px}
 .top{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.4px}
@@ -22,20 +29,21 @@ header{background:linear-gradient(135deg,var(--petrol),var(--petrol-dark));color
 .logo b{color:var(--mint)}
 .subtitle{color:#bcd6db;font-size:12.5px;margin-top:3px}
 .usr{display:flex;align-items:center;gap:10px}
-.usr .who{font-size:12.5px;color:#cfe3e6;text-align:right;line-height:1.3;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.usr a,.usr button{color:#cfe3e6;text-decoration:none;font-size:13px;font-weight:600;background:rgba(255,255,255,.12);border:none;border-radius:8px;padding:7px 11px;cursor:pointer;font-family:inherit}
+.usr .who{font-size:12.5px;color:#cfe3e6;text-align:right;line-height:1.3;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.usr a,.usr button{color:#cfe3e6;text-decoration:none;font-size:13px;font-weight:600;background:rgba(255,255,255,.12);border:none;border-radius:8px;padding:8px 11px;cursor:pointer;font-family:inherit}
 .usr button:hover{background:rgba(255,255,255,.22)}
-main{max-width:980px;margin:0 auto;padding:18px 18px 60px}
+main{max-width:980px;margin:0 auto;padding:16px 18px calc(60px + env(safe-area-inset-bottom))}
 .tabs{display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:5px;margin-bottom:16px;width:fit-content;max-width:100%}
-.tabs button{border:none;background:none;padding:9px 18px;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;color:var(--muted);font-family:inherit;white-space:nowrap}
+.tabs button{border:none;background:none;padding:10px 18px;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;color:var(--muted);font-family:inherit;white-space:nowrap}
 .tabs button.on{background:var(--petrol);color:#fff}
 .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap}
 .bar .right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-input.search{padding:9px 12px;border:1px solid var(--line);border-radius:9px;font-size:14px;font-family:inherit;background:#fff;min-width:230px}
-.btn{display:inline-flex;align-items:center;gap:7px;border:none;border-radius:10px;padding:11px 16px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;text-decoration:none}
+input.search{padding:11px 12px;border:1px solid var(--line);border-radius:9px;font-size:16px;font-family:inherit;background:#fff;min-width:230px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:none;border-radius:10px;padding:12px 16px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;text-decoration:none;min-height:44px}
 .btn-p{background:var(--mint);color:var(--petrol-dark)}.btn-p:hover{background:var(--mint-dark)}
 .btn-g{background:#fff;color:var(--petrol);border:1px solid var(--line)}
-.btn-sm{padding:8px 12px;font-size:13px;border-radius:9px}
+.btn-v{background:var(--violet);color:#fff}
+.btn-sm{padding:9px 12px;font-size:13px;border-radius:9px;min-height:40px}
 .btn-dn{background:var(--red-bg);color:var(--red)}
 .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:16px}
 .kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 14px}
@@ -56,28 +64,38 @@ input.search{padding:9px 12px;border:1px solid var(--line);border-radius:9px;fon
 .pt-field.pend{background:var(--amber-bg);border-radius:8px;padding:5px 9px;color:#6b4413}
 .pt-field.pend b{color:var(--amber)}
 .pt-obs{font-size:12.5px;color:var(--muted);margin-top:5px;white-space:pre-wrap}
-.pt-acts{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
-.pt-acts button{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 9px;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap}
+.pt-acts{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.pt-acts button{background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 10px;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap;min-height:38px}
+.pt-acts .visita{color:#fff;background:var(--violet);border-color:var(--violet);font-weight:700}
 .pt-acts .saida{color:var(--amber);font-weight:700}
 .badge{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:999px;vertical-align:middle}
 .b-alta{background:var(--green-bg);color:var(--green)}.b-obito{background:#eee;color:#555}.b-transf{background:var(--blue-bg);color:var(--blue)}
+.chip-hoje{display:inline-block;font-size:10px;font-weight:800;background:var(--violet-bg);color:var(--violet);border-radius:999px;padding:2px 8px;margin-left:4px}
 .empty{text-align:center;color:var(--muted);padding:42px 18px;background:#fff;border:1px dashed var(--line);border-radius:14px}
 .modal{position:fixed;inset:0;background:rgba(8,56,69,.45);display:flex;align-items:center;justify-content:center;padding:18px;z-index:60}
-.modal .box{background:#fff;border-radius:16px;padding:22px;max-width:600px;width:100%;max-height:93vh;overflow:auto}
-.modal h3{margin-bottom:14px}
+.modal .box{background:#fff;border-radius:16px;padding:22px;max-width:600px;width:100%;max-height:93vh;overflow:auto;-webkit-overflow-scrolling:touch}
+.modal h3{margin-bottom:6px;font-size:18px}
 .field{margin-bottom:12px}.field label{display:block;font-weight:600;font-size:13.5px;margin-bottom:5px}
-.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit;background:#fff}
+.field input,.field select,.field textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:16px;font-family:inherit;background:#fff}
 .field textarea{resize:vertical;min-height:52px;line-height:1.5}
 .field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--mint)}
 .pt-main,.leito,.field input,.field select,.field textarea{text-transform:uppercase}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .three{display:grid;grid-template-columns:90px 1fr 90px;gap:10px}
 .row{display:flex;gap:10px;margin-top:6px;flex-wrap:wrap}
-.hint{font-size:12px;color:var(--muted);margin-top:4px}
+.row.actions{position:sticky;bottom:calc(-1 * env(safe-area-inset-bottom));background:#fff;padding:10px 0 calc(2px + env(safe-area-inset-bottom));margin-top:8px;z-index:2}
+.row.actions .btn{flex:1}
+.hint{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5}
+.sec-h{font-weight:800;color:var(--petrol);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;margin:16px 0 9px;border-top:1px solid var(--line);padding-top:13px}
 .ai-box{background:#eef7f4;border:1px solid #bfe6db;border-radius:12px;padding:13px;margin-bottom:14px}
 .ai-box .ai-h{font-weight:800;color:var(--petrol-dark);font-size:14px;margin-bottom:7px;display:flex;align-items:center;gap:6px}
-.ai-box textarea{width:100%;min-height:90px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;font-family:inherit;resize:vertical;background:#fff;line-height:1.5}
+.ai-box textarea{width:100%;min-height:90px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:16px;font-family:inherit;resize:vertical;background:#fff;line-height:1.5}
 .ai-box textarea:focus{outline:none;border-color:var(--mint)}
+.file-in{display:block;width:100%;font-size:13px;font-family:inherit;margin:6px 0;padding:10px;border:1px dashed #bfe6db;border-radius:10px;background:#fff}
+.thumbs{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.thumb{position:relative;width:76px;height:76px;border-radius:9px;overflow:hidden;border:1px solid var(--line);background:#f0f0f0}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb button{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:12px;line-height:1;padding:0;min-height:0}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid var(--petrol-dark);border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
 @keyframes sp{to{transform:rotate(360deg)}}
 .note{background:var(--soft);border-radius:12px;padding:12px 15px;font-size:13px;color:#28424a;margin-top:16px;line-height:1.6}
@@ -87,9 +105,8 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 .setor-h{font-size:12px;font-weight:800;color:var(--petrol-dark);text-transform:uppercase;letter-spacing:.04em;margin:16px 2px 8px;display:flex;align-items:center;gap:8px}
 .setor-h span{background:var(--soft);color:var(--petrol);border-radius:999px;padding:1px 9px;font-size:11px}
 .pt-pend{margin-top:6px;background:var(--amber-bg);border-radius:9px;padding:7px 10px}
-.pt-pend>b{color:var(--amber);font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;display:block;margin-bottom:3px}
-.pend-item{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;color:#6b4413;padding:2px 0;cursor:pointer}
-.pend-item input{margin-top:2px;flex:0 0 auto;width:16px;height:16px;accent-color:var(--mint-dark);cursor:pointer}
+.pend-item{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;color:#6b4413;padding:3px 0;cursor:pointer}
+.pend-item input{margin-top:2px;flex:0 0 auto;width:18px;height:18px;accent-color:var(--mint-dark);cursor:pointer}
 .pend-item.done span{text-decoration:line-through;color:#9aa8a0}
 .mini-ed{background:none;border:none;cursor:pointer;font-size:12px;opacity:.55;padding:0 4px;vertical-align:middle;font-family:inherit}
 .mini-ed:hover{opacity:1}
@@ -97,7 +114,20 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 .pt-pend-h b{color:var(--amber);font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.03em}
 .pend-empty{font-size:13px;color:var(--muted);padding:2px 0}
 .pt-muted{color:#9aa8a0}
-@media(max-width:680px){.cards{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}.pt-acts{flex-direction:row}}
+.evo-out{min-height:60vh;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.55;text-transform:none!important}
+@media(max-width:680px){
+  .cards{grid-template-columns:1fr 1fr}
+  .two,.three{grid-template-columns:1fr}
+  .modal{padding:0;align-items:flex-end}
+  .modal .box{max-width:100%;max-height:96vh;border-radius:18px 18px 0 0;padding:18px 16px 14px}
+  .pt-card{gap:10px;flex-wrap:wrap}
+  .pt-acts{flex-direction:row;flex-wrap:wrap;align-items:stretch;width:100%}
+  .pt-acts button{flex:1 1 44%}
+  .bar{gap:8px}
+  input.search{min-width:0;width:100%;flex:1 1 100%}
+  .bar .right{width:100%}
+  .bar .right .btn{flex:1}
+}
 </style>
 </head>
 <body>
@@ -105,7 +135,7 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
   <div class="wrap top">
     <div>
       <div class="logo"><span class="mark">🛏️</span> Enfermar<b>IA</b></div>
-      <div class="subtitle">Gestão de pacientes internados · com extração por IA · por MedTech</div>
+      <div class="subtitle">Visita beira-leito · evolução por IA · por MedTech</div>
     </div>
     <div class="usr" id="usr"></div>
   </div>
@@ -125,8 +155,9 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 <script>
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const SAIDA={alta:{l:'Alta',c:'b-alta'},obito:{l:'Óbito',c:'b-obito'},transferencia:{l:'Transferência',c:'b-transf'}};
+const EF_TEMPLATE='- NEURO: \n- AC: \n- AP: \n- ABDOME: \n- EXT: \n- PELE: ';
 let state={pacientes:[]};
-let tab='ativos', busca='';
+let tab='ativos', busca='', visitaImgs=[];
 
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
 function nowISO(){return new Date().toISOString();}
@@ -134,11 +165,12 @@ function ymd(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1
 function fmtData(s){if(!s)return '';const d=new Date((s.length<=10?s+'T00:00:00':s));if(isNaN(d))return esc(s);return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();}
 function setVal(id,v){const e=document.getElementById(id);if(e!=null&&v!=null)e.value=v;}
 function getVal(id){const e=document.getElementById(id);return e?e.value.trim():'';}
+function up(s){return String(s==null?'':s).toUpperCase();}
 
 /* ===== boot ===== */
 function sampleSeed(){return {pacientes:[
-  {id:uid(),leito:'12A',setor:'Enfermaria',nome:'Maria Souza',idade:'74 anos',sexo:'F',diagnosticos:'Pneumonia adquirida na comunidade\nHAS, DM2',exames:'RX tórax: consolidação em base direita\nLeucograma 15.000 com desvio · PCR 180 · Creatinina 1,3',condutas:'Ceftriaxona + azitromicina (D2)',pendencias:[{id:uid(),t:'Colher hemocultura',done:false},{id:uid(),t:'Controle de PCR em 48h',done:false}],obs:'',status:'ativo',criadoEm:nowISO()},
-  {id:uid(),leito:'UTI 3',setor:'UTI',nome:'João Lima',idade:'61 anos',sexo:'M',diagnosticos:'IAM sem supra (NSTEMI)\nIC descompensada',exames:'Troponina em curva ascendente\nECG: infra de ST em V4-V6 · Eco: FE 35%',condutas:'AAS + clopidogrel + enoxaparina',pendencias:[{id:uid(),t:'CAT amanhã',done:false},{id:uid(),t:'Ajustar diurético',done:false}],obs:'Aguardando vaga em hemodinâmica.',status:'ativo',criadoEm:nowISO()}
+  {id:uid(),leito:'12A',setor:'Enfermaria',nome:'Maria Souza',idade:'74 anos',sexo:'F',clinica:'Clínica Médica',diagnosticos:'Pneumonia adquirida na comunidade',comorbidades:'HAS, DM2',alergias:'',muc:'Losartana 50 mg/dia',hda:'Quadro de tosse produtiva e febre há 4 dias, com piora da dispneia, admitida em 18/06.',laboratorio:'PCR 180 · leucograma 15.000 com desvio',culturas:'Hemocultura (18/06): em andamento',imagem:'RX tórax: consolidação em base direita',exameFisico:EF_TEMPLATE,evolucao:'',parametros:'',conduta:'Ceftriaxona + azitromicina (D2)',pendencias:[{id:uid(),t:'Colher hemocultura',done:false},{id:uid(),t:'Controle de PCR em 48h',done:false}],obs:'',status:'ativo',criadoEm:nowISO()},
+  {id:uid(),leito:'UTI 3',setor:'UTI',nome:'João Lima',idade:'61 anos',sexo:'M',clinica:'Clínica Médica',diagnosticos:'IAM sem supra (NSTEMI)\nIC descompensada',comorbidades:'HAS, tabagismo',alergias:'',muc:'AAS, sinvastatina',hda:'Dor torácica em aperto iniciada há 1 dia, com dispneia progressiva.',laboratorio:'Troponina em curva ascendente',culturas:'',imagem:'ECG: infra de ST em V4-V6 · Eco: FE 35%',exameFisico:EF_TEMPLATE,evolucao:'',parametros:'',conduta:'AAS + clopidogrel + enoxaparina',pendencias:[{id:uid(),t:'CAT amanhã',done:false},{id:uid(),t:'Ajustar diurético',done:false}],obs:'Aguardando vaga em hemodinâmica.',status:'ativo',criadoEm:nowISO()}
 ]};}
 function normalize(d){d=d&&typeof d==='object'?d:{};return {pacientes:Array.isArray(d.pacientes)?d.pacientes:[]};}
 
@@ -162,25 +194,28 @@ function ativos(){return state.pacientes.filter(p=>p.status!=='saida');}
 function saidos(){return state.pacientes.filter(p=>p.status==='saida');}
 function leitoSort(a,b){return String(a.setor||'').localeCompare(String(b.setor||''))||String(a.leito||'').localeCompare(String(b.leito||''),'pt',{numeric:true});}
 function render(){tab==='ativos'?renderAtivos():renderSaidas();}
+function examesFmt(p){return [p.laboratorio,p.culturas,p.imagem].filter(Boolean).join('\n')||p.exames||'';}
 
 function matchBusca(p){const q=busca.trim().toLowerCase();if(!q)return true;return [p.leito,p.nome,p.diagnosticos,p.setor].some(x=>(x||'').toLowerCase().includes(q));}
 
 function ptCard(p){
   const meta=[p.idade||'',p.sexo||'',p.setor||''].filter(Boolean).join(' · ');
   const pend=(p.pendencias||[]);
-  const edBtn=campo=>`<button class="mini-ed" onclick="editCampo('${p.id}','${campo}')">✏️</button>`;
-  const pendHtml=`<div class="pt-pend"><div class="pt-pend-h"><b>Pendências</b>${edBtn('pendencias')}</div>${pend.length?pend.map(it=>`<label class="pend-item${it.done?' done':''}"><input type="checkbox" ${it.done?'checked':''} onclick="togglePend('${p.id}','${it.id}')"><span>${esc(it.t)}</span></label>`).join(''):'<div class="pend-empty">Nenhuma pendência.</div>'}</div>`;
+  const exFmt=examesFmt(p);
+  const visitHoje=p.visitaEm===ymd();
+  const pendHtml=`<div class="pt-pend"><div class="pt-pend-h"><b>Pendências</b><button class="mini-ed" onclick="editCampo('${p.id}','pendencias')">✏️</button></div>${pend.length?pend.map(it=>`<label class="pend-item${it.done?' done':''}"><input type="checkbox" ${it.done?'checked':''} onclick="togglePend('${p.id}','${it.id}')"><span>${esc(it.t)}</span></label>`).join(''):'<div class="pend-empty">Nenhuma pendência.</div>'}</div>`;
   return `<div class="pt-card">
     <div class="leito"><div class="ln">${esc(p.leito||'—')}</div>${p.setor?`<div class="ls">${esc(p.setor)}</div>`:''}</div>
     <div class="pt-main">
-      <div class="pt-top"><span class="nome">${esc(p.nome||'Paciente')}</span>${meta?`<span class="meta">${esc(meta)}</span>`:''}</div>
-      <div class="pt-field"><b>Dx:</b> ${edBtn('dx')}${p.diagnosticos?('\n'+esc(bullets(p.diagnosticos))):' <span class="pt-muted">—</span>'}</div>
-      <div class="pt-field"><b>Exames:</b> ${edBtn('exames')}${p.exames?('\n'+esc(bullets(p.exames))):' <span class="pt-muted">—</span>'}</div>
+      <div class="pt-top"><span class="nome">${esc(p.nome||'Paciente')}</span>${meta?`<span class="meta">${esc(meta)}</span>`:''}${visitHoje?'<span class="chip-hoje">✓ visto hoje</span>':''}</div>
+      <div class="pt-field"><b>Dx:</b> <button class="mini-ed" onclick="editCampo('${p.id}','dx')">✏️</button>${p.diagnosticos?('\n'+esc(bullets(p.diagnosticos))):' <span class="pt-muted">—</span>'}</div>
+      <div class="pt-field"><b>Exames:</b> <button class="mini-ed" onclick="openForm('${p.id}')">✏️</button>${exFmt?('\n'+esc(bullets(exFmt))):' <span class="pt-muted">—</span>'}</div>
       ${pendHtml}
       ${p.obs?`<div class="pt-obs">📝 ${esc(p.obs)}</div>`:''}
     </div>
     <div class="pt-acts">
-      <button onclick="openForm('${p.id}')">✏️ Ficha</button>
+      <button class="visita" onclick="openVisita('${p.id}')">👨‍⚕️ Visita</button>
+      <button onclick="openForm('${p.id}')">📋 Ficha</button>
       <button class="saida" onclick="openSaida('${p.id}')">🚪 Saída</button>
       <button onclick="delPac('${p.id}')">🗑️</button>
     </div>
@@ -188,18 +223,17 @@ function ptCard(p){
 }
 function editCampo(pid,campo){
   const p=state.pacientes.find(x=>x.id===pid);if(!p)return;
-  const M={dx:{l:'Diagnósticos / hipóteses',v:bullets(p.diagnosticos)},exames:{l:'Principais exames',v:bullets(p.exames)},pendencias:{l:'Pendências',v:(p.pendencias||[]).map(x=>'- '+x.t).join('\n')}}[campo];
+  const M={dx:{l:'Diagnósticos / hipóteses',v:bullets(p.diagnosticos)},pendencias:{l:'Pendências',v:(p.pendencias||[]).map(x=>'- '+x.t).join('\n')}}[campo];
   if(!M)return;
   modal(`<h3>Editar ${M.l}</h3><div class="hint" style="margin-bottom:8px">${esc(p.nome||'Paciente')} · leito ${esc(p.leito||'—')} — um item por linha</div>
    <div class="field"><textarea id="ec_txt" style="min-height:170px" placeholder="- um por linha">${esc(M.v)}</textarea></div>
-   <div class="row"><button class="btn btn-p" onclick="saveCampo('${pid}','${campo}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
+   <div class="row actions"><button class="btn btn-p" onclick="saveCampo('${pid}','${campo}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
   const t=document.getElementById('ec_txt');if(t){t.focus();t.setSelectionRange(t.value.length,t.value.length);}
 }
 function saveCampo(pid,campo){
   const p=state.pacientes.find(x=>x.id===pid);if(!p)return;
   const v=getVal('ec_txt');
   if(campo==='dx')p.diagnosticos=bullets(v);
-  else if(campo==='exames')p.exames=bullets(v);
   else if(campo==='pendencias'){const oldP=p.pendencias||[];p.pendencias=v.split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>o.t===t);return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});}
   persist();closeModal();render();
 }
@@ -253,34 +287,47 @@ function renderSaidas(){
   document.getElementById('view').innerHTML=html;
 }
 
-/* ===== form do paciente (com extração por IA) ===== */
+/* ===== ficha do paciente (dados de base + extração por IA) ===== */
 function openForm(id){
-  const p=id?state.pacientes.find(x=>x.id===id):{leito:'',setor:'',nome:'',idade:'',sexo:'',diagnosticos:'',exames:'',condutas:'',obs:''};
+  const p=id?state.pacientes.find(x=>x.id===id):{leito:'',setor:'',nome:'',idade:'',sexo:'',clinica:'Clínica Médica',diagnosticos:'',comorbidades:'',alergias:'',muc:'',hda:'',laboratorio:'',culturas:'',imagem:'',exameFisico:'',conduta:'',obs:''};
   const sx=['','M','F'].map(k=>`<option value="${k}" ${p.sexo===k?'selected':''}>${k||'—'}</option>`).join('');
   modal(`<h3>${id?'Editar':'Novo'} paciente</h3>
    ${id?'':`<div class="ai-box">
-     <div class="ai-h">✨ Colar evolução — a IA preenche os campos</div>
-     <textarea id="f_evol" placeholder="Cole aqui a evolução / prontuário do paciente. A IA extrai nome, idade, hipóteses diagnósticas, principais exames de imagem e laboratoriais e condutas."></textarea>
-     <div class="row"><button class="btn btn-p btn-sm" id="extrairBtn" onclick="extrairEvol()">✨ Extrair dados da evolução</button></div>
+     <div class="ai-h">✨ Colar evolução — a IA preenche a ficha</div>
+     <textarea id="f_evol" placeholder="Cole aqui a evolução / prontuário do paciente. A IA extrai identificação, comorbidades, HDA, exames, exame físico, conduta e pendências."></textarea>
+     <div class="row"><button class="btn btn-p btn-sm" id="extrairBtn" onclick="extrairEvol()">✨ Extrair dados</button></div>
      <div class="hint">Revise sempre o que a IA preencher. O <b>leito</b> você informa manualmente.${MT.mode==='demo'?' <b>Entre na conta MedTech para usar a IA.</b>':''}</div>
    </div>`}
+   <div class="sec-h">Identificação</div>
    <div class="three"><div class="field"><label>Leito *</label><input id="f_leito" value="${esc(p.leito)}" placeholder="12A"></div>
      <div class="field"><label>Nome</label><input id="f_nome" value="${esc(p.nome)}" placeholder="Nome do paciente"></div>
      <div class="field"><label>Idade</label><input id="f_idade" value="${esc(p.idade)}" placeholder="74 anos"></div></div>
-   <div class="two"><div class="field"><label>Setor / unidade</label><input id="f_setor" value="${esc(p.setor)}" placeholder="Enfermaria, UTI, etc."></div>
-     <div class="field"><label>Sexo</label><select id="f_sexo">${sx}</select></div></div>
-   <div class="field"><label>Diagnósticos / hipóteses <span style="color:var(--muted);font-weight:400">(um por linha)</span></label><textarea id="f_dx" placeholder="- um por linha">${esc(bullets(p.diagnosticos))}</textarea></div>
-   <div class="field"><label>Principais exames <span style="color:var(--muted);font-weight:400">(um por linha)</span></label><textarea id="f_exames" placeholder="- imagem e laboratório investigativos (um por linha)">${esc(bullets(p.exames))}</textarea></div>
-   <div class="field"><label>Pendências <span style="color:var(--muted);font-weight:400">(uma por linha — você marca como feitas na lista)</span></label><textarea id="f_pend" placeholder="- colher hemocultura&#10;- controle de PCR em 48h&#10;- avaliar com a cirurgia">${esc((p.pendencias||[]).map(x=>'- '+x.t).join('\n'))}</textarea></div>
+   <div class="three"><div class="field"><label>Setor / unidade</label><input id="f_setor" value="${esc(p.setor)}" placeholder="Enfermaria, UTI..."></div>
+     <div class="field"><label>Sexo</label><select id="f_sexo">${sx}</select></div>
+     <div class="field"><label>Clínica</label><input id="f_clinica" value="${esc(p.clinica||'Clínica Médica')}" placeholder="Clínica Médica"></div></div>
+   <div class="field"><label>Motivo da internação / hipóteses <span style="color:var(--muted);font-weight:400">(um por linha — vira o "IH POR")</span></label><textarea id="f_dx" placeholder="- um por linha">${esc(bullets(p.diagnosticos))}</textarea></div>
+   <div class="sec-h">Dados de base</div>
+   <div class="field"><label>Comorbidades</label><textarea id="f_comorb" placeholder="HAS, DM2...">${esc(p.comorbidades||'')}</textarea></div>
+   <div class="two"><div class="field"><label>Alergias</label><input id="f_alergias" value="${esc(p.alergias||'')}" placeholder="Nega / ..."></div>
+     <div class="field"><label>Uso contínuo (MUC)</label><input id="f_muc" value="${esc(p.muc||'')}" placeholder="Losartana 50 mg/dia"></div></div>
+   <div class="field"><label>HDA</label><textarea id="f_hda" placeholder="História da doença atual" style="min-height:80px">${esc(p.hda||'')}</textarea></div>
+   <div class="sec-h">Exames</div>
+   <div class="field"><label>Laboratório <span style="color:var(--muted);font-weight:400">(um por linha)</span></label><textarea id="f_lab" placeholder="- investigativos (um por linha)">${esc(bullets(p.laboratorio||p.exames))}</textarea></div>
+   <div class="field"><label>Culturas / sorologias <span style="color:var(--muted);font-weight:400">(um por linha)</span></label><textarea id="f_culturas" placeholder="- hemocultura, urocultura...">${esc(bullets(p.culturas))}</textarea></div>
+   <div class="field"><label>Exames de imagem <span style="color:var(--muted);font-weight:400">(um por linha)</span></label><textarea id="f_imagem" placeholder="- RX, USG, TC, eco...">${esc(bullets(p.imagem))}</textarea></div>
+   <div class="sec-h">Pendências e observações</div>
+   <div class="field"><label>Pendências <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="f_pend" placeholder="- colher hemocultura&#10;- avaliar com a cirurgia">${esc((p.pendencias||[]).map(x=>'- '+x.t).join('\n'))}</textarea></div>
    <div class="field"><label>Observações</label><textarea id="f_obs" placeholder="Anotações livres">${esc(p.obs)}</textarea></div>
-   <div class="row"><button class="btn btn-p" onclick="saveForm('${id||''}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
+   <textarea id="f_ef" style="display:none">${esc(p.exameFisico||'')}</textarea>
+   <textarea id="f_conduta" style="display:none">${esc(bullets(p.conduta))}</textarea>
+   <div class="row actions"><button class="btn btn-p" onclick="saveForm('${id||''}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
 }
 function saveForm(id){
   const oldP=id?((state.pacientes.find(x=>x.id===id)||{}).pendencias||[]):[];
   const pend=getVal('f_pend').split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>o.t===t);return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});
-  const o={leito:getVal('f_leito'),setor:getVal('f_setor'),nome:getVal('f_nome'),idade:getVal('f_idade'),sexo:getVal('f_sexo'),diagnosticos:bullets(getVal('f_dx')),exames:bullets(getVal('f_exames')),pendencias:pend,obs:getVal('f_obs')};
+  const o={leito:getVal('f_leito'),setor:getVal('f_setor'),nome:getVal('f_nome'),idade:getVal('f_idade'),sexo:getVal('f_sexo'),clinica:getVal('f_clinica'),diagnosticos:bullets(getVal('f_dx')),comorbidades:getVal('f_comorb'),alergias:getVal('f_alergias'),muc:getVal('f_muc'),hda:getVal('f_hda'),laboratorio:bullets(getVal('f_lab')),culturas:bullets(getVal('f_culturas')),imagem:bullets(getVal('f_imagem')),exameFisico:getVal('f_ef'),conduta:bullets(getVal('f_conduta')),pendencias:pend,obs:getVal('f_obs')};
   if(!o.leito&&!o.nome){alert('Informe ao menos o leito ou o nome do paciente.');return;}
-  if(id){Object.assign(state.pacientes.find(x=>x.id===id),o);}
+  if(id){const cur=state.pacientes.find(x=>x.id===id);delete cur.exames;Object.assign(cur,o);}
   else{state.pacientes.push({id:uid(),status:'ativo',criadoEm:nowISO(),...o});}
   persist();closeModal();render();
 }
@@ -289,7 +336,107 @@ function delPac(id){const p=state.pacientes.find(x=>x.id===id);if(!p)return;
 function reabrir(id){const p=state.pacientes.find(x=>x.id===id);if(!p)return;p.status='ativo';delete p.saida;persist();render();}
 function togglePend(pid,itemId){const p=state.pacientes.find(x=>x.id===pid);if(!p)return;const it=(p.pendencias||[]).find(x=>x.id===itemId);if(!it)return;it.done=!it.done;persist();renderAtivos();}
 function oneLine(s){return String(s||'').replace(/\s*\n\s*/g,'; ').trim();}
-function bullets(s){return String(s||'').split('\n').map(x=>x.trim()).filter(Boolean).map(x=>/^[-•*]/.test(x)?('- '+x.replace(/^[-•*]\s*/,'')):('- '+x)).join('\n');}
+function bullets(s){return String(s||'').split('\n').map(x=>x.trim()).filter(Boolean).map(x=>/^[-•*>]/.test(x)?('- '+x.replace(/^[-•*>]\s*/,'')):('- '+x)).join('\n');}
+function gtbul(s){return String(s||'').split('\n').map(x=>x.trim()).filter(Boolean).map(x=>'> '+x.replace(/^[-•*>]\s*/,'')).join('\n');}
+
+/* ===== visita beira-leito ===== */
+function openVisita(id){
+  const p=state.pacientes.find(x=>x.id===id);if(!p)return;
+  visitaImgs=[];
+  const ef=(p.exameFisico&&p.exameFisico.trim())?p.exameFisico:EF_TEMPLATE;
+  modal(`<h3>👨‍⚕️ Visita · ${esc(p.nome||'Paciente')}</h3>
+   <div class="hint" style="margin-bottom:6px">Leito ${esc(p.leito||'—')}${p.idade?(' · '+esc(p.idade)):''}. Atualize a evolução do dia — o exame físico já vem do dia anterior, edite só o que mudou.</div>
+   <div class="field"><label>Evolução do dia <span style="color:var(--muted);font-weight:400">(queixas / intercorrências)</span></label><textarea id="v_evol" placeholder="Paciente estável, sem queixas no período..." style="min-height:80px">${esc(p.evolucao||'')}</textarea></div>
+   <div class="ai-box">
+     <div class="ai-h">📷 Parâmetros das últimas 24h (foto)</div>
+     <div class="hint">Tire foto do controle hemodinâmico e, se tiver, da folha de diurese/balanço hídrico. A IA transcreve para a linha de parâmetros.</div>
+     <input class="file-in" type="file" id="v_imgs" accept="image/*" multiple onchange="addParamImgs(event)">
+     <div id="v_thumbs" class="thumbs"></div>
+     <div class="row"><button class="btn btn-p btn-sm" id="transBtn" onclick="transcreverParams()">✨ Transcrever parâmetros</button></div>
+   </div>
+   <div class="field"><label>Parâmetros</label><textarea id="v_param" placeholder="PA ... // FC ... // FR ... // T ... // SPO2 ... // DX ... // DIURESE ... // BH ..." style="min-height:70px">${esc(p.parametros||'')}</textarea></div>
+   <div class="field"><label>Exame físico</label><textarea id="v_ef" style="min-height:150px">${esc(ef)}</textarea></div>
+   <div class="field"><label>Conduta <span style="color:var(--muted);font-weight:400">(uma por linha — "EXPLICO PLANO TERAPEUTICO" entra automático)</span></label><textarea id="v_conduta" placeholder="- mantenho atb&#10;- solicito nova rotina" style="min-height:90px">${esc(p.conduta||'')}</textarea></div>
+   <div class="field"><label>Pendências <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="v_pend" placeholder="- ...">${esc((p.pendencias||[]).map(x=>'- '+x.t).join('\n'))}</textarea></div>
+   <div class="row actions"><button class="btn btn-p" onclick="saveVisita('${id}',true)">📄 Gerar evolução</button><button class="btn btn-g" onclick="saveVisita('${id}',false)">Salvar</button></div>`);
+}
+function saveVisita(id,gerar){
+  const p=state.pacientes.find(x=>x.id===id);if(!p)return;
+  p.evolucao=getVal('v_evol');
+  p.parametros=getVal('v_param');
+  p.exameFisico=getVal('v_ef');
+  p.conduta=getVal('v_conduta');
+  const oldP=p.pendencias||[];
+  p.pendencias=getVal('v_pend').split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>o.t===t);return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});
+  p.visitaEm=ymd();
+  persist();
+  if(gerar)verEvolucao(id);else{closeModal();render();}
+}
+
+/* fotos dos parâmetros */
+function addParamImgs(ev){
+  const files=[...(ev.target.files||[])];
+  files.forEach(f=>{if(!/^image\//.test(f.type))return;const r=new FileReader();r.onload=()=>downscale(r.result,1600,.82,(dataUrl)=>{visitaImgs.push({data:dataUrl.split(',')[1],mimeType:'image/jpeg',thumb:dataUrl});renderThumbs();});r.readAsDataURL(f);});
+  ev.target.value='';
+}
+function renderThumbs(){const box=document.getElementById('v_thumbs');if(!box)return;box.innerHTML=visitaImgs.map((im,i)=>`<div class="thumb"><img src="${im.thumb}"><button onclick="rmThumb(${i})">✕</button></div>`).join('');}
+function rmThumb(i){visitaImgs.splice(i,1);renderThumbs();}
+function downscale(dataUrl,maxDim,q,cb){const img=new Image();img.onload=()=>{let w=img.width,h=img.height;const sc=Math.min(1,maxDim/Math.max(w,h));const cw=Math.max(1,Math.round(w*sc)),ch=Math.max(1,Math.round(h*sc));const c=document.createElement('canvas');c.width=cw;c.height=ch;c.getContext('2d').drawImage(img,0,0,cw,ch);try{cb(c.toDataURL('image/jpeg',q));}catch(e){cb(dataUrl);}};img.onerror=()=>cb(dataUrl);img.src=dataUrl;}
+const PARAM_PROMPT='Você recebe FOTO(S) da folha de CONTROLE HEMODINÂMICO e, possivelmente, de uma folha SEPARADA de DIURESE/BALANÇO HÍDRICO das últimas 24h de um paciente internado. Transcreva os sinais vitais e calcule as faixas mínimo–máximo. Responda APENAS UMA LINHA, em MAIÚSCULAS, exatamente neste formato, sem o rótulo "PARÂMETROS:" e sem nenhum texto extra:\n'
+ +'PA [sis_min-sis_max] X [dia_min-dia_max] MMHG // FC [min-max] BPM // FR [min-max] IRPM // T [min-max] ºC // SPO2 [min-max]% // DX [valores em ordem de horário separados por hífen, sem espaços] MG/DL // DIURESE [valor/descrição] // BH [valor com sinal]\n'
+ +'REGRAS: (1) PA = curva sistólica × diastólica (ex.: PA 100-140 X 60-80); leia os pares completos sis×dia da linha superior do campo de pressão; se houver só um valor, use-o; NUNCA inclua PAM. '
+ +'(2) DX: valores em ordem de horário separados por "-" sem espaços (ex.: DX 124-154-198 MG/DL) — o hífen é separador de horário, não faixa; se uma só medida, registre só ela; se não houver, escreva DX NÃO AFERIDA (sem unidade). '
+ +'(3) DIURESE e BH vêm da folha separada; inclua na MESMA linha (ex.: DIURESE ~1500 ML // BH +1200 ML); se não houver, DIURESE NÃO AFERIDA e/ou BH NÃO AFERIDO. '
+ +'(4) DÉBITO DE DRENO: se houver na folha de balanço, acrescente "// DEBITO DE DRENO [valor]"; se não houver, omita. '
+ +'(5) Se algum sinal não estiver na foto, omita esse campo (não invente). Responda só a linha.';
+async function transcreverParams(){
+  if(!visitaImgs.length){alert('Anexe ao menos uma foto dos parâmetros.');return;}
+  const b=document.getElementById('transBtn');b.innerHTML='<span class="spin"></span> Transcrevendo...';b.disabled=true;
+  try{
+    const out=await MT.aiImage(visitaImgs.map(im=>({data:im.data,mimeType:im.mimeType})),PARAM_PROMPT);
+    const clean=String(out||'').replace(/^```[a-z]*\s*/i,'').replace(/```\s*$/,'').replace(/^\s*PARÂMETROS:\s*/i,'').trim();
+    if(clean)setVal('v_param',up(clean));
+    b.innerHTML='✓ Transcrito';setTimeout(()=>{b.innerHTML='✨ Transcrever parâmetros';b.disabled=false;},1600);
+    return;
+  }catch(e){alert('⚠️ '+(e.message||'Falha na IA.'));}
+  b.innerHTML='✨ Transcrever parâmetros';b.disabled=false;
+}
+
+/* evolução pronta para colar */
+function condutaComExplico(s){
+  const lines=String(s||'').split('\n').map(x=>x.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).filter(x=>!/EXPLICO[\s\S]*PLANO\s+TERAP/i.test(x));
+  lines.push('EXPLICO PLANO TERAPEUTICO');
+  return lines.map(x=>'- '+x).join('\n');
+}
+function gerarEvolucao(p){
+  const L=[];
+  L.push('# EVOLUÇÃO MÉDICA - '+(p.clinica||'Clínica Médica'));
+  L.push('# ID: '+(p.nome||'')+(p.idade?(', '+p.idade):'')+', IH POR:');
+  if(p.diagnosticos)L.push(bullets(p.diagnosticos));
+  if(p.comorbidades)L.push('# COMORBIDADES: '+oneLine(p.comorbidades));
+  if(p.alergias)L.push('> ALERGIAS: '+oneLine(p.alergias));
+  if(p.muc)L.push('> MUC: '+oneLine(p.muc));
+  if(p.hda)L.push('# HDA: '+oneLine(p.hda));
+  if(p.evolucao)L.push('# EVOLUÇÃO: '+oneLine(p.evolucao));
+  if(p.parametros)L.push('# PARÂMETROS: '+oneLine(p.parametros).replace(/^\s*PARÂMETROS:\s*/i,''));
+  if(p.exameFisico&&p.exameFisico.trim()){L.push('# EXAME FÍSICO:');L.push(bullets(p.exameFisico));}
+  const lab=p.laboratorio||p.exames||'';
+  if(lab){L.push('# LABORATÓRIO:');L.push(bullets(lab));}
+  if(p.culturas){L.push('# CULTURAS:');L.push(gtbul(p.culturas));}
+  if(p.imagem){L.push('# EXAMES DE IMAGEM');L.push(gtbul(p.imagem));}
+  L.push('# CONDUTA:');L.push(condutaComExplico(p.conduta));
+  return up(L.join('\n'));
+}
+function verEvolucao(id){
+  const p=state.pacientes.find(x=>x.id===id);if(!p)return;
+  const txt=gerarEvolucao(p);
+  modal(`<h3>📄 Evolução — pronta para colar</h3>
+   <div class="hint" style="margin-bottom:8px">${esc(p.nome||'Paciente')} · leito ${esc(p.leito||'—')}. Revise antes de colar no sistema do hospital.</div>
+   <div class="field"><textarea id="evoTa" class="evo-out">${esc(txt)}</textarea></div>
+   <div class="row actions"><button class="btn btn-p" id="copyEvoBtn" onclick="copyTa('evoTa','copyEvoBtn','📋 Copiar evolução')">📋 Copiar evolução</button><button class="btn btn-g" onclick="openVisita('${id}')">← Voltar</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
+}
+function copyTa(taId,btnId,label){const t=document.getElementById(taId);if(!t)return;t.focus();t.select();try{document.execCommand('copy');}catch(e){}if(navigator.clipboard){try{navigator.clipboard.writeText(t.value);}catch(e){}}const b=document.getElementById(btnId);if(b){b.textContent='✓ Copiado';setTimeout(()=>b.textContent=label,1600);}}
+
 function resumoPlantao(){
   const list=ativos();
   if(!list.length){alert('Não há pacientes internados para resumir.');return;}
@@ -298,13 +445,12 @@ function resumoPlantao(){
   grupoKeys(g).forEach(k=>{txt+='\n== '+k+' ('+g[k].length+') ==\n';
     g[k].forEach(p=>{txt+='\n['+(p.leito||'—')+'] '+(p.nome||'Paciente')+(p.idade?(', '+p.idade):'')+'\n';
       if(p.diagnosticos)txt+='Dx:\n'+bullets(p.diagnosticos)+'\n';
-      if(p.exames)txt+='Exames:\n'+bullets(p.exames)+'\n';
+      const ex=examesFmt(p);if(ex)txt+='Exames:\n'+bullets(ex)+'\n';
       const pend=(p.pendencias||[]).filter(x=>!x.done);
       if(pend.length)txt+='Pendências:\n'+pend.map(x=>'- '+x.t).join('\n')+'\n';
       if(p.obs)txt+='Obs: '+oneLine(p.obs)+'\n';});});
-  modal(`<h3>📋 Passar plantão</h3><div class="hint" style="margin-bottom:8px">Resumo dos ${list.length} internado(s), agrupado por setor (só pendências em aberto). Revise e copie.</div><div class="field"><textarea id="resumoTa" style="min-height:320px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.55">${esc(txt.toUpperCase())}</textarea></div><div class="row"><button class="btn btn-p" id="copyResBtn" onclick="copyResumo()">📋 Copiar tudo</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
+  modal(`<h3>📋 Passar plantão</h3><div class="hint" style="margin-bottom:8px">Resumo dos ${list.length} internado(s), agrupado por setor (só pendências em aberto). Revise e copie.</div><div class="field"><textarea id="resumoTa" class="evo-out" style="min-height:50vh">${esc(txt.toUpperCase())}</textarea></div><div class="row actions"><button class="btn btn-p" id="copyResBtn" onclick="copyTa('resumoTa','copyResBtn','📋 Copiar tudo')">📋 Copiar tudo</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
 }
-function copyResumo(){const t=document.getElementById('resumoTa');if(!t)return;t.focus();t.select();try{document.execCommand('copy');}catch(e){}if(navigator.clipboard){try{navigator.clipboard.writeText(t.value);}catch(e){}}const b=document.getElementById('copyResBtn');if(b){const o=b.textContent;b.textContent='✓ Copiado';setTimeout(()=>b.textContent=o,1500);}}
 
 /* ===== saída (alta / óbito / transferência) ===== */
 function openSaida(id){
@@ -315,7 +461,7 @@ function openSaida(id){
    <div class="two"><div class="field"><label>Data</label><input id="s_data" type="date" value="${ymd()}"></div>
      <div class="field" id="s_destWrap" style="display:none"><label>Destino</label><input id="s_dest" placeholder="Hospital / setor de destino"></div></div>
    <div class="field"><label>Observações da saída (opcional)</label><textarea id="s_obs" placeholder="Resumo, orientações, motivo..."></textarea></div>
-   <div class="row"><button class="btn btn-p" onclick="saveSaida('${id}')">Confirmar saída</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
+   <div class="row actions"><button class="btn btn-p" onclick="saveSaida('${id}')">Confirmar saída</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
 }
 function saidaToggle(){const t=document.getElementById('s_tipo').value;const w=document.getElementById('s_destWrap');if(w)w.style.display=(t==='transferencia')?'':'none';}
 function saveSaida(id){
@@ -331,13 +477,21 @@ async function extrairEvol(){
   const raw=getVal('f_evol');
   if(!raw){alert('Cole a evolução do paciente antes de extrair.');return;}
   const b=document.getElementById('extrairBtn');b.innerHTML='<span class="spin"></span> Extraindo...';b.disabled=true;
-  const prompt='Você é um assistente clínico extraindo dados de uma evolução de paciente INTERNADO para um painel de enfermaria. Responda APENAS um objeto JSON válido (sem markdown, sem comentários) com EXATAMENTE estas chaves:\n'
+  const prompt='Você é um assistente clínico extraindo dados de uma evolução/prontuário de paciente INTERNADO para um sistema de enfermaria. Responda APENAS um objeto JSON válido (sem markdown, sem comentários) com EXATAMENTE estas chaves:\n'
    +'- "nome" (string)\n'
-   +'- "idade" (string, ex.: "47 anos")\n'
-   +'- "diagnosticos" (ARRAY de strings): SOMENTE o MOTIVO DA INTERNAÇÃO / as hipóteses que justificaram a internação (costuma vir logo após a identificação). CADA hipótese/diagnóstico em um ITEM SEPARADO do array. NUNCA junte duas hipóteses no mesmo item (não use "e" nem vírgula para unir hipóteses distintas — separe em itens). NÃO liste comorbidades/diagnósticos prévios de rotina (HAS, DM2, etc.), a não ser que sejam o motivo da internação.\n'
-   +'- "exames" (ARRAY de strings): SOMENTE os exames INVESTIGATIVOS do quadro atual, UM exame por item, com o resultado relevante. Para exames LABORATORIAIS, NÃO inclua os de ROTINA — hemograma, função renal (ureia/creatinina) e eletrólitos (sódio/potássio/magnésio/cálcio) — inclua apenas os NÃO-rotineiros/investigativos (ex.: culturas/hemocultura/urocultura, sorologias, marcadores, PCR/procalcitonina, lactato, enzimas específicas, hormônios/TSH, líquor, gasometria com alteração relevante). Exames de IMAGEM investigativos entram normalmente. NÃO inclua exames de rotina/controle de praxe.\n'
-   +'- "pendencias" (ARRAY de strings curtas): o que IMPEDE A ALTA neste momento — extraído sobretudo do que aparece APÓS a linha/título "CONDUTA"/"PLANO". UMA por item (ex.: aguardar resultado de exame, avaliação de especialidade, conclusão de antibiótico, melhora clínica, vaga). Ignore o que já foi resolvido. ANTIBIÓTICOS EM USO: para CADA antibiótico citado na conduta que tenha um dia de início (DI / D1 / "iniciado em" / "início em"), crie uma pendência separada no formato exato "<ANTIBIÓTICO> DI <DD/MM> - programado até <DD/MM>", usando a data de início informada e o término programado quando a evolução der a duração/término (ex.: "Tazocin DI 14/06 - programado até 28/06"); se a duração/término não estiver explícita, escreva "<ANTIBIÓTICO> DI <DD/MM> - programado até [definir]".\n'
-   +'Cada array deve ter um item por elemento (a interface mostra um por linha). Não invente nada; se algo não estiver no texto, use array vazio. Use português do Brasil.\n\nEvolução:\n'+raw;
+   +'- "idade" (string, ex.: "78 anos")\n'
+   +'- "diagnosticos" (ARRAY de strings): SOMENTE o MOTIVO DA INTERNAÇÃO / hipóteses que justificaram a internação (o "IH POR"). CADA hipótese em um ITEM SEPARADO. NUNCA junte duas no mesmo item.\n'
+   +'- "comorbidades" (string): comorbidades/doenças prévias separadas por vírgula. "" se não houver.\n'
+   +'- "alergias" (string): alergias relatadas. "" se não houver.\n'
+   +'- "muc" (string): medicações de USO CONTÍNUO/domiciliar (o "USO DE"), separadas por vírgula. "" se não houver.\n'
+   +'- "hda" (string): a História da Doença Atual em um parágrafo. "" se não houver.\n'
+   +'- "laboratorio" (ARRAY de strings): exames LABORATORIAIS relevantes (um por item, com data e resultado). NÃO inclua rotina pura (hemograma/função renal/eletrólitos) salvo se alterada e relevante. Resultados de CULTURAS/SOROLOGIAS vão em "culturas".\n'
+   +'- "culturas" (ARRAY de strings): hemoculturas, uroculturas, culturas, sorologias e painéis virais (um por item, com data e resultado). [] se não houver.\n'
+   +'- "imagem" (ARRAY de strings): exames de IMAGEM (RX, USG, TC, RM, ECO) — um por item, com o achado resumido. [] se não houver.\n'
+   +'- "exameFisico" (string): o EXAME FÍSICO em linhas começando por "- ", uma por aparelho, nesta ordem quando houver: "- NEURO:", "- AC:", "- AP:", "- ABDOME:", "- EXT:", "- PELE:" (mapeie SCR→AC, SR→AP, TGI→ABDOME). "" se não houver.\n'
+   +'- "conduta" (ARRAY de strings): cada item da CONDUTA/PLANO atual (um por item). NÃO inclua nenhuma linha de "explico plano terapêutico" (ela é adicionada automaticamente).\n'
+   +'- "pendencias" (ARRAY de strings curtas): o que IMPEDE A ALTA agora (sobretudo após "CONDUTA"/"PLANO"). Para CADA antibiótico em uso com dia de início (DI/D1/"iniciado em"), crie uma pendência "<ATB> DI <DD/MM> - programado até <DD/MM>" (ou "[definir]" se não houver término).\n'
+   +'Não invente nada; use "" ou [] quando não houver. Português do Brasil.\n\nEvolução:\n'+raw;
   try{
     const txt=await MT.ai(prompt);
     const data=parseJsonLoose(txt);
@@ -346,20 +500,31 @@ async function extrairEvol(){
       const toLines=v=>Array.isArray(v)?v.filter(Boolean).join('\n'):(v||'');
       setVal('f_nome',data.nome||'');
       setVal('f_idade',data.idade||'');
+      setVal('f_comorb',data.comorbidades||'');
+      setVal('f_alergias',data.alergias||'');
+      setVal('f_muc',data.muc||'');
+      setVal('f_hda',data.hda||'');
       setVal('f_dx',bullets(toLines(data.diagnosticos)));
-      setVal('f_exames',bullets(toLines(data.exames)));
+      setVal('f_lab',bullets(toLines(data.laboratorio)));
+      setVal('f_culturas',bullets(toLines(data.culturas)));
+      setVal('f_imagem',bullets(toLines(data.imagem)));
       setVal('f_pend',bullets(toLines(data.pendencias)));
+      setVal('f_ef',data.exameFisico||'');
+      setVal('f_conduta',bullets(toLines(data.conduta)));
       const okN=(data.nome||'')?'':' (nome não encontrado)';
-      const bb=document.getElementById('extrairBtn');if(bb){bb.innerHTML='✓ Campos preenchidos'+okN;setTimeout(()=>{bb.innerHTML='✨ Extrair dados da evolução';bb.disabled=false;},1800);}
+      const bb=document.getElementById('extrairBtn');if(bb){bb.innerHTML='✓ Ficha preenchida'+okN;setTimeout(()=>{bb.innerHTML='✨ Extrair dados';bb.disabled=false;},1800);}
       return;
     }
   }catch(e){alert('⚠️ '+(e.message||'Falha na IA.'));}
-  b.innerHTML='✨ Extrair dados da evolução';b.disabled=false;
+  b.innerHTML='✨ Extrair dados';b.disabled=false;
 }
 
 /* ===== modal ===== */
 function modal(html){document.querySelectorAll('.modal').forEach(m=>m.remove());const d=document.createElement('div');d.className='modal';d.id='modal';d.innerHTML='<div class="box">'+html+'</div>';d.onclick=e=>{if(e.target===d)closeModal();};document.body.appendChild(d);}
 function closeModal(){const m=document.getElementById('modal');if(m)m.remove();}
+
+/* ===== PWA ===== */
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
 </script>
 </body>
 </html>
