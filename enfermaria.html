@@ -467,13 +467,36 @@ function gerarEvolucao(p){
   L.push('# CONDUTA:');L.push(condutaComExplico(p.conduta));
   return up(L.join('\n'));
 }
+function lineToHtml(line){
+  if(line==='')return '<div><br></div>';
+  if(/^# EVOLUÇÃO MÉDICA/.test(line)||/^# EXAME FÍSICO:/.test(line)||/^# LABORATÓRIO:/.test(line)||/^# CULTURAS:/.test(line)||/^# EXAMES DE IMAGEM/.test(line)||/^# CONDUTA:/.test(line))
+    return '<div><b>'+esc(line)+'</b></div>';
+  const m=line.match(/^((?:#|>) (?:ID|COMORBIDADES|ALERGIAS|MUC|HDA|EVOLUÇÃO|PARÂMETROS):)([\s\S]*)$/);
+  if(m)return '<div><b>'+esc(m[1])+'</b>'+esc(m[2])+'</div>';
+  return '<div>'+esc(line)+'</div>';
+}
+function gerarEvolucaoHtml(p){return gerarEvolucao(p).split('\n').map(lineToHtml).join('');}
+async function copyEvoFmt(id,btnId){
+  const p=state.pacientes.find(x=>x.id===id);if(!p)return;
+  const html=gerarEvolucaoHtml(p), text=gerarEvolucao(p);
+  let ok=false;
+  try{
+    if(navigator.clipboard&&window.ClipboardItem){
+      await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([text],{type:'text/plain'})})]);
+      ok=true;
+    }
+  }catch(e){}
+  if(!ok){const t=document.getElementById('evoTa');if(t){t.focus();t.select();try{document.execCommand('copy');ok=true;}catch(e){}}}
+  const b=document.getElementById(btnId);if(b){b.textContent=ok?'✓ Copiado (formatado)':'Selecione e copie manualmente';setTimeout(()=>b.textContent='📋 Copiar p/ o sistema',2000);}
+}
 function verEvolucao(id){
   const p=state.pacientes.find(x=>x.id===id);if(!p)return;
   const txt=gerarEvolucao(p);
   modal(`<h3>📄 Evolução — pronta para colar</h3>
    <div class="hint" style="margin-bottom:8px">${esc(p.nome||'Paciente')} · leito ${esc(p.leito||'—')}. Revise antes de colar no sistema do hospital.</div>
+   <div class="hint" style="margin:-2px 0 8px">Use o botão abaixo (cola formatada, sem grudar as linhas no sistema do hospital).</div>
    <div class="field"><textarea id="evoTa" class="evo-out">${esc(txt)}</textarea></div>
-   <div class="row actions"><button class="btn btn-p" id="copyEvoBtn" onclick="copyTa('evoTa','copyEvoBtn','📋 Copiar evolução')">📋 Copiar evolução</button><button class="btn btn-g" onclick="openVisita('${id}')">← Voltar</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
+   <div class="row actions"><button class="btn btn-p" id="copyEvoBtn" onclick="copyEvoFmt('${id}','copyEvoBtn')">📋 Copiar p/ o sistema</button><button class="btn btn-g" onclick="openVisita('${id}')">← Voltar</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
 }
 function copyTa(taId,btnId,label){const t=document.getElementById(taId);if(!t)return;t.focus();t.select();try{document.execCommand('copy');}catch(e){}if(navigator.clipboard){try{navigator.clipboard.writeText(t.value);}catch(e){}}const b=document.getElementById(btnId);if(b){b.textContent='✓ Copiado';setTimeout(()=>b.textContent=label,1600);}}
 
