@@ -1,7 +1,7 @@
 /* MedTech Portal — service worker (PWA instalável).
    Network-first no shell do portal; cache só como fallback offline.
    NÃO intercepta apps externos (.web.app) nem APIs (origem diferente). */
-const CACHE = 'medtech-portal-v2';
+const CACHE = 'medtech-portal-v3';
 const SHELL = [
   './app.html',
   './enfermaria.html',
@@ -35,8 +35,12 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   // só o próprio domínio (não toca apps .web.app, gstatic, firebase, etc.)
   if (url.origin !== location.origin) return;
+  // HTML (navegação / *.html): SEMPRE buscar fresco da rede (cache:'reload') p/ nunca servir
+  // código velho quando online; cache só como reserva offline. Estáticos (?v) seguem normal.
+  const isHTML = req.mode === 'navigate' || url.pathname.endsWith('.html');
+  const fetchReq = isHTML ? new Request(url.href, { cache: 'reload' }) : req;
   e.respondWith(
-    fetch(req)
+    fetch(fetchReq)
       .then(res => {
         if (res && res.status === 200 && res.type === 'basic') {
           const copy = res.clone();
@@ -44,6 +48,6 @@ self.addEventListener('fetch', e => {
         }
         return res;
       })
-      .catch(() => caches.match(req).then(c => c || caches.match('./app.html')))
+      .catch(() => caches.match(req).then(c => c || caches.match('./enfermaria.html') || caches.match('./app.html')))
   );
 });
