@@ -69,6 +69,7 @@ input.search{padding:9px 12px;border:1px solid var(--line);border-radius:9px;fon
 .field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit;background:#fff}
 .field textarea{resize:vertical;min-height:52px;line-height:1.5}
 .field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--mint)}
+.pt-main,.leito,.field input,.field select,.field textarea{text-transform:uppercase}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .three{display:grid;grid-template-columns:90px 1fr 90px;gap:10px}
 .row{display:flex;gap:10px;margin-top:6px;flex-wrap:wrap}
@@ -301,7 +302,7 @@ function resumoPlantao(){
       const pend=(p.pendencias||[]).filter(x=>!x.done);
       if(pend.length)txt+='Pendências:\n'+pend.map(x=>'- '+x.t).join('\n')+'\n';
       if(p.obs)txt+='Obs: '+oneLine(p.obs)+'\n';});});
-  modal(`<h3>📋 Passar plantão</h3><div class="hint" style="margin-bottom:8px">Resumo dos ${list.length} internado(s), agrupado por setor (só pendências em aberto). Revise e copie.</div><div class="field"><textarea id="resumoTa" style="min-height:320px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.55">${esc(txt)}</textarea></div><div class="row"><button class="btn btn-p" id="copyResBtn" onclick="copyResumo()">📋 Copiar tudo</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
+  modal(`<h3>📋 Passar plantão</h3><div class="hint" style="margin-bottom:8px">Resumo dos ${list.length} internado(s), agrupado por setor (só pendências em aberto). Revise e copie.</div><div class="field"><textarea id="resumoTa" style="min-height:320px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.55">${esc(txt.toUpperCase())}</textarea></div><div class="row"><button class="btn btn-p" id="copyResBtn" onclick="copyResumo()">📋 Copiar tudo</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
 }
 function copyResumo(){const t=document.getElementById('resumoTa');if(!t)return;t.focus();t.select();try{document.execCommand('copy');}catch(e){}if(navigator.clipboard){try{navigator.clipboard.writeText(t.value);}catch(e){}}const b=document.getElementById('copyResBtn');if(b){const o=b.textContent;b.textContent='✓ Copiado';setTimeout(()=>b.textContent=o,1500);}}
 
@@ -334,8 +335,8 @@ async function extrairEvol(){
    +'- "nome" (string)\n'
    +'- "idade" (string, ex.: "47 anos")\n'
    +'- "diagnosticos" (ARRAY de strings): SOMENTE o MOTIVO DA INTERNAÇÃO / as hipóteses que justificaram a internação (costuma vir logo após a identificação). CADA hipótese/diagnóstico em um ITEM SEPARADO do array. NUNCA junte duas hipóteses no mesmo item (não use "e" nem vírgula para unir hipóteses distintas — separe em itens). NÃO liste comorbidades/diagnósticos prévios de rotina (HAS, DM2, etc.), a não ser que sejam o motivo da internação.\n'
-   +'- "exames" (ARRAY de strings): SOMENTE os exames INVESTIGATIVOS do quadro atual, UM exame por item, com o resultado relevante. NÃO inclua exames de rotina/controle de praxe.\n'
-   +'- "pendencias" (ARRAY de strings curtas): o que IMPEDE A ALTA neste momento — extraído sobretudo do que aparece APÓS a linha/título "CONDUTA"/"PLANO". UMA por item (ex.: aguardar resultado de exame, avaliação de especialidade, conclusão de antibiótico, melhora clínica, vaga). Ignore o que já foi resolvido.\n'
+   +'- "exames" (ARRAY de strings): SOMENTE os exames INVESTIGATIVOS do quadro atual, UM exame por item, com o resultado relevante. Para exames LABORATORIAIS, NÃO inclua os de ROTINA — hemograma, função renal (ureia/creatinina) e eletrólitos (sódio/potássio/magnésio/cálcio) — inclua apenas os NÃO-rotineiros/investigativos (ex.: culturas/hemocultura/urocultura, sorologias, marcadores, PCR/procalcitonina, lactato, enzimas específicas, hormônios/TSH, líquor, gasometria com alteração relevante). Exames de IMAGEM investigativos entram normalmente. NÃO inclua exames de rotina/controle de praxe.\n'
+   +'- "pendencias" (ARRAY de strings curtas): o que IMPEDE A ALTA neste momento — extraído sobretudo do que aparece APÓS a linha/título "CONDUTA"/"PLANO". UMA por item (ex.: aguardar resultado de exame, avaliação de especialidade, conclusão de antibiótico, melhora clínica, vaga). Ignore o que já foi resolvido. ANTIBIÓTICOS EM USO: para CADA antibiótico citado na conduta que tenha um dia de início (DI / D1 / "iniciado em" / "início em"), crie uma pendência separada no formato exato "<ANTIBIÓTICO> DI <DD/MM> - programado até <DD/MM>", usando a data de início informada e o término programado quando a evolução der a duração/término (ex.: "Tazocin DI 14/06 - programado até 28/06"); se a duração/término não estiver explícita, escreva "<ANTIBIÓTICO> DI <DD/MM> - programado até [definir]".\n'
    +'Cada array deve ter um item por elemento (a interface mostra um por linha). Não invente nada; se algo não estiver no texto, use array vazio. Use português do Brasil.\n\nEvolução:\n'+raw;
   try{
     const txt=await MT.ai(prompt);
