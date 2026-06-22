@@ -380,22 +380,23 @@ function saveVisita(id,gerar){
 function guessMime(name){const n=(name||'').toLowerCase();if(/\.png$/.test(n))return 'image/png';if(/\.webp$/.test(n))return 'image/webp';if(/\.(heic|heif)$/.test(n))return 'image/heic';return 'image/jpeg';}
 function addParamImgs(input){
   const files=[...(input.files||[])];
-  input.value='';
   if(!files.length)return;
+  let pending=files.length;
+  const doneOne=()=>{if(--pending<=0){try{input.value='';}catch(e){}}};
   files.forEach(f=>{
+    const origMime=f.type||guessMime(f.name);
+    let blob=f;try{blob=f.slice(0,f.size,f.type||origMime);}catch(e){blob=f;} // cópia independente do input
     const r=new FileReader();
     r.onload=()=>{
-      const dataUrl=String(r.result||'');if(!dataUrl)return;
-      const origMime=f.type||guessMime(f.name);
+      const dataUrl=String(r.result||'');if(!dataUrl){doneOne();return;}
       downscale(dataUrl,1600,.82,(outUrl,outMime)=>{
         const url=outUrl||dataUrl, mime=outMime||origMime||'image/jpeg', b64=(url.split(',')[1]||'');
-        if(!b64)return;
-        visitaImgs.push({data:b64,mimeType:mime,thumb:url,heic:/heic|heif/i.test(mime)});
-        renderThumbs();
+        if(b64){visitaImgs.push({data:b64,mimeType:mime,thumb:url,heic:/heic|heif/i.test(mime)});renderThumbs();}
+        doneOne();
       });
     };
-    r.onerror=()=>alert('Não consegui ler '+(f.name||'a imagem')+'. Tente outra foto.');
-    r.readAsDataURL(f);
+    r.onerror=()=>{doneOne();alert('Não consegui ler '+(f.name||'a imagem')+'. Se a foto estiver no iCloud, abra-a no app Fotos primeiro p/ baixar, ou tire uma foto nova.');};
+    r.readAsDataURL(blob);
   });
 }
 function renderThumbs(){const box=document.getElementById('v_thumbs');if(!box)return;
