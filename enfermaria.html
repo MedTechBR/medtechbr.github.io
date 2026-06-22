@@ -468,15 +468,15 @@ function gerarEvolucao(p){
   return up(L.join('\n'));
 }
 function lineToHtml(line){
-  if(line==='')return '<div><br></div>';
+  if(line==='')return '';
   if(/^# EVOLUÇÃO MÉDICA/.test(line)||/^# EXAME FÍSICO:/.test(line)||/^# LABORATÓRIO:/.test(line)||/^# CULTURAS:/.test(line)||/^# EXAMES DE IMAGEM/.test(line)||/^# CONDUTA:/.test(line))
-    return '<div><b>'+esc(line)+'</b></div>';
+    return '<b>'+esc(line)+'</b>';
   const m=line.match(/^((?:#|>) (?:ID|COMORBIDADES|ALERGIAS|MUC|HDA|EVOLUÇÃO|PARÂMETROS):)([\s\S]*)$/);
-  if(m)return '<div><b>'+esc(m[1])+'</b>'+esc(m[2])+'</div>';
-  if(/^- /.test(line)||/^> /.test(line))return '<div><b>'+esc(line)+'</b></div>'; // tópicos (itens) em negrito
-  return '<div>'+esc(line)+'</div>';
+  if(m)return '<b>'+esc(m[1])+'</b>'+esc(m[2]);
+  if(/^- /.test(line)||/^> /.test(line))return '<b>'+esc(line)+'</b>'; // tópicos (itens) em negrito
+  return esc(line);
 }
-function gerarEvolucaoHtml(p){return gerarEvolucao(p).split('\n').map(lineToHtml).join('');}
+function gerarEvolucaoHtml(p){return '<div>'+gerarEvolucao(p).split('\n').map(lineToHtml).join('<br>')+'</div>';}
 async function copyEvoFmt(id,btnId){
   const p=state.pacientes.find(x=>x.id===id);if(!p)return;
   const html=gerarEvolucaoHtml(p), text=gerarEvolucao(p);
