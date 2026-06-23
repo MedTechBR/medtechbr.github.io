@@ -486,16 +486,21 @@ function applyFlowRow(kind, real, budget, hasFixed) {
 
 // ====== Transações ======
 function txItemHTML(t) {
-  const cat = categoryByName(t.category) || { color: '#888', icon: '🏷️' };
+  const cat = categoryByName(t.category) || { color: '#999', icon: '🏷️' };
   const sign = t.type === 'income' ? '+' : '−';
   const pendingCls = t.pending ? ' pending' : '';
   const pendingBadge = t.pending ? ' <span class="badge-pending">agendado</span>' : '';
+  // Chip estilo Monerix: fundo tonal da cor da categoria + emoji + nome
+  const chipBg = cat.color + '1F'; // ~12% alpha
+  const chipFg = cat.color;
   return `<li class="tx-item${pendingCls}" data-id="${t.id}">
-    <div class="icon" style="background:${cat.color}22;color:${cat.color}">${cat.icon}</div>
     <div class="meta">
       <span class="desc">${escapeHTML(t.description)}${pendingBadge}</span>
-      <span class="sub">${dayFmt.format(new Date(t.date + 'T00:00:00'))} · ${escapeHTML(t.category)}</span>
+      <span class="sub">${dayFmt.format(new Date(t.date + 'T00:00:00'))}</span>
     </div>
+    <span class="tx-cat-chip" style="background:${chipBg};color:${chipFg}">
+      <span class="ico">${cat.icon || '🏷️'}</span> ${escapeHTML(t.category)}
+    </span>
     <span class="val ${t.type}">${sign} ${fmt.format(t.amount)}</span>
   </li>`;
 }
