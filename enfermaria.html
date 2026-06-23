@@ -306,9 +306,8 @@ function openForm(id){
    <div class="three"><div class="field"><label>Leito *</label><input id="f_leito" value="${esc(p.leito)}" placeholder="12A"></div>
      <div class="field"><label>Nome</label><input id="f_nome" value="${esc(p.nome)}" placeholder="Nome do paciente"></div>
      <div class="field"><label>Idade</label><input id="f_idade" value="${esc(p.idade)}" placeholder="74 anos"></div></div>
-   <div class="three"><div class="field"><label>Setor / unidade</label><input id="f_setor" value="${esc(p.setor)}" placeholder="Enfermaria, UTI..."></div>
-     <div class="field"><label>Sexo</label><select id="f_sexo">${sx}</select></div>
-     <div class="field"><label>Clínica</label><input id="f_clinica" value="${esc(p.clinica||'Clínica Médica')}" placeholder="Clínica Médica"></div></div>
+   <div class="two"><div class="field"><label>Setor / clínica</label><input id="f_setor" value="${esc(p.setor||p.clinica||'')}" placeholder="Clínica Médica, UTI, Cirurgia..."></div>
+     <div class="field"><label>Sexo</label><select id="f_sexo">${sx}</select></div></div>
    <div class="field"><label>Motivo da internação / hipóteses <span style="color:var(--muted);font-weight:400">(um por linha — vira o "IH POR")</span></label><textarea id="f_dx" placeholder="- um por linha">${esc(bullets(p.diagnosticos))}</textarea></div>
    <div class="sec-h">Dados de base</div>
    <div class="field"><label>Comorbidades</label><textarea id="f_comorb" placeholder="HAS, DM2...">${esc(p.comorbidades||'')}</textarea></div>
@@ -329,7 +328,7 @@ function openForm(id){
 function saveForm(id){
   const oldP=id?((state.pacientes.find(x=>x.id===id)||{}).pendencias||[]):[];
   const pend=getVal('f_pend').split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>o.t===t);return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});
-  const o={leito:getVal('f_leito'),setor:getVal('f_setor'),nome:getVal('f_nome'),idade:getVal('f_idade'),sexo:getVal('f_sexo'),clinica:getVal('f_clinica'),diagnosticos:bullets(getVal('f_dx')),comorbidades:getVal('f_comorb'),alergias:getVal('f_alergias'),muc:getVal('f_muc'),hda:getVal('f_hda'),laboratorio:bullets(getVal('f_lab')),culturas:bullets(getVal('f_culturas')),imagem:bullets(getVal('f_imagem')),exameFisico:getVal('f_ef'),conduta:bullets(getVal('f_conduta')),pendencias:pend,obs:getVal('f_obs')};
+  const o={leito:getVal('f_leito'),setor:getVal('f_setor'),nome:getVal('f_nome'),idade:getVal('f_idade'),sexo:getVal('f_sexo'),diagnosticos:bullets(getVal('f_dx')),comorbidades:getVal('f_comorb'),alergias:getVal('f_alergias'),muc:getVal('f_muc'),hda:getVal('f_hda'),laboratorio:bullets(getVal('f_lab')),culturas:bullets(getVal('f_culturas')),imagem:bullets(getVal('f_imagem')),exameFisico:getVal('f_ef'),conduta:bullets(getVal('f_conduta')),pendencias:pend,obs:getVal('f_obs')};
   if(!o.leito&&!o.nome){alert('Informe ao menos o leito ou o nome do paciente.');return;}
   if(id){const cur=state.pacientes.find(x=>x.id===id);delete cur.exames;Object.assign(cur,o);}
   else{state.pacientes.push({id:uid(),status:'ativo',criadoEm:nowISO(),...o});}
@@ -450,7 +449,7 @@ function condutaComExplico(s){
 }
 function gerarEvolucao(p){
   const L=[];
-  L.push('# EVOLUÇÃO MÉDICA - '+(p.clinica||'Clínica Médica'));
+  L.push('# EVOLUÇÃO MÉDICA - '+(p.setor||p.clinica||'Clínica Médica'));
   L.push('# ID: '+(p.nome||'')+(p.idade?(', '+p.idade):'')+', IH POR:');
   if(p.diagnosticos)L.push(bullets(p.diagnosticos));
   if(p.comorbidades)L.push('# COMORBIDADES: '+oneLine(p.comorbidades));
