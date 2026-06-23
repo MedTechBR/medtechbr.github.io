@@ -74,18 +74,18 @@ input.search{padding:11px 12px;border:1px solid var(--line);border-radius:9px;fo
 .empty{text-align:center;color:var(--muted);padding:42px 18px;background:#fff;border:1px dashed var(--line);border-radius:14px}
 .modal{position:fixed;inset:0;background:rgba(8,56,69,.45);display:flex;align-items:center;justify-content:center;padding:18px;z-index:60}
 .modal .box{background:#fff;border-radius:16px;padding:22px;max-width:600px;width:100%;max-height:93vh;overflow:auto;-webkit-overflow-scrolling:touch}
-.modal h3{margin-bottom:6px;font-size:18px;position:sticky;top:0;background:#fff;z-index:3;padding-bottom:6px}
+.modal h3{margin-bottom:6px;font-size:16px;position:sticky;top:0;background:#fff;z-index:3;padding-bottom:6px}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
 .chip{background:var(--soft);color:var(--petrol-dark);border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;-webkit-tap-highlight-color:transparent}
 .chip:active{background:var(--mint);border-color:var(--mint);transform:scale(.96)}
-.ef-grid{display:flex;flex-direction:column;gap:7px;margin-bottom:7px}
-.ef-row{display:flex;align-items:center;gap:9px}
-.ef-lbl{flex:0 0 58px;font-size:12px;font-weight:800;color:var(--petrol-dark);letter-spacing:.02em}
-.ef-row input{flex:1;min-width:0;padding:9px 11px}
-.ef-outros{min-height:40px}
-.field{margin-bottom:12px}.field label{display:block;font-weight:600;font-size:13.5px;margin-bottom:5px}
-.field input,.field select,.field textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:16px;font-family:inherit;background:#fff}
-.field textarea{resize:vertical;min-height:52px;line-height:1.5}
+.ef-grid{display:flex;flex-direction:column;gap:4px;margin-bottom:5px}
+.ef-row{display:flex;align-items:center;gap:7px}
+.ef-lbl{flex:0 0 46px;font-size:10.5px;font-weight:800;color:var(--petrol-dark);letter-spacing:.02em}
+.ef-grid .ef-row input{flex:1;min-width:0;padding:5px 9px;font-size:13.5px}
+.ef-outros{min-height:34px}
+.field{margin-bottom:9px}.field label{display:block;font-weight:600;font-size:12px;margin-bottom:3px}
+.field input,.field select,.field textarea{width:100%;padding:8px 11px;border:1px solid var(--line);border-radius:10px;font-size:14px;font-family:inherit;background:#fff}
+.field textarea{resize:vertical;min-height:48px;line-height:1.38}
 .field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--mint)}
 .pt-main,.leito,.field input,.field select,.field textarea{text-transform:uppercase}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -132,7 +132,7 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
   .two,.three{grid-template-columns:1fr}
   .chip{padding:9px 13px;font-size:13px}
   .ai-box{padding:11px}
-  .ef-lbl{flex-basis:54px}
+  .ef-lbl{flex-basis:42px}
   .modal{padding:0;align-items:flex-end}
   .modal .box{max-width:100%;max-height:96vh;border-radius:18px 18px 0 0;padding:18px 16px 14px}
   .pt-card{gap:10px;flex-wrap:wrap}
@@ -366,7 +366,7 @@ function openVisita(id){
   const efP=parseEF(ef);
   modal(`<h3>👨‍⚕️ Visita · ${esc(p.nome||'Paciente')}</h3>
    <div class="hint" style="margin-bottom:6px">Leito ${esc(p.leito||'—')}${p.idade?(' · '+esc(p.idade)):''}. Atualize a evolução do dia — o exame físico já vem do dia anterior, edite só o que mudou.</div>
-   <div class="field"><label>Evolução do dia <span style="color:var(--muted);font-weight:400">(queixas / intercorrências)</span></label><textarea id="v_evol" autocapitalize="characters" spellcheck="false" placeholder="PACIENTE ESTÁVEL, SEM QUEIXAS NO PERÍODO..." style="min-height:120px">${esc(p.evolucao||'')}</textarea></div>
+   <div class="field"><label>Evolução do dia <span style="color:var(--muted);font-weight:400">(queixas / intercorrências)</span></label><textarea id="v_evol" autocapitalize="characters" spellcheck="false" placeholder="PACIENTE ESTÁVEL, SEM QUEIXAS NO PERÍODO..." style="min-height:152px">${esc(p.evolucao||'')}</textarea></div>
    <div class="ai-box">
      <div class="ai-h">📷 Parâmetros das últimas 24h (foto)</div>
      <div class="hint">Tire foto do controle hemodinâmico e, se tiver, da folha de diurese/balanço hídrico. A IA transcreve para a linha de parâmetros.</div>
@@ -378,7 +378,7 @@ function openVisita(id){
    <div class="field"><label>Exame físico <span style="color:var(--muted);font-weight:400">(vem do dia anterior — edite o que mudou)</span></label>
      <div class="ef-grid">${SISTEMAS.map(s=>`<div class="ef-row"><span class="ef-lbl">${s}</span><input id="ef_${s}" autocapitalize="characters" spellcheck="false" value="${esc(efP.map[s]||'')}" placeholder="—"></div>`).join('')}</div>
      <textarea id="ef_outros" class="ef-outros" autocapitalize="characters" spellcheck="false" placeholder="+ OUTROS ACHADOS (OPCIONAL)">${esc(efP.outros||'')}</textarea></div>
-   <div class="field"><label>Conduta <span style="color:var(--muted);font-weight:400">(uma por linha — "EXPLICO PLANO TERAPEUTICO" entra automático)</span></label><textarea id="v_conduta" autocapitalize="characters" spellcheck="false" placeholder="- MANTENHO ATB&#10;- SOLICITO NOVA ROTINA&#10;- AGUARDO EXAMES" style="min-height:130px">${esc(p.conduta||'')}</textarea></div>
+   <div class="field"><label>Conduta <span style="color:var(--muted);font-weight:400">(uma por linha — "EXPLICO PLANO TERAPEUTICO" entra automático)</span></label><textarea id="v_conduta" autocapitalize="characters" spellcheck="false" placeholder="- MANTENHO ATB&#10;- SOLICITO NOVA ROTINA&#10;- AGUARDO EXAMES" style="min-height:168px">${esc(p.conduta||'')}</textarea></div>
    <div class="field"><label>Pendências <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="v_pend" autocapitalize="characters" spellcheck="false" placeholder="- ..." style="min-height:96px">${esc((p.pendencias||[]).map(x=>'- '+x.t).join('\n'))}</textarea></div>
    <div class="row actions"><button class="btn btn-p" onclick="saveVisita('${id}',true)">📄 Gerar evolução</button><button class="btn btn-g" onclick="saveVisita('${id}',false)">Salvar</button></div>`);
 }
