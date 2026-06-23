@@ -366,14 +366,7 @@ function openVisita(id){
   const efP=parseEF(ef);
   modal(`<h3>👨‍⚕️ Visita · ${esc(p.nome||'Paciente')}</h3>
    <div class="hint" style="margin-bottom:6px">Leito ${esc(p.leito||'—')}${p.idade?(' · '+esc(p.idade)):''}. Atualize a evolução do dia — o exame físico já vem do dia anterior, edite só o que mudou.</div>
-   <div class="field"><label>Evolução do dia <span style="color:var(--muted);font-weight:400">(queixas / intercorrências)</span></label><textarea id="v_evol" placeholder="Paciente estável, sem queixas no período..." style="min-height:72px">${esc(p.evolucao||'')}</textarea>
-     <div class="chips">
-       <span class="chip" onclick="addEvolChip('ESTÁVEL, SEM QUEIXAS NO PERÍODO')">+ Estável s/ queixas</span>
-       <span class="chip" onclick="addEvolChip('SEM INTERCORRÊNCIAS')">+ Sem intercorrências</span>
-       <span class="chip" onclick="addEvolChip('ACEITANDO DIETA')">+ Aceita dieta</span>
-       <span class="chip" onclick="addEvolChip('DIURESE E EVACUAÇÕES PRESENTES')">+ Diurese/evac</span>
-       <span class="chip" onclick="addEvolChip('AFEBRIL')">+ Afebril</span>
-     </div></div>
+   <div class="field"><label>Evolução do dia <span style="color:var(--muted);font-weight:400">(queixas / intercorrências)</span></label><textarea id="v_evol" autocapitalize="characters" spellcheck="false" placeholder="PACIENTE ESTÁVEL, SEM QUEIXAS NO PERÍODO..." style="min-height:120px">${esc(p.evolucao||'')}</textarea></div>
    <div class="ai-box">
      <div class="ai-h">📷 Parâmetros das últimas 24h (foto)</div>
      <div class="hint">Tire foto do controle hemodinâmico e, se tiver, da folha de diurese/balanço hídrico. A IA transcreve para a linha de parâmetros.</div>
@@ -381,29 +374,22 @@ function openVisita(id){
      <div id="v_thumbs" class="thumbs"></div>
      <div class="row"><button class="btn btn-p btn-sm" id="transBtn" onclick="transcreverParams()">✨ Transcrever parâmetros</button></div>
    </div>
-   <div class="field"><label>Parâmetros</label><textarea id="v_param" placeholder="PA ... // FC ... // FR ... // T ... // SPO2 ... // DX ... // DIURESE ... // BH ..." style="min-height:70px">${esc(p.parametros||'')}</textarea></div>
+   <div class="field"><label>Parâmetros</label><textarea id="v_param" autocapitalize="characters" spellcheck="false" placeholder="PA ... // FC ... // FR ... // T ... // SPO2 ... // DX ... // DIURESE ... // BH ..." style="min-height:78px">${esc(p.parametros||'')}</textarea></div>
    <div class="field"><label>Exame físico <span style="color:var(--muted);font-weight:400">(vem do dia anterior — edite o que mudou)</span></label>
-     <div class="ef-grid">${SISTEMAS.map(s=>`<div class="ef-row"><span class="ef-lbl">${s}</span><input id="ef_${s}" value="${esc(efP.map[s]||'')}" placeholder="—"></div>`).join('')}</div>
-     <textarea id="ef_outros" class="ef-outros" placeholder="+ outros achados (opcional)">${esc(efP.outros||'')}</textarea></div>
-   <div class="field"><label>Conduta <span style="color:var(--muted);font-weight:400">("EXPLICO PLANO TERAPEUTICO" entra automático)</span></label><textarea id="v_conduta" placeholder="- mantenho atb&#10;- solicito nova rotina" style="min-height:80px">${esc(p.conduta||'')}</textarea>
-     <div class="chips">
-       <span class="chip" onclick="addCondutaChip('MANTENHO CONDUTA')">+ Mantenho conduta</span>
-       <span class="chip" onclick="addCondutaChip('MANTENHO ATB')">+ Mantenho ATB</span>
-       <span class="chip" onclick="addCondutaChip('SOLICITO NOVA ROTINA LABORATORIAL')">+ Nova rotina</span>
-       <span class="chip" onclick="addCondutaChip('AGUARDO EXAMES')">+ Aguardo exames</span>
-       <span class="chip" onclick="addCondutaChip('AVALIAÇÃO DE ESPECIALIDADE')">+ Aval. especialidade</span>
-     </div></div>
-   <div class="field"><label>Pendências <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="v_pend" placeholder="- ...">${esc((p.pendencias||[]).map(x=>'- '+x.t).join('\n'))}</textarea></div>
+     <div class="ef-grid">${SISTEMAS.map(s=>`<div class="ef-row"><span class="ef-lbl">${s}</span><input id="ef_${s}" autocapitalize="characters" spellcheck="false" value="${esc(efP.map[s]||'')}" placeholder="—"></div>`).join('')}</div>
+     <textarea id="ef_outros" class="ef-outros" autocapitalize="characters" spellcheck="false" placeholder="+ OUTROS ACHADOS (OPCIONAL)">${esc(efP.outros||'')}</textarea></div>
+   <div class="field"><label>Conduta <span style="color:var(--muted);font-weight:400">(uma por linha — "EXPLICO PLANO TERAPEUTICO" entra automático)</span></label><textarea id="v_conduta" autocapitalize="characters" spellcheck="false" placeholder="- MANTENHO ATB&#10;- SOLICITO NOVA ROTINA&#10;- AGUARDO EXAMES" style="min-height:130px">${esc(p.conduta||'')}</textarea></div>
+   <div class="field"><label>Pendências <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="v_pend" autocapitalize="characters" spellcheck="false" placeholder="- ..." style="min-height:96px">${esc((p.pendencias||[]).map(x=>'- '+x.t).join('\n'))}</textarea></div>
    <div class="row actions"><button class="btn btn-p" onclick="saveVisita('${id}',true)">📄 Gerar evolução</button><button class="btn btn-g" onclick="saveVisita('${id}',false)">Salvar</button></div>`);
 }
 function saveVisita(id,gerar){
   const p=state.pacientes.find(x=>x.id===id);if(!p)return;
-  p.evolucao=getVal('v_evol');
-  p.parametros=getVal('v_param');
-  p.exameFisico=buildEF();
-  p.conduta=getVal('v_conduta');
+  p.evolucao=getVal('v_evol').toUpperCase();
+  p.parametros=getVal('v_param').toUpperCase();
+  p.exameFisico=buildEF().toUpperCase();
+  p.conduta=getVal('v_conduta').toUpperCase();
   const oldP=p.pendencias||[];
-  p.pendencias=getVal('v_pend').split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>o.t===t);return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});
+  p.pendencias=getVal('v_pend').toUpperCase().split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>o.t===t);return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});
   p.visitaEm=ymd();
   persist();
   if(gerar)verEvolucao(id);else{closeModal();render();}
