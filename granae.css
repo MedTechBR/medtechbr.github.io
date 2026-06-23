@@ -1,61 +1,40 @@
 :root {
-  /* Backgrounds — slate profundo com leve azul, menos saturado */
-  --bg: #0a0e1d;
-  --bg-2: #111728;
-  --bg-3: #161d34;
-  --surface: #1a2240;
-  --surface-2: #232c52;
-  --border: #2a3358;
-  --border-2: #3a4677;
+  /* Tema CLARO inspirado no Monerix — fundo creme, preto puro, único acento verde */
+  --bg: #F6F4F0;             /* creme quente, não branco gelado */
+  --bg-2: #FFFFFF;
+  --bg-3: #FAF8F3;
+  --surface: #FFFFFF;
+  --surface-2: #F0EEE8;
+  --border: #E8E4DC;          /* hairline */
+  --border-2: #D6D0C2;
 
-  --text: #f1f4fb;
-  --muted: #8e98b9;
-  --muted-2: #6c7595;
+  --text: #0A0A0A;            /* preto puro pros números */
+  --muted: #6B7280;
+  --muted-2: #9CA3AF;
 
-  /* Primárias — indigo/violeta sóbrio, sem o magenta gritante */
-  --primary: #6366f1;       /* indigo-500 */
-  --primary-2: #8b5cf6;     /* violet-500 — gradient end */
-  --accent: #14b8a6;        /* teal — sotaque elegante */
+  /* Acento único — verde mint MedTech */
+  --primary: #14B894;
+  --primary-2: #10C285;
+  --accent: #14B894;
 
-  /* Dinheiro — verde/vermelho clássicos, banca confiável */
-  --income: #22c55e;        /* green-500 */
-  --income-2: #16a34a;
-  --expense: #ef4444;       /* red-500 */
-  --expense-2: #dc2626;
-  --warning: #f59e0b;
+  /* Dinheiro — verde pra income, preto pra expense (estilo Monerix) */
+  --income: #10C285;
+  --income-2: #0E9E6F;
+  --expense: #0A0A0A;         /* mesmo preto do texto pra leitura limpa */
+  --expense-2: #DC2626;       /* só pra estouros / alertas */
+  --warning: #F59E0B;
 
-  --shadow: 0 18px 40px rgba(0,0,0,.50), 0 4px 12px rgba(0,0,0,.28);
-  --shadow-glow: 0 16px 32px rgba(99,102,241,.32);
-  --shadow-glow-pink: 0 16px 32px rgba(139,92,246,.28);
-  /* Raios variados — não tudo no mesmo radius (anti-AI tell) */
-  --radius: 20px;        /* cards principais */
-  --radius-sm: 12px;     /* cards menores, listas */
-  --radius-input: 8px;   /* inputs, controls */
+  --shadow: 0 1px 0 rgba(10,10,10,.04), 0 4px 16px rgba(10,10,10,.04);
+  --shadow-glow: 0 8px 24px rgba(20,184,148,.20);
+  --shadow-glow-pink: 0 8px 24px rgba(20,184,148,.12);
+  /* Raios variados — não tudo no mesmo radius */
+  --radius: 16px;        /* cards principais */
+  --radius-sm: 10px;     /* cards menores */
+  --radius-input: 8px;   /* inputs */
   --radius-pill: 999px;  /* chips, badges */
   --serif: 'IBM Plex Serif', Georgia, 'Times New Roman', serif;
 }
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #f6f8fc;
-    --bg-2: #ffffff;
-    --bg-3: #eef1f9;
-    --surface: #ffffff;
-    --surface-2: #f3f5fc;
-    --border: #e4e7f2;
-    --border-2: #d2d7ea;
-    --text: #131830;
-    --muted: #5e6886;
-    --muted-2: #8590b0;
-    --primary: #4f46e5;
-    --primary-2: #7c3aed;
-    --income: #16a34a;
-    --income-2: #15803d;
-    --expense: #dc2626;
-    --expense-2: #b91c1c;
-    --shadow: 0 14px 30px rgba(20,24,60,.08), 0 2px 8px rgba(20,24,60,.04);
-    --shadow-glow: 0 14px 28px rgba(79,70,229,.22);
-  }
-}
+/* Tema sempre claro — referência Monerix. Sem dark mode automático. */
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
@@ -66,9 +45,10 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100dvh;
-  padding-bottom: 170px; /* deixa espaço pro bottom-nav (~80) + FAB (~70) + buffer */
+  padding-bottom: 170px;
   -webkit-tap-highlight-color: transparent;
-  letter-spacing: -0.005em;
+  letter-spacing: -0.01em;
+  font-feature-settings: "cv11", "ss01";
 }
 
 /* TOP BAR */
@@ -80,14 +60,21 @@ body {
   background: var(--bg);
   border-bottom: 1px solid var(--border);
 }
+.topbar .icon-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  width: 40px; height: 40px;
+  border-radius: 10px;
+}
+.topbar .icon-btn svg { color: var(--text); opacity: .75; }
 .brand { display: flex; align-items: center; gap: 12px; }
 .brand .logo {
-  width: 46px; height: 46px; border-radius: 14px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-2));
-  display: grid; place-items: center; color: white;
-  font-weight: 900; font-size: 22px;
-  box-shadow: var(--shadow-glow);
+  width: 42px; height: 42px; border-radius: 12px;
+  background: var(--text); /* logo em preto puro tipo Monerix */
+  display: grid; place-items: center; color: var(--bg);
+  font-weight: 900; font-size: 20px;
 }
+.brand h1 { font-size: 18px; }
 .brand .brand-text { display: grid; line-height: 1.1; }
 .brand h1 { font-size: 20px; margin: 0; letter-spacing: -0.3px; font-weight: 800; }
 .brand .user-name { font-size: 12px; color: var(--muted); margin-top: 2px; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -136,28 +123,43 @@ main { padding: 8px 16px; max-width: 760px; margin: 0 auto; }
 .card-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
 .card.alt { background: var(--surface-2); }
 
-/* MONTH HERO — saldo gigante em serif + flow receitas/despesas com barras */
+/* MONTH HERO — saldo gigante em sans bold, estilo Monerix */
 .month-hero {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 22px 22px 18px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 8px 4px 18px;
   margin-bottom: 16px;
   display: flex; flex-direction: column; gap: 18px;
+  text-align: center;
 }
-.month-hero .hero-head { display: flex; flex-direction: column; gap: 8px; }
+.month-hero .hero-head {
+  display: flex; flex-direction: column;
+  gap: 6px; align-items: center;
+}
+.month-hero .hero-head .card-label {
+  font-size: 11px; letter-spacing: 1.2px;
+  color: var(--muted);
+}
 .hero-number {
-  font-family: var(--serif);
-  font-size: clamp(34px, 10vw, 44px);
-  font-weight: 400;
-  letter-spacing: -0.02em;
+  font-family: inherit;
+  font-size: clamp(46px, 13vw, 64px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
   line-height: 1;
   font-variant-numeric: tabular-nums;
   color: var(--text);
 }
-.hero-number.negative { color: var(--expense); }
+.hero-number.negative { color: var(--expense-2); }
 
-.hero-flow { display: grid; gap: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+.hero-flow {
+  display: grid; gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  text-align: left;
+}
 .flow-row {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -166,18 +168,18 @@ main { padding: 8px 16px; max-width: 760px; margin: 0 auto; }
   align-items: baseline;
 }
 .flow-label-wrap { grid-area: label; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.flow-label { font-size: 15px; font-weight: 600; color: var(--text); }
+.flow-label { font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
 .flow-meta { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .flow-meta:empty { display: none; }
-.flow-value { grid-area: value; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.flow-value { grid-area: value; font-size: 19px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--text); }
 .flow-value.income { color: var(--income); }
-.flow-value.expense { color: var(--expense); }
-.flow-bar { grid-area: bar; background: rgba(255,255,255,.06); height: 6px; border-radius: var(--radius-pill); overflow: hidden; margin-top: 4px; }
+.flow-value.expense { color: var(--text); } /* preto puro estilo Monerix */
+.flow-bar { grid-area: bar; background: var(--surface-2); height: 5px; border-radius: var(--radius-pill); overflow: hidden; margin-top: 4px; }
 .flow-bar[hidden] { display: none; }
 .flow-bar > i { display: block; height: 100%; border-radius: var(--radius-pill); transition: width .3s ease; }
-.flow-bar > i.ok { background: linear-gradient(90deg, var(--income-2), var(--income)); }
-.flow-bar > i.under { background: linear-gradient(90deg, var(--muted-2), var(--muted)); }
-.flow-bar > i.over { background: linear-gradient(90deg, var(--expense-2), var(--expense)); }
+.flow-bar > i.ok { background: var(--income); }
+.flow-bar > i.under { background: var(--muted-2); }
+.flow-bar > i.over { background: var(--expense-2); }
 
 .hero-cta { padding-top: 6px; border-top: 1px solid var(--border); }
 .hero-cta .link { padding: 6px 0; font-size: 13px; }
@@ -210,25 +212,51 @@ main { padding: 8px 16px; max-width: 760px; margin: 0 auto; }
 .bar-item .bar-sub strong { color: var(--text); font-weight: 700; }
 .bar-item strong { font-weight: 800; font-variant-numeric: tabular-nums; }
 
-/* TRANSACTIONS */
-.tx-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+/* TRANSACTIONS — estilo Monerix: tabela com hairlines, sem cards */
+.tx-list {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
 .tx-item {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
-  padding: 12px 14px; display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center;
-  cursor: pointer; transition: transform .12s ease, border-color .12s ease;
+  background: transparent; border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 14px 16px;
+  display: grid; grid-template-columns: 1fr auto auto; gap: 14px; align-items: center;
+  cursor: pointer; transition: background .12s ease;
 }
-.tx-item:active { transform: scale(.985); border-color: var(--border-2); }
-.tx-item .icon {
-  width: 44px; height: 44px; border-radius: 12px;
-  display: grid; place-items: center; font-size: 22px;
-  background: rgba(255,255,255,.04);
+.tx-item:last-child { border-bottom: none; }
+.tx-item:hover { background: var(--surface-2); }
+.tx-item:active { background: var(--surface-2); }
+/* Esconde o ícone redondo gigante — usamos chip colorido na categoria */
+.tx-item .icon { display: none; }
+.tx-item .meta { display: grid; gap: 2px; min-width: 0; }
+.tx-item .desc {
+  font-weight: 600; font-size: 14px; color: var(--text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.tx-item .meta { display: grid; gap: 4px; min-width: 0; }
-.tx-item .desc { font-weight: 700; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; letter-spacing: .02em; }
-.tx-item .sub { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
-.tx-item .val { font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums; }
+.tx-item .sub {
+  color: var(--muted); font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+}
+/* Chip de categoria (substitui o ícone gordo) */
+.tx-cat-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 11.5px; font-weight: 600;
+  background: var(--surface-2);
+  color: var(--text);
+  white-space: nowrap;
+}
+.tx-cat-chip .ico { font-size: 12px; line-height: 1; }
+.tx-item .val { font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; }
 .tx-item .val.income { color: var(--income); }
-.tx-item .val.expense { color: var(--expense); }
+.tx-item .val.expense { color: var(--text); }
 .tx-item.pending { border-style: dashed; background: linear-gradient(180deg, var(--surface), rgba(99,102,241,.06)); }
 .tx-item.pending .val { font-style: italic; opacity: .85; }
 .badge-pending {
