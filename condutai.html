@@ -982,6 +982,7 @@ main, #main { display: block !important; height: auto !important; overflow: visi
     <div class="search-box">
       <div class="mode-toggle">
         <button class="mode-btn active" data-mode="direta">📋 Conduta</button>
+        <button class="mode-btn" data-mode="assistente">💬 Assistente</button>
         <button class="mode-btn" data-mode="caso">📄 Avaliar caso</button>
         <button class="mode-btn" data-mode="protocolo">📚 Protocolo</button>
       </div>
@@ -1079,6 +1080,7 @@ main, #main { display: block !important; height: auto !important; overflow: visi
     <div class="search-box">
       <div class="mode-toggle">
         <button class="mode-btn active" data-mode="direta">📋 Conduta</button>
+        <button class="mode-btn" data-mode="assistente">💬 Assistente</button>
         <button class="mode-btn" data-mode="caso">📄 Avaliar caso</button>
         <button class="mode-btn" data-mode="protocolo">📚 Protocolo</button>
       </div>
@@ -8847,7 +8849,8 @@ function setMode(mode) {
       direta: 'Analisar →',
       socratica: 'Iniciar discussão →',
       caso: 'Analisar caso →',
-      protocolo: 'Gerar protocolo →'
+      protocolo: 'Gerar protocolo →',
+      assistente: 'Perguntar →'
     };
     b.textContent = labels[mode] || 'Analisar →';
   });
@@ -8858,7 +8861,8 @@ function setMode(mode) {
     direta: 'Ex: dor torácica, ICFEr descompensada, sepse, AVC isquêmico em janela...',
     socratica: 'Ex: dor torácica, ICFEr descompensada, sepse, AVC isquêmico em janela...',
     caso: 'Cole aqui a evolução do paciente — identificação, HMA, exame físico, exames, condutas atuais. Quanto mais dados, melhor a análise.',
-    protocolo: 'Ex: sepse, STEMI, anafilaxia, CAD... (ou escolha um protocolo na biblioteca abaixo)'
+    protocolo: 'Ex: sepse, STEMI, anafilaxia, CAD... (ou escolha um protocolo na biblioteca abaixo)',
+    assistente: 'Pergunte direto: como prescrevo octreotide p/ HDA em 60 kg? como diluo em BIC e qual a vazão? dose de noradrenalina...'
   };
   ['searchInput', 'searchInput2'].forEach(id => {
     const inp = document.getElementById(id);
@@ -9591,7 +9595,8 @@ function showLoading(query, mode) {
     direta: { title: 'Consultando diretrizes para', sub: 'Buscando guidelines mais recentes (15-40s)...' },
     socratica: { title: 'Iniciando discussão sobre', sub: 'Preparando o caso clínico...' },
     caso: { title: 'Analisando evolução do paciente', sub: 'Identificando problemas ativos, hipóteses e montando roteiro de discussão (20-50s)...' },
-    protocolo: { title: 'Gerando protocolo passo-a-passo para', sub: 'Consultando a diretriz mais recente e montando fluxograma operacional (20-50s)...' }
+    protocolo: { title: 'Gerando protocolo passo-a-passo para', sub: 'Consultando a diretriz mais recente e montando fluxograma operacional (20-50s)...' },
+    assistente: { title: 'Pensando na sua dúvida', sub: 'Montando a resposta prática (dose, diluição, vazão)...' }
   };
   const { title, sub } = labels[mode] || labels.direta;
   const displayQ = mode === 'caso' ? (query.length > 100 ? query.slice(0, 100) + '…' : query) : query;
@@ -9842,6 +9847,119 @@ async function continueSocratic(userText, isFinishing = false) {
   }
 }
 
+// ============ MODO ASSISTENTE (tira-dúvidas prático, conversacional) ============
+function buildAssistentePrompt(ctx, cenario) {
+  const { ctxLabel, cenLabel } = ctxLabels(ctx || 'adulto', cenario || 'emergencia');
+  return `Você é o ASSISTENTE CLÍNICO do CondutAI, falando com um MÉDICO no Brasil (contexto: ${ctxLabel}, ${cenLabel}). Responda dúvidas PRÁTICAS de plantão/beira-leito de forma DIRETA e ACIONÁVEL, como um colega experiente — não como professor, sem rodeios.
+
+COMO RESPONDER:
+- Português do Brasil, markdown enxuto: negrito nos números/doses, bullets curtos. Vá direto ao ponto (sem introdução longa).
+- PRESCRIÇÃO: dê droga, dose, via, frequência/duração e, quando houver, a apresentação comercial brasileira (ex.: ampola 0,1 mg/mL).
+- DILUIÇÃO / INFUSÃO / BIC: MOSTRE O CÁLCULO passo a passo — quantos mL/ampolas aspirar, em qual soro e volume, a concentração final e a VAZÃO da bomba em mL/h para a dose-alvo. Confira a conta antes de responder.
+- Ajuste por PESO, idade e função renal/hepática quando relevante. Se faltar um dado essencial (peso, apresentação disponível, gravidade), faça a conta com uma suposição explícita ("assumindo X") E pergunte o dado ao final para refinar.
+- Conversa de VÁRIOS TURNOS: lembre do que já foi dito (paciente, peso, apresentação, soro disponível) e refaça as contas conforme o médico corrige.
+- Cite a base (diretriz/sociedade/bula) quando souber; NUNCA invente referência, número de estudo ou dose.
+- Segurança: em 1 linha, sinalize dose máxima, contraindicação ou red flag relevante quando houver. Você apoia a decisão; a conduta final e a checagem são do médico.
+
+Responda agora à dúvida do médico.`;
+}
+
+async function startAssistente(query, ctx, cenario, ctxLabel, cenarioLabel) {
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const item = {
+    id, mode: 'assistente', query, ctx, cenario, ctxLabel, cenarioLabel,
+    date: new Date().toISOString(), starred: false,
+    messages: [{ role: 'user', text: query }]
+  };
+  history.unshift(item);
+  currentId = id; currentConversation = item;
+  saveHistory(); renderSide();
+  await renderAssistente(item);
+  await assistenteRespond();
+}
+
+async function continueAssistente(text) {
+  if (!currentConversation) return;
+  currentConversation.messages.push({ role: 'user', text });
+  await renderAssistente(currentConversation);
+  await assistenteRespond();
+}
+
+async function assistenteRespond() {
+  const container = document.getElementById('chatContainer');
+  if (!container) return;
+  const typingEl = document.createElement('div');
+  typingEl.className = 'chat-message ai';
+  typingEl.innerHTML = `<div class="chat-avatar">🎓</div><div class="chat-bubble"><div class="typing-indicator"><span></span><span></span><span></span></div><div style="font-size:12px;color:var(--text-mute);margin-top:6px;">Calculando dose/diluição...</div></div>`;
+  container.appendChild(typingEl);
+  const fi = document.getElementById('followupInput'); if (fi) { fi.value = ''; fi.disabled = true; }
+  const fs = document.getElementById('followupSend'); if (fs) fs.disabled = true;
+  typingEl.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+  const msgs = currentConversation.messages.filter(m => !m.hidden);
+  const contents = msgs.map(m => ({ role: m.role === 'ai' ? 'model' : 'user', parts: [{ text: m.text }] }));
+  const firstUser = contents.find(c => c.role === 'user');
+  if (firstUser) firstUser.parts[0].text = buildAssistentePrompt(currentConversation.ctx, currentConversation.cenario) + '\n\n--- DÚVIDA DO MÉDICO ---\n' + firstUser.parts[0].text;
+
+  try {
+    const { text } = await callGemini(contents);
+    currentConversation.messages.push({ role: 'ai', text });
+    const idx = history.findIndex(h => h.id === currentConversation.id);
+    if (idx >= 0) history[idx] = currentConversation;
+    saveHistory();
+    typingEl.remove();
+    await renderAssistente(currentConversation);
+  } catch (err) {
+    typingEl.remove();
+    if (fi) fi.disabled = false; if (fs) fs.disabled = false;
+    const errEl = document.createElement('div');
+    errEl.className = 'alert alert-warn';
+    errEl.style.cssText = 'margin-top:12px;max-width:900px;';
+    errEl.innerHTML = `<span>⚠</span><div><strong>Não consegui responder agora:</strong> ${escapeHtml(err.message || 'falha na IA')}. Tente reenviar.</div>`;
+    container.appendChild(errEl);
+    errEl.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }
+}
+
+async function renderAssistente(item) {
+  showView('result');
+  document.getElementById('resultContainer').innerHTML = `
+    <div class="result-header" style="max-width:900px;margin:0 auto 16px;">
+      <div>
+        <div class="result-title">💬 Assistente clínico</div>
+        <div class="result-meta">Tira-dúvidas prático • ${escapeHtml(item.ctxLabel || 'Adulto')}${item.cenarioLabel ? ' • ' + escapeHtml(item.cenarioLabel) : ''}</div>
+      </div>
+      <div class="result-actions">
+        <button class="action-btn" id="printBtn">🖨 PDF</button>
+        <button class="action-btn" id="homeBtn2">🏠 Início</button>
+      </div>
+    </div>
+    <div class="chat-container" id="chatContainer"></div>
+    <div class="followup-box" id="followupBox">
+      <div class="followup-label">💬 Continue perguntando (ex.: e se for 0,1 mg/mL? qual a vazão da BIC?)</div>
+      <div class="followup-wrap">
+        <textarea class="followup-input" id="followupInput" rows="2" placeholder="Sua pergunta..."></textarea>
+        <div class="followup-actions">
+          <button class="followup-send" id="followupSend">Enviar →</button>
+        </div>
+      </div>
+    </div>`;
+  await renderChatMessages();
+  bindAssistenteFollowup();
+  document.getElementById('printBtn').onclick = () => window.print();
+  document.getElementById('homeBtn2').onclick = () => showView('home');
+}
+
+function bindAssistenteFollowup() {
+  const inp = document.getElementById('followupInput');
+  const btn = document.getElementById('followupSend');
+  if (!inp) return;
+  const send = () => { const t = inp.value.trim(); if (!t) return; continueAssistente(t); };
+  btn.onclick = send;
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
+  inp.focus();
+}
+
 // ============ Carregar histórico ============
 async function loadHistoric(id) {
   const h = history.find(x => x.id === id);
@@ -9854,6 +9972,9 @@ async function loadHistoric(id) {
   if (m === 'socratica') {
     currentConversation = h;
     await renderSocratic(h);
+  } else if (m === 'assistente') {
+    currentConversation = h;
+    await renderAssistente(h);
   } else {
     // direta OU caso — ambos usam renderResultDireto (distinguidos pelo item.mode)
     await renderResultDireto(h);
@@ -9892,6 +10013,8 @@ async function run(query) {
       if (currentMode === 'protocolo') currentProtocol = null;
       saveHistory(); renderSide();
       await renderResultDireto(item);
+    } else if (currentMode === 'assistente') {
+      await startAssistente(query, ctx, cenario, ctxLabel, cenarioLabel);
     } else {
       // socrática: primeira chamada gera o caso + 1ª pergunta
       const prompt = buildPromptSocraticoInicial(query, ctx, cenario);
