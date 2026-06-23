@@ -262,7 +262,7 @@ function renderAtivos(){
   renderListOnly();
 }
 function grupoKeys(groups){return Object.keys(groups).sort((a,b)=>a==='Sem setor'?1:b==='Sem setor'?-1:a.localeCompare(b,'pt'));}
-function agrupaPorSetor(list){const g={};list.forEach(p=>{const k=(p.setor||'').trim()||'Sem setor';(g[k]=g[k]||[]).push(p);});Object.keys(g).forEach(k=>g[k].sort((a,b)=>String(a.leito||'').localeCompare(String(b.leito||''),'pt',{numeric:true})));return g;}
+function agrupaPorSetor(list){const g={};list.forEach(p=>{const k=(p.setor||'').replace(/\s+/g,' ').trim().toUpperCase()||'Sem setor';(g[k]=g[k]||[]).push(p);});Object.keys(g).forEach(k=>g[k].sort((a,b)=>String(a.leito||'').localeCompare(String(b.leito||''),'pt',{numeric:true})));return g;}
 function renderListOnly(){
   const box=document.getElementById('ptlist');if(!box)return;
   const list=ativos().filter(matchBusca);
