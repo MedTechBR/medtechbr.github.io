@@ -380,6 +380,7 @@ const PROMPT_ANALISE='Você é um médico hospitalista sênior revisando o caso 
  +'5) EXAMES FALTANTES: exames específicos importantes para o quadro ainda não solicitados.\n'
  +'6) PROFILAXIA/SEGURANÇA: profilaxia de TEV, protetor gástrico, interações/dose máxima — quando claramente indicado e ausente.\n'
  +'7) PENDÊNCIAS não endereçadas ou condutas incompletas.\n'
+ +'IMPORTANTE: os itens 1, 2 e 3 (glicêmico, pressórico, febre) são DINÂMICOS — sinalize-os SEMPRE que o PARÂMETRO DO DIA estiver alterado/descompensado, MESMO que constem em "PONTOS JÁ AVALIADOS" (são reavaliados a cada dia). Os itens 4 a 7, se já avaliados, NÃO repita.\n'
  +'REGRAS: seja OBJETIVO e PRÁTICO. Bullets curtos começando por "- ", citando o DADO que motivou (ex.: "DX 256 MG/DL", "CR 2,1", "T 38,5°C"). Só sugira o que tiver respaldo nos dados; se uma categoria está adequada, NÃO cite. Se NÃO houver oportunidade relevante, responda APENAS: "✅ Sem oportunidades críticas de ajuste no momento." NUNCA invente dados ausentes. Português do Brasil, no máximo ~8 bullets. Se vier uma seção "PONTOS JÁ AVALIADOS", NÃO repita nenhum daqueles itens (exceto se o dado ATUAL mostrar piora/mudança relevante). Termine com a linha: "⚠️ Sugestões de apoio — a decisão é do médico."';
 function dadosParaAnalise(p){
   const aberto=!!document.getElementById('v_evol');
@@ -406,16 +407,18 @@ function dadosParaAnalise(p){
 }
 function mdInline(s){return esc(String(s||'')).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');}
 function normSug(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim().slice(0,70);}
+function isDinamica(t){t=String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');return /pressoric|hipertens|hipotens|\bpa\b|pressao/.test(t)||/glic|hipergli|hipogli|\bdx\b|insulin|\bhgt\b/.test(t)||/febre|febril|temperatura|hipertermia/.test(t);}
 let _sugAtual=[], _sugCtx=null;
 function renderSugestoes(id,txt,alvo){
   const p=state.pacientes.find(x=>x.id===id);if(!p||!alvo)return;
   _sugCtx={id,txt,alvo};
   const ack=p.sugAck||[];
+  const ackDia=(p.sugAckDia&&p.sugAckDia.data===ymd())?(p.sugAckDia.items||[]):[];
   _sugAtual=[];let html='',nItens=0;
   String(txt||'').split('\n').map(l=>l.trim()).filter(Boolean).forEach(l=>{
     if(/^[-•*]\s/.test(l)){
       const item=l.replace(/^[-•*]\s*/,'');
-      if(ack.some(a=>normSug(a)===normSug(item)))return; // já marcado como OK → não mostra
+      if((isDinamica(item)?ackDia:ack).some(a=>normSug(a)===normSug(item)))return; // estáticos: silenciados de vez; dinâmicos (PA/glicemia/febre): só no dia de hoje
       const i=_sugAtual.length;_sugAtual.push(item);nItens++;
       html+=`<div class="sug-item"><div class="sug-tx">${mdInline(item)}</div><button class="sug-ok" onclick="ackSug('${id}',${i},this)" title="Marcar como resolvido — não sugerir de novo">✓ OK</button></div>`;
     } else if(/^#{1,4}\s/.test(l)){
@@ -423,19 +426,26 @@ function renderSugestoes(id,txt,alvo){
     } else { html+=`<div class="sug-p">${mdInline(l)}</div>`; }
   });
   if(!nItens && !/✅|sem oportunidade/i.test(txt)) html+='<div class="sug-p">✅ Sem novas oportunidades (os pontos marcados como OK foram ocultados).</div>';
-  if(ack.length) html+=`<div class="sug-clear"><button onclick="limparAck('${id}')">↺ Limpar ${ack.length} marcação(ões) "OK"</button></div>`;
+  const nAck=ack.length+ackDia.length;
+  if(nAck) html+=`<div class="sug-clear"><button onclick="limparAck('${id}')">↺ Limpar ${nAck} marcação(ões) "OK"</button></div>`;
   alvo.innerHTML='<div class="sug-out">'+html+'</div>';
 }
 function ackSug(id,i,btn){
   const p=state.pacientes.find(x=>x.id===id);if(!p)return;
   const item=_sugAtual[i];if(!item)return;
-  p.sugAck=p.sugAck||[];if(!p.sugAck.some(a=>normSug(a)===normSug(item)))p.sugAck.push(item);
+  if(isDinamica(item)){ // PA/glicemia/febre: OK vale só para HOJE — reaparece amanhã se o parâmetro do dia ainda estiver alterado
+    const hoje=ymd();
+    if(!p.sugAckDia||p.sugAckDia.data!==hoje)p.sugAckDia={data:hoje,items:[]};
+    if(!p.sugAckDia.items.some(a=>normSug(a)===normSug(item)))p.sugAckDia.items.push(item);
+  } else { // pontuais (exame, ATB/função renal, profilaxia...): silenciado de vez
+    p.sugAck=p.sugAck||[];if(!p.sugAck.some(a=>normSug(a)===normSug(item)))p.sugAck.push(item);
+  }
   persist();
   const row=btn&&btn.closest('.sug-item');if(row)row.remove();
 }
 function limparAck(id){
   const p=state.pacientes.find(x=>x.id===id);if(!p)return;
-  p.sugAck=[];persist();
+  p.sugAck=[];p.sugAckDia=null;persist();
   if(_sugCtx&&_sugCtx.id===id)renderSugestoes(id,_sugCtx.txt,_sugCtx.alvo);
 }
 async function rodarAnalise(id,alvo,btn){
