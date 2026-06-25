@@ -83,6 +83,11 @@ input.search{padding:11px 12px;border:1px solid var(--line);border-radius:9px;fo
 .ef-lbl{flex:0 0 46px;font-size:10.5px;font-weight:800;color:var(--petrol-dark);letter-spacing:.02em}
 .ef-grid .ef-row input{flex:1;min-width:0;padding:5px 9px;font-size:13.5px}
 .ef-outros{min-height:34px}
+.sug-out{background:#eef7f4;border:1px solid #bfe6db;border-radius:11px;padding:11px 13px;font-size:13px;line-height:1.5;color:#243b41;margin-top:8px}
+.sug-out b{color:var(--petrol-dark)}
+.sug-h{font-weight:800;color:var(--petrol-dark);margin:8px 0 3px}
+.sug-li{margin:4px 0;padding-left:2px}
+.sug-p{margin:5px 0}
 .field{margin-bottom:9px}.field label{display:block;font-weight:600;font-size:12px;margin-bottom:3px}
 .field input,.field select,.field textarea{width:100%;padding:8px 11px;border:1px solid var(--line);border-radius:10px;font-size:14px;font-family:inherit;background:#fff}
 .field textarea{resize:vertical;min-height:48px;line-height:1.38}
@@ -359,6 +364,52 @@ function parseEF(ef){const map={};SISTEMAS.forEach(s=>map[s]='');const outros=[]
 function buildEF(){const lines=SISTEMAS.map(s=>'- '+s+': '+getVal('ef_'+s).trim());getVal('ef_outros').split('\n').map(x=>x.trim().replace(/^-\s*/,'')).filter(Boolean).forEach(x=>lines.push('- '+x));return lines.join('\n');}
 function addEvolChip(t){const e=document.getElementById('v_evol');if(!e)return;const c=e.value.trim().replace(/[.\s]*$/,'');e.value=(c?c+'. ':'')+t;e.focus();}
 function addCondutaChip(t){const e=document.getElementById('v_conduta');if(!e)return;const c=e.value.replace(/\s+$/,'');e.value=(c?c+'\n':'')+'- '+t;e.focus();}
+/* ===== análise da evolução por IA (sugere oportunidades, NÃO edita) ===== */
+const PROMPT_ANALISE='Você é um médico hospitalista sênior revisando o caso de um paciente INTERNADO para apoiar o colega de plantão. Aponte OPORTUNIDADES DE MELHORIA na condução — somente SUGESTÕES; NÃO reescreva a evolução. Verifique especificamente:\n'
+ +'1) AJUSTE GLICÊMICO: glicemia/DX alterada (hiper/hipo) sem tratamento/ajuste na conduta.\n'
+ +'2) AJUSTE PRESSÓRICO: PA fora de meta (hiper/hipotensão) sem ajuste de anti-hipertensivo/vasoativo.\n'
+ +'3) INVESTIGAÇÃO DE FEBRE: febre/temperatura elevada sem investigação de foco (culturas/exames/imagem) ou sem ATB quando indicado.\n'
+ +'4) ATB x FUNÇÃO RENAL: se há antibiótico em uso E função renal alterada (creatinina/ureia/TFG) E a evolução NÃO sinaliza que a dose já está ajustada → sugerir checar/ajustar a dose. Se já está sinalizado como ajustado, NÃO sugira.\n'
+ +'5) EXAMES FALTANTES: exames específicos importantes para o quadro ainda não solicitados.\n'
+ +'6) PROFILAXIA/SEGURANÇA: profilaxia de TEV, protetor gástrico, interações/dose máxima — quando claramente indicado e ausente.\n'
+ +'7) PENDÊNCIAS não endereçadas ou condutas incompletas.\n'
+ +'REGRAS: seja OBJETIVO e PRÁTICO. Bullets curtos começando por "- ", citando o DADO que motivou (ex.: "DX 256 MG/DL", "CR 2,1", "T 38,5°C"). Só sugira o que tiver respaldo nos dados; se uma categoria está adequada, NÃO cite. Se NÃO houver oportunidade relevante, responda APENAS: "✅ Sem oportunidades críticas de ajuste no momento." NUNCA invente dados ausentes. Português do Brasil, no máximo ~8 bullets. Termine com a linha: "⚠️ Sugestões de apoio — a decisão é do médico."';
+function dadosParaAnalise(p){
+  const aberto=!!document.getElementById('v_evol');
+  const ev=aberto?getVal('v_evol'):(p.evolucao||'');
+  const pr=aberto?getVal('v_param'):(p.parametros||'');
+  const ef=aberto?buildEF():(p.exameFisico||'');
+  const cd=aberto?getVal('v_conduta'):(p.conduta||'');
+  const pd=aberto?getVal('v_pend'):((p.pendencias||[]).map(x=>'- '+x.t).join('\n'));
+  const L=[];
+  L.push('PACIENTE: '+(p.nome||'—')+(p.idade?(', '+p.idade):'')+(p.sexo?(' · '+p.sexo):''));
+  if(p.diagnosticos)L.push('MOTIVO DA INTERNAÇÃO:\n'+p.diagnosticos);
+  if(p.comorbidades)L.push('COMORBIDADES: '+p.comorbidades);
+  if(p.muc)L.push('MEDICAÇÕES DE USO CONTÍNUO: '+p.muc);
+  if(p.hda)L.push('HDA: '+p.hda);
+  if(ev)L.push('EVOLUÇÃO DE HOJE: '+ev);
+  if(pr)L.push('PARÂMETROS (24H): '+pr);
+  if(ef&&ef.trim())L.push('EXAME FÍSICO:\n'+ef);
+  if(p.laboratorio)L.push('LABORATÓRIO:\n'+p.laboratorio);
+  if(p.culturas)L.push('CULTURAS:\n'+p.culturas);
+  if(p.imagem)L.push('EXAMES DE IMAGEM:\n'+p.imagem);
+  if(cd)L.push('CONDUTA ATUAL:\n'+cd);
+  if(pd)L.push('PENDÊNCIAS:\n'+pd);
+  return L.join('\n\n');
+}
+function mdLite(t){let h=esc(String(t||''));h=h.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');return h.split('\n').map(l=>{l=l.trim();if(!l)return '';if(/^#{1,4}\s/.test(l))return '<div class="sug-h">'+l.replace(/^#{1,4}\s*/,'')+'</div>';if(/^[-•*]\s/.test(l))return '<div class="sug-li">• '+l.replace(/^[-•*]\s*/,'')+'</div>';return '<div class="sug-p">'+l+'</div>';}).join('');}
+async function rodarAnalise(id,alvo,btn){
+  const p=state.pacientes.find(x=>x.id===id);if(!p||!alvo)return;
+  alvo.innerHTML='<div class="sug-out"><span class="spin"></span> Analisando o caso e buscando oportunidades de melhoria…</div>';
+  if(btn)btn.disabled=true;
+  try{
+    const txt=await MT.ai(PROMPT_ANALISE+'\n\n=== CASO ===\n'+dadosParaAnalise(p));
+    alvo.innerHTML='<div class="sug-out">'+mdLite(txt)+'</div>';
+  }catch(e){
+    alvo.innerHTML='<div class="sug-out" style="color:var(--red)">⚠️ '+esc(e.message||'Falha na IA.')+(MT.mode==='demo'?' (Entre na conta MedTech para usar a IA.)':'')+'</div>';
+  }
+  if(btn)btn.disabled=false;
+}
 function openVisita(id){
   const p=state.pacientes.find(x=>x.id===id);if(!p)return;
   visitaImgs=[];visitaImgErrs=[];
@@ -380,6 +431,8 @@ function openVisita(id){
      <textarea id="ef_outros" class="ef-outros" autocapitalize="characters" spellcheck="false" placeholder="+ OUTROS ACHADOS (OPCIONAL)">${esc(efP.outros||'')}</textarea></div>
    <div class="field"><label>Conduta <span style="color:var(--muted);font-weight:400">(uma por linha — "EXPLICO PLANO TERAPEUTICO" entra automático)</span></label><textarea id="v_conduta" autocapitalize="characters" spellcheck="false" placeholder="- MANTENHO ATB&#10;- SOLICITO NOVA ROTINA&#10;- AGUARDO EXAMES" style="min-height:168px">${esc(p.conduta||'')}</textarea></div>
    <div class="field"><label>Pendências <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="v_pend" autocapitalize="characters" spellcheck="false" placeholder="- ..." style="min-height:96px">${esc((p.pendencias||[]).map(x=>'- '+x.t).join('\n'))}</textarea></div>
+   <div class="row" style="margin-top:2px"><button class="btn btn-g btn-sm" style="width:100%" onclick="rodarAnalise('${id}',document.getElementById('v_sug'),this)">🔎 Analisar evolução por IA — oportunidades de melhoria</button></div>
+   <div id="v_sug"></div>
    <div class="row actions"><button class="btn btn-p" onclick="saveVisita('${id}',true)">📄 Gerar evolução</button><button class="btn btn-g" onclick="saveVisita('${id}',false)">Salvar</button></div>`);
 }
 function saveVisita(id,gerar){
