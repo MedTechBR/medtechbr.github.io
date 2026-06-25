@@ -88,6 +88,13 @@ input.search{padding:11px 12px;border:1px solid var(--line);border-radius:9px;fo
 .sug-h{font-weight:800;color:var(--petrol-dark);margin:8px 0 3px}
 .sug-li{margin:4px 0;padding-left:2px}
 .sug-p{margin:5px 0}
+.sug-item{display:flex;align-items:flex-start;gap:8px;margin:6px 0;padding-bottom:7px;border-bottom:1px dashed #cfe6dd}
+.sug-item:last-child{border-bottom:none;padding-bottom:0}
+.sug-tx{flex:1;min-width:0;font-size:13px;line-height:1.45}
+.sug-ok{flex:0 0 auto;background:#fff;border:1px solid var(--mint-dark);color:var(--green);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap}
+.sug-ok:active{background:var(--mint-dark);color:#fff}
+.sug-clear{margin-top:8px;text-align:right}
+.sug-clear button{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline}
 .field{margin-bottom:9px}.field label{display:block;font-weight:600;font-size:12px;margin-bottom:3px}
 .field input,.field select,.field textarea{width:100%;padding:8px 11px;border:1px solid var(--line);border-radius:10px;font-size:14px;font-family:inherit;background:#fff}
 .field textarea{resize:vertical;min-height:48px;line-height:1.38}
@@ -373,7 +380,7 @@ const PROMPT_ANALISE='Você é um médico hospitalista sênior revisando o caso 
  +'5) EXAMES FALTANTES: exames específicos importantes para o quadro ainda não solicitados.\n'
  +'6) PROFILAXIA/SEGURANÇA: profilaxia de TEV, protetor gástrico, interações/dose máxima — quando claramente indicado e ausente.\n'
  +'7) PENDÊNCIAS não endereçadas ou condutas incompletas.\n'
- +'REGRAS: seja OBJETIVO e PRÁTICO. Bullets curtos começando por "- ", citando o DADO que motivou (ex.: "DX 256 MG/DL", "CR 2,1", "T 38,5°C"). Só sugira o que tiver respaldo nos dados; se uma categoria está adequada, NÃO cite. Se NÃO houver oportunidade relevante, responda APENAS: "✅ Sem oportunidades críticas de ajuste no momento." NUNCA invente dados ausentes. Português do Brasil, no máximo ~8 bullets. Termine com a linha: "⚠️ Sugestões de apoio — a decisão é do médico."';
+ +'REGRAS: seja OBJETIVO e PRÁTICO. Bullets curtos começando por "- ", citando o DADO que motivou (ex.: "DX 256 MG/DL", "CR 2,1", "T 38,5°C"). Só sugira o que tiver respaldo nos dados; se uma categoria está adequada, NÃO cite. Se NÃO houver oportunidade relevante, responda APENAS: "✅ Sem oportunidades críticas de ajuste no momento." NUNCA invente dados ausentes. Português do Brasil, no máximo ~8 bullets. Se vier uma seção "PONTOS JÁ AVALIADOS", NÃO repita nenhum daqueles itens (exceto se o dado ATUAL mostrar piora/mudança relevante). Termine com a linha: "⚠️ Sugestões de apoio — a decisão é do médico."';
 function dadosParaAnalise(p){
   const aberto=!!document.getElementById('v_evol');
   const ev=aberto?getVal('v_evol'):(p.evolucao||'');
@@ -397,14 +404,49 @@ function dadosParaAnalise(p){
   if(pd)L.push('PENDÊNCIAS:\n'+pd);
   return L.join('\n\n');
 }
-function mdLite(t){let h=esc(String(t||''));h=h.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');return h.split('\n').map(l=>{l=l.trim();if(!l)return '';if(/^#{1,4}\s/.test(l))return '<div class="sug-h">'+l.replace(/^#{1,4}\s*/,'')+'</div>';if(/^[-•*]\s/.test(l))return '<div class="sug-li">• '+l.replace(/^[-•*]\s*/,'')+'</div>';return '<div class="sug-p">'+l+'</div>';}).join('');}
+function mdInline(s){return esc(String(s||'')).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');}
+function normSug(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim().slice(0,70);}
+let _sugAtual=[], _sugCtx=null;
+function renderSugestoes(id,txt,alvo){
+  const p=state.pacientes.find(x=>x.id===id);if(!p||!alvo)return;
+  _sugCtx={id,txt,alvo};
+  const ack=p.sugAck||[];
+  _sugAtual=[];let html='',nItens=0;
+  String(txt||'').split('\n').map(l=>l.trim()).filter(Boolean).forEach(l=>{
+    if(/^[-•*]\s/.test(l)){
+      const item=l.replace(/^[-•*]\s*/,'');
+      if(ack.some(a=>normSug(a)===normSug(item)))return; // já marcado como OK → não mostra
+      const i=_sugAtual.length;_sugAtual.push(item);nItens++;
+      html+=`<div class="sug-item"><div class="sug-tx">${mdInline(item)}</div><button class="sug-ok" onclick="ackSug('${id}',${i},this)" title="Marcar como resolvido — não sugerir de novo">✓ OK</button></div>`;
+    } else if(/^#{1,4}\s/.test(l)){
+      html+=`<div class="sug-h">${esc(l.replace(/^#{1,4}\s*/,''))}</div>`;
+    } else { html+=`<div class="sug-p">${mdInline(l)}</div>`; }
+  });
+  if(!nItens && !/✅|sem oportunidade/i.test(txt)) html+='<div class="sug-p">✅ Sem novas oportunidades (os pontos marcados como OK foram ocultados).</div>';
+  if(ack.length) html+=`<div class="sug-clear"><button onclick="limparAck('${id}')">↺ Limpar ${ack.length} marcação(ões) "OK"</button></div>`;
+  alvo.innerHTML='<div class="sug-out">'+html+'</div>';
+}
+function ackSug(id,i,btn){
+  const p=state.pacientes.find(x=>x.id===id);if(!p)return;
+  const item=_sugAtual[i];if(!item)return;
+  p.sugAck=p.sugAck||[];if(!p.sugAck.some(a=>normSug(a)===normSug(item)))p.sugAck.push(item);
+  persist();
+  const row=btn&&btn.closest('.sug-item');if(row)row.remove();
+}
+function limparAck(id){
+  const p=state.pacientes.find(x=>x.id===id);if(!p)return;
+  p.sugAck=[];persist();
+  if(_sugCtx&&_sugCtx.id===id)renderSugestoes(id,_sugCtx.txt,_sugCtx.alvo);
+}
 async function rodarAnalise(id,alvo,btn){
   const p=state.pacientes.find(x=>x.id===id);if(!p||!alvo)return;
   alvo.innerHTML='<div class="sug-out"><span class="spin"></span> Analisando o caso e buscando oportunidades de melhoria…</div>';
   if(btn)btn.disabled=true;
   try{
-    const txt=await MT.ai(PROMPT_ANALISE+'\n\n=== CASO ===\n'+dadosParaAnalise(p));
-    alvo.innerHTML='<div class="sug-out">'+mdLite(txt)+'</div>';
+    const ack=(p.sugAck||[]);
+    const ackBlock=ack.length?('\n\n=== PONTOS JÁ AVALIADOS/DECIDIDOS PELO MÉDICO (NÃO sugerir de novo, salvo piora relevante) ===\n'+ack.map(a=>'- '+a).join('\n')):'';
+    const txt=await MT.ai(PROMPT_ANALISE+'\n\n=== CASO ===\n'+dadosParaAnalise(p)+ackBlock);
+    renderSugestoes(id,txt,alvo);
   }catch(e){
     alvo.innerHTML='<div class="sug-out" style="color:var(--red)">⚠️ '+esc(e.message||'Falha na IA.')+(MT.mode==='demo'?' (Entre na conta MedTech para usar a IA.)':'')+'</div>';
   }
