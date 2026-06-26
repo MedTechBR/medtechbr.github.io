@@ -70,6 +70,12 @@ main{max-width:1000px;margin:0 auto;padding:18px 18px 70px;min-height:60vh}
 .diag-leg{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
 .diag-leg b{color:var(--petrol-dark)}
 .img-slot{border:1.5px dashed var(--line);border-radius:10px;padding:18px;text-align:center;color:var(--muted);font-size:12.5px;line-height:1.5}
+.ig{margin:0 0 12px}
+.ig img{width:100%;border-radius:9px;border:1px solid var(--line);display:block;background:#0b1416}
+.ig figcaption{font-size:12px;color:#243b41;margin-top:5px;line-height:1.45}
+.img-cred{display:block;font-size:10.5px;color:var(--muted);margin-top:2px}
+.img-cred a{color:var(--muted)}
+.img-note{font-size:11.5px;color:var(--muted);line-height:1.5;border-top:1px solid var(--line);padding-top:9px;margin-top:2px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:none;border-radius:11px;padding:12px 16px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;text-decoration:none}
 .btn-p{background:var(--mint);color:var(--petrol-dark)}.btn-p:hover{background:var(--mint-dark)}
 .btn-g{background:#fff;color:var(--petrol);border:1px solid var(--line)}
@@ -362,6 +368,31 @@ FoCUS: **derrame/tamponamento?** contratilidade (boa/ruim)? **VD dilatado** (TEP
 ];
 const ORDEM_CAT=['Tórax','Cardíaco','Abdome','Vascular','Procedimentos','Outros','Protocolos'];
 
+/* imagens reais de ultrassom — só com licença aberta verificada (uso comercial + atribuição). Crédito embaixo de cada uma. */
+const IMGS={
+ pulmao:[
+  {src:'pocusimg/pulmao-blines.jpg',leg:'Linhas B (síndrome intersticial) — caudas de cometa verticais.',autor:'Tinss',lic:'CC BY-SA 4.0',url:'https://commons.wikimedia.org/wiki/File:B_lines_on_a_lung_ultrasound_of_a_patient_with_fibrosis.jpg'},
+  {src:'pocusimg/pulmao-praia.jpg',leg:'Sinal da praia (modo M) — deslizamento pleural normal.',autor:'Tinss',lic:'CC BY-SA 4.0',url:'https://commons.wikimedia.org/wiki/File:Sea_shore_sign_on_a_lung_ultrasound.jpg'}
+ ],
+ focus:[
+  {src:'pocusimg/focus-derrame.png',leg:'Derrame pericárdico (líquido anecoico ao redor do coração).',autor:'James Heilman, MD',lic:'CC BY-SA 3.0',url:'https://commons.wikimedia.org/wiki/File:PericardialeffusionUS.PNG'}
+ ],
+ vci:[
+  {src:'pocusimg/vci.gif',leg:'VCI (subxifoide) com variação respiratória — clipe.',autor:'Tinss',lic:'CC BY-SA 4.0',url:'https://commons.wikimedia.org/wiki/File:Inferior_vena_cava_ultrasound.gif'}
+ ],
+ aorta:[
+  {src:'pocusimg/aorta-aaa.jpg',leg:'Aneurisma de aorta abdominal — corte axial, com medida (anotado).',autor:'Mikael Häggström, MD',lic:'CC0 (domínio público)',url:'https://commons.wikimedia.org/wiki/File:Ultrasonography_of_abdominal_aortic_aneurysm_in_axial_plane,_annotated.jpg'}
+ ]
+};
+function galeriaHtml(e){
+  const arr=IMGS[e.id];
+  if(arr&&arr.length){
+    return arr.map(im=>`<figure class="ig"><a href="${im.src}" target="_blank" rel="noopener"><img src="${im.src}" alt="${esc(im.leg)}" loading="lazy"></a><figcaption>${esc(im.leg)}<span class="img-cred">${esc(im.autor)} · ${esc(im.lic)} · <a href="${im.url}" target="_blank" rel="noopener">fonte</a></span></figcaption></figure>`).join('')
+     +'<div class="img-note">Imagens sob licença aberta (crédito em cada uma). Envie suas próprias captações para complementar.</div>';
+  }
+  return '<div class="img-slot">📷 Sem imagens ainda neste exame.<br>Envie materiais de referência com direito de uso que eu integro aqui.</div>';
+}
+
 /* ===================== MARKDOWN ===================== */
 function md(t){
   const blocks=String(t||'').split('\n');let html='',inUl=false;
@@ -422,7 +453,7 @@ function renderExam(e){
      </div>
      <div class="aside">
        <div class="panel"><h4>Posição da sonda</h4>${e.diag||corpo([])}<div class="diag-leg">${e.leg||''}</div></div>
-       <div class="panel"><h4>Imagens de ultrassom</h4><div class="img-slot">📷 Espaço reservado para imagens reais.<br>Envie seus materiais de referência que eu integro aqui.</div></div>
+       <div class="panel"><h4>Imagens de ultrassom</h4>${galeriaHtml(e)}</div>
      </div>
    </div>`;
 }
