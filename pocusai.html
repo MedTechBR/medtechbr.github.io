@@ -7,6 +7,13 @@
 <meta name="description" content="PocusAI: guia prático de ultrassom point-of-care (POCUS) por região — sonda, posição, cortes, técnica, achados normais e patológicos, com IA integrada.">
 <meta name="theme-color" content="#0E5A6D">
 <link rel="icon" type="image/png" href="favicon.png">
+<link rel="manifest" href="pocusai.webmanifest">
+<link rel="apple-touch-icon" href="icone-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PocusAI">
+<meta name="mobile-web-app-capable" content="yes">
+<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"pocusai",name:"PocusAI"};</script>
 <script type="module" src="_mtauth.js?v=6"></script>
@@ -375,13 +382,23 @@ const IMGS={
   {src:'pocusimg/pulmao-praia.jpg',leg:'Sinal da praia (modo M) — deslizamento pleural normal.',autor:'Tinss',lic:'CC BY-SA 4.0',url:'https://commons.wikimedia.org/wiki/File:Sea_shore_sign_on_a_lung_ultrasound.jpg'}
  ],
  focus:[
-  {src:'pocusimg/focus-derrame.png',leg:'Derrame pericárdico (líquido anecoico ao redor do coração).',autor:'James Heilman, MD',lic:'CC BY-SA 3.0',url:'https://commons.wikimedia.org/wiki/File:PericardialeffusionUS.PNG'}
+  {src:'pocusimg/focus-plax.jpg',leg:'Janela: paraesternal eixo longo (PLAX) — VE, VD, AE e aorta.',autor:'Balaji.md au',lic:'CC BY-SA 4.0',url:'https://commons.wikimedia.org/wiki/File:Echoparasternallongaxis.jpg'},
+  {src:'pocusimg/focus-a4c.jpg',leg:'Janela: apical 4 câmaras — compara tamanho de VD × VE.',autor:'Balaji.md au',lic:'CC BY-SA 4.0',url:'https://commons.wikimedia.org/wiki/File:Echoapicalfourchamber.jpg'},
+  {src:'pocusimg/focus-derrame.png',leg:'Achado: derrame pericárdico (líquido anecoico ao redor do coração).',autor:'James Heilman, MD',lic:'CC BY-SA 3.0',url:'https://commons.wikimedia.org/wiki/File:PericardialeffusionUS.PNG'}
  ],
  vci:[
   {src:'pocusimg/vci.gif',leg:'VCI (subxifoide) com variação respiratória — clipe.',autor:'Tinss',lic:'CC BY-SA 4.0',url:'https://commons.wikimedia.org/wiki/File:Inferior_vena_cava_ultrasound.gif'}
  ],
  aorta:[
-  {src:'pocusimg/aorta-aaa.jpg',leg:'Aneurisma de aorta abdominal — corte axial, com medida (anotado).',autor:'Mikael Häggström, MD',lic:'CC0 (domínio público)',url:'https://commons.wikimedia.org/wiki/File:Ultrasonography_of_abdominal_aortic_aneurysm_in_axial_plane,_annotated.jpg'}
+  {src:'pocusimg/aorta-aaa.jpg',leg:'AAA — corte axial (transversal), com medida (anotado).',autor:'Mikael Häggström, MD',lic:'CC0 (domínio público)',url:'https://commons.wikimedia.org/wiki/File:Ultrasonography_of_abdominal_aortic_aneurysm_in_axial_plane,_annotated.jpg'},
+  {src:'pocusimg/aorta-aaa-long.jpg',leg:'AAA — corte longitudinal (sagital), anotado.',autor:'Mikael Häggström, MD',lic:'CC0 (domínio público)',url:'https://commons.wikimedia.org/wiki/File:Ultrasonography_of_abdominal_aortic_aneurysm_in_sagittal_plane,_annotated.jpg'},
+  {src:'pocusimg/aorta-trombo.jpg',leg:'Achado: AAA com trombo mural — lúmen menor que o vaso.',autor:'Mikael Häggström, MD',lic:'CC0 (domínio público)',url:'https://commons.wikimedia.org/wiki/File:Ultrasonography_of_abdominal_aortic_aneurysm_with_mural_thrombus.jpg'}
+ ],
+ renal:[
+  {src:'pocusimg/renal-hidro.jpg',leg:'Achado: hidronefrose moderada — dilatação anecoica do sistema coletor.',autor:'Cerevisae',lic:'CC BY-SA 4.0',url:'https://commons.wikimedia.org/wiki/File:Ultrasound_of_right_kidney_moderate_hydronephrosis.jpg'}
+ ],
+ tvp:[
+  {src:'pocusimg/tvp-dvt.jpg',leg:'Achado: TVP da veia femoral — veia não compressível com trombo.',autor:'Mikael Häggström, MD',lic:'CC0 (domínio público)',url:'https://commons.wikimedia.org/wiki/File:Ultrasonography_of_deep_vein_thrombosis_of_the_femoral_vein.jpg'}
  ]
 };
 function galeriaHtml(e){
