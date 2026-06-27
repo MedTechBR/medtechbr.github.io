@@ -602,11 +602,11 @@ function gerarEvolucao(p){
 function lineToHtml(line){
   if(line==='')return '';
   if(/^# EVOLUÇÃO MÉDICA/.test(line)||/^# EXAME FÍSICO:/.test(line)||/^# LABORATÓRIO:/.test(line)||/^# CULTURAS:/.test(line)||/^# EXAMES DE IMAGEM/.test(line)||/^# CONDUTA:/.test(line))
-    return '<b>'+esc(line)+'</b>';
+    return '<b>'+esc(line.replace(/^#\s+/,''))+'</b>';
   const m=line.match(/^((?:#|>) (?:ID|COMORBIDADES|ALERGIAS|MUC|HDA|EVOLUÇÃO|PARÂMETROS):)([\s\S]*)$/);
-  if(m)return '<b>'+esc(m[1])+'</b>'+esc(m[2]);
-  if(/^- /.test(line)||/^> /.test(line))return '<b>'+esc(line)+'</b>'; // tópicos (itens) em negrito
-  return esc(line);
+  if(m)return '<b>'+esc(m[1].replace(/^[#>]\s+/,''))+'</b>'+esc(m[2]);
+  if(/^> /.test(line))return esc(line.replace(/^>\s+/,'')); // linha ">" remanescente: sem marcador, peso normal
+  return esc(line); // bullets/itens em peso normal (só cabeçalhos ficam em negrito)
 }
 function gerarEvolucaoHtml(p){return gerarEvolucao(p).split('\n').map(l=>'<div>'+(lineToHtml(l)||'<br>')+'</div>').join('');}
 function copyEvoFmt(id,btnId){
@@ -614,24 +614,30 @@ function copyEvoFmt(id,btnId){
   // O editor do ISGH (ars vitae) DESCARTA HTML na colagem e só quebra linha quando há LINHA EM BRANCO.
   // Solução testada no editor real: separar cada linha por \n\n (vira 1 parágrafo por linha, margem 0 = sem espaço extra).
   const plain=gerarEvolucao(p).split('\n').join('\n\n');
-  let ok=false;
-  try{
-    const ta=document.createElement('textarea');
-    ta.value=plain;ta.setAttribute('style','position:fixed;left:-9999px;top:0;opacity:0');
-    document.body.appendChild(ta);ta.focus();ta.select();
-    ok=document.execCommand('copy');
-    document.body.removeChild(ta);
-  }catch(e){ok=false;}
-  if(!ok&&navigator.clipboard){try{navigator.clipboard.writeText(plain);ok=true;}catch(e){}}
-  const b=document.getElementById(btnId);if(b){b.textContent=ok?'✓ Copiado p/ o sistema':'Selecione e copie manualmente';setTimeout(()=>b.textContent='📋 Copiar p/ o sistema',2000);}
+  const html='<div style="font-family:sans-serif">'+gerarEvolucaoHtml(p)+'</div>';
+  const done=ok=>{const b=document.getElementById(btnId);if(b){b.textContent=ok?'✓ Copiado p/ o sistema':'Selecione e copie manualmente';setTimeout(()=>b.textContent='📋 Copiar p/ o sistema',2000);}};
+  function fallbackPlain(){
+    let ok=false;
+    try{const ta=document.createElement('textarea');ta.value=plain;ta.setAttribute('style','position:fixed;left:-9999px;top:0;opacity:0');document.body.appendChild(ta);ta.focus();ta.select();ok=document.execCommand('copy');document.body.removeChild(ta);}catch(e){ok=false;}
+    if(!ok&&navigator.clipboard){try{navigator.clipboard.writeText(plain);ok=true;}catch(e){}}
+    done(ok);
+  }
+  if(navigator.clipboard&&window.ClipboardItem){
+    try{
+      const item=new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([plain],{type:'text/plain'})});
+      navigator.clipboard.write([item]).then(()=>done(true)).catch(fallbackPlain);
+      return;
+    }catch(e){}
+  }
+  fallbackPlain();
 }
 function verEvolucao(id){
   const p=state.pacientes.find(x=>x.id===id);if(!p)return;
   const txt=gerarEvolucao(p);
   modal(`<h3>📄 Evolução — pronta para colar</h3>
    <div class="hint" style="margin-bottom:8px">${esc(p.nome||'Paciente')} · leito ${esc(p.leito||'—')}. Revise antes de colar no sistema do hospital.</div>
-   <div class="hint" style="margin:-2px 0 8px">Use o botão <b>Copiar p/ o sistema</b> e cole no ISGH — as quebras de linha são preservadas. (O editor do ISGH não aceita negrito na colagem.)</div>
-   <div class="field"><textarea id="evoTa" class="evo-out">${esc(txt)}</textarea></div>
+   <div class="hint" style="margin:-2px 0 8px">Use o botão <b>Copiar p/ o sistema</b> e cole no destino. Os <b>cabeçalhos saem em negrito</b> ao colar em editores que aceitam formatação (Word, Docs, e-mail); no ISGH, vai em texto puro com as quebras de linha preservadas.</div>
+   <div class="evo-out" style="border:1px solid var(--line);border-radius:10px;padding:12px;min-height:auto;max-height:55vh;overflow:auto;background:#fff">${gerarEvolucaoHtml(p)}</div>
    <div class="row actions"><button class="btn btn-p" id="copyEvoBtn" onclick="copyEvoFmt('${id}','copyEvoBtn')">📋 Copiar p/ o sistema</button><button class="btn btn-g" onclick="openVisita('${id}')">← Voltar</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
 }
 function copyTa(taId,btnId,label){const t=document.getElementById(taId);if(!t)return;t.focus();t.select();try{document.execCommand('copy');}catch(e){}if(navigator.clipboard){try{navigator.clipboard.writeText(t.value);}catch(e){}}const b=document.getElementById(btnId);if(b){b.textContent='✓ Copiado';setTimeout(()=>b.textContent=label,1600);}}
