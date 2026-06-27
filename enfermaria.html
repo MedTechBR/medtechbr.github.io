@@ -319,12 +319,12 @@ function openForm(id){
   const p=id?state.pacientes.find(x=>x.id===id):{leito:'',setor:'',nome:'',idade:'',sexo:'',clinica:'Clínica Médica',diagnosticos:'',comorbidades:'',alergias:'',muc:'',hda:'',laboratorio:'',culturas:'',imagem:'',exameFisico:'',conduta:'',obs:''};
   const sx=['','M','F'].map(k=>`<option value="${k}" ${p.sexo===k?'selected':''}>${k||'—'}</option>`).join('');
   modal(`<h3>${id?'Editar':'Novo'} paciente</h3>
-   ${id?'':`<div class="ai-box">
-     <div class="ai-h">✨ Colar evolução — a IA preenche a ficha</div>
-     <textarea id="f_evol" placeholder="Cole aqui a evolução / prontuário do paciente. A IA extrai identificação, comorbidades, HDA, exames, exame físico, conduta e pendências."></textarea>
-     <div class="row"><button class="btn btn-p btn-sm" id="extrairBtn" onclick="extrairEvol()">✨ Extrair dados</button></div>
-     <div class="hint">Revise sempre o que a IA preencher. O <b>leito</b> você informa manualmente.${MT.mode==='demo'?' <b>Entre na conta MedTech para usar a IA.</b>':''}</div>
-   </div>`}
+   <div class="ai-box">
+     <div class="ai-h">✨ ${id?'Atualizar pela nova evolução':'Colar evolução — a IA preenche a ficha'}</div>
+     <textarea id="f_evol" placeholder="${id?'Cole a NOVA evolução de hoje — a IA ATUALIZA exames, exame físico, conduta e pendências, mantendo os dados de base.':'Cole aqui a evolução / prontuário do paciente. A IA extrai identificação, comorbidades, HDA, exames, exame físico, conduta e pendências.'}"></textarea>
+     <div class="row"><button class="btn btn-p btn-sm" id="extrairBtn" onclick="extrairEvol('${id||''}')">${id?'✨ Atualizar dados':'✨ Extrair dados'}</button></div>
+     <div class="hint">Revise sempre o que a IA ${id?'atualizar (ela mescla com os dados atuais)':'preencher. O <b>leito</b> você informa manualmente'}.${MT.mode==='demo'?' <b>Entre na conta MedTech para usar a IA.</b>':''}</div>
+   </div>
    <div class="sec-h">Identificação</div>
    <div class="three"><div class="field"><label>Leito *</label><input id="f_leito" value="${esc(p.leito)}" placeholder="12A"></div>
      <div class="field"><label>Nome</label><input id="f_nome" value="${esc(p.nome)}" placeholder="Nome do paciente"></div>
@@ -666,11 +666,12 @@ function saveSaida(id){
 
 /* ===== IA: extrair dados da evolução ===== */
 function parseJsonLoose(t){if(!t)return null;t=String(t).trim().replace(/^```[a-z]*\s*/i,'').replace(/```\s*$/,'').trim();const i=t.indexOf('{'),j=t.lastIndexOf('}');if(i>=0&&j>i){try{return JSON.parse(t.slice(i,j+1));}catch(e){}}try{return JSON.parse(t);}catch(e){return null;}}
-async function extrairEvol(){
+async function extrairEvol(id){
   const raw=getVal('f_evol');
-  if(!raw){alert('Cole a evolução do paciente antes de extrair.');return;}
-  const b=document.getElementById('extrairBtn');b.innerHTML='<span class="spin"></span> Extraindo...';b.disabled=true;
-  const prompt='Você é um assistente clínico extraindo dados de uma evolução/prontuário de paciente INTERNADO para um sistema de enfermaria. Responda APENAS um objeto JSON válido (sem markdown, sem comentários) com EXATAMENTE estas chaves:\n'
+  const editar=!!id;
+  if(!raw){alert('Cole a evolução do paciente antes de '+(editar?'atualizar.':'extrair.'));return;}
+  const b=document.getElementById('extrairBtn');b.innerHTML='<span class="spin"></span> '+(editar?'Atualizando…':'Extraindo…');b.disabled=true;
+  const KEYS=''
    +'- "nome" (string)\n'
    +'- "idade" (string, ex.: "78 anos")\n'
    +'- "diagnosticos" (ARRAY de strings): SOMENTE o MOTIVO DA INTERNAÇÃO / hipóteses que justificaram a internação (o "IH POR"). CADA hipótese em um ITEM SEPARADO. NUNCA junte duas no mesmo item.\n'
@@ -684,7 +685,25 @@ async function extrairEvol(){
    +'- "exameFisico" (string): o EXAME FÍSICO em linhas começando por "- ", uma por aparelho, nesta ordem quando houver: "- NEURO:", "- AC:", "- AP:", "- ABDOME:", "- EXT:", "- PELE:" (mapeie SCR→AC, SR→AP, TGI→ABDOME). "" se não houver.\n'
    +'- "conduta" (ARRAY de strings): cada item da CONDUTA/PLANO atual (um por item). NÃO inclua nenhuma linha de "explico plano terapêutico" (ela é adicionada automaticamente).\n'
    +'- "pendencias" (ARRAY de strings curtas): o que IMPEDE A ALTA agora (sobretudo após "CONDUTA"/"PLANO"). Para CADA antibiótico em uso com dia de início (DI/D1/"iniciado em"), crie uma pendência "<ATB> DI <DD/MM> - programado até <DD/MM>" (ou "[definir]" se não houver término).\n'
-   +'Não invente nada; use "" ou [] quando não houver. Português do Brasil.\n\nEvolução:\n'+raw;
+   ;
+  let prompt;
+  if(editar){
+    const A=[]; const g=(lbl,v)=>{v=(v||'').trim();if(v)A.push(lbl+': '+v);};
+    g('nome',getVal('f_nome'));g('idade',getVal('f_idade'));g('diagnosticos',getVal('f_dx'));g('comorbidades',getVal('f_comorb'));g('alergias',getVal('f_alergias'));g('muc',getVal('f_muc'));g('hda',getVal('f_hda'));g('laboratorio',getVal('f_lab'));g('culturas',getVal('f_culturas'));g('imagem',getVal('f_imagem'));g('exameFisico',getVal('f_ef'));g('conduta',getVal('f_conduta'));g('pendencias',getVal('f_pend'));
+    prompt='Você é um assistente clínico ATUALIZANDO a ficha de um paciente INTERNADO. Recebe os DADOS ATUAIS (já no sistema) e uma NOVA EVOLUÇÃO; responda APENAS um objeto JSON válido (sem markdown) com EXATAMENTE as chaves abaixo, já com os dados ATUALIZADOS após esta evolução. REGRAS DE ATUALIZAÇÃO:\n'
+     +'- MANTENHA os dados de base (nome, idade, comorbidades, alergias, muc, hda) — só altere se a evolução claramente corrigir/acrescentar.\n'
+     +'- "diagnosticos": mantenha os atuais e ACRESCENTE novas hipóteses que a evolução trouxer (sem duplicar).\n'
+     +'- "laboratorio": mantenha as investigações já listadas e ACRESCENTE novos exames investigativos da evolução (mesmas regras; sem duplicar o mesmo exame).\n'
+     +'- "culturas" e "imagem": ACRESCENTE os novos resultados aos já existentes (sem duplicar).\n'
+     +'- "exameFisico": SUBSTITUA pelo exame físico MAIS RECENTE desta evolução, se houver; senão mantenha o atual.\n'
+     +'- "conduta": SUBSTITUA pela conduta/plano ATUAL desta evolução, se houver plano novo; senão mantenha.\n'
+     +'- "pendencias": ATUALIZE — REMOVA as que a evolução indica resolvidas, MANTENHA as ainda pendentes e ACRESCENTE as novas.\n\n'
+     +'CHAVES (siga as regras de conteúdo de cada uma):\n'+KEYS
+     +'\nNão invente nada; use "" ou [] quando não houver. Português do Brasil.\n\n=== DADOS ATUAIS ===\n'+A.join('\n')+'\n\n=== NOVA EVOLUÇÃO ===\n'+raw;
+  } else {
+    prompt='Você é um assistente clínico extraindo dados de uma evolução/prontuário de paciente INTERNADO para um sistema de enfermaria. Responda APENAS um objeto JSON válido (sem markdown, sem comentários) com EXATAMENTE estas chaves:\n'+KEYS
+     +'Não invente nada; use "" ou [] quando não houver. Português do Brasil.\n\nEvolução:\n'+raw;
+  }
   try{
     const txt=await MT.ai(prompt);
     const data=parseJsonLoose(txt);
@@ -705,11 +724,11 @@ async function extrairEvol(){
       setVal('f_ef',data.exameFisico||'');
       setVal('f_conduta',bullets(toLines(data.conduta)));
       const okN=(data.nome||'')?'':' (nome não encontrado)';
-      const bb=document.getElementById('extrairBtn');if(bb){bb.innerHTML='✓ Ficha preenchida'+okN;setTimeout(()=>{bb.innerHTML='✨ Extrair dados';bb.disabled=false;},1800);}
+      const bb=document.getElementById('extrairBtn');if(bb){bb.innerHTML=(editar?'✓ Ficha atualizada':'✓ Ficha preenchida')+okN;setTimeout(()=>{bb.innerHTML=editar?'✨ Atualizar dados':'✨ Extrair dados';bb.disabled=false;},1800);}
       return;
     }
   }catch(e){alert('⚠️ '+(e.message||'Falha na IA.'));}
-  b.innerHTML='✨ Extrair dados';b.disabled=false;
+  b.innerHTML=editar?'✨ Atualizar dados':'✨ Extrair dados';b.disabled=false;
 }
 
 /* ===== modal ===== */
