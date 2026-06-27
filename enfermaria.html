@@ -369,7 +369,7 @@ function gtbul(s){return String(s||'').split('\n').map(x=>x.trim()).filter(Boole
 /* ===== visita beira-leito ===== */
 const SISTEMAS=['NEURO','AC','AP','ABDOME','EXT','PELE'];
 function parseEF(ef){const map={};SISTEMAS.forEach(s=>map[s]='');const outros=[];String(ef||'').split('\n').forEach(line=>{const m=line.match(/^\s*-?\s*(NEURO|AC|AP|ABDOME|EXT|PELE)\s*:\s*(.*)$/i);if(m){map[m[1].toUpperCase()]=(m[2]||'').trim();}else{const t=line.replace(/^\s*-\s*/,'').trim();if(t)outros.push(t);}});return {map,outros:outros.join('\n')};}
-function buildEF(){const lines=SISTEMAS.map(s=>'- '+s+': '+getVal('ef_'+s).trim());getVal('ef_outros').split('\n').map(x=>x.trim().replace(/^-\s*/,'')).filter(Boolean).forEach(x=>lines.push('- '+x));return lines.join('\n');}
+function buildEF(){const lines=SISTEMAS.map(s=>{const v=getVal('ef_'+s).trim();return v?('- '+s+': '+v):null;}).filter(Boolean);getVal('ef_outros').split('\n').map(x=>x.trim().replace(/^-\s*/,'')).filter(Boolean).forEach(x=>lines.push('- '+x));return lines.join('\n');}
 function addEvolChip(t){const e=document.getElementById('v_evol');if(!e)return;const c=e.value.trim().replace(/[.\s]*$/,'');e.value=(c?c+'. ':'')+t;e.focus();}
 function addCondutaChip(t){const e=document.getElementById('v_conduta');if(!e)return;const c=e.value.replace(/\s+$/,'');e.value=(c?c+'\n':'')+'- '+t;e.focus();}
 /* ===== análise da evolução por IA (sugere oportunidades, NÃO edita) ===== */
@@ -588,7 +588,10 @@ function gerarEvolucao(p){
   if(p.hda)L.push('# HDA: '+oneLine(p.hda));
   if(p.evolucao)L.push('# EVOLUÇÃO: '+oneLine(p.evolucao));
   if(p.parametros)L.push('# PARÂMETROS: '+oneLine(p.parametros).replace(/^\s*PARÂMETROS:\s*/i,''));
-  if(p.exameFisico&&p.exameFisico.trim()){L.push('# EXAME FÍSICO:');L.push(bullets(p.exameFisico));}
+  if(p.exameFisico&&p.exameFisico.trim()){
+    const efLines=p.exameFisico.split('\n').filter(l=>{const m=l.match(/^\s*-?\s*(NEURO|AC|AP|ABDOME|EXT|PELE)\s*:\s*(.*)$/i);return m?((m[2]||'').trim().length>0):(l.trim().length>0);});
+    if(efLines.length){L.push('# EXAME FÍSICO:');L.push(bullets(efLines.join('\n')));}
+  }
   const lab=p.laboratorio||p.exames||'';
   if(lab){L.push('# LABORATÓRIO:');L.push(bullets(lab));}
   if(p.culturas){L.push('# CULTURAS:');L.push(gtbul(p.culturas));}
