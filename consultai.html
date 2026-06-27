@@ -710,7 +710,7 @@ async function genEvol(){
   const fmt=document.getElementById('e_fmt').value;
   const b=document.getElementById('aiBtn');b.innerHTML='<span class="spin"></span> Gerando...';b.disabled=true;
   const prompt='Você é um escriba clínico experiente. O texto abaixo pode ser a TRANSCRIÇÃO de uma consulta inteira (fala do médico e do paciente, linguagem coloquial, com repetições e possíveis ruídos) ou um rascunho/ditado. Extraia apenas as informações clinicamente relevantes e produza um documento em português do Brasil, completo, organizado e objetivo. REGRAS: não invente dados, exames, doses ou condutas que não foram ditos; ignore conversas irrelevantes; padronize termos médicos; se algo essencial faltar, escreva "[não informado]". '+(REC_FMT[fmt]||REC_FMT.evolucao).ai+'\n\nTranscrição/rascunho:\n'+raw;
-  try{const text=await MT.ai(prompt);document.getElementById('e_out').value=(text||'').trim();}
+  try{const text=await MT.ai(prompt, 'gemini-2.5-pro');document.getElementById('e_out').value=(text||'').trim();}
   catch(e){alert('⚠️ '+e.message);}
   b.innerHTML='✨ Estruturar com IA';b.disabled=false;
 }

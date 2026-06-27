@@ -456,7 +456,7 @@ async function rodarAnalise(id,alvo,btn){
   try{
     const ack=(p.sugAck||[]);
     const ackBlock=ack.length?('\n\n=== PONTOS JÁ AVALIADOS/DECIDIDOS PELO MÉDICO (NÃO sugerir de novo, salvo piora relevante) ===\n'+ack.map(a=>'- '+a).join('\n')):'';
-    const txt=await MT.ai(PROMPT_ANALISE+'\n\n=== CASO ===\n'+dadosParaAnalise(p)+ackBlock);
+    const txt=await MT.ai(PROMPT_ANALISE+'\n\n=== CASO ===\n'+dadosParaAnalise(p)+ackBlock, 'gemini-2.5-pro');
     renderSugestoes(id,txt,alvo);
   }catch(e){
     alvo.innerHTML='<div class="sug-out" style="color:var(--red)">⚠️ '+esc(e.message||'Falha na IA.')+(MT.mode==='demo'?' (Entre na conta MedTech para usar a IA.)':'')+'</div>';
