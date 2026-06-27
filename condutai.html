@@ -9601,7 +9601,7 @@ async function callGemini(contents, opts = {}) {
   if (!u) throw new Error('Entre na sua conta MedTech para usar a IA.');
   let idToken;
   try { idToken = await u.getIdToken(); } catch (e) { throw new Error('Sessão expirada — entre novamente.'); }
-  const usedModel = 'gemini-2.5-flash'; // o gateway central aceita só gemini-2.5-flash*
+  const usedModel = 'gemini-2.5-pro'; // pro p/ análises (conduta/assistente/bula/investigação); gateway já aceita pro
   const maxRetries = opts.maxRetries ?? 2;
   const body = { contents, model: usedModel, generationConfig: { temperature: 0.4, topP: 0.95, maxOutputTokens: 8192 } };
   let lastStatus = 0, lastErrText = '';
