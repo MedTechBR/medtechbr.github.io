@@ -137,6 +137,10 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 .pt-pend-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .pt-pend-h b{color:var(--amber);font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.03em}
 .pend-empty{font-size:13px;color:var(--muted);padding:2px 0}
+.pt-pend-l{display:inline-flex;align-items:center;gap:1px}
+.pt-prev{font-size:10.5px;font-weight:800;color:var(--green);background:var(--green-bg);border-radius:999px;padding:2px 9px;cursor:pointer;white-space:nowrap;letter-spacing:.01em}
+.pt-prev.empty{color:var(--muted);background:transparent;font-weight:600;opacity:.65;border:1px dashed var(--line)}
+.pt-prev:hover{filter:brightness(.96);opacity:1}
 .pt-muted{color:#9aa8a0}
 .evo-out{min-height:60vh;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.55;text-transform:none!important}
 @media(max-width:680px){
@@ -230,7 +234,7 @@ function ptCard(p){
   const pend=(p.pendencias||[]);
   const exFmt=examesFmt(p);
   const visitHoje=p.visitaEm===ymd();
-  const pendHtml=`<div class="pt-pend"><div class="pt-pend-h"><b>Pendências</b><button class="mini-ed" onclick="editCampo('${p.id}','pendencias')">✏️</button></div>${pend.length?pend.map(it=>`<label class="pend-item${it.done?' done':''}"><input type="checkbox" ${it.done?'checked':''} onclick="togglePend('${p.id}','${it.id}')"><span>${esc(it.t)}</span></label>`).join(''):'<div class="pend-empty">Nenhuma pendência.</div>'}</div>`;
+  const pendHtml=`<div class="pt-pend"><div class="pt-pend-h"><span class="pt-pend-l"><b>Pendências</b><button class="mini-ed" onclick="editCampo('${p.id}','pendencias')">✏️</button></span><span class="pt-prev${p.previsaoAlta?'':' empty'}" onclick="editPrevAlta('${p.id}')" title="Previsão de alta — clique para editar">🗓️ ${p.previsaoAlta?('Alta: '+esc(fmtData(p.previsaoAlta))):'+ previsão de alta'}</span></div>${pend.length?pend.map(it=>`<label class="pend-item${it.done?' done':''}"><input type="checkbox" ${it.done?'checked':''} onclick="togglePend('${p.id}','${it.id}')"><span>${esc(it.t)}</span></label>`).join(''):'<div class="pend-empty">Nenhuma pendência.</div>'}</div>`;
   return `<div class="pt-card">
     <div class="leito"><div class="ln">${esc(p.leito||'—')}</div>${p.setor?`<div class="ls">${esc(p.setor)}</div>`:''}</div>
     <div class="pt-main">
@@ -263,6 +267,17 @@ function saveCampo(pid,campo){
   if(campo==='dx')p.diagnosticos=bullets(v);
   else if(campo==='pendencias'){const oldP=p.pendencias||[];p.pendencias=v.split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>o.t===t);return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});}
   persist();closeModal();render();
+}
+function editPrevAlta(pid){
+  const p=state.pacientes.find(x=>x.id===pid);if(!p)return;
+  modal(`<h3>🗓️ Previsão de alta</h3>
+   <div class="hint" style="margin-bottom:8px">${esc(p.nome||'Paciente')} · leito ${esc(p.leito||'—')} — opcional, preenchimento manual.</div>
+   <div class="field"><label>Data prevista para a alta</label><input type="date" id="pa_date" value="${esc(p.previsaoAlta||'')}"></div>
+   <div class="row actions"><button class="btn btn-p" onclick="savePrevAlta('${pid}')">Salvar</button>${p.previsaoAlta?`<button class="btn btn-g" onclick="savePrevAlta('${pid}',true)">Remover</button>`:''}<button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
+}
+function savePrevAlta(pid,clear){
+  const p=state.pacientes.find(x=>x.id===pid);if(!p)return;
+  p.previsaoAlta=clear?'':getVal('pa_date');persist();closeModal();render();
 }
 
 function renderAtivos(){
@@ -345,6 +360,7 @@ function openForm(id){
    <div class="field"><label>Conduta do dia <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="f_conduta" placeholder="- dieta livre&#10;- ATB conforme&#10;- HV / analgesia / profilaxia de TEV">${esc(bullets(p.conduta))}</textarea></div>
    <div class="sec-h">Pendências e observações</div>
    <div class="field"><label>Pendências <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="f_pend" placeholder="- colher hemocultura&#10;- avaliar com a cirurgia">${esc((p.pendencias||[]).map(x=>'- '+x.t).join('\n'))}</textarea></div>
+   <div class="field"><label>🗓️ Previsão de alta <span style="color:var(--muted);font-weight:400">(opcional, manual)</span></label><input type="date" id="f_prevAlta" value="${esc(p.previsaoAlta||'')}"></div>
    <div class="field"><label>Observações</label><textarea id="f_obs" placeholder="Anotações livres">${esc(p.obs)}</textarea></div>
    <textarea id="f_ef" style="display:none">${esc(p.exameFisico||'')}</textarea>
    <div class="row actions"><button class="btn btn-p" onclick="saveForm('${id||''}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
@@ -352,7 +368,7 @@ function openForm(id){
 function saveForm(id){
   const oldP=id?((state.pacientes.find(x=>x.id===id)||{}).pendencias||[]):[];
   const pend=getVal('f_pend').split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>o.t===t);return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});
-  const o={leito:getVal('f_leito'),setor:getVal('f_setor'),nome:getVal('f_nome'),idade:getVal('f_idade'),sexo:getVal('f_sexo'),diagnosticos:bullets(getVal('f_dx')),comorbidades:getVal('f_comorb'),alergias:getVal('f_alergias'),muc:getVal('f_muc'),hda:getVal('f_hda'),laboratorio:bullets(getVal('f_lab')),culturas:bullets(getVal('f_culturas')),imagem:bullets(getVal('f_imagem')),exameFisico:getVal('f_ef'),conduta:bullets(getVal('f_conduta')),pendencias:pend,obs:getVal('f_obs')};
+  const o={leito:getVal('f_leito'),setor:getVal('f_setor'),nome:getVal('f_nome'),idade:getVal('f_idade'),sexo:getVal('f_sexo'),diagnosticos:bullets(getVal('f_dx')),comorbidades:getVal('f_comorb'),alergias:getVal('f_alergias'),muc:getVal('f_muc'),hda:getVal('f_hda'),laboratorio:bullets(getVal('f_lab')),culturas:bullets(getVal('f_culturas')),imagem:bullets(getVal('f_imagem')),exameFisico:getVal('f_ef'),conduta:bullets(getVal('f_conduta')),pendencias:pend,previsaoAlta:getVal('f_prevAlta'),obs:getVal('f_obs')};
   if(!o.leito&&!o.nome){alert('Informe ao menos o leito ou o nome do paciente.');return;}
   if(id){const cur=state.pacientes.find(x=>x.id===id);delete cur.exames;Object.assign(cur,o);}
   else{state.pacientes.push({id:uid(),status:'ativo',criadoEm:nowISO(),...o});}
@@ -485,6 +501,7 @@ function openVisita(id){
      <textarea id="ef_outros" class="ef-outros" autocapitalize="characters" spellcheck="false" placeholder="+ OUTROS ACHADOS (OPCIONAL)">${esc(efP.outros||'')}</textarea></div>
    <div class="field"><label>Conduta <span style="color:var(--muted);font-weight:400">(uma por linha — "EXPLICO PLANO TERAPEUTICO" entra automático)</span></label><textarea id="v_conduta" autocapitalize="characters" spellcheck="false" placeholder="- MANTENHO ATB&#10;- SOLICITO NOVA ROTINA&#10;- AGUARDO EXAMES" style="min-height:168px">${esc(p.conduta||'')}</textarea></div>
    <div class="field"><label>Pendências <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="v_pend" autocapitalize="characters" spellcheck="false" placeholder="- ..." style="min-height:96px">${esc((p.pendencias||[]).map(x=>'- '+x.t).join('\n'))}</textarea></div>
+   <div class="field"><label>🗓️ Previsão de alta <span style="color:var(--muted);font-weight:400">(opcional)</span></label><input type="date" id="v_prevAlta" value="${esc(p.previsaoAlta||'')}"></div>
    <div class="row" style="margin-top:2px"><button class="btn btn-g btn-sm" style="width:100%" onclick="rodarAnalise('${id}',document.getElementById('v_sug'),this)">🔎 Analisar evolução por IA — oportunidades de melhoria</button></div>
    <div id="v_sug"></div>
    <div class="row actions"><button class="btn btn-p" onclick="saveVisita('${id}',true)">📄 Gerar evolução</button><button class="btn btn-g" onclick="saveVisita('${id}',false)">Salvar</button></div>`);
@@ -497,6 +514,7 @@ function saveVisita(id,gerar){
   p.conduta=getVal('v_conduta').toUpperCase();
   const oldP=p.pendencias||[];
   p.pendencias=getVal('v_pend').toUpperCase().split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>o.t===t);return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});
+  p.previsaoAlta=getVal('v_prevAlta');
   p.visitaEm=ymd();
   persist();
   if(gerar)verEvolucao(id);else{closeModal();render();}
@@ -654,6 +672,7 @@ function resumoPlantao(){
       const ex=examesFmt(p);if(ex)txt+='Exames:\n'+bullets(ex)+'\n';
       const pend=(p.pendencias||[]).filter(x=>!x.done);
       if(pend.length)txt+='Pendências:\n'+pend.map(x=>'- '+x.t).join('\n')+'\n';
+      if(p.previsaoAlta)txt+='Previsão de alta: '+fmtData(p.previsaoAlta)+'\n';
       if(p.obs)txt+='Obs: '+oneLine(p.obs)+'\n';});});
   modal(`<h3>📋 Passar plantão</h3><div class="hint" style="margin-bottom:8px">Resumo dos ${list.length} internado(s), agrupado por setor (só pendências em aberto). Revise e copie.</div><div class="field"><textarea id="resumoTa" class="evo-out" style="min-height:50vh">${esc(txt.toUpperCase())}</textarea></div><div class="row actions"><button class="btn btn-p" id="copyResBtn" onclick="copyTa('resumoTa','copyResBtn','📋 Copiar tudo')">📋 Copiar tudo</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
 }
