@@ -10158,9 +10158,210 @@ function renderHomeFeatured() {
 }
 
 // ============================================================
+//  BUSCA OFFLINE (bulas/investigação) — normaliza e casa por nome/alias
+// ============================================================
+function _normKey(s){return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim();}
+function findOffline(bank, q){
+  const n=_normKey(q); if(!n) return null;
+  if(bank[n]) return bank[n];
+  for(const k in bank){ const e=bank[k];
+    const cand=[k,_normKey(e.nome||'')].concat((e.alias||[]).map(_normKey));
+    if(cand.some(x=>x && (x===n || n.indexOf(x)>=0 || (x.length>4 && x.indexOf(n)>=0)))) return e;
+  }
+  return null;
+}
+
+// ============================================================
+//  BULAS — banco offline (Banco MedTech) + IA p/ o que faltar
+// ============================================================
+const BULAS_OFF = {
+ 'noradrenalina': { nome:'Noradrenalina', alias:['norepinefrina','noradrena'], md:`# Noradrenalina
+## 💊 Classe e mecanismo
+- Vasopressor (catecolamina): agonista α1 potente (vasoconstrição) + β1 discreto. Eleva a PAM com pouco aumento de FC.
+## ✅ Indicações principais
+- **Vasopressor de 1ª escolha no choque** (séptico, distributivo, e como adjuvante no cardiogênico).
+## 📐 Posologia (adulto)
+- BIC: **0,05–0,1 mcg/kg/min** inicial, titular até PAM ≥ 65 mmHg. Faixa usual 0,05–1 (até 3) mcg/kg/min.
+## 💉 Apresentações no Brasil
+- Hemitartarato 4 mg/4 mL (1 mg/mL) — **2 mg de base por ampola**. (Atenção base × sal conforme protocolo.)
+## 🫘 Ajuste renal/hepático
+- Sem ajuste — titular pelo efeito hemodinâmico.
+## 🚫 Contraindicações
+- Hipovolemia não corrigida (corrigir volume antes/junto), vasoespasmo grave. Cautela em arritmias.
+## ⚠️ Efeitos adversos
+- Arritmias, isquemia (miocárdica/digital/mesentérica), **necrose se extravasamento** (preferir acesso central; antídoto fentolamina).
+## 🔗 Interações
+- IMAO/antidepressivos tricíclicos → crise hipertensiva; halogenados → arritmia.
+## 💡 Pérolas (diluição / BIC)
+- Diluição comum: **4 ampolas (16 mg) em 234 mL de SG 5%** = 250 mL a **64 mcg/mL**. Para 70 kg a 0,1 mcg/kg/min → 7 mcg/min → **~6,6 mL/h**.
+- Use **acesso central**; em periférico, só transitório e vigiar extravasamento. Não interromper abruptamente.` },
+ 'adrenalina': { nome:'Adrenalina', alias:['epinefrina'], md:`# Adrenalina
+## 💊 Classe e mecanismo
+- Catecolamina α + β (β em dose baixa: inotropismo/cronotropismo; α em dose alta: vasoconstrição).
+## ✅ Indicações principais
+- **PCR** (1 mg IV a cada 3–5 min), **anafilaxia** (IM), **choque** refratário, bradicardia/broncoespasmo graves, crupe (nebulizado).
+## 📐 Posologia (adulto)
+- **PCR:** 1 mg IV/IO em bolus a cada 3–5 min. **Anafilaxia:** **0,5 mg IM** (0,5 mL de 1 mg/mL) vasto lateral, repetir a cada 5–15 min. **BIC (choque):** 0,01–0,5 mcg/kg/min.
+## 💉 Apresentações no Brasil
+- 1 mg/mL (1 mL) — “1:1000”. (Para IV em PCR usa-se 1 mg diluído.)
+## 🚫 Contraindicações
+- Nenhuma absoluta na PCR/anafilaxia (situações de risco de vida).
+## ⚠️ Efeitos adversos
+- Taquiarritmia, isquemia, hipertensão, tremor, hiperglicemia, hipocalemia.
+## 🔗 Interações
+- β-bloqueador (anafilaxia refratária → considerar glucagon), tricíclicos/IMAO.
+## 💡 Pérolas
+- **Anafilaxia: a via é IM (não IV em bolus)**, coxa lateral. IV em bolus só na PCR. BIC: 6 mg em 100 mL SG5% = 60 mcg/mL.` },
+ 'dobutamina': { nome:'Dobutamina', alias:['dobutrex'], md:`# Dobutamina
+## 💊 Classe e mecanismo
+- Inotrópico β1 (↑ contratilidade e DC), com vasodilatação β2 discreta (pode ↓ PA).
+## ✅ Indicações principais
+- **Choque cardiogênico / baixo débito** com PA preservada; ICC descompensada com hipoperfusão.
+## 📐 Posologia (adulto)
+- BIC **2,5–20 mcg/kg/min**, titular pela perfusão/DC.
+## 💉 Apresentações no Brasil
+- 250 mg/20 mL (12,5 mg/mL).
+## ⚠️ Efeitos adversos
+- Taquicardia, arritmia, **hipotensão** (vasodilatação), isquemia; tolerância em uso prolongado.
+## 🔗 Interações
+- β-bloqueador antagoniza o efeito.
+## 💡 Pérolas (diluição / BIC)
+- **1 ampola (250 mg) em 230 mL SG5%** = 250 mL a **1000 mcg/mL**. Para 70 kg a 5 mcg/kg/min → 350 mcg/min → **21 mL/h**.
+- Não corrige hipotensão por vasodilatação — se PA baixa, associar noradrenalina.` },
+ 'enoxaparina': { nome:'Enoxaparina', alias:['clexane','hbpm','heparina de baixo peso'], md:`# Enoxaparina
+## 💊 Classe e mecanismo
+- HBPM — inibe sobretudo o fator **Xa** (anti-Xa).
+## ✅ Indicações principais
+- **Profilaxia** de TEV; **tratamento** de TVP/TEP; SCA.
+## 📐 Posologia (adulto)
+- **Profilática:** 40 mg SC 1×/dia (20 mg se ClCr 15–30). **Terapêutica:** **1 mg/kg SC 12/12h** ou 1,5 mg/kg 1×/dia.
+## 💉 Apresentações no Brasil
+- Seringas 20, 40, 60, 80, 100 mg.
+## 🫘 Ajuste renal
+- **ClCr < 30:** terapêutica **1 mg/kg 1×/dia**; profilática 20 mg/dia. Considerar HNF se ClCr muito baixo.
+## 🚫 Contraindicações
+- Sangramento ativo, plaquetopenia induzida por heparina (HIT), hipersensibilidade.
+## ⚠️ Efeitos adversos
+- Sangramento, ↑ transaminases, HIT (menos que HNF), hipercalemia.
+## 💡 Pérolas
+- **Não monitora rotineiramente** (anti-Xa só em obeso/gestante/IRC). Reversão parcial com protamina. Suspender ~24 h antes de procedimento (profilática 12 h).` },
+ 'heparina': { nome:'Heparina não fracionada', alias:['hnf','heparina sodica','heparina iv'], md:`# Heparina não fracionada (HNF)
+## 💊 Classe e mecanismo
+- Potencializa a antitrombina → inibe trombina (IIa) e Xa. Meia-vida curta, reversível.
+## ✅ Indicações principais
+- TEV/SCA quando se quer **efeito rápido e reversível** (peri-procedimento, IRC grave, instabilidade).
+## 📐 Posologia (adulto)
+- **Bolus 80 U/kg + BIC 18 U/kg/h**, ajustar pelo **TTPa** (alvo 1,5–2,5×) ou anti-Xa. Profilaxia: 5.000 U SC 8/8–12/12h.
+## 💉 Apresentações no Brasil
+- 5.000 UI/mL (frasco 5 mL = 25.000 UI).
+## ⚠️ Efeitos adversos
+- Sangramento, **HIT** (dosar plaquetas), osteoporose (uso prolongado), hipercalemia.
+## 💡 Pérolas (diluição)
+- BIC: **25.000 UI em 250 mL SF** = 100 UI/mL. **Reversão: protamina** 1 mg por 100 UI de heparina nas últimas ~2–3 h. Preferida à HBPM na **IRC grave**.` },
+ 'vancomicina': { nome:'Vancomicina', alias:['vanco'], md:`# Vancomicina
+## 💊 Classe e mecanismo
+- Glicopeptídeo — inibe a parede celular de Gram-positivos (MRSA, *Enterococcus* sensível).
+## ✅ Indicações principais
+- Infecções graves por **MRSA**, empírico em sepse com risco de MRSA; **VO só para C. difficile**.
+## 📐 Posologia (adulto)
+- **15–20 mg/kg IV 8/8–12/12h** (alvo AUC/MIC ou vale 15–20). Ataque 25–30 mg/kg no grave. **CDI: 125 mg VO 6/6h**.
+## 💉 Apresentações no Brasil
+- Frasco 500 mg / 1 g.
+## 🫘 Ajuste renal
+- ClCr 20–49: a cada 24 h; < 20: dose + redose por nível. **Guiar por nível sérico/função renal**.
+## ⚠️ Efeitos adversos
+- **Nefrotoxicidade** (↑ com pip-tazo/aminoglicosídeo), **“homem vermelho”** (infusão rápida), ototoxicidade, plaquetopenia.
+## 💡 Pérolas (diluição)
+- Diluir **≤ 5 mg/mL** (1 g em 250 mL SF/SG); **infundir em ≥ 60 min** (máx 10 mg/min) — evita o “homem vermelho”. VO não trata infecção sistêmica.` },
+ 'amiodarona': { nome:'Amiodarona', alias:['ancoron'], md:`# Amiodarona
+## 💊 Classe e mecanismo
+- Antiarrítmico classe III (bloqueia K⁺; também Na/Ca/β). Largo espectro.
+## ✅ Indicações principais
+- **FV/TV sem pulso** na PCR; TV estável; controle de FA/flutter (incl. com disfunção de VE).
+## 📐 Posologia (adulto)
+- **PCR (FV/TV):** 300 mg IV bolus → 150 mg. **TV estável/FA:** 150 mg IV em 10 min → BIC **1 mg/min por 6 h → 0,5 mg/min por 18 h** (máx ~2,2 g/24 h). VO: ataque 600–800 mg/dia → manutenção 200 mg/dia.
+## 💉 Apresentações no Brasil
+- 150 mg/3 mL; comp 200 mg.
+## ⚠️ Efeitos adversos
+- **Hipotensão/bradicardia** (IV), QT longo, **tireoide** (hipo/hiper), **pulmão** (fibrose), hepato, depósito corneano, fotossensibilidade.
+## 🔗 Interações
+- ↑ varfarina e digoxina (reduzir 30–50%); QT com outros.
+## 💡 Pérolas (diluição)
+- Diluir **só em SG 5%** (precipita em SF); via central se BIC prolongada (flebite). Pré-tratamento: TSH, RX tórax, transaminases.` },
+ 'furosemida': { nome:'Furosemida', alias:['lasix','furosemide'], md:`# Furosemida
+## 💊 Classe e mecanismo
+- Diurético de alça (inibe Na-K-2Cl na alça de Henle).
+## ✅ Indicações principais
+- **Congestão/EAP**, IC descompensada, edema, hipercalemia (adjuvante), hipercalcemia.
+## 📐 Posologia (adulto)
+- EAP: **0,5–1 mg/kg IV** (em uso crônico, dose ≥ a oral diária IV). BIC nos refratários (ex.: 5–20 mg/h após bolus).
+## 💉 Apresentações no Brasil
+- 20 mg/2 mL; comp 40 mg.
+## ⚠️ Efeitos adversos
+- **Hipocalemia/hipomagnesemia/hipocloremia**, alcalose, hipovolemia/LRA pré-renal, ototoxicidade (infusão rápida), hiperuricemia.
+## 🔗 Interações
+- Aminoglicosídeos (oto/nefro), lítio (↑ nível), AINEs (↓ efeito).
+## 💡 Pérolas
+- IV infundir **≤ 4 mg/min** no alta dose (ototoxicidade). Reavaliar diurese/eletrólitos; “dose-resposta” — se pouca resposta, **dobrar a dose** antes de associar tiazídico.` },
+ 'dexametasona': { nome:'Dexametasona', alias:['decadron'], md:`# Dexametasona
+## 💊 Classe e mecanismo
+- Corticoide potente, longa duração, **sem ação mineralocorticoide**.
+## ✅ Indicações principais
+- COVID/SDRA (O₂-dependente), edema cerebral/tumoral, antiemese, crupe, exacerbação (alternativa), maturação pulmonar fetal.
+## 📐 Posologia (adulto)
+- Varia: **COVID 6 mg/dia**; edema cerebral 10 mg → 4 mg 6/6h; antiemético 4–8 mg. Equivale a ~25× a hidrocortisona (0,75 mg dexa ≈ 20 mg hidrocortisona).
+## 💉 Apresentações no Brasil
+- 2 mg/mL, 4 mg/mL; comp 0,5/4 mg.
+## ⚠️ Efeitos adversos
+- Hiperglicemia, HAS, insônia/psicose, imunossupressão, úlcera (com AINE), miopatia, osteoporose (uso prolongado).
+## 💡 Pérolas
+- Não tem mineralocorticoide → **não serve sozinha p/ insuficiência adrenal** (usar hidrocortisona). Profilaxia gástrica se associada a AINE/risco.` },
+ 'hidrocortisona': { nome:'Hidrocortisona', alias:['cortisol','solucortef'], md:`# Hidrocortisona
+## 💊 Classe e mecanismo
+- Corticoide com ação **gluco + mineralocorticoide** (cortisol).
+## ✅ Indicações principais
+- **Insuficiência adrenal / crise addisoniana**, **choque séptico refratário** a vasopressor, asma/anafilaxia (adjuvante).
+## 📐 Posologia (adulto)
+- **Crise adrenal:** 100 mg IV bolus → 50 mg 6/6h (ou 200 mg/dia BIC). **Choque séptico refratário:** 200 mg/dia (50 mg 6/6h ou BIC).
+## 💉 Apresentações no Brasil
+- Frasco 100 mg / 500 mg.
+## ⚠️ Efeitos adversos
+- Hiperglicemia, retenção de sódio/edema, hipocalemia, imunossupressão.
+## 💡 Pérolas
+- É o corticoide de escolha na **insuficiência adrenal** (tem mineralocorticoide). No choque séptico, não atrasa: usar se má resposta a vasopressor.` },
+ 'insulina_regular': { nome:'Insulina regular', alias:['insulina r','insulina humana regular','insulina iv'], md:`# Insulina regular (humana)
+## 💊 Classe e mecanismo
+- Insulina de ação rápida; única para **uso IV**.
+## ✅ Indicações principais
+- **CAD/EHH** (BIC IV), **hipercalemia** (com glicose), hiperglicemia hospitalar.
+## 📐 Posologia (adulto)
+- **CAD:** BIC **0,1 U/kg/h** (± bolus 0,1 U/kg); alvo queda da glicemia 50–75 mg/dL/h; adicionar SG quando glicemia ~200–250. **Hipercalemia:** 10 U IV + 25 g de glicose (50 mL G50%).
+## 💉 Apresentações no Brasil
+- Frasco 100 U/mL.
+## ⚠️ Efeitos adversos
+- **Hipoglicemia**, **hipocalemia** (monitorar K⁺ — repor se < 3,3 antes de iniciar na CAD).
+## 💡 Pérolas (diluição)
+- BIC: **100 U em 100 mL SF** = 1 U/mL. Na CAD **não iniciar insulina se K⁺ < 3,3** (repor antes). Transição IV→SC: sobrepor 1–2 h com a basal.` },
+ 'acido_tranexamico': { nome:'Ácido tranexâmico', alias:['transamin','txa',' tranexamico'], md:`# Ácido tranexâmico (TXA)
+## 💊 Classe e mecanismo
+- Antifibrinolítico (inibe a ativação do plasminogênio).
+## ✅ Indicações principais
+- **Trauma com hemorragia** (≤ 3 h — CRASH-2), HPP (WOMAN), sangramento cirúrgico/menorragia, epistaxe.
+## 📐 Posologia (adulto)
+- **Trauma:** 1 g IV em 10 min → 1 g em 8 h. **HPP:** 1 g IV (repetir se persistir).
+## 💉 Apresentações no Brasil
+- 250 mg/5 mL; comp 250 mg.
+## 🚫 Contraindicações
+- Trombose ativa/CIVD com trombose, convulsão (alta dose), cautela na hematúria de via alta (coágulo obstrutivo).
+## 💡 Pérolas
+- No trauma, **quanto mais precoce melhor**; após 3 h pode aumentar mortalidade. Não substitui controle cirúrgico do foco.` }
+};
+function bulaIaBtn(q){ return `<button class="btn-primary" style="margin-top:12px" onclick="runBula(${JSON.stringify(q).replace(/"/g,'&quot;')}, true)">🔄 Gerar versão da IA</button>`; }
+
+// ============================================================
 //  BULAS (IA)
 // ============================================================
-const BULA_COMUNS = ['Enoxaparina','Noradrenalina','Vancomicina','Amiodarona','Insulina regular','Furosemida','Ceftriaxona','Dexametasona','Ácido tranexâmico','Metoprolol'];
+const BULA_COMUNS = ['Noradrenalina','Adrenalina','Dobutamina','Enoxaparina','Heparina não fracionada','Vancomicina','Amiodarona','Furosemida','Dexametasona','Hidrocortisona','Insulina regular','Ácido tranexâmico'];
 function renderBulaQuick() {
   const el = document.getElementById('bulaQuick'); if (!el || el.dataset.done) return;
   el.innerHTML = '<span style="font-size:12px;color:var(--text-mute);width:100%;margin-bottom:2px">Comuns:</span>' + BULA_COMUNS.map(d => `<button data-q="${escapeHtml(d)}">${escapeHtml(d)}</button>`).join('');
@@ -10186,9 +10387,17 @@ function buildPromptBula(drug) {
 
 Sob cada cabeçalho, escreva o conteúdo em bullets curtos. Responda em português do Brasil. Não invente apresentações inexistentes.`;
 }
-async function runBula(q) {
+async function runBula(q, forceIA) {
   q = (q || '').trim(); if (!q) return;
   const box = document.getElementById('bulaResult');
+  if (!forceIA) {
+    const off = findOffline(BULAS_OFF, q);
+    if (off) {
+      box.innerHTML = `<div class="result content"><div style="display:inline-block;background:#e7f7f1;color:#13503a;border:1px solid #bfe6db;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;margin-bottom:10px">📚 Banco MedTech</div>${accordionize(md(off.md))}<div class="alert alert-info" style="margin-top:14px"><span>ℹ</span><div>Doses de referência — confirme na bula oficial/ANVISA e ajuste ao paciente.</div></div>${bulaIaBtn(q)}</div>`;
+      window.scrollTo({ top: 0, behavior:'smooth' });
+      return;
+    }
+  }
   if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span>⚠</span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
   box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Buscando bula:</strong> ${escapeHtml(q)}</div><div class="loading-sub">Posologia, ajustes e interações…</div></div>`;
   try {
@@ -10201,6 +10410,158 @@ async function runBula(q) {
     const r = document.createElement('button'); r.className='btn-primary'; r.style.marginTop='10px'; r.textContent='🔄 Tentar de novo'; r.onclick=()=>runBula(q); box.appendChild(r);
   }
 }
+
+// ============================================================
+//  INVESTIGAÇÃO — banco offline (Banco MedTech) + IA p/ o que faltar
+// ============================================================
+const INV_OFF = {
+ 'hiponatremia': { nome:'Hiponatremia', alias:['sodio baixo','na baixo'], md:`# Investigação: Hiponatremia
+## 🎯 Quando valorizar
+- Na⁺ < 135. Gravidade pelo valor e pela velocidade/sintomas (náusea → confusão → convulsão/coma). **Aguda/sintomática = emergência.**
+## 🔀 Diagnóstico diferencial (passo a passo)
+- **1) Osmolaridade sérica:** normal/alta → pseudo-hiponatremia (hiperlipidemia/proteína) ou **hiperglicemia** (corrigir: +1,6 Na a cada 100 de glicose >100).
+- **2) Hipotônica → volemia:** **Hipovolêmica** (perdas GI/renais, diurético); **Euvolêmica** (SIADH, hipotireoidismo, Addison, polidipsia); **Hipervolêmica** (IC, cirrose, síndrome nefrótica, IRC).
+## 🩺 Anamnese e exame dirigidos
+- Diuréticos, perdas, IC/hepatopatia/nefropatia, drogas (ISRS, carbamazepina), DPOC/neoplasia (SIADH), sintomas neuro.
+## 🧪 Exames de 1ª linha
+- Osmolaridade sérica e **urinária**, **Na urinário**, função renal, glicose, TSH, K⁺. (Cortisol se suspeita de Addison.)
+- **Na urinário < 20** = ávido por sódio (hipovolemia, IC, cirrose); **> 40 + Uosm alta** = SIADH (após excluir tireoide/adrenal).
+## 🔬 Exames de 2ª linha
+- Cortisol/ACTH, investigação de SIADH (TC tórax/SNC conforme), ácido úrico (baixo no SIADH).
+## 🚩 Alarme / quando internar
+- Na < 120, sintomas neurológicos, queda rápida → internar. **Sintomática grave: NaCl 3% 100–150 mL** e UTI; corrigir **≤ 8–10 mEq/24 h** (risco de mielinólise).` },
+ 'hipercalemia': { nome:'Hipercalemia', alias:['potassio alto','k alto'], md:`# Investigação: Hipercalemia
+## 🎯 Quando valorizar
+- K⁺ > 5,5 (grave > 6,5 ou alterações no ECG). Excluir **pseudo-hipercalemia** (hemólise da coleta) se sem causa.
+## 🔀 Diagnóstico diferencial
+- **↓ excreção:** LRA/DRC, **drogas** (IECA/BRA, espironolactona, AINE, heparina, SMX-TMP), hipoaldosteronismo/Addison.
+- **Redistribuição:** acidose, deficiência de insulina, β-bloqueador, lise tumoral/rabdomiólise, digital.
+- **↑ aporte:** dieta/suplemento/transfusão (com fator renal).
+## 🩺 Anamnese e exame dirigidos
+- Drogas, débito urinário, força muscular, contexto (DM, rabdomiólise, sangramento digestivo).
+## 🧪 Exames de 1ª linha
+- **ECG já** (apiculação de T → alargamento de QRS → onda sinusoidal), função renal, gaso (acidose), glicemia, CPK, hemograma.
+## 🔬 Exames de 2ª linha
+- Aldosterona/renina, cortisol (se hipoaldo), urina (TTKG em casos selecionados).
+## 🚩 Alarme / conduta imediata
+- **ECG alterado ou K ≥ 6,5:** **gluconato de cálcio** (estabiliza membrana) + **insulina R 10 U + glicose** + β2 inalado; depois **remover K** (diurético, resina, **diálise** se refratário/anúrico). Suspender o agente causal.` },
+ 'anemia': { nome:'Anemia', alias:['hb baixa','hemoglobina baixa'], md:`# Investigação: Anemia
+## 🎯 Quando valorizar
+- Hb < 13 (homem) / < 12 (mulher). Avaliar **agudo vs crônico** e repercussão (taquicardia, angina, dispneia).
+## 🔀 Diagnóstico diferencial — pelo VCM
+- **Micro (VCM<80):** ferropriva (ferritina baixa), talassemia, doença crônica (alguns), sideroblástica.
+- **Normo (80–100):** sangramento agudo, hemólise, doença crônica, IRC, mielodisplasia, infiltração medular.
+- **Macro (>100):** **B12/folato**, álcool, hipotireoidismo, hepatopatia, MDS, drogas (MTX, hidroxiureia).
+## 🩺 Anamnese e exame dirigidos
+- Sangramento (GI, menstrual), dieta, álcool, drogas, icterícia (hemólise), história familiar, sintomas de tireoide.
+## 🧪 Exames de 1ª linha
+- Hemograma com **VCM/RDW**, **reticulócitos**, **ferritina + sat. transferrina**, B12, folato, função renal, **esfregaço**.
+- Reticulócitos **altos** = perda/hemólise; **baixos** = produção (carência, medula, IRC).
+## 🔬 Exames de 2ª linha
+- Hemólise: LDH, bilirrubina indireta, haptoglobina, **Coombs**, esquizócitos. Pesquisa de sangue oculto/EDA-colono se ferropriva sem causa. Eletroforese de Hb. Mielograma se citopenias/blastos.
+## 🚩 Alarme / quando internar
+- Instabilidade, angina, Hb muito baixa/sintomática, sangramento ativo → transfundir e internar; **anemia ferropriva no homem/pós-menopausa = investigar TGI**.` },
+ 'dispneia': { nome:'Dispneia', alias:['falta de ar','dispneia aguda'], md:`# Investigação: Dispneia
+## 🎯 Quando valorizar
+- Sempre medir **SpO₂, FR, PA, FC**. Súbita + dor/hipoxemia → pensar em TEP/PNTX/SCA. Sibilos, estertores, turgência jugular orientam.
+## 🔀 Diagnóstico diferencial
+- **Pulmonar:** asma/DPOC, PAC, **TEP**, pneumotórax, derrame, SDRA.
+- **Cardíaco:** EAP/IC, SCA, tamponamento, arritmia.
+- **Outros:** anemia, acidose (Kussmaul), ansiedade, obstrução de via aérea, sepse.
+## 🩺 Anamnese e exame dirigidos
+- Início (súbito × progressivo), febre, dor torácica, ortopneia/DPN, fatores de risco para TEV, tabagismo.
+## 🧪 Exames de 1ª linha
+- **ECG**, **RX tórax**, gasometria/lactato, hemograma, **BNP/NT-proBNP**, **troponina**, D-dímero (se baixa probabilidade de TEP), função renal/eletrólitos.
+- **POCUS** à beira-leito (protocolo BLUE/FoCUS) acelera muito o diagnóstico.
+## 🔬 Exames de 2ª linha
+- **AngioTC de tórax** (TEP), ecocardiograma, espirometria (ambulatorial), TC de tórax.
+## 🚩 Alarme / quando internar
+- SpO₂ < 90%, esforço/uso de musculatura, hipotensão, rebaixamento, suspeita de TEP/SCA/PNTX → O₂, monitorização e internação.` },
+ 'dor_toracica': { nome:'Dor torácica', alias:['precordialgia','dor no peito'], md:`# Investigação: Dor torácica
+## 🎯 Quando valorizar
+- **ECG em ≤ 10 min**. Foco nas causas que matam: **SCA, dissecção de aorta, TEP, pneumotórax hipertensivo, tamponamento, ruptura esofágica**.
+## 🔀 Diagnóstico diferencial
+- Cardíaco isquêmico (SCA), pericardite/miocardite; vascular (dissecção, TEP); pulmonar (PNTX, pleurite); GI (DRGE, espasmo, úlcera, pancreatite); musculoesquelético; ansiedade.
+## 🩺 Anamnese e exame dirigidos
+- Caráter/irradiação, esforço, duração, fatores de risco CV, assimetria de pulsos/PA (dissecção), atrito (pericardite), dor pleurítica.
+## 🧪 Exames de 1ª linha
+- **ECG seriado** + **troponina (0 e 1–3 h)**, RX tórax, glicemia/eletrólitos. Escore (HEART) para estratificar.
+## 🔬 Exames de 2ª linha
+- AngioTC (dissecção/TEP), ecocardiograma, teste provocativo/angioTC de coronárias (baixo-moderado risco), EDA (causas GI).
+## 🚩 Alarme / quando internar
+- Supra de ST → **reperfusão imediata**. Instabilidade, troponina ↑, dor persistente, suspeita de dissecção/TEP → monitor + internar.` },
+ 'transaminases': { nome:'Transaminases elevadas', alias:['tgo tgp','aminotransferases','hepatograma alterado','enzimas hepaticas'], md:`# Investigação: Transaminases elevadas
+## 🎯 Quando valorizar
+- Padrão **hepatocelular** (AST/ALT) × **colestático** (FA/GGT/bilirrubina). Grau: leve (<5×), moderado, **grave >15× ou com INR/encefalopatia = falência aguda (emergência)**.
+## 🔀 Diagnóstico diferencial
+- **Hepatocelular:** virais (A/B/C), **álcool** (AST:ALT >2), **DHGNA/esteato-hepatite**, drogas (paracetamol, estatina, MTX, fitoterápicos), autoimune, isquêmica (“choque hepático”), Wilson, hemocromatose.
+- **Colestático:** coledocolitíase, neoplasia de via biliar/pâncreas, CBP/CEP, drogas.
+## 🩺 Anamnese e exame dirigidos
+- Álcool, medicamentos/suplementos, fatores de risco metabólico, viagens, dor em HD, icterícia/colúria, estigmas de hepatopatia.
+## 🧪 Exames de 1ª linha
+- Repetir hepatograma com **FA, GGT, BT/frações, albumina, INR**, **sorologias virais** (anti-HAV IgM, HBsAg/anti-HBc, anti-HCV), glicemia/lipídeos, **USG de abdome**.
+## 🔬 Exames de 2ª linha
+- Autoanticorpos (FAN, anti-músculo liso, AMA), ferritina/sat, ceruloplasmina (jovem), α1-antitripsina, **colangioRM/CPRE** (colestase), elastografia/biópsia.
+## 🚩 Alarme / quando internar
+- **INR alargado, icterícia + encefalopatia** (falência hepática aguda), suspeita de paracetamol (NAC), colangite → internar.` },
+ 'plaquetopenia': { nome:'Plaquetopenia', alias:['plaquetas baixas','trombocitopenia'], md:`# Investigação: Plaquetopenia
+## 🎯 Quando valorizar
+- Plaq < 150 mil. **Excluir pseudoplaquetopenia** (agregação por EDTA — repetir em citrato). Risco de sangramento sobretudo < 20–30 mil.
+## 🔀 Diagnóstico diferencial
+- **↓ produção:** medular (MDS, leucemia, aplasia, quimio, álcool, B12/folato).
+- **↑ destruição/consumo:** **PTI**, **CIVD**, **PTT/SHU** (esquizócitos), HIT (heparina), drogas, hiperesplenismo, sepse, dengue, LES, SAF, gestação (HELLP).
+## 🩺 Anamnese e exame dirigidos
+- Drogas (heparina, quinino, sulfa), infecções, sangramentos, febre/petéquias, esplenomegalia, gestação.
+## 🧪 Exames de 1ª linha
+- **Esfregaço** (esquizócitos, blastos, grumos), hemograma completo, **coagulograma + fibrinogênio + D-dímero** (CIVD), função renal/hepática, LDH/bilirrubina (microangiopatia).
+## 🔬 Exames de 2ª linha
+- Sorologias (HIV, HCV, dengue), FAN/anti-DNA, anticorpos antiplaquetários (baixo rendimento), **mielograma** se outras citopenias/blastos, ADAMTS13 (PTT).
+## 🚩 Alarme / quando internar
+- **Esquizócitos + anemia + LRA/febre/neuro = PTT** (emergência: plasmaférese, NÃO transfundir plaqueta). Sangramento ativo, plaq < 10–20 mil, suspeita de leucemia → internar.` },
+ 'lra': { nome:'Lesão renal aguda', alias:['injuria renal aguda','creatinina elevada','ira','aki'], md:`# Investigação: Lesão renal aguda (LRA)
+## 🎯 Quando valorizar
+- ↑ creatinina ≥ 0,3 em 48 h, ou ≥ 1,5× em 7 dias, ou diurese < 0,5 mL/kg/h (KDIGO).
+## 🔀 Diagnóstico diferencial
+- **Pré-renal:** hipovolemia, IC, cirrose, sepse, AINE/IECA-BRA (hemodinâmica).
+- **Renal (intrínseca):** **NTA** (isquêmica/nefrotóxica — contraste, aminoglicosídeo, vanco), nefrite intersticial (drogas), glomerulonefrite, rabdomiólise.
+- **Pós-renal:** obstrução (próstata, cálculo bilateral, neoplasia, bexigoma).
+## 🩺 Anamnese e exame dirigidos
+- Volemia (PA, mucosas, turgência), drogas nefrotóxicas, contraste, jato urinário/globo vesical, sintomas sistêmicos (rash, artrite).
+## 🧪 Exames de 1ª linha
+- **USG de rins e vias** (descartar obstrução), **EAS + sedimento** (cilindros granulosos = NTA; hemácias dismórficas/cilindros hemáticos = GN; eosinofilúria = NIA), eletrólitos/gaso, **frações de excreção** (FeNa < 1% pré-renal), CPK.
+## 🔬 Exames de 2ª linha
+- Sorologias/complemento/ANCA/anti-MBG (GN), proteinúria 24 h ou relação P/C, **biópsia renal** em casos selecionados.
+## 🚩 Alarme / quando internar (indicações de diálise — “AEIOU”)
+- **A**cidose refratária, dist. **E**letrolítico (hipercalemia refratária), **I**ntoxicação dialisável, s**O**brecarga volêmica (EAP refratário), **U**remia (encefalopatia/pericardite). Suspender nefrotóxicos, ajustar drogas à função renal.` },
+ 'hipercalcemia': { nome:'Hipercalcemia', alias:['calcio alto'], md:`# Investigação: Hipercalcemia
+## 🎯 Quando valorizar
+- **Corrigir pela albumina** (Ca + 0,8×(4 − alb)) ou cálcio iônico. Sintomas: “stones, bones, groans, psychic moans” + poliúria, desidratação, ↓ consciência. **> 14 = emergência.**
+## 🔀 Diagnóstico diferencial — pelo PTH
+- **PTH alto/normal-alto:** **hiperparatireoidismo primário** (causa ambulatorial nº 1), hipercalcemia hipocalciúrica familiar, lítio.
+- **PTH baixo:** **malignidade** (PTHrP, metástase óssea, mieloma — causa hospitalar nº 1), intoxicação por vit. D, granulomatoses (sarcoidose), tireotoxicose, imobilização.
+## 🩺 Anamnese e exame dirigidos
+- Neoplasia/perda de peso, cálculos renais, fraturas, suplementos (cálcio/vit. D), lítio, sintomas de tireoide.
+## 🧪 Exames de 1ª linha
+- **PTH**, cálcio iônico, fósforo, função renal, **25-OH e 1,25-vit D**, eletroforese de proteínas (mieloma), TSH, cálcio urinário.
+## 🔬 Exames de 2ª linha
+- PTHrP, rastreio de neoplasia (imagem), densitometria, investigação de sarcoidose conforme.
+## 🚩 Alarme / conduta
+- **Grave/sintomática:** **hidratação vigorosa com SF** + **bisfosfonado IV** (ácido zoledrônico) ± calcitonina (efeito rápido); diálise se renal/refratário. Suspender cálcio/vit D/tiazídico.` },
+ 'febre_sem_foco': { nome:'Febre sem foco', alias:['febre de origem indeterminada','foi','febre sem sinais localizatorios'], md:`# Investigação: Febre sem foco
+## 🎯 Quando valorizar
+- Diferenciar **agudo** (provável infecção viral/bacteriana autolimitada) de **FOI** (>38,3 °C por >3 semanas sem dx após investigação inicial). No internado/imunossuprimido, baixar o limiar.
+## 🔀 Diagnóstico diferencial
+- **Infecção** (ITU, pneumonia, abscesso, endocardite, TB, abdome, cateter), **neoplasia** (linfoma, leucemia, tumor sólido), **inflamatória/autoimune** (arterite, LES, Still), drogas, TEV.
+## 🩺 Anamnese e exame dirigidos
+- Viagens, contatos/animais, drogas, próteses/cateteres, sopro novo, linfonodos, hepatoesplenomegalia, lesões de pele, exame minucioso e repetido.
+## 🧪 Exames de 1ª linha
+- Hemograma, **2 hemoculturas (antes de ATB)**, urina/urocultura, PCR/VHS, função renal/hepática, RX tórax, **HIV**, EAS.
+## 🔬 Exames de 2ª linha
+- **Eco** (endocardite), TC tórax/abdome/pelve, sorologias dirigidas, FAN, eletroforese/LDH, **PET-CT** na FOI, considerar biópsia (medula/linfonodo/artéria temporal).
+## 🚩 Alarme / quando internar
+- Sepse/instabilidade, neutropenia febril, imunossupressão, sinais de endocardite/foco profundo → culturas + ATB empírico e internação.` }
+};
+function invIaBtn(q){ return `<button class="btn-primary" style="margin-top:12px" onclick="runInv(${JSON.stringify(q).replace(/"/g,'&quot;')}, true)">🔄 Gerar versão da IA (com fluxograma)</button>`; }
 
 // ============================================================
 //  INVESTIGAÇÃO (IA)
@@ -10227,9 +10588,17 @@ function buildPromptInvestigacao(finding) {
 
 Sob cada cabeçalho, escreva o conteúdo em bullets curtos. Na seção "Fluxograma de investigação", inclua um bloco \`\`\`mermaid (flowchart TD) com a sequência de decisão; nos rótulos dos nós NÃO use os caracteres ( ) < > ; & — escreva por extenso (ex.: "menor que"). Responda em português do Brasil.`;
 }
-async function runInv(q) {
+async function runInv(q, forceIA) {
   q = (q || '').trim(); if (!q) return;
   const box = document.getElementById('invResult');
+  if (!forceIA) {
+    const off = findOffline(INV_OFF, q);
+    if (off) {
+      box.innerHTML = `<div class="result content"><div style="display:inline-block;background:#e7f7f1;color:#13503a;border:1px solid #bfe6db;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;margin-bottom:10px">📚 Banco MedTech</div>${accordionize(md(off.md))}<div class="alert alert-info" style="margin-top:14px"><span>ℹ</span><div>Roteiro de referência — adapte ao contexto do paciente e às diretrizes locais.</div></div>${invIaBtn(q)}</div>`;
+      window.scrollTo({ top: 0, behavior:'smooth' });
+      return;
+    }
+  }
   if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span>⚠</span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
   box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Investigando:</strong> ${escapeHtml(q)}</div><div class="loading-sub">Hipóteses, exames e fluxograma…</div></div>`;
   try {
