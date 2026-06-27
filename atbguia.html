@@ -136,7 +136,7 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
   <div class="wrap top">
     <div>
       <div class="logo"><span class="mark">💊</span> ATB<b>guia</b></div>
-      <div class="subtitle">Antibioticoterapia prática · referência <b>Sanford Guide 2026</b> · por MedTech</div>
+      <div class="subtitle">Antibioticoterapia prática · empírico, escalonamento e resistência · por MedTech</div>
     </div>
     <div class="usr" id="usr"></div>
   </div>
@@ -146,7 +146,7 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 <main id="view"></main>
 
 <footer>© 2026 <a href="index.html">MedTech</a> · <a href="app.html">Portal</a> · <a href="privacidade.html">Privacidade</a>
-  <div class="disc" style="max-width:780px;margin:14px auto 0">ATBguia é uma ferramenta de <b>apoio à decisão</b> para profissionais de saúde. As sugestões são <b>empíricas e gerais</b> — sempre ajuste à <b>função renal</b>, <b>alergias</b>, gestação, ao <b>antibiograma</b> e ao <b>protocolo/perfil de resistência da sua instituição</b>. Não substitui o julgamento clínico. Confira doses antes de prescrever. <b>Referência principal: Sanford Guide 2026</b> (+ diretrizes brasileiras e bula).</div>
+  <div class="disc" style="max-width:780px;margin:14px auto 0">ATBguia é uma ferramenta de <b>apoio à decisão</b> para profissionais de saúde. As sugestões são <b>empíricas e gerais</b> — sempre ajuste à <b>função renal</b>, <b>alergias</b>, gestação, ao <b>antibiograma</b> e ao <b>protocolo/perfil de resistência da sua instituição</b>. Não substitui o julgamento clínico. Confira doses antes de prescrever.</div>
 </footer>
 
 <script>
@@ -841,7 +841,7 @@ function renderItem(e){
      <button class="btn btn-ai" id="aprBtn" onclick="aprofundar('${e.id}')">✨ Casos, doses e detalhes com a IA</button>
      <div id="aprOut"></div>
    </div>
-   <div class="disc">Referência: <b>Sanford Guide 2026</b> (+ diretrizes/bula). Doses para adulto com função renal normal — confira ajuste renal, alergias, gestação e o antibiograma/protocolo local.</div>`;
+   <div class="disc">Doses para adulto com função renal normal — confira ajuste renal, alergias, gestação e o antibiograma/protocolo local.</div>`;
 }
 
 /* ===================== BULÁRIO (drug) ===================== */
@@ -883,7 +883,7 @@ function renderDrug(d){
      <button class="btn btn-ai" id="aprBtn" onclick="aprofundarDrug('${d.id}')">✨ Mais detalhes / dúvidas com a IA</button>
      <div id="aprOut"></div>
    </div>
-   <div class="disc">Referência: <b>Sanford Guide 2026</b> + bula. Doses para adulto — confirme no protocolo local; atenção a obesidade, gestação, diálise e infecções de SNC. A calculadora é estimativa de apoio.</div>`;
+   <div class="disc">Doses para adulto — confirme na bula/protocolo local; atenção a obesidade, gestação, diálise e infecções de SNC. A calculadora é estimativa de apoio.</div>`;
 }
 function calcDose(id){
   const d=DRUGS.find(x=>x.id===id);if(!d)return;
@@ -891,7 +891,7 @@ function calcDose(id){
   const out=document.getElementById('dOut');
   if(clcr<=0){out.innerHTML='<div class="calc-out" style="background:#fdecea;border-color:#f5c6c0;color:#7a241b">Informe o clearance (mL/min).</div>';return;}
   if(d.kg&&peso<=0){out.innerHTML='<div class="calc-out" style="background:#fdf0e0;border-color:#f3dcbd;color:#7a4a12">Este antibiótico é dosado por peso — informe o peso (kg).</div>';return;}
-  out.innerHTML='<div class="calc-out">'+doseAjustada(d,peso,clcr)+(RX[d.id]?'<br><b>Prescrição:</b> '+inlMd(RX[d.id]):'')+'<div style="font-size:11px;margin-top:7px;color:#557799">Referência: Sanford 2026 + bula. Ajustes em SNC, diálise e obesidade podem diferir.</div></div>';
+  out.innerHTML='<div class="calc-out">'+doseAjustada(d,peso,clcr)+(RX[d.id]?'<br><b>Prescrição:</b> '+inlMd(RX[d.id]):'')+'<div style="font-size:11px;margin-top:7px;color:#557799">Estimativa — confirme na bula/protocolo. Ajustes em SNC, diálise e obesidade podem diferir.</div></div>';
 }
 async function aprofundarDrug(id){
   const d=DRUGS.find(x=>x.id===id);if(!d)return;
@@ -940,7 +940,7 @@ function renderEmpirico(){
    </div>
    <div class="sec-title">Guia curado — ${esc(foco.nome)}</div>
    <div class="content" id="empCurado">${md(foco.md)}</div>
-   <div class="disc">Referência: <b>Sanford Guide 2026</b>. Sugestão empírica e geral — ajuste à função renal, alergias, gestação, ao antibiograma e ao perfil de resistência local. Em sepse/choque, não atrase o ATB e colha culturas antes.</div>`;
+   <div class="disc">Sugestão empírica e geral — ajuste à função renal, alergias, gestação, ao antibiograma e ao perfil de resistência local. Em sepse/choque, não atrase o ATB e colha culturas antes.</div>`;
 }
 function setEmp(k,v){empForm[k]=v;renderEmpirico();}
 async function sugerirEmpirico(){
@@ -969,7 +969,7 @@ async function sugerirEmpirico(){
       (usados?`- ATB já em uso (avaliar ESCALONAR/trocar e por quê): ${usados}\n`:'- ATB já em uso: nenhum (esquema INICIAL)\n')+
       (extra?`- Dados extras: ${extra}\n`:'')+
       `\n## RESPONDA nas seções (use blocos "### <ATB>" com bullets de Posologia/Prescrição, conforme as regras):\n## Esquema sugerido\n## Alternativas (inclua opção se houver alergia a penicilina)\n## ${usados?'Escalonamento vs. o ATB atual':'Quando escalonar'}\n## Culturas a colher\n## Duração e descalonamento\n`+
-      `${(peso||clcr)?'AJUSTE as doses ao peso/ClCr informados.':'Sem peso/ClCr informados: dê a dose habitual e oriente ajustar.'} Inclua a prescrição (diluição/infusão) em cada antibiótico. Priorize o menor espectro eficaz. Referência: Sanford 2026.`;
+      `${(peso||clcr)?'AJUSTE as doses ao peso/ClCr informados.':'Sem peso/ClCr informados: dê a dose habitual e oriente ajustar.'} Inclua a prescrição (diluição/infusão) em cada antibiótico. Priorize o menor espectro eficaz.`;
     const txt=await callIA(prompt);
     out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
   }catch(err){out.innerHTML='<div class="ai-out" style="background:#fdecea;border-color:#f5c6c0;color:#7a241b">⚠️ '+esc(err.message||'Falha na IA')+'</div>';}
@@ -986,7 +986,7 @@ function renderCobertura(){
    <div class="exam-head"><div class="ei">🎯</div><div><h1>Cobertura / espectro</h1><div class="tags">Quem cobre o quê — visão rápida de espectro</div></div></div>
    <div class="tbl-wrap"><table class="cov"><thead><tr><th class="atb" style="text-align:left">Antibiótico</th>${COV_ALVOS.map(a=>`<th>${esc(a)}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>
    <div class="legend"><span class="cy">✓</span> cobre &nbsp; <span class="cp">±</span> parcial/variável (depende de antibiograma, dose ou cepa) &nbsp; <span class="cn">—</span> não cobre / não confiável</div>
-   <div class="disc">Referência: <b>Sanford Guide 2026</b>. Mapa simplificado de espectro — <b>não substitui o antibiograma</b>; "ESBL" e "Pseudomonas" dependem do perfil local. Para detalhes, abra cada antibiótico no banco.</div>`;
+   <div class="disc">Mapa simplificado de espectro — <b>não substitui o antibiograma</b>; "ESBL" e "Pseudomonas" dependem do perfil local. Para detalhes, abra cada antibiótico no banco.</div>`;
 }
 
 /* ===================== TERAPIA DIRIGIDA ===================== */
@@ -1002,7 +1002,7 @@ function renderDirigida(){
      <button class="btn btn-ai" id="dirBtn" onclick="sugerirDirigida()" style="margin-top:6px">✨ Refinar com a IA (dose, duração, alergia)</button>
      <div id="dirOut"></div>
    </div>
-   <div class="disc">Referência: <b>Sanford Guide 2026</b>. Princípio de stewardship: ao sair a cultura, <b>descalone</b> para o menor espectro eficaz contra o germe isolado.</div>`;
+   <div class="disc">Princípio de stewardship: ao sair a cultura, <b>descalone</b> para o menor espectro eficaz contra o germe isolado.</div>`;
   renderDirAlvo();
 }
 function renderDirAlvo(){
@@ -1030,7 +1030,7 @@ function doseBlocoHtml(d,peso,clcr){
   h+='<b>Ajuste (peso/ClCr):</b> '+doseAjustada(d,peso,clcr)+'<br>';
   if(RX[d.id]) h+='<b>Prescrição:</b> '+inlMd(RX[d.id])+'<br>';
   if(PED[d.id]) h+='<b>Pediátrico:</b> '+inlMd(PED[d.id])+'<br>';
-  h+='<span style="font-size:11px;color:#557799">Referência: Sanford 2026 + bula. Estimativa — confirme no protocolo institucional.</span>';
+  h+='<span style="font-size:11px;color:#557799">Estimativa — confirme dose/diluição na bula/protocolo institucional.</span>';
   return h;
 }
 function abrir_dose(){curView='dose';renderDose();scroll0();}
@@ -1056,7 +1056,7 @@ function renderDose(){
        <div id="rOut" style="margin-top:8px"></div>
      </details>
    </div>
-   <div class="disc">Referência: <b>Sanford Guide 2026</b> + bula. Estimativa de apoio — confirme posologia/diluição no protocolo institucional. Use peso ideal/ajustado em obesos; em LRA a Cockcroft-Gault é imprecisa.</div>`;
+   <div class="disc">Estimativa de apoio — confirme posologia/diluição na bula/protocolo institucional. Use peso ideal/ajustado em obesos; em LRA a Cockcroft-Gault é imprecisa.</div>`;
 }
 function calcClcrFill(){
   const idade=+document.getElementById('rIdade').value, peso=+document.getElementById('dosePeso').value, cr=+document.getElementById('rCr').value;
@@ -1094,7 +1094,7 @@ function renderIVVO(){
      <ul>${rows}</ul>
      <div class="perla">💡 <b>Pérola:</b> a troca precoce IV→VO encurta internação, reduz risco de cateter e custo — reavalie diariamente quem ainda precisa de IV.</div>
    </div>
-   <div class="disc">Referência: <b>Sanford Guide 2026</b>. Confirme espectro pela cultura e ajuste a dose oral à função renal.</div>`;
+   <div class="disc">Confirme espectro pela cultura e ajuste a dose oral à função renal.</div>`;
 }
 
 /* ===================== IA ===================== */
@@ -1102,7 +1102,7 @@ async function callIA(prompt){
   if(!(window.MT&&MT.user))throw new Error('Entre na sua conta MedTech para usar a IA.');
   return await MT.ai(prompt);
 }
-const SYS_ATB='Você é um médico infectologista brasileiro experiente, consultor de antibioticoterapia e stewardship. Responda em português, PRÁTICO e CONCISO. **Referência principal: Sanford Guide 2026** (e diretrizes brasileiras quando pertinente); se houver incerteza sobre dose, sinalize "confirmar". FORMATO OBRIGATÓRIO em markdown LIMPO: use "## " para as seções; para CADA antibiótico crie um bloco "### <Nome do ATB>" seguido de bullets curtos rotulados em negrito — "- **Posologia:** dose, via e intervalo (já ajustados ao peso/ClCr informados, quando aplicável)", "- **Prescrição:** diluição + tempo de infusão + apresentação (pronta para prescrever)", "- **Obs:** 1 linha". NÃO escreva parágrafos longos nem listas achatadas. SEMPRE que indicar um antibiótico, inclua a prescrição pronta (diluição, infusão, posologia). Em sugestões de esquema, dê opção de 1ª linha com DOSE/via, alternativas (inclusive para alergia a penicilina), quando colher culturas e critérios de descalonamento/duração. Priorize sempre o MENOR espectro eficaz (stewardship) e considere o perfil de resistência (ESBL, KPC, MRSA, Pseudomonas, AmpC). SEMPRE lembre de ajustar à função renal, checar alergias e seguir o antibiograma e o protocolo institucional local. NÃO invente doses nem referências — se houver incerteza, oriente confirmar na bula/protocolo. Sinalize red flags (sepse/choque: não atrasar ATB, colher culturas antes; meningite/neutropenia febril: emergência). Além de condutas, responda também dúvidas CONCEITUAIS e didáticas quando perguntado — fisiopatologia da infecção, microbiologia, mecanismo de ação, mecanismos de resistência (ESBL/AmpC/KPC/MBL/MRSA/VRE) e farmacocinética/farmacodinâmica — cobrindo antibacterianos, **antifúngicos** e **antituberculose** (e noções de antivirais/antiparasitários quando solicitado). Você é apoio à decisão, não substitui o julgamento clínico.';
+const SYS_ATB='Você é um médico infectologista brasileiro experiente, consultor de antibioticoterapia e stewardship. Responda em português, PRÁTICO e CONCISO. Baseie TODO o conteúdo (doses, intervalos, condutas, espectro) no **Sanford Guide to Antimicrobial Therapy 2026** como referência principal (complemente com diretrizes brasileiras quando pertinente); **NÃO cite a fonte na resposta**. Se houver incerteza sobre uma dose, sinalize "confirmar". FORMATO OBRIGATÓRIO em markdown LIMPO: use "## " para as seções; para CADA antibiótico crie um bloco "### <Nome do ATB>" seguido de bullets curtos rotulados em negrito — "- **Posologia:** dose, via e intervalo (já ajustados ao peso/ClCr informados, quando aplicável)", "- **Prescrição:** diluição + tempo de infusão + apresentação (pronta para prescrever)", "- **Obs:** 1 linha". NÃO escreva parágrafos longos nem listas achatadas. SEMPRE que indicar um antibiótico, inclua a prescrição pronta (diluição, infusão, posologia). Em sugestões de esquema, dê opção de 1ª linha com DOSE/via, alternativas (inclusive para alergia a penicilina), quando colher culturas e critérios de descalonamento/duração. Priorize sempre o MENOR espectro eficaz (stewardship) e considere o perfil de resistência (ESBL, KPC, MRSA, Pseudomonas, AmpC). SEMPRE lembre de ajustar à função renal, checar alergias e seguir o antibiograma e o protocolo institucional local. NÃO invente doses nem referências — se houver incerteza, oriente confirmar na bula/protocolo. Sinalize red flags (sepse/choque: não atrasar ATB, colher culturas antes; meningite/neutropenia febril: emergência). Além de condutas, responda também dúvidas CONCEITUAIS e didáticas quando perguntado — fisiopatologia da infecção, microbiologia, mecanismo de ação, mecanismos de resistência (ESBL/AmpC/KPC/MBL/MRSA/VRE) e farmacocinética/farmacodinâmica — cobrindo antibacterianos, **antifúngicos** e **antituberculose** (e noções de antivirais/antiparasitários quando solicitado). Você é apoio à decisão, não substitui o julgamento clínico.';
 
 async function aprofundar(id){
   const e=itemById(id);if(!e)return;
@@ -1126,7 +1126,7 @@ function renderAssistente(){
   html+=`<div class="chat" id="chat">`+chat.map(m=>`<div class="msg ${m.role==='user'?'u':'a'}"><div class="av">${m.role==='user'?'🧑‍⚕️':'💊'}</div><div class="bub">${m.role==='user'?'<p>'+esc(m.text).replace(/\n/g,'<br>')+'</p>':md(m.text)}</div></div>`).join('')+`</div>
    <div class="ask"><textarea id="ask" rows="1" placeholder="Ex.: paciente com colangite e alergia a penicilina, qual esquema?" oninput="growAsk(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviar();}"></textarea><button onclick="enviar()" aria-label="Enviar">➤</button></div>
    ${MT.mode==='demo'?'<div class="note" style="margin-top:12px">Entre na conta MedTech para usar a IA.</div>':''}
-   <div class="disc">Referência: <b>Sanford Guide 2026</b>. Apoio à decisão — confira doses, ajuste renal, alergias e o antibiograma/protocolo local antes de prescrever.</div>`;
+   <div class="disc">Apoio à decisão — confira doses, ajuste renal, alergias e o antibiograma/protocolo local antes de prescrever.</div>`;
   document.getElementById('view').innerHTML=html;
   scrollChat();
 }
