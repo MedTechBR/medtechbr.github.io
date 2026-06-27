@@ -136,7 +136,7 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
   <div class="wrap top">
     <div>
       <div class="logo"><span class="mark">💊</span> ATB<b>guia</b></div>
-      <div class="subtitle">Antibioticoterapia prática · empírico, escalonamento e resistência · por MedTech</div>
+      <div class="subtitle">Antibioticoterapia prática · referência <b>Sanford Guide 2026</b> · por MedTech</div>
     </div>
     <div class="usr" id="usr"></div>
   </div>
@@ -146,7 +146,7 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 <main id="view"></main>
 
 <footer>© 2026 <a href="index.html">MedTech</a> · <a href="app.html">Portal</a> · <a href="privacidade.html">Privacidade</a>
-  <div class="disc" style="max-width:780px;margin:14px auto 0">ATBguia é uma ferramenta de <b>apoio à decisão</b> para profissionais de saúde. As sugestões são <b>empíricas e gerais</b> — sempre ajuste à <b>função renal</b>, <b>alergias</b>, gestação, ao <b>antibiograma</b> e ao <b>protocolo/perfil de resistência da sua instituição</b>. Não substitui o julgamento clínico. Confira doses antes de prescrever.</div>
+  <div class="disc" style="max-width:780px;margin:14px auto 0">ATBguia é uma ferramenta de <b>apoio à decisão</b> para profissionais de saúde. As sugestões são <b>empíricas e gerais</b> — sempre ajuste à <b>função renal</b>, <b>alergias</b>, gestação, ao <b>antibiograma</b> e ao <b>protocolo/perfil de resistência da sua instituição</b>. Não substitui o julgamento clínico. Confira doses antes de prescrever. <b>Referência principal: Sanford Guide 2026</b> (+ diretrizes brasileiras e bula).</div>
 </footer>
 
 <script>
@@ -841,7 +841,7 @@ function renderItem(e){
      <button class="btn btn-ai" id="aprBtn" onclick="aprofundar('${e.id}')">✨ Casos, doses e detalhes com a IA</button>
      <div id="aprOut"></div>
    </div>
-   <div class="disc">Doses para adulto com função renal normal — confira ajuste renal, alergias, gestação e o antibiograma/protocolo local.</div>`;
+   <div class="disc">Referência: <b>Sanford Guide 2026</b> (+ diretrizes/bula). Doses para adulto com função renal normal — confira ajuste renal, alergias, gestação e o antibiograma/protocolo local.</div>`;
 }
 
 /* ===================== BULÁRIO (drug) ===================== */
@@ -883,7 +883,7 @@ function renderDrug(d){
      <button class="btn btn-ai" id="aprBtn" onclick="aprofundarDrug('${d.id}')">✨ Mais detalhes / dúvidas com a IA</button>
      <div id="aprOut"></div>
    </div>
-   <div class="disc">Doses de referência para adulto — confirme na bula/protocolo local; atenção a obesidade, gestação, diálise e infecções de SNC. A calculadora é uma estimativa de apoio.</div>`;
+   <div class="disc">Referência: <b>Sanford Guide 2026</b> + bula. Doses para adulto — confirme no protocolo local; atenção a obesidade, gestação, diálise e infecções de SNC. A calculadora é estimativa de apoio.</div>`;
 }
 function calcDose(id){
   const d=DRUGS.find(x=>x.id===id);if(!d)return;
@@ -940,7 +940,7 @@ function renderEmpirico(){
    </div>
    <div class="sec-title">Guia curado — ${esc(foco.nome)}</div>
    <div class="content" id="empCurado">${md(foco.md)}</div>
-   <div class="disc">Sugestão empírica e geral. Ajuste à função renal, alergias, gestação, ao antibiograma e ao protocolo/perfil de resistência local. Em sepse/choque, não atrase o ATB e colha culturas antes.</div>`;
+   <div class="disc">Referência: <b>Sanford Guide 2026</b>. Sugestão empírica e geral — ajuste à função renal, alergias, gestação, ao antibiograma e ao perfil de resistência local. Em sepse/choque, não atrase o ATB e colha culturas antes.</div>`;
 }
 function setEmp(k,v){empForm[k]=v;renderEmpirico();}
 async function sugerirEmpirico(){
@@ -986,7 +986,7 @@ function renderCobertura(){
    <div class="exam-head"><div class="ei">🎯</div><div><h1>Cobertura / espectro</h1><div class="tags">Quem cobre o quê — visão rápida de espectro</div></div></div>
    <div class="tbl-wrap"><table class="cov"><thead><tr><th class="atb" style="text-align:left">Antibiótico</th>${COV_ALVOS.map(a=>`<th>${esc(a)}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>
    <div class="legend"><span class="cy">✓</span> cobre &nbsp; <span class="cp">±</span> parcial/variável (depende de antibiograma, dose ou cepa) &nbsp; <span class="cn">—</span> não cobre / não confiável</div>
-   <div class="disc">Mapa simplificado de espectro para decisão rápida — <b>não substitui o antibiograma</b>. "ESBL" e "Pseudomonas" dependem fortemente do perfil local. Para detalhes, abra cada antibiótico no banco.</div>`;
+   <div class="disc">Referência: <b>Sanford Guide 2026</b>. Mapa simplificado de espectro — <b>não substitui o antibiograma</b>; "ESBL" e "Pseudomonas" dependem do perfil local. Para detalhes, abra cada antibiótico no banco.</div>`;
 }
 
 /* ===================== TERAPIA DIRIGIDA ===================== */
@@ -1002,7 +1002,7 @@ function renderDirigida(){
      <button class="btn btn-ai" id="dirBtn" onclick="sugerirDirigida()" style="margin-top:6px">✨ Refinar com a IA (dose, duração, alergia)</button>
      <div id="dirOut"></div>
    </div>
-   <div class="disc">Princípio de stewardship: ao sair a cultura, <b>descalone</b> para o menor espectro eficaz contra o germe isolado.</div>`;
+   <div class="disc">Referência: <b>Sanford Guide 2026</b>. Princípio de stewardship: ao sair a cultura, <b>descalone</b> para o menor espectro eficaz contra o germe isolado.</div>`;
   renderDirAlvo();
 }
 function renderDirAlvo(){
@@ -1094,7 +1094,7 @@ function renderIVVO(){
      <ul>${rows}</ul>
      <div class="perla">💡 <b>Pérola:</b> a troca precoce IV→VO encurta internação, reduz risco de cateter e custo — reavalie diariamente quem ainda precisa de IV.</div>
    </div>
-   <div class="disc">Confirme espectro pela cultura e ajuste a dose oral à função renal.</div>`;
+   <div class="disc">Referência: <b>Sanford Guide 2026</b>. Confirme espectro pela cultura e ajuste a dose oral à função renal.</div>`;
 }
 
 /* ===================== IA ===================== */
@@ -1126,7 +1126,7 @@ function renderAssistente(){
   html+=`<div class="chat" id="chat">`+chat.map(m=>`<div class="msg ${m.role==='user'?'u':'a'}"><div class="av">${m.role==='user'?'🧑‍⚕️':'💊'}</div><div class="bub">${m.role==='user'?'<p>'+esc(m.text).replace(/\n/g,'<br>')+'</p>':md(m.text)}</div></div>`).join('')+`</div>
    <div class="ask"><textarea id="ask" rows="1" placeholder="Ex.: paciente com colangite e alergia a penicilina, qual esquema?" oninput="growAsk(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviar();}"></textarea><button onclick="enviar()" aria-label="Enviar">➤</button></div>
    ${MT.mode==='demo'?'<div class="note" style="margin-top:12px">Entre na conta MedTech para usar a IA.</div>':''}
-   <div class="disc">Apoio à decisão — confira doses, ajuste renal, alergias e o antibiograma/protocolo local antes de prescrever.</div>`;
+   <div class="disc">Referência: <b>Sanford Guide 2026</b>. Apoio à decisão — confira doses, ajuste renal, alergias e o antibiograma/protocolo local antes de prescrever.</div>`;
   document.getElementById('view').innerHTML=html;
   scrollChat();
 }
