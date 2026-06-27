@@ -79,8 +79,8 @@ main{max-width:1000px;margin:0 auto;padding:18px 18px 70px;min-height:60vh}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
 @keyframes sp{to{transform:rotate(360deg)}}
 .ai-out{background:#eef7f4;border:1px solid #bfe6db;border-radius:12px;padding:13px 15px;margin-top:12px;font-size:14px;line-height:1.6;color:#243b41}
-.ai-out h2{font-size:15px;color:var(--petrol-dark);margin:12px 0 6px}
-.ai-out h3{font-size:13.5px;color:var(--petrol);margin:9px 0 3px}
+.ai-out h2{font-size:15px;color:var(--petrol-dark);margin:14px 0 6px;padding-bottom:4px;border-bottom:1px solid #cfe7df}
+.ai-out h3{font-size:13.5px;color:var(--petrol-dark);margin:11px 0 4px;padding:5px 9px;background:#dff0ea;border-left:3px solid var(--mint);border-radius:7px}
 .ai-out ul{margin:4px 0 8px;padding-left:19px}.ai-out li{margin:3px 0}
 .ai-out b{color:var(--petrol-dark)}
 /* form */
@@ -686,6 +686,50 @@ const PED={
  etambutol:'15–25 mg/kg/dia (monitorar visão; difícil em pré-escolar).'
 };
 
+/* ===================== PRESCRIÇÃO SUGERIDA (apresentação · diluição · infusão) ===================== */
+const RX={
+ amoxiclav:'VO. Comp 500/875 mg (susp). Tomar com alimento. Sem diluição.',
+ ampicilina:'EV. FA 500 mg/1 g. Diluir em 50–100 mL SF 0,9%; infundir 15–30 min.',
+ oxacilina:'EV. FA 500 mg. Diluir em 50–100 mL SF; infundir 30–60 min. Flebogênica (preferir acesso central se prolongado).',
+ piptazo:'EV. FA 4,5 g. Diluir em 100 mL SF/SG; **infusão estendida 3–4 h** no grave (ou 30 min).',
+ cefazolina:'EV/IM. FA 1 g. Diluir em 50–100 mL SF; infundir 15–30 min.',
+ cefalexina:'VO. Cáps 500 mg / susp. Sem diluição.',
+ ceftriaxona:'EV/IM. FA 1 g. Diluir em 50–100 mL SF/SG; infundir 30 min. **NÃO usar diluente com cálcio (Ringer).** IM: reconstituir com lidocaína 1%.',
+ cefepime:'EV. FA 1/2 g. Diluir em 50–100 mL SF/SG; infundir 30 min (estendida 3 h no grave).',
+ ceftazidima:'EV. FA 1 g. Diluir em 50–100 mL SF; infundir 30 min (estendida no grave).',
+ meropenem:'EV. FA 1 g. Diluir em 100 mL SF; infundir 30 min ou **estendida 3 h** (grave). Diluir na hora (pouco estável).',
+ ertapenem:'EV/IM. FA 1 g. Diluir em 50–100 mL SF (**não usar SG**); infundir 30 min.',
+ ciprofloxacino:'EV: bolsa 400 mg/200 mL, infundir 60 min. VO: comp 500 mg (longe de cátions/laticínios).',
+ levofloxacino:'EV: bolsa 500/750 mg, infundir 60–90 min. VO: comp 500/750 mg.',
+ azitromicina:'VO comp 500 mg. EV: diluir e infundir ≥60 min (2 mg/mL em 1 h).',
+ clindamicina:'EV: diluir ≤6 mg/mL, infundir 10–60 min (máx 30 mg/min). VO: cáps 300 mg.',
+ vancomicina:'EV. FA 500 mg/1 g. Diluir ≤5 mg/mL (1 g em 250 mL SF/SG); **infundir ≥60 min** (máx 10 mg/min) — evita "homem vermelho". VO (só CDI): conteúdo do FA diluído.',
+ linezolida:'EV: bolsa 600 mg/300 mL, infundir 30–120 min. VO: comp 600 mg (biodisp ~100%).',
+ daptomicina:'EV. FA 350/500 mg. Diluir em SF (não SG); infundir 30 min (ou bolus 2 min).',
+ gentamicina:'EV. Diluir em 50–100 mL SF; infundir 30–60 min (dose única diária). Monitorar nível (pico/vale).',
+ amicacina:'EV. Diluir em 100 mL SF; infundir 30–60 min (dose única diária). Monitorar nível.',
+ metronidazol:'EV: bolsa 500 mg/100 mL, infundir 30–60 min. VO: comp 250/400 mg.',
+ sulfa:'EV: diluir (1 amp em 125 mL SG 5%), infundir 60–90 min. VO: comp 400/80 ou 800/160 mg.',
+ nitrofurantoina:'VO. Cáps 100 mg, com alimento.',
+ fosfomicina:'VO. Sachê 3 g — dissolver em água, em jejum, ao deitar (esvaziar a bexiga antes).',
+ ampisulbactam:'EV. FA 1,5/3 g. Diluir em 50–100 mL SF; infundir 15–30 min.',
+ aztreonam:'EV. FA 1 g. Diluir em 50–100 mL SF; infundir 20–60 min.',
+ ceftarolina:'EV. FA 600 mg. Diluir em 250 mL SF/SG; infundir 60 min (até 120 min).',
+ tigeciclina:'EV. FA 50 mg. Diluir em 100 mL SF/SG; infundir 30–60 min.',
+ polimixinab:'EV. Diluir em 100 mL SG 5%; infundir 60 min. Dose em **mg** (não confundir com UI). Monitorar função renal.',
+ doxiciclina:'VO comp 100 mg (com bastante água, sentado). EV: infundir 60 min, protegido da luz.',
+ ceftazavi:'EV. FA 2,5 g. Diluir em 100 mL SF/SG; **infundir 120 min**.',
+ fluconazol:'EV: bolsa pronta 2 mg/mL, infundir ≤200 mg/h. VO: comp 150 mg (biodisp ~90%).',
+ anfotericina:'EV. Lipossomal: diluir **SÓ em SG 5%** (1 mg/mL), infundir 30–120 min, com filtro. **Não usar SF (precipita).** Pré-medicar se reação infusional.',
+ voriconazol:'EV: diluir ≤5 mg/mL, infundir em 1–2 h (≤3 mg/kg/h). VO: comp 200 mg, longe das refeições.',
+ caspofungina:'EV. FA 50/70 mg. Diluir em 250 mL SF (**não SG**); infundir 60 min.',
+ itraconazol:'VO. Cáps (com alimento + bebida ácida) ou solução (em jejum). Evitar IBP/antiácido com a cápsula.',
+ rifampicina:'VO. Cáps 300 mg / susp — **em jejum** (1 h antes ou 2 h após). EV em alguns serviços.',
+ isoniazida:'VO comp 100/300 mg, em jejum. **Sempre com piridoxina (B6).**',
+ pirazinamida:'VO comp 500 mg (com alimento se intolerância GI).',
+ etambutol:'VO comp 400 mg.'
+};
+
 /* ===================== COBERTURA (matriz espectro) ===================== */
 const COV_ALVOS=['MSSA','MRSA','Strepto','Enterococo','Entero (E.coli)','ESBL','Pseudomonas','Anaeróbio','Atípicos'];
 /* 2=sim, 1=parcial/variável, 0=não */
@@ -765,7 +809,7 @@ function renderHome(){
   const tools=[
     ['cobertura','🎯','Cobertura / espectro','Quem cobre MRSA, Pseudomonas, ESBL, anaeróbio…'],
     ['dirigida','🔬','Terapia dirigida','Germe do antibiograma → opções (menor espectro)'],
-    ['renal','🧮','Ajuste renal','Clearance (Cockcroft-Gault) e o que ajustar'],
+    ['dose','🧮','Calculadora de dose','ATB + peso + clearance → dose ajustada + prescrição'],
     ['ivvo','🔁','Switch IV → VO','ATB com boa absorção oral + critérios']
   ].filter(t=>!q||(t[2]+' '+t[3]).toLowerCase().includes(q));
   if(tools.length){html+=`<div class="sec-title">Ferramentas</div><div class="grid">`+tools.map(t=>`<div class="card tool" onclick="abrir_${t[0]}()"><div class="ci">${t[1]}</div><div class="cn">${t[2]}</div><div class="ct">${t[3]}</div></div>`).join('')+`</div>`;}
@@ -819,7 +863,8 @@ function renderDrug(d){
    <div class="exam-head"><div class="ei">💊</div><div><h1>${esc(d.nome)}</h1><div class="tags">${esc(d.classe)}</div></div></div>
    <div class="content"><h2>Dose habitual (adulto, função renal normal)</h2>${md(d.doseNormal)}
    ${d.kg?`<div class="perla">⚖️ <b>Dose por peso:</b> ${d.kg.lo}${d.kg.hi!==d.kg.lo?'–'+d.kg.hi:''} mg/kg ${inlMd(d.kg.intervalo)}${d.kg.nota?'. '+inlMd(d.kg.nota):''}</div>`:''}
-   ${PED[d.id]?`<h2>Dose pediátrica</h2>${md(PED[d.id])}<div style="font-size:11.5px;color:var(--muted)">Dose pediátrica geral — confirme por peso/idade e protocolo; neonatos têm regras próprias.</div>`:''}</div>
+   ${PED[d.id]?`<h2>Dose pediátrica</h2>${md(PED[d.id])}<div style="font-size:11.5px;color:var(--muted)">Dose pediátrica geral — confirme por peso/idade e protocolo; neonatos têm regras próprias.</div>`:''}
+   ${RX[d.id]?`<h2>Prescrição sugerida</h2>${md(RX[d.id])}`:''}</div>
    <div class="formcard">
      <h4 style="font-size:13px;font-weight:800;color:var(--petrol-dark);margin-bottom:10px">🧮 Calculadora de dose — peso + clearance</h4>
      <div class="field"><label>Peso (kg)${d.kg?'':' — não usado neste antibiótico'}</label><input type="number" id="dPeso" inputmode="decimal" placeholder="ex.: 70" ${d.kg?'':'disabled style="opacity:.5"'}></div>
@@ -846,7 +891,7 @@ function calcDose(id){
   const out=document.getElementById('dOut');
   if(clcr<=0){out.innerHTML='<div class="calc-out" style="background:#fdecea;border-color:#f5c6c0;color:#7a241b">Informe o clearance (mL/min).</div>';return;}
   if(d.kg&&peso<=0){out.innerHTML='<div class="calc-out" style="background:#fdf0e0;border-color:#f3dcbd;color:#7a4a12">Este antibiótico é dosado por peso — informe o peso (kg).</div>';return;}
-  out.innerHTML='<div class="calc-out">'+doseAjustada(d,peso,clcr)+'<div style="font-size:11px;margin-top:7px;color:#557799">Estimativa de apoio — confirme na bula/protocolo. Ajustes em SNC, diálise e obesidade podem diferir.</div></div>';
+  out.innerHTML='<div class="calc-out">'+doseAjustada(d,peso,clcr)+(RX[d.id]?'<br><b>Prescrição:</b> '+inlMd(RX[d.id]):'')+'<div style="font-size:11px;margin-top:7px;color:#557799">Referência: Sanford 2026 + bula. Ajustes em SNC, diálise e obesidade podem diferir.</div></div>';
 }
 async function aprofundarDrug(id){
   const d=DRUGS.find(x=>x.id===id);if(!d)return;
@@ -861,7 +906,7 @@ async function aprofundarDrug(id){
 
 /* ===================== EMPÍRICO ===================== */
 const PREV_ATBS=['Amoxicilina','Amox-clavulanato','Ampicilina','Oxacilina','Cefalexina','Cefazolina','Ceftriaxona','Cefepime','Ceftazidima','Piperacilina-tazobactam','Meropenem','Ertapenem','Ciprofloxacino','Levofloxacino','Azitromicina','Clindamicina','Metronidazol','Sulfametoxazol-trimetoprim','Vancomicina','Linezolida','Daptomicina','Gentamicina','Amicacina','Nitrofurantoína','Polimixina B'];
-let empForm={foco:'pac',ctx:'comunitario',grav:'enfermaria',alergia:'nao',usados:[],detalhe:'',extra:''};
+let empForm={foco:'pac',ctx:'comunitario',grav:'enfermaria',alergia:'nao',usados:[],detalhe:'',extra:'',peso:'',clcr:''};
 function toggleUsado(i){const a=PREV_ATBS[i];const k=empForm.usados.indexOf(a);if(k>=0)empForm.usados.splice(k,1);else empForm.usados.push(a);const w=document.getElementById('usadosChips');if(w&&w.children[i])w.children[i].classList.toggle('on');}
 function abrirEmpirico(){curView='emp';renderEmpirico();scroll0();}
 function renderEmpirico(){
@@ -876,6 +921,7 @@ function renderEmpirico(){
      <div class="field"><label>Contexto</label><div class="segs">${seg('ctx','comunitario','🏠 Comunitário')}${seg('ctx','hospitalar','🏥 Hospitalar/nosocomial')}</div></div>
      <div class="field"><label>Gravidade / local</label><div class="segs">${seg('grav','ambulatorial','Ambulatorial')}${seg('grav','enfermaria','Internado')}${seg('grav','uti','UTI / grave')}</div></div>
      <div class="field"><label>Alergia a penicilina</label><div class="segs">${seg('alergia','nao','Não')}${seg('alergia','leve','Leve (rash)')}${seg('alergia','grave','Grave/anafilaxia')}</div></div>
+     <div class="field"><label>Peso e clearance (para já ajustar as doses)</label><div style="display:flex;gap:8px"><input type="number" id="empPeso" value="${esc(empForm.peso)}" oninput="empForm.peso=this.value" inputmode="decimal" placeholder="Peso (kg)" style="flex:1"><input type="number" id="empClcr" value="${esc(empForm.clcr)}" oninput="empForm.clcr=this.value" inputmode="numeric" placeholder="ClCr (mL/min)" style="flex:1"></div></div>
      <div class="field"><label>Fatores de risco para multirresistência</label>
        <div class="checks">
          <label><input type="checkbox" id="r_atb"> Uso de ATB nos últimos 90 dias</label>
@@ -915,12 +961,15 @@ async function sugerirEmpirico(){
   const b=document.getElementById('empBtn'),out=document.getElementById('empOut');
   b.disabled=true;b.innerHTML='<span class="spin"></span> Gerando sugestão…';
   try{
-    const prompt=SYS_ATB+`\n\nMonte uma SUGESTÃO de antibioticoterapia para o caso abaixo.\n`+
-      `- Foco/sítio: ${foco.nome}\n- Contexto: ${ctxL}\n- Gravidade/local: ${gravL}\n- Alergia: ${algL}\n`+
+    const peso=(empForm.peso||'').trim(), clcr=(empForm.clcr||'').trim();
+    const prompt=SYS_ATB+`\n\n## CASO\n`+
+      `- Foco/sítio: ${foco.nome}\n- Contexto: ${ctxL}\n- Gravidade/local: ${gravL}\n- Alergia a penicilina: ${algL}\n`+
       `- Fatores de risco para MDR: ${riscos.length?riscos.join('; '):'nenhum assinalado'}\n`+
+      (peso?`- Peso: ${peso} kg\n`:'')+(clcr?`- Clearance de creatinina: ${clcr} mL/min\n`:'')+
       (usados?`- ATB já em uso (avaliar ESCALONAR/trocar e por quê): ${usados}\n`:'- ATB já em uso: nenhum (esquema INICIAL)\n')+
       (extra?`- Dados extras: ${extra}\n`:'')+
-      `\nResponda em markdown com: ## Esquema sugerido (1ª linha com DOSE/via), ## Alternativas (incluindo se houver alergia), ## ${usados?'Escalonamento/ajuste vs. o ATB atual':'Quando escalonar'}, ## Culturas a colher, ## Duração e descalonamento. Priorize o MENOR espectro eficaz. Lembre ajuste renal e antibiograma. Seja conciso e prático.`;
+      `\n## RESPONDA nas seções (use blocos "### <ATB>" com bullets de Posologia/Prescrição, conforme as regras):\n## Esquema sugerido\n## Alternativas (inclua opção se houver alergia a penicilina)\n## ${usados?'Escalonamento vs. o ATB atual':'Quando escalonar'}\n## Culturas a colher\n## Duração e descalonamento\n`+
+      `${(peso||clcr)?'AJUSTE as doses ao peso/ClCr informados.':'Sem peso/ClCr informados: dê a dose habitual e oriente ajustar.'} Inclua a prescrição (diluição/infusão) em cada antibiótico. Priorize o menor espectro eficaz. Referência: Sanford 2026.`;
     const txt=await callIA(prompt);
     out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
   }catch(err){out.innerHTML='<div class="ai-out" style="background:#fdecea;border-color:#f5c6c0;color:#7a241b">⚠️ '+esc(err.message||'Falha na IA')+'</div>';}
@@ -971,36 +1020,59 @@ async function sugerirDirigida(){
   b.disabled=false;b.innerHTML='✨ Refinar com a IA (dose, duração, alergia)';
 }
 
-/* ===================== AJUSTE RENAL ===================== */
-function abrir_renal(){curView='ren';renderRenal();scroll0();}
-function renderRenal(){
+/* ===================== CALCULADORA DE DOSE (ATB + peso + ClCr) ===================== */
+let rSexo='M';
+function setSexo(s){rSexo=s;var m=document.getElementById('sexoM'),f=document.getElementById('sexoF');if(m)m.classList.toggle('on',s==='M');if(f)f.classList.toggle('on',s==='F');}
+/* bloco dose + prescrição reutilizado na calculadora e na monografia */
+function doseBlocoHtml(d,peso,clcr){
+  let h='<b>'+esc(d.nome)+'</b> <span style="color:#557799">· '+esc((d.classe||'').split('·')[0].trim())+'</span><br>';
+  h+='<b>Posologia:</b> '+inlMd(d.doseNormal)+'<br>';
+  h+='<b>Ajuste (peso/ClCr):</b> '+doseAjustada(d,peso,clcr)+'<br>';
+  if(RX[d.id]) h+='<b>Prescrição:</b> '+inlMd(RX[d.id])+'<br>';
+  if(PED[d.id]) h+='<b>Pediátrico:</b> '+inlMd(PED[d.id])+'<br>';
+  h+='<span style="font-size:11px;color:#557799">Referência: Sanford 2026 + bula. Estimativa — confirme no protocolo institucional.</span>';
+  return h;
+}
+function abrir_dose(){curView='dose';renderDose();scroll0();}
+function renderDose(){
+  const opts=[['Antibacterianos','Antibacterianos'],['Antifúngicos','Antifúngicos'],['Antituberculose','Antituberculose']].map(g=>{
+    const list=DRUGS.filter(d=>(d.grupo||'Antibacterianos')===g[0]);
+    return `<optgroup label="${g[1]}">`+list.map(d=>`<option value="${d.id}">${esc(d.nome)}</option>`).join('')+`</optgroup>`;
+  }).join('');
   document.getElementById('view').innerHTML=`
    <button class="back" onclick="routeHome()">← Voltar</button>
-   <div class="exam-head"><div class="ei">🧮</div><div><h1>Ajuste renal</h1><div class="tags">Clearance de creatinina (Cockcroft-Gault)</div></div></div>
+   <div class="exam-head"><div class="ei">🧮</div><div><h1>Calculadora de dose</h1><div class="tags">Selecione o ATB + peso + clearance → dose ajustada + prescrição</div></div></div>
    <div class="formcard">
-     <div class="field"><label>Idade (anos)</label><input type="number" id="rIdade" inputmode="numeric" placeholder="ex.: 68"></div>
-     <div class="field"><label>Peso (kg)</label><input type="number" id="rPeso" inputmode="decimal" placeholder="ex.: 70"></div>
-     <div class="field"><label>Creatinina sérica (mg/dL)</label><input type="number" id="rCr" inputmode="decimal" step="0.01" placeholder="ex.: 1.4"></div>
-     <div class="field"><label>Sexo</label><div class="segs"><button class="seg on" id="sexoM" onclick="setSexo('M')">Homem</button><button class="seg" id="sexoF" onclick="setSexo('F')">Mulher</button></div></div>
-     <button class="btn btn-p" onclick="calcRenal()">Calcular clearance</button>
-     <div id="rOut"></div>
+     <div class="field"><label>Antibiótico</label><select id="doseAtb">${opts}</select></div>
+     <div class="field"><label>Peso (kg)</label><input type="number" id="dosePeso" inputmode="decimal" placeholder="ex.: 60"></div>
+     <div class="field"><label>Clearance de creatinina (mL/min)</label><input type="number" id="doseClcr" inputmode="numeric" placeholder="ex.: 30"></div>
+     <button class="btn btn-p" onclick="calcDoseTool()">Calcular dose + prescrição</button>
+     <div id="doseOut"></div>
+     <details style="margin-top:12px"><summary style="cursor:pointer;font-size:13px;color:var(--petrol);font-weight:700">▸ Não sei o clearance — calcular (Cockcroft-Gault)</summary>
+       <div class="field" style="margin-top:10px"><label>Idade (anos)</label><input type="number" id="rIdade" inputmode="numeric" placeholder="ex.: 68"></div>
+       <div class="field"><label>Creatinina sérica (mg/dL)</label><input type="number" id="rCr" inputmode="decimal" step="0.01" placeholder="ex.: 1.4"></div>
+       <div class="field"><label>Sexo</label><div class="segs"><button class="seg on" id="sexoM" onclick="setSexo('M')">Homem</button><button class="seg" id="sexoF" onclick="setSexo('F')">Mulher</button></div></div>
+       <button class="btn btn-g" onclick="calcClcrFill()">Calcular e preencher o clearance</button>
+       <div id="rOut" style="margin-top:8px"></div>
+     </details>
    </div>
-   <div class="disc">Cockcroft-Gault estima o ClCr para ajuste de dose. Use peso ideal/ajustado em obesos; em lesão renal aguda a fórmula é imprecisa. Confira a bula/posologia de cada ATB para o ajuste exato.</div>`;
+   <div class="disc">Referência: <b>Sanford Guide 2026</b> + bula. Estimativa de apoio — confirme posologia/diluição no protocolo institucional. Use peso ideal/ajustado em obesos; em LRA a Cockcroft-Gault é imprecisa.</div>`;
 }
-let rSexo='M';
-function setSexo(s){rSexo=s;document.getElementById('sexoM').classList.toggle('on',s==='M');document.getElementById('sexoF').classList.toggle('on',s==='F');}
-function calcRenal(){
-  const idade=+document.getElementById('rIdade').value,peso=+document.getElementById('rPeso').value,cr=+document.getElementById('rCr').value;
+function calcClcrFill(){
+  const idade=+document.getElementById('rIdade').value, peso=+document.getElementById('dosePeso').value, cr=+document.getElementById('rCr').value;
   const out=document.getElementById('rOut');
-  if(!idade||!peso||!cr){out.innerHTML='<div class="calc-out" style="background:#fdecea;border-color:#f5c6c0;color:#7a241b">Preencha idade, peso e creatinina.</div>';return;}
-  let clcr=((140-idade)*peso)/(72*cr);if(rSexo==='F')clcr*=0.85;
-  clcr=Math.round(clcr);
-  let faixa,nota;
-  if(clcr>=50){faixa='≥ 50 mL/min — função preservada';nota='Em geral dose padrão para a maioria dos ATB.';}
-  else if(clcr>=30){faixa='30–49 mL/min — redução leve a moderada';nota='Ajustar: vancomicina, aminoglicosídeos, β-lactâmicos (intervalo), SMX-TMP, levofloxacino, fluconazol. Evitar nitrofurantoína se <30.';}
-  else if(clcr>=10){faixa='10–29 mL/min — redução importante';nota='Reduzir dose/intervalo da maioria dos ATB renais. Evitar nitrofurantoína. Cuidado redobrado com nefrotóxicos (aminoglicosídeo, polimixina, vancomicina).';}
-  else {faixa='< 10 mL/min / diálise';nota='Doses específicas e relação com a diálise (dar após HD para muitos ATB). Consultar farmácia/nefrologia.';}
-  out.innerHTML=`<div class="calc-out"><b>ClCr ≈ ${clcr} mL/min</b><br><b>${faixa}</b><br>${nota}<br><span style="font-size:12px;color:#557799">Doses exatas: abra o antibiótico no banco "Antibióticos".</span></div>`;
+  if(!idade||!peso||!cr){out.innerHTML='<div class="calc-out" style="background:#fdecea;border-color:#f5c6c0;color:#7a241b">Preencha o peso (campo acima), a idade e a creatinina.</div>';return;}
+  let clcr=((140-idade)*peso)/(72*cr);if(rSexo==='F')clcr*=0.85;clcr=Math.round(clcr);
+  document.getElementById('doseClcr').value=clcr;
+  out.innerHTML='<div class="calc-out"><b>ClCr ≈ '+clcr+' mL/min</b> — preenchido acima. Agora clique em <b>Calcular dose + prescrição</b>.</div>';
+}
+function calcDoseTool(){
+  const d=DRUGS.find(x=>x.id===document.getElementById('doseAtb').value);if(!d)return;
+  const peso=+document.getElementById('dosePeso').value||0, clcr=+document.getElementById('doseClcr').value||0;
+  const out=document.getElementById('doseOut');
+  if(clcr<=0){out.innerHTML='<div class="calc-out" style="background:#fdecea;border-color:#f5c6c0;color:#7a241b">Informe o clearance (ou calcule no "▸" abaixo).</div>';return;}
+  if(d.kg&&peso<=0){out.innerHTML='<div class="calc-out" style="background:#fdf0e0;border-color:#f3dcbd;color:#7a4a12">'+esc(d.nome)+' é dosado por peso — informe o peso (kg).</div>';return;}
+  out.innerHTML='<div class="calc-out">'+doseBlocoHtml(d,peso,clcr)+'</div>';
 }
 
 /* ===================== IV → VO ===================== */
@@ -1030,7 +1102,7 @@ async function callIA(prompt){
   if(!(window.MT&&MT.user))throw new Error('Entre na sua conta MedTech para usar a IA.');
   return await MT.ai(prompt);
 }
-const SYS_ATB='Você é um médico infectologista brasileiro experiente, consultor de antibioticoterapia e stewardship. Responda de forma PRÁTICA, ACIONÁVEL e CONCISA, em português, markdown com seções "## " e bullets curtos. Em sugestões de esquema, dê opção de 1ª linha com DOSE/via, alternativas (inclusive para alergia a penicilina), quando colher culturas e critérios de descalonamento/duração. Priorize sempre o MENOR espectro eficaz (stewardship) e considere o perfil de resistência (ESBL, KPC, MRSA, Pseudomonas, AmpC). SEMPRE lembre de ajustar à função renal, checar alergias e seguir o antibiograma e o protocolo institucional local. NÃO invente doses nem referências — se houver incerteza, oriente confirmar na bula/protocolo. Sinalize red flags (sepse/choque: não atrasar ATB, colher culturas antes; meningite/neutropenia febril: emergência). Além de condutas, responda também dúvidas CONCEITUAIS e didáticas quando perguntado — fisiopatologia da infecção, microbiologia, mecanismo de ação, mecanismos de resistência (ESBL/AmpC/KPC/MBL/MRSA/VRE) e farmacocinética/farmacodinâmica — cobrindo antibacterianos, **antifúngicos** e **antituberculose** (e noções de antivirais/antiparasitários quando solicitado). Você é apoio à decisão, não substitui o julgamento clínico.';
+const SYS_ATB='Você é um médico infectologista brasileiro experiente, consultor de antibioticoterapia e stewardship. Responda em português, PRÁTICO e CONCISO. **Referência principal: Sanford Guide 2026** (e diretrizes brasileiras quando pertinente); se houver incerteza sobre dose, sinalize "confirmar". FORMATO OBRIGATÓRIO em markdown LIMPO: use "## " para as seções; para CADA antibiótico crie um bloco "### <Nome do ATB>" seguido de bullets curtos rotulados em negrito — "- **Posologia:** dose, via e intervalo (já ajustados ao peso/ClCr informados, quando aplicável)", "- **Prescrição:** diluição + tempo de infusão + apresentação (pronta para prescrever)", "- **Obs:** 1 linha". NÃO escreva parágrafos longos nem listas achatadas. SEMPRE que indicar um antibiótico, inclua a prescrição pronta (diluição, infusão, posologia). Em sugestões de esquema, dê opção de 1ª linha com DOSE/via, alternativas (inclusive para alergia a penicilina), quando colher culturas e critérios de descalonamento/duração. Priorize sempre o MENOR espectro eficaz (stewardship) e considere o perfil de resistência (ESBL, KPC, MRSA, Pseudomonas, AmpC). SEMPRE lembre de ajustar à função renal, checar alergias e seguir o antibiograma e o protocolo institucional local. NÃO invente doses nem referências — se houver incerteza, oriente confirmar na bula/protocolo. Sinalize red flags (sepse/choque: não atrasar ATB, colher culturas antes; meningite/neutropenia febril: emergência). Além de condutas, responda também dúvidas CONCEITUAIS e didáticas quando perguntado — fisiopatologia da infecção, microbiologia, mecanismo de ação, mecanismos de resistência (ESBL/AmpC/KPC/MBL/MRSA/VRE) e farmacocinética/farmacodinâmica — cobrindo antibacterianos, **antifúngicos** e **antituberculose** (e noções de antivirais/antiparasitários quando solicitado). Você é apoio à decisão, não substitui o julgamento clínico.';
 
 async function aprofundar(id){
   const e=itemById(id);if(!e)return;
