@@ -80,7 +80,7 @@ input.search{padding:11px 12px;border:1px solid var(--line);border-radius:9px;fo
 .chip:active{background:var(--mint);border-color:var(--mint);transform:scale(.96)}
 .ef-grid{display:flex;flex-direction:column;gap:4px;margin-bottom:5px}
 .ef-row{display:flex;align-items:center;gap:7px}
-.ef-lbl{flex:0 0 46px;font-size:10.5px;font-weight:800;color:var(--petrol-dark);letter-spacing:.02em}
+.ef-lbl{flex:0 0 86px;font-size:10.5px;font-weight:800;color:var(--petrol-dark);letter-spacing:.02em;white-space:nowrap}
 .ef-grid .ef-row input{flex:1;min-width:0;padding:5px 9px;font-size:13.5px}
 .ef-outros{min-height:34px}
 .sug-out{background:#eef7f4;border:1px solid #bfe6db;border-radius:11px;padding:11px 13px;font-size:13px;line-height:1.5;color:#243b41;margin-top:8px}
@@ -144,7 +144,7 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
   .two,.three{grid-template-columns:1fr}
   .chip{padding:9px 13px;font-size:13px}
   .ai-box{padding:11px}
-  .ef-lbl{flex-basis:42px}
+  .ef-lbl{flex-basis:84px}
   .modal{padding:0;align-items:flex-end}
   .modal .box{max-width:100%;max-height:96vh;border-radius:18px 18px 0 0;padding:18px 16px 14px}
   .pt-card{gap:10px;flex-wrap:wrap}
@@ -182,7 +182,7 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 <script>
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const SAIDA={alta:{l:'Alta',c:'b-alta'},obito:{l:'Óbito',c:'b-obito'},transferencia:{l:'Transferência',c:'b-transf'}};
-const EF_TEMPLATE='- NEURO: \n- AC: \n- AP: \n- ABDOME: \n- EXT: \n- PELE: ';
+const EF_TEMPLATE='- ESTADO GERAL: \n- NEURO: \n- AC: \n- AP: \n- ABDOME: \n- EXT: \n- PELE: ';
 let state={pacientes:[]};
 let tab='ativos', busca='', visitaImgs=[], visitaImgErrs=[];
 
@@ -367,9 +367,10 @@ function bullets(s){return String(s||'').split('\n').map(x=>x.trim()).filter(Boo
 function gtbul(s){return String(s||'').split('\n').map(x=>x.trim()).filter(Boolean).map(x=>'> '+x.replace(/^[-•*>]\s*/,'')).join('\n');}
 
 /* ===== visita beira-leito ===== */
-const SISTEMAS=['NEURO','AC','AP','ABDOME','EXT','PELE'];
-function parseEF(ef){const map={};SISTEMAS.forEach(s=>map[s]='');const outros=[];String(ef||'').split('\n').forEach(line=>{const m=line.match(/^\s*-?\s*(NEURO|AC|AP|ABDOME|EXT|PELE)\s*:\s*(.*)$/i);if(m){map[m[1].toUpperCase()]=(m[2]||'').trim();}else{const t=line.replace(/^\s*-\s*/,'').trim();if(t)outros.push(t);}});return {map,outros:outros.join('\n')};}
-function buildEF(){const lines=SISTEMAS.map(s=>{const v=getVal('ef_'+s).trim();return v?('- '+s+': '+v):null;}).filter(Boolean);getVal('ef_outros').split('\n').map(x=>x.trim().replace(/^-\s*/,'')).filter(Boolean).forEach(x=>lines.push('- '+x));return lines.join('\n');}
+const SISTEMAS=[{k:'EG',l:'ESTADO GERAL'},{k:'NEURO',l:'NEURO'},{k:'AC',l:'AC'},{k:'AP',l:'AP'},{k:'ABDOME',l:'ABDOME'},{k:'EXT',l:'EXT'},{k:'PELE',l:'PELE'}];
+function efRegex(){return new RegExp('^\\s*-?\\s*('+SISTEMAS.map(s=>s.l).join('|')+')\\s*:\\s*(.*)$','i');}
+function parseEF(ef){const map={};SISTEMAS.forEach(s=>map[s.k]='');const outros=[];const rx=efRegex();String(ef||'').split('\n').forEach(line=>{const m=line.match(rx);if(m){const sys=SISTEMAS.find(s=>s.l===m[1].toUpperCase());if(sys)map[sys.k]=(m[2]||'').trim();}else{const t=line.replace(/^\s*-\s*/,'').trim();if(t)outros.push(t);}});return {map,outros:outros.join('\n')};}
+function buildEF(){const lines=SISTEMAS.map(s=>{const v=getVal('ef_'+s.k).trim();return v?('- '+s.l+': '+v):null;}).filter(Boolean);getVal('ef_outros').split('\n').map(x=>x.trim().replace(/^-\s*/,'')).filter(Boolean).forEach(x=>lines.push('- '+x));return lines.join('\n');}
 function addEvolChip(t){const e=document.getElementById('v_evol');if(!e)return;const c=e.value.trim().replace(/[.\s]*$/,'');e.value=(c?c+'. ':'')+t;e.focus();}
 function addCondutaChip(t){const e=document.getElementById('v_conduta');if(!e)return;const c=e.value.replace(/\s+$/,'');e.value=(c?c+'\n':'')+'- '+t;e.focus();}
 /* ===== análise da evolução por IA (sugere oportunidades, NÃO edita) ===== */
@@ -480,7 +481,7 @@ function openVisita(id){
    </div>
    <div class="field"><label>Parâmetros</label><textarea id="v_param" autocapitalize="characters" spellcheck="false" placeholder="PA ... // FC ... // FR ... // T ... // SPO2 ... // DX ... // DIURESE ... // BH ..." style="min-height:78px">${esc(p.parametros||'')}</textarea></div>
    <div class="field"><label>Exame físico <span style="color:var(--muted);font-weight:400">(vem do dia anterior — edite o que mudou)</span></label>
-     <div class="ef-grid">${SISTEMAS.map(s=>`<div class="ef-row"><span class="ef-lbl">${s}</span><input id="ef_${s}" autocapitalize="characters" spellcheck="false" value="${esc(efP.map[s]||'')}" placeholder="—"></div>`).join('')}</div>
+     <div class="ef-grid">${SISTEMAS.map(s=>`<div class="ef-row"><span class="ef-lbl">${s.l}</span><input id="ef_${s.k}" autocapitalize="characters" spellcheck="false" value="${esc(efP.map[s.k]||'')}" placeholder="—"></div>`).join('')}</div>
      <textarea id="ef_outros" class="ef-outros" autocapitalize="characters" spellcheck="false" placeholder="+ OUTROS ACHADOS (OPCIONAL)">${esc(efP.outros||'')}</textarea></div>
    <div class="field"><label>Conduta <span style="color:var(--muted);font-weight:400">(uma por linha — "EXPLICO PLANO TERAPEUTICO" entra automático)</span></label><textarea id="v_conduta" autocapitalize="characters" spellcheck="false" placeholder="- MANTENHO ATB&#10;- SOLICITO NOVA ROTINA&#10;- AGUARDO EXAMES" style="min-height:168px">${esc(p.conduta||'')}</textarea></div>
    <div class="field"><label>Pendências <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="v_pend" autocapitalize="characters" spellcheck="false" placeholder="- ..." style="min-height:96px">${esc((p.pendencias||[]).map(x=>'- '+x.t).join('\n'))}</textarea></div>
@@ -589,7 +590,7 @@ function gerarEvolucao(p){
   if(p.evolucao)L.push('# EVOLUÇÃO: '+oneLine(p.evolucao));
   if(p.parametros)L.push('# PARÂMETROS: '+oneLine(p.parametros).replace(/^\s*PARÂMETROS:\s*/i,''));
   if(p.exameFisico&&p.exameFisico.trim()){
-    const efLines=p.exameFisico.split('\n').filter(l=>{const m=l.match(/^\s*-?\s*(NEURO|AC|AP|ABDOME|EXT|PELE)\s*:\s*(.*)$/i);return m?((m[2]||'').trim().length>0):(l.trim().length>0);});
+    const efRx=efRegex();const efLines=p.exameFisico.split('\n').filter(l=>{const m=l.match(efRx);return m?((m[2]||'').trim().length>0):(l.trim().length>0);});
     if(efLines.length){L.push('# EXAME FÍSICO:');L.push(bullets(efLines.join('\n')));}
   }
   const lab=p.laboratorio||p.exames||'';
@@ -694,7 +695,7 @@ async function extrairEvol(id){
    +'- "laboratorio" (ARRAY de strings): exames laboratoriais de INVESTIGAÇÃO relevantes para ESTE paciente — use JULGAMENTO CLÍNICO e o CONTEXTO (motivo da internação, diagnósticos, comorbidades). NÃO inclua MONITORIZAÇÃO DE ROTINA (hemograma, função renal, eletrólitos isolados, coagulograma, gasometria). **NÃO invente um rótulo de "investigação" para um valor ISOLADO.** Uma linha de investigação é um CONJUNTO de exames direcionados a um problema (ex.: anemia = ferro/ferritina/IST/transferrina/B12/folato/reticulócitos/LDH/haptoglobina) OU um exame específico claramente ligado ao motivo da internação/problema ativo. Um marcador SOLTO (uma PCR isolada, um cálcio, um reticulócito sem o resto do perfil) é rotina/monitorização → NÃO inclua. EXEMPLO: NÃO existe "investigação de cálcio" — só inclua cálcio/fósforo se houver contexto de DISTÚRBIO MINERAL-ÓSSEO/DRC (perfil DMO-DRC) OU se o paciente estiver internado POR distúrbio do cálcio. Na dúvida, OMITA. Quando houver investigação REAL, AGRUPE os exames dela em UM ÚNICO item: "NOME DA INVESTIGAÇÃO: exame: valor, exame: valor" (ex.: "INVESTIGAÇÃO DE ANEMIA: FERRITINA: 1090, B12: 300, RETICULÓCITOS: 79110"; "PERFIL DMO-DRC: VIT D: 24.3, FÓSFORO: 6.2, PTH: 120"). CULTURAS/SOROLOGIAS vão em "culturas". [] se não houver investigação relevante.\n'
    +'- "culturas" (ARRAY de strings): hemoculturas, uroculturas, culturas, sorologias e painéis virais (um por item, com data e resultado). [] se não houver.\n'
    +'- "imagem" (ARRAY de strings): exames de IMAGEM (RX, USG, TC, RM, ECO) — um por item, com o achado resumido. [] se não houver.\n'
-   +'- "exameFisico" (string): o EXAME FÍSICO em linhas começando por "- ", uma por aparelho, nesta ordem quando houver: "- NEURO:", "- AC:", "- AP:", "- ABDOME:", "- EXT:", "- PELE:" (mapeie SCR→AC, SR→AP, TGI→ABDOME). "" se não houver.\n'
+   +'- "exameFisico" (string): o EXAME FÍSICO em linhas começando por "- ", uma por aparelho, nesta ordem quando houver: "- ESTADO GERAL:" (impressão geral — ex.: BEG/REG/MEG, hidratação, mucosas, febril/afebril, nível de consciência), "- NEURO:", "- AC:", "- AP:", "- ABDOME:", "- EXT:", "- PELE:" (mapeie SCR→AC, SR→AP, TGI→ABDOME). "" se não houver.\n'
    +'- "conduta" (ARRAY de strings): cada item da CONDUTA/PLANO atual (um por item). NÃO inclua nenhuma linha de "explico plano terapêutico" (ela é adicionada automaticamente).\n'
    +'- "pendencias" (ARRAY de strings curtas): o que IMPEDE A ALTA agora (sobretudo após "CONDUTA"/"PLANO"). Para CADA antibiótico em uso com dia de início (DI/D1/"iniciado em"), crie uma pendência "<ATB> DI <DD/MM> - programado até <DD/MM>" (ou "[definir]" se não houver término).\n'
    ;
