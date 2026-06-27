@@ -121,6 +121,7 @@ table.cov td.atb{text-align:left;font-weight:700;color:var(--petrol-dark);backgr
 .suggs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
 .sugg{background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:12.5px;cursor:pointer;color:var(--petrol);font-family:inherit}
 .sugg:hover{border-color:var(--mint)}
+.sugg.on{background:var(--petrol);color:#fff;border-color:var(--petrol)}
 .typing span{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--violet);margin:0 1px;animation:bl 1.2s infinite}
 .typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
 @keyframes bl{0%,60%,100%{opacity:.3}30%{opacity:1}}
@@ -151,10 +152,11 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 <script>
 /* ===================== UTIL ===================== */
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+function inlMd(s){return esc(s).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\*([^*]+)\*/g,'<i>$1</i>');}
 function md(t){
   const blocks=String(t||'').split('\n');let html='',inUl=false;
   const closeUl=()=>{if(inUl){html+='</ul>';inUl=false;}};
-  const inl=s=>esc(s).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\b(≥|≤|>|<)\s/g,'$1 ');
+  const inl=s=>inlMd(s);
   for(let raw of blocks){
     const l=raw.trim();
     if(!l){closeUl();continue;}
@@ -292,7 +294,7 @@ Objetivo: cobrir a flora da pele/sítio. Dose **30–60 min antes da incisão**.
 ];
 
 /* ===================== BANCO: GUIA (bactérias / resistência / ATB) ===================== */
-const ORDEM_CAT=['Bactérias','Mecanismos de resistência','Antibióticos'];
+const ORDEM_CAT=['Bactérias','Mecanismos de resistência'];
 const GUIA=[
 /* ---- BACTÉRIAS ---- */
 {id:'saureus',icon:'🟣',cat:'Bactérias',nome:'Staphylococcus aureus',tags:'MSSA, MRSA, Gram+, cocos, pele, bacteremia',
@@ -403,92 +405,135 @@ ATB recente (cefalosporina/quinolona), internação, ITU de repetição, viagem,
 - Novos β-lactâmicos: **ceftolozano-tazobactam**, **ceftazidima-avibactam**, cefiderocol (conforme mecanismo).
 - **Polimixina B/colistina** como resgate (nefrotoxicidade; muitas vezes combinada).
 > Alarme: escolha guiada por mecanismo + MIC e por infecto/CCIH; evite monoterapia subótima que seleciona resistência.`},
-/* ---- ANTIBIÓTICOS ---- */
-{id:'amoxiclav',icon:'💊',cat:'Antibióticos',nome:'Amoxicilina ± clavulanato',tags:'penicilina, oral, PAC, sinusite, mordedura',
- md:`## Classe e espectro
-Aminopenicilina (± inibidor de β-lactamase). Cobre *Strepto*/pneumococo, *Enterococcus* (amox), *H. influenzae* e anaeróbios/*S. aureus* MSSA (com clavulanato). **Não** cobre MRSA, Pseudomonas, ESBL.
-## Dose adulta (função renal normal)
-- Amoxicilina 500 mg–1 g VO 8/8h. Amox-clav 875/125 mg 12/12h (ou 500 mg 8/8h).
-## Ajuste renal
-Reduzir intervalo/dose se ClCr <30. Gestação: **seguro** (1ª linha em muitas situações).
-## Usos
-PAC ambulatorial, sinusite/otite, ITU (gestante), mordeduras (amox-clav), profilaxia odontológica.
-> Perla: clavulanato adiciona cobertura de anaeróbios e de β-lactamase de *H. influenzae*/*S. aureus*.`},
-{id:'cefalosporinas',icon:'💊',cat:'Antibióticos',nome:'Cefalosporinas (cefazolina→cefepime)',tags:'ceftriaxona, cefepime, cefalexina, ceftazidima',
- md:`## Por geração
-- **1ª (cefazolina IV / cefalexina VO):** Gram+ (MSSA, *Strepto*) — pele, profilaxia cirúrgica.
-- **3ª (ceftriaxona):** Gram- comunitário + pneumococo — PAC, pielonefrite, meningite. **Ceftazidima** = anti-Pseudomonas (pouco Gram+).
-- **4ª (cefepime):** amplo, anti-Pseudomonas, estável à AmpC — hospitalar/neutropenia.
-- **5ª (ceftarolina):** ativa contra MRSA.
-## Não cobrem
-**Enterococcus** (todas), **anaeróbios** (associar metronidazol), MRSA (exceto ceftarolina), ESBL.
-## Dose típica
-Ceftriaxona 1–2 g/d (2 g 12/12h meningite); cefepime 2 g 8/8h; cefazolina 2 g profilaxia.
-> Perla: reatividade cruzada com penicilina é **baixa** (~1–2%); cefalosporina costuma ser segura em alergia não grave.`},
-{id:'piptazo',icon:'💊',cat:'Antibióticos',nome:'Piperacilina-tazobactam',tags:'tazocin, anti-pseudomonas, anaeróbio, hospitalar',
- md:`## Espectro
-Muito amplo: Gram+ (incl. MSSA, *Enterococcus*), Gram- **incl. Pseudomonas**, **anaeróbios**. **Não** cobre MRSA, ESBL grave (preferir carbapenêmico), atípicos.
-## Dose adulta
-4,5 g IV 6/6h (ou infusão estendida); ajustar à função renal.
-## Usos
-Sepse de foco abdominal, PAV/PAH, pé diabético grave, neutropenia febril.
-> Perla: cobre anaeróbio — não precisa associar metronidazol de rotina.`},
-{id:'carbapenemicos',icon:'💊',cat:'Antibióticos',nome:'Carbapenêmicos (meropenem, ertapenem)',tags:'meropenem, ertapenem, imipenem, ESBL, amplo',
- md:`## Espectro
-Amplíssimo: Gram+/Gram- **incl. ESBL** e anaeróbios. **Meropenem/imipenem** cobrem **Pseudomonas**; **ertapenem NÃO** cobre Pseudomonas/Acinetobacter/Enterococcus.
-## Dose
-Meropenem 1 g 8/8h (2 g 8/8h em SNC/Pseudomonas grave); ertapenem 1 g/d.
-## Reserve
-Para ESBL, infecção grave polimicrobiana, falha de esquema mais estreito. **Stewardship**: descalone assim que possível.
-> Alarme: uso excessivo de carbapenêmico seleciona KPC — não use como "amplo de conforto".`},
-{id:'quinolonas',icon:'💊',cat:'Antibióticos',nome:'Fluoroquinolonas (cipro, levo)',tags:'ciprofloxacino, levofloxacino, oral, pseudomonas',
- md:`## Espectro
-Gram- (cipro tem boa ação anti-Pseudomonas), atípicos; **levo/moxifloxacino** ("respiratórias") cobrem pneumococo. Excelente **biodisponibilidade oral**.
-## Dose
-Cipro 500 mg 12/12h (400 mg IV); levo 750 mg/d.
-## Cautelas
-Tendinopatia/ruptura, **prolongamento do QT**, aneurisma de aorta, disglicemia, neuropatia, interação com cátions (Ca/Mg/Fe). Evitar em gestante/criança quando houver alternativa.
-> Alarme: evite quinolona para cistite simples e infecções banais — reserve (efeitos adversos e resistência).`},
-{id:'vancodapto',icon:'💊',cat:'Antibióticos',nome:'Vancomicina / Daptomicina / Linezolida',tags:'MRSA, VRE, glicopeptídeo, Gram+',
- md:`## Anti-Gram+ resistentes
-- **Vancomicina** IV: MRSA, *Strepto*, *Enterococcus* (não VRE). Monitorar nível/AUC e função renal. VO **só** para *C. difficile*.
-- **Daptomicina:** MRSA/VRE, bacteremia/endocardite. **Não usar em pneumonia** (inativada pelo surfactante). Monitorar CPK.
-- **Linezolida:** MRSA/VRE, boa em pneumonia e VO; cuidado com plaquetopenia, neuropatia e síndrome serotoninérgica (uso >14 d).
-> Perla: para MSSA prefira β-lactâmico (oxacilina/cefazolina) — vancomicina é inferior no MSSA.`},
-{id:'metronidazol',icon:'💊',cat:'Antibióticos',nome:'Metronidazol',tags:'anaeróbio, abdominal, C. difficile, giárdia',
- md:`## Espectro
-**Anaeróbios** (esp. abdominais/*Bacteroides*) e protozoários (giárdia, ameba, tricomonas). Sem ação contra aeróbios.
-## Dose
-500 mg IV/VO 8/8h. Ótima biodisponibilidade oral.
-## Cautelas
-Efeito **dissulfiram-like** com álcool; gosto metálico; neuropatia em uso prolongado.
-> Perla: associe a um β-lactâmico/quinolona que não cubra anaeróbio quando o foco for abdominal/pélvico (ex.: ceftriaxona + metronidazol).`},
-{id:'sulfa',icon:'💊',cat:'Antibióticos',nome:'Sulfametoxazol-trimetoprim',tags:'SMX-TMP, bactrim, MRSA-AC, ITU, PCP',
- md:`## Espectro/usos
-ITU, MRSA comunitário (pele), *Stenotrophomonas*, **PCP** (*Pneumocystis*) tratamento/profilaxia, nocardiose.
-## Dose
-ITU 800/160 mg 12/12h; PCP doses altas (15–20 mg/kg/d de TMP).
-## Cautelas
-Hipercalemia, rash/Stevens-Johnson, mielotoxicidade, ↑ creatinina (competição tubular), interação com varfarina; evitar no 1º trimestre/final da gestação.
-> Perla: ótima opção VO para pele por MRSA-AC e para profilaxia de PCP em imunossuprimidos.`},
-{id:'nitro-fosfo',icon:'💊',cat:'Antibióticos',nome:'Nitrofurantoína / Fosfomicina',tags:'cistite, ITU baixa, oral',
- md:`## Uso restrito à bexiga
-- **Nitrofurantoína** 100 mg 6/6h 5 d — cistite não complicada. **Evitar se ClCr <30** e na pielonefrite (não atinge tecido/sangue).
-- **Fosfomicina** 3 g dose única — cistite (inclui muitos ESBL).
-> Alarme: **não** servem para pielonefrite, ITU complicada ou bacteremia — apenas infecção **baixa**.`},
-{id:'aminoglicosideos',icon:'💊',cat:'Antibióticos',nome:'Aminoglicosídeos (genta, amica)',tags:'gentamicina, amicacina, Gram-, sinergia',
- md:`## Espectro/uso
-Gram- (incl. Pseudomonas/amicacina), **sinergia** em endocardite por Gram+. Dose única diária reduz toxicidade.
-## Cautelas
-**Nefrotoxicidade** e **ototoxicidade** (monitorar função renal/níveis); evitar uso prolongado. Pouca penetração pulmonar/urina ácida.
-> Perla: úteis como segundo agente dirigido em Gram- resistente; não como monoterapia de foco profundo.`},
-{id:'macrolidos-doxi',icon:'💊',cat:'Antibióticos',nome:'Macrolídeos / Doxiciclina',tags:'azitromicina, claritromicina, doxiciclina, atípicos',
- md:`## Espectro/uso
-- **Azitromicina:** atípicos (PAC), coqueluche, DST (clamídia), profilaxias. QT longo; interações.
-- **Doxiciclina:** atípicos, riquetsioses, leptospirose, MRSA-AC (pele), DST, malária (profilaxia).
-## Dose
-Azitro 500 mg/d; doxi 100 mg 12/12h.
-> Perla: doxiciclina é uma boa opção VO para pneumonia atípica e pele quando se quer evitar quinolona.`}
+];
+
+/* ===================== BULÁRIO: DRUGS (dose, ajuste renal, peso, adversos, interações) ===================== */
+/* renal: faixas de ClCr (mL/min) — band onde clcr ∈ [min,max]. kg: dose por peso (mg/kg/dose). */
+const DRUGS=[
+ {id:'amoxiclav',nome:'Amoxicilina ± clavulanato',classe:'Aminopenicilina (± inibidor de β-lactamase) · VO',
+  doseNormal:'Amoxicilina 500 mg–1 g VO 8/8h. Amox-clavulanato 875/125 mg 12/12h (ou 500/125 mg 8/8h).',
+  renal:[{min:30,max:999,txt:'Dose padrão (875/125 12/12h ou 500 mg 8/8h).'},{min:10,max:29,txt:'500/125 mg 12/12h (evitar a formulação 875/125).'},{min:0,max:9,txt:'500/125 mg 24/24h; em hemodiálise, dose após a sessão.'}],
+  adversos:'Diarreia (mais com clavulanato), rash, candidíase; raramente **hepatite colestásica** (clavulanato) e reação alérgica/anafilaxia.',
+  interacoes:'↑ efeito da **varfarina** (INR); **alopurinol** ↑ rash; reduz discretamente eficácia de contraceptivo oral.'},
+ {id:'ampicilina',nome:'Ampicilina',classe:'Aminopenicilina · IV',
+  doseNormal:'1–2 g IV 6/6h. Listeria/meningite e endocardite: 2 g IV 4/4h.',
+  renal:[{min:30,max:999,txt:'1–2 g a cada 6 h.'},{min:10,max:29,txt:'1–2 g a cada 6–12 h.'},{min:0,max:9,txt:'1–2 g a cada 12–24 h; dose após hemodiálise.'}],
+  adversos:'Rash (muito comum se mononucleose), diarreia, alergia/anafilaxia, **convulsão** em dose alta com insuficiência renal.',
+  interacoes:'**Varfarina**; **alopurinol** (rash); probenecida ↑ nível sérico.'},
+ {id:'oxacilina',nome:'Oxacilina',classe:'Penicilina antiestafilocócica (MSSA) · IV',
+  doseNormal:'2 g IV 4/4h (MSSA grave/endocardite); 1–2 g 4/4–6/6h.',
+  renal:[{min:0,max:999,txt:'**Sem ajuste renal** (eliminação hepática). Cautela na disfunção hepática.'}],
+  adversos:'**Hepatotoxicidade** (↑ transaminases), nefrite intersticial, flebite, neutropenia em uso prolongado, alergia.',
+  interacoes:'Pode ↓ nível de varfarina; flebite (preferir acesso central se uso prolongado).'},
+ {id:'piptazo',nome:'Piperacilina-tazobactam',classe:'β-lactâmico + inibidor (anti-Pseudomonas + anaeróbio) · IV',
+  doseNormal:'4,5 g IV 6/6h (infusão estendida 3–4 h no grave/Pseudomonas).',
+  renal:[{min:40,max:999,txt:'4,5 g a cada 6 h.'},{min:20,max:39,txt:'3,375 g a cada 6 h (ou 4,5 g 8/8h).'},{min:0,max:19,txt:'2,25 g a cada 6 h; hemodiálise: 2,25 g 8/8h + dose extra pós-HD.'}],
+  adversos:'Diarreia/**C. difficile**, rash, ↑ transaminases, hipocalemia, plaquetopenia; **↑ nefrotoxicidade quando associada à vancomicina**.',
+  interacoes:'**Vancomicina** → ↑ risco de lesão renal aguda (monitorar); prolonga bloqueio neuromuscular; ↑ metotrexato; pode dar **falso-positivo de galactomanana**.'},
+ {id:'cefazolina',nome:'Cefazolina',classe:'Cefalosporina 1ª geração (MSSA, profilaxia) · IV',
+  doseNormal:'1–2 g IV 8/8h. Profilaxia cirúrgica: 2 g (3 g se ≥120 kg), 30–60 min antes.',
+  renal:[{min:35,max:999,txt:'1–2 g a cada 8 h.'},{min:10,max:34,txt:'1–2 g a cada 12 h.'},{min:0,max:9,txt:'1–2 g a cada 24 h; dose após hemodiálise.'}],
+  adversos:'Alergia (reatividade cruzada com penicilina baixa, ~1–2%), flebite, diarreia, raramente nefrite/citopenia.',
+  interacoes:'Probenecida ↑ nível; poucas interações relevantes.'},
+ {id:'cefalexina',nome:'Cefalexina',classe:'Cefalosporina 1ª geração · VO',
+  doseNormal:'500 mg VO 6/6h (pele, ITU).',
+  renal:[{min:30,max:999,txt:'500 mg a cada 6 h.'},{min:15,max:29,txt:'500 mg a cada 8–12 h.'},{min:0,max:14,txt:'250–500 mg a cada 12–24 h.'}],
+  adversos:'GI, rash/alergia, candidíase.',
+  interacoes:'↑ nível de **metformina**; probenecida ↑ nível.'},
+ {id:'ceftriaxona',nome:'Ceftriaxona',classe:'Cefalosporina 3ª geração (PAC, pielonefrite, meningite) · IV/IM',
+  doseNormal:'1–2 g IV 1×/dia. Meningite: 2 g 12/12h.',
+  renal:[{min:0,max:999,txt:'**Sem ajuste renal** (até 2 g/dia). Reduzir só se houver disfunção renal **e** hepática combinadas (máx 2 g/dia).'}],
+  adversos:'Diarreia/C. difficile, rash, **pseudolitíase biliar**, kernicterus no neonato.',
+  interacoes:'**NÃO infundir com soluções contendo cálcio** (Ringer) — precipitado (fatal em neonato); ↑ efeito da varfarina.'},
+ {id:'cefepime',nome:'Cefepime',classe:'Cefalosporina 4ª geração (anti-Pseudomonas, estável à AmpC) · IV',
+  doseNormal:'2 g IV 8/8h (grave/Pseudomonas/neutropenia febril); 1–2 g 12/12h em infecções leves.',
+  renal:[{min:60,max:999,txt:'2 g a cada 8 h.'},{min:30,max:59,txt:'2 g a cada 12 h.'},{min:11,max:29,txt:'2 g a cada 24 h.'},{min:0,max:10,txt:'1 g a cada 24 h; dose após hemodiálise.'}],
+  adversos:'**Neurotoxicidade / encefalopatia / mioclonia / convulsão** se acumular na insuficiência renal (ajuste é obrigatório!), diarreia, alergia.',
+  interacoes:'Aminoglicosídeos/diuréticos → nefro/ototoxicidade. **Ajuste renal estrito** para evitar neurotoxicidade.'},
+ {id:'ceftazidima',nome:'Ceftazidima',classe:'Cefalosporina 3ª geração anti-Pseudomonas · IV',
+  doseNormal:'2 g IV 8/8h.',
+  renal:[{min:50,max:999,txt:'2 g a cada 8 h.'},{min:30,max:49,txt:'2 g a cada 12 h.'},{min:10,max:29,txt:'2 g a cada 24 h.'},{min:0,max:9,txt:'1 g a cada 24 h; dose após hemodiálise.'}],
+  adversos:'Alergia, diarreia, neurotoxicidade na IRA não ajustada, ↑ transaminases.',
+  interacoes:'Aminoglicosídeos (nefrotoxicidade); cloranfenicol (antagonismo).'},
+ {id:'meropenem',nome:'Meropenem',classe:'Carbapenêmico (ESBL, Pseudomonas, anaeróbio) · IV',
+  doseNormal:'1 g IV 8/8h; 2 g IV 8/8h (SNC, Pseudomonas grave; infusão estendida 3 h).',
+  renal:[{min:50,max:999,txt:'1–2 g a cada 8 h.'},{min:25,max:49,txt:'1 g a cada 12 h.'},{min:10,max:24,txt:'500 mg a cada 12 h.'},{min:0,max:9,txt:'500 mg a cada 24 h; dose após hemodiálise.'}],
+  adversos:'Diarreia/C. difficile, rash, convulsão (menos que imipenem), ↑ transaminases.',
+  interacoes:'**↓ nível de ácido valproico → convulsão** (evitar a associação); probenecida ↑ nível.'},
+ {id:'ertapenem',nome:'Ertapenem',classe:'Carbapenêmico (1×/dia; NÃO cobre Pseudomonas) · IV/IM',
+  doseNormal:'1 g IV 1×/dia. Não cobre Pseudomonas, Acinetobacter nem Enterococcus.',
+  renal:[{min:30,max:999,txt:'1 g a cada 24 h.'},{min:0,max:29,txt:'500 mg a cada 24 h; se a dose for <6 h antes da HD, dar 150 mg suplementar pós-sessão.'}],
+  adversos:'Diarreia, **convulsão** (idoso/IRA), rash, flebite.',
+  interacoes:'**↓ ácido valproico** (convulsão); probenecida ↑ nível.'},
+ {id:'ciprofloxacino',nome:'Ciprofloxacino',classe:'Fluoroquinolona (Gram-, Pseudomonas) · IV/VO',
+  doseNormal:'400 mg IV 12/12h ou 500–750 mg VO 12/12h.',
+  renal:[{min:30,max:999,txt:'Dose padrão.'},{min:0,max:29,txt:'400 mg IV 24/24h ou 500 mg VO 24/24h.'}],
+  adversos:'**Tendinopatia/ruptura**, **QT longo**, neuropatia, disglicemia, **aneurisma de aorta**, C. difficile, fototoxicidade.',
+  interacoes:'**Cátions** (Ca/Mg/Fe/Zn, antiácido, sucralfato) ↓ absorção VO (espaçar 2 h); ↑ **teofilina/tizanidina**; ↑ varfarina; **QT** somado a outros (ondansetrona, azitromicina).'},
+ {id:'levofloxacino',nome:'Levofloxacino',classe:'Fluoroquinolona respiratória (pneumococo) · IV/VO',
+  doseNormal:'750 mg 1×/dia (ou 500 mg/dia).',
+  renal:[{min:50,max:999,txt:'750 mg a cada 24 h.'},{min:20,max:49,txt:'750 mg a cada 48 h.'},{min:0,max:19,txt:'750 mg ×1 e depois 500 mg a cada 48 h.'}],
+  adversos:'Iguais às quinolonas: **tendão, QT, neuropatia, disglicemia, aorta**, C. difficile.',
+  interacoes:'**Cátions** (espaçar); **QT** (somatório); ↑ varfarina; AINE ↑ neuroexcitação.'},
+ {id:'azitromicina',nome:'Azitromicina',classe:'Macrolídeo (atípicos) · VO/IV',
+  doseNormal:'500 mg 1×/dia (3–5 dias) ou 500 mg D1 + 250 mg D2–5.',
+  renal:[{min:0,max:999,txt:'**Sem ajuste renal.** Cautela na disfunção hepática.'}],
+  adversos:'GI, **QT longo**/arritmia, hepatotoxicidade, ototoxicidade (dose alta/prolongada).',
+  interacoes:'**QT** somado (quinolona, ondansetrona, antipsicótico); ↑ varfarina. Menos interação CYP que claritromicina.'},
+ {id:'clindamicina',nome:'Clindamicina',classe:'Lincosamida (Gram+, anaeróbio acima do diafragma, antitoxina) · IV/VO',
+  doseNormal:'600 mg IV 8/8h (até 900 mg 8/8h no grave); 300–450 mg VO 6/6h.',
+  renal:[{min:0,max:999,txt:'**Sem ajuste renal** (metabolismo hepático).'}],
+  adversos:'**C. difficile (clássico)**, diarreia, rash (incl. DRESS), gosto metálico (VO), hepatotoxicidade.',
+  interacoes:'Potencializa **bloqueador neuromuscular**; antagonismo com macrolídeo (mesmo sítio ribossomal).'},
+ {id:'vancomicina',nome:'Vancomicina',classe:'Glicopeptídeo (MRSA) · IV (VO só p/ C. difficile)',
+  doseNormal:'15–20 mg/kg IV 8/8–12/12h (alvo AUC/MIC ou vale 15–20). Ataque 25–30 mg/kg no grave. C. difficile: 125 mg VO 6/6h.',
+  kg:{lo:15,hi:20,intervalo:'a cada 8–12 h (guiar por nível sérico)',nota:'Ataque 25–30 mg/kg (máx ~3 g) no choque/grave'},
+  renal:[{min:50,max:999,txt:'a cada 8–12 h, guiado por nível.'},{min:20,max:49,txt:'a cada 24 h, guiado por nível.'},{min:0,max:19,txt:'dose e redose conforme nível sérico (intermitente / hemodiálise).'}],
+  adversos:'**Nefrotoxicidade** (↑ com pip-tazo/aminoglicosídeo/contraste), **síndrome do homem vermelho** (infusão rápida → infundir em ≥60 min), ototoxicidade, neutropenia/plaquetopenia, DRESS.',
+  interacoes:'**Nefrotóxicos** (aminoglicosídeo, piperacilina-tazobactam, anfotericina, contraste). Monitorar função renal e nível.'},
+ {id:'linezolida',nome:'Linezolida',classe:'Oxazolidinona (MRSA, VRE; ótima VO) · IV/VO',
+  doseNormal:'600 mg 12/12h (IV = VO, biodisponibilidade ~100%).',
+  renal:[{min:0,max:999,txt:'**Sem ajuste renal** (metabólitos acumulam na IRA — monitorar; dar após hemodiálise).'}],
+  adversos:'**Mielossupressão/plaquetopenia** (uso >10–14 dias), **neuropatia óptica/periférica** (prolongado), acidose láctica, **síndrome serotoninérgica**.',
+  interacoes:'É **IMAO fraco**: serotoninérgicos (ISRS, tramadol, triptanos), simpaticomiméticos e tiramina → crise/serotoninérgica — evitar associação.'},
+ {id:'daptomicina',nome:'Daptomicina',classe:'Lipopeptídeo (MRSA/VRE; NÃO em pneumonia) · IV',
+  doseNormal:'6 mg/kg/dia (pele); 8–10 mg/kg/dia em bacteremia/endocardite. Não usar em pneumonia (inativada pelo surfactante).',
+  kg:{lo:6,hi:10,intervalo:'1×/dia',nota:'6 mg/kg pele; 8–10 mg/kg bacteremia/endocardite'},
+  renal:[{min:30,max:999,txt:'dose plena 1×/dia.'},{min:0,max:29,txt:'mesma dose, a cada 48 h (e após hemodiálise).'}],
+  adversos:'**↑ CPK / miopatia / rabdomiólise** (dosar CPK semanal; suspender estatina), eosinofilia pulmonar, neuropatia.',
+  interacoes:'**Estatinas** ↑ risco de miopatia (considerar suspender durante o uso); monitorar CPK.'},
+ {id:'gentamicina',nome:'Gentamicina',classe:'Aminoglicosídeo (Gram-, sinergia) · IV',
+  doseNormal:'5–7 mg/kg/dia em dose única diária; sinergia em endocardite 3 mg/kg/dia.',
+  kg:{lo:5,hi:7,intervalo:'1×/dia (dose única diária)',nota:'Use peso ideal/ajustado no obeso; guie por nível (pico/vale)'},
+  renal:[{min:60,max:999,txt:'dose plena a cada 24 h.'},{min:40,max:59,txt:'a cada 36 h (ou ↓ dose), guiado por nível.'},{min:0,max:39,txt:'a cada 48 h ou mais, guiado por nível; em HD, dose pós-sessão.'}],
+  adversos:'**Nefrotoxicidade** (em geral reversível) e **ototoxicidade/vestibulotoxicidade** (pode ser irreversível), bloqueio neuromuscular.',
+  interacoes:'Outros **nefro/ototóxicos** (vancomicina, anfotericina, furosemida, contraste, cisplatina); potencializa bloqueador neuromuscular.'},
+ {id:'amicacina',nome:'Amicacina',classe:'Aminoglicosídeo (Gram-, inclui muitos resistentes à genta) · IV',
+  doseNormal:'15 mg/kg/dia em dose única diária.',
+  kg:{lo:15,hi:15,intervalo:'1×/dia (dose única diária)',nota:'Peso ideal/ajustado no obeso; guie por nível'},
+  renal:[{min:60,max:999,txt:'dose plena a cada 24 h.'},{min:40,max:59,txt:'a cada 36 h (ou ↓ dose), guiado por nível.'},{min:0,max:39,txt:'a cada 48 h ou mais, guiado por nível; em HD, dose pós-sessão.'}],
+  adversos:'**Nefrotoxicidade** e **ototoxicidade** (monitorar função renal e níveis), bloqueio neuromuscular.',
+  interacoes:'Outros nefro/ototóxicos; potencializa bloqueador neuromuscular.'},
+ {id:'metronidazol',nome:'Metronidazol',classe:'Nitroimidazol (anaeróbios, protozoários) · IV/VO',
+  doseNormal:'500 mg IV/VO 8/8h (biodisponibilidade ~100%).',
+  renal:[{min:10,max:999,txt:'500 mg a cada 8 h (sem ajuste relevante).'},{min:0,max:9,txt:'500 mg a cada 12 h; dar após hemodiálise.'}],
+  adversos:'Gosto metálico, **neuropatia periférica** (prolongado), neurotoxicidade/cerebelar, **efeito dissulfiram com álcool**, urina escura.',
+  interacoes:'**Álcool** (reação dissulfiram-like — evitar até 3 dias depois); ↑ **varfarina**/INR; ↑ **lítio**; dissulfiram → psicose.'},
+ {id:'sulfa',nome:'Sulfametoxazol-trimetoprim',classe:'Sulfa + diaminopirimidina (ITU, MRSA-AC, PCP) · VO/IV',
+  doseNormal:'ITU: 800/160 mg 12/12h. Grave/PCP: 15–20 mg/kg/dia de trimetoprim ÷ 6/6–8/8h.',
+  renal:[{min:30,max:999,txt:'dose padrão.'},{min:15,max:29,txt:'reduzir para 50% da dose.'},{min:0,max:14,txt:'**evitar** (se imprescindível, dose reduzida com monitorização).'}],
+  adversos:'Rash/**Stevens-Johnson**, **hipercalemia**, mielossupressão, ↑ creatinina (competição tubular, sem ↓ real da TFG), hepatite, hipoglicemia.',
+  interacoes:'**Varfarina ↑↑ INR**; **IECA/BRA/espironolactona → hipercalemia**; **metotrexato** (mielotoxicidade); sulfonilureia (hipoglicemia); fenitoína.'},
+ {id:'nitrofurantoina',nome:'Nitrofurantoína',classe:'Nitrofurano (apenas cistite) · VO',
+  doseNormal:'100 mg VO 6/6h por 5 dias (macrocristal 100 mg 12/12h). Só cistite — não atinge tecido/sangue.',
+  renal:[{min:30,max:999,txt:'100 mg a cada 6 h (5 dias).'},{min:0,max:29,txt:'**Contraindicada** (ineficaz e ↑ toxicidade).'}],
+  adversos:'Náusea, **pneumonite** (aguda e crônica), neuropatia periférica, hepatotoxicidade, urina escura, hemólise no deficiente de G6PD.',
+  interacoes:'Antiácido com magnésio ↓ absorção; probenecida ↑ nível; não associar a quinolona na ITU (antagonismo).'},
+ {id:'fosfomicina',nome:'Fosfomicina',classe:'Fosfonato (cistite, inclui muitos ESBL) · VO',
+  doseNormal:'3 g VO em dose única (cistite). Pode repetir em 48–72 h em casos selecionados.',
+  renal:[{min:10,max:999,txt:'3 g dose única.'},{min:0,max:9,txt:'evitar (eficácia reduzida).'}],
+  adversos:'Diarreia, náusea, cefaleia, vaginite; geralmente bem tolerada.',
+  interacoes:'Metoclopramida ↓ nível; poucas interações relevantes.'}
 ];
 
 /* ===================== COBERTURA (matriz espectro) ===================== */
@@ -582,7 +627,10 @@ function renderHome(){
     const list=GUIA.filter(e=>e.cat===cat&&match(e));if(!list.length)return;
     html+=`<div class="sec-title">${esc(cat)}</div><div class="grid">`+list.map(e=>`<div class="card" onclick="abrirItem('${e.id}')"><div class="ci">${e.icon}</div><div class="cn">${esc(e.nome)}</div><div class="ct">${esc(e.tags)}</div></div>`).join('')+`</div>`;
   });
-  if(q && !focos.length && !tools.length && !GUIA.some(match)){html+='<div class="empty">Nada encontrado para "'+esc(busca)+'". Tente o Assistente acima.</div>';}
+  // antibióticos — bulário + calculadora de dose
+  const drugs=DRUGS.filter(d=>!q||((d.nome+' '+d.classe).toLowerCase().includes(q)));
+  if(drugs.length){html+=`<div class="sec-title">Antibióticos · bulário + calculadora de dose</div><div class="grid">`+drugs.map(d=>`<div class="card" onclick="abrirDrug('${d.id}')"><div class="ci">💊</div><div class="cn">${esc(d.nome)}</div><div class="ct">${esc(d.classe)}</div></div>`).join('')+`</div>`;}
+  if(q && !focos.length && !tools.length && !GUIA.some(match) && !drugs.length){html+='<div class="empty">Nada encontrado para "'+esc(busca)+'". Tente o Assistente acima.</div>';}
   document.getElementById('view').innerHTML=html;
 }
 
@@ -599,8 +647,68 @@ function renderItem(e){
    <div class="disc">Doses para adulto com função renal normal — confira ajuste renal, alergias, gestação e o antibiograma/protocolo local.</div>`;
 }
 
+/* ===================== BULÁRIO (drug) ===================== */
+function bandFor(d,clcr){return (d.renal||[]).find(b=>clcr>=(b.min||0)&&clcr<=(b.max==null?999:b.max));}
+function doseAjustada(d,peso,clcr){
+  const parts=[];
+  if(d.kg&&peso>0){const lo=Math.round(d.kg.lo*peso),hi=Math.round(d.kg.hi*peso);
+    parts.push('<b>Dose por peso ('+peso+' kg):</b> '+(lo===hi?lo+' mg':'≈ '+lo+'–'+hi+' mg')+'/dose '+inlMd(d.kg.intervalo)+(d.kg.nota?' — '+inlMd(d.kg.nota):''));}
+  const b=bandFor(d,clcr);
+  if(b)parts.push('<b>Ajuste renal (ClCr '+clcr+' mL/min):</b> '+inlMd(b.txt));
+  return parts.join('<br>')||'Sem regra cadastrada — ver dose habitual.';
+}
+function abrirDrug(id){const d=DRUGS.find(x=>x.id===id);if(!d)return;curView='drug';renderDrug(d);scroll0();}
+function renderDrug(d){
+  const faixaLbl=b=>(b.max>=999?'≥ '+b.min:(b.min<=0?'< '+(b.max+1):b.min+'–'+b.max))+' mL/min';
+  const rows=(d.renal||[]).map(b=>`<tr><td class="atb">ClCr ${faixaLbl(b)}</td><td style="text-align:left">${inlMd(b.txt)}</td></tr>`).join('');
+  document.getElementById('view').innerHTML=`
+   <button class="back" onclick="routeHome()">← Voltar</button>
+   <div class="exam-head"><div class="ei">💊</div><div><h1>${esc(d.nome)}</h1><div class="tags">${esc(d.classe)}</div></div></div>
+   <div class="content"><h2>Dose habitual (adulto, função renal normal)</h2>${md(d.doseNormal)}
+   ${d.kg?`<div class="perla">⚖️ <b>Dose por peso:</b> ${d.kg.lo}${d.kg.hi!==d.kg.lo?'–'+d.kg.hi:''} mg/kg ${inlMd(d.kg.intervalo)}${d.kg.nota?'. '+inlMd(d.kg.nota):''}</div>`:''}</div>
+   <div class="formcard">
+     <h4 style="font-size:13px;font-weight:800;color:var(--petrol-dark);margin-bottom:10px">🧮 Calculadora de dose — peso + clearance</h4>
+     <div class="field"><label>Peso (kg)${d.kg?'':' — não usado neste antibiótico'}</label><input type="number" id="dPeso" inputmode="decimal" placeholder="ex.: 70" ${d.kg?'':'disabled style="opacity:.5"'}></div>
+     <div class="field"><label>Clearance de creatinina (mL/min)</label><input type="number" id="dClcr" inputmode="numeric" placeholder="ex.: 45"></div>
+     <button class="btn btn-p" onclick="calcDose('${d.id}')">Calcular dose ajustada</button>
+     <div id="dOut"></div>
+     <div style="font-size:11.5px;color:var(--muted);margin-top:9px">Não sabe o ClCr? Use a ferramenta <b>Ajuste renal</b> (Cockcroft-Gault) na home.</div>
+   </div>
+   <div class="content">
+     <h2>Ajuste pela função renal</h2>
+     <div class="tbl-wrap"><table class="cov"><thead><tr><th class="atb" style="text-align:left">Faixa de ClCr</th><th style="text-align:left">Dose / intervalo</th></tr></thead><tbody>${rows}</tbody></table></div>
+     <h2>Reações adversas</h2>${md(d.adversos)}
+     <h2>Interações importantes</h2>${md(d.interacoes)}
+   </div>
+   <div class="panel" style="margin-top:14px"><h4>Aprofundar com IA</h4>
+     <button class="btn btn-ai" id="aprBtn" onclick="aprofundarDrug('${d.id}')">✨ Mais detalhes / dúvidas com a IA</button>
+     <div id="aprOut"></div>
+   </div>
+   <div class="disc">Doses de referência para adulto — confirme na bula/protocolo local; atenção a obesidade, gestação, diálise e infecções de SNC. A calculadora é uma estimativa de apoio.</div>`;
+}
+function calcDose(id){
+  const d=DRUGS.find(x=>x.id===id);if(!d)return;
+  const peso=+document.getElementById('dPeso').value||0, clcr=+document.getElementById('dClcr').value||0;
+  const out=document.getElementById('dOut');
+  if(clcr<=0){out.innerHTML='<div class="calc-out" style="background:#fdecea;border-color:#f5c6c0;color:#7a241b">Informe o clearance (mL/min).</div>';return;}
+  if(d.kg&&peso<=0){out.innerHTML='<div class="calc-out" style="background:#fdf0e0;border-color:#f3dcbd;color:#7a4a12">Este antibiótico é dosado por peso — informe o peso (kg).</div>';return;}
+  out.innerHTML='<div class="calc-out">'+doseAjustada(d,peso,clcr)+'<div style="font-size:11px;margin-top:7px;color:#557799">Estimativa de apoio — confirme na bula/protocolo. Ajustes em SNC, diálise e obesidade podem diferir.</div></div>';
+}
+async function aprofundarDrug(id){
+  const d=DRUGS.find(x=>x.id===id);if(!d)return;
+  const b=document.getElementById('aprBtn'),out=document.getElementById('aprOut');
+  b.disabled=true;b.innerHTML='<span class="spin"></span> Gerando…';
+  try{
+    const prompt=SYS_ATB+`\n\nO médico está vendo o antibiótico "${d.nome}" (${d.classe}). Traga: principais indicações/espectro na prática, ajustes especiais (obesidade, diálise, gestação, SNC), erros comuns e 1–2 interações/cuidados que costumam passar batido. Doses de adulto. Conciso, markdown.`;
+    const txt=await callIA(prompt);out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
+  }catch(err){out.innerHTML='<div class="ai-out" style="background:#fdecea;border-color:#f5c6c0;color:#7a241b">⚠️ '+esc(err.message||'Falha na IA')+'</div>';}
+  b.disabled=false;b.innerHTML='✨ Mais detalhes / dúvidas com a IA';
+}
+
 /* ===================== EMPÍRICO ===================== */
-let empForm={foco:'pac',ctx:'comunitario',grav:'enfermaria',alergia:'nao'};
+const PREV_ATBS=['Amoxicilina','Amox-clavulanato','Ampicilina','Oxacilina','Cefalexina','Cefazolina','Ceftriaxona','Cefepime','Ceftazidima','Piperacilina-tazobactam','Meropenem','Ertapenem','Ciprofloxacino','Levofloxacino','Azitromicina','Clindamicina','Metronidazol','Sulfametoxazol-trimetoprim','Vancomicina','Linezolida','Daptomicina','Gentamicina','Amicacina','Nitrofurantoína','Polimixina B'];
+let empForm={foco:'pac',ctx:'comunitario',grav:'enfermaria',alergia:'nao',usados:[],detalhe:'',extra:''};
+function toggleUsado(i){const a=PREV_ATBS[i];const k=empForm.usados.indexOf(a);if(k>=0)empForm.usados.splice(k,1);else empForm.usados.push(a);const w=document.getElementById('usadosChips');if(w&&w.children[i])w.children[i].classList.toggle('on');}
 function abrirEmpirico(){curView='emp';renderEmpirico();scroll0();}
 function renderEmpirico(){
   const foco=FOCOS.find(f=>f.id===empForm.foco)||FOCOS[0];
@@ -622,10 +730,11 @@ function renderEmpirico(){
          <label><input type="checkbox" id="r_col"> Colonização/infecção prévia por MDR (ESBL/KPC/MRSA/Pseudomonas)</label>
          <label><input type="checkbox" id="r_imuno"> Imunossupressão / neutropenia</label>
        </div></div>
-     <div class="field"><label>Antibióticos já em uso (para escalonar/trocar)</label>
-       <input type="text" id="empUsados" placeholder="ex.: ceftriaxona há 3 dias, sem melhora"></div>
+     <div class="field"><label>Antibióticos já em uso (toque para adicionar — para escalonar/trocar)</label>
+       <div class="suggs" id="usadosChips">${PREV_ATBS.map((a,i)=>`<button type="button" class="sugg ${empForm.usados.includes(a)?'on':''}" onclick="toggleUsado(${i})">${esc(a)}</button>`).join('')}</div>
+       <input type="text" id="empUsadosTxt" value="${esc(empForm.detalhe)}" oninput="empForm.detalhe=this.value" placeholder="outros / detalhes: ex. há 3 dias, sem melhora" style="margin-top:8px"></div>
      <div class="field"><label>Dados extras (opcional)</label>
-       <input type="text" id="empExtra" placeholder="ex.: ClCr 35, gestante, peso 90 kg, cultura: E. coli ESBL"></div>
+       <input type="text" id="empExtra" value="${esc(empForm.extra)}" oninput="empForm.extra=this.value" placeholder="ex.: ClCr 35, gestante, peso 90 kg, cultura: E. coli ESBL"></div>
      <button class="btn btn-ai" id="empBtn" onclick="sugerirEmpirico()">✨ Sugerir conduta</button>
      <div id="empOut"></div>
    </div>
@@ -642,7 +751,9 @@ async function sugerirEmpirico(){
   if(document.getElementById('r_disp').checked)riscos.push('dispositivo invasivo');
   if(document.getElementById('r_col').checked)riscos.push('colonização/infecção prévia por MDR');
   if(document.getElementById('r_imuno').checked)riscos.push('imunossupressão/neutropenia');
-  const usados=(document.getElementById('empUsados').value||'').trim();
+  const txtDet=(document.getElementById('empUsadosTxt').value||'').trim();
+  const usadosSel=empForm.usados.slice();
+  const usados=(usadosSel.length?usadosSel.join(', '):'')+(txtDet?(usadosSel.length?'; ':'')+txtDet:'');
   const extra=(document.getElementById('empExtra').value||'').trim();
   const ctxL={comunitario:'comunitário',hospitalar:'hospitalar/nosocomial'}[empForm.ctx];
   const gravL={ambulatorial:'ambulatorial',enfermaria:'internado em enfermaria',uti:'UTI / grave'}[empForm.grav];
