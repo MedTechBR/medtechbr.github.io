@@ -1493,7 +1493,7 @@
         <div id="provaQuestoes" style="margin-top: 20px;"></div>
         <div style="margin-top: 16px; padding: 16px; border: 2px dashed var(--border-strong); border-radius: var(--radius); background: var(--bg); display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:center;">
           <strong style="color:var(--text-muted); margin-right:6px;">Adicionar nova questão:</strong>
-          <button class="success small" onclick="adicionarQuestaoIA()">✨ Gerar com IA</button>
+          <button class="success small" id="btnAddIA" onclick="adicionarQuestaoIA()">✨ Gerar com IA</button>
           <button class="secondary small" onclick="adicionarQuestaoManual()">✏️ Em branco</button>
         </div>
         <div id="addQuestaoStatus" style="margin-top:10px;"></div>
@@ -3947,14 +3947,29 @@ function adicionarQuestaoManual() {
 async function adicionarQuestaoIA() {
   const p = getProvaAtual();
   if (!p) return;
+
+  // Quantas questões gerar de uma vez (1 a 10)
+  const qtdRaw = prompt(
+    `Quantas questões deseja gerar de uma vez? (1 a 10)\n\nEx.: digite 5 para gerar 5 questões.`,
+    '1'
+  );
+  if (qtdRaw === null) return;
+  let qtd = parseInt(String(qtdRaw).replace(/[^\d]/g, ''), 10);
+  if (!qtd || qtd < 1) qtd = 1;
+  if (qtd > 10) qtd = 10;
+
+  // Orientação aplicada a TODAS as questões desta leva (opcional)
   const orientacao = prompt(
-    `Gerar nova questão para "${p.titulo}".\n\nVocê pode dar uma orientação (opcional):\n- Tema/tópico específico\n- "Mais difícil", "mais fácil"\n- "Sobre tal doença/medicamento"\n\nDeixe em branco para a IA escolher livremente um tema novo.`,
+    `Orientação para ${qtd > 1 ? 'as ' + qtd + ' questões' : 'a questão'} (opcional):\n- "Mais difícil", "mais fácil"\n- Tema/tópico específico, doença, medicamento\n\nDeixe em branco para a IA escolher livremente (sem repetir as já existentes).`,
     ''
   );
   if (orientacao === null) return;
 
   const statusEl = document.getElementById('addQuestaoStatus');
-  statusEl.innerHTML = '<span class="spinner"></span> Buscando materiais e gerando questão...';
+  const btn = document.getElementById('btnAddIA');
+  if (btn) btn.disabled = true;
+  let geradas = 0;
+  const erros = [];
 
   const materiais = await obterMateriais(p.id);
   const _u = userAtual();
@@ -3970,10 +3985,14 @@ async function adicionarQuestaoIA() {
   const blocoOutrasProvas = _outras.length
     ? `\n\nQUESTÕES DE PROVAS ANTERIORES DA MESMA DISCIPLINA (TAMBÉM NÃO REPETIR — devem ser INÉDITAS em relação a estas):\n` + _outras.slice(-120).map((e, i) => `${i + 1}. ${e}`).join('\n')
     : '';
-  const questoesExistentes = p.questoes
-    .map((q, i) => `Q${i + 1}: ${(q.enunciado || '').slice(0, 200).replace(/\s+/g, ' ')}`)
-    .join('\n');
-  const proximoNum = p.questoes.length + 1;
+
+  for (let iLeva = 0; iLeva < qtd; iLeva++) {
+    statusEl.innerHTML = `<span class="spinner"></span> Gerando questão ${iLeva + 1} de ${qtd}${orientacao && orientacao.trim() ? ' — ' + orientacao.trim() : ''}...`;
+    // Recalcula a cada iteração para a IA não repetir nem as recém-criadas
+    const questoesExistentes = p.questoes
+      .map((q, i) => `Q${i + 1}: ${(q.enunciado || '').slice(0, 200).replace(/\s+/g, ' ')}`)
+      .join('\n');
+    const proximoNum = p.questoes.length + 1;
 
   const prompt2 = `Você está adicionando UMA NOVA questão a uma prova já existente, estilo ENARE/ENAMED brasileiro, em PORTUGUÊS BRASILEIRO.
 
@@ -4054,20 +4073,30 @@ Retorne APENAS este JSON, sem markdown:
     p.anuladas.push(false);
     p.numQuestoes = p.questoes.length;
     salvarEstado();
-
+    geradas++;
+    renderProva();
     // (Imagem NÃO é anexada automaticamente. Use "Adicionar imagem" se quiser.)
+    } catch (err) {
+      erros.push(`#${iLeva + 1}: ${err.message}`);
+      console.error(err);
+    }
+  } // fim do loop de geração
 
-    statusEl.innerHTML = '<span style="color:#10b981;">✓ Questão adicionada!</span>';
+  if (btn) btn.disabled = false;
+
+  if (geradas > 0) {
+    const plural = geradas > 1;
+    statusEl.innerHTML = `<span style="color:#10b981;">✓ ${geradas} quest${plural ? 'ões' : 'ão'} adicionada${plural ? 's' : ''}!</span>${erros.length ? ` <span style="color:#ef4444;">(${erros.length} falhou — tente de novo)</span>` : ''}`;
     renderProva();
     setTimeout(() => {
       const cards = document.querySelectorAll('#provaQuestoes .questao-gerada');
       const ultima = cards[cards.length - 1];
       if (ultima) ultima.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      document.getElementById('addQuestaoStatus').innerHTML = '';
-    }, 600);
-  } catch (err) {
-    statusEl.innerHTML = `<span style="color:#ef4444;">❌ Erro: ${err.message}</span>`;
-    console.error(err);
+      const s = document.getElementById('addQuestaoStatus');
+      if (s) s.innerHTML = '';
+    }, 1400);
+  } else {
+    statusEl.innerHTML = `<span style="color:#ef4444;">❌ Falha ao gerar: ${erros.join(' · ') || 'erro desconhecido'}</span>`;
   }
 }
 
