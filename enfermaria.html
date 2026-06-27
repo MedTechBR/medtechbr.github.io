@@ -341,11 +341,12 @@ function openForm(id){
    <div class="field"><label>Laboratório <span style="color:var(--muted);font-weight:400">(um por linha)</span></label><textarea id="f_lab" placeholder="- investigativos (um por linha)">${esc(bullets(p.laboratorio||p.exames))}</textarea></div>
    <div class="field"><label>Culturas / sorologias <span style="color:var(--muted);font-weight:400">(um por linha)</span></label><textarea id="f_culturas" placeholder="- hemocultura, urocultura...">${esc(bullets(p.culturas))}</textarea></div>
    <div class="field"><label>Exames de imagem <span style="color:var(--muted);font-weight:400">(um por linha)</span></label><textarea id="f_imagem" placeholder="- RX, USG, TC, eco...">${esc(bullets(p.imagem))}</textarea></div>
+   <div class="sec-h">Conduta</div>
+   <div class="field"><label>Conduta do dia <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="f_conduta" placeholder="- dieta livre&#10;- ATB conforme&#10;- HV / analgesia / profilaxia de TEV">${esc(bullets(p.conduta))}</textarea></div>
    <div class="sec-h">Pendências e observações</div>
    <div class="field"><label>Pendências <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="f_pend" placeholder="- colher hemocultura&#10;- avaliar com a cirurgia">${esc((p.pendencias||[]).map(x=>'- '+x.t).join('\n'))}</textarea></div>
    <div class="field"><label>Observações</label><textarea id="f_obs" placeholder="Anotações livres">${esc(p.obs)}</textarea></div>
    <textarea id="f_ef" style="display:none">${esc(p.exameFisico||'')}</textarea>
-   <textarea id="f_conduta" style="display:none">${esc(bullets(p.conduta))}</textarea>
    <div class="row actions"><button class="btn btn-p" onclick="saveForm('${id||''}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
 }
 function saveForm(id){
