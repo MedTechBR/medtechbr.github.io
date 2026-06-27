@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ATBguia — Guia prático de antibioticoterapia | MedTech</title>
+<meta name="description" content="ATBguia: guia prático de antibióticos — esquema empírico e escalonamento por foco, bactérias, mecanismos de resistência, espectro/cobertura, ajuste renal, IV→VO e assistente de IA.">
+<meta name="theme-color" content="#0E5A6D">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="manifest" href="atbguia.webmanifest">
+<link rel="apple-touch-icon" href="icone-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ATBguia">
+<meta name="mobile-web-app-capable" content="yes">
+<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
+<script src="_mtfb.js?v=1"></script>
+<script>window.MT_APP={id:"atbguia",name:"ATBguia"};</script>
+<script type="module" src="_mtauth.js?v=6"></script>
+<style>
+:root{--petrol:#0E5A6D;--petrol-dark:#083845;--ink:#0E2A31;--mint:#2DD4A8;--mint-dark:#14b894;--bg:#F6FAFB;--soft:#EAF3F4;--line:#dbe8ea;--muted:#5B7882;--green:#14794f;--green-bg:#e7f7f1;--amber:#c97a17;--amber-bg:#fdf0e0;--red:#c0392b;--red-bg:#fdecea;--blue:#2563a8;--blue-bg:#e8f1fb;--violet:#6b46c1;--violet-bg:#efe9fb;--card:#fff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--ink);background:var(--bg);-webkit-text-size-adjust:100%}
+header{background:linear-gradient(135deg,var(--petrol),var(--petrol-dark));color:#fff;padding:calc(14px + env(safe-area-inset-top)) 0 14px;position:sticky;top:0;z-index:40}
+.wrap{max-width:1000px;margin:0 auto;padding:0 18px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.4px}
+.logo .mark{width:34px;height:34px;border-radius:10px;background:#2DD4A8;display:grid;place-items:center;flex:0 0 auto;font-size:18px}
+.logo b{color:var(--mint)}
+.subtitle{color:#bcd6db;font-size:12.5px;margin-top:3px}
+.usr{display:flex;align-items:center;gap:10px}
+.usr .who{font-size:12.5px;color:#cfe3e6;text-align:right;line-height:1.3;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.usr a,.usr button{color:#cfe3e6;text-decoration:none;font-size:13px;font-weight:600;background:rgba(255,255,255,.12);border:none;border-radius:8px;padding:7px 11px;cursor:pointer;font-family:inherit}
+.usr button:hover{background:rgba(255,255,255,.22)}
+.search-wrap{margin-top:12px;position:relative}
+.search-wrap input{width:100%;padding:12px 14px 12px 40px;border:none;border-radius:12px;font-size:15px;font-family:inherit;background:#fff;color:var(--ink)}
+.search-wrap input:focus{outline:2px solid var(--mint)}
+.search-wrap .ic{position:absolute;left:14px;top:50%;transform:translateY(-50%);opacity:.5}
+main{max-width:1000px;margin:0 auto;padding:18px 18px 70px;min-height:60vh}
+.note{background:var(--soft);border-radius:12px;padding:12px 15px;font-size:13px;color:#28424a;line-height:1.55;margin-bottom:16px}
+.note b{color:var(--petrol)}
+.sec-title{font-size:12px;font-weight:800;color:var(--petrol-dark);text-transform:uppercase;letter-spacing:.05em;margin:18px 2px 10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:11px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;cursor:pointer;transition:.12s;display:flex;flex-direction:column;gap:6px;min-height:96px}
+.card:hover{border-color:var(--mint);transform:translateY(-2px);box-shadow:0 6px 18px rgba(14,90,109,.09)}
+.card .ci{font-size:26px;line-height:1}
+.card .cn{font-weight:700;font-size:14.5px;line-height:1.25}
+.card .ct{font-size:11.5px;color:var(--muted);line-height:1.35}
+.card.ai{background:linear-gradient(135deg,#173f4b,#0E5A6D);color:#fff;border:none}
+.card.ai .cn{color:#fff}.card.ai .ct{color:#bcd6db}
+.card.tool{background:var(--blue-bg);border-color:#cfe0f4}
+.card.foco{background:var(--amber-bg);border-color:#f3dcbd}
+.empty{text-align:center;color:var(--muted);padding:40px 18px;background:#fff;border:1px dashed var(--line);border-radius:14px}
+.back{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 13px;font-size:13.5px;font-weight:600;cursor:pointer;color:var(--petrol);font-family:inherit;margin-bottom:14px}
+.exam-head{display:flex;align-items:flex-start;gap:13px;margin-bottom:6px}
+.exam-head .ei{font-size:34px;line-height:1}
+.exam-head h1{font-size:21px;line-height:1.15}
+.exam-head .tags{font-size:12.5px;color:var(--muted);margin-top:3px}
+.layout{display:grid;grid-template-columns:1fr;gap:18px;margin-top:8px}
+@media(min-width:820px){.layout{grid-template-columns:1fr 320px}.layout .aside{order:2}}
+.content{font-size:14.5px;line-height:1.62;color:#243b41}
+.content h2{font-size:15.5px;color:var(--petrol-dark);margin:18px 0 7px;padding-bottom:5px;border-bottom:2px solid var(--soft);display:flex;align-items:center;gap:7px}
+.content h2:first-child{margin-top:4px}
+.content h3{font-size:14px;color:var(--petrol);margin:12px 0 4px}
+.content ul{margin:4px 0 10px;padding-left:20px}
+.content li{margin:4px 0}
+.content p{margin:6px 0}
+.content b,.content strong{color:var(--petrol-dark)}
+.content .alarme{background:var(--red-bg);border-left:3px solid var(--red);border-radius:8px;padding:8px 12px;margin:8px 0;color:#7a241b;font-size:13.5px}
+.content .perla{background:var(--green-bg);border-left:3px solid var(--green);border-radius:8px;padding:8px 12px;margin:8px 0;color:#13503a;font-size:13.5px}
+.aside{display:flex;flex-direction:column;gap:14px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}
+.panel h4{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:9px;font-weight:800}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:none;border-radius:11px;padding:12px 16px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;text-decoration:none}
+.btn-p{background:var(--mint);color:var(--petrol-dark)}.btn-p:hover{background:var(--mint-dark)}
+.btn-g{background:#fff;color:var(--petrol);border:1px solid var(--line)}
+.btn-ai{background:linear-gradient(135deg,#173f4b,#0E5A6D);color:#fff;width:100%}
+.btn:disabled{opacity:.6;cursor:default}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.ai-out{background:#eef7f4;border:1px solid #bfe6db;border-radius:12px;padding:13px 15px;margin-top:12px;font-size:14px;line-height:1.6;color:#243b41}
+.ai-out h2{font-size:15px;color:var(--petrol-dark);margin:12px 0 6px}
+.ai-out h3{font-size:13.5px;color:var(--petrol);margin:9px 0 3px}
+.ai-out ul{margin:4px 0 8px;padding-left:19px}.ai-out li{margin:3px 0}
+.ai-out b{color:var(--petrol-dark)}
+/* form */
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12.5px;font-weight:700;color:var(--petrol-dark);margin-bottom:5px}
+.field select,.field input[type=text],.field input[type=number]{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:14.5px;font-family:inherit;background:#fff;color:var(--ink)}
+.field select:focus,.field input:focus{outline:none;border-color:var(--mint)}
+.segs{display:flex;flex-wrap:wrap;gap:7px}
+.seg{flex:1;min-width:90px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px;font-size:13px;cursor:pointer;text-align:center;font-family:inherit;color:var(--ink)}
+.seg.on{background:var(--petrol);color:#fff;border-color:var(--petrol)}
+.checks{display:flex;flex-direction:column;gap:6px}
+.checks label{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;font-weight:500;color:#243b41;cursor:pointer}
+.checks input{margin-top:2px;flex:0 0 auto;width:16px;height:16px;accent-color:var(--petrol)}
+.formcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+/* tabela cobertura */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:12px}
+table.cov{border-collapse:collapse;font-size:12.5px;min-width:640px;width:100%}
+table.cov th,table.cov td{border:1px solid var(--line);padding:7px 9px;text-align:center;white-space:nowrap}
+table.cov thead th{background:var(--soft);color:var(--petrol-dark);position:sticky;top:0;font-size:11.5px}
+table.cov td.atb{text-align:left;font-weight:700;color:var(--petrol-dark);background:#fbfdfd;position:sticky;left:0;z-index:1}
+.cy{color:var(--green);font-weight:800}.cn{color:#c9c9c9}.cp{color:var(--amber);font-weight:800}
+.legend{font-size:12px;color:var(--muted);margin:9px 2px;line-height:1.6}
+.calc-out{background:var(--blue-bg);border:1px solid #cfe0f4;border-radius:12px;padding:13px 15px;margin-top:12px;font-size:14px;line-height:1.55;color:#1b3a5c}
+.calc-out b{color:#143052}
+/* chat */
+.chat{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
+.msg{display:flex;gap:9px}
+.av{flex:0 0 auto;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:15px}
+.msg.u .av{background:var(--mint);color:var(--petrol-dark)}
+.msg.a .av{background:var(--violet-bg);color:var(--violet)}
+.bub{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 14px;font-size:14px;line-height:1.55}
+.msg.u .bub{background:var(--soft);border-color:var(--soft)}
+.bub p{margin:5px 0}.bub ul{margin:4px 0;padding-left:19px}.bub h2,.bub h3{font-size:14px;color:var(--petrol-dark);margin:8px 0 4px}
+.ask{position:sticky;bottom:0;background:linear-gradient(180deg,transparent,var(--bg) 22%);padding-top:10px;display:flex;gap:8px;align-items:flex-end}
+.ask textarea{flex:1;padding:11px 13px;border:1px solid var(--line);border-radius:12px;font-size:15px;font-family:inherit;background:#fff;resize:none;min-height:46px;max-height:130px}
+.ask textarea:focus{outline:none;border-color:var(--mint)}
+.ask button{flex:0 0 auto;background:var(--mint);color:var(--petrol-dark);border:none;border-radius:12px;width:48px;height:48px;font-size:18px;cursor:pointer}
+.suggs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+.sugg{background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:12.5px;cursor:pointer;color:var(--petrol);font-family:inherit}
+.sugg:hover{border-color:var(--mint)}
+.typing span{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--violet);margin:0 1px;animation:bl 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes bl{0%,60%,100%{opacity:.3}30%{opacity:1}}
+footer{text-align:center;color:var(--muted);font-size:12.5px;padding:24px;line-height:1.6}
+footer a{color:var(--petrol);font-weight:600;text-decoration:none}
+.disc{font-size:11.5px;color:var(--muted);margin-top:14px;line-height:1.5;border-top:1px solid var(--line);padding-top:12px}
+@media(max-width:680px){.grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap top">
+    <div>
+      <div class="logo"><span class="mark">💊</span> ATB<b>guia</b></div>
+      <div class="subtitle">Antibioticoterapia prática · empírico, escalonamento e resistência · por MedTech</div>
+    </div>
+    <div class="usr" id="usr"></div>
+  </div>
+  <div class="wrap"><div class="search-wrap"><span class="ic">🔍</span><input id="busca" placeholder="Buscar: pneumonia, Pseudomonas, ESBL, meropenem, ITU…" oninput="onBusca(this.value)" autocomplete="off"></div></div>
+</header>
+
+<main id="view"></main>
+
+<footer>© 2026 <a href="index.html">MedTech</a> · <a href="app.html">Portal</a> · <a href="privacidade.html">Privacidade</a>
+  <div class="disc" style="max-width:780px;margin:14px auto 0">ATBguia é uma ferramenta de <b>apoio à decisão</b> para profissionais de saúde. As sugestões são <b>empíricas e gerais</b> — sempre ajuste à <b>função renal</b>, <b>alergias</b>, gestação, ao <b>antibiograma</b> e ao <b>protocolo/perfil de resistência da sua instituição</b>. Não substitui o julgamento clínico. Confira doses antes de prescrever.</div>
+</footer>
+
+<script>
+/* ===================== UTIL ===================== */
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+function md(t){
+  const blocks=String(t||'').split('\n');let html='',inUl=false;
+  const closeUl=()=>{if(inUl){html+='</ul>';inUl=false;}};
+  const inl=s=>esc(s).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\b(≥|≤|>|<)\s/g,'$1 ');
+  for(let raw of blocks){
+    const l=raw.trim();
+    if(!l){closeUl();continue;}
+    if(/^## /.test(l)){closeUl();html+='<h2>'+inl(l.slice(3))+'</h2>';}
+    else if(/^### /.test(l)){closeUl();html+='<h3>'+inl(l.slice(4))+'</h3>';}
+    else if(/^> Perla[:：]?/i.test(l)){closeUl();html+='<div class="perla">💡 <b>Pérola:</b> '+inl(l.replace(/^> Perla[:：]?\s*/i,''))+'</div>';}
+    else if(/^> Alarme[:：]?/i.test(l)){closeUl();html+='<div class="alarme">⚠️ <b>Atenção:</b> '+inl(l.replace(/^> Alarme[:：]?\s*/i,''))+'</div>';}
+    else if(/^[-*] /.test(l)){if(!inUl){html+='<ul>';inUl=true;}html+='<li>'+inl(l.slice(2))+'</li>';}
+    else {closeUl();html+='<p>'+inl(l)+'</p>';}
+  }
+  closeUl();return html;
+}
+
+/* ===================== BANCO: FOCOS (empírico) ===================== */
+const FOCOS=[
+{id:'pac',icon:'🫁',nome:'Pneumonia',tags:'PAC, PAV, PAH, respiratória, tosse, dispneia',
+ md:`## Germes prováveis
+**Comunitária (PAC):** pneumococo, *H. influenzae*, atípicos (*Mycoplasma*, *Legionella*, *Chlamydophila*), *S. aureus* (pós-influenza). **Hospitalar/PAV:** enterobactérias, *Pseudomonas*, *Acinetobacter*, *S. aureus* (incl. MRSA).
+## Empírico — comunitária
+- **Ambulatorial, hígido:** amoxicilina 1 g VO 8/8h (cobre pneumococo). Alérgico/atípico: azitromicina 500 mg/d ou doxiciclina 100 mg 12/12h.
+- **Ambulatorial com comorbidade / ATB recente:** amoxicilina-clavulanato 875 mg 12/12h **+ azitromicina**, OU levofloxacino 750 mg/d (monoterapia respiratória).
+- **Internado (enfermaria):** ceftriaxona 1–2 g/d **+ azitromicina**, OU levofloxacino 750 mg/d.
+- **UTI/grave:** ceftriaxona 2 g/d **+ azitromicina** (ou + macrolídeo/quinolona). Cobrir *Pseudomonas* (pip-tazo, cefepime ou meropenem + quinolona) se bronquiectasia/DPOC grave/ATB IV recente.
+## Empírico — hospitalar / PAV
+- Anti-Pseudomonas: **piperacilina-tazobactam 4,5 g 6/6h** OU **cefepime 2 g 8/8h** OU **meropenem 1–2 g 8/8h**.
+- **+ cobertura MRSA** (vancomicina ou linezolida) se risco (ATB IV 90d, prevalência local alta, instável).
+- Ajuste pelo aspirado/antibiograma e descalone assim que possível.
+## Alergia a penicilina
+Leve: cefalosporina segura. Grave/anafilaxia: levofloxacino (PAC) / aztreonam + vancomicina ± metronidazol (hospitalar).
+## Duração
+PAC: **5 dias** (afebril 48–72h, estável). PAV/PAH: **7 dias**. *Legionella*/imunossupressão: mais longo.
+> Perla: calcule **CURB-65/PSI** para definir local de tratamento; colha cultura/antígenos urinários (pneumococo, *Legionella*) no grave antes do ATB.
+> Alarme: cobertura anti-Pseudomonas e anti-MRSA **só** com fator de risco — não as use de rotina (stewardship).`},
+{id:'itu',icon:'🚽',nome:'ITU / urinária',tags:'cistite, pielonefrite, urina, cateter, urossepse',
+ md:`## Germes prováveis
+*E. coli* (maioria), *Klebsiella*, *Proteus*, *Enterococcus*; em hospitalar/cateter: *Pseudomonas*, ESBL, *Enterococcus*.
+## Cistite não complicada (mulher)
+- **Nitrofurantoína** 100 mg 6/6h por 5 d (evitar se ClCr <30); **OU fosfomicina** 3 g dose única; **OU** sulfametoxazol-trimetoprim 800/160 mg 12/12h 3 d (se resistência local <20%).
+- Evite quinolona para cistite simples (reservar).
+## Pielonefrite
+- **Ambulatorial:** ciprofloxacino 500 mg 12/12h ou levofloxacino 750 mg/d 5–7 d; ou ceftriaxona 1 g IM/IV dose inicial.
+- **Internado:** ceftriaxona 1–2 g/d. **Risco de ESBL** (ITU de repetição, ATB recente, internação): **ertapenem 1 g/d** ou meropenem.
+- **Grave/urossepse ou cateter:** cobrir *Pseudomonas* (cefepime/pip-tazo/meropenem) conforme perfil; ajustar pela urocultura.
+## Duração
+Cistite 3–5 d; pielonefrite 7 d (quinolona) a 10–14 d (β-lactâmico).
+> Perla: **bacteriúria assintomática NÃO trata** — exceto gestante e pré-procedimento urológico com sangramento. Sempre colha urocultura antes no quadro complicado.
+> Alarme: nitrofurantoína e fosfomicina **não** servem para pielonefrite (não atingem parênquima/sangue).`},
+{id:'pele',icon:'🩹',nome:'Pele e partes moles',tags:'celulite, erisipela, abscesso, MRSA, fasciíte, pé diabético',
+ md:`## Germes prováveis
+Não purulenta (erisipela/celulite): *Streptococcus* β-hemolítico; purulenta/abscesso: *S. aureus* (incl. **MRSA comunitário**).
+## Empírico
+- **Celulite/erisipela (não purulenta):** cefalexina 500 mg 6/6h ou cefazolina/oxacilina IV; penicilina/amox se típico de *Strepto*.
+- **Purulenta / abscesso:** **drenar** + cobrir MRSA-AC: sulfametoxazol-trimetoprim, doxiciclina ou clindamicina (VO); vancomicina (grave/IV).
+- **Pé diabético:** leve → amoxicilina-clavulanato; moderado-grave → piperacilina-tazobactam ou carbapenêmico ± cobertura MRSA; avaliar osteomielite.
+## Infecção necrosante (fasciíte)
+**Emergência cirúrgica.** ATB de amplo espectro: piperacilina-tazobactam ou carbapenem **+ clindamicina** (efeito antitoxina) **± vancomicina/linezolida**. Não atrasar o desbridamento.
+## Duração
+Celulite não complicada: 5 d (estende se lenta resposta).
+> Perla: marque o bordo do eritema — piora nas primeiras 24–48h pode ser evolução natural, não falha.
+> Alarme: dor desproporcional, bolhas, crepitação, necrose ou toxemia → suspeite de **necrosante** e chame cirurgia já.`},
+{id:'abdome',icon:'🫄',nome:'Intra-abdominal',tags:'peritonite, apendicite, colangite, diverticulite, biliar',
+ md:`## Germes prováveis
+Enterobactérias (*E. coli*, *Klebsiella*), **anaeróbios** (*Bacteroides fragilis*), *Enterococcus* (selecionados).
+## Empírico — comunitária (leve-moderada)
+- **Ceftriaxona 2 g/d + metronidazol** 500 mg 8/8h; OU amoxicilina-clavulanato; OU ciprofloxacino + metronidazol; OU **ertapenem** 1 g/d (monoterapia, cobre anaeróbio).
+## Grave / hospitalar / pós-operatória
+- **Piperacilina-tazobactam 4,5 g 6/6h** OU **meropenem/cefepime + metronidazol**. Considerar cobertura de *Enterococcus* e antifúngico (Candida) em pós-op/grave.
+## Duração
+**4 dias após controle de foco** adequado (estudo STOP-IT); sem controle de foco, prolongar.
+> Perla: **controle de foco** (drenagem/cirurgia) é mais importante que o ATB. Colha cultura do material.
+> Alarme: colangite/sepse biliar → descompressão das vias biliares (CPRE) é prioritária.`},
+{id:'sepse',icon:'🆘',nome:'Sepse / foco indefinido',tags:'sepse, choque, bacteremia, corrente sanguínea, hemocultura',
+ md:`## Conduta
+**Emergência.** ATB de amplo espectro na **1ª hora**, após **2 hemoculturas** (não atrasar). Identifique o foco provável e direcione.
+## Empírico amplo
+- Gram-negativos (incl. *Pseudomonas* se risco): **piperacilina-tazobactam 4,5 g 6/6h** OU **cefepime 2 g 8/8h** OU **meropenem 1–2 g 8/8h** (se risco de ESBL/grave).
+- **+ vancomicina** se risco de MRSA (cateter, pele, hemodiálise, instável).
+- Considere foco (urinário, pulmonar, abdominal, pele, SNC) e ajuste.
+## Descalonamento
+Reavalie em 48–72h com culturas: **estreite o espectro** para o agente isolado e suspenda coberturas desnecessárias (stewardship). Defina duração pelo foco.
+> Perla: lactato, controle de foco e ressuscitação volêmica andam junto com o ATB. Repique hemoculturas se *S. aureus*/candidemia.
+> Alarme: cada hora de atraso do ATB no choque séptico aumenta mortalidade — não espere exames para iniciar.`},
+{id:'meningite',icon:'🧠',nome:'Meningite / SNC',tags:'meningite, neuro, líquor, rigidez de nuca',
+ md:`## Germes prováveis
+Pneumococo, meningococo, *H. influenzae*; **>50 anos / imunossuprimido / gestante:** + *Listeria monocytogenes*.
+## Empírico (não atrasar — antes ou junto da TC/PL se necessário)
+- **Ceftriaxona 2 g IV 12/12h + vancomicina** (pneumococo resistente).
+- **+ ampicilina 2 g 4/4h** se risco de *Listeria* (>50a, imunossupressão, gestante).
+- **Dexametasona 10 mg 6/6h** antes/junto da 1ª dose de ATB (pneumococo).
+- Pós-neurocirurgia/derivação: cobrir Gram- nosocomial + *S. aureus* (cefepime/meropenem + vancomicina).
+## Duração
+Meningococo 5–7 d; pneumococo 10–14 d; *Listeria* ≥21 d.
+> Perla: colha hemoculturas e inicie ATB em **<1h**; a PL pode ser feita depois se houver indicação de TC antes.
+> Alarme: não atrase o antibiótico esperando exame de imagem ou líquor.`},
+{id:'osteo',icon:'🦴',nome:'Osteoarticular',tags:'artrite séptica, osteomielite, prótese, articular',
+ md:`## Germes prováveis
+*S. aureus* (principal), *Streptococcus*, Gram-negativos (idoso, trato urinário), *Pseudomonas* (UDIV/punção plantar).
+## Empírico
+- Cobrir *S. aureus*: **oxacilina/cefazolina** (MSSA) ou **vancomicina** (risco de MRSA) ± Gram- (ceftriaxona/cefepime) conforme contexto.
+- **Artrite séptica:** drenagem/lavagem articular + ATB. **Prótese:** abordagem cirúrgica + ATB prolongado (envolver infecto/orto).
+## Duração
+Artrite séptica ~2–4 semanas; osteomielite **4–6 semanas** (mais se prótese). Direcionar por cultura óssea/articular.
+> Perla: colha cultura (articular/óssea) **antes** do ATB sempre que possível — define o tratamento prolongado.`},
+{id:'neutropenia',icon:'🌡️',nome:'Neutropenia febril',tags:'oncologia, quimioterapia, febre, neutropenia',
+ md:`## Definição e conduta
+Febre ≥38,3°C (ou ≥38°C sustentada) + neutrófilos <500. **Emergência:** ATB anti-Pseudomonas em **<1h**, após culturas.
+## Empírico (monoterapia)
+- **Cefepime 2 g 8/8h** OU **piperacilina-tazobactam 4,5 g 6/6h** OU **meropenem 1–2 g 8/8h**.
+- **+ vancomicina** se: instabilidade, suspeita de infecção de cateter, mucosite grave, pele/partes moles, colonização por MRSA/pneumococo resistente.
+- Reavaliar antifúngico se febre persistente >4–7 d.
+## Duração
+Até resolução da febre **e** recuperação dos neutrófilos; direcionar por foco/cultura.
+> Perla: estratifique risco (**MASCC**); baixo risco selecionado pode usar ciprofloxacino + amoxicilina-clavulanato VO.
+> Alarme: vancomicina **não** é rotina — adicione só com indicação e suspenda em 48–72h se cultura negativa.`},
+{id:'cdiff',icon:'💩',nome:'C. difficile (diarreia)',tags:'colite, diarreia associada a antibiótico, CDI',
+ md:`## Quando suspeitar
+Diarreia (≥3 evacuações amolecidas/24h) com uso recente de ATB. Confirme com toxina/PCR. **Suspenda o ATB causador** se possível.
+## Tratamento
+- **1º episódio:** **vancomicina 125 mg VO 6/6h por 10 d** OU **fidaxomicina** 200 mg 12/12h 10 d (preferenciais).
+- Metronidazol VO 500 mg 8/8h **só** se as opções acima indisponíveis (leve) ou associado IV no fulminante.
+- **Fulminante (íleo/megacólon/choque):** vancomicina VO/enema em dose alta + metronidazol IV; avaliar cirurgia.
+- Recorrência: fidaxomicina ou vancomicina em esquema de redução/pulso; considerar transplante de microbiota.
+> Perla: **não** use antiperistálticos; isolamento de contato + higiene das mãos com água e sabão (álcool não inativa esporos).
+> Alarme: vancomicina para CDI é **VO** (não IV — a IV não atinge a luz intestinal).`},
+{id:'profilaxia',icon:'🔪',nome:'Profilaxia cirúrgica',tags:'pré-operatório, cirurgia, profilaxia',
+ md:`## Princípios
+Objetivo: cobrir a flora da pele/sítio. Dose **30–60 min antes da incisão**.
+## Escolha
+- **Padrão (maioria):** **cefazolina 2 g IV** (3 g se ≥120 kg). Alérgico a β-lactâmico: clindamicina ou vancomicina ± gentamicina.
+- **Cólon/abdome com anaeróbios:** acrescentar metronidazol (ou cefoxitina).
+## Redosagem e duração
+- **Redose** intraoperatória se cirurgia longa (cefazolina a cada ~4h) ou sangramento volumoso.
+- **Suspender em ≤24h** (na maioria, dose única basta). Prolongar não reduz infecção e aumenta resistência.
+> Alarme: profilaxia prolongada "até retirar o dreno" **não** é recomendada e seleciona resistência.`}
+];
+
+/* ===================== BANCO: GUIA (bactérias / resistência / ATB) ===================== */
+const ORDEM_CAT=['Bactérias','Mecanismos de resistência','Antibióticos'];
+const GUIA=[
+/* ---- BACTÉRIAS ---- */
+{id:'saureus',icon:'🟣',cat:'Bactérias',nome:'Staphylococcus aureus',tags:'MSSA, MRSA, Gram+, cocos, pele, bacteremia',
+ md:`## Quem é
+Coco **Gram-positivo** em cachos. Causa pele/partes moles, bacteremia, endocardite, osteoarticular, pneumonia.
+## Resistência
+- **MSSA** (sensível à oxacilina): tratar com **oxacilina** ou **cefazolina** (melhores que vancomicina para MSSA).
+- **MRSA** (gene *mecA* → PBP2a): resistente a TODOS os β-lactâmicos clássicos. Tratar com **vancomicina**, **daptomicina** (não em pneumonia), **linezolida**, ceftarolina.
+## Escolha por cenário
+- Pele MRSA-AC ambulatorial: SMX-TMP, doxiciclina, clindamicina.
+- Bacteremia/endocardite MSSA: oxacilina/cefazolina; MRSA: vancomicina ou daptomicina.
+> Perla: em bacteremia por *S. aureus*, repique hemoculturas, procure foco/endocardite e trate ≥14 dias (mais se complicada).`},
+{id:'strepto',icon:'🔵',cat:'Bactérias',nome:'Streptococcus / pneumococo',tags:'Gram+, pneumococo, pyogenes, faringite, pneumonia',
+ md:`## Quem é
+Cocos **Gram-positivos** em cadeia. *S. pyogenes* (erisipela, faringite, escarlatina), *S. pneumoniae* (pneumonia, meningite, otite), *S. agalactiae* (neonatal/gestante).
+## Tratamento
+- Em geral **muito sensível à penicilina/amoxicilina** (1ª escolha).
+- Pneumococo com resistência intermediária: doses altas de amoxicilina/ceftriaxona; meningite por pneumococo → ceftriaxona **+ vancomicina** empírico.
+> Perla: alergia não grave à penicilina → cefalosporina; grave → macrolídeo/clindamicina (atenção à resistência).`},
+{id:'enterococo',icon:'🟢',cat:'Bactérias',nome:'Enterococcus (E. faecalis/faecium)',tags:'VRE, Gram+, urinária, endocardite, abdominal',
+ md:`## Quem é
+Cocos **Gram-positivos** do TGI; ITU, intra-abdominal, endocardite, bacteremia de cateter. Intrinsecamente resistente a cefalosporinas.
+## Tratamento
+- ***E. faecalis*:** **ampicilina** (1ª escolha) ou amoxicilina; alternativa vancomicina.
+- ***E. faecium*:** frequentemente resistente à ampicilina → vancomicina; se **VRE** (gene *vanA*) → **linezolida** ou **daptomicina**.
+- Endocardite: associar (ampicilina + ceftriaxona, ou + gentamicina).
+> Alarme: cefalosporinas **não cobrem** *Enterococcus* — lembre disso em esquemas empíricos.`},
+{id:'ecoli',icon:'🟠',cat:'Bactérias',nome:'Enterobactérias (E. coli, Klebsiella)',tags:'Gram-, ESBL, urinária, abdominal, bacteremia',
+ md:`## Quem é
+Bacilos **Gram-negativos** entéricos: *E. coli*, *Klebsiella*, *Proteus*. ITU, intra-abdominal, bacteremia, pneumonia.
+## Tratamento
+- Sensível: ceftriaxona, ciprofloxacino, amoxicilina-clavulanato (conforme antibiograma).
+- **ESBL+** (β-lactamase de espectro estendido): resistente a cefalosporinas → **carbapenêmico** (meropenem/ertapenem) é o padrão; em ITU não grave, considerar pip-tazo/cefepime conforme MIC ou outras opções dirigidas.
+- **KPC/carbapenemase:** ver mecanismo de resistência (opções: ceftazidima-avibactam, meropenem-vaborbactam, polimixina).
+> Perla: *Klebsiella* hospitalar é um dos principais reservatórios de ESBL/KPC — siga o perfil local.`},
+{id:'pseudomonas',icon:'🟡',cat:'Bactérias',nome:'Pseudomonas aeruginosa',tags:'Gram-, hospitalar, PAV, MDR, anti-pseudomonas',
+ md:`## Quem é
+Bacilo **Gram-negativo** não fermentador, ambiental/hospitalar. PAV, ITU de cateter, partes moles (úlcera/queimadura), neutropenia, otite externa maligna.
+## ATB com ação anti-Pseudomonas
+Piperacilina-tazobactam, **cefepime**, **ceftazidima**, **meropenem/imipenem**, ciprofloxacino/levofloxacino, aminoglicosídeos, aztreonam; MDR: ceftolozano-tazobactam, ceftazidima-avibactam, polimixina.
+## Princípios
+- Só cubra empiricamente com **fator de risco** (hospitalização, ATB recente, dispositivos, imunossupressão).
+- Cefalosporinas comuns (ceftriaxona) e ertapenem **NÃO** cobrem Pseudomonas.
+> Alarme: ertapenem (carbapenêmico) **não** tem ação anti-Pseudomonas — use meropenem/imipenem se precisar de carbapenêmico contra Pseudomonas.`},
+{id:'acineto',icon:'🟤',cat:'Bactérias',nome:'Acinetobacter baumannii',tags:'Gram-, MDR, UTI, PAV, carbapenemase',
+ md:`## Quem é
+Bacilo **Gram-negativo** não fermentador, tipicamente **hospitalar/UTI** (PAV, cateter). Frequentemente **MDR/XDR**.
+## Tratamento
+Direcionado pelo antibiograma: sulbactam (alta dose)/ampicilina-sulbactam, **polimixina**, **carbapenêmico** (se sensível), tigeciclina, cefiderocol; muitas vezes **terapia combinada**.
+> Alarme: surtos hospitalares — reforce precaução de contato e controle de foco; envolva a CCIH/infectologia.`},
+{id:'anaerobios',icon:'⚫',cat:'Bactérias',nome:'Anaeróbios (Bacteroides)',tags:'anaeróbio, abdominal, aspirativa, abscesso, metronidazol',
+ md:`## Quem é
+*Bacteroides fragilis* e outros — infecções **abaixo do diafragma** (intra-abdominal, pélvica), abscessos, pneumonia aspirativa, pé diabético.
+## Cobertura anaeróbia
+- **Metronidazol** (melhor para anaeróbios abdominais), clindamicina (acima do diafragma), **amoxicilina-clavulanato**, **piperacilina-tazobactam**, **carbapenêmicos**, cefoxitina, moxifloxacino.
+- **Não** cobrem bem anaeróbios: ceftriaxona/cefepime, ciprofloxacino, aminoglicosídeos, aztreonam.
+> Perla: em foco abdominal, associe metronidazol quando o β-lactâmico escolhido não cobre anaeróbio (ex.: ceftriaxona + metronidazol).`},
+{id:'atipicos',icon:'🔬',cat:'Bactérias',nome:'Atípicos (Mycoplasma, Legionella, Chlamydophila)',tags:'pneumonia atípica, macrolídeo, quinolona',
+ md:`## Quem é
+Sem parede celular típica → **não respondem a β-lactâmicos**. Causam pneumonia "atípica"; *Legionella* pode ser grave.
+## Tratamento
+- **Macrolídeo** (azitromicina) ou **doxiciclina** ou **fluoroquinolona respiratória** (levo/moxifloxacino).
+- Por isso a PAC internada associa β-lactâmico **+ macrolídeo** (ou quinolona em monoterapia).
+> Perla: *Legionella* — pesquise antígeno urinário no grave; pode cursar com hiponatremia e sintomas GI.`},
+/* ---- RESISTÊNCIA ---- */
+{id:'esbl',icon:'🧬',cat:'Mecanismos de resistência',nome:'ESBL',tags:'beta-lactamase espectro estendido, cefalosporina, carbapenem',
+ md:`## O que é
+**β-lactamase de espectro estendido** (enterobactérias, esp. *E. coli*/*Klebsiella*): hidrolisa penicilinas e **cefalosporinas** (incl. ceftriaxona/cefepime), mas **não** carbapenêmicos.
+## Como tratar
+- **Carbapenêmico** (meropenem; ertapenem se não Pseudomonas) é o padrão na infecção grave.
+- ITU não grave: pode-se considerar pip-tazo, aminoglicosídeo, fosfomicina, nitrofurantoína (cistite) conforme antibiograma.
+## Fatores de risco
+ATB recente (cefalosporina/quinolona), internação, ITU de repetição, viagem, colonização prévia.
+> Perla: cefepime "esconde" falha em ESBL com MIC elevado — na infecção grave por ESBL, prefira carbapenêmico.`},
+{id:'ampc',icon:'🧬',cat:'Mecanismos de resistência',nome:'AmpC',tags:'Enterobacter, Serratia, Citrobacter, indução',
+ md:`## O que é
+β-lactamase **AmpC** (cromossômica indutível) em *Enterobacter*, *Serratia*, *Citrobacter freundii*, *Providencia*, *Morganella* ("grupo ESCPM"). Pode ser **induzida** durante o tratamento → falha com cefalosporinas de 3ª geração mesmo se inicialmente "sensível".
+## Como tratar
+- **Cefepime** (estável à AmpC) ou **carbapenêmico** na infecção grave.
+- Evite ceftriaxona/ceftazidima em infecção invasiva por esses germes mesmo com antibiograma sensível.
+> Alarme: "sensível à ceftriaxona" em *Enterobacter* pode virar resistência em dias — prefira cefepime/carbapenêmico.`},
+{id:'kpc',icon:'🧬',cat:'Mecanismos de resistência',nome:'KPC e carbapenemases (ERC)',tags:'KPC, carbapenemase, enterobactéria resistente a carbapenêmico',
+ md:`## O que é
+**Carbapenemases** (serina, ex. **KPC**) hidrolisam até carbapenêmicos → **enterobactéria resistente a carbapenêmico (ERC)**. Grave, hospitalar.
+## Como tratar (direcionado, com infecto/CCIH)
+- **Ceftazidima-avibactam** (KPC), meropenem-vaborbactam, imipenem-relebactam.
+- **Polimixina B/colistina**, **tigeciclina**, aminoglicosídeo, fosfomicina — frequentemente em **combinação**.
+- Distinga de **metalo-β-lactamase (MBL/NDM)** — avibactam não age; opções: aztreonam + ceftazidima-avibactam, cefiderocol.
+> Alarme: ERC exige precaução de contato e notificação à CCIH; trate guiado por teste de mecanismo e MIC.`},
+{id:'mrsa',icon:'🧬',cat:'Mecanismos de resistência',nome:'MRSA (S. aureus resistente)',tags:'mecA, PBP2a, oxacilina, vancomicina',
+ md:`## O que é
+*S. aureus* com gene **mecA** → **PBP2a**, alvo de baixa afinidade → resistência a **todos os β-lactâmicos** clássicos (oxacilina, cefazolina, ceftriaxona).
+## Como tratar
+- **Vancomicina** (alvo vale 15–20 ou AUC/MIC), **daptomicina** (não pneumonia — surfactante inativa), **linezolida**, ceftarolina (β-lactâmico ativo contra MRSA).
+- Comunitário (pele): SMX-TMP, doxiciclina, clindamicina.
+> Perla: para **MSSA**, β-lactâmico (oxacilina/cefazolina) é superior à vancomicina — desça assim que o antibiograma liberar.`},
+{id:'vre',icon:'🧬',cat:'Mecanismos de resistência',nome:'VRE (Enterococcus resistente à vanco)',tags:'vanA, linezolida, daptomicina',
+ md:`## O que é
+*Enterococcus* (geralmente *E. faecium*) com **vanA/vanB** → resistente à vancomicina. Hospitalar, colonização intestinal.
+## Como tratar
+- **Linezolida** ou **daptomicina** (dose alta) são as opções principais (direcionar por antibiograma).
+- ITU por VRE: nitrofurantoína/fosfomicina podem servir conforme sensibilidade.
+> Perla: diferencie **colonização** (não trata) de **infecção** — não trate swab/cultura de vigilância.`},
+{id:'mdr-pseudo',icon:'🧬',cat:'Mecanismos de resistência',nome:'Pseudomonas/MDR e polimixina',tags:'XDR, polimixina, colistina, cefolozano',
+ md:`## O que é
+*Pseudomonas*/Gram- não fermentadores podem combinar vários mecanismos (efluxo, perda de porina, carbapenemases) → **MDR/XDR**.
+## Como tratar (direcionado)
+- Novos β-lactâmicos: **ceftolozano-tazobactam**, **ceftazidima-avibactam**, cefiderocol (conforme mecanismo).
+- **Polimixina B/colistina** como resgate (nefrotoxicidade; muitas vezes combinada).
+> Alarme: escolha guiada por mecanismo + MIC e por infecto/CCIH; evite monoterapia subótima que seleciona resistência.`},
+/* ---- ANTIBIÓTICOS ---- */
+{id:'amoxiclav',icon:'💊',cat:'Antibióticos',nome:'Amoxicilina ± clavulanato',tags:'penicilina, oral, PAC, sinusite, mordedura',
+ md:`## Classe e espectro
+Aminopenicilina (± inibidor de β-lactamase). Cobre *Strepto*/pneumococo, *Enterococcus* (amox), *H. influenzae* e anaeróbios/*S. aureus* MSSA (com clavulanato). **Não** cobre MRSA, Pseudomonas, ESBL.
+## Dose adulta (função renal normal)
+- Amoxicilina 500 mg–1 g VO 8/8h. Amox-clav 875/125 mg 12/12h (ou 500 mg 8/8h).
+## Ajuste renal
+Reduzir intervalo/dose se ClCr <30. Gestação: **seguro** (1ª linha em muitas situações).
+## Usos
+PAC ambulatorial, sinusite/otite, ITU (gestante), mordeduras (amox-clav), profilaxia odontológica.
+> Perla: clavulanato adiciona cobertura de anaeróbios e de β-lactamase de *H. influenzae*/*S. aureus*.`},
+{id:'cefalosporinas',icon:'💊',cat:'Antibióticos',nome:'Cefalosporinas (cefazolina→cefepime)',tags:'ceftriaxona, cefepime, cefalexina, ceftazidima',
+ md:`## Por geração
+- **1ª (cefazolina IV / cefalexina VO):** Gram+ (MSSA, *Strepto*) — pele, profilaxia cirúrgica.
+- **3ª (ceftriaxona):** Gram- comunitário + pneumococo — PAC, pielonefrite, meningite. **Ceftazidima** = anti-Pseudomonas (pouco Gram+).
+- **4ª (cefepime):** amplo, anti-Pseudomonas, estável à AmpC — hospitalar/neutropenia.
+- **5ª (ceftarolina):** ativa contra MRSA.
+## Não cobrem
+**Enterococcus** (todas), **anaeróbios** (associar metronidazol), MRSA (exceto ceftarolina), ESBL.
+## Dose típica
+Ceftriaxona 1–2 g/d (2 g 12/12h meningite); cefepime 2 g 8/8h; cefazolina 2 g profilaxia.
+> Perla: reatividade cruzada com penicilina é **baixa** (~1–2%); cefalosporina costuma ser segura em alergia não grave.`},
+{id:'piptazo',icon:'💊',cat:'Antibióticos',nome:'Piperacilina-tazobactam',tags:'tazocin, anti-pseudomonas, anaeróbio, hospitalar',
+ md:`## Espectro
+Muito amplo: Gram+ (incl. MSSA, *Enterococcus*), Gram- **incl. Pseudomonas**, **anaeróbios**. **Não** cobre MRSA, ESBL grave (preferir carbapenêmico), atípicos.
+## Dose adulta
+4,5 g IV 6/6h (ou infusão estendida); ajustar à função renal.
+## Usos
+Sepse de foco abdominal, PAV/PAH, pé diabético grave, neutropenia febril.
+> Perla: cobre anaeróbio — não precisa associar metronidazol de rotina.`},
+{id:'carbapenemicos',icon:'💊',cat:'Antibióticos',nome:'Carbapenêmicos (meropenem, ertapenem)',tags:'meropenem, ertapenem, imipenem, ESBL, amplo',
+ md:`## Espectro
+Amplíssimo: Gram+/Gram- **incl. ESBL** e anaeróbios. **Meropenem/imipenem** cobrem **Pseudomonas**; **ertapenem NÃO** cobre Pseudomonas/Acinetobacter/Enterococcus.
+## Dose
+Meropenem 1 g 8/8h (2 g 8/8h em SNC/Pseudomonas grave); ertapenem 1 g/d.
+## Reserve
+Para ESBL, infecção grave polimicrobiana, falha de esquema mais estreito. **Stewardship**: descalone assim que possível.
+> Alarme: uso excessivo de carbapenêmico seleciona KPC — não use como "amplo de conforto".`},
+{id:'quinolonas',icon:'💊',cat:'Antibióticos',nome:'Fluoroquinolonas (cipro, levo)',tags:'ciprofloxacino, levofloxacino, oral, pseudomonas',
+ md:`## Espectro
+Gram- (cipro tem boa ação anti-Pseudomonas), atípicos; **levo/moxifloxacino** ("respiratórias") cobrem pneumococo. Excelente **biodisponibilidade oral**.
+## Dose
+Cipro 500 mg 12/12h (400 mg IV); levo 750 mg/d.
+## Cautelas
+Tendinopatia/ruptura, **prolongamento do QT**, aneurisma de aorta, disglicemia, neuropatia, interação com cátions (Ca/Mg/Fe). Evitar em gestante/criança quando houver alternativa.
+> Alarme: evite quinolona para cistite simples e infecções banais — reserve (efeitos adversos e resistência).`},
+{id:'vancodapto',icon:'💊',cat:'Antibióticos',nome:'Vancomicina / Daptomicina / Linezolida',tags:'MRSA, VRE, glicopeptídeo, Gram+',
+ md:`## Anti-Gram+ resistentes
+- **Vancomicina** IV: MRSA, *Strepto*, *Enterococcus* (não VRE). Monitorar nível/AUC e função renal. VO **só** para *C. difficile*.
+- **Daptomicina:** MRSA/VRE, bacteremia/endocardite. **Não usar em pneumonia** (inativada pelo surfactante). Monitorar CPK.
+- **Linezolida:** MRSA/VRE, boa em pneumonia e VO; cuidado com plaquetopenia, neuropatia e síndrome serotoninérgica (uso >14 d).
+> Perla: para MSSA prefira β-lactâmico (oxacilina/cefazolina) — vancomicina é inferior no MSSA.`},
+{id:'metronidazol',icon:'💊',cat:'Antibióticos',nome:'Metronidazol',tags:'anaeróbio, abdominal, C. difficile, giárdia',
+ md:`## Espectro
+**Anaeróbios** (esp. abdominais/*Bacteroides*) e protozoários (giárdia, ameba, tricomonas). Sem ação contra aeróbios.
+## Dose
+500 mg IV/VO 8/8h. Ótima biodisponibilidade oral.
+## Cautelas
+Efeito **dissulfiram-like** com álcool; gosto metálico; neuropatia em uso prolongado.
+> Perla: associe a um β-lactâmico/quinolona que não cubra anaeróbio quando o foco for abdominal/pélvico (ex.: ceftriaxona + metronidazol).`},
+{id:'sulfa',icon:'💊',cat:'Antibióticos',nome:'Sulfametoxazol-trimetoprim',tags:'SMX-TMP, bactrim, MRSA-AC, ITU, PCP',
+ md:`## Espectro/usos
+ITU, MRSA comunitário (pele), *Stenotrophomonas*, **PCP** (*Pneumocystis*) tratamento/profilaxia, nocardiose.
+## Dose
+ITU 800/160 mg 12/12h; PCP doses altas (15–20 mg/kg/d de TMP).
+## Cautelas
+Hipercalemia, rash/Stevens-Johnson, mielotoxicidade, ↑ creatinina (competição tubular), interação com varfarina; evitar no 1º trimestre/final da gestação.
+> Perla: ótima opção VO para pele por MRSA-AC e para profilaxia de PCP em imunossuprimidos.`},
+{id:'nitro-fosfo',icon:'💊',cat:'Antibióticos',nome:'Nitrofurantoína / Fosfomicina',tags:'cistite, ITU baixa, oral',
+ md:`## Uso restrito à bexiga
+- **Nitrofurantoína** 100 mg 6/6h 5 d — cistite não complicada. **Evitar se ClCr <30** e na pielonefrite (não atinge tecido/sangue).
+- **Fosfomicina** 3 g dose única — cistite (inclui muitos ESBL).
+> Alarme: **não** servem para pielonefrite, ITU complicada ou bacteremia — apenas infecção **baixa**.`},
+{id:'aminoglicosideos',icon:'💊',cat:'Antibióticos',nome:'Aminoglicosídeos (genta, amica)',tags:'gentamicina, amicacina, Gram-, sinergia',
+ md:`## Espectro/uso
+Gram- (incl. Pseudomonas/amicacina), **sinergia** em endocardite por Gram+. Dose única diária reduz toxicidade.
+## Cautelas
+**Nefrotoxicidade** e **ototoxicidade** (monitorar função renal/níveis); evitar uso prolongado. Pouca penetração pulmonar/urina ácida.
+> Perla: úteis como segundo agente dirigido em Gram- resistente; não como monoterapia de foco profundo.`},
+{id:'macrolidos-doxi',icon:'💊',cat:'Antibióticos',nome:'Macrolídeos / Doxiciclina',tags:'azitromicina, claritromicina, doxiciclina, atípicos',
+ md:`## Espectro/uso
+- **Azitromicina:** atípicos (PAC), coqueluche, DST (clamídia), profilaxias. QT longo; interações.
+- **Doxiciclina:** atípicos, riquetsioses, leptospirose, MRSA-AC (pele), DST, malária (profilaxia).
+## Dose
+Azitro 500 mg/d; doxi 100 mg 12/12h.
+> Perla: doxiciclina é uma boa opção VO para pneumonia atípica e pele quando se quer evitar quinolona.`}
+];
+
+/* ===================== COBERTURA (matriz espectro) ===================== */
+const COV_ALVOS=['MSSA','MRSA','Strepto','Enterococo','Entero (E.coli)','ESBL','Pseudomonas','Anaeróbio','Atípicos'];
+/* 2=sim, 1=parcial/variável, 0=não */
+const COV=[
+ ['Amoxicilina',1,0,2,2,0,0,0,1,0],
+ ['Amox-clavulanato',2,0,2,2,1,0,0,2,0],
+ ['Cefazolina/Cefalexina',2,0,2,0,1,0,0,0,0],
+ ['Ceftriaxona',1,0,2,0,2,0,0,0,0],
+ ['Ceftazidima',0,0,1,0,2,0,2,0,0],
+ ['Cefepime',1,0,2,0,2,1,2,0,0],
+ ['Pip-tazobactam',2,0,2,1,2,1,2,2,0],
+ ['Ertapenem',2,0,2,0,2,2,0,2,0],
+ ['Meropenem',2,0,2,1,2,2,2,2,0],
+ ['Ciprofloxacino',0,0,0,0,2,1,2,0,2],
+ ['Levo/Moxifloxacino',1,0,2,0,2,1,1,1,2],
+ ['Vancomicina',2,2,2,2,0,0,0,0,0],
+ ['Linezolida/Dapto',2,2,2,2,0,0,0,0,0],
+ ['Metronidazol',0,0,0,0,0,0,0,2,0],
+ ['SMX-TMP',1,1,1,0,2,1,0,0,0],
+ ['Azitro/Doxi',0,1,1,0,0,0,0,1,2]
+];
+
+/* ===================== TERAPIA DIRIGIDA ===================== */
+const DIRIGIDA=[
+ {g:'Staphylococcus aureus (MSSA)',atb:'Oxacilina ou cefazolina (superiores à vancomicina no MSSA). Pele VO: cefalexina.'},
+ {g:'Staphylococcus aureus (MRSA)',atb:'Vancomicina, daptomicina (não em pneumonia) ou linezolida. Pele/VO: SMX-TMP, doxiciclina, clindamicina.'},
+ {g:'Streptococcus / pneumococo',atb:'Penicilina/amoxicilina ou ceftriaxona. Meningite por pneumococo: ceftriaxona + vancomicina empírico.'},
+ {g:'Enterococcus faecalis',atb:'Ampicilina (1ª escolha) ou amoxicilina; alternativa vancomicina. Endocardite: associar ceftriaxona/gentamicina.'},
+ {g:'Enterococcus faecium / VRE',atb:'Linezolida ou daptomicina (VRE). Confirmar pelo antibiograma.'},
+ {g:'E. coli / Klebsiella sensível',atb:'Ceftriaxona, ciprofloxacino ou amox-clav conforme antibiograma; descalonar ao mais estreito.'},
+ {g:'Enterobactéria ESBL+',atb:'Carbapenêmico (meropenem; ertapenem se não-Pseudomonas). ITU não grave: opções dirigidas (pip-tazo/aminoglicosídeo/fosfomicina) por MIC.'},
+ {g:'AmpC (Enterobacter/Serratia/Citrobacter)',atb:'Cefepime ou carbapenêmico (evitar ceftriaxona mesmo se "sensível").'},
+ {g:'Enterobactéria KPC (ERC)',atb:'Ceftazidima-avibactam, meropenem-vaborbactam; polimixina/tigeciclina em combinação. Infecto/CCIH.'},
+ {g:'Pseudomonas aeruginosa',atb:'Pip-tazo, cefepime, ceftazidima, meropenem ou cipro conforme antibiograma; MDR: ceftolozano-tazobactam/ceftazidima-avibactam.'},
+ {g:'Acinetobacter baumannii',atb:'Ampicilina-sulbactam (dose alta), polimixina, carbapenêmico se sensível; muitas vezes combinação.'},
+ {g:'Anaeróbios (Bacteroides)',atb:'Metronidazol, amox-clav, pip-tazo ou carbapenêmico.'},
+ {g:'Atípicos (Mycoplasma/Legionella/Chlamydophila)',atb:'Azitromicina, doxiciclina ou fluoroquinolona respiratória.'}
+];
+
+/* ===================== IV→VO ===================== */
+const IVVO=[
+ {a:'Fluoroquinolonas (cipro, levo, moxi)',b:'Biodisp. ~100% — troca direta'},
+ {a:'Metronidazol',b:'Biodisp. ~100%'},
+ {a:'Linezolida',b:'Biodisp. ~100%'},
+ {a:'Sulfametoxazol-trimetoprim',b:'Excelente VO'},
+ {a:'Doxiciclina / Azitromicina',b:'Boa VO'},
+ {a:'Fluconazol',b:'Excelente VO (antifúngico)'},
+ {a:'Clindamicina',b:'Boa VO'},
+ {a:'Amoxicilina ± clavulanato',b:'Boa VO (passo após cefalosporina IV em muitos casos)'}
+];
+
+/* ===================== ESTADO / NAV ===================== */
+let busca='', curView='home';
+function whenMT(cb){if(window.MT){cb();}else{setTimeout(()=>whenMT(cb),30);}}
+whenMT(()=>{renderUser();if(window.MT&&MT.onData)MT.onData(()=>renderUser());routeHome();});
+function renderUser(){const el=document.getElementById('usr');if(!el)return;
+  if(MT.mode==='demo'){el.innerHTML='<span class="who">Modo demo</span><a href="index.html">← MedTech</a>';return;}
+  const u=MT.user;const nm=u?(u.displayName||u.email||'Conta'):'';
+  el.innerHTML=`<span class="who">${esc(nm)}</span><button onclick="MT.signOut()">Sair</button>`;}
+function onBusca(v){busca=v;if(curView==='home')renderHome();}
+function scroll0(){window.scrollTo(0,0);}
+function routeHome(){curView='home';renderHome();scroll0();}
+function itemById(id){return FOCOS.find(x=>x.id===id)||GUIA.find(x=>x.id===id);}
+function abrirItem(id){const e=itemById(id);if(!e)return;curView='item';renderItem(e);scroll0();}
+
+/* ===================== HOME ===================== */
+function renderHome(){
+  const q=busca.trim().toLowerCase();
+  const match=e=>!q||((e.nome+' '+(e.tags||'')+' '+(e.cat||'')).toLowerCase().includes(q));
+  let html=`<div class="note">💊 <b>Como usar:</b> abra <b>Empírico & escalonamento</b> para uma sugestão pelo foco/contexto, consulte os bancos de <b>bactérias, resistência e antibióticos</b>, ou pergunte ao <b>Assistente</b>. ${MT.mode==='demo'?'<b>Entre na conta MedTech para usar a IA.</b>':''}</div>`;
+  // destaques
+  html+=`<div class="grid">
+    <div class="card ai" onclick="abrirEmpirico()"><div class="ci">🧭</div><div class="cn">Empírico & escalonamento</div><div class="ct">Foco + contexto + ATB já usado → como iniciar ou escalonar</div></div>
+    <div class="card ai" onclick="abrirAssistente()"><div class="ci">✨</div><div class="cn">Assistente de antibióticos</div><div class="ct">Pergunte qualquer dúvida de antibioticoterapia</div></div>
+  </div>`;
+  // ferramentas
+  const tools=[
+    ['cobertura','🎯','Cobertura / espectro','Quem cobre MRSA, Pseudomonas, ESBL, anaeróbio…'],
+    ['dirigida','🔬','Terapia dirigida','Germe do antibiograma → opções (menor espectro)'],
+    ['renal','🧮','Ajuste renal','Clearance (Cockcroft-Gault) e o que ajustar'],
+    ['ivvo','🔁','Switch IV → VO','ATB com boa absorção oral + critérios']
+  ].filter(t=>!q||(t[2]+' '+t[3]).toLowerCase().includes(q));
+  if(tools.length){html+=`<div class="sec-title">Ferramentas</div><div class="grid">`+tools.map(t=>`<div class="card tool" onclick="abrir_${t[0]}()"><div class="ci">${t[1]}</div><div class="cn">${t[2]}</div><div class="ct">${t[3]}</div></div>`).join('')+`</div>`;}
+  // foco
+  const focos=FOCOS.filter(match);
+  if(focos.length){html+=`<div class="sec-title">Por foco de infecção</div><div class="grid">`+focos.map(e=>`<div class="card foco" onclick="abrirItem('${e.id}')"><div class="ci">${e.icon}</div><div class="cn">${esc(e.nome)}</div><div class="ct">${esc(e.tags)}</div></div>`).join('')+`</div>`;}
+  // guia por categoria
+  ORDEM_CAT.forEach(cat=>{
+    const list=GUIA.filter(e=>e.cat===cat&&match(e));if(!list.length)return;
+    html+=`<div class="sec-title">${esc(cat)}</div><div class="grid">`+list.map(e=>`<div class="card" onclick="abrirItem('${e.id}')"><div class="ci">${e.icon}</div><div class="cn">${esc(e.nome)}</div><div class="ct">${esc(e.tags)}</div></div>`).join('')+`</div>`;
+  });
+  if(q && !focos.length && !tools.length && !GUIA.some(match)){html+='<div class="empty">Nada encontrado para "'+esc(busca)+'". Tente o Assistente acima.</div>';}
+  document.getElementById('view').innerHTML=html;
+}
+
+/* ===================== ITEM (md) ===================== */
+function renderItem(e){
+  document.getElementById('view').innerHTML=`
+   <button class="back" onclick="routeHome()">← Voltar</button>
+   <div class="exam-head"><div class="ei">${e.icon}</div><div><h1>${esc(e.nome)}</h1><div class="tags">${esc(e.cat||'Foco de infecção')} · ${esc(e.tags||'')}</div></div></div>
+   <div class="content">${md(e.md)}</div>
+   <div class="panel" style="margin-top:18px"><h4>Aprofundar com IA</h4>
+     <button class="btn btn-ai" id="aprBtn" onclick="aprofundar('${e.id}')">✨ Casos, doses e detalhes com a IA</button>
+     <div id="aprOut"></div>
+   </div>
+   <div class="disc">Doses para adulto com função renal normal — confira ajuste renal, alergias, gestação e o antibiograma/protocolo local.</div>`;
+}
+
+/* ===================== EMPÍRICO ===================== */
+let empForm={foco:'pac',ctx:'comunitario',grav:'enfermaria',alergia:'nao'};
+function abrirEmpirico(){curView='emp';renderEmpirico();scroll0();}
+function renderEmpirico(){
+  const foco=FOCOS.find(f=>f.id===empForm.foco)||FOCOS[0];
+  const seg=(grp,val,label)=>`<button class="seg ${empForm[grp]===val?'on':''}" onclick="setEmp('${grp}','${val}')">${label}</button>`;
+  document.getElementById('view').innerHTML=`
+   <button class="back" onclick="routeHome()">← Voltar</button>
+   <div class="exam-head"><div class="ei">🧭</div><div><h1>Empírico & escalonamento</h1><div class="tags">Monte o contexto → guia curado + sugestão da IA</div></div></div>
+   <div class="formcard">
+     <div class="field"><label>Foco / sítio de infecção</label>
+       <select id="empFoco" onchange="setEmp('foco',this.value)">${FOCOS.map(f=>`<option value="${f.id}" ${f.id===empForm.foco?'selected':''}>${esc(f.nome)}</option>`).join('')}</select></div>
+     <div class="field"><label>Contexto</label><div class="segs">${seg('ctx','comunitario','🏠 Comunitário')}${seg('ctx','hospitalar','🏥 Hospitalar/nosocomial')}</div></div>
+     <div class="field"><label>Gravidade / local</label><div class="segs">${seg('grav','ambulatorial','Ambulatorial')}${seg('grav','enfermaria','Internado')}${seg('grav','uti','UTI / grave')}</div></div>
+     <div class="field"><label>Alergia a penicilina</label><div class="segs">${seg('alergia','nao','Não')}${seg('alergia','leve','Leve (rash)')}${seg('alergia','grave','Grave/anafilaxia')}</div></div>
+     <div class="field"><label>Fatores de risco para multirresistência</label>
+       <div class="checks">
+         <label><input type="checkbox" id="r_atb"> Uso de ATB nos últimos 90 dias</label>
+         <label><input type="checkbox" id="r_intern"> Internação/UTI recente ou atual prolongada</label>
+         <label><input type="checkbox" id="r_disp"> Dispositivo invasivo (cateter, sonda, VM)</label>
+         <label><input type="checkbox" id="r_col"> Colonização/infecção prévia por MDR (ESBL/KPC/MRSA/Pseudomonas)</label>
+         <label><input type="checkbox" id="r_imuno"> Imunossupressão / neutropenia</label>
+       </div></div>
+     <div class="field"><label>Antibióticos já em uso (para escalonar/trocar)</label>
+       <input type="text" id="empUsados" placeholder="ex.: ceftriaxona há 3 dias, sem melhora"></div>
+     <div class="field"><label>Dados extras (opcional)</label>
+       <input type="text" id="empExtra" placeholder="ex.: ClCr 35, gestante, peso 90 kg, cultura: E. coli ESBL"></div>
+     <button class="btn btn-ai" id="empBtn" onclick="sugerirEmpirico()">✨ Sugerir conduta</button>
+     <div id="empOut"></div>
+   </div>
+   <div class="sec-title">Guia curado — ${esc(foco.nome)}</div>
+   <div class="content" id="empCurado">${md(foco.md)}</div>
+   <div class="disc">Sugestão empírica e geral. Ajuste à função renal, alergias, gestação, ao antibiograma e ao protocolo/perfil de resistência local. Em sepse/choque, não atrase o ATB e colha culturas antes.</div>`;
+}
+function setEmp(k,v){empForm[k]=v;renderEmpirico();}
+async function sugerirEmpirico(){
+  const foco=FOCOS.find(f=>f.id===empForm.foco)||FOCOS[0];
+  const riscos=[];
+  if(document.getElementById('r_atb').checked)riscos.push('ATB nos últimos 90 dias');
+  if(document.getElementById('r_intern').checked)riscos.push('internação/UTI recente');
+  if(document.getElementById('r_disp').checked)riscos.push('dispositivo invasivo');
+  if(document.getElementById('r_col').checked)riscos.push('colonização/infecção prévia por MDR');
+  if(document.getElementById('r_imuno').checked)riscos.push('imunossupressão/neutropenia');
+  const usados=(document.getElementById('empUsados').value||'').trim();
+  const extra=(document.getElementById('empExtra').value||'').trim();
+  const ctxL={comunitario:'comunitário',hospitalar:'hospitalar/nosocomial'}[empForm.ctx];
+  const gravL={ambulatorial:'ambulatorial',enfermaria:'internado em enfermaria',uti:'UTI / grave'}[empForm.grav];
+  const algL={nao:'sem alergia a penicilina',leve:'alergia leve à penicilina (rash)',grave:'alergia GRAVE/anafilaxia à penicilina'}[empForm.alergia];
+  const b=document.getElementById('empBtn'),out=document.getElementById('empOut');
+  b.disabled=true;b.innerHTML='<span class="spin"></span> Gerando sugestão…';
+  try{
+    const prompt=SYS_ATB+`\n\nMonte uma SUGESTÃO de antibioticoterapia para o caso abaixo.\n`+
+      `- Foco/sítio: ${foco.nome}\n- Contexto: ${ctxL}\n- Gravidade/local: ${gravL}\n- Alergia: ${algL}\n`+
+      `- Fatores de risco para MDR: ${riscos.length?riscos.join('; '):'nenhum assinalado'}\n`+
+      (usados?`- ATB já em uso (avaliar ESCALONAR/trocar e por quê): ${usados}\n`:'- ATB já em uso: nenhum (esquema INICIAL)\n')+
+      (extra?`- Dados extras: ${extra}\n`:'')+
+      `\nResponda em markdown com: ## Esquema sugerido (1ª linha com DOSE/via), ## Alternativas (incluindo se houver alergia), ## ${usados?'Escalonamento/ajuste vs. o ATB atual':'Quando escalonar'}, ## Culturas a colher, ## Duração e descalonamento. Priorize o MENOR espectro eficaz. Lembre ajuste renal e antibiograma. Seja conciso e prático.`;
+    const txt=await callIA(prompt);
+    out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
+  }catch(err){out.innerHTML='<div class="ai-out" style="background:#fdecea;border-color:#f5c6c0;color:#7a241b">⚠️ '+esc(err.message||'Falha na IA')+'</div>';}
+  b.disabled=false;b.innerHTML='✨ Sugerir conduta';
+}
+
+/* ===================== COBERTURA ===================== */
+function abrir_cobertura(){curView='cob';renderCobertura();scroll0();}
+function cellCov(v){return v===2?'<span class="cy">✓</span>':v===1?'<span class="cp">±</span>':'<span class="cn">—</span>';}
+function renderCobertura(){
+  let rows=COV.map(r=>`<tr><td class="atb">${esc(r[0])}</td>`+COV_ALVOS.map((_,i)=>`<td>${cellCov(r[i+1])}</td>`).join('')+`</tr>`).join('');
+  document.getElementById('view').innerHTML=`
+   <button class="back" onclick="routeHome()">← Voltar</button>
+   <div class="exam-head"><div class="ei">🎯</div><div><h1>Cobertura / espectro</h1><div class="tags">Quem cobre o quê — visão rápida de espectro</div></div></div>
+   <div class="tbl-wrap"><table class="cov"><thead><tr><th class="atb" style="text-align:left">Antibiótico</th>${COV_ALVOS.map(a=>`<th>${esc(a)}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>
+   <div class="legend"><span class="cy">✓</span> cobre &nbsp; <span class="cp">±</span> parcial/variável (depende de antibiograma, dose ou cepa) &nbsp; <span class="cn">—</span> não cobre / não confiável</div>
+   <div class="disc">Mapa simplificado de espectro para decisão rápida — <b>não substitui o antibiograma</b>. "ESBL" e "Pseudomonas" dependem fortemente do perfil local. Para detalhes, abra cada antibiótico no banco.</div>`;
+}
+
+/* ===================== TERAPIA DIRIGIDA ===================== */
+function abrir_dirigida(){curView='dir';renderDirigida();scroll0();}
+function renderDirigida(){
+  const opts=DIRIGIDA.map((d,i)=>`<option value="${i}">${esc(d.g)}</option>`).join('');
+  document.getElementById('view').innerHTML=`
+   <button class="back" onclick="routeHome()">← Voltar</button>
+   <div class="exam-head"><div class="ei">🔬</div><div><h1>Terapia dirigida</h1><div class="tags">Germe isolado no antibiograma → opções dirigidas</div></div></div>
+   <div class="formcard">
+     <div class="field"><label>Germe isolado</label><select id="dirSel" onchange="renderDirAlvo()">${opts}</select></div>
+     <div id="dirAlvo"></div>
+     <button class="btn btn-ai" id="dirBtn" onclick="sugerirDirigida()" style="margin-top:6px">✨ Refinar com a IA (dose, duração, alergia)</button>
+     <div id="dirOut"></div>
+   </div>
+   <div class="disc">Princípio de stewardship: ao sair a cultura, <b>descalone</b> para o menor espectro eficaz contra o germe isolado.</div>`;
+  renderDirAlvo();
+}
+function renderDirAlvo(){
+  const i=+document.getElementById('dirSel').value;const d=DIRIGIDA[i];
+  document.getElementById('dirAlvo').innerHTML=`<div class="calc-out"><b>${esc(d.g)}</b><br>${esc(d.atb)}</div>`;
+}
+async function sugerirDirigida(){
+  const i=+document.getElementById('dirSel').value;const d=DIRIGIDA[i];
+  const b=document.getElementById('dirBtn'),out=document.getElementById('dirOut');
+  b.disabled=true;b.innerHTML='<span class="spin"></span> Gerando…';
+  try{
+    const prompt=SYS_ATB+`\n\nGerme isolado: ${d.g}. Dê a terapia DIRIGIDA preferencial (menor espectro eficaz) com DOSE e via, alternativas (inclusive para alergia a penicilina), e duração típica por foco. Mencione quando associar 2ª droga (ex.: endocardite). Conciso, markdown.`;
+    const txt=await callIA(prompt);out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
+  }catch(err){out.innerHTML='<div class="ai-out" style="background:#fdecea;border-color:#f5c6c0;color:#7a241b">⚠️ '+esc(err.message||'Falha na IA')+'</div>';}
+  b.disabled=false;b.innerHTML='✨ Refinar com a IA (dose, duração, alergia)';
+}
+
+/* ===================== AJUSTE RENAL ===================== */
+function abrir_renal(){curView='ren';renderRenal();scroll0();}
+function renderRenal(){
+  document.getElementById('view').innerHTML=`
+   <button class="back" onclick="routeHome()">← Voltar</button>
+   <div class="exam-head"><div class="ei">🧮</div><div><h1>Ajuste renal</h1><div class="tags">Clearance de creatinina (Cockcroft-Gault)</div></div></div>
+   <div class="formcard">
+     <div class="field"><label>Idade (anos)</label><input type="number" id="rIdade" inputmode="numeric" placeholder="ex.: 68"></div>
+     <div class="field"><label>Peso (kg)</label><input type="number" id="rPeso" inputmode="decimal" placeholder="ex.: 70"></div>
+     <div class="field"><label>Creatinina sérica (mg/dL)</label><input type="number" id="rCr" inputmode="decimal" step="0.01" placeholder="ex.: 1.4"></div>
+     <div class="field"><label>Sexo</label><div class="segs"><button class="seg on" id="sexoM" onclick="setSexo('M')">Homem</button><button class="seg" id="sexoF" onclick="setSexo('F')">Mulher</button></div></div>
+     <button class="btn btn-p" onclick="calcRenal()">Calcular clearance</button>
+     <div id="rOut"></div>
+   </div>
+   <div class="disc">Cockcroft-Gault estima o ClCr para ajuste de dose. Use peso ideal/ajustado em obesos; em lesão renal aguda a fórmula é imprecisa. Confira a bula/posologia de cada ATB para o ajuste exato.</div>`;
+}
+let rSexo='M';
+function setSexo(s){rSexo=s;document.getElementById('sexoM').classList.toggle('on',s==='M');document.getElementById('sexoF').classList.toggle('on',s==='F');}
+function calcRenal(){
+  const idade=+document.getElementById('rIdade').value,peso=+document.getElementById('rPeso').value,cr=+document.getElementById('rCr').value;
+  const out=document.getElementById('rOut');
+  if(!idade||!peso||!cr){out.innerHTML='<div class="calc-out" style="background:#fdecea;border-color:#f5c6c0;color:#7a241b">Preencha idade, peso e creatinina.</div>';return;}
+  let clcr=((140-idade)*peso)/(72*cr);if(rSexo==='F')clcr*=0.85;
+  clcr=Math.round(clcr);
+  let faixa,nota;
+  if(clcr>=50){faixa='≥ 50 mL/min — função preservada';nota='Em geral dose padrão para a maioria dos ATB.';}
+  else if(clcr>=30){faixa='30–49 mL/min — redução leve a moderada';nota='Ajustar: vancomicina, aminoglicosídeos, β-lactâmicos (intervalo), SMX-TMP, levofloxacino, fluconazol. Evitar nitrofurantoína se <30.';}
+  else if(clcr>=10){faixa='10–29 mL/min — redução importante';nota='Reduzir dose/intervalo da maioria dos ATB renais. Evitar nitrofurantoína. Cuidado redobrado com nefrotóxicos (aminoglicosídeo, polimixina, vancomicina).';}
+  else {faixa='< 10 mL/min / diálise';nota='Doses específicas e relação com a diálise (dar após HD para muitos ATB). Consultar farmácia/nefrologia.';}
+  out.innerHTML=`<div class="calc-out"><b>ClCr ≈ ${clcr} mL/min</b><br><b>${faixa}</b><br>${nota}<br><span style="font-size:12px;color:#557799">Doses exatas: abra o antibiótico no banco "Antibióticos".</span></div>`;
+}
+
+/* ===================== IV → VO ===================== */
+function abrir_ivvo(){curView='ivvo';renderIVVO();scroll0();}
+function renderIVVO(){
+  const rows=IVVO.map(x=>`<li><b>${esc(x.a)}</b> — ${esc(x.b)}</li>`).join('');
+  document.getElementById('view').innerHTML=`
+   <button class="back" onclick="routeHome()">← Voltar</button>
+   <div class="exam-head"><div class="ei">🔁</div><div><h1>Switch IV → VO</h1><div class="tags">Quando e com o quê trocar para via oral</div></div></div>
+   <div class="content">
+     <h2>Critérios para a troca</h2>
+     <ul>
+       <li>Melhora clínica e hemodinâmica; <b>afebril ~24–48h</b>.</li>
+       <li>Trato gastrointestinal funcionante e via oral confiável (deglute/absorve).</li>
+       <li>Foco que permite VO (evitar em endocardite, meningite, bacteremia por <i>S. aureus</i>, abscesso não drenado, neutropenia instável).</li>
+       <li>Existe opção oral com espectro/biodisponibilidade adequados (idealmente guiada por cultura).</li>
+     </ul>
+     <h2>ATB com excelente biodisponibilidade oral</h2>
+     <ul>${rows}</ul>
+     <div class="perla">💡 <b>Pérola:</b> a troca precoce IV→VO encurta internação, reduz risco de cateter e custo — reavalie diariamente quem ainda precisa de IV.</div>
+   </div>
+   <div class="disc">Confirme espectro pela cultura e ajuste a dose oral à função renal.</div>`;
+}
+
+/* ===================== IA ===================== */
+async function callIA(prompt){
+  if(!(window.MT&&MT.user))throw new Error('Entre na sua conta MedTech para usar a IA.');
+  return await MT.ai(prompt);
+}
+const SYS_ATB='Você é um médico infectologista brasileiro experiente, consultor de antibioticoterapia e stewardship. Responda de forma PRÁTICA, ACIONÁVEL e CONCISA, em português, markdown com seções "## " e bullets curtos. Em sugestões de esquema, dê opção de 1ª linha com DOSE/via, alternativas (inclusive para alergia a penicilina), quando colher culturas e critérios de descalonamento/duração. Priorize sempre o MENOR espectro eficaz (stewardship) e considere o perfil de resistência (ESBL, KPC, MRSA, Pseudomonas, AmpC). SEMPRE lembre de ajustar à função renal, checar alergias e seguir o antibiograma e o protocolo institucional local. NÃO invente doses nem referências — se houver incerteza, oriente confirmar na bula/protocolo. Sinalize red flags (sepse/choque: não atrasar ATB, colher culturas antes; meningite/neutropenia febril: emergência). Você é apoio à decisão, não substitui o julgamento clínico.';
+
+async function aprofundar(id){
+  const e=itemById(id);if(!e)return;
+  const b=document.getElementById('aprBtn'),out=document.getElementById('aprOut');
+  b.disabled=true;b.innerHTML='<span class="spin"></span> Gerando…';
+  try{
+    const prompt=SYS_ATB+`\n\nO médico está lendo o guia de "${e.nome}". Aprofunde com: pontos práticos avançados, doses (adulto, função renal normal) e ajustes, erros/armadilhas comuns, e 1–2 cenários clínicos curtos com a conduta esperada. Não repita o óbvio; agregue valor. Conciso.`;
+    const txt=await callIA(prompt);
+    out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
+  }catch(err){out.innerHTML='<div class="ai-out" style="background:#fdecea;border-color:#f5c6c0;color:#7a241b">⚠️ '+esc(err.message||'Falha na IA')+'</div>';}
+  b.disabled=false;b.innerHTML='✨ Casos, doses e detalhes com a IA';
+}
+
+let chat=[];
+function abrirAssistente(){curView='ai';chat=[];renderAssistente();scroll0();}
+function renderAssistente(){
+  const suggs=['Esquema empírico para PAC internado','Como tratar ITU por E. coli ESBL?','Quem cobre Pseudomonas?','Alérgico grave a penicilina com pneumonia, o que uso?','Duração de tratamento na pielonefrite','Como escalonar se ceftriaxona falhou na sepse abdominal?'];
+  let html=`<button class="back" onclick="routeHome()">← Voltar</button>
+   <div class="exam-head"><div class="ei">✨</div><div><h1>Assistente de antibióticos</h1><div class="tags">Empírico, escalonamento, espectro, doses, duração</div></div></div>`;
+  if(!chat.length){html+=`<div class="suggs">`+suggs.map(s=>`<button class="sugg" onclick="enviarSug(this)">${esc(s)}</button>`).join('')+`</div>`;}
+  html+=`<div class="chat" id="chat">`+chat.map(m=>`<div class="msg ${m.role==='user'?'u':'a'}"><div class="av">${m.role==='user'?'🧑‍⚕️':'💊'}</div><div class="bub">${m.role==='user'?'<p>'+esc(m.text).replace(/\n/g,'<br>')+'</p>':md(m.text)}</div></div>`).join('')+`</div>
+   <div class="ask"><textarea id="ask" rows="1" placeholder="Ex.: paciente com colangite e alergia a penicilina, qual esquema?" oninput="growAsk(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviar();}"></textarea><button onclick="enviar()" aria-label="Enviar">➤</button></div>
+   ${MT.mode==='demo'?'<div class="note" style="margin-top:12px">Entre na conta MedTech para usar a IA.</div>':''}
+   <div class="disc">Apoio à decisão — confira doses, ajuste renal, alergias e o antibiograma/protocolo local antes de prescrever.</div>`;
+  document.getElementById('view').innerHTML=html;
+  scrollChat();
+}
+function growAsk(t){t.style.height='auto';t.style.height=Math.min(130,t.scrollHeight)+'px';}
+function enviarSug(b){const t=document.getElementById('ask');if(t){t.value=b.textContent;enviar();}}
+function scrollChat(){const c=document.getElementById('chat');if(c&&c.lastElementChild)c.lastElementChild.scrollIntoView({behavior:'smooth',block:'end'});}
+async function enviar(){
+  const t=document.getElementById('ask');const q=(t.value||'').trim();if(!q)return;
+  chat.push({role:'user',text:q});renderAssistente();
+  const c=document.getElementById('chat');
+  const typ=document.createElement('div');typ.className='msg a';typ.innerHTML='<div class="av">💊</div><div class="bub"><span class="typing"><span></span><span></span><span></span></span></div>';c.appendChild(typ);typ.scrollIntoView({block:'end'});
+  try{
+    const hist=chat.slice(-8).map(m=>(m.role==='user'?'MÉDICO: ':'ATBGUIA: ')+m.text).join('\n\n');
+    const prompt=SYS_ATB+'\n\nConversa até aqui:\n'+hist+'\n\nResponda à última pergunta do médico de forma prática e objetiva.';
+    const txt=await callIA(prompt);
+    chat.push({role:'ai',text:txt});renderAssistente();
+  }catch(err){
+    typ.remove();
+    chat.push({role:'ai',text:'⚠️ '+(err.message||'Falha na IA. Tente novamente.')});renderAssistente();
+  }
+}
+</script>
+</body>
+</html>
