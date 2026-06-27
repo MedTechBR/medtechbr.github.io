@@ -8826,9 +8826,84 @@ function runProtocol(id) {
   setMode('protocolo');
   run(p.name);
 }
+// ============================================================
+//  CRITÉRIOS DIAGNÓSTICOS — anexados automaticamente às condutas
+// ============================================================
+const CRITERIOS = {
+ duke:{md:`### Critérios de Duke modificados (endocardite)
+**Diagnóstico:** 2 maiores; OU 1 maior + 3 menores; OU 5 menores.
+- **Maior 1 (microbiológico):** 2 hemoculturas + para germe típico (*S. viridans*, *S. gallolyticus/bovis*, grupo HACEK, *S. aureus*, enterococo comunitário) OU hemoculturas persistentemente positivas.
+- **Maior 2 (endocárdico):** ecocardiograma com vegetação, abscesso ou nova deiscência de prótese; OU nova regurgitação valvar.
+- **Menores:** predisposição (valvopatia/UDIV); febre ≥ 38 °C; fenômenos vasculares (êmbolos, Janeway, hemorragia conjuntival); fenômenos imunológicos (Osler, Roth, GN, fator reumatoide); microbiologia que não preenche maior.
+- **Pérola:** se ETT negativo e suspeita alta → **ecocardiograma transesofágico**.`},
+ atlanta:{md:`### Pancreatite aguda — Atlanta 2012
+- **Diagnóstico (≥ 2 de 3):** dor abdominal típica; lipase/amilase ≥ 3× LSN; imagem compatível (TC/RM/USG).
+- **Gravidade:** *Leve* (sem falência orgânica nem complicação) · *Moderada* (falência orgânica transitória < 48 h e/ou complicação local) · *Grave* (falência orgânica persistente > 48 h).`},
+ ranson:{md:`### Ranson (prognóstico na pancreatite)
+- **Na admissão:** idade > 55a; leucócitos > 16.000; glicose > 200; LDH > 350; AST > 250.
+- **Em 48 h:** queda do Ht > 10%; ↑ ureia (BUN > 5 mg/dL); cálcio < 8; PaO₂ < 60; déficit de base > 4; sequestro de líquido > 6 L.
+- **≥ 3 critérios = pancreatite grave.** Alternativa simples: **BISAP** (BUN > 25, alteração mental, SIRS, idade > 60, derrame pleural; ≥ 3 = alto risco).`},
+ sepsis3:{md:`### Sepse — Sepsis-3
+- **Sepse:** infecção suspeita/confirmada + disfunção orgânica (**↑ SOFA ≥ 2**).
+- **qSOFA (beira-leito, ≥ 2):** FR ≥ 22; PAS ≤ 100; alteração do estado mental (Glasgow < 15).
+- **Choque séptico:** sepse + vasopressor para PAM ≥ 65 **E** lactato > 2 mmol/L apesar de ressuscitação volêmica.
+- **Pérola:** qSOFA tem baixa sensibilidade — não use para excluir; valorize lactato e o foco.`},
+ curb65:{md:`### CURB-65 (gravidade da PAC)
+1 ponto cada: **C**onfusão · **U**reia > 50 mg/dL (BUN > 19) · **R** FR ≥ 30 · **B** PAS < 90 ou PAD ≤ 60 · idade **≥ 65**.
+- **0–1:** ambulatorial · **2:** considerar internação · **≥ 3:** internar (4–5 → avaliar UTI). CRB-65 (sem ureia) serve para a atenção primária.`},
+ wells_tep:{md:`### Wells (probabilidade de TEP)
+Sinais/sintomas de TVP **3** · TEP é o dx mais provável **3** · FC > 100 **1,5** · imobilização/cirurgia recente **1,5** · TEP/TVP prévia **1,5** · hemoptise **1** · câncer **1**.
+- **≤ 4 improvável** → D-dímero (negativo exclui; use corte **idade-ajustado** = idade × 10 se > 50a) · **> 4 provável** → angioTC.`},
+ wells_tvp:{md:`### Wells (probabilidade de TVP)
+Câncer ativo **1** · paralisia/imobilização do membro **1** · acamado > 3 d ou cirurgia < 12 sem **1** · dor no trajeto venoso **1** · edema de todo o membro **1** · panturrilha > 3 cm vs contralateral **1** · edema depressível **1** · colaterais superficiais **1** · TVP prévia **1** · **diagnóstico alternativo igualmente provável −2**.
+- **< 2 improvável** → D-dímero · **≥ 2 provável** → USG doppler com compressão.`},
+ light:{md:`### Critérios de Light (exsudato × transudato)
+**Exsudato se ≥ 1:** proteína pleural/sérica > 0,5; LDH pleural/sérica > 0,6; LDH pleural > 2/3 do LSN sérico.
+- Nenhum = **transudato** (IC, cirrose, síndrome nefrótica). Light pode rotular transudato como exsudato em uso de diurético → confirme com **gradiente de albumina soro-pleural > 1,2 g/dL = transudato**.`},
+ berlin:{md:`### SDRA — Definição de Berlim
+1. Início ≤ 1 semana de um insulto; 2. infiltrados bilaterais não explicados por derrame/colapso/nódulo; 3. edema não explicado por IC/sobrecarga (eco se necessário); 4. **PaO₂/FiO₂ com PEEP ≥ 5:** Leve 200–300 · Moderada 100–200 · Grave ≤ 100.`},
+ child_pugh:{md:`### Child-Pugh (gravidade da cirrose)
+Pontos 1/2/3 — **Bilirrubina** < 2 / 2–3 / > 3 · **Albumina** > 3,5 / 2,8–3,5 / < 2,8 · **INR** < 1,7 / 1,7–2,3 / > 2,3 · **Ascite** ausente / leve / moderada-grave · **Encefalopatia** ausente / grau I-II / III-IV.
+- **A** 5–6 · **B** 7–9 · **C** 10–15 (pior sobrevida).`},
+ meld:{md:`### MELD / MELD-Na
+Calculado com **bilirrubina, INR e creatinina** (MELD-Na inclui o sódio). Estima mortalidade em 90 dias e prioriza a fila de transplante; quanto maior, pior. (Cálculo na CalcMed.)`},
+ acr_eular_gota:{md:`### Gota — ACR/EULAR 2015
+- **Padrão-ouro:** cristais de **urato monossódico** (negativamente birrefringentes) no líquido sinovial/tofo.
+- Critério de classificação (entrada: ≥ 1 surto de artrite/bursite): pontua sítio (1ª MTF/tornozelo/médio-pé), características do surto, **urato sérico** (> 6 mg/dL soma; < 4 subtrai) e imagem (US "sinal do duplo contorno"/DECT). **≥ 8 pontos** classifica.`},
+ dengue_alarme:{md:`### Dengue — sinais de alarme e gravidade (OMS)
+- **Sinais de alarme:** dor abdominal intensa/contínua; vômitos persistentes; acúmulo de líquidos (ascite/derrame); sangramento de mucosa; letargia/irritabilidade; hepatomegalia > 2 cm; **↑ hematócrito com queda rápida das plaquetas**.
+- **Dengue grave:** extravasamento plasmático com choque/desconforto respiratório; sangramento grave; disfunção orgânica (AST/ALT ≥ 1000, SNC, coração).`},
+ trombolise:{md:`### AVC isquêmico — critérios de trombólise/trombectomia
+- **Janela:** alteplase/tenecteplase ≤ **4,5 h** do início (ou *mismatch* por imagem em casos selecionados); déficit incapacitante + TC sem hemorragia.
+- **Exclusões principais:** hemorragia na TC; PA > 185/110 não controlável; glicemia < 50; plaquetas < 100 mil; INR > 1,7 / DOAC recente; AVC ou TCE grave < 3 meses; cirurgia de grande porte recente; sangramento ativo.
+- **Trombectomia mecânica:** oclusão de grande vaso até 6 h (até 24 h se *mismatch* favorável).`},
+ blatchford:{md:`### Glasgow-Blatchford (risco na HDA)
+Pontua ureia, hemoglobina, PAS, FC ≥ 100, melena, síncope, hepatopatia e IC.
+- **Escore 0 (alguns usam ≤ 1) = baixo risco** → alta com EDA ambulatorial. Quanto maior, maior a chance de necessitar transfusão/intervenção. (Rockall pós-EDA estima mortalidade.)`},
+ tokyo:{md:`### Colangite aguda — Tokyo Guidelines (TG18)
+- **A. Inflamação sistêmica:** febre/calafrio OU PCR/leucócitos alterados. **B. Colestase:** icterícia OU PFH alteradas. **C. Imagem:** dilatação biliar OU causa (cálculo/estenose).
+- **Suspeita:** 1 de A + (B ou C). **Definida:** 1 de A + 1 de B + 1 de C.
+- **Gravidade:** *Grave (III)* = disfunção orgânica; *Moderada (II)* ≥ 2 de (leuco > 12/< 4, febre ≥ 39, idade ≥ 75, bili ≥ 5, hipoalbuminemia); *Leve (I)* sem esses.`},
+ acr_eular_les:{md:`### LES — EULAR/ACR 2019
+- **Critério de entrada (obrigatório):** FAN ≥ 1:80.
+- Depois soma de **domínios ponderados** (clínicos e imunológicos; conta-se só o item de maior peso em cada domínio, e apenas se não houver causa mais provável). **≥ 10 pontos** classifica (ex.: nefrite lúpica classe III/IV vale 10).`}
+};
+const CRIT_MAP = {
+ endocardite:['duke'], pancreatite:['atlanta','ranson'], sepse:['sepsis3'], pac:['curb65'],
+ tep:['wells_tep'], tep_gestante:['wells_tep'], tvp:['wells_tvp'], derrame:['light'],
+ sdra:['berlin'], cirrose_inicial:['child_pugh','meld'], gota:['acr_eular_gota'],
+ dengue:['dengue_alarme'], avc_isq:['trombolise'], hda_naovar:['blatchford'], hda_var:['blatchford'],
+ colangite:['tokyo'], lupus_grave:['acr_eular_les']
+};
+function criteriosFor(id){
+  const ks = CRIT_MAP[id]; if (!ks || !ks.length) return '';
+  const blocks = ks.map(k => CRITERIOS[k] && CRITERIOS[k].md).filter(Boolean).join('\n\n');
+  return blocks ? ('\n\n## 📋 Critérios diagnósticos\n' + blocks) : '';
+}
+
 function showOfflineProtocol(p) {
   const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  const item = { id, mode: 'protocolo', offline: true, query: p.name, text: OFFLINE[p.id], sources: [], ctx: 'adulto', cenario: 'emergencia', ctxLabel: 'Banco MedTech', cenarioLabel: 'Offline', date: new Date().toISOString(), starred: false, protocolMeta: p };
+  const item = { id, mode: 'protocolo', offline: true, query: p.name, text: OFFLINE[p.id] + criteriosFor(p.id), sources: [], ctx: 'adulto', cenario: 'emergencia', ctxLabel: 'Banco MedTech', cenarioLabel: 'Offline', date: new Date().toISOString(), starred: false, protocolMeta: p };
   history.unshift(item); currentId = id; currentConversation = null; currentProtocol = null;
   saveHistory(); renderSide();
   showView('result');
