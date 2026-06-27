@@ -550,9 +550,11 @@ const PARAM_PROMPT='Você recebe FOTO(S) manuscritas: uma folha de CONTROLE HEMO
  +'REGRAS: (0) A folha hemodinâmica costuma ter, ABAIXO dos valores, uma GRADE DE ESCORE (MEWS/alerta precoce) com números 0, 1, 2 e 3 nas células — IGNORE completamente esses escores; use SEMPRE os valores REAIS medidos. '
  +'(1) PA = curva sistólica × diastólica (ex.: PA 100-136 X 60-80). A pressão aparece como pares na linha "PRESSÃO ARTERIAL" do topo (ex.: 136/75, 130X80, 100X60); use a MENOR e a MAIOR sistólica e a MENOR e a MAIOR diastólica do dia. NUNCA inclua PAM. '
  +'(2) DX = glicemia/HGT: valores em ordem de horário separados por "-" sem espaços (ex.: DX 135-192-84-104 MG/DL) — o hífen é separador de horário, NÃO faixa; pule horários sem medida; se uma só medida, registre só ela; se não houver nenhuma, escreva DX NÃO AFERIDA (sem unidade). '
- +'(3) DIURESE e BH vêm da folha de controle hídrico: use os TOTAIS DO DIA (24h) — DIURESE = total de diurese do dia; BH = TOTAL BALANÇO do dia (com sinal + ou −). IGNORE os subtotais parciais (linhas "TP"/total parcial) de cada período. Se a folha não vier ou não houver registro, escreva DIURESE NÃO AFERIDA e/ou BH NÃO AFERIDO. '
- +'(4) DÉBITO DE DRENO: só se houver coluna de dreno preenchida na folha de balanço, acrescente "// DEBITO DE DRENO [valor] ML"; se não houver, omita. '
- +'(5) Se algum sinal não estiver nas fotos, omita esse campo (não invente). Responda só a linha.';
+ +'(3) FOLHA DE CONTROLE HÍDRICO: ela tem CABEÇALHOS/TÍTULOS escritos EM CIMA de cada coluna ou bloco dizendo o que é cada coisa — GANHOS/ENTRADAS (soro/SF, hidratação, dieta, água, medicações diluídas) e SAÍDAS/PERDAS (DIURESE, DIÁLISE ou ultrafiltração/UF, DRENOS). LEIA esses cabeçalhos e CLASSIFIQUE cada coluna por eles. NÃO confunda GANHOS (entradas) com DIURESE (saída urinária): diurese é SOMENTE a coluna rotulada como diurese. '
+ +'(4) DIURESE = total do dia (24h) somando APENAS a coluna de diurese. '
+ +'(5) BALANÇO HÍDRICO (BH): CALCULE você mesmo (NÃO copie um total que pode estar errado). BH = (SOMA de TODOS os GANHOS/entradas do dia) − (DIURESE + DIÁLISE/UF + DRENOS + outras perdas). Some todas as entradas, some todas as saídas e subtraia; informe BH com sinal (+ positivo, − negativo). Use os TOTAIS do dia; ignore subtotais parciais ("TP"/total parcial). Se não houver folha hídrica, escreva DIURESE NÃO AFERIDA e BH NÃO AFERIDO. '
+ +'(6) DRENOS: se houver coluna de dreno preenchida, acrescente "// DEBITO DE DRENO [valor] ML" e INCLUA esse valor nas perdas do cálculo do BH; se não houver, omita. '
+ +'(7) Se algum sinal não estiver nas fotos, omita esse campo (não invente). Responda só a linha.';
 async function transcreverParams(){
   if(!visitaImgs.length){alert('Anexe ao menos uma foto dos parâmetros.');return;}
   const b=document.getElementById('transBtn');b.innerHTML='<span class="spin"></span> Transcrevendo...';b.disabled=true;
