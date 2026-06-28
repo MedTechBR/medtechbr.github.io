@@ -133,7 +133,7 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
     </div>
     <div class="usr" id="usr"></div>
   </div>
-  <div class="wrap"><div class="search-wrap"><span class="ic">🔍</span><input id="busca" placeholder="Buscar região/exame: pulmão, FAST, aorta, TVP, acesso..." oninput="onBusca(this.value)" autocomplete="off"></div></div>
+  <div class="wrap"><div class="search-wrap"><span class="ic"><i class="ti ti-search"></i></span><input id="busca" placeholder="Buscar região/exame: pulmão, FAST, aorta, TVP, acesso..." oninput="onBusca(this.value)" autocomplete="off"></div></div>
 </header>
 
 <main id="view"></main>
@@ -172,7 +172,7 @@ function svgOlho(){return `<svg viewBox="0 0 100 70" class="pocus-svg" role="img
  </svg>`;}
 
 const EXAMES=[
-{id:'pulmao',icon:'🫁',cat:'Tórax',nome:'Pulmão (US pulmonar)',tags:'dispneia, B-lines, pneumotórax, derrame, congestão, BLUE',
+{id:'pulmao',icon:'<i class="ti ti-lungs"></i>',cat:'Tórax',nome:'Pulmão (US pulmonar)',tags:'dispneia, B-lines, pneumotórax, derrame, congestão, BLUE',
  diag:corpo([{x:42,y:40,n:1},{x:58,y:40,n:1},{x:42,y:58,n:2},{x:58,y:58,n:2},{x:34,y:74,n:3},{x:66,y:74,n:3}]),
  leg:'<b>1</b> BLUE superior (2º EIC) · <b>2</b> BLUE inferior · <b>3</b> PLAPS (linha axilar post., base). Avalie os 2 hemitórax.',
  md:`## Indicações
@@ -197,7 +197,7 @@ Sonda **longitudinal**, perpendicular às costelas → **"sinal do morcego"** (2
 - **Consolidação**: parênquima "hepatizado", broncogramas aéreos dinâmicos.
 > Perla: EAP cardiogênico = B-lines **bilaterais e simétricas** + VCI cheia; pneumonia tende a ser **focal** com broncogramas.
 > Alarme: pneumotórax hipertensivo é diagnóstico clínico — não atrase a descompressão para fazer US.`},
-{id:'focus',icon:'❤️',cat:'Cardíaco',nome:'FoCUS (eco focado)',tags:'parada, choque, derrame, tamponamento, FE, VD, cardíaco',
+{id:'focus',icon:'<i class="ti ti-heart"></i>',cat:'Cardíaco',nome:'FoCUS (eco focado)',tags:'parada, choque, derrame, tamponamento, FE, VD, cardíaco',
  diag:corpo([{x:46,y:46,n:1},{x:46,y:50,n:2},{x:60,y:62,n:3},{x:50,y:74,n:4}]),
  leg:'<b>1</b> Paraesternal eixo longo · <b>2</b> Paraesternal eixo curto · <b>3</b> Apical 4 câmaras · <b>4</b> Subcostal (4C + VCI).',
  md:`## Indicações
@@ -219,7 +219,7 @@ Contratilidade simétrica e vigorosa, VE > VD (relação ~0,6), válvulas móvei
 - **Hipovolemia**: cavidades pequenas, VE "beijando" (kissing walls), VCI colabada.
 > Perla: na parada, faça o subcostal em **<10 s** durante a checagem de pulso (não atrase compressões). Atividade organizada na tela com pulso ausente = AESP "real".
 > Alarme: FoCUS estima função/derrame — não é ecocardiograma formal (não medir valvopatia/gradiente).`},
-{id:'efast',icon:'🩸',cat:'Abdome',nome:'eFAST (trauma)',tags:'trauma, líquido livre, hemoperitônio, pneumotórax, FAST',
+{id:'efast',icon:'<i class="ti ti-droplet"></i>',cat:'Abdome',nome:'eFAST (trauma)',tags:'trauma, líquido livre, hemoperitônio, pneumotórax, FAST',
  diag:corpo([{x:64,y:60,n:1},{x:36,y:58,n:2},{x:50,y:82,n:3},{x:50,y:48,n:4},{x:42,y:38,n:5},{x:58,y:38,n:5}]),
  leg:'<b>1</b> QSD/Morrison · <b>2</b> QSE/esplenorrenal · <b>3</b> Pelve (suprapúbico) · <b>4</b> Subxifoide (pericárdio) · <b>5</b> Ápices anteriores (pneumotórax).',
  md:`## Indicações
@@ -241,7 +241,7 @@ Sem coleção anecoica nas goteiras, pericárdio seco, **lung sliding** presente
 - **Pneumotórax**: ausência de sliding + lung point.
 > Perla: FAST **negativo não exclui** lesão — repita seriadamente; em instável + FAST positivo → laparotomia. Mínimo detectável ~200 mL.
 > Alarme: gordura perirrenal e o próprio rim podem simular líquido — siga a coleção pela goteira.`},
-{id:'aorta',icon:'🩻',cat:'Abdome',nome:'Aorta / AAA',tags:'aneurisma, aorta, dor abdominal, lombar, síncope',
+{id:'aorta',icon:'<i class="ti ti-scan"></i>',cat:'Abdome',nome:'Aorta / AAA',tags:'aneurisma, aorta, dor abdominal, lombar, síncope',
  diag:corpo([{x:50,y:50,n:1},{x:50,y:62,n:2},{x:50,y:74,n:3}]),
  leg:'Varra do <b>1</b> epigástrio (subdiafragmático) até a <b>3</b> bifurcação (umbigo), medindo o maior diâmetro AP (parede a parede).',
  md:`## Indicações
@@ -262,7 +262,7 @@ Aorta abdominal **< 3 cm**, afilando distalmente.
 - US **não exclui ruptura/dissecção** — instável + AAA = cirurgia.
 > Perla: meça sempre **parede a parede** (medir só o lúmen subestima por causa do trombo).
 > Alarme: ruptura é frequentemente **retroperitoneal** (FAST pode ser negativo). AAA + dor + hipotensão = emergência cirúrgica, não peça TC se instável.`},
-{id:'vci',icon:'💧',cat:'Cardíaco',nome:'VCI / volemia',tags:'volemia, fluido-responsividade, choque, congestão, IVC',
+{id:'vci',icon:'<i class="ti ti-wave-sine"></i>',cat:'Cardíaco',nome:'VCI / volemia',tags:'volemia, fluido-responsividade, choque, congestão, IVC',
  diag:corpo([{x:50,y:72,n:1}]),
  leg:'<b>1</b> Subxifoide longitudinal: VCI entrando no átrio direito, medida ~2 cm da junção/veias hepáticas.',
  md:`## Indicações
@@ -279,7 +279,7 @@ Identifique a VCI desembocando no **átrio direito**; meça o diâmetro **~2 cm*
 VCI pletórica fixa = congestão / tamponamento / TEP / disfunção de VD. VCI virtual = hipovolemia grave.
 > Perla: VCI é **uma peça** do quebra-cabeça — combine com FoCUS, pulmão (B-lines) e clínica. Não decida volume só pela VCI.
 > Alarme: VM, PEEP alta, valsalva e VD insuficiente distorcem a leitura.`},
-{id:'tvp',icon:'🦵',cat:'Vascular',nome:'TVP (compressão)',tags:'trombose, TVP, edema unilateral, perna, compressão',
+{id:'tvp',icon:'<i class="ti ti-walk"></i>',cat:'Vascular',nome:'TVP (compressão)',tags:'trombose, TVP, edema unilateral, perna, compressão',
  diag:svgPerna(),
  leg:'<b>1</b> Femoral comum (virilha, até a safena/bifurcação) · <b>2</b> Poplítea (fossa poplítea). Comprima a cada 1–2 cm.',
  md:`## Indicações
@@ -299,7 +299,7 @@ Veia **totalmente compressível** (paredes se tocam), sem material ecogênico no
 Protocolo de 2 pontos **não avalia veias da panturrilha nem ilíacas**; se alta suspeita e exame negativo, repetir em 5–7 dias ou ampliar.
 > Perla: sempre compare com o lado contralateral. Linfonodo/cisto de Baker podem simular.
 > Alarme: TVP iliofemoral extensa (phlegmasia) é emergência vascular.`},
-{id:'renal',icon:'🫘',cat:'Abdome',nome:'Rim / Bexiga',tags:'hidronefrose, retenção, cólica renal, anúria, volume vesical, bexiga',
+{id:'renal',icon:'<i class="ti ti-flask"></i>',cat:'Abdome',nome:'Rim / Bexiga',tags:'hidronefrose, retenção, cólica renal, anúria, volume vesical, bexiga',
  diag:corpo([{x:66,y:56,n:1},{x:34,y:56,n:1},{x:50,y:88,n:2}]),
  leg:'<b>1</b> Rins (flancos, linha axilar post.) · <b>2</b> Bexiga (suprapúbico, transversal e longitudinal).',
  md:`## Indicações
@@ -319,7 +319,7 @@ Rim com córtex hipoecoico e seio central ecogênico **sem dilatação**. Bexiga
 Hidronefrose bilateral / em rim único + LRA = obstrução pós-renal → desobstruir. Pós-miccional elevado (>100–150 mL) sugere retenção/esvaziamento incompleto.
 > Perla: bexiga muito cheia pode causar hidronefrose "fisiológica" — reavalie após esvaziar.
 > Alarme: pielonefrite obstruída/pionefrose é emergência (drenagem).`},
-{id:'biliar',icon:'🫧',cat:'Abdome',nome:'Vesícula / vias biliares',tags:'colelitíase, colecistite, murphy ecográfico, dor em HD, colédoco, biliar',
+{id:'biliar',icon:'<i class="ti ti-droplet-half-2"></i>',cat:'Abdome',nome:'Vesícula / vias biliares',tags:'colelitíase, colecistite, murphy ecográfico, dor em HD, colédoco, biliar',
  diag:corpo([{x:62,y:52,n:1}]),
  leg:'<b>1</b> Hipocôndrio direito (subcostal, linha hemiclavicular) — varra a vesícula no eixo longo e curto, com inspiração profunda.',
  md:`## Indicações
@@ -338,7 +338,7 @@ Vesícula anecoica, **parede < 3 mm**, sem cálculos; colédoco **< 6–7 mm** (
 - **Dilatação biliar**: colédoco **> 6–7 mm** sugere obstrução.
 > Perla: o **Murphy ecográfico** (dor máxima com a sonda sobre a vesícula vista na tela) é mais específico que o Murphy clássico.
 > Alarme: colangite/colecistite com instabilidade = emergência (ATB + drenagem/cirurgia).`},
-{id:'acesso',icon:'💉',cat:'Procedimentos',nome:'Acesso venoso guiado',tags:'punção, acesso central, jugular, periférico difícil, procedimento',
+{id:'acesso',icon:'<i class="ti ti-vaccine"></i>',cat:'Procedimentos',nome:'Acesso venoso guiado',tags:'punção, acesso central, jugular, periférico difícil, procedimento',
  diag:corpo([{x:42,y:30,n:1},{x:30,y:40,n:2}]),
  leg:'<b>1</b> Jugular interna (lateral à carótida) · <b>2</b> Veias do braço (basílica/braquial) p/ acesso periférico difícil.',
  md:`## Indicações
@@ -357,7 +357,7 @@ Acesso venoso central (jugular interna, femoral) e **acesso periférico difícil
 - Confirme o fio-guia **dentro da veia** (eixo longo) antes de dilatar.
 > Perla: confirme sempre a **ponta** da agulha (não o corpo) — "ver a veia entortar" ajuda. Posição/Trendelenburg distende a jugular.
 > Alarme: punção arterial, pneumotórax (ápice), e nunca dilatar sem certeza de estar na veia.`},
-{id:'ocular',icon:'👁️',cat:'Outros',nome:'Ocular / nervo óptico',tags:'PIC, papiledema, descolamento de retina, hemorragia vítrea, olho',
+{id:'ocular',icon:'<i class="ti ti-eye"></i>',cat:'Outros',nome:'Ocular / nervo óptico',tags:'PIC, papiledema, descolamento de retina, hemorragia vítrea, olho',
  diag:svgOlho(),
  leg:'Sonda linear transversal sobre a pálpebra fechada, com gel abundante. Bainha do nervo óptico medida a 3 mm atrás do globo.',
  md:`## Indicações
@@ -376,7 +376,7 @@ Pálpebra **fechada**, **muito gel**, apoio leve da mão na face (sem pressão s
 - **Luxação do cristalino**.
 > Perla: avalie os **dois olhos** e compare; ONSD varia — use junto da clínica/TC.
 > Alarme: suspeita de **ruptura do globo** = NÃO fazer US (não comprimir). Encaminhar.`},
-{id:'blue',icon:'🔵',cat:'Protocolos',nome:'Protocolo BLUE (insuf. respiratória)',tags:'dispneia, insuficiência respiratória aguda, lung sliding, perfil A, perfil B, PLAPS, lung point, EAP, TEP, pneumonia, pneumotórax, BLUE',
+{id:'blue',icon:'<i class="ti ti-circle"></i>',cat:'Protocolos',nome:'Protocolo BLUE (insuf. respiratória)',tags:'dispneia, insuficiência respiratória aguda, lung sliding, perfil A, perfil B, PLAPS, lung point, EAP, TEP, pneumonia, pneumotórax, BLUE',
  diag:corpo([{x:42,y:42,n:1},{x:58,y:42,n:1},{x:42,y:58,n:2},{x:58,y:58,n:2},{x:32,y:74,n:3},{x:68,y:74,n:3}]),
  leg:'<b>1</b> BLUE superior (~2º EIC) · <b>2</b> BLUE inferior · <b>3</b> PLAPS (linha axilar post., base). Avalie os <b>dois</b> hemitórax.',
  flow:`<style>
@@ -454,7 +454,7 @@ O **protocolo BLUE** (Bedside Lung Ultrasound in Emergency) é um algoritmo de U
 > Alarme: **pneumotórax hipertensivo** é diagnóstico clínico — descomprima já, não espere o US. E ausência de sliding **não** é sinônimo de pneumotórax (vários diferenciais).
 ## Referência
 Lichtenstein DA, Mezière GA. *Relevance of Lung Ultrasound in the Diagnosis of Acute Respiratory Failure: The BLUE Protocol.* Chest 2008;134(1):117–125.`},
-{id:'rush',icon:'⚡',cat:'Protocolos',nome:'RUSH (choque indiferenciado)',tags:'choque, hipotensão, protocolo, bomba tanque tubos',
+{id:'rush',icon:'<i class="ti ti-bolt"></i>',cat:'Protocolos',nome:'RUSH (choque indiferenciado)',tags:'choque, hipotensão, protocolo, bomba tanque tubos',
  diag:corpo([{x:50,y:48,n:1},{x:64,y:60,n:2},{x:36,y:58,n:2},{x:50,y:82,n:2},{x:42,y:40,n:3},{x:58,y:40,n:3},{x:50,y:66,n:4}]),
  leg:'"Bomba–Tanque–Tubos": <b>1</b> coração · <b>2</b> abdome/pelve (tanque "vazando") · <b>3</b> pulmão · <b>4</b> VCI/aorta.',
  md:`## O que é
@@ -473,7 +473,7 @@ FoCUS: **derrame/tamponamento?** contratilidade (boa/ruim)? **VD dilatado** (TEP
 - **Distributivo/séptico**: coração híper ou hipodinâmico, VCI variável, sem líquido livre → buscar foco.
 > Perla: faça rápido e **integre os 3 compartimentos** — o padrão aponta a causa e guia a ressuscitação.
 > Alarme: achado de US não substitui reavaliação clínica seriada.`},
-{id:'pcr',icon:'🫀',cat:'Protocolos',nome:'USG na PCR (parada)',tags:'parada, PCR, AESP, causas reversíveis, subcostal, FoCUS',
+{id:'pcr',icon:'<i class="ti ti-activity"></i>',cat:'Protocolos',nome:'USG na PCR (parada)',tags:'parada, PCR, AESP, causas reversíveis, subcostal, FoCUS',
  diag:corpo([{x:50,y:62,n:1},{x:42,y:40,n:2},{x:58,y:40,n:2},{x:64,y:60,n:3}]),
  leg:'<b>1</b> Subcostal (4 câmaras + VCI) — janela principal na parada · <b>2</b> Pulmões (pneumotórax/B-lines) · <b>3</b> FAST/abdome (hipovolemia/sangramento).',
  md:`## Objetivo
@@ -499,7 +499,7 @@ Setorial (cardíaco). **Subcostal** é a janela de escolha (não interfere nas c
 Combine com **pulmão** (pneumotórax), **FAST** (hemorragia) e **VCI/aorta** (hipovolemia, AAA roto).
 > Perla: grave um **clipe** no subcostal e interprete com o tórax já sendo comprimido — assim o US nunca prolonga a pausa.
 > Alarme: ausência de atividade ao US é UM dado entre vários — a decisão de terminar a reanimação é clínica e multifatorial.`},
-{id:'principios',icon:'📐',cat:'Fundamentos',nome:'Princípios físicos & artefatos',tags:'física, frequência, resolução, modos, doppler, artefatos, fundamentos',
+{id:'principios',icon:'<i class="ti ti-ruler-2"></i>',cat:'Fundamentos',nome:'Princípios físicos & artefatos',tags:'física, frequência, resolução, modos, doppler, artefatos, fundamentos',
  md:`## Como a imagem se forma
 O transdutor emite ultrassom e "escuta" os ecos que voltam das interfaces dos tecidos. Quanto maior a diferença de impedância entre dois meios, mais branca (hiperecoica) a interface.
 ## Frequência × profundidade (o trade-off central)
@@ -521,7 +521,7 @@ O transdutor emite ultrassom e "escuta" os ecos que voltam das interfaces dos te
 - **Anisotropia**: tendão/nervo "somem" se a sonda não está perpendicular — incline a sonda.
 > Perla: na dúvida entre lesão e artefato, **mude o ângulo/janela** — o artefato muda ou some; a estrutura real persiste.
 > Alarme: POCUS é operador-dependente e focado — confirme achados duvidosos com exame formal.`},
-{id:'knobology',icon:'🎛️',cat:'Fundamentos',nome:'Knobology (manuseio do aparelho)',tags:'preset, ganho, profundidade, foco, doppler, congelar, higiene, fundamentos',
+{id:'knobology',icon:'<i class="ti ti-adjustments"></i>',cat:'Fundamentos',nome:'Knobology (manuseio do aparelho)',tags:'preset, ganho, profundidade, foco, doppler, congelar, higiene, fundamentos',
  md:`## Fluxo básico (do ligar ao salvar)
 1) Ligar e inserir dados (se for documentar). 2) Escolher **sonda** e **preset**. 3) Ajustar **profundidade** e **ganho**. 4) Otimizar **foco/frequência**. 5) **Congelar**, medir e salvar.
 ## Escolha da sonda
@@ -647,7 +647,7 @@ function renderHome(){
   const q=busca.trim().toLowerCase();
   const filt=EXAMES.filter(e=>!q||(e.nome+' '+e.tags+' '+e.cat).toLowerCase().includes(q));
   let html=`<div class="note">🔎 <b>Como usar:</b> escolha a região/exame para um guia prático — <b>sonda, posição, cortes, técnica e achados</b> — ou use o <b>Assistente POCUS</b> para perguntar qualquer coisa. ${MT.mode==='demo'?'<b>Entre na conta MedTech para a IA.</b>':''}</div>`;
-  html+=`<div class="grid"><div class="card ai" onclick="abrirAssistente()"><div class="ci">✨</div><div class="cn">Assistente POCUS</div><div class="ct">Pergunte como avaliar qualquer região, dúvidas de técnica, achados…</div></div></div>`;
+  html+=`<div class="grid"><div class="card ai" onclick="abrirAssistente()"><div class="ci"><i class="ti ti-sparkles"></i></div><div class="cn">Assistente POCUS</div><div class="ct">Pergunte como avaliar qualquer região, dúvidas de técnica, achados…</div></div></div>`;
   if(!filt.length){html+='<div class="empty">Nada encontrado para "'+esc(busca)+'". Tente o Assistente POCUS acima.</div>';}
   else{
     ORDEM_CAT.forEach(cat=>{
@@ -701,7 +701,7 @@ function abrirAssistente(){curView='ai';chat=[];renderAssistente();window.scroll
 function renderAssistente(){
   const suggs=['Como faço POCUS pulmonar na dispneia?','Diferenciar EAP de pneumonia no US','Como avalio volemia com VCI?','Protocolo para parada (FoCUS)','Acesso venoso periférico difícil guiado'];
   let html=`<button class="back" onclick="routeHome()">← Voltar</button>
-   <div class="exam-head"><div class="ei">✨</div><div><h1>Assistente POCUS</h1><div class="tags">Pergunte sobre qualquer região, técnica ou achado</div></div></div>`;
+   <div class="exam-head"><div class="ei"><i class="ti ti-sparkles"></i></div><div><h1>Assistente POCUS</h1><div class="tags">Pergunte sobre qualquer região, técnica ou achado</div></div></div>`;
   if(!chat.length){html+=`<div class="suggs">`+suggs.map(s=>`<button class="sugg" onclick="enviarSug(this)">${esc(s)}</button>`).join('')+`</div>`;}
   html+=`<div class="chat" id="chat">`+chat.map(m=>`<div class="msg ${m.role==='user'?'u':'a'}"><div class="av">${m.role==='user'?'🧑‍⚕️':'🔎'}</div><div class="bub">${m.role==='user'?'<p>'+esc(m.text).replace(/\n/g,'<br>')+'</p>':md(m.text)}</div></div>`).join('')+`</div>
    <div class="ask"><textarea id="ask" rows="1" placeholder="Ex.: como diferencio derrame de espessamento pleural?" oninput="growAsk(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviar();}"></textarea><button onclick="enviar()" aria-label="Enviar">➤</button></div>
