@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PaliAI — Triagem de cuidados paliativos | MedTech</title>
+<meta name="description" content="PaliAI: triagem rápida (menos de 2 min) para identificar pacientes que se beneficiam de avaliação em cuidados paliativos, com apoio de IA para a reunião familiar. Baseado em indicadores validados (Surprise Question, indicadores de deterioração, PPS/ECOG).">
+<meta name="theme-color" content="#2563eb">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
+<link rel="icon" type="image/png" href="favicon.png">
+<script src="_mtfb.js?v=1"></script>
+<script>window.MT_APP={id:"paliai",name:"PaliAI"};</script>
+<script type="module" src="_mtauth.js?v=8"></script>
+<style>
+:root{--primary:#2563eb;--primary-dark:#1e40af;--ink:#0f172a;--bg:#f4f7fb;--soft:#e8f0fe;--surface:#fff;--line:#e6ebf3;--line-strong:#d8e0ec;--muted:#64748b;--shadow:0 1px 2px rgba(15,23,42,.05),0 6px 18px rgba(15,23,42,.06)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:-.011em;color:var(--ink);background:var(--bg);line-height:1.5}
+header{background:var(--primary);color:#fff;padding:14px 0;position:sticky;top:0;z-index:20}
+.wrap{max-width:860px;margin:0 auto;padding:0 18px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{display:flex;align-items:center;gap:11px;font-weight:700;font-size:20px}
+.logo .mark{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.16);display:grid;place-items:center;flex:0 0 auto;font-size:20px}
+.logo small{display:block;font-weight:400;font-size:12px;color:#dbe7fb;letter-spacing:0}
+.btn{display:inline-flex;align-items:center;gap:7px;border:none;border-radius:10px;font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;padding:10px 16px}
+.btn-p{background:var(--primary);color:#fff}
+.btn-p:hover{background:var(--primary-dark)}
+.btn-light{background:rgba(255,255,255,.15);color:#fff}
+.btn-ghost{background:var(--surface);color:var(--primary);border:1px solid var(--line-strong)}
+.btn-ghost:hover{background:var(--soft)}
+.btn:disabled{opacity:.55;cursor:default}
+main{padding:22px 0 60px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:22px;margin-bottom:18px}
+.card h2{font-size:16px;display:flex;align-items:center;gap:9px;margin-bottom:4px}
+.card h2 .ti{color:var(--primary)}
+.card .hint{color:var(--muted);font-size:13px;margin-bottom:14px}
+.step{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--primary);background:var(--soft);padding:3px 9px;border-radius:999px}
+.sqrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.sqrow .opt{flex:1;min-width:160px;border:1.5px solid var(--line-strong);border-radius:12px;padding:14px;cursor:pointer;text-align:center;font-weight:600;transition:.15s}
+.sqrow .opt:hover{border-color:var(--primary)}
+.sqrow .opt.sel{border-color:var(--primary);background:var(--soft);color:var(--primary-dark)}
+.sqrow .opt small{display:block;font-weight:400;font-size:12px;color:var(--muted);margin-top:3px}
+select,input{width:100%;padding:11px 13px;border:1px solid var(--line-strong);border-radius:10px;font-size:15px;font-family:inherit;background:#fff;color:var(--ink)}
+select:focus,input:focus{outline:none;border-color:var(--primary)}
+.checks{display:grid;gap:8px;margin-top:6px}
+.chk{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:14px}
+.chk:hover{border-color:var(--primary)}
+.chk input{margin-top:2px;flex:0 0 auto;width:auto;accent-color:var(--primary)}
+.lbl{font-weight:600;font-size:13px;margin:14px 0 6px;color:var(--ink)}
+.result{border-radius:16px;padding:22px;margin-bottom:18px;border:1px solid var(--line)}
+.result.green{background:#e7f7f1;border-color:#bfe6d4}
+.result.amber{background:#fdf3e3;border-color:#f4d9a8}
+.result.red{background:#fdeaea;border-color:#f3c0c0}
+.result .rtitle{font-size:18px;font-weight:700;display:flex;align-items:center;gap:9px}
+.result .rwhy{margin-top:10px;font-size:14px}
+.result .rwhy ul{margin:6px 0 0 18px}
+.result .rwhy li{margin-bottom:3px}
+.iaout{white-space:pre-wrap;font-size:14px;line-height:1.6;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:16px;margin-top:12px}
+.spin{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.disclaimer{background:#fff8ed;border:1px solid #f4d9a8;color:#8a5a16;border-radius:12px;padding:13px 16px;font-size:13px;margin-top:6px}
+.src{font-size:12px;color:var(--muted);line-height:1.6}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 18px 30px}
+footer a{color:var(--primary);font-weight:600;text-decoration:none}
+@media(max-width:560px){.card{padding:18px}}
+</style>
+</head>
+<body>
+<header><div class="wrap top">
+  <div class="logo"><span class="mark"><i class="ti ti-heart-handshake" aria-hidden="true"></i></span><div>PaliAI<small>Triagem de cuidados paliativos · por MedTech</small></div></div>
+  <button class="btn btn-light" onclick="resetAll()"><i class="ti ti-refresh"></i> Nova triagem</button>
+</div></header>
+
+<main class="wrap">
+  <div class="card" style="background:var(--soft);border-color:#cfe0fb">
+    <h2><i class="ti ti-stethoscope"></i> Identifique, em menos de 2 minutos, quem se beneficia de avaliação paliativa</h2>
+    <div class="hint" style="margin:0">Triagem na admissão hospitalar/UTI para apoiar a indicação <b>precoce</b> de avaliação em cuidados paliativos e a reunião familiar estruturada. Baseada em indicadores validados — é apoio à decisão, não prognóstico determinístico.</div>
+  </div>
+
+  <!-- 1) Surprise Question -->
+  <div class="card">
+    <h2><span class="step">Passo 1</span> Pergunta-gatilho</h2>
+    <div class="hint">"Você ficaria <b>surpreso</b> se este paciente morresse nos próximos 12 meses?"</div>
+    <div class="sqrow" id="sq">
+      <div class="opt" data-sq="sim" onclick="setSQ('sim')">Sim, ficaria surpreso<small>Menor probabilidade — reavaliar adiante</small></div>
+      <div class="opt" data-sq="nao" onclick="setSQ('nao')">Não, não ficaria<small>Gatilho — prossiga a triagem</small></div>
+    </div>
+  </div>
+
+  <!-- 2) Funcional + gerais -->
+  <div class="card">
+    <h2><span class="step">Passo 2</span> Estado funcional e indicadores gerais de deterioração</h2>
+    <div class="lbl">Estado funcional (PPS / ECOG)</div>
+    <select id="pps" onchange="compute()">
+      <option value="">Selecione…</option>
+      <option value="90">PPS 80–100% · ECOG 0–1 — ativo, autocuidado pleno</option>
+      <option value="70">PPS 70% · ECOG 2 — ambulante, não trabalha</option>
+      <option value="55">PPS 50–60% · ECOG 2–3 — assistência considerável, &gt;50% sentado/deitado</option>
+      <option value="35">PPS 30–40% · ECOG 3–4 — maior parte/ totalmente no leito</option>
+      <option value="15">PPS 10–20% · ECOG 4 — acamado, cuidado total</option>
+    </select>
+    <div class="lbl">Indicadores gerais (marque os presentes)</div>
+    <div class="checks" id="gerais"></div>
+  </div>
+
+  <!-- 3) Por doença -->
+  <div class="card">
+    <h2><span class="step">Passo 3</span> Indicadores específicos por doença</h2>
+    <div class="hint">Selecione a condição de base principal e marque os indicadores de gravidade/progressão presentes.</div>
+    <select id="doenca" onchange="renderDoenca()"><option value="">Selecione a doença de base…</option></select>
+    <div class="checks" id="espec" style="margin-top:10px"></div>
+  </div>
+
+  <!-- resultado -->
+  <div id="resultBox"></div>
+
+  <!-- IA -->
+  <div class="card" id="iaCard" style="display:none">
+    <h2><i class="ti ti-sparkles"></i> Apoio à reunião familiar / conversa de objetivos de cuidado</h2>
+    <div class="hint">A IA gera um roteiro estruturado (abertura, comunicação de notícias, exploração de valores, definição de metas e próximos passos) a partir do contexto. Revise sempre — é apoio, não substitui o julgamento clínico.</div>
+    <div class="lbl">Contexto breve do paciente (opcional — ajuda a IA)</div>
+    <input id="ctx" placeholder="Ex.: 82a, DPOC O2-dependente, 3 internações em 6 meses, família presente, sem diretivas.">
+    <div style="margin-top:12px"><button class="btn btn-p" id="iaBtn" onclick="gerarReuniao()"><i class="ti ti-sparkles"></i> Gerar roteiro da reunião</button></div>
+    <div id="iaOut"></div>
+  </div>
+
+  <div class="card">
+    <div class="src">
+      <b>Base:</b> Pergunta Surpresa (GSF); indicadores gerais de deterioração e por doença derivados de instrumentos validados (SPICT™, NECPAL CCOMS-ICO©) e dos critérios CMS/NHPCO de status terminal; escalas funcionais PPS/ECOG/Karnofsky; contexto brasileiro: ANCP, Política Nacional de Cuidados Paliativos (Portaria GM/MS 3.681/2024) e Resoluções CFM 1.805/2006 e 2.156/2016.<br>
+      <span style="color:var(--muted)">SPICT™, NECPAL© e PPS são instrumentos registrados; o PaliAI usa os indicadores clínicos publicados, sem reproduzir o material proprietário.</span>
+    </div>
+    <div class="disclaimer">⚠️ Ferramenta de apoio à decisão. Resultado positivo significa "considerar avaliação de cuidados paliativos / reunião familiar", <b>não</b> prognóstico de morte. A decisão é sempre do médico, com o paciente e a família.</div>
+  </div>
+</main>
+<footer>PaliAI · <a href="app.html">Portal MedTech</a> — apoio à decisão; confirme condutas e elegibilidade no contexto do seu serviço.</footer>
+
+<script>
+const GERAIS=[
+ {id:'g_intern',t:'≥ 2 internações não planejadas nos últimos 6–12 meses'},
+ {id:'g_peso',t:'Perda de peso significativa (>5–10%) e/ou albumina baixa'},
+ {id:'g_avd',t:'Dependência nova/crescente em ≥ 2 atividades de vida diária'},
+ {id:'g_sint',t:'Sintomas persistentes/refratários apesar de tratamento otimizado'},
+ {id:'g_cuid',t:'Sobrecarga do cuidador / necessidade crescente de suporte'},
+ {id:'g_pedido',t:'Paciente/família pedem foco em conforto ou recusam tratamento agressivo'},
+];
+const DOENCAS=[
+ {id:'cancer',l:'Câncer avançado',inds:['Metástases à distância / progressão apesar de terapia','Debilitado demais para tratamento oncológico (só controle de sintomas)','Declínio funcional por câncer progressivo']},
+ {id:'ic',l:'Insuficiência cardíaca / cardiovascular',inds:['NYHA IV (dispneia/dor ao mínimo esforço ou em repouso)','FE ≤ 20% ou doença coronariana/valvar intratável','Internações repetidas por descompensação']},
+ {id:'dpoc',l:'Doença respiratória (DPOC/fibrose)',inds:['Dispneia em repouso/mínimo esforço entre exacerbações','O₂ domiciliar prolongado por hipoxemia persistente','Já necessitou de ventilação ou ela é contraindicada']},
+ {id:'hepato',l:'Hepatopatia (cirrose)',inds:['Cirrose com complicação no último ano (ascite refratária, PBE, encefalopatia, síndrome hepatorrenal, sangramento varicoso)','Transplante hepático não é opção']},
+ {id:'renal',l:'Doença renal crônica',inds:['DRC estágio 4–5 (TFG < 30) com deterioração','Optou por não iniciar / interromper diálise','Falência renal complicando outras condições']},
+ {id:'neuro',l:'Doença neurológica / AVC',inds:['Deterioração progressiva física e/ou cognitiva apesar de terapia','Disfagia progressiva / pneumonia aspirativa recorrente','Sequela grave de AVC com perda funcional importante']},
+ {id:'demencia',l:'Demência / fragilidade avançada',inds:['Não deambula/veste/alimenta sem ajuda; comunicação verbal mínima','Incontinência dupla; disfagia / ingesta reduzida','Quedas recorrentes / infecções (pneumonia, ITU) de repetição']},
+ {id:'outra',l:'Outra condição avançada/irreversível',inds:['Deterioração e risco de morte por condição não reversível','Tratamentos disponíveis com desfecho ruim esperado']},
+];
+let SQ='';
+function setSQ(v){SQ=v;document.querySelectorAll('#sq .opt').forEach(o=>o.classList.toggle('sel',o.dataset.sq===v));compute();}
+function elChecks(box,arr){document.getElementById(box).innerHTML=arr.map(x=>`<label class="chk"><input type="checkbox" value="${x.id||x}" onchange="compute()"> <span>${x.t||x}</span></label>`).join('');}
+function renderDoenca(){const d=DOENCAS.find(x=>x.id===document.getElementById('doenca').value);elChecks('espec', d?d.inds.map((t,i)=>({id:'e'+i,t})):[]);compute();}
+function countChecked(box){return [...document.querySelectorAll('#'+box+' input:checked')].length;}
+function compute(){
+  const pps=+document.getElementById('pps').value||0;
+  const nG=countChecked('gerais'), nE=countChecked('espec');
+  const ppsLow=pps&&pps<=55, ppsVeryLow=pps&&pps<=35;
+  const box=document.getElementById('resultBox'), iaCard=document.getElementById('iaCard');
+  if(!SQ){box.innerHTML='';iaCard.style.display='none';return;}
+  // lógica: SQ "Não" é o gatilho; positividade por indicadores/funcional
+  let positive=false, strong=false;
+  if(SQ==='nao'){
+    positive = (nG>=2) || (nE>=1) || ppsLow;
+    strong = ppsVeryLow || (nG>=2 && nE>=1) || (nE>=2);
+  }
+  const why=[];
+  why.push(SQ==='nao'?'Pergunta Surpresa <b>negativa</b> ("Não ficaria surpreso") — gatilho positivo.':'Pergunta Surpresa positiva ("ficaria surpreso").');
+  if(pps)why.push('Funcional: '+document.getElementById('pps').selectedOptions[0].text.split('—')[0].trim()+(ppsLow?' <b>(baixo)</b>':''));
+  if(nG)why.push(nG+' indicador(es) geral(is) de deterioração.');
+  if(nE)why.push(nE+' indicador(es) específico(s) da doença.');
+  let cls,icon,title,msg;
+  if(SQ==='nao' && positive){
+    if(strong){cls='red';icon='ti-alert-triangle';title='Avaliação de cuidados paliativos RECOMENDADA';msg='Vários indicadores de doença avançada/deterioração. Acione avaliação paliativa e <b>reunião familiar estruturada</b> precocemente; discuta objetivos de cuidado e planejamento antecipado.';}
+    else{cls='amber';icon='ti-clipboard-check';title='Sugere avaliação de cuidados paliativos';msg='Há gatilho e indicadores presentes. Considere avaliação paliativa e conversa de objetivos de cuidado; reavalie a evolução.';}
+  } else if(SQ==='nao'){
+    cls='amber';icon='ti-eye';title='Vigilância — gatilho presente, poucos indicadores';msg='A Pergunta Surpresa foi negativa, mas há poucos indicadores. Reavalie em internações futuras / mudança clínica; considere conversa inicial sobre preferências.';
+  } else {
+    cls='green';icon='ti-circle-check';title='Baixa probabilidade de necessidade no momento';msg='Sem gatilho na triagem. Reavaliar se houver deterioração, internação não planejada ou mudança funcional.';
+  }
+  box.innerHTML=`<div class="result ${cls}"><div class="rtitle"><i class="ti ${icon}"></i> ${title}</div><div class="rwhy">${msg}<ul>${why.map(w=>'<li>'+w+'</li>').join('')}</ul></div></div>`;
+  iaCard.style.display = (SQ==='nao' && positive) ? 'block' : 'none';
+}
+async function gerarReuniao(){
+  if(!window.MT||!MT.user){alert('Entre na sua conta MedTech para usar a IA.');return;}
+  const ctx=document.getElementById('ctx').value.trim();
+  const pps=document.getElementById('pps').selectedOptions[0]?document.getElementById('pps').selectedOptions[0].text:'';
+  const ger=[...document.querySelectorAll('#gerais input:checked')].map(i=>i.parentElement.innerText.trim());
+  const esp=[...document.querySelectorAll('#espec input:checked')].map(i=>i.parentElement.innerText.trim());
+  const dn=document.getElementById('doenca').selectedOptions[0]?document.getElementById('doenca').selectedOptions[0].text:'';
+  const b=document.getElementById('iaBtn');b.innerHTML='<span class="spin"></span> Gerando…';b.disabled=true;
+  const prompt='Você é um médico com expertise em cuidados paliativos, ajudando um colega a conduzir uma REUNIÃO FAMILIAR / conversa de objetivos de cuidado (goals of care) de um paciente que a triagem identificou como candidato a avaliação paliativa. Produza um ROTEIRO PRÁTICO em português do Brasil, estruturado, humano e culturalmente adequado ao Brasil, com as seções: 1) Preparação (quem convidar, ambiente, checar o que a família já sabe); 2) Abertura e alinhamento de informação (modelo ask-tell-ask / SPIKES); 3) Comunicação honesta e compassiva do quadro (sem jargão, sem prognóstico numérico falsamente preciso); 4) Exploração de valores e preferências do paciente (protocolo NURSE para emoções); 5) Definição de metas de cuidado e proposta de plano (incluindo conforto, sintomas, local de cuidado, diretivas); 6) Frases-modelo prontas para usar; 7) Próximos passos e registro. REGRAS: não invente dados clínicos; foque em comunicação e tomada de decisão compartilhada; respeite ortotanásia (evitar distanásia/obstinação) conforme as Resoluções CFM. Seja objetivo e acolhedor. FORMATAÇÃO: texto limpo, sem markdown (sem # nem *); use títulos de seção em maiúsculas seguidos de dois-pontos.\n\nCONTEXTO: Pergunta Surpresa = "Não ficaria surpreso". Doença de base: '+(dn||'[não informada]')+'. Funcional: '+(pps||'[não informado]')+'. Indicadores gerais: '+(ger.join('; ')||'—')+'. Indicadores da doença: '+(esp.join('; ')||'—')+'. Observações: '+(ctx||'—')+'.';
+  try{const t=await MT.ai(prompt,'gemini-2.5-pro');document.getElementById('iaOut').innerHTML='<div class="iaout">'+(t||'').replace(/[<>]/g,s=>({'<':'&lt;','>':'&gt;'}[s]))+'</div>';}
+  catch(e){alert('⚠️ '+(e.message||'Falha na IA.'));}
+  b.innerHTML='<i class="ti ti-sparkles"></i> Gerar roteiro da reunião';b.disabled=false;
+}
+function resetAll(){SQ='';document.querySelectorAll('#sq .opt').forEach(o=>o.classList.remove('sel'));document.getElementById('pps').value='';document.getElementById('doenca').value='';elChecks('gerais',GERAIS);document.getElementById('espec').innerHTML='';document.getElementById('iaOut').innerHTML='';document.getElementById('ctx').value='';compute();window.scrollTo(0,0);}
+// init
+document.getElementById('doenca').innerHTML='<option value="">Selecione a doença de base…</option>'+DOENCAS.map(d=>`<option value="${d.id}">${d.l}</option>`).join('');
+elChecks('gerais',GERAIS);
+</script>
+</body>
+</html>
