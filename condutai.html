@@ -988,6 +988,16 @@ main, #main { display: block !important; height: auto !important; overflow: visi
           <span class="ic" style="background:#fce7f3;color:#be185d">💉</span>
           <span class="ttl">Vacinação</span><span class="sub">Calendário PNI/SBIm</span>
         </button>
+        <button class="wb-card" data-go="orientacoes">
+          <span class="wb-badge new">Novo</span>
+          <span class="ic" style="background:#ecfeff;color:#0e7490">👨‍👩‍👧</span>
+          <span class="ttl">Orientações ao paciente</span><span class="sub">Material em linguagem simples</span>
+        </button>
+        <button class="wb-card" data-go="cid">
+          <span class="wb-badge new">Novo</span>
+          <span class="ic" style="background:#f1f5f9;color:#475569">🔖</span>
+          <span class="ttl">CID-10</span><span class="sub">Busca de códigos</span>
+        </button>
       </div>
     </div>
 
@@ -1170,6 +1180,28 @@ main, #main { display: block !important; height: auto !important; overflow: visi
     <div id="vacResult" style="margin-top:8px"></div>
     <div class="wb-bigsearch" style="margin-top:14px"><input id="vacSearch" type="search" placeholder="Dúvida específica (ex.: HPV, gestante, pós-exposição raiva)..." enterkeyhint="search"><button id="vacGo">Perguntar à IA</button></div>
     <div id="vacIAResult" style="margin-top:12px"></div>
+  </section>
+
+  <!-- ===================== ORIENTAÇÕES AO PACIENTE ===================== -->
+  <section id="orientacoesView" class="wb-view" hidden>
+    <div class="wb-view-head"><span class="vic">👨‍👩‍👧</span><h2>Orientações ao paciente</h2></div>
+    <p class="wb-view-intro">Gere um material de orientação em linguagem simples para entregar ao paciente — o que é, cuidados, sinais de alerta e quando procurar ajuda.</p>
+    <div class="pres-full"><label>Tema / diagnóstico <span style="color:#dc2626">*</span><input id="or_tema" type="text" placeholder="Ex.: hipertensão; pós-op de apendicectomia; uso de amoxicilina; dengue"></label></div>
+    <div class="pres-full"><label>Detalhes (opcional)<textarea id="or_det" placeholder="Ex.: idoso, baixa escolaridade; reforçar dieta; foco nos sinais de alarme…"></textarea></label></div>
+    <button id="orGo" class="gaso-btn">👨‍👩‍👧 Gerar orientações</button>
+    <div id="orResult" style="margin-top:16px"></div>
+  </section>
+
+  <!-- ===================== BUSCA CID-10 ===================== -->
+  <section id="cidView" class="wb-view" hidden>
+    <div class="wb-view-head"><span class="vic">🔖</span><h2>Busca CID-10</h2></div>
+    <p class="wb-view-intro">Busque por código ou descrição (ex.: “I10”, “hipertensão”, “lombalgia”). Classificação pública (OMS/DATASUS) — seleção dos diagnósticos mais comuns.</p>
+    <div class="wb-bigsearch">
+      <input id="cidSearch" type="search" placeholder="Código ou doença..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
+      <button id="cidGo">Buscar</button>
+    </div>
+    <div class="wb-quick" id="cidQuick"></div>
+    <div id="cidResult" style="margin-top:14px"></div>
   </section>
 
   <!-- ===================== HISTÓRICO / FAVORITOS ===================== -->
@@ -10295,10 +10327,10 @@ document.getElementById('newBtn').onclick = () => {
 //  Navegação estilo Whitebook (views + bottom nav)
 // ============================================================
 function showView(name) {
-  const map = { home:'homeView', condutas:'condutasView', ia:'iaView', bulas:'bulasView', investigacao:'investigacaoView', prescricao:'prescricaoView', interacoes:'interacoesView', ddx:'ddxView', exames:'examesView', procedimentos:'proceduresView', vacinas:'vacinasView', gaso:'gasoView', favoritos:'listView', historico:'listView', result:'resultView' };
+  const map = { home:'homeView', condutas:'condutasView', ia:'iaView', bulas:'bulasView', investigacao:'investigacaoView', prescricao:'prescricaoView', interacoes:'interacoesView', ddx:'ddxView', exames:'examesView', procedimentos:'proceduresView', vacinas:'vacinasView', orientacoes:'orientacoesView', cid:'cidView', gaso:'gasoView', favoritos:'listView', historico:'listView', result:'resultView' };
   const id = map[name] || 'homeView';
   document.querySelectorAll('.wb-view').forEach(v => { v.hidden = (v.id !== id); });
-  const navMap = { home:'home', condutas:'condutas', ia:'ia', favoritos:'favoritos', historico:'historico', bulas:'home', investigacao:'home', prescricao:'home', interacoes:'home', ddx:'home', exames:'home', procedimentos:'home', vacinas:'home', gaso:'home', escores:'home', result:'home' };
+  const navMap = { home:'home', condutas:'condutas', ia:'ia', favoritos:'favoritos', historico:'historico', bulas:'home', investigacao:'home', prescricao:'home', interacoes:'home', ddx:'home', exames:'home', procedimentos:'home', vacinas:'home', orientacoes:'home', cid:'home', gaso:'home', escores:'home', result:'home' };
   const navT = navMap[name] || 'home';
   document.querySelectorAll('#wbNav button').forEach(b => b.classList.toggle('active', b.dataset.go === navT));
   if (name === 'favoritos' || name === 'historico') {
@@ -10311,6 +10343,7 @@ function showView(name) {
   if (name === 'investigacao') renderInvQuick();
   if (name === 'procedimentos') renderProcQuick();
   if (name === 'vacinas') renderVacinas();
+  if (name === 'cid') renderCidQuick();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 window.showView = showView;
@@ -11243,6 +11276,188 @@ async function runVacIA(q) {
 const _vcg = document.getElementById('vacGo'), _vcs = document.getElementById('vacSearch');
 if (_vcg) _vcg.onclick = () => runVacIA(_vcs.value);
 if (_vcs) _vcs.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); runVacIA(_vcs.value); } });
+
+// ============================================================
+//  ORIENTAÇÕES AO PACIENTE (IA, linguagem leiga)
+// ============================================================
+function buildPromptOrient(tema, det) {
+  return `Você é um médico explicando para o PACIENTE (leigo), em português do Brasil simples e acolhedor, sobre "${tema}". ${det ? ('Considere: ' + det + '. ') : ''}Evite jargão; quando precisar de um termo técnico, explique entre parênteses. Use Markdown com EXATAMENTE estes cabeçalhos começando com "## ":
+
+# Orientações: ${tema}
+
+## 📋 O que é / o que está acontecendo
+## ✅ Cuidados em casa
+## 💊 Sobre as medicações
+## 🚨 Sinais de alerta — procure atendimento se
+## 📅 Acompanhamento
+
+Frases curtas e diretas, em 2ª pessoa ("você"). Não invente diagnóstico nem doses específicas se não foram informadas; oriente seguir a receita do médico. Responda em português do Brasil.`;
+}
+async function runOrient() {
+  const tema = (document.getElementById('or_tema').value || '').trim();
+  const box = document.getElementById('orResult');
+  if (!tema) { box.innerHTML = '<div class="alert alert-warn"><span>⚠</span><div>Informe o <b>tema / diagnóstico</b>.</div></div>'; return; }
+  if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span>⚠</span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
+  const det = (document.getElementById('or_det').value || '').trim();
+  box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Gerando orientações…</strong></div><div class="loading-sub">Linguagem simples para o paciente…</div></div>`;
+  try {
+    const { text } = await callGemini([{ role: 'user', parts: [{ text: buildPromptOrient(tema, det) }] }]);
+    window.__orTxt = (text || '').trim();
+    box.innerHTML = `<div class="result content">${accordionize(md(text))}<div class="row" style="margin-top:12px"><button class="btn-primary" onclick="navigator.clipboard&&navigator.clipboard.writeText(window.__orTxt||'')">📋 Copiar</button></div><div class="alert alert-info" style="margin-top:10px"><span>ℹ</span><div>Material educativo gerado por IA — revise antes de entregar ao paciente.</div></div></div>`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (err) {
+    box.innerHTML = `<div class="alert alert-warn"><span>⚠</span><div>Não foi possível gerar agora: ${escapeHtml(err.message || 'erro')}.</div></div>`;
+    const r = document.createElement('button'); r.className = 'btn-primary'; r.style.marginTop = '10px'; r.textContent = '🔄 Tentar de novo'; r.onclick = () => runOrient(); box.appendChild(r);
+  }
+}
+const _org = document.getElementById('orGo'); if (_org) _org.onclick = () => runOrient();
+
+// ============================================================
+//  BUSCA CID-10 — seleção de códigos comuns (classificação pública OMS/DATASUS)
+// ============================================================
+const CID10 = [
+ {c:'A09',d:'Diarreia e gastroenterite de origem infecciosa presumível'},
+ {c:'A41',d:'Sepse, não especificada'},
+ {c:'A90',d:'Dengue clássico'},
+ {c:'A91',d:'Dengue hemorrágico / com sinais de alarme'},
+ {c:'A15',d:'Tuberculose respiratória, com confirmação'},
+ {c:'A46',d:'Erisipela'},
+ {c:'A08',d:'Infecções intestinais virais'},
+ {c:'B01',d:'Varicela'},
+ {c:'B19',d:'Hepatite viral não especificada'},
+ {c:'B24',d:'Doença pelo HIV não especificada'},
+ {c:'B34',d:'Infecção viral não especificada'},
+ {c:'B35',d:'Dermatofitose (tinha)'},
+ {c:'B37',d:'Candidíase'},
+ {c:'B86',d:'Escabiose'},
+ {c:'E03',d:'Hipotireoidismo'},
+ {c:'E05',d:'Tireotoxicose (hipertireoidismo)'},
+ {c:'E10',d:'Diabetes mellitus tipo 1'},
+ {c:'E11',d:'Diabetes mellitus tipo 2'},
+ {c:'E16.2',d:'Hipoglicemia não especificada'},
+ {c:'E55',d:'Deficiência de vitamina D'},
+ {c:'E66',d:'Obesidade'},
+ {c:'E78',d:'Distúrbios do metabolismo de lipoproteínas (dislipidemia)'},
+ {c:'E86',d:'Depleção de volume (desidratação)'},
+ {c:'E87',d:'Outros transtornos do equilíbrio hidroeletrolítico'},
+ {c:'F10',d:'Transtornos por uso de álcool'},
+ {c:'F17',d:'Transtornos por uso de tabaco'},
+ {c:'F32',d:'Episódio depressivo'},
+ {c:'F41',d:'Outros transtornos ansiosos'},
+ {c:'F41.0',d:'Transtorno de pânico'},
+ {c:'F43',d:'Reações ao estresse grave e transtornos de adaptação'},
+ {c:'F90',d:'Transtorno de hiperatividade e déficit de atenção (TDAH)'},
+ {c:'G20',d:'Doença de Parkinson'},
+ {c:'G40',d:'Epilepsia'},
+ {c:'G43',d:'Enxaqueca'},
+ {c:'G47.0',d:'Distúrbios do início e manutenção do sono (insônia)'},
+ {c:'I10',d:'Hipertensão essencial (primária)'},
+ {c:'I20',d:'Angina pectoris'},
+ {c:'I21',d:'Infarto agudo do miocárdio'},
+ {c:'I48',d:'Fibrilação e flutter atrial'},
+ {c:'I50',d:'Insuficiência cardíaca'},
+ {c:'I63',d:'Infarto cerebral (AVC isquêmico)'},
+ {c:'I64',d:'Acidente vascular cerebral não especificado'},
+ {c:'I26',d:'Embolia pulmonar'},
+ {c:'I80',d:'Flebite e tromboflebite'},
+ {c:'I83',d:'Varizes dos membros inferiores'},
+ {c:'J00',d:'Nasofaringite aguda (resfriado comum)'},
+ {c:'J02',d:'Faringite aguda'},
+ {c:'J03',d:'Amigdalite aguda'},
+ {c:'J06',d:'Infecção aguda das vias aéreas superiores'},
+ {c:'J11',d:'Influenza (gripe)'},
+ {c:'J18',d:'Pneumonia por microrganismo não especificado'},
+ {c:'J20',d:'Bronquite aguda'},
+ {c:'J44',d:'Doença pulmonar obstrutiva crônica (DPOC)'},
+ {c:'J45',d:'Asma'},
+ {c:'J81',d:'Edema pulmonar'},
+ {c:'K21',d:'Doença do refluxo gastroesofágico'},
+ {c:'K29',d:'Gastrite e duodenite'},
+ {c:'K30',d:'Dispepsia funcional'},
+ {c:'K35',d:'Apendicite aguda'},
+ {c:'K52',d:'Gastroenterite e colite não infecciosas'},
+ {c:'K57',d:'Doença diverticular do intestino'},
+ {c:'K58',d:'Síndrome do intestino irritável'},
+ {c:'K59.0',d:'Constipação'},
+ {c:'K70',d:'Doença alcoólica do fígado'},
+ {c:'K74',d:'Fibrose e cirrose hepáticas'},
+ {c:'K80',d:'Colelitíase'},
+ {c:'K81',d:'Colecistite'},
+ {c:'K92.2',d:'Hemorragia gastrointestinal não especificada'},
+ {c:'L03',d:'Celulite (erisipela/flegmão)'},
+ {c:'L20',d:'Dermatite atópica'},
+ {c:'L23',d:'Dermatite de contato alérgica'},
+ {c:'L29',d:'Prurido'},
+ {c:'L40',d:'Psoríase'},
+ {c:'L50',d:'Urticária'},
+ {c:'L70',d:'Acne'},
+ {c:'M06',d:'Outras artrites reumatoides'},
+ {c:'M10',d:'Gota'},
+ {c:'M16',d:'Coxartrose (artrose do quadril)'},
+ {c:'M17',d:'Gonartrose (artrose do joelho)'},
+ {c:'M25.5',d:'Dor articular'},
+ {c:'M51',d:'Outros transtornos de discos intervertebrais'},
+ {c:'M54',d:'Dorsalgia'},
+ {c:'M54.5',d:'Dor lombar baixa (lombalgia)'},
+ {c:'M79.7',d:'Fibromialgia'},
+ {c:'M81',d:'Osteoporose sem fratura patológica'},
+ {c:'N17',d:'Insuficiência renal aguda'},
+ {c:'N18',d:'Doença renal crônica'},
+ {c:'N20',d:'Cálculo do rim e do ureter'},
+ {c:'N39.0',d:'Infecção do trato urinário, local não especificado'},
+ {c:'N40',d:'Hiperplasia da próstata'},
+ {c:'N76',d:'Outras afecções inflamatórias da vagina e da vulva'},
+ {c:'N91',d:'Menstruação ausente, escassa ou rara'},
+ {c:'N93',d:'Outros sangramentos uterinos/vaginais anormais'},
+ {c:'N94',d:'Dor e outras afecções do aparelho geniturinário feminino (dismenorreia)'},
+ {c:'N95',d:'Transtornos da menopausa e do climatério'},
+ {c:'O20',d:'Hemorragia do início da gravidez'},
+ {c:'O21',d:'Vômitos excessivos na gravidez (hiperêmese)'},
+ {c:'Z34',d:'Supervisão de gravidez normal'},
+ {c:'Z39',d:'Assistência e exame no pós-parto'},
+ {c:'R05',d:'Tosse'},
+ {c:'R06.0',d:'Dispneia'},
+ {c:'R07.4',d:'Dor torácica não especificada'},
+ {c:'R10',d:'Dor abdominal e pélvica'},
+ {c:'R11',d:'Náusea e vômitos'},
+ {c:'R42',d:'Tontura e instabilidade'},
+ {c:'R50',d:'Febre não especificada'},
+ {c:'R51',d:'Cefaleia'},
+ {c:'R53',d:'Mal-estar, fadiga'},
+ {c:'R55',d:'Síncope e colapso'},
+ {c:'R60',d:'Edema não classificado em outra parte'},
+ {c:'R73',d:'Glicemia elevada (hiperglicemia)'},
+ {c:'S52',d:'Fratura do antebraço'},
+ {c:'S93.4',d:'Entorse e distensão do tornozelo'},
+ {c:'T14',d:'Traumatismo de região não especificada do corpo'},
+ {c:'T78.2',d:'Choque anafilático não especificado'},
+ {c:'T78.4',d:'Alergia não especificada'},
+ {c:'Z00',d:'Exame geral e investigação de pessoas sem queixas'},
+ {c:'Z20',d:'Contato/exposição a doença transmissível'},
+ {c:'Z23',d:'Necessidade de imunização (vacinação)'},
+ {c:'Z71',d:'Aconselhamento médico não classificado em outra parte'},
+ {c:'Z76.0',d:'Emissão de receita de repetição'}
+];
+const CID_COMUNS = ['Hipertensão','Diabetes','Lombalgia','ITU','Ansiedade','Dengue','Cefaleia','Dor abdominal'];
+function renderCidQuick() {
+  const el = document.getElementById('cidQuick'); if (!el || el.dataset.done) return;
+  el.innerHTML = '<span style="font-size:12px;color:var(--text-mute);width:100%;margin-bottom:2px">Comuns:</span>' + CID_COMUNS.map(d => `<button data-q="${escapeHtml(d)}">${escapeHtml(d)}</button>`).join('');
+  el.querySelectorAll('button').forEach(b => b.onclick = () => { document.getElementById('cidSearch').value = b.dataset.q; runCid(b.dataset.q); });
+  el.dataset.done = '1';
+}
+function cidCopy(c) { const x = CID10.find(i => i.c === c); if (x && navigator.clipboard) navigator.clipboard.writeText(x.c + ' - ' + x.d); }
+function runCid(q) {
+  q = (q || '').trim(); const box = document.getElementById('cidResult'); if (!box) return;
+  if (q.length < 2) { box.innerHTML = '<div class="empty">Digite ao menos 2 caracteres (código ou doença).</div>'; return; }
+  const n = _normKey(q);
+  const res = CID10.filter(x => _normKey(x.c).indexOf(n) === 0 || _normKey(x.d).includes(n)).slice(0, 50);
+  if (!res.length) { box.innerHTML = '<div class="alert alert-info"><span>ℹ</span><div>Nenhum código nesta seleção de comuns. Para CIDs específicos/raros, consulte o DATASUS/CID-10 oficial.</div></div>'; return; }
+  box.innerHTML = res.map(x => `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--border);border-radius:10px;margin-bottom:6px;background:var(--bg-card)"><b style="color:var(--primary);min-width:58px">${escapeHtml(x.c)}</b><span style="flex:1;font-size:14px;color:var(--text)">${escapeHtml(x.d)}</span><button class="btn-primary" style="padding:5px 11px;font-size:12px" onclick="cidCopy('${x.c}')">copiar</button></div>`).join('');
+}
+const _cdg = document.getElementById('cidGo'), _cds = document.getElementById('cidSearch');
+if (_cdg) _cdg.onclick = () => runCid(_cds.value);
+if (_cds) _cds.addEventListener('input', () => { if (_cds.value.trim().length >= 2) runCid(_cds.value); });
+if (_cds) _cds.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); runCid(_cds.value); } });
 
 // ============ Init ============
 renderSide();
