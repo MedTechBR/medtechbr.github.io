@@ -818,6 +818,13 @@ main, #main { display: block !important; height: auto !important; overflow: visi
 .gaso-form input:focus { outline: none; border-color: var(--primary); }
 .gaso-btn { margin-top: 14px; width: 100%; background: var(--primary); color: #fff; border: 0; border-radius: 12px; padding: 13px; font-weight: 700; font-size: 15px; cursor: pointer; font-family: inherit; }
 .gaso-btn:hover { background: var(--primary-dark); }
+.gaso-form select { border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px; font-size: 16px; font-family: inherit; background: var(--bg-card); color: var(--text); }
+.gaso-form select:focus { outline: none; border-color: var(--primary); }
+.pres-full { margin-top: 10px; }
+.pres-full label { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; font-weight: 600; color: var(--text-soft); }
+.pres-full input, .pres-full select, .pres-full textarea { border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px; font-size: 15px; font-family: inherit; background: var(--bg-card); color: var(--text); }
+.pres-full textarea { min-height: 64px; resize: vertical; line-height: 1.4; }
+.pres-full input:focus, .pres-full select:focus, .pres-full textarea:focus { outline: none; border-color: var(--primary); }
 /* Escores clínicos clicáveis */
 .esc-form { display: flex; flex-direction: column; gap: 8px; }
 .esc-form .esc-check { flex-direction: row; align-items: center; gap: 10px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; font-size: 13.5px; font-weight: 500; color: var(--text); cursor: pointer; }
@@ -943,6 +950,11 @@ main, #main { display: block !important; height: auto !important; overflow: visi
           <span class="ic" style="background:var(--purple-soft);color:var(--purple)">🔬</span>
           <span class="ttl">Investigação</span><span class="sub">Sintoma → exames → Dx</span>
         </button>
+        <button class="wb-card" data-go="prescricao">
+          <span class="wb-badge new">Novo</span>
+          <span class="ic" style="background:#ffe4e6;color:#be123c">📝</span>
+          <span class="ttl">Prescrição</span><span class="sub">Doses por peso e função renal</span>
+        </button>
         <button class="wb-card" data-go="ia">
           <span class="ic" style="background:#d1fae5;color:#047857">✨</span>
           <span class="ttl">CondutAI IA</span><span class="sub">Conduta sob medida</span>
@@ -1063,6 +1075,25 @@ main, #main { display: block !important; height: auto !important; overflow: visi
     </div>
     <button id="gasoGo" class="gaso-btn">🔬 Interpretar</button>
     <div id="gasoResult" style="margin-top:16px"></div>
+  </section>
+
+  <!-- ===================== PRESCRIÇÃO INTELIGENTE ===================== -->
+  <section id="prescricaoView" class="wb-view" hidden>
+    <div class="wb-view-head"><span class="vic">📝</span><h2>Prescrição inteligente</h2></div>
+    <p class="wb-view-intro">Informe os dados do paciente. A IA sugere medicações com ajuste por peso e função renal, alertas de interação e referências de evidência.</p>
+    <div class="alert alert-warn" style="margin-bottom:14px"><span>⚠</span><div><b>Apoio à decisão clínica baseado em evidências.</b> Não substitui o julgamento do médico responsável — todas as condutas e doses devem ser confirmadas antes de qualquer aplicação ao paciente.</div></div>
+    <div class="gaso-form">
+      <label>Idade (anos)<input id="p_idade" type="number" step="1" inputmode="numeric" placeholder="62"></label>
+      <label>Sexo<select id="p_sexo"><option value="">—</option><option value="M">Masculino</option><option value="F">Feminino</option></select></label>
+      <label>Peso (kg)<input id="p_peso" type="number" step="0.1" inputmode="decimal" placeholder="78"></label>
+      <label>Creatinina (mg/dL)<input id="p_creat" type="number" step="0.01" inputmode="decimal" placeholder="opcional"></label>
+    </div>
+    <div class="pres-full"><label>Alergias<input id="p_alergias" type="text" autocomplete="off" placeholder="Ex: penicilina, AINE… (ou “nega”)"></label></div>
+    <div class="pres-full"><label>Diagnóstico / contexto clínico <span style="color:#dc2626">*</span><textarea id="p_dx" placeholder="Ex: pneumonia comunitária grave; DPOC exacerbada; ITU complicada; CAD…"></textarea></label></div>
+    <div class="pres-full"><label>Cenário<select id="p_cenario"><option value="emergencia">Emergência</option><option value="enfermaria">Enfermaria</option><option value="uti">UTI</option><option value="ambulatorio">Ambulatório</option></select></label></div>
+    <div class="pres-full"><label>Observações adicionais<textarea id="p_obs" placeholder="Comorbidades, gestação, função hepática, medicações em uso…"></textarea></label></div>
+    <button id="presGo" class="gaso-btn">✨ Gerar sugestão de prescrição</button>
+    <div id="presResult" style="margin-top:16px"></div>
   </section>
 
   <!-- ===================== HISTÓRICO / FAVORITOS ===================== -->
@@ -10188,10 +10219,10 @@ document.getElementById('newBtn').onclick = () => {
 //  Navegação estilo Whitebook (views + bottom nav)
 // ============================================================
 function showView(name) {
-  const map = { home:'homeView', condutas:'condutasView', ia:'iaView', bulas:'bulasView', investigacao:'investigacaoView', gaso:'gasoView', favoritos:'listView', historico:'listView', result:'resultView' };
+  const map = { home:'homeView', condutas:'condutasView', ia:'iaView', bulas:'bulasView', investigacao:'investigacaoView', prescricao:'prescricaoView', gaso:'gasoView', favoritos:'listView', historico:'listView', result:'resultView' };
   const id = map[name] || 'homeView';
   document.querySelectorAll('.wb-view').forEach(v => { v.hidden = (v.id !== id); });
-  const navMap = { home:'home', condutas:'condutas', ia:'ia', favoritos:'favoritos', historico:'historico', bulas:'home', investigacao:'home', gaso:'home', escores:'home', result:'home' };
+  const navMap = { home:'home', condutas:'condutas', ia:'ia', favoritos:'favoritos', historico:'historico', bulas:'home', investigacao:'home', prescricao:'home', gaso:'home', escores:'home', result:'home' };
   const navT = navMap[name] || 'home';
   document.querySelectorAll('#wbNav button').forEach(b => b.classList.toggle('active', b.dataset.go === navT));
   if (name === 'favoritos' || name === 'historico') {
@@ -10687,6 +10718,82 @@ async function runInv(q, forceIA) {
     const r = document.createElement('button'); r.className='btn-primary'; r.style.marginTop='10px'; r.textContent='🔄 Tentar de novo'; r.onclick=()=>runInv(q); box.appendChild(r);
   }
 }
+
+// ============================================================
+//  PRESCRIÇÃO INTELIGENTE (IA) — doses por peso e função renal
+// ============================================================
+function calcClCr({ idade, peso, creat, sexo }) {
+  // Cockcroft-Gault — exige idade, peso, creatinina e sexo
+  if (!idade || !peso || !creat || creat <= 0 || !sexo) return null;
+  let v = ((140 - idade) * peso) / (72 * creat);
+  if (sexo === 'F') v *= 0.85;
+  if (!isFinite(v) || v <= 0) return null;
+  return Math.round(v);
+}
+function buildPromptPrescricao(d) {
+  const L = [];
+  L.push(`Diagnóstico / contexto clínico: ${d.dx}`);
+  if (d.cenario) L.push(`Cenário de atendimento: ${d.cenario}`);
+  if (d.idade) L.push(`Idade: ${d.idade} anos`);
+  if (d.sexo) L.push(`Sexo: ${d.sexo === 'F' ? 'feminino' : 'masculino'}`);
+  if (d.peso) L.push(`Peso: ${d.peso} kg`);
+  if (d.creat) L.push(`Creatinina sérica: ${d.creat} mg/dL`);
+  if (d.clcr != null) L.push(`Clearance de creatinina estimado (Cockcroft-Gault): ≈ ${d.clcr} mL/min — AJUSTE TODAS as doses a esta função renal.`);
+  L.push(`Alergias: ${d.alergias || 'não relatadas'}`);
+  if (d.obs) L.push(`Observações adicionais: ${d.obs}`);
+  return `Você é médico assistente experiente e farmacêutico clínico. Com base nos DADOS DO PACIENTE abaixo e nas DIRETRIZES vigentes (cite a diretriz/sociedade e o ano quando aplicável), elabore uma SUGESTÃO DE PRESCRIÇÃO inicial, prática e segura, para uso no Brasil. Responda em português do Brasil, em Markdown, com números concretos (mg, mg/kg, mL, gotas, mL/h) e ajustando as doses ao PESO e à FUNÇÃO RENAL informados.
+
+DADOS DO PACIENTE:
+${L.join('\n')}
+
+REGRAS:
+- NUNCA prescreva um fármaco ao qual o paciente é alérgico; verifique reação cruzada (ex.: penicilina × cefalosporina) e sinalize de forma destacada.
+- Para CADA medicação: nome genérico (comercial entre parênteses quando útil), DOSE (ajustada por peso/função renal), VIA, FREQUÊNCIA, DURAÇÃO e — quando endovenoso — DILUIÇÃO e TEMPO DE INFUSÃO. Ofereça ALTERNATIVA quando relevante.
+- Priorize o que muda desfecho; não encha de itens supérfluos. Indique nível de evidência/diretriz quando houver.
+- Se faltarem dados essenciais (peso, função renal, gestação), ASSUMA o cenário mais provável e DEIXE EXPLÍCITO o que assumiu.
+
+ESTRUTURA OBRIGATÓRIA (use EXATAMENTE estes cabeçalhos começando com "## "):
+
+# Sugestão de prescrição — ${d.dx}
+
+## 🧾 Resumo do caso
+## 🧠 Hipóteses e racional terapêutico
+## 💊 Medicações sugeridas
+## 🫘 Ajuste por função renal
+## ⚠️ Alertas de interação e segurança
+## 🩹 Medidas de suporte e não-farmacológicas
+## 📚 Evidência / diretrizes
+
+Em "Medicações sugeridas", agrupe por classe/objetivo e use bullets no formato: "- **Fármaco** — dose, via, frequência, duração — (diluição/infusão se EV; alternativa; evidência)". Em "Ajuste por função renal", se houver ClCr informado, diga EXPLICITAMENTE quais fármacos foram ajustados e como; se não houver, oriente o que monitorar. Seja objetivo e use negrito nos números/doses.`;
+}
+async function runPrescricao() {
+  const dxEl = document.getElementById('p_dx');
+  const box = document.getElementById('presResult');
+  const dx = (dxEl.value || '').trim();
+  if (!dx) { box.innerHTML = '<div class="alert alert-warn"><span>⚠</span><div>Informe ao menos o <b>diagnóstico / contexto clínico</b>.</div></div>'; dxEl.focus(); return; }
+  const numId = id => { const x = parseFloat((document.getElementById(id).value || '').replace(',', '.')); return isNaN(x) ? null : x; };
+  const idade = numId('p_idade'), peso = numId('p_peso'), creat = numId('p_creat');
+  const sexo = document.getElementById('p_sexo').value || '';
+  const cenario = document.getElementById('p_cenario').value || '';
+  const alergias = (document.getElementById('p_alergias').value || '').trim();
+  const obs = (document.getElementById('p_obs').value || '').trim();
+  const clcr = calcClCr({ idade, peso, creat, sexo });
+  if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span>⚠</span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
+  box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Elaborando prescrição…</strong></div><div class="loading-sub">Doses por peso e função renal, alertas e evidência…</div></div>`;
+  const prompt = buildPromptPrescricao({ dx, idade, sexo, peso, creat, clcr, alergias, obs, cenario });
+  try {
+    const { text } = await callGemini([{ role: 'user', parts: [{ text: prompt }] }]);
+    const clcrChip = clcr != null ? `<div style="display:inline-block;background:#eef6ff;color:#0b5cab;border:1px solid #cfe3fb;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;margin-bottom:10px">🫘 ClCr estimado ≈ ${clcr} mL/min (Cockcroft-Gault)</div>` : '';
+    box.innerHTML = `<div class="result content">${clcrChip}${accordionize(md(text))}<div class="alert alert-warn" style="margin-top:14px"><span>⚠</span><div><b>Apoio à decisão — não substitui o julgamento médico.</b> Confira doses, ajustes, interações e contraindicações antes de prescrever; a responsabilidade é do médico assistente.</div></div></div>`;
+    await renderMermaidIn(box);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (err) {
+    box.innerHTML = `<div class="alert alert-warn"><span>⚠</span><div>Não foi possível gerar agora: ${escapeHtml(err.message || 'erro')}.</div></div>`;
+    const r = document.createElement('button'); r.className = 'btn-primary'; r.style.marginTop = '10px'; r.textContent = '🔄 Tentar de novo'; r.onclick = () => runPrescricao(); box.appendChild(r);
+  }
+}
+const _pg = document.getElementById('presGo');
+if (_pg) _pg.onclick = () => runPrescricao();
 
 // ============ Init ============
 renderSide();
