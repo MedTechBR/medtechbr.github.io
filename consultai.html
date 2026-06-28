@@ -33,6 +33,16 @@ main{max-width:1040px;margin:0 auto;padding:18px 18px 60px}
 .subtabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
 .subtabs button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-weight:700;font-size:13px;cursor:pointer;color:var(--muted);font-family:inherit}
 .subtabs button.on{background:var(--soft);color:var(--petrol);border-color:var(--mint)}
+.lab-add{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px}
+.lab-add input{border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;background:#fff}
+.lab-add #lab_nome{flex:1;min-width:150px}.lab-add #lab_val,.lab-add #lab_un{width:84px}
+.lab-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:12px}
+.lab-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:4px}
+.lab-h b{font-size:15px;color:var(--petrol)}
+.lab-last{font-size:14px;font-weight:800;color:var(--ink)}
+.lab-rows{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.lab-pill{font-size:12px;background:var(--soft);border-radius:999px;padding:3px 9px;color:var(--ink)}
+.lab-pill a{color:var(--red);cursor:pointer;font-weight:800;margin-left:3px}
 .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap}
 .bar .nav{display:flex;align-items:center;gap:9px}
 .bar h2{font-size:17px;text-transform:capitalize}
@@ -359,7 +369,7 @@ const MED_DB=[
  {n:'Cetoconazol 2% xampu',p:'aplicar no couro cabeludo 2x/semana, deixar agir 5 min'}
 ];
 
-let state={patients:[],appts:[],records:[],prescriptions:[],documentos:[],docs:[],cfg:{medico:'',clinica:'',crm:'',esp:'',rqe:'',endereco:'',telefone:'',agenda:{ini:'07:00',fim:'19:00',slot:30,dias:[1,2,3,4,5,6]}},migratedEvoluai:false};
+let state={patients:[],appts:[],records:[],prescriptions:[],documentos:[],docs:[],labs:[],cfg:{medico:'',clinica:'',crm:'',esp:'',rqe:'',endereco:'',telefone:'',agenda:{ini:'07:00',fim:'19:00',slot:30,dias:[1,2,3,4,5,6]}},migratedEvoluai:false};
 let cur=new Date();cur.setHours(0,0,0,0);
 let view='agenda', aTab='dia', busca='', curPac=null, pTab='evol', pSearch='', attendApptId=null;
 
@@ -387,13 +397,13 @@ function sampleSeed(){const f=ymd(cur);const p1=uid(),p2=uid();
    {id:uid(),pacId:null,pac:'Ana Costa',fone:'',date:f,time:'10:00',dur:30,type:'tel',status:'agendado',obs:''}
  ],records:[
    {id:uid(),pacId:p1,date:nowISO(),tipo:'soap',titulo:'Consulta de rotina',texto:'S: Refere cefaleia ocasional, sem outras queixas.\nO: PA 130x85, FC 76, ACV/AR sem alterações.\nA: HAS controlada.\nP: Mantém losartana; retorno em 3 meses.'}
- ],prescriptions:[],documentos:[],docs:[],cfg:{medico:'',clinica:'',crm:'',esp:'',rqe:'',endereco:'',telefone:''},migratedEvoluai:true};
+ ],prescriptions:[],documentos:[],docs:[],labs:[],cfg:{medico:'',clinica:'',crm:'',esp:'',rqe:'',endereco:'',telefone:''},migratedEvoluai:true};
 }
 function normalize(d){d=d&&typeof d==='object'?d:{};
  const cfg=Object.assign({medico:'',clinica:'',crm:'',esp:'',rqe:'',endereco:'',telefone:''},d.cfg||{});
  cfg.agenda=Object.assign({ini:'07:00',fim:'19:00',slot:30,dias:[1,2,3,4,5,6]},cfg.agenda||{});
  if(!Array.isArray(cfg.agenda.dias)||!cfg.agenda.dias.length)cfg.agenda.dias=[1,2,3,4,5,6];
- return {patients:d.patients||[],appts:d.appts||[],records:d.records||[],prescriptions:d.prescriptions||[],documentos:d.documentos||[],docs:d.docs||[],
+ return {patients:d.patients||[],appts:d.appts||[],records:d.records||[],prescriptions:d.prescriptions||[],documentos:d.documentos||[],docs:d.docs||[],labs:d.labs||[],
    cfg,migratedEvoluai:!!d.migratedEvoluai};}
 
 function whenMT(cb){if(window.MT){cb();}else{setTimeout(()=>whenMT(cb),30);}}
@@ -694,6 +704,7 @@ function renderPaciente(){
     <button class="${pTab==='evol'?'on':''}" onclick="setPTab('evol')">📋 Evoluções</button>
     <button class="${pTab==='rx'?'on':''}" onclick="setPTab('rx')">💊 Receituários</button>
     <button class="${pTab==='docs'?'on':''}" onclick="setPTab('docs')">📄 Documentos</button>
+    <button class="${pTab==='labs'?'on':''}" onclick="setPTab('labs')">📈 Exames</button>
     <button class="${pTab==='cons'?'on':''}" onclick="setPTab('cons')">📅 Consultas</button>
   </div><div id="pbody"></div>`;
   document.getElementById('view').innerHTML=head;
@@ -728,6 +739,32 @@ function renderPBody(){
         <div class="racts"><button onclick="printDocu2('${r.id}')">🖨️ Imprimir</button><button onclick="waDocu('${r.id}')">📱 WhatsApp</button><button onclick="${r.tipo==='atestado'?`openAtestado('${r.id}')`:`openExames('${r.id}')`}">✏️ Editar</button><button onclick="delDocu('${r.id}')">🗑️ Excluir</button></div></div>`).join('')
       :'<div class="empty">Nenhum atestado ou solicitação de exames.<br>Use <b>+ Atestado</b> ou <b>+ Solicitação de exames</b> acima.</div>';
     box.innerHTML=h;
+  } else if(pTab==='labs'){
+    const labs=state.labs.filter(r=>r.pacId===curPac);
+    const today=ymd(new Date());
+    const comuns=['Hemoglobina','Hematócrito','Leucócitos','Plaquetas','Creatinina','Ureia','Sódio','Potássio','PCR','Glicose','HbA1c','TSH','TGO','TGP','Cálcio','Magnésio','INR','Albumina'];
+    let h=`<div class="hint" style="margin-bottom:8px">Anote os valores ao longo do tempo — com 2 ou mais, o app monta a <b>curva de evolução</b>.</div>
+      <div class="lab-add">
+        <input id="lab_nome" list="labdl" autocomplete="off" placeholder="Exame (ex.: Creatinina)"><datalist id="labdl">${comuns.map(c=>`<option value="${c}">`).join('')}</datalist>
+        <input id="lab_val" type="number" step="any" inputmode="decimal" placeholder="Valor">
+        <input id="lab_un" placeholder="Unid.">
+        <input id="lab_data" type="date" value="${today}">
+        <button class="btn btn-p btn-sm" onclick="addLab()">+ Adicionar</button>
+      </div>`;
+    const groups={};labs.forEach(r=>{const k=(r.nome||'').trim();if(k)(groups[k]=groups[k]||[]).push(r);});
+    const keys=Object.keys(groups).sort((a,b)=>a.localeCompare(b));
+    if(!keys.length){h+='<div class="empty">Nenhum exame anotado ainda.<br>Adicione acima — com 2+ valores aparece o gráfico de evolução.</div>';}
+    else{
+      h+=keys.map(k=>{
+        const series=groups[k].slice().sort((a,b)=>a.date.localeCompare(b.date));
+        const last=series[series.length-1],prev=series.length>1?series[series.length-2]:null;
+        const tr=prev?(last.valor>prev.valor?'<span style="color:var(--blue)">▲</span>':last.valor<prev.valor?'<span style="color:var(--red)">▼</span>':'<span style="color:var(--muted)">=</span>'):'';
+        const chart=series.length>=2?labChartSVG(series):'<div class="hint">Adicione outro valor para ver a curva.</div>';
+        const rows=series.slice().reverse().map(r=>`<span class="lab-pill">${esc(dm(r.date))}: <b>${esc(fmtNum(r.valor))}${r.unidade?(' '+esc(r.unidade)):''}</b> <a onclick="delLab('${r.id}')" title="Excluir">×</a></span>`).join('');
+        return `<div class="lab-card"><div class="lab-h"><b>${esc(k)}</b><span class="lab-last">${esc(fmtNum(last.valor))}${last.unidade?(' '+esc(last.unidade)):''} ${tr}</span></div>${chart}<div class="lab-rows">${rows}</div></div>`;
+      }).join('');
+    }
+    box.innerHTML=h;
   } else {
     const cs=apptsSorted(state.appts.filter(a=>a.pacId===curPac)).reverse();
     let h=`<div class="bar"><div></div><div class="right"><button class="btn btn-p btn-sm" onclick="openForm(null,'${curPac}')">+ Agendar consulta</button></div></div>`;
@@ -738,6 +775,37 @@ function renderPBody(){
 function copyRec(id){const r=state.records.find(x=>x.id===id);if(r&&navigator.clipboard)navigator.clipboard.writeText(r.texto);}
 function delRec(id){if(confirm('Excluir esta evolução do prontuário?')){state.records=state.records.filter(x=>x.id!==id);persist();renderPBody();}}
 function delRx(id){if(confirm('Excluir este receituário?')){state.prescriptions=state.prescriptions.filter(x=>x.id!==id);persist();renderPBody();}}
+
+/* ===== EXAMES (curva/gráfico) ===== */
+function dm(s){const d=new Date((s&&String(s).length<=10?s+'T00:00:00':s));if(isNaN(d))return esc(String(s||''));return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');}
+function fmtNum(n){return (Math.round(Number(n)*100)/100).toString().replace('.',',');}
+function labChartSVG(series){
+  const W=600,H=170,padL=8,padR=8,padT=20,padB=26,n=series.length;
+  const ys=series.map(s=>s.valor);let lo=Math.min(...ys),hi=Math.max(...ys);
+  if(lo===hi){lo=lo-1;hi=hi+1;}const p=(hi-lo)*0.18;lo-=p;hi+=p;const span=(hi-lo)||1;
+  const plotW=W-padL-padR,plotH=H-padT-padB;
+  const X=i=>padL+(n<=1?plotW/2:(i/(n-1))*plotW);
+  const Y=v=>padT+(1-(v-lo)/span)*plotH;
+  const line=series.map((s,i)=>X(i).toFixed(1)+','+Y(s.valor).toFixed(1)).join(' ');
+  const step=Math.max(1,Math.ceil(n/6));let marks='';
+  series.forEach((s,i)=>{const x=X(i).toFixed(1),y=Y(s.valor);
+    marks+='<circle cx="'+x+'" cy="'+y.toFixed(1)+'" r="3.5" fill="#0E5A6D"/>';
+    marks+='<text x="'+x+'" y="'+(y-7).toFixed(1)+'" font-size="10" text-anchor="middle" fill="#0E2A31">'+esc(fmtNum(s.valor))+'</text>';
+    if(i%step===0||i===n-1)marks+='<text x="'+x+'" y="'+(H-8)+'" font-size="9" text-anchor="middle" fill="#5B7882">'+esc(dm(s.date))+'</text>';
+  });
+  return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="max-width:100%;height:auto;display:block" preserveAspectRatio="xMidYMid meet"><polyline points="'+line+'" fill="none" stroke="#14b894" stroke-width="2"/>'+marks+'</svg>';
+}
+function addLab(){
+  const nome=(document.getElementById('lab_nome').value||'').trim();
+  const val=parseFloat((document.getElementById('lab_val').value||'').replace(',','.'));
+  if(!nome){alert('Informe o nome do exame.');return;}
+  if(isNaN(val)){alert('Informe um valor numérico.');return;}
+  const unidade=(document.getElementById('lab_un').value||'').trim();
+  const date=document.getElementById('lab_data').value||ymd(new Date());
+  state.labs.push({id:uid(),pacId:curPac,date,nome,valor:val,unidade});
+  persist();renderPBody();
+}
+function delLab(id){if(confirm('Excluir este valor?')){state.labs=state.labs.filter(x=>x.id!==id);persist();renderPBody();}}
 
 /* ===== EVOLUÇÃO (editor + IA + voz) ===== */
 function openEvol(id){
