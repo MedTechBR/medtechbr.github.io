@@ -978,6 +978,16 @@ main, #main { display: block !important; height: auto !important; overflow: visi
           <span class="ic" style="background:#dcfce7;color:#15803d">🧪</span>
           <span class="ttl">Análise de exames</span><span class="sub">Interpretar laboratório por IA</span>
         </button>
+        <button class="wb-card" data-go="procedimentos">
+          <span class="wb-badge new">Novo</span>
+          <span class="ic" style="background:#e0f2fe;color:#0369a1">🧰</span>
+          <span class="ttl">Procedimentos</span><span class="sub">Passo a passo à beira-leito</span>
+        </button>
+        <button class="wb-card" data-go="vacinas">
+          <span class="wb-badge new">Novo</span>
+          <span class="ic" style="background:#fce7f3;color:#be185d">💉</span>
+          <span class="ttl">Vacinação</span><span class="sub">Calendário PNI/SBIm</span>
+        </button>
       </div>
     </div>
 
@@ -1138,6 +1148,28 @@ main, #main { display: block !important; height: auto !important; overflow: visi
     <div class="pres-full"><label>Contexto clínico (opcional)<input id="ex_ctx" type="text" placeholder="Ex.: mulher 45a, fadiga e menorragia"></label></div>
     <button id="exGo" class="gaso-btn">🧪 Interpretar exames</button>
     <div id="exResult" style="margin-top:16px"></div>
+  </section>
+
+  <!-- ===================== GUIA DE PROCEDIMENTOS ===================== -->
+  <section id="proceduresView" class="wb-view" hidden>
+    <div class="wb-view-head"><span class="vic">🧰</span><h2>Guia de procedimentos</h2></div>
+    <p class="wb-view-intro">Procedimentos à beira-leito: indicações, material, técnica passo a passo, complicações e pérolas. Banco MedTech; o que faltar, a IA gera.</p>
+    <div class="wb-bigsearch">
+      <input id="procSearch" type="search" placeholder="Ex.: punção lombar, acesso central, intubação..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
+      <button id="procGo">Buscar</button>
+    </div>
+    <div class="wb-quick" id="procQuick"></div>
+    <div id="procResult" style="margin-top:16px"></div>
+  </section>
+
+  <!-- ===================== CALENDÁRIO VACINAL ===================== -->
+  <section id="vacinasView" class="wb-view" hidden>
+    <div class="wb-view-head"><span class="vic">💉</span><h2>Calendário vacinal</h2></div>
+    <p class="wb-view-intro">Esquema do PNI (Ministério da Saúde) por faixa/condição, com complementos da SBIm. O calendário é atualizado periodicamente — confirme o vigente.</p>
+    <div class="wb-quick" id="vacChips"></div>
+    <div id="vacResult" style="margin-top:8px"></div>
+    <div class="wb-bigsearch" style="margin-top:14px"><input id="vacSearch" type="search" placeholder="Dúvida específica (ex.: HPV, gestante, pós-exposição raiva)..." enterkeyhint="search"><button id="vacGo">Perguntar à IA</button></div>
+    <div id="vacIAResult" style="margin-top:12px"></div>
   </section>
 
   <!-- ===================== HISTÓRICO / FAVORITOS ===================== -->
@@ -10263,10 +10295,10 @@ document.getElementById('newBtn').onclick = () => {
 //  Navegação estilo Whitebook (views + bottom nav)
 // ============================================================
 function showView(name) {
-  const map = { home:'homeView', condutas:'condutasView', ia:'iaView', bulas:'bulasView', investigacao:'investigacaoView', prescricao:'prescricaoView', interacoes:'interacoesView', ddx:'ddxView', exames:'examesView', gaso:'gasoView', favoritos:'listView', historico:'listView', result:'resultView' };
+  const map = { home:'homeView', condutas:'condutasView', ia:'iaView', bulas:'bulasView', investigacao:'investigacaoView', prescricao:'prescricaoView', interacoes:'interacoesView', ddx:'ddxView', exames:'examesView', procedimentos:'proceduresView', vacinas:'vacinasView', gaso:'gasoView', favoritos:'listView', historico:'listView', result:'resultView' };
   const id = map[name] || 'homeView';
   document.querySelectorAll('.wb-view').forEach(v => { v.hidden = (v.id !== id); });
-  const navMap = { home:'home', condutas:'condutas', ia:'ia', favoritos:'favoritos', historico:'historico', bulas:'home', investigacao:'home', prescricao:'home', interacoes:'home', ddx:'home', exames:'home', gaso:'home', escores:'home', result:'home' };
+  const navMap = { home:'home', condutas:'condutas', ia:'ia', favoritos:'favoritos', historico:'historico', bulas:'home', investigacao:'home', prescricao:'home', interacoes:'home', ddx:'home', exames:'home', procedimentos:'home', vacinas:'home', gaso:'home', escores:'home', result:'home' };
   const navT = navMap[name] || 'home';
   document.querySelectorAll('#wbNav button').forEach(b => b.classList.toggle('active', b.dataset.go === navT));
   if (name === 'favoritos' || name === 'historico') {
@@ -10277,6 +10309,8 @@ function showView(name) {
   }
   if (name === 'bulas') renderBulaQuick();
   if (name === 'investigacao') renderInvQuick();
+  if (name === 'procedimentos') renderProcQuick();
+  if (name === 'vacinas') renderVacinas();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 window.showView = showView;
@@ -10928,6 +10962,287 @@ async function runExames() {
 const _itg = document.getElementById('itGo'); if (_itg) _itg.onclick = () => runInteracoes();
 const _ddg = document.getElementById('ddGo'); if (_ddg) _ddg.onclick = () => runDDx();
 const _exg = document.getElementById('exGo'); if (_exg) _exg.onclick = () => runExames();
+
+// ============================================================
+//  GUIA DE PROCEDIMENTOS — banco offline (original, base em diretrizes) + IA
+// ============================================================
+const PROC_OFF = {
+ 'puncao_lombar': { nome:'Punção lombar', alias:['raquidiana','liquor','pl'], md:`# Punção lombar
+## 🎯 Indicações
+- Coleta de líquor (suspeita de meningite/encefalite, HSA com TC normal, Guillain-Barré, esclerose múltipla); medida de pressão; via para anestesia/quimioterapia.
+## 🚫 Contraindicações / precauções
+- Sinais de hipertensão intracraniana com efeito de massa, infecção no local, plaquetopenia/coagulopatia. **TC de crânio antes** se déficit focal, papiledema, rebaixamento ou imunossupressão.
+## 🧰 Material
+- Antissépticos, campo estéril, anestésico local, agulha de punção (Quincke/atraumática), manômetro, tubos para coleta.
+## 🪡 Técnica (passo a passo)
+- 1) Posição: decúbito lateral (joelhos fletidos) ou sentado, dorso fletido. 2) Marco: cruzamento das cristas ilíacas (linha de Tuffier ≈ L4) — puncionar L3-L4 ou L4-L5. 3) Antissepsia ampla + anestesia local. 4) Inserir a agulha na linha média, levemente cefálica, bisel paralelo às fibras durais. 5) Ao sentir a perda de resistência, retirar o mandril e checar fluxo. 6) Medir pressão de abertura e coletar 3-4 tubos. 7) Recolocar o mandril antes de retirar.
+## ⚠️ Complicações
+- Cefaleia pós-punção (menor com agulha atraumática/fino calibre), dor local, sangramento, infecção; herniação (se HIC com massa).
+## 💡 Pérolas
+- Pressão de abertura normal ~ 7-18 cmH2O. Se acelular e proteína alta → dissociação (Guillain-Barré). Sempre coletar amostra para cultura antes do antibiótico, sem atrasar a 1ª dose em suspeita de meningite.` },
+ 'acesso_venoso_central': { nome:'Acesso venoso central', alias:['cvc','puncao venosa profunda','jugular','subclavia','cateter central'], md:`# Acesso venoso central
+## 🎯 Indicações
+- Drogas vasoativas/irritantes, monitorização (PVC), hemodiálise, falha de acesso periférico, nutrição parenteral.
+## 🚫 Contraindicações / precauções
+- Coagulopatia grave (preferir sítio compressível), infecção/trombose no sítio, distorção anatômica. Subclávia evita em coagulopatia (não compressível).
+## 🧰 Material
+- Kit de Seldinger (fio-guia, dilatador, cateter), USG, paramentação estéril completa, SF para checar refluxo, fio de fixação.
+## 🪡 Técnica (passo a passo)
+- 1) Escolher sítio (jugular interna guiada por USG é a 1ª escolha; subclávia; femoral). 2) Posição (Trendelenburg para jugular/subclávia). 3) Paramentação e antissepsia amplas (barreira máxima). 4) Puncionar sob USG, confirmar sangue venoso (escuro, baixa pressão). 5) Passar o fio-guia (vigiar arritmias), retirar a agulha. 6) Dilatar, introduzir o cateter, retirar o guia. 7) Checar refluxo em todas as vias, fixar, curativo. 8) **RX de tórax** para posição e descartar pneumotórax.
+## ⚠️ Complicações
+- Pneumotórax/hemotórax, punção arterial, arritmia (guia no AD), embolia gasosa, infecção de corrente, trombose.
+## 💡 Pérolas
+- Nunca soltar o fio-guia. Confirmar que é venoso (USG/transdução/gasometria) antes de dilatar. Ponta ideal na junção cava-átrio.` },
+ 'intubacao_orotraqueal': { nome:'Intubação orotraqueal', alias:['iot','via aerea','sequencia rapida','tubo'], md:`# Intubação orotraqueal
+## 🎯 Indicações
+- Insuficiência respiratória, proteção de via aérea (Glasgow ≤ 8), choque/parada, necessidade de ventilação mecânica.
+## 🚫 Contraindicações / precauções
+- Via aérea difícil prevista (preparar plano alternativo). Avaliar LEMON/preditores.
+## 🧰 Material
+- Laringoscópio (lâmina/vídeo), tubos (mulher 7,0-7,5; homem 7,5-8,0), fio-guia, seringa, bolsa-valva-máscara, capnógrafo, aspirador, drogas de sequência rápida, fixador.
+## 🪡 Técnica (passo a passo)
+- 1) Preparar material, monitor, acesso, pré-oxigenar (O2 100% por 3 min). 2) Posição olfativa/rampa. 3) Sequência rápida: indução (etomidato/cetamina/propofol) + bloqueador (succinilcolina/rocurônio). 4) Laringoscopia, expor a glote, passar o tubo sob visão. 5) Insuflar o cuff. 6) **Confirmar: capnografia** + ausculta (epigástrio e ápices) + expansão. 7) Fixar e ajustar a ventilação; RX para profundidade.
+## ⚠️ Complicações
+- Intubação esofágica/seletiva, hipoxemia, trauma dentário/laríngeo, broncoaspiração, instabilidade hemodinâmica.
+## 💡 Pérolas
+- Capnografia é o padrão-ouro de confirmação. Profundidade ≈ 21 cm (mulher) / 23 cm (homem) na rima labial. Planeje a falha (plano B/C) ANTES.` },
+ 'toracocentese': { nome:'Toracocentese', alias:['puncao pleural','derrame pleural'], md:`# Toracocentese
+## 🎯 Indicações
+- Diagnóstica (investigar derrame — critérios de Light) ou terapêutica (alívio de dispneia).
+## 🚫 Contraindicações / precauções
+- Coagulopatia não corrigida, derrame muito pequeno (guiar por USG), infecção de pele no local.
+## 🧰 Material
+- Antissépticos, anestésico, jelco/agulha longa, torneira de 3 vias, frascos/coletor, USG.
+## 🪡 Técnica (passo a passo)
+- 1) Paciente sentado, braços apoiados. 2) Localizar o derrame (percussão + **USG**) — geralmente espaço intercostal na linha axilar posterior. 3) Antissepsia e anestesia por planos. 4) Puncionar **na borda SUPERIOR da costela inferior** (evita o feixe vásculo-nervoso). 5) Aspirar; se terapêutica, retirar até alívio. 6) Curativo; RX se suspeita de pneumotórax.
+## ⚠️ Complicações
+- Pneumotórax, hemotórax, edema de reexpansão, punção de baço/fígado, dor.
+## 💡 Pérolas
+- Limitar a retirada a ~1-1,5 L por sessão (risco de edema de reexpansão). Coletar para: proteína, LDH, celularidade, glicose, pH, ADA, citologia e cultura conforme suspeita.` },
+ 'paracentese': { nome:'Paracentese', alias:['puncao abdominal','ascite'], md:`# Paracentese
+## 🎯 Indicações
+- Diagnóstica (toda ascite nova / piora / suspeita de PBE) ou terapêutica (ascite tensa/refratária).
+## 🚫 Contraindicações / precauções
+- CIVD/fibrinólise; cautela com alças distendidas, bexigoma (esvaziar), cicatrizes/organomegalia (guiar por USG).
+## 🧰 Material
+- Antissépticos, anestésico, jelco/agulha, sistema coletor, USG; albumina se grande volume.
+## 🪡 Técnica (passo a passo)
+- 1) Decúbito dorsal, leve lateralização. 2) Local: quadrante inferior **esquerdo**, ~2-3 cm medial e cefálico à espinha ilíaca ântero-superior (ou linha média infraumbilical), evitando cicatrizes/vasos — confirmar por USG. 3) Antissepsia e anestesia. 4) **Técnica em Z** (tracionar a pele) para reduzir vazamento. 5) Aspirar; se terapêutica, drenar. 6) Curativo.
+## ⚠️ Complicações
+- Sangramento, perfuração de alça, vazamento persistente, disfunção circulatória pós-paracentese (grande volume).
+## 💡 Pérolas
+- Repor **albumina ~6-8 g por litro retirado** quando a retirada for > 5 L. Diagnóstico: GASA (≥ 1,1 = hipertensão portal), celularidade (PMN ≥ 250 = PBE), cultura em frasco de hemocultura.` },
+ 'drenagem_toracica': { nome:'Drenagem torácica', alias:['dreno de torax','toracostomia','pneumotorax'], md:`# Drenagem torácica
+## 🎯 Indicações
+- Pneumotórax (hipertensivo após descompressão; grande/sintomático), hemotórax, derrame complicado/empiema.
+## 🚫 Contraindicações / precauções
+- Coagulopatia (corrigir se possível); aderências. Pneumotórax hipertensivo: **descomprimir com agulha antes** se instável.
+## 🧰 Material
+- Antissépticos, anestésico, bisturi, pinça (Kelly), dreno tubular, sistema em selo d'água, fio de fixação.
+## 🪡 Técnica (passo a passo)
+- 1) Paciente em semi-decúbito, braço elevado. 2) Local: **triângulo de segurança** (5º espaço intercostal, entre as linhas axilares anterior e média). 3) Antissepsia e anestesia generosa (pele→pleura). 4) Incisão sobre a **borda superior da costela**; dissecção romba com a pinça até a pleura; entrar na pleura e checar com o dedo (sem víscera/aderência). 5) Introduzir o dreno (ápice no pneumotórax, base no derrame) sem trocarte. 6) Conectar ao selo d'água, fixar, curativo; RX de controle.
+## ⚠️ Complicações
+- Lesão de pulmão/coração/diafragma/fígado-baço, posicionamento incorreto, sangramento, infecção, enfisema subcutâneo.
+## 💡 Pérolas
+- Confirme borbulhamento/oscilação no selo. Nunca clampear um dreno borbulhante (risco de pneumotórax hipertensivo).` },
+ 'sondagem_vesical': { nome:'Sondagem vesical', alias:['cateter vesical','foley','svd','sonda de demora'], md:`# Sondagem vesical
+## 🎯 Indicações
+- Retenção urinária, monitorização de diurese (grave), perioperatório, lesões/úlceras com necessidade de derivação.
+## 🚫 Contraindicações / precauções
+- Suspeita de **lesão de uretra** (trauma: sangue no meato, hematoma perineal, próstata deslocada) → não sondar, avaliar uretrografia.
+## 🧰 Material
+- Kit estéril, sonda Foley (adulto 14-16 Fr), lubrificante (idealmente com anestésico), seringa com água destilada, sistema coletor.
+## 🪡 Técnica (passo a passo)
+- 1) Antissepsia e campo estéril. 2) Lubrificar generosamente. 3) Introduzir a sonda até o fluxo de urina (no homem, tracionar o pênis a 90°). 4) **Só insuflar o balão após confirmar a urina** (5-10 mL). 5) Tracionar suavemente e conectar o coletor (sistema fechado), fixar.
+## ⚠️ Complicações
+- Trauma/falso trajeto, ITU associada ao cateter, hematúria, parafimose (recolocar o prepúcio).
+## 💡 Pérolas
+- Nunca forçar; se resistência, reavaliar (estenose/próstata). Indicação restrita e retirada precoce reduzem ITU.` },
+ 'cardioversao': { nome:'Cardioversão elétrica', alias:['cardioversao sincronizada','desfibrilacao','choque eletrico'], md:`# Cardioversão elétrica
+## 🎯 Indicações
+- **Sincronizada:** taquiarritmia COM pulso e **instável** (FA/flutter, TSV, TV monomórfica com pulso). **Desfibrilação (NÃO sincronizada):** FV / TV sem pulso.
+## 🚫 Contraindicações / precauções
+- FA > 48 h sem anticoagulação (risco embólico — preferir controle/ETE se eletiva). Intoxicação digitálica.
+## 🧰 Material
+- Desfibrilador/monitor, pás/eletrodos, material de via aérea, sedação/analgesia, acesso venoso.
+## 🪡 Técnica (passo a passo)
+- 1) Monitorizar, O2, acesso, **sedar** (paciente consciente). 2) Ativar o modo **SINCRONIZADO** (sync) para cardioversão. 3) Selecionar a carga: FA ~120-200 J (bifásico); flutter/TSV ~50-100 J; TV monomórfica ~100 J. 4) Carregar, afastar todos, aplicar o choque. 5) Reavaliar ritmo/pulso; repetir com carga maior se necessário. Para FV/TV sem pulso: desfibrilar (não sincronizado) ~200 J bifásico e seguir o ACLS.
+## ⚠️ Complicações
+- Queimadura de pele, arritmias, embolia (FA), depressão respiratória pela sedação.
+## 💡 Pérolas
+- Reative o "sync" a cada choque (alguns aparelhos saem do modo após disparar). Em TV polimórfica instável, trate como FV (desfibrilação).` },
+ 'acesso_intraosseo': { nome:'Acesso intraósseo', alias:['io','intraossea','emergencia acesso'], md:`# Acesso intraósseo
+## 🎯 Indicações
+- Emergência/parada com falha de acesso venoso rápido (adulto e criança). Via para qualquer droga/fluido da reanimação.
+## 🚫 Contraindicações / precauções
+- Fratura/prótese no osso-alvo, infecção/celulite no local, tentativa prévia no mesmo osso.
+## 🧰 Material
+- Dispositivo intraósseo (broca/manual), seringa, SF para flush, conector.
+## 🪡 Técnica (passo a passo)
+- 1) Sítios: **tíbia proximal** (1-2 cm abaixo e medial à tuberosidade) ou úmero proximal. 2) Antissepsia. 3) Inserir perpendicular ao osso até a perda de resistência (cortical). 4) Retirar o mandril, **confirmar** (estável + aspirado medular ± flush sem extravasamento). 5) Flush vigoroso (dói — analgesia/lidocaína no consciente) e conectar.
+## ⚠️ Complicações
+- Extravasamento (síndrome compartimental), fratura, osteomielite (rara, uso curto), dor.
+## 💡 Pérolas
+- Ponte temporária: trocar por acesso venoso assim que possível (idealmente < 24 h).` },
+ 'sutura_simples': { nome:'Sutura de pele', alias:['sutura simples','ferida','pontos'], md:`# Sutura simples de pele
+## 🎯 Indicações
+- Fechamento de feridas lineares limpas, sem grande perda de tecido, dentro da janela (geralmente até ~6-12 h; face até ~24 h).
+## 🚫 Contraindicações / precauções
+- Feridas infectadas, mordeduras (avaliar não fechar / fechamento tardio), corpo estranho, perda extensa.
+## 🧰 Material
+- Antissépticos, SF para irrigação, anestésico local (lidocaína; com vaso evitar em extremidades), porta-agulha, pinça, tesoura, fio.
+## 🪡 Técnica (passo a passo)
+- 1) Anamnese (tétano, mecanismo) e exame (vasos/nervos/tendões). 2) **Irrigação abundante** com SF + limpeza/desbridamento. 3) Anestesia local. 4) Pontos simples aproximando as bordas com eversão, espaçados uniformemente. 5) Curativo; orientar sinais de infecção e retorno.
+## ⚠️ Complicações
+- Infecção, deiscência, cicatriz inestética, lesão não identificada de estrutura profunda.
+## 💡 Pérolas
+- Calibre por região: face 5-0/6-0; couro cabeludo/tronco/MMSS 3-0/4-0; MMII 3-0/4-0. Retirada: face ~5 dias; tronco/MMSS ~7-10; MMII/dorso ~10-14. Atualizar profilaxia antitetânica.` }
+};
+const PROC_COMUNS = ['Punção lombar','Acesso venoso central','Intubação orotraqueal','Toracocentese','Paracentese','Drenagem torácica','Sondagem vesical','Cardioversão elétrica','Acesso intraósseo','Sutura de pele'];
+function renderProcQuick() {
+  const el = document.getElementById('procQuick'); if (!el || el.dataset.done) return;
+  el.innerHTML = '<span style="font-size:12px;color:var(--text-mute);width:100%;margin-bottom:2px">Comuns:</span>' + PROC_COMUNS.map(d => `<button data-q="${escapeHtml(d)}">${escapeHtml(d)}</button>`).join('');
+  el.querySelectorAll('button').forEach(b => b.onclick = () => { document.getElementById('procSearch').value = b.dataset.q; runProc(b.dataset.q); });
+  el.dataset.done = '1';
+}
+function procIaBtn(q){ return `<button class="btn-primary" style="margin-top:12px" onclick="runProc(${JSON.stringify(q).replace(/"/g,'&quot;')}, true)">🔄 Gerar versão da IA</button>`; }
+function buildPromptProc(proc) {
+  return `Você é médico experiente e preceptor de procedimentos. Descreva o PROCEDIMENTO "${proc}" para execução à beira do leito por médicos no Brasil, em Markdown, prático e seguro. Use EXATAMENTE estes cabeçalhos começando com "## ":
+
+# ${proc}
+
+## 🎯 Indicações
+## 🚫 Contraindicações / precauções
+## 🧰 Material
+## 🪡 Técnica (passo a passo)
+## ⚠️ Complicações
+## 💡 Pérolas
+
+Bullets curtos; na técnica, passos numerados "1) ... 2) ...". Cite parâmetros concretos (calibres, marcos anatômicos, doses). Não invente; se incerto, sinalize. Responda em português do Brasil.`;
+}
+async function runProc(q, forceIA) {
+  q = (q || '').trim(); if (!q) return;
+  const box = document.getElementById('procResult');
+  if (!forceIA) {
+    const off = findOffline(PROC_OFF, q);
+    if (off) {
+      box.innerHTML = `<div class="result content"><div style="display:inline-block;background:#e7f7f1;color:#13503a;border:1px solid #bfe6db;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;margin-bottom:10px">📚 Banco MedTech</div>${accordionize(md(off.md))}<div class="alert alert-info" style="margin-top:14px"><span>ℹ</span><div>Guia de referência — adapte ao paciente, ao material e ao protocolo da sua instituição.</div></div>${procIaBtn(q)}</div>`;
+      window.scrollTo({ top: 0, behavior:'smooth' }); return;
+    }
+  }
+  if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span>⚠</span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
+  box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Buscando procedimento:</strong> ${escapeHtml(q)}</div><div class="loading-sub">Indicações, técnica e complicações…</div></div>`;
+  try {
+    const { text } = await callGemini([{ role:'user', parts:[{ text: buildPromptProc(q) }] }]);
+    box.innerHTML = `<div class="result content">${accordionize(md(text))}<div class="alert alert-info" style="margin-top:14px"><span>ℹ</span><div>Gerado por IA — confirme técnica e material no protocolo institucional antes de executar.</div></div></div>`;
+    window.scrollTo({ top: 0, behavior:'smooth' });
+  } catch (err) {
+    box.innerHTML = `<div class="alert alert-warn"><span>⚠</span><div>Não foi possível buscar agora: ${escapeHtml(err.message||'erro')}.</div></div>`;
+    const r = document.createElement('button'); r.className='btn-primary'; r.style.marginTop='10px'; r.textContent='🔄 Tentar de novo'; r.onclick=()=>runProc(q); box.appendChild(r);
+  }
+}
+const _prg = document.getElementById('procGo'), _prs = document.getElementById('procSearch');
+if (_prg) _prg.onclick = () => runProc(_prs.value);
+if (_prs) _prs.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); runProc(_prs.value); } });
+
+// ============================================================
+//  CALENDÁRIO VACINAL — base PNI (Ministério da Saúde) / SBIm + IA p/ dúvidas
+// ============================================================
+const VACINAS = {
+ crianca:{ l:'Criança (0-4a)', md:`# Calendário da criança (PNI)
+## Ao nascer
+- BCG (dose única) e Hepatite B (1ª dose, idealmente nas primeiras 12-24 h).
+## 2 meses
+- Pentavalente (DTP+Hib+HepB) 1ª; VIP (poliomielite inativada) 1ª; Pneumocócica 10-valente 1ª; Rotavírus 1ª.
+## 3 meses
+- Meningocócica C 1ª.
+## 4 meses
+- Pentavalente 2ª; VIP 2ª; Pneumo 10 2ª; Rotavírus 2ª (respeitar a idade-limite para iniciar/última dose).
+## 5 meses
+- Meningocócica C 2ª.
+## 6 meses
+- Pentavalente 3ª; VIP 3ª. Influenza anual a partir dos 6 meses (campanha).
+## 9 meses
+- Febre amarela (1ª dose).
+## 12 meses
+- Tríplice viral (sarampo/caxumba/rubéola) 1ª; Pneumo 10 reforço; Meningo C reforço.
+## 15 meses
+- DTP 1º reforço; VOP (poliomielite oral); Hepatite A (dose única); Tetraviral (tríplice viral + varicela).
+## 4 anos
+- DTP 2º reforço; VOP; Varicela 2ª; Febre amarela reforço.
+> As idades/esquemas mudam periodicamente — confira o calendário vigente do PNI.` },
+ adolescente:{ l:'Adolescente', md:`# Adolescente (9-19 anos)
+- **HPV:** dose única dos 9 aos 14 anos (esquema atual do PNI); imunossuprimidos seguem 3 doses.
+- **Meningocócica ACWY:** 11-14 anos (dose/reforço conforme calendário).
+- **dT/dTpa:** reforço a cada 10 anos.
+- **Hepatite B:** completar 3 doses se não vacinado.
+- **Tríplice viral:** garantir 2 doses ao longo da vida (ver caderneta).
+- **Febre amarela:** conforme situação vacinal e área de recomendação.` },
+ adulto:{ l:'Adulto (20-59a)', md:`# Adulto (20-59 anos)
+- **dT:** reforço a cada 10 anos (antecipar para 5 anos em ferimentos de risco).
+- **Hepatite B:** 3 doses se sem comprovação.
+- **Tríplice viral:** até 29 anos → 2 doses; 30-59 anos → 1 dose (ver caderneta).
+- **Febre amarela:** 1 dose conforme recomendação de área.
+- **Influenza:** anual para grupos prioritários.
+- **COVID-19:** conforme orientação vigente.` },
+ idoso:{ l:'Idoso (60+)', md:`# Idoso (60+ anos)
+- **Influenza:** anual.
+- **dT:** reforço a cada 10 anos.
+- **Hepatite B:** 3 doses se não vacinado.
+- **Febre amarela:** conforme área/indicação (avaliar risco-benefício se 1ª dose após os 60).
+- **Pneumocócica 23-valente:** grupos de risco/institucionalizados (CRIE).
+- **COVID-19:** conforme orientação vigente.
+> Herpes-zóster e pneumo conjugada (VPC) disponíveis na rede privada/SBIm para esta faixa.` },
+ gestante:{ l:'Gestante', md:`# Gestante
+- **dTpa:** a cada gestação, a partir da 20ª semana (protege o RN contra coqueluche).
+- **dT:** completar o esquema se incompleto.
+- **Hepatite B:** se não vacinada.
+- **Influenza:** em qualquer trimestre (campanha).
+- **COVID-19:** conforme orientação vigente.
+- **Contraindicadas (vacinas vivas):** tríplice viral, varicela, febre amarela (avaliar só em situação de risco real), dengue; HPV é adiada para após a gestação.` },
+ especiais:{ l:'Situações especiais', md:`# Situações especiais
+## Imunossuprimidos / CRIE
+- O CRIE oferece imunobiológicos especiais (pneumo conjugada, meningo ACWY/B, hepatite A/B em esquema reforçado, VIP no lugar da VOP, etc.). **Evitar vacinas VIVAS** na imunossupressão grave; idealmente vacinar antes de iniciar a imunossupressão.
+## Profilaxia pós-exposição
+- **Tétano (ferimentos):** vacina ± imunoglobulina/soro conforme o estado vacinal e o tipo de ferimento.
+- **Raiva:** esquema vacinal ± soro/imunoglobulina conforme o tipo de exposição e a condição do animal.
+- **Hepatite B:** vacina ± imunoglobulina (HBIG) conforme a fonte e o estado vacinal.
+> Consulte o manual do CRIE e as normas de profilaxia pós-exposição vigentes.` }
+};
+function renderVacinas() {
+  const chips = document.getElementById('vacChips'); if (!chips) return;
+  if (!chips.dataset.done) {
+    chips.innerHTML = Object.keys(VACINAS).map((k,i) => `<button data-k="${k}" class="${i===0?'on':''}" onclick="setVacGrupo('${k}')">${escapeHtml(VACINAS[k].l)}</button>`).join('');
+    chips.dataset.done = '1';
+  }
+  setVacGrupo(chips.dataset.cur || 'crianca');
+}
+function setVacGrupo(k) {
+  const chips = document.getElementById('vacChips'); if (chips) { chips.dataset.cur = k; [...chips.querySelectorAll('button')].forEach(b => b.className = (b.getAttribute('data-k') === k ? 'on' : '')); }
+  const box = document.getElementById('vacResult'); const g = VACINAS[k]; if (box && g) box.innerHTML = `<div class="result content"><div style="display:inline-block;background:#e7f7f1;color:#13503a;border:1px solid #bfe6db;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;margin-bottom:10px">📚 Base PNI / SBIm</div>${accordionize(md(g.md))}</div>`;
+}
+function buildPromptVac(q) {
+  return `Você é médico e a referência é o calendário do PNI (Ministério da Saúde do Brasil), complementado pela SBIm. Responda à dúvida de vacinação abaixo em português, em Markdown objetivo (esquema, doses, intervalos, vias, contraindicações). O calendário é atualizado periodicamente — oriente confirmar o vigente. Use cabeçalhos "## " quando ajudar. Não invente.
+
+Dúvida: ${q}`;
+}
+async function runVacIA(q) {
+  q = (q || '').trim(); if (!q) return;
+  const box = document.getElementById('vacIAResult');
+  if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span>⚠</span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
+  box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Consultando:</strong> ${escapeHtml(q)}</div><div class="loading-sub">Esquema, doses e intervalos…</div></div>`;
+  try {
+    const { text } = await callGemini([{ role:'user', parts:[{ text: buildPromptVac(q) }] }]);
+    box.innerHTML = `<div class="result content">${accordionize(md(text))}<div class="alert alert-info" style="margin-top:14px"><span>ℹ</span><div>Gerado por IA com base no PNI/SBIm — confirme no calendário vigente.</div></div></div>`;
+    window.scrollTo({ top: 0, behavior:'smooth' });
+  } catch (err) {
+    box.innerHTML = `<div class="alert alert-warn"><span>⚠</span><div>Não foi possível consultar agora: ${escapeHtml(err.message||'erro')}.</div></div>`;
+    const r = document.createElement('button'); r.className='btn-primary'; r.style.marginTop='10px'; r.textContent='🔄 Tentar de novo'; r.onclick=()=>runVacIA(q); box.appendChild(r);
+  }
+}
+const _vcg = document.getElementById('vacGo'), _vcs = document.getElementById('vacSearch');
+if (_vcg) _vcg.onclick = () => runVacIA(_vcs.value);
+if (_vcs) _vcs.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); runVacIA(_vcs.value); } });
 
 // ============ Init ============
 renderSide();
