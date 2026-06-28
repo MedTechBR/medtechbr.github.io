@@ -144,7 +144,7 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
     </div>
     <div class="usr" id="usr"></div>
   </div>
-  <div class="wrap"><div class="search-wrap"><span class="ic">🔍</span><input id="busca" placeholder="Buscar: pneumonia, Pseudomonas, ESBL, meropenem, ITU…" oninput="onBusca(this.value)" autocomplete="off"></div></div>
+  <div class="wrap"><div class="search-wrap"><span class="ic"><i class="ti ti-search"></i></span><input id="busca" placeholder="Buscar: pneumonia, Pseudomonas, ESBL, meropenem, ITU…" oninput="onBusca(this.value)" autocomplete="off"></div></div>
 </header>
 
 <main id="view"></main>
@@ -176,7 +176,7 @@ function md(t){
 
 /* ===================== BANCO: FOCOS (empírico) ===================== */
 const FOCOS=[
-{id:'pac',icon:'🫁',nome:'Pneumonia',tags:'PAC, PAV, PAH, respiratória, tosse, dispneia',
+{id:'pac',icon:'<i class="ti ti-lungs"></i>',nome:'Pneumonia',tags:'PAC, PAV, PAH, respiratória, tosse, dispneia',
  md:`## Germes prováveis
 **Comunitária (PAC):** pneumococo, *H. influenzae*, atípicos (*Mycoplasma*, *Legionella*, *Chlamydophila*), *S. aureus* (pós-influenza). **Hospitalar/PAV:** enterobactérias, *Pseudomonas*, *Acinetobacter*, *S. aureus* (incl. MRSA).
 ## Empírico — comunitária
@@ -194,7 +194,7 @@ Leve: cefalosporina segura. Grave/anafilaxia: levofloxacino (PAC) / aztreonam + 
 PAC: **5 dias** (afebril 48–72h, estável). PAV/PAH: **7 dias**. *Legionella*/imunossupressão: mais longo.
 > Perla: calcule **CURB-65/PSI** para definir local de tratamento; colha cultura/antígenos urinários (pneumococo, *Legionella*) no grave antes do ATB.
 > Alarme: cobertura anti-Pseudomonas e anti-MRSA **só** com fator de risco — não as use de rotina (stewardship).`},
-{id:'itu',icon:'🚽',nome:'ITU / urinária',tags:'cistite, pielonefrite, urina, cateter, urossepse',
+{id:'itu',icon:'<i class="ti ti-droplet"></i>',nome:'ITU / urinária',tags:'cistite, pielonefrite, urina, cateter, urossepse',
  md:`## Germes prováveis
 *E. coli* (maioria), *Klebsiella*, *Proteus*, *Enterococcus*; em hospitalar/cateter: *Pseudomonas*, ESBL, *Enterococcus*.
 ## Cistite não complicada (mulher)
@@ -208,7 +208,7 @@ PAC: **5 dias** (afebril 48–72h, estável). PAV/PAH: **7 dias**. *Legionella*/
 Cistite 3–5 d; pielonefrite 7 d (quinolona) a 10–14 d (β-lactâmico).
 > Perla: **bacteriúria assintomática NÃO trata** — exceto gestante e pré-procedimento urológico com sangramento. Sempre colha urocultura antes no quadro complicado.
 > Alarme: nitrofurantoína e fosfomicina **não** servem para pielonefrite (não atingem parênquima/sangue).`},
-{id:'pele',icon:'🩹',nome:'Pele e partes moles',tags:'celulite, erisipela, abscesso, MRSA, fasciíte, pé diabético',
+{id:'pele',icon:'<i class="ti ti-bandage"></i>',nome:'Pele e partes moles',tags:'celulite, erisipela, abscesso, MRSA, fasciíte, pé diabético',
  md:`## Germes prováveis
 Não purulenta (erisipela/celulite): *Streptococcus* β-hemolítico; purulenta/abscesso: *S. aureus* (incl. **MRSA comunitário**).
 ## Empírico
@@ -221,7 +221,7 @@ Não purulenta (erisipela/celulite): *Streptococcus* β-hemolítico; purulenta/a
 Celulite não complicada: 5 d (estende se lenta resposta).
 > Perla: marque o bordo do eritema — piora nas primeiras 24–48h pode ser evolução natural, não falha.
 > Alarme: dor desproporcional, bolhas, crepitação, necrose ou toxemia → suspeite de **necrosante** e chame cirurgia já.`},
-{id:'abdome',icon:'🫄',nome:'Intra-abdominal',tags:'peritonite, apendicite, colangite, diverticulite, biliar',
+{id:'abdome',icon:'<i class="ti ti-medical-cross"></i>',nome:'Intra-abdominal',tags:'peritonite, apendicite, colangite, diverticulite, biliar',
  md:`## Germes prováveis
 Enterobactérias (*E. coli*, *Klebsiella*), **anaeróbios** (*Bacteroides fragilis*), *Enterococcus* (selecionados).
 ## Empírico — comunitária (leve-moderada)
@@ -232,7 +232,7 @@ Enterobactérias (*E. coli*, *Klebsiella*), **anaeróbios** (*Bacteroides fragil
 **4 dias após controle de foco** adequado (estudo STOP-IT); sem controle de foco, prolongar.
 > Perla: **controle de foco** (drenagem/cirurgia) é mais importante que o ATB. Colha cultura do material.
 > Alarme: colangite/sepse biliar → descompressão das vias biliares (CPRE) é prioritária.`},
-{id:'sepse',icon:'🆘',nome:'Sepse / foco indefinido',tags:'sepse, choque, bacteremia, corrente sanguínea, hemocultura',
+{id:'sepse',icon:'<i class="ti ti-alert-triangle"></i>',nome:'Sepse / foco indefinido',tags:'sepse, choque, bacteremia, corrente sanguínea, hemocultura',
  md:`## Conduta
 **Emergência.** ATB de amplo espectro na **1ª hora**, após **2 hemoculturas** (não atrasar). Identifique o foco provável e direcione.
 ## Empírico amplo
@@ -243,7 +243,7 @@ Enterobactérias (*E. coli*, *Klebsiella*), **anaeróbios** (*Bacteroides fragil
 Reavalie em 48–72h com culturas: **estreite o espectro** para o agente isolado e suspenda coberturas desnecessárias (stewardship). Defina duração pelo foco.
 > Perla: lactato, controle de foco e ressuscitação volêmica andam junto com o ATB. Repique hemoculturas se *S. aureus*/candidemia.
 > Alarme: cada hora de atraso do ATB no choque séptico aumenta mortalidade — não espere exames para iniciar.`},
-{id:'meningite',icon:'🧠',nome:'Meningite / SNC',tags:'meningite, neuro, líquor, rigidez de nuca',
+{id:'meningite',icon:'<i class="ti ti-brain"></i>',nome:'Meningite / SNC',tags:'meningite, neuro, líquor, rigidez de nuca',
  md:`## Germes prováveis
 Pneumococo, meningococo, *H. influenzae*; **>50 anos / imunossuprimido / gestante:** + *Listeria monocytogenes*.
 ## Empírico (não atrasar — antes ou junto da TC/PL se necessário)
@@ -255,7 +255,7 @@ Pneumococo, meningococo, *H. influenzae*; **>50 anos / imunossuprimido / gestant
 Meningococo 5–7 d; pneumococo 10–14 d; *Listeria* ≥21 d.
 > Perla: colha hemoculturas e inicie ATB em **<1h**; a PL pode ser feita depois se houver indicação de TC antes.
 > Alarme: não atrase o antibiótico esperando exame de imagem ou líquor.`},
-{id:'osteo',icon:'🦴',nome:'Osteoarticular',tags:'artrite séptica, osteomielite, prótese, articular',
+{id:'osteo',icon:'<i class="ti ti-bone"></i>',nome:'Osteoarticular',tags:'artrite séptica, osteomielite, prótese, articular',
  md:`## Germes prováveis
 *S. aureus* (principal), *Streptococcus*, Gram-negativos (idoso, trato urinário), *Pseudomonas* (UDIV/punção plantar).
 ## Empírico
@@ -264,7 +264,7 @@ Meningococo 5–7 d; pneumococo 10–14 d; *Listeria* ≥21 d.
 ## Duração
 Artrite séptica ~2–4 semanas; osteomielite **4–6 semanas** (mais se prótese). Direcionar por cultura óssea/articular.
 > Perla: colha cultura (articular/óssea) **antes** do ATB sempre que possível — define o tratamento prolongado.`},
-{id:'neutropenia',icon:'🌡️',nome:'Neutropenia febril',tags:'oncologia, quimioterapia, febre, neutropenia',
+{id:'neutropenia',icon:'<i class="ti ti-temperature"></i>',nome:'Neutropenia febril',tags:'oncologia, quimioterapia, febre, neutropenia',
  md:`## Definição e conduta
 Febre ≥38,3°C (ou ≥38°C sustentada) + neutrófilos <500. **Emergência:** ATB anti-Pseudomonas em **<1h**, após culturas.
 ## Empírico (monoterapia)
@@ -275,7 +275,7 @@ Febre ≥38,3°C (ou ≥38°C sustentada) + neutrófilos <500. **Emergência:** 
 Até resolução da febre **e** recuperação dos neutrófilos; direcionar por foco/cultura.
 > Perla: estratifique risco (**MASCC**); baixo risco selecionado pode usar ciprofloxacino + amoxicilina-clavulanato VO.
 > Alarme: vancomicina **não** é rotina — adicione só com indicação e suspenda em 48–72h se cultura negativa.`},
-{id:'cdiff',icon:'💩',nome:'C. difficile (diarreia)',tags:'colite, diarreia associada a antibiótico, CDI',
+{id:'cdiff',icon:'<i class="ti ti-bug"></i>',nome:'C. difficile (diarreia)',tags:'colite, diarreia associada a antibiótico, CDI',
  md:`## Quando suspeitar
 Diarreia (≥3 evacuações amolecidas/24h) com uso recente de ATB. Confirme com toxina/PCR. **Suspenda o ATB causador** se possível.
 ## Tratamento
@@ -285,7 +285,7 @@ Diarreia (≥3 evacuações amolecidas/24h) com uso recente de ATB. Confirme com
 - Recorrência: fidaxomicina ou vancomicina em esquema de redução/pulso; considerar transplante de microbiota.
 > Perla: **não** use antiperistálticos; isolamento de contato + higiene das mãos com água e sabão (álcool não inativa esporos).
 > Alarme: vancomicina para CDI é **VO** (não IV — a IV não atinge a luz intestinal).`},
-{id:'profilaxia',icon:'🔪',nome:'Profilaxia cirúrgica',tags:'pré-operatório, cirurgia, profilaxia',
+{id:'profilaxia',icon:'<i class="ti ti-cut"></i>',nome:'Profilaxia cirúrgica',tags:'pré-operatório, cirurgia, profilaxia',
  md:`## Princípios
 Objetivo: cobrir a flora da pele/sítio. Dose **30–60 min antes da incisão**.
 ## Escolha
@@ -295,7 +295,7 @@ Objetivo: cobrir a flora da pele/sítio. Dose **30–60 min antes da incisão**.
 - **Redose** intraoperatória se cirurgia longa (cefazolina a cada ~4h) ou sangramento volumoso.
 - **Suspender em ≤24h** (na maioria, dose única basta). Prolongar não reduz infecção e aumenta resistência.
 > Alarme: profilaxia prolongada "até retirar o dreno" **não** é recomendada e seleciona resistência.`},
-{id:'tuberculose',icon:'🧫',nome:'Tuberculose',tags:'TB, RIPE, rifampicina, isoniazida, BAAR, GeneXpert, latente, RHZE',
+{id:'tuberculose',icon:'<i class="ti ti-virus"></i>',nome:'Tuberculose',tags:'TB, RIPE, rifampicina, isoniazida, BAAR, GeneXpert, latente, RHZE',
  md:`## Quando suspeitar / diagnóstico
 Tosse >2–3 semanas, febre vespertina, sudorese noturna, emagrecimento, hemoptise. Confirme com **TRM-TB (GeneXpert)**, baciloscopia e cultura; imagem (RX/TC). **Notificação compulsória**; rastrear HIV.
 ## Esquema básico (adulto, TB sensível) — "RIPE"
@@ -309,7 +309,7 @@ Tosse >2–3 semanas, febre vespertina, sudorese noturna, emagrecimento, hemopti
 Após excluir doença ativa: isoniazida 9 meses, OU rifampicina 4 meses, OU rifapentina+isoniazida semanal (3 meses).
 > Perla: monitore **transaminases** (R/H/Z hepatotóxicas) e **visão** (etambutol → neurite óptica). Urina/lágrima alaranjadas pela rifampicina são esperadas.
 > Alarme: **rifampicina é indutor potente** (↓ anticoncepcional, antirretroviral, varfarina, azóis). Suspeita de **TB resistente (MDR/RR)** → encaminhar a serviço de referência (drogas de 2ª linha).`},
-{id:'fungos',icon:'🍄',nome:'Infecções fúngicas',tags:'candidíase, candidemia, aspergilose, criptococo, antifúngico, fungo',
+{id:'fungos',icon:'<i class="ti ti-mushroom"></i>',nome:'Infecções fúngicas',tags:'candidíase, candidemia, aspergilose, criptococo, antifúngico, fungo',
  md:`## Candidíase
 - **Candidemia / invasiva:** **equinocandina** (caspo/mica/anidulafungina) é a **1ª linha**. Retire/troque cateter, faça **fundo de olho** e hemoculturas de controle. Descalone para **fluconazol** se sensível e estável. Trate ~14 dias após a 1ª hemocultura negativa.
 - **Orofaríngea/esofágica:** fluconazol (nistatina tópica na orofaríngea leve).
@@ -806,15 +806,15 @@ function renderHome(){
   let html=`<div class="note">💊 <b>Como usar:</b> abra <b>Empírico & escalonamento</b> para uma sugestão pelo foco/contexto, consulte os bancos de <b>bactérias, resistência e o bulário</b> (antibacterianos, <b>antifúngicos</b> e <b>tuberculose</b>, com calculadora de dose), ou pergunte ao <b>Assistente</b>. ${MT.mode==='demo'?'<b>Entre na conta MedTech para usar a IA.</b>':''}</div>`;
   // destaques
   html+=`<div class="grid">
-    <div class="card ai" onclick="abrirEmpirico()"><div class="ci">🧭</div><div class="cn">Empírico & escalonamento</div><div class="ct">Foco + contexto + ATB já usado → como iniciar ou escalonar</div></div>
-    <div class="card ai" onclick="abrirAssistente()"><div class="ci">✨</div><div class="cn">Assistente de antibióticos</div><div class="ct">Fisiopatologia, microbiologia, resistência, esquemas e doses — pergunte tudo</div></div>
+    <div class="card ai" onclick="abrirEmpirico()"><div class="ci"><i class="ti ti-compass"></i></div><div class="cn">Empírico & escalonamento</div><div class="ct">Foco + contexto + ATB já usado → como iniciar ou escalonar</div></div>
+    <div class="card ai" onclick="abrirAssistente()"><div class="ci"><i class="ti ti-sparkles"></i></div><div class="cn">Assistente de antibióticos</div><div class="ct">Fisiopatologia, microbiologia, resistência, esquemas e doses — pergunte tudo</div></div>
   </div>`;
   // ferramentas
   const tools=[
-    ['cobertura','🎯','Cobertura / espectro','Quem cobre MRSA, Pseudomonas, ESBL, anaeróbio…'],
-    ['dirigida','🔬','Terapia dirigida','Germe do antibiograma → opções (menor espectro)'],
-    ['dose','🧮','Calculadora de dose','ATB + peso + clearance → dose ajustada + prescrição'],
-    ['ivvo','🔁','Switch IV → VO','ATB com boa absorção oral + critérios']
+    ['cobertura','<i class="ti ti-target-arrow"></i>','Cobertura / espectro','Quem cobre MRSA, Pseudomonas, ESBL, anaeróbio…'],
+    ['dirigida','<i class="ti ti-microscope"></i>','Terapia dirigida','Germe do antibiograma → opções (menor espectro)'],
+    ['dose','<i class="ti ti-calculator"></i>','Calculadora de dose','ATB + peso + clearance → dose ajustada + prescrição'],
+    ['ivvo','<i class="ti ti-arrows-exchange"></i>','Switch IV → VO','ATB com boa absorção oral + critérios']
   ].filter(t=>!q||(t[2]+' '+t[3]).toLowerCase().includes(q));
   if(tools.length){html+=`<div class="sec-title">Ferramentas</div><div class="grid">`+tools.map(t=>`<div class="card tool" onclick="abrir_${t[0]}()"><div class="ci">${t[1]}</div><div class="cn">${t[2]}</div><div class="ct">${t[3]}</div></div>`).join('')+`</div>`;}
   // foco
@@ -829,7 +829,7 @@ function renderHome(){
   const drugs=DRUGS.filter(d=>!q||((d.nome+' '+d.classe).toLowerCase().includes(q)));
   [['Antibacterianos','Antibacterianos · bulário + calculadora'],['Antifúngicos','Antifúngicos · bulário + calculadora'],['Antituberculose','Antituberculose (esquema RIPE) · bulário']].forEach(g=>{
     const list=drugs.filter(d=>(d.grupo||'Antibacterianos')===g[0]);if(!list.length)return;
-    html+=`<div class="sec-title">${g[1]}</div><div class="grid">`+list.map(d=>`<div class="card" onclick="abrirDrug('${d.id}')"><div class="ci">💊</div><div class="cn">${esc(d.nome)}</div><div class="ct">${esc(d.classe)}</div></div>`).join('')+`</div>`;
+    html+=`<div class="sec-title">${g[1]}</div><div class="grid">`+list.map(d=>`<div class="card" onclick="abrirDrug('${d.id}')"><div class="ci"><i class="ti ti-pill"></i></div><div class="cn">${esc(d.nome)}</div><div class="ct">${esc(d.classe)}</div></div>`).join('')+`</div>`;
   });
   if(q && !focos.length && !tools.length && !GUIA.some(match) && !drugs.length){html+='<div class="empty">Nada encontrado para "'+esc(busca)+'". Tente o Assistente acima.</div>';}
   document.getElementById('view').innerHTML=html;
@@ -864,7 +864,7 @@ function renderDrug(d){
   const rows=(d.renal||[]).map(b=>`<tr><td class="atb">ClCr ${faixaLbl(b)}</td><td style="text-align:left">${inlMd(b.txt)}</td></tr>`).join('');
   document.getElementById('view').innerHTML=`
    <button class="back" onclick="routeHome()">← Voltar</button>
-   <div class="exam-head"><div class="ei">💊</div><div><h1>${esc(d.nome)}</h1><div class="tags">${esc(d.classe)}</div></div></div>
+   <div class="exam-head"><div class="ei"><i class="ti ti-pill"></i></div><div><h1>${esc(d.nome)}</h1><div class="tags">${esc(d.classe)}</div></div></div>
    <div class="content"><h2>Dose habitual (adulto, função renal normal)</h2>${md(d.doseNormal)}
    ${d.kg?`<div class="perla">⚖️ <b>Dose por peso:</b> ${d.kg.lo}${d.kg.hi!==d.kg.lo?'–'+d.kg.hi:''} mg/kg ${inlMd(d.kg.intervalo)}${d.kg.nota?'. '+inlMd(d.kg.nota):''}</div>`:''}
    ${PED[d.id]?`<h2>Dose pediátrica</h2>${md(PED[d.id])}<div style="font-size:11.5px;color:var(--muted)">Dose pediátrica geral — confirme por peso/idade e protocolo; neonatos têm regras próprias.</div>`:''}
@@ -918,7 +918,7 @@ function renderEmpirico(){
   const seg=(grp,val,label)=>`<button class="seg ${empForm[grp]===val?'on':''}" onclick="setEmp('${grp}','${val}')">${label}</button>`;
   document.getElementById('view').innerHTML=`
    <button class="back" onclick="routeHome()">← Voltar</button>
-   <div class="exam-head"><div class="ei">🧭</div><div><h1>Empírico & escalonamento</h1><div class="tags">Monte o contexto → guia curado + sugestão da IA</div></div></div>
+   <div class="exam-head"><div class="ei"><i class="ti ti-compass"></i></div><div><h1>Empírico & escalonamento</h1><div class="tags">Monte o contexto → guia curado + sugestão da IA</div></div></div>
    <div class="formcard">
      <div class="field"><label>Foco / sítio de infecção</label>
        <select id="empFoco" onchange="setEmp('foco',this.value)">${FOCOS.map(f=>`<option value="${f.id}" ${f.id===empForm.foco?'selected':''}>${esc(f.nome)}</option>`).join('')}</select></div>
@@ -987,7 +987,7 @@ function renderCobertura(){
   let rows=COV.map(r=>`<tr><td class="atb">${esc(r[0])}</td>`+COV_ALVOS.map((_,i)=>`<td>${cellCov(r[i+1])}</td>`).join('')+`</tr>`).join('');
   document.getElementById('view').innerHTML=`
    <button class="back" onclick="routeHome()">← Voltar</button>
-   <div class="exam-head"><div class="ei">🎯</div><div><h1>Cobertura / espectro</h1><div class="tags">Quem cobre o quê — visão rápida de espectro</div></div></div>
+   <div class="exam-head"><div class="ei"><i class="ti ti-target-arrow"></i></div><div><h1>Cobertura / espectro</h1><div class="tags">Quem cobre o quê — visão rápida de espectro</div></div></div>
    <div class="tbl-wrap"><table class="cov"><thead><tr><th class="atb" style="text-align:left">Antibiótico</th>${COV_ALVOS.map(a=>`<th>${esc(a)}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>
    <div class="legend"><span class="cy">✓</span> cobre &nbsp; <span class="cp">±</span> parcial/variável (depende de antibiograma, dose ou cepa) &nbsp; <span class="cn">—</span> não cobre / não confiável</div>
    <div class="disc">Mapa simplificado de espectro — <b>não substitui o antibiograma</b>; "ESBL" e "Pseudomonas" dependem do perfil local. Para detalhes, abra cada antibiótico no banco.</div>`;
@@ -999,7 +999,7 @@ function renderDirigida(){
   const opts=DIRIGIDA.map((d,i)=>`<option value="${i}">${esc(d.g)}</option>`).join('');
   document.getElementById('view').innerHTML=`
    <button class="back" onclick="routeHome()">← Voltar</button>
-   <div class="exam-head"><div class="ei">🔬</div><div><h1>Terapia dirigida</h1><div class="tags">Germe isolado no antibiograma → opções dirigidas</div></div></div>
+   <div class="exam-head"><div class="ei"><i class="ti ti-microscope"></i></div><div><h1>Terapia dirigida</h1><div class="tags">Germe isolado no antibiograma → opções dirigidas</div></div></div>
    <div class="formcard">
      <div class="field"><label>Germe isolado</label><select id="dirSel" onchange="renderDirAlvo()">${opts}</select></div>
      <div id="dirAlvo"></div>
@@ -1045,7 +1045,7 @@ function renderDose(){
   }).join('');
   document.getElementById('view').innerHTML=`
    <button class="back" onclick="routeHome()">← Voltar</button>
-   <div class="exam-head"><div class="ei">🧮</div><div><h1>Calculadora de dose</h1><div class="tags">Selecione o ATB + peso + clearance → dose ajustada + prescrição</div></div></div>
+   <div class="exam-head"><div class="ei"><i class="ti ti-calculator"></i></div><div><h1>Calculadora de dose</h1><div class="tags">Selecione o ATB + peso + clearance → dose ajustada + prescrição</div></div></div>
    <div class="formcard">
      <div class="field"><label>Antibiótico</label><select id="doseAtb">${opts}</select></div>
      <div class="field"><label>Peso (kg)</label><input type="number" id="dosePeso" inputmode="decimal" placeholder="ex.: 60"></div>
@@ -1087,7 +1087,7 @@ function renderIVVO(){
   const rows=IVVO.map(x=>`<li><b>${esc(x.a)}</b> — ${esc(x.b)}</li>`).join('');
   document.getElementById('view').innerHTML=`
    <button class="back" onclick="routeHome()">← Voltar</button>
-   <div class="exam-head"><div class="ei">🔁</div><div><h1>Switch IV → VO</h1><div class="tags">Quando e com o quê trocar para via oral</div></div></div>
+   <div class="exam-head"><div class="ei"><i class="ti ti-arrows-exchange"></i></div><div><h1>Switch IV → VO</h1><div class="tags">Quando e com o quê trocar para via oral</div></div></div>
    <div class="content">
      <h2>Critérios para a troca</h2>
      <ul>
