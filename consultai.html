@@ -223,6 +223,8 @@ const REC_FMT={
  alta:{l:'Alta',ai:'Organize em resumo de alta: Diagnósticos, Resumo do atendimento, Procedimentos, Medicações de alta, Orientações e Seguimento.'},
  encaminhamento:{l:'Encaminhamento',ai:'Organize em carta de encaminhamento/parecer: especialidade de destino, resumo do caso, hipótese diagnóstica, exames relevantes e motivo do encaminhamento.'}
 };
+/* tipo de atendimento — molda a profundidade da anamnese e o contexto enviado à IA */
+const ATEND_TIPOS={ primeira:'Primeira consulta', retorno:'Retorno', nova:'Nova consulta' };
 
 /* Banco de medicamentos (estilo Memed): nome+apresentação e posologia padrão (adulto). c:1 = controle especial. Posologia é sugestão — ajustar por caso. */
 const MED_DB=[
@@ -705,7 +707,7 @@ function renderPBody(){
     const recs=state.records.filter(r=>r.pacId===curPac).sort((a,b)=>b.date.localeCompare(a.date));
     let h=`<div class="bar"><div></div><div class="right"><button class="btn btn-p btn-sm" onclick="openEvol()">+ Nova evolução</button></div></div>`;
     h+=recs.length?recs.map(r=>{const f=REC_FMT[r.tipo]||REC_FMT.evolucao;
-      return `<div class="rec"><div class="rh"><div class="rt"><span class="chip">${f.l}</span> ${esc(r.titulo||'Evolução')}</div><div class="rd">${fmtDT(r.date)}</div></div>
+      return `<div class="rec"><div class="rh"><div class="rt">${r.tipoAtend&&ATEND_TIPOS[r.tipoAtend]?`<span class="chip">${ATEND_TIPOS[r.tipoAtend]}</span> `:''}<span class="chip">${f.l}</span> ${esc(r.titulo||'Evolução')}</div><div class="rd">${fmtDT(r.date)}</div></div>
         <div class="rbody">${esc(r.texto)}</div>
         <div class="racts"><button onclick="openEvol('${r.id}')">✏️ Editar</button><button onclick="printEvol('${r.id}')">🖨️ Imprimir</button><button onclick="copyRec('${r.id}')">📋 Copiar</button><button onclick="delRec('${r.id}')">🗑️ Excluir</button></div></div>`;
     }).join(''):'<div class="empty">Nenhuma evolução registrada.<br>Toque em <b>+ Nova evolução</b> (pode ditar por voz e a IA estrutura em SOAP).</div>';
@@ -741,9 +743,14 @@ function delRx(id){if(confirm('Excluir este receituário?')){state.prescriptions
 function openEvol(id){
   const r=id?state.records.find(x=>x.id===id):{tipo:'soap',texto:'',titulo:''};
   const fopt=Object.keys(REC_FMT).map(k=>`<option value="${k}" ${r.tipo===k?'selected':''}>${REC_FMT[k].l}</option>`).join('');
+  const prevN=state.records.filter(x=>x.pacId===curPac).length;
+  const atendDef=id?(r.tipoAtend||'retorno'):(prevN?'retorno':'primeira');
+  const aopt=Object.keys(ATEND_TIPOS).map(k=>`<option value="${k}" ${atendDef===k?'selected':''}>${ATEND_TIPOS[k]}</option>`).join('');
   modal(`<div class="box wide"><h3>${id?'Editar':'Nova'} evolução</h3>
-   <div class="two"><div class="field"><label>Formato</label><select id="e_fmt">${fopt}</select></div>
-    <div class="field"><label>Título (opcional)</label><input id="e_titulo" value="${esc(r.titulo||'')}" placeholder="Ex.: Consulta de retorno"></div></div>
+   <div class="three"><div class="field"><label>Tipo de atendimento</label><select id="e_atend">${aopt}</select></div>
+    <div class="field"><label>Formato</label><select id="e_fmt">${fopt}</select></div>
+    <div class="field"><label>Título (opcional)</label><input id="e_titulo" value="${esc(r.titulo||'')}" placeholder="Ex.: Retorno cardiologia"></div></div>
+   <div class="hint" style="margin:-4px 0 8px"><b>Primeira</b>: anamnese completa · <b>Retorno</b>: usa a evolução anterior + foco no intervalo · <b>Nova</b>: aproveita comorbidades/medicações já cadastradas.</div>
    <div class="field"><label>Gravação / ditado</label>
      <div class="toolbar"><button class="btn btn-mic btn-sm" id="recBtn" onclick="toggleConsulta()">🔴 Gravar consulta</button><button class="btn btn-mic btn-sm" id="micBtn" onclick="toggleMic('e_raw')">🎤 Ditar</button><span id="liveTag"></span>
        <button class="btn btn-g btn-sm" onclick="if(confirm('Limpar o rascunho?'))document.getElementById('e_raw').value='';">Limpar</button>
@@ -755,12 +762,29 @@ function openEvol(id){
    <div class="hint">⚠️ A IA é apoio e não inventa dados. Revise sempre antes de salvar/assinar.${MT.mode==='demo'?' <b>Entre na conta MedTech para usar a IA.</b>':''}</div>
    <div class="row"><button class="btn btn-p" onclick="saveEvol('${id||''}')">💾 Salvar no prontuário</button><button class="btn btn-g" onclick="closeModalMic()">Cancelar</button></div></div>`);
 }
+function encounterCtx(tipo){
+  const p=patientById(curPac)||{};
+  if(tipo==='retorno'){
+    const prev=state.records.filter(r=>r.pacId===curPac).sort((a,b)=>b.date.localeCompare(a.date))[0];
+    let c='CONTEXTO: esta é uma consulta de RETORNO. Resuma brevemente o caso já conhecido, FOQUE na evolução do intervalo (queixas novas, resposta ao tratamento, exames trazidos) e no DIRECIONAMENTO/ajuste de conduta — não repita a anamnese completa.';
+    if(prev&&prev.texto)c+='\n\nEVOLUÇÃO ANTERIOR ('+fmtDate(prev.date)+'):\n'+prev.texto;
+    return c+'\n\n';
+  }
+  if(tipo==='nova'){
+    let c='CONTEXTO: esta é uma NOVA consulta de um paciente JÁ CONHECIDO. Faça a anamnese do problema atual de forma completa, mas APROVEITE os dados já conhecidos abaixo (não re-pergunte o que já está registrado; atualize apenas se houver mudança).';
+    const base=[p.problemas?('Problemas/comorbidades: '+p.problemas):'',p.meds?('Medicações em uso: '+p.meds):'',p.alergias?('Alergias: '+p.alergias):''].filter(Boolean).join('\n');
+    if(base)c+='\n\nDADOS JÁ CONHECIDOS:\n'+base;
+    return c+'\n\n';
+  }
+  return 'CONTEXTO: esta é a PRIMEIRA consulta deste paciente. Faça uma ANAMNESE COMPLETA: identificação, queixa principal, história da doença atual, antecedentes pessoais e familiares, hábitos de vida, medicações em uso, alergias, exame físico, hipóteses diagnósticas e conduta.\n\n';
+}
 async function genEvol(){
   const raw=document.getElementById('e_raw').value.trim();
   if(!raw){alert('Dite ou digite o caso antes de gerar.');return;}
   const fmt=document.getElementById('e_fmt').value;
+  const atend=(document.getElementById('e_atend')||{}).value||'primeira';
   const b=document.getElementById('aiBtn');b.innerHTML='<span class="spin"></span> Gerando...';b.disabled=true;
-  const prompt='Você é um escriba clínico experiente. O texto abaixo pode ser a TRANSCRIÇÃO de uma consulta inteira (fala do médico e do paciente, linguagem coloquial, com repetições e possíveis ruídos) ou um rascunho/ditado. Extraia apenas as informações clinicamente relevantes e produza um documento em português do Brasil, completo, organizado e objetivo. REGRAS: não invente dados, exames, doses ou condutas que não foram ditos; ignore conversas irrelevantes; padronize termos médicos; se algo essencial faltar, escreva "[não informado]". '+(REC_FMT[fmt]||REC_FMT.evolucao).ai+'\n\nTranscrição/rascunho:\n'+raw;
+  const prompt='Você é um escriba clínico experiente. O texto abaixo pode ser a TRANSCRIÇÃO de uma consulta inteira (fala do médico e do paciente, linguagem coloquial, com repetições e possíveis ruídos) ou um rascunho/ditado. Extraia apenas as informações clinicamente relevantes e produza um documento em português do Brasil, completo, organizado e objetivo. REGRAS: não invente dados, exames, doses ou condutas que não foram ditos; ignore conversas irrelevantes; padronize termos médicos; se algo essencial faltar, escreva "[não informado]". '+encounterCtx(atend)+(REC_FMT[fmt]||REC_FMT.evolucao).ai+'\n\nTranscrição/rascunho:\n'+raw;
   try{const text=await MT.ai(prompt, 'gemini-2.5-pro');document.getElementById('e_out').value=(text||'').trim();}
   catch(e){alert('⚠️ '+e.message);}
   b.innerHTML='✨ Estruturar com IA';b.disabled=false;
@@ -769,10 +793,11 @@ function saveEvol(id){
   const texto=document.getElementById('e_out').value.trim();
   if(!texto){alert('Escreva ou gere o texto da evolução antes de salvar.');return;}
   const tipo=document.getElementById('e_fmt').value;
+  const tipoAtend=(document.getElementById('e_atend')||{}).value||'';
   let titulo=document.getElementById('e_titulo').value.trim();
   if(!titulo){titulo=(texto.split('\n').map(s=>s.trim()).find(s=>s)||'Evolução').replace(/^[#*•\-\s]+/,'').slice(0,60);}
-  if(id){Object.assign(state.records.find(x=>x.id===id),{tipo,titulo,texto});}
-  else{const rec={id:uid(),pacId:curPac,date:nowISO(),tipo,titulo,texto};if(attendApptId)rec.apptId=attendApptId;state.records.push(rec);}
+  if(id){Object.assign(state.records.find(x=>x.id===id),{tipo,tipoAtend,titulo,texto});}
+  else{const rec={id:uid(),pacId:curPac,date:nowISO(),tipo,tipoAtend,titulo,texto};if(attendApptId)rec.apptId=attendApptId;state.records.push(rec);}
   if(attendApptId){const ap=state.appts.find(x=>x.id===attendApptId);if(ap)ap.status='atendido';attendApptId=null;}
   persist();closeModalMic();renderPBody();
 }
@@ -999,7 +1024,8 @@ async function processConsultaAudio(){
     const b64=await blobToB64(blob);
     if(b64.length>9400000){alert('A gravação ficou muito longa para enviar de uma vez (~30–40 min é o limite por bloco). Grave em partes menores ou use 🎤 Ditar.');return;}
     const fmt=(document.getElementById('e_fmt')||{}).value||'soap';
-    const prompt='Você recebeu o ÁUDIO de uma consulta médica (fala do médico e do paciente). Transcreva internamente e produza um documento clínico em português do Brasil, completo, organizado e objetivo, extraindo só o que é clinicamente relevante. REGRAS: não invente dados, exames, doses ou condutas que não foram ditos; padronize termos médicos; se algo essencial faltar, escreva "[não informado]". '+(REC_FMT[fmt]||REC_FMT.evolucao).ai;
+    const atend=(document.getElementById('e_atend')||{}).value||'primeira';
+    const prompt='Você recebeu o ÁUDIO de uma consulta médica (fala do médico e do paciente). Transcreva internamente e produza um documento clínico em português do Brasil, completo, organizado e objetivo, extraindo só o que é clinicamente relevante. REGRAS: não invente dados, exames, doses ou condutas que não foram ditos; padronize termos médicos; se algo essencial faltar, escreva "[não informado]". '+encounterCtx(atend)+(REC_FMT[fmt]||REC_FMT.evolucao).ai;
     const mt=(blob.type||'audio/webm').split(';')[0];
     const text=await MT.aiAudio(b64,mt,prompt);
     if(out)out.value=(text||'').trim();
