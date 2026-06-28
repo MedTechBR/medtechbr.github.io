@@ -963,6 +963,21 @@ main, #main { display: block !important; height: auto !important; overflow: visi
           <span class="ic" style="background:#fee2e2;color:#dc2626">🩸</span>
           <span class="ttl">Gasometria</span><span class="sub">Interpretador ácido-base</span>
         </button>
+        <button class="wb-card" data-go="interacoes">
+          <span class="wb-badge new">Novo</span>
+          <span class="ic" style="background:#fef3c7;color:#b45309">⚠️</span>
+          <span class="ttl">Interações</span><span class="sub">Checar interação medicamentosa</span>
+        </button>
+        <button class="wb-card" data-go="ddx">
+          <span class="wb-badge new">Novo</span>
+          <span class="ic" style="background:#e0e7ff;color:#4338ca">🧠</span>
+          <span class="ttl">Diagnóstico diferencial</span><span class="sub">Quadro → hipóteses</span>
+        </button>
+        <button class="wb-card" data-go="exames">
+          <span class="wb-badge new">Novo</span>
+          <span class="ic" style="background:#dcfce7;color:#15803d">🧪</span>
+          <span class="ttl">Análise de exames</span><span class="sub">Interpretar laboratório por IA</span>
+        </button>
       </div>
     </div>
 
@@ -1094,6 +1109,35 @@ main, #main { display: block !important; height: auto !important; overflow: visi
     <div class="pres-full"><label>Observações adicionais<textarea id="p_obs" placeholder="Comorbidades, gestação, função hepática, medicações em uso…"></textarea></label></div>
     <button id="presGo" class="gaso-btn">✨ Gerar sugestão de prescrição</button>
     <div id="presResult" style="margin-top:16px"></div>
+  </section>
+
+  <!-- ===================== INTERAÇÃO MEDICAMENTOSA ===================== -->
+  <section id="interacoesView" class="wb-view" hidden>
+    <div class="wb-view-head"><span class="vic">⚠️</span><h2>Interação medicamentosa</h2></div>
+    <p class="wb-view-intro">Liste os medicamentos do paciente (um por linha) e a IA aponta as interações relevantes — gravidade, mecanismo, manejo e o que monitorar.</p>
+    <div class="pres-full"><label>Medicamentos em uso <span style="color:#dc2626">*</span><textarea id="it_meds" style="min-height:90px" placeholder="Um por linha. Ex.:&#10;Varfarina&#10;Amiodarona&#10;Claritromicina"></textarea></label></div>
+    <div class="pres-full"><label>Observações (opcional)<input id="it_obs" type="text" placeholder="Ex.: idoso, função renal reduzida, hepatopatia…"></label></div>
+    <button id="itGo" class="gaso-btn">⚠️ Verificar interações</button>
+    <div id="itResult" style="margin-top:16px"></div>
+  </section>
+
+  <!-- ===================== DIAGNÓSTICO DIFERENCIAL ===================== -->
+  <section id="ddxView" class="wb-view" hidden>
+    <div class="wb-view-head"><span class="vic">🧠</span><h2>Diagnóstico diferencial</h2></div>
+    <p class="wb-view-intro">Descreva o quadro (queixa, achados, exames) e receba as hipóteses priorizadas, os diagnósticos que “não dá pra perder” e o que pedir para diferenciar.</p>
+    <div class="pres-full"><label>Quadro clínico <span style="color:#dc2626">*</span><textarea id="dd_caso" style="min-height:110px" placeholder="Ex.: homem 58a, dor torácica em aperto há 2h, sudorese, PA 150x90, ECG inespecífico…"></textarea></label></div>
+    <button id="ddGo" class="gaso-btn">🧠 Gerar diagnóstico diferencial</button>
+    <div id="ddResult" style="margin-top:16px"></div>
+  </section>
+
+  <!-- ===================== ANÁLISE DE EXAMES LABORATORIAIS ===================== -->
+  <section id="examesView" class="wb-view" hidden>
+    <div class="wb-view-head"><span class="vic">🧪</span><h2>Análise de exames laboratoriais</h2></div>
+    <p class="wb-view-intro">Cole os resultados dos exames e o contexto clínico — a IA interpreta as alterações, levanta hipóteses e sugere exames complementares e conduta.</p>
+    <div class="pres-full"><label>Resultados dos exames <span style="color:#dc2626">*</span><textarea id="ex_lab" style="min-height:130px" placeholder="Cole aqui. Ex.:&#10;Hb 9,1 · VCM 72 · RDW 17&#10;Ferritina 8 · Sat transferrina 6%&#10;Cr 1,8 · Ureia 80 · K 5,6"></textarea></label></div>
+    <div class="pres-full"><label>Contexto clínico (opcional)<input id="ex_ctx" type="text" placeholder="Ex.: mulher 45a, fadiga e menorragia"></label></div>
+    <button id="exGo" class="gaso-btn">🧪 Interpretar exames</button>
+    <div id="exResult" style="margin-top:16px"></div>
   </section>
 
   <!-- ===================== HISTÓRICO / FAVORITOS ===================== -->
@@ -10219,10 +10263,10 @@ document.getElementById('newBtn').onclick = () => {
 //  Navegação estilo Whitebook (views + bottom nav)
 // ============================================================
 function showView(name) {
-  const map = { home:'homeView', condutas:'condutasView', ia:'iaView', bulas:'bulasView', investigacao:'investigacaoView', prescricao:'prescricaoView', gaso:'gasoView', favoritos:'listView', historico:'listView', result:'resultView' };
+  const map = { home:'homeView', condutas:'condutasView', ia:'iaView', bulas:'bulasView', investigacao:'investigacaoView', prescricao:'prescricaoView', interacoes:'interacoesView', ddx:'ddxView', exames:'examesView', gaso:'gasoView', favoritos:'listView', historico:'listView', result:'resultView' };
   const id = map[name] || 'homeView';
   document.querySelectorAll('.wb-view').forEach(v => { v.hidden = (v.id !== id); });
-  const navMap = { home:'home', condutas:'condutas', ia:'ia', favoritos:'favoritos', historico:'historico', bulas:'home', investigacao:'home', prescricao:'home', gaso:'home', escores:'home', result:'home' };
+  const navMap = { home:'home', condutas:'condutas', ia:'ia', favoritos:'favoritos', historico:'historico', bulas:'home', investigacao:'home', prescricao:'home', interacoes:'home', ddx:'home', exames:'home', gaso:'home', escores:'home', result:'home' };
   const navT = navMap[name] || 'home';
   document.querySelectorAll('#wbNav button').forEach(b => b.classList.toggle('active', b.dataset.go === navT));
   if (name === 'favoritos' || name === 'historico') {
@@ -10794,6 +10838,96 @@ async function runPrescricao() {
 }
 const _pg = document.getElementById('presGo');
 if (_pg) _pg.onclick = () => runPrescricao();
+
+// ============================================================
+//  INTERAÇÃO MEDICAMENTOSA · DIAGNÓSTICO DIFERENCIAL · ANÁLISE DE EXAMES (IA)
+// ============================================================
+function buildPromptInteracoes(meds, obs) {
+  return `Você é farmacêutico clínico e médico. Analise as INTERAÇÕES MEDICAMENTOSAS clinicamente relevantes entre os fármacos listados (uso no Brasil), em português, em Markdown. ${obs ? ('Contexto do paciente: ' + obs + '. ') : ''}Considere o conjunto todo (não só pares óbvios) e também interações fármaco-doença quando o contexto indicar. Para cada interação relevante informe os fármacos envolvidos, a GRAVIDADE, o mecanismo, a consequência clínica e o MANEJO (ajuste/alternativa/monitorização). Use EXATAMENTE estes cabeçalhos começando com "## ":
+
+# Interações medicamentosas
+
+## 🚦 Resumo (risco geral)
+## ⛔ Graves / contraindicadas
+## ⚠️ Moderadas
+## 🟡 Leves / monitorar
+## 💡 Conduta e monitorização
+
+Sob cada cabeçalho use bullets curtos: "- **Fármaco A + Fármaco B** — efeito — conduta". Se uma categoria não tiver itens, escreva "- Sem interações relevantes nesta categoria." Não invente; se incerto, sinalize "confirmar".
+
+MEDICAMENTOS:
+${meds}`;
+}
+async function runInteracoes() {
+  const meds = (document.getElementById('it_meds').value || '').trim();
+  const box = document.getElementById('itResult');
+  if (!meds) { box.innerHTML = '<div class="alert alert-warn"><span>⚠</span><div>Liste ao menos <b>dois medicamentos</b> (um por linha).</div></div>'; return; }
+  if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span>⚠</span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
+  const obs = (document.getElementById('it_obs').value || '').trim();
+  box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Verificando interações…</strong></div><div class="loading-sub">Gravidade, mecanismo e manejo…</div></div>`;
+  try { const { text } = await callGemini([{ role: 'user', parts: [{ text: buildPromptInteracoes(meds, obs) }] }]);
+    box.innerHTML = `<div class="result content">${accordionize(md(text))}<div class="alert alert-info" style="margin-top:14px"><span>ℹ</span><div>Gerado por IA — confirme em fonte de interações (bula/UpToDate/Micromedex) antes de decidir.</div></div></div>`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (err) { box.innerHTML = `<div class="alert alert-warn"><span>⚠</span><div>Não foi possível analisar agora: ${escapeHtml(err.message || 'erro')}.</div></div>`; const r = document.createElement('button'); r.className = 'btn-primary'; r.style.marginTop = '10px'; r.textContent = '🔄 Tentar de novo'; r.onclick = () => runInteracoes(); box.appendChild(r); }
+}
+function buildPromptDDx(caso) {
+  return `Você é um clínico experiente e preceptor. Para o QUADRO CLÍNICO abaixo, construa o DIAGNÓSTICO DIFERENCIAL em português, em Markdown, raciocinando como à beira do leito. Use EXATAMENTE estes cabeçalhos começando com "## ":
+
+# Diagnóstico diferencial
+
+## 🧩 Síntese do caso
+## 🥇 Hipóteses mais prováveis
+## 🚨 Não dá para perder (graves)
+## 🔬 Exames para diferenciar
+## 🩺 Conduta inicial
+
+Em "Hipóteses mais prováveis" e "Não dá para perder", use bullets: "- **Diagnóstico** — pistas A FAVOR / CONTRA neste caso". Ordene por probabilidade/risco. Não invente dados que não foram fornecidos; aponte o que falta perguntar/examinar. Responda em português do Brasil.
+
+QUADRO CLÍNICO:
+${caso}`;
+}
+async function runDDx() {
+  const caso = (document.getElementById('dd_caso').value || '').trim();
+  const box = document.getElementById('ddResult');
+  if (!caso) { box.innerHTML = '<div class="alert alert-warn"><span>⚠</span><div>Descreva o <b>quadro clínico</b>.</div></div>'; return; }
+  if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span>⚠</span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
+  box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Levantando hipóteses…</strong></div><div class="loading-sub">Prováveis, graves e exames…</div></div>`;
+  try { const { text } = await callGemini([{ role: 'user', parts: [{ text: buildPromptDDx(caso) }] }]);
+    box.innerHTML = `<div class="result content">${accordionize(md(text))}<div class="alert alert-info" style="margin-top:14px"><span>ℹ</span><div>Apoio ao raciocínio — correlacione sempre com a clínica e reavalie.</div></div></div>`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (err) { box.innerHTML = `<div class="alert alert-warn"><span>⚠</span><div>Não foi possível gerar agora: ${escapeHtml(err.message || 'erro')}.</div></div>`; const r = document.createElement('button'); r.className = 'btn-primary'; r.style.marginTop = '10px'; r.textContent = '🔄 Tentar de novo'; r.onclick = () => runDDx(); box.appendChild(r); }
+}
+function buildPromptExames(lab, ctx) {
+  return `Você é um clínico experiente. Interprete os RESULTADOS DE EXAMES laboratoriais abaixo, em português, em Markdown. ${ctx ? ('Contexto clínico: ' + ctx + '. ') : ''}Use EXATAMENTE estes cabeçalhos começando com "## ":
+
+# Análise dos exames
+
+## 🔎 Alterações relevantes
+## 🧠 Interpretação / correlação
+## 🧩 Hipóteses diagnósticas
+## 🔬 Exames complementares sugeridos
+## 🩺 Conduta / próximos passos
+
+Sob "Alterações relevantes", liste cada valor alterado com a direção e a magnitude. Não invente valores não fornecidos; se faltar referência, use as faixas usuais de adulto. Sinalize valores de PÂNICO/urgência. Responda em português do Brasil.
+
+RESULTADOS:
+${lab}`;
+}
+async function runExames() {
+  const lab = (document.getElementById('ex_lab').value || '').trim();
+  const box = document.getElementById('exResult');
+  if (!lab) { box.innerHTML = '<div class="alert alert-warn"><span>⚠</span><div>Cole os <b>resultados dos exames</b>.</div></div>'; return; }
+  if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span>⚠</span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
+  const ctx = (document.getElementById('ex_ctx').value || '').trim();
+  box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Interpretando exames…</strong></div><div class="loading-sub">Alterações, hipóteses e conduta…</div></div>`;
+  try { const { text } = await callGemini([{ role: 'user', parts: [{ text: buildPromptExames(lab, ctx) }] }]);
+    box.innerHTML = `<div class="result content">${accordionize(md(text))}<div class="alert alert-info" style="margin-top:14px"><span>ℹ</span><div>Interpretação por IA — correlacione com a clínica e com os valores de referência do seu laboratório.</div></div></div>`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (err) { box.innerHTML = `<div class="alert alert-warn"><span>⚠</span><div>Não foi possível interpretar agora: ${escapeHtml(err.message || 'erro')}.</div></div>`; const r = document.createElement('button'); r.className = 'btn-primary'; r.style.marginTop = '10px'; r.textContent = '🔄 Tentar de novo'; r.onclick = () => runExames(); box.appendChild(r); }
+}
+const _itg = document.getElementById('itGo'); if (_itg) _itg.onclick = () => runInteracoes();
+const _ddg = document.getElementById('ddGo'); if (_ddg) _ddg.onclick = () => runDDx();
+const _exg = document.getElementById('exGo'); if (_exg) _exg.onclick = () => runExames();
 
 // ============ Init ============
 renderSide();
