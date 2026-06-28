@@ -159,6 +159,28 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 .mcell.today .mnum{color:var(--petrol)}
 .mcount{font-size:10.5px;font-weight:800;color:#fff;background:var(--mint-dark);border-radius:999px;padding:1px 8px;align-self:flex-start}
 @media(max-width:680px){.mcell{min-height:48px;padding:4px}.mhead div{font-size:9.5px}.mnum{font-size:12px}.mcount{padding:0 6px;font-size:9.5px}}
+/* ===== grade semanal (time-grid) ===== */
+.wkg-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:14px;background:#fff}
+.wkg{display:flex;min-width:640px}
+.wkg-time{flex:0 0 48px}
+.wkg-corner{height:34px;border-bottom:1px solid var(--line)}
+.wkg-time-body{position:relative}
+.wkg-tl{position:absolute;right:6px;font-size:10px;color:var(--muted);transform:translateY(-6px);font-weight:600}
+.wkg-day{flex:1 1 0;min-width:84px;border-left:1px solid var(--line)}
+.wkg-head{height:34px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-bottom:1px solid var(--line);font-size:11.5px;font-weight:800;color:var(--petrol-dark);line-height:1.15}
+.wkg-head small{font-weight:600;color:var(--muted);font-size:9.5px}
+.wkg-head.today{background:var(--soft);color:var(--petrol)}
+.wkg-col{position:relative}
+.wkg-slot{border-bottom:1px solid #eef4f5;cursor:pointer}
+.wkg-slot:hover{background:var(--soft)}
+.wkg-slot.alt{background:#fbfdfd}
+.wkg-appt{position:absolute;left:2px;right:2px;border-radius:7px;padding:1px 5px;font-size:10px;line-height:1.12;overflow:hidden;cursor:pointer;border-left:3px solid currentColor;box-shadow:0 1px 2px rgba(0,0,0,.07)}
+.wkg-appt b{display:block;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wkg-appt .wt{font-weight:700;opacity:.8;font-size:9px}
+.wkg-appt.cae{opacity:.5;text-decoration:line-through}
+.dias-pick{display:flex;gap:5px;flex-wrap:wrap}
+.dias-pick button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 0;width:42px;font-weight:700;font-size:12px;cursor:pointer;color:var(--muted);font-family:inherit}
+.dias-pick button.on{background:var(--mint);color:var(--petrol-dark);border-color:var(--mint-dark)}
 </style>
 </head>
 <body>
@@ -188,6 +210,8 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const MES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const WDL=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+const WDS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const WKC={con:['var(--blue-bg)','var(--blue)'],ret:['var(--soft)','var(--petrol)'],tel:['var(--violet-bg)','var(--violet)'],pro:['var(--amber-bg)','var(--amber)'],exa:['var(--green-bg)','var(--green)']};
 const TYPES={con:{l:'Consulta',c:'t-con'},ret:{l:'Retorno',c:'t-ret'},tel:{l:'Telemedicina',c:'t-tel'},pro:{l:'Procedimento',c:'t-pro'},exa:{l:'Exame',c:'t-exa'}};
 const STATUS={agendado:{l:'Agendado',c:'s-ag'},confirmado:{l:'Confirmado',c:'s-cf'},atendido:{l:'Atendido',c:'s-at'},faltou:{l:'Faltou',c:'s-fa'},cancelado:{l:'Cancelado',c:'s-ca'}};
 const SORDER=['agendado','confirmado','atendido','faltou','cancelado'];
@@ -333,9 +357,9 @@ const MED_DB=[
  {n:'Cetoconazol 2% xampu',p:'aplicar no couro cabeludo 2x/semana, deixar agir 5 min'}
 ];
 
-let state={patients:[],appts:[],records:[],prescriptions:[],documentos:[],docs:[],cfg:{medico:'',clinica:'',crm:'',esp:'',rqe:'',endereco:'',telefone:''},migratedEvoluai:false};
+let state={patients:[],appts:[],records:[],prescriptions:[],documentos:[],docs:[],cfg:{medico:'',clinica:'',crm:'',esp:'',rqe:'',endereco:'',telefone:'',agenda:{ini:'07:00',fim:'19:00',slot:30,dias:[1,2,3,4,5,6]}},migratedEvoluai:false};
 let cur=new Date();cur.setHours(0,0,0,0);
-let view='agenda', aTab='dia', busca='', curPac=null, pTab='evol', pSearch='';
+let view='agenda', aTab='dia', busca='', curPac=null, pTab='evol', pSearch='', attendApptId=null;
 
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
 function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -364,13 +388,16 @@ function sampleSeed(){const f=ymd(cur);const p1=uid(),p2=uid();
  ],prescriptions:[],documentos:[],docs:[],cfg:{medico:'',clinica:'',crm:'',esp:'',rqe:'',endereco:'',telefone:''},migratedEvoluai:true};
 }
 function normalize(d){d=d&&typeof d==='object'?d:{};
+ const cfg=Object.assign({medico:'',clinica:'',crm:'',esp:'',rqe:'',endereco:'',telefone:''},d.cfg||{});
+ cfg.agenda=Object.assign({ini:'07:00',fim:'19:00',slot:30,dias:[1,2,3,4,5,6]},cfg.agenda||{});
+ if(!Array.isArray(cfg.agenda.dias)||!cfg.agenda.dias.length)cfg.agenda.dias=[1,2,3,4,5,6];
  return {patients:d.patients||[],appts:d.appts||[],records:d.records||[],prescriptions:d.prescriptions||[],documentos:d.documentos||[],docs:d.docs||[],
-   cfg:Object.assign({medico:'',clinica:'',crm:'',esp:'',rqe:'',endereco:'',telefone:''},d.cfg||{}),migratedEvoluai:!!d.migratedEvoluai};}
+   cfg,migratedEvoluai:!!d.migratedEvoluai};}
 
 function whenMT(cb){if(window.MT){cb();}else{setTimeout(()=>whenMT(cb),30);}}
 whenMT(()=>{MT.onData(d=>{
   if(d&&typeof d==='object'&&(d.patients||d.appts||d.records||d.cfg)){state=normalize(d);}
-  else{state=(MT.mode==='demo')?sampleSeed():normalize(null);if(MT.mode==='demo')MT.save(state);}
+  else{state=normalize((MT.mode==='demo')?sampleSeed():null);if(MT.mode==='demo')MT.save(state);}
   renderUser();render();
   migrateEvoluai();
 });renderUser();});
@@ -453,6 +480,7 @@ function apptCard(a){const ty=TYPES[a.type]||TYPES.con;const st=STATUS[a.status]
       ${a.obs?`<div class="obs">${esc(a.obs)}</div>`:''}
     </div>
     <div class="acts">
+      <button class="btn btn-p btn-sm" onclick="atender('${a.id}')" title="Atender: gravar a consulta e gerar a evolução por IA">🎙️ Atender</button>
       <button class="btn btn-wa btn-sm" onclick="waMenu('${a.id}')">WhatsApp</button>
       <div class="ic">${a.pacId?`<button title="Prontuário" onclick="openPac('${a.pacId}')">📋</button>`:''}<button onclick="openForm('${a.id}')">✏️</button><button onclick="del('${a.id}')">🗑️</button></div>
     </div>
@@ -482,20 +510,39 @@ function goToday(){cur=new Date();cur.setHours(0,0,0,0);renderAgenda();}
 function pickDate(v){if(v){cur=new Date(v+'T00:00:00');renderAgenda();}}
 
 function renderWeek(){
+  const ag=state.cfg.agenda||{ini:'07:00',fim:'19:00',slot:30,dias:[1,2,3,4,5,6]};
+  const slot=Math.max(10,parseInt(ag.slot)||30);
   const start=new Date(cur);start.setDate(start.getDate()-start.getDay());
   const end=new Date(start);end.setDate(end.getDate()+6);
-  const days=[];for(let i=0;i<7;i++){const d=new Date(start);d.setDate(d.getDate()+i);days.push(d);}
-  const total=state.appts.filter(a=>a.date>=ymd(start)&&a.date<=ymd(end)&&a.status!=='cancelado').length;
+  const days7=[];for(let i=0;i<7;i++){const d=new Date(start);d.setDate(d.getDate()+i);days7.push(d);}
+  const weekAppts=state.appts.filter(a=>a.date>=ymd(start)&&a.date<=ymd(end));
+  const total=weekAppts.filter(a=>a.status!=='cancelado').length;
+  const showDays=days7.filter(d=>(ag.dias||[]).includes(d.getDay())||weekAppts.some(a=>a.date===ymd(d)));
+  const daysToShow=showDays.length?showDays:days7;
+  let rStart=minutesOf(ag.ini||'07:00'),rEnd=minutesOf(ag.fim||'19:00');
+  weekAppts.forEach(a=>{const s=minutesOf(a.time),e=s+(+a.dur||slot);if(s<rStart)rStart=s;if(e>rEnd)rEnd=e;});
+  rStart=Math.floor(rStart/slot)*slot;rEnd=Math.ceil(rEnd/slot)*slot;if(rEnd<=rStart)rEnd=rStart+slot;
+  const nSlots=Math.round((rEnd-rStart)/slot),SP=28,colH=nSlots*SP;
+  const fmtMin=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+  const todayYmd=ymd(new Date());
   let html=`<div class="bar">
     <div class="nav"><button class="arr" onclick="moveWeek(-1)">‹</button><h2>${start.getDate()}/${start.getMonth()+1} – ${end.getDate()}/${end.getMonth()+1}</h2><button class="arr" onclick="moveWeek(1)">›</button><button class="todaybtn" onclick="goToday()">Esta semana</button></div>
-    <div class="right"><span style="color:var(--muted);font-size:13px;font-weight:600">${total} consulta(s) na semana</span><button class="btn btn-p btn-sm" onclick="openForm()">+ Consulta</button></div>
+    <div class="right"><span style="color:var(--muted);font-size:13px;font-weight:600">${total} consulta(s)</span><button class="btn btn-p btn-sm" onclick="openForm()">+ Consulta</button></div>
   </div>`;
-  let any=false;
-  days.forEach(d=>{const ds=apptsSorted(state.appts.filter(a=>a.date===ymd(d)));if(!ds.length)return;any=true;
-    html+=`<div class="daygrp"><div class="dh">${WDL[d.getDay()]}, ${d.getDate()}/${d.getMonth()+1}</div>${ds.map(apptCard).join('')}</div>`;});
-  if(!any)html+='<div class="empty">Nenhuma consulta nesta semana.</div>';
+  let timeLabels='';for(let i=0;i<=nSlots;i++)timeLabels+=`<div class="wkg-tl" style="top:${i*SP}px">${fmtMin(rStart+i*slot)}</div>`;
+  let cols='';
+  daysToShow.forEach(d=>{const dy=ymd(d),isToday=dy===todayYmd;
+    let slots='';for(let i=0;i<nSlots;i++){const t=fmtMin(rStart+i*slot);slots+=`<div class="wkg-slot${i%2?' alt':''}" style="height:${SP}px" onclick="openSlot('${dy}','${t}')"></div>`;}
+    let blocks='';apptsSorted(state.appts.filter(a=>a.date===dy)).forEach(a=>{
+      const s=minutesOf(a.time),top=((s-rStart)/slot)*SP,h=Math.max(((+a.dur||slot)/slot)*SP-2,16);
+      const c=WKC[a.type]||WKC.con,nm=(pacNome(a)||'').split(' ').slice(0,2).join(' ');
+      blocks+=`<div class="wkg-appt${a.status==='cancelado'?' cae':''}" style="top:${top}px;height:${h}px;background:${c[0]};color:${c[1]}" onclick="openForm('${a.id}')" title="${esc(a.time+' · '+pacNome(a))}"><span class="wt">${a.time}</span><b>${esc(nm)}</b></div>`;});
+    cols+=`<div class="wkg-day"><div class="wkg-head${isToday?' today':''}">${WDS[d.getDay()]}<small>${d.getDate()}/${d.getMonth()+1}</small></div><div class="wkg-col" style="height:${colH}px">${slots}${blocks}</div></div>`;});
+  html+=`<div class="wkg-wrap"><div class="wkg"><div class="wkg-time"><div class="wkg-corner"></div><div class="wkg-time-body" style="height:${colH}px">${timeLabels}</div></div>${cols}</div></div>
+   <div class="hint" style="margin-top:8px">Toque num horário livre para agendar, ou numa consulta para abrir. Defina seus horários em ⚙️ Configurações.</div>`;
   document.getElementById('aview').innerHTML=html;
 }
+function openSlot(ds,ts){openForm(null,null,{date:ds,time:ts});}
 function moveWeek(n){cur.setDate(cur.getDate()+7*n);renderAgenda();}
 
 function renderSearch(){
@@ -517,8 +564,10 @@ function cycleStatus(id){const a=state.appts.find(x=>x.id===id);const i=SORDER.i
 function del(id){if(confirm('Excluir esta consulta?')){state.appts=state.appts.filter(x=>x.id!==id);persist();render();}}
 
 /* form de consulta (com vínculo a paciente) */
-function openForm(id,prefillPacId){
-  const a=id?state.appts.find(x=>x.id===id):{date:ymd(cur),time:'08:00',dur:30,pacId:prefillPacId||null,pac:'',fone:'',type:'con',status:'agendado',obs:''};
+function openForm(id,prefillPacId,prefill){
+  prefill=prefill||{};
+  const defDur=(state.cfg.agenda&&state.cfg.agenda.slot)||30;
+  const a=id?state.appts.find(x=>x.id===id):{date:prefill.date||ymd(cur),time:prefill.time||'08:00',dur:prefill.dur||defDur,pacId:prefillPacId||null,pac:'',fone:'',type:'con',status:'agendado',obs:''};
   const topt=Object.entries(TYPES).map(([k,v])=>`<option value="${k}" ${a.type===k?'selected':''}>${v.l}</option>`).join('');
   const sopt=SORDER.map(k=>`<option value="${k}" ${a.status===k?'selected':''}>${STATUS[k].l}</option>`).join('');
   const dl=state.patients.slice().sort((x,y)=>x.nome.localeCompare(y.nome)).map(p=>`<option value="${esc(p.nome)}">`).join('');
@@ -628,6 +677,8 @@ function renderPaciente(){
     <div class="pacts">
       <button class="btn btn-g btn-sm" onclick="openPacForm('${p.id}')">✏️ Editar ficha</button>
       <button class="btn btn-g btn-sm" onclick="openForm(null,'${p.id}')">📅 Agendar</button>
+      <button class="btn btn-g btn-sm" onclick="resumoPac('${p.id}')">✨ Resumo (IA)</button>
+      <button class="btn btn-wa btn-sm" onclick="waPac('${p.id}')">📱 WhatsApp</button>
       <button class="btn btn-dn btn-sm" onclick="delPac('${p.id}')">🗑️ Excluir</button>
     </div></div>
     <div class="pinfo">
@@ -664,7 +715,7 @@ function renderPBody(){
     let h=`<div class="bar"><div></div><div class="right"><button class="btn btn-p btn-sm" onclick="openRx()">+ Novo receituário</button></div></div>`;
     h+=rxs.length?rxs.map(r=>`<div class="rec"><div class="rh"><div class="rt"><span class="chip">${r.tipo==='especial'?'Controle especial':'Receituário'}</span></div><div class="rd">${fmtDT(r.date)}</div></div>
         <div class="rbody">${esc(r.texto)}</div>${r.obs?`<div class="rbody" style="color:var(--muted);font-size:13px">Obs.: ${esc(r.obs)}</div>`:''}
-        <div class="racts"><button onclick="printRx('${r.id}')">🖨️ Imprimir</button><button onclick="openRx('${r.id}')">✏️ Editar</button><button onclick="delRx('${r.id}')">🗑️ Excluir</button></div></div>`).join('')
+        <div class="racts"><button onclick="printRx('${r.id}')">🖨️ Imprimir</button><button onclick="waRx('${r.id}')">📱 WhatsApp</button><button onclick="openRx('${r.id}')">✏️ Editar</button><button onclick="delRx('${r.id}')">🗑️ Excluir</button></div></div>`).join('')
       :'<div class="empty">Nenhum receituário emitido.<br>Toque em <b>+ Novo receituário</b> (busque o medicamento e a posologia vem pronta; depois imprima).</div>';
     box.innerHTML=h;
   } else if(pTab==='docs'){
@@ -672,7 +723,7 @@ function renderPBody(){
     let h=`<div class="bar"><div></div><div class="right"><button class="btn btn-p btn-sm" onclick="openAtestado()">+ Atestado</button><button class="btn btn-p btn-sm" onclick="openExames()">+ Solicitação de exames</button></div></div>`;
     h+=docs.length?docs.map(r=>`<div class="rec"><div class="rh"><div class="rt"><span class="chip">${r.tipo==='atestado'?'Atestado':'Exames'}</span> ${esc(r.titulo||'')}</div><div class="rd">${fmtDT(r.date)}</div></div>
         <div class="rbody">${esc(r.texto)}${r.obs?('\n\n'+esc(r.obs)):''}</div>
-        <div class="racts"><button onclick="printDocu2('${r.id}')">🖨️ Imprimir</button><button onclick="${r.tipo==='atestado'?`openAtestado('${r.id}')`:`openExames('${r.id}')`}">✏️ Editar</button><button onclick="delDocu('${r.id}')">🗑️ Excluir</button></div></div>`).join('')
+        <div class="racts"><button onclick="printDocu2('${r.id}')">🖨️ Imprimir</button><button onclick="waDocu('${r.id}')">📱 WhatsApp</button><button onclick="${r.tipo==='atestado'?`openAtestado('${r.id}')`:`openExames('${r.id}')`}">✏️ Editar</button><button onclick="delDocu('${r.id}')">🗑️ Excluir</button></div></div>`).join('')
       :'<div class="empty">Nenhum atestado ou solicitação de exames.<br>Use <b>+ Atestado</b> ou <b>+ Solicitação de exames</b> acima.</div>';
     box.innerHTML=h;
   } else {
@@ -721,7 +772,8 @@ function saveEvol(id){
   let titulo=document.getElementById('e_titulo').value.trim();
   if(!titulo){titulo=(texto.split('\n').map(s=>s.trim()).find(s=>s)||'Evolução').replace(/^[#*•\-\s]+/,'').slice(0,60);}
   if(id){Object.assign(state.records.find(x=>x.id===id),{tipo,titulo,texto});}
-  else{state.records.push({id:uid(),pacId:curPac,date:nowISO(),tipo,titulo,texto});}
+  else{const rec={id:uid(),pacId:curPac,date:nowISO(),tipo,titulo,texto};if(attendApptId)rec.apptId=attendApptId;state.records.push(rec);}
+  if(attendApptId){const ap=state.appts.find(x=>x.id===attendApptId);if(ap)ap.status='atendido';attendApptId=null;}
   persist();closeModalMic();renderPBody();
 }
 
@@ -956,7 +1008,7 @@ async function processConsultaAudio(){
 }
 
 /* ===== CONFIG ===== */
-function renderConfig(){const c=state.cfg;
+function renderConfig(){const c=state.cfg;const ag=c.agenda||{ini:'07:00',fim:'19:00',slot:30,dias:[1,2,3,4,5,6]};
   let docsHtml='';
   if(state.docs&&state.docs.length){
     docsHtml=`<div class="phead" style="margin-top:14px"><h2 style="font-size:16px;margin-bottom:4px">Documentos importados do EvoluAI (${state.docs.length})</h2>
@@ -973,12 +1025,22 @@ function renderConfig(){const c=state.cfg;
    <div class="field"><label>Clínica / consultório</label><input id="c_cli" value="${esc(c.clinica)}" placeholder="Ex.: Clínica Vida"></div>
    <div class="two"><div class="field"><label>Endereço</label><input id="c_end" value="${esc(c.endereco)}" placeholder="Rua, nº — cidade"></div>
     <div class="field"><label>Telefone</label><input id="c_tel" value="${esc(c.telefone)}" placeholder="(11) 3333-3333"></div></div>
-   <div class="hint">Nome, CRM, RQE e especialidade saem em <b>todos</b> os documentos. Endereço e telefone saem no <b>receituário de controle especial</b>.</div>
+   <div class="hint">Nome, CRM, RQE e especialidade saem em <b>todos</b> os documentos. Endereço e telefone saem no <b>receituário de controle especial</b>.</div></div>
+   <div class="phead" style="margin-top:14px"><h2 style="font-size:17px;margin-bottom:4px">📅 Modelo de agenda</h2>
+   <div class="sub" style="color:var(--muted);font-size:13px;margin-bottom:14px">Define a faixa de horários e a grade da visão <b>Semana</b>, além da duração padrão das novas consultas.</div>
+   <div class="three"><div class="field"><label>Início do atendimento</label><input id="ag_ini" type="time" value="${esc(ag.ini)}"></div>
+    <div class="field"><label>Fim do atendimento</label><input id="ag_fim" type="time" value="${esc(ag.fim)}"></div>
+    <div class="field"><label>Duração padrão (min)</label><input id="ag_slot" type="number" min="10" step="5" value="${ag.slot}"></div></div>
+   <div class="field"><label>Dias de atendimento</label><div class="dias-pick" id="ag_dias">${[1,2,3,4,5,6,0].map(n=>`<button type="button" data-d="${n}" class="${(ag.dias||[]).includes(n)?'on':''}" onclick="this.classList.toggle('on')">${WDS[n]}</button>`).join('')}</div></div>
    <div class="row"><button class="btn btn-p" onclick="saveCfg()">Salvar dados</button></div></div>
    ${docsHtml}`;
 }
 function saveCfg(){
-  state.cfg={medico:document.getElementById('c_med').value.trim(),crm:document.getElementById('c_crm').value.trim(),rqe:document.getElementById('c_rqe').value.trim(),esp:document.getElementById('c_esp').value.trim(),clinica:document.getElementById('c_cli').value.trim(),endereco:document.getElementById('c_end').value.trim(),telefone:document.getElementById('c_tel').value.trim()};
+  const gi=id=>document.getElementById(id);
+  const ag=Object.assign({ini:'07:00',fim:'19:00',slot:30,dias:[1,2,3,4,5,6]},state.cfg.agenda||{});
+  if(gi('ag_ini')){ag.ini=gi('ag_ini').value||'07:00';ag.fim=gi('ag_fim').value||'19:00';ag.slot=Math.max(10,parseInt(gi('ag_slot').value)||30);
+    const ds=[...document.querySelectorAll('#ag_dias button.on')].map(b=>+b.dataset.d).sort((a,b)=>a-b);ag.dias=ds.length?ds:[1,2,3,4,5,6];}
+  state.cfg={medico:gi('c_med').value.trim(),crm:gi('c_crm').value.trim(),rqe:gi('c_rqe').value.trim(),esp:gi('c_esp').value.trim(),clinica:gi('c_cli').value.trim(),endereco:gi('c_end').value.trim(),telefone:gi('c_tel').value.trim(),agenda:ag};
   persist();const b=event.target;const o=b.textContent;b.textContent='✓ Salvo';setTimeout(()=>b.textContent=o,1500);
 }
 function copyDoc(i){const d=state.docs[i];if(d&&navigator.clipboard)navigator.clipboard.writeText(d.out||'');}
@@ -1032,12 +1094,47 @@ function waSend(id){
   closeModal();render();
 }
 
+/* ===== Atender (gravar consulta → IA), resumo IA e WhatsApp do prontuário ===== */
+function atender(id){
+  const a=state.appts.find(x=>x.id===id);if(!a)return;
+  let pid=a.pacId;
+  if(!pid){const nome=(a.pac||'').trim();
+    if(!nome){alert('Esta consulta não tem paciente vinculado. Toque em ✏️ para vincular ou cadastrar o paciente.');return;}
+    if(!confirm('Criar a ficha de "'+nome+'" para registrar a evolução desta consulta?'))return;
+    const np={id:uid(),criadoEm:nowISO(),nome,nasc:'',sexo:'',cpf:'',fone:a.fone||'',email:'',convenio:'',endereco:'',alergias:'',problemas:'',meds:'',obs:''};
+    state.patients.push(np);a.pacId=np.id;a.pac='';pid=np.id;persist();
+  }
+  attendApptId=id;openPac(pid);openEvol();
+}
+async function resumoPac(pid){
+  const p=patientById(pid);if(!p)return;
+  const recs=state.records.filter(r=>r.pacId===pid).sort((a,b)=>a.date.localeCompare(b.date));
+  if(!recs.length){alert('Este paciente ainda não tem evoluções para resumir.');return;}
+  if(MT.mode!=='cloud'||!MT.ai){alert('Entre na sua conta MedTech para usar a IA.');return;}
+  modal(`<h3>✨ Resumo do paciente — ${esc(p.nome)}</h3><div class="hint" style="margin-bottom:8px">Síntese das ${recs.length} evolução(ões) para leitura rápida antes da consulta. Revise — a IA não substitui o prontuário.</div><div id="rp_out" class="rbody" style="white-space:pre-wrap;min-height:130px;background:var(--soft);border-radius:10px;padding:12px"><span class="spin"></span> Gerando resumo…</div><div class="row"><button class="btn btn-p" id="rp_copy" style="display:none" onclick="navigator.clipboard&&navigator.clipboard.writeText(window.__rpTxt||'')">📋 Copiar</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
+  const hist=recs.map(r=>fmtDate(r.date)+' ['+((REC_FMT[r.tipo]||REC_FMT.evolucao).l)+']: '+r.texto).join('\n\n');
+  const ctx='Paciente: '+p.nome+(age(p.nasc)!==''?(', '+age(p.nasc)+' anos'):'')+'. '+(p.problemas?('Problemas: '+p.problemas+'. '):'')+(p.alergias?('Alergias: '+p.alergias+'. '):'')+(p.meds?('Medicações em uso: '+p.meds+'.'):'');
+  const prompt='Você é um médico assistente. Com base no histórico de evoluções abaixo, escreva um RESUMO CLÍNICO do paciente para leitura rápida antes da consulta, em português do Brasil. Estruture em: Problemas ativos; Evolução recente; Medicações; Pendências/seguimento. Use bullets curtos e objetivos; NÃO invente dados que não estejam no histórico.\n\n'+ctx+'\n\nEvoluções (mais antigas → mais recentes):\n'+hist;
+  try{const t=await MT.ai(prompt,'gemini-2.5-pro');window.__rpTxt=(t||'').trim();const o=document.getElementById('rp_out');if(o)o.textContent=window.__rpTxt||'Sem resposta.';const c=document.getElementById('rp_copy');if(c&&window.__rpTxt)c.style.display='';}
+  catch(e){const o=document.getElementById('rp_out');if(o)o.textContent='⚠️ '+(e.message||'Falha na IA.');}
+}
+function waSign(){return state.cfg.medico?('\n\n— '+(state.cfg.clinica?state.cfg.clinica+' · ':'')+'Dr(a). '+state.cfg.medico):'';}
+function waToPatient(pid,text){const p=patientById(pid);const num=waNumber(p&&p.fone);if(!p||!num){alert('Cadastre o telefone (WhatsApp) do paciente na ficha para enviar.');return;}window.open('https://wa.me/'+num+'?text='+encodeURIComponent(text),'_blank');}
+function waPac(pid){const p=patientById(pid);if(!p)return;const nome=(p.nome||'').split(' ')[0];waToPatient(pid,'Olá, '+nome+'! 😊'+waSign());}
+function waRx(id){const r=state.prescriptions.find(x=>x.id===id);if(!r)return;const p=patientById(r.pacId);const nome=(p&&p.nome||'').split(' ')[0];
+  const txt='Olá, '+nome+'! 😊 Segue seu receituário:\n\n'+r.texto+(r.obs?('\n\nOrientações: '+r.obs):'')+waSign()+'\n\n(A via assinada impressa fica disponível no consultório quando necessária.)';
+  waToPatient(r.pacId,txt);}
+function waDocu(id){const d=state.documentos.find(x=>x.id===id);if(!d)return;const p=patientById(d.pacId);const nome=(p&&p.nome||'').split(' ')[0];
+  const lbl=d.tipo==='atestado'?'seu atestado':'sua solicitação de exames';
+  const txt='Olá, '+nome+'! 😊 Segue '+lbl+':\n\n'+d.texto+(d.obs?('\n\n'+d.obs):'')+waSign();
+  waToPatient(d.pacId,txt);}
+
 /* ===== modal ===== */
 function modal(html){document.querySelectorAll('.modal').forEach(m=>m.remove());const d=document.createElement('div');d.className='modal';d.id='modal';d.innerHTML='<div class="box">'+html+'</div>';
   if(/<div class="box wide"/.test(html)){d.innerHTML=html;}
   d.onclick=e=>{if(e.target===d)closeModalMic();};document.body.appendChild(d);}
 function closeModal(){const m=document.getElementById('modal');if(m)m.remove();}
-function closeModalMic(){stopRec();if(mediaRec&&mediaRec.state==='recording'){consultaAbort=true;try{mediaRec.stop();}catch(e){}}stopStream();if(recTimer){clearInterval(recTimer);recTimer=null;}closeModal();}
+function closeModalMic(){attendApptId=null;stopRec();if(mediaRec&&mediaRec.state==='recording'){consultaAbort=true;try{mediaRec.stop();}catch(e){}}stopStream();if(recTimer){clearInterval(recTimer);recTimer=null;}closeModal();}
 </script>
 </body>
 </html>
