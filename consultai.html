@@ -5,20 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ConsultAI — Atendimento ambulatorial completo | MedTech</title>
 <meta name="description" content="ConsultAI: sistema de atendimento ambulatorial completo — cadastro de pacientes, prontuário eletrônico, evolução por voz com IA, receituários e agenda com confirmação por WhatsApp. Login e nuvem MedTech.">
-<meta name="theme-color" content="#0E5A6D">
+<meta name="theme-color" content="#2563eb">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
 <link rel="icon" type="image/png" href="favicon.png">
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"agendaai",name:"ConsultAI"};</script>
 <script type="module" src="_mtauth.js?v=6"></script>
 <style>
-:root{--petrol:#0E5A6D;--petrol-dark:#083845;--ink:#0E2A31;--mint:#2DD4A8;--mint-dark:#14b894;--bg:#F6FAFB;--soft:#EAF3F4;--line:#dbe8ea;--muted:#5B7882;--green:#14794f;--green-bg:#e7f7f1;--amber:#c97a17;--amber-bg:#fdf0e0;--red:#c0392b;--red-bg:#fdecea;--blue:#2563a8;--blue-bg:#e8f1fb;--violet:#6b46c1;--violet-bg:#efe9fb;--wa:#25D366}
+:root{--petrol:#2563eb;--petrol-dark:#1e40af;--ink:#0f172a;--mint:#2563eb;--mint-dark:#1e40af;--bg:#f4f7fb;--soft:#e8f0fe;--line:#e6ebf3;--muted:#64748b;--green:#14794f;--green-bg:#e7f7f1;--amber:#c97a17;--amber-bg:#fdf0e0;--red:#c0392b;--red-bg:#fdecea;--blue:#2563a8;--blue-bg:#e8f1fb;--violet:#6b46c1;--violet-bg:#efe9fb;--wa:#25D366}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--ink);background:var(--bg)}
-header{background:linear-gradient(135deg,var(--petrol),var(--petrol-dark));color:#fff;padding:14px 0}
+body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:-.011em;color:var(--ink);background:var(--bg)}
+header{background:var(--petrol);color:#fff;padding:14px 0}
 .wrap{max-width:1040px;margin:0 auto;padding:0 18px}
 .top{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.5px}
-.logo .mark{width:34px;height:34px;border-radius:10px;background:#2DD4A8;display:grid;place-items:center;flex:0 0 auto}
+.logo .mark{width:34px;height:34px;border-radius:10px;background:#2563eb;display:grid;place-items:center;flex:0 0 auto}
 .logo .mark svg{width:22px;height:22px}
 .logo b{color:var(--mint)}
 .subtitle{color:#bcd6db;font-size:12.5px;margin-top:3px}
@@ -789,11 +793,11 @@ function labChartSVG(series){
   const line=series.map((s,i)=>X(i).toFixed(1)+','+Y(s.valor).toFixed(1)).join(' ');
   const step=Math.max(1,Math.ceil(n/6));let marks='';
   series.forEach((s,i)=>{const x=X(i).toFixed(1),y=Y(s.valor);
-    marks+='<circle cx="'+x+'" cy="'+y.toFixed(1)+'" r="3.5" fill="#0E5A6D"/>';
-    marks+='<text x="'+x+'" y="'+(y-7).toFixed(1)+'" font-size="10" text-anchor="middle" fill="#0E2A31">'+esc(fmtNum(s.valor))+'</text>';
+    marks+='<circle cx="'+x+'" cy="'+y.toFixed(1)+'" r="3.5" fill="#2563eb"/>';
+    marks+='<text x="'+x+'" y="'+(y-7).toFixed(1)+'" font-size="10" text-anchor="middle" fill="#0f172a">'+esc(fmtNum(s.valor))+'</text>';
     if(i%step===0||i===n-1)marks+='<text x="'+x+'" y="'+(H-8)+'" font-size="9" text-anchor="middle" fill="#5B7882">'+esc(dm(s.date))+'</text>';
   });
-  return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="max-width:100%;height:auto;display:block" preserveAspectRatio="xMidYMid meet"><polyline points="'+line+'" fill="none" stroke="#14b894" stroke-width="2"/>'+marks+'</svg>';
+  return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="max-width:100%;height:auto;display:block" preserveAspectRatio="xMidYMid meet"><polyline points="'+line+'" fill="none" stroke="#1e40af" stroke-width="2"/>'+marks+'</svg>';
 }
 function addLab(){
   const nome=(document.getElementById('lab_nome').value||'').trim();
@@ -974,7 +978,7 @@ function delModelo(id){if(confirm('Excluir este modelo?')){state.modelos=state.m
 function printHTML(title,bodyHTML){
   const w=window.open('','_blank');
   if(!w){alert('Permita pop-ups para imprimir/salvar em PDF.');return;}
-  w.document.write('<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>'+esc(title)+'</title><style>@page{size:A4;margin:18mm}body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#111;font-size:14px;line-height:1.55}.hd{display:flex;align-items:center;gap:14px;border-bottom:2px solid #0E5A6D;padding-bottom:10px;margin-bottom:6px}.hd-logo{max-height:64px;max-width:170px;object-fit:contain}.hd-txt{flex:1}.hd .cli{font-size:18px;font-weight:800;color:#0E5A6D}.hd .med{font-size:12.5px;color:#333;margin-top:2px}.ttl{font-size:15px;font-weight:800;text-align:center;margin:18px 0 12px;text-transform:uppercase;letter-spacing:.06em}.pac{margin:8px 0 14px;font-size:14px;border-bottom:1px dashed #ccc;padding-bottom:8px}.body{white-space:pre-wrap;min-height:120px}.sig{margin-top:64px;text-align:center}.sig .line{width:300px;border-top:1px solid #333;margin:0 auto 5px}.ft{margin-top:26px;font-size:11px;color:#888;text-align:center;border-top:1px solid #eee;padding-top:8px}</style></head><body>'+bodyHTML+'<scr'+'ipt>window.onload=function(){setTimeout(function(){window.print();},250);}<\/scr'+'ipt></body></html>');
+  w.document.write('<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>'+esc(title)+'</title><style>@page{size:A4;margin:18mm}body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#111;font-size:14px;line-height:1.55}.hd{display:flex;align-items:center;gap:14px;border-bottom:2px solid #2563eb;padding-bottom:10px;margin-bottom:6px}.hd-logo{max-height:64px;max-width:170px;object-fit:contain}.hd-txt{flex:1}.hd .cli{font-size:18px;font-weight:800;color:#2563eb}.hd .med{font-size:12.5px;color:#333;margin-top:2px}.ttl{font-size:15px;font-weight:800;text-align:center;margin:18px 0 12px;text-transform:uppercase;letter-spacing:.06em}.pac{margin:8px 0 14px;font-size:14px;border-bottom:1px dashed #ccc;padding-bottom:8px}.body{white-space:pre-wrap;min-height:120px}.sig{margin-top:64px;text-align:center}.sig .line{width:300px;border-top:1px solid #333;margin:0 auto 5px}.ft{margin-top:26px;font-size:11px;color:#888;text-align:center;border-top:1px solid #eee;padding-top:8px}</style></head><body>'+bodyHTML+'<scr'+'ipt>window.onload=function(){setTimeout(function(){window.print();},250);}<\/scr'+'ipt></body></html>');
   w.document.close();
 }
 function cabecalho(full){const c=state.cfg;
