@@ -613,8 +613,8 @@ function gerarEvolucao(p){
   }
   const lab=p.laboratorio||p.exames||'';
   if(lab){L.push('# LABORATÓRIO:');L.push(bullets(lab));}
-  if(p.culturas){L.push('# CULTURAS:');L.push(gtbul(p.culturas));}
-  if(p.imagem){L.push('# EXAMES DE IMAGEM');L.push(gtbul(p.imagem));}
+  if(p.culturas){L.push('# CULTURAS:');L.push(bullets(p.culturas));}
+  if(p.imagem){L.push('# EXAMES DE IMAGEM');L.push(bullets(p.imagem));}
   L.push('# CONDUTA:');L.push(condutaComExplico(p.conduta));
   return up(L.join('\n'));
 }
@@ -632,31 +632,20 @@ function copyEvoFmt(id,btnId){
   const p=state.pacientes.find(x=>x.id===id);if(!p)return;
   // O editor do ISGH (ars vitae) DESCARTA HTML na colagem e só quebra linha quando há LINHA EM BRANCO.
   // Solução testada no editor real: separar cada linha por \n\n (vira 1 parágrafo por linha, margem 0 = sem espaço extra).
+  // Modelo "#": TEXTO PURO — cabeçalhos com "#", itens com "-". Cada linha vira parágrafo (\n\n) para o ISGH preservar as quebras.
   const plain=gerarEvolucao(p).split('\n').join('\n\n');
-  const html='<div style="font-family:sans-serif">'+gerarEvolucaoHtml(p)+'</div>';
-  const done=ok=>{const b=document.getElementById(btnId);if(b){b.textContent=ok?'✓ Copiado p/ o sistema':'Selecione e copie manualmente';setTimeout(()=>b.textContent='📋 Copiar p/ o sistema',2000);}};
-  function fallbackPlain(){
-    let ok=false;
-    try{const ta=document.createElement('textarea');ta.value=plain;ta.setAttribute('style','position:fixed;left:-9999px;top:0;opacity:0');document.body.appendChild(ta);ta.focus();ta.select();ok=document.execCommand('copy');document.body.removeChild(ta);}catch(e){ok=false;}
-    if(!ok&&navigator.clipboard){try{navigator.clipboard.writeText(plain);ok=true;}catch(e){}}
-    done(ok);
-  }
-  if(navigator.clipboard&&window.ClipboardItem){
-    try{
-      const item=new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([plain],{type:'text/plain'})});
-      navigator.clipboard.write([item]).then(()=>done(true)).catch(fallbackPlain);
-      return;
-    }catch(e){}
-  }
-  fallbackPlain();
+  let ok=false;
+  try{const ta=document.createElement('textarea');ta.value=plain;ta.setAttribute('style','position:fixed;left:-9999px;top:0;opacity:0');document.body.appendChild(ta);ta.focus();ta.select();ok=document.execCommand('copy');document.body.removeChild(ta);}catch(e){ok=false;}
+  if(!ok&&navigator.clipboard){try{navigator.clipboard.writeText(plain);ok=true;}catch(e){}}
+  const b=document.getElementById(btnId);if(b){b.textContent=ok?'✓ Copiado p/ o sistema':'Selecione e copie manualmente';setTimeout(()=>b.textContent='📋 Copiar p/ o sistema',2000);}
 }
 function verEvolucao(id){
   const p=state.pacientes.find(x=>x.id===id);if(!p)return;
   const txt=gerarEvolucao(p);
   modal(`<h3>📄 Evolução — pronta para colar</h3>
    <div class="hint" style="margin-bottom:8px">${esc(p.nome||'Paciente')} · leito ${esc(p.leito||'—')}. Revise antes de colar no sistema do hospital.</div>
-   <div class="hint" style="margin:-2px 0 8px">Use o botão <b>Copiar p/ o sistema</b> e cole no destino. Os <b>cabeçalhos saem em negrito</b> ao colar em editores que aceitam formatação (Word, Docs, e-mail); no ISGH, vai em texto puro com as quebras de linha preservadas.</div>
-   <div class="evo-out" style="border:1px solid var(--line);border-radius:10px;padding:12px;min-height:auto;max-height:55vh;overflow:auto;background:#fff">${gerarEvolucaoHtml(p)}</div>
+   <div class="hint" style="margin:-2px 0 8px">Use o botão <b>Copiar p/ o sistema</b> e cole no destino. Os cabeçalhos saem marcados com <b>#</b> e os itens com <b>-</b>; as quebras de linha são preservadas no ISGH.</div>
+   <textarea readonly class="evo-out" style="width:100%;box-sizing:border-box;min-height:42vh;max-height:55vh;border:1px solid var(--line);border-radius:10px;padding:12px;background:#fff">${esc(txt)}</textarea>
    <div class="row actions"><button class="btn btn-p" id="copyEvoBtn" onclick="copyEvoFmt('${id}','copyEvoBtn')">📋 Copiar p/ o sistema</button><button class="btn btn-g" onclick="openVisita('${id}')">← Voltar</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
 }
 function copyTa(taId,btnId,label){const t=document.getElementById(taId);if(!t)return;t.focus();t.select();try{document.execCommand('copy');}catch(e){}if(navigator.clipboard){try{navigator.clipboard.writeText(t.value);}catch(e){}}const b=document.getElementById(btnId);if(b){b.textContent='✓ Copiado';setTimeout(()=>b.textContent=label,1600);}}
