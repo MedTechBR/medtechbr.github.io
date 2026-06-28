@@ -868,10 +868,10 @@ function renderDrug(d){
    <div class="formcard">
      <h4 style="font-size:13px;font-weight:800;color:var(--petrol-dark);margin-bottom:10px">🧮 Calculadora de dose — peso + clearance</h4>
      <div class="field"><label>Peso (kg)${d.kg?'':' — não usado neste antibiótico'}</label><input type="number" id="dPeso" inputmode="decimal" placeholder="ex.: 70" ${d.kg?'':'disabled style="opacity:.5"'}></div>
-     <div class="field"><label>Clearance de creatinina (mL/min)</label><input type="number" id="dClcr" inputmode="numeric" placeholder="ex.: 45"></div>
+     <div class="field"><label>Clearance / TFG (mL/min)</label><input type="number" id="dClcr" inputmode="numeric" placeholder="ex.: 45"></div>
      <button class="btn btn-p" onclick="calcDose('${d.id}')">Calcular dose ajustada</button>
      <div id="dOut"></div>
-     <div style="font-size:11.5px;color:var(--muted);margin-top:9px">Não sabe o ClCr? Use a ferramenta <b>Ajuste renal</b> (Cockcroft-Gault) na home.</div>
+     <div style="font-size:11.5px;color:var(--muted);margin-top:9px">Não sabe a função renal? A <b>Calculadora de dose</b> estima a TFG (CKD-EPI 2021).</div>
    </div>
    <div class="content">
      <h2>Ajuste pela função renal</h2>
@@ -1045,10 +1045,10 @@ function renderDose(){
    <div class="formcard">
      <div class="field"><label>Antibiótico</label><select id="doseAtb">${opts}</select></div>
      <div class="field"><label>Peso (kg)</label><input type="number" id="dosePeso" inputmode="decimal" placeholder="ex.: 60"></div>
-     <div class="field"><label>Clearance de creatinina (mL/min)</label><input type="number" id="doseClcr" inputmode="numeric" placeholder="ex.: 30"></div>
+     <div class="field"><label>Clearance / TFG (mL/min)</label><input type="number" id="doseClcr" inputmode="numeric" placeholder="ex.: 30"></div>
      <button class="btn btn-p" onclick="calcDoseTool()">Calcular dose + prescrição</button>
      <div id="doseOut"></div>
-     <details style="margin-top:12px"><summary style="cursor:pointer;font-size:13px;color:var(--petrol);font-weight:700">▸ Não sei o clearance — calcular (Cockcroft-Gault)</summary>
+     <details style="margin-top:12px"><summary style="cursor:pointer;font-size:13px;color:var(--petrol);font-weight:700">▸ Não sei a função renal — calcular (CKD-EPI 2021)</summary>
        <div class="field" style="margin-top:10px"><label>Idade (anos)</label><input type="number" id="rIdade" inputmode="numeric" placeholder="ex.: 68"></div>
        <div class="field"><label>Creatinina sérica (mg/dL)</label><input type="number" id="rCr" inputmode="decimal" step="0.01" placeholder="ex.: 1.4"></div>
        <div class="field"><label>Sexo</label><div class="segs"><button class="seg on" id="sexoM" onclick="setSexo('M')">Homem</button><button class="seg" id="sexoF" onclick="setSexo('F')">Mulher</button></div></div>
@@ -1056,15 +1056,17 @@ function renderDose(){
        <div id="rOut" style="margin-top:8px"></div>
      </details>
    </div>
-   <div class="disc">Estimativa de apoio — confirme posologia/diluição na bula/protocolo institucional. Use peso ideal/ajustado em obesos; em LRA a Cockcroft-Gault é imprecisa.</div>`;
+   <div class="disc">Estimativa de apoio — confirme posologia/diluição na bula/protocolo institucional. Use peso ideal/ajustado em obesos; em LRA/função renal instável a TFG estimada (CKD-EPI 2021, mL/min/1,73m²) é imprecisa.</div>`;
 }
 function calcClcrFill(){
-  const idade=+document.getElementById('rIdade').value, peso=+document.getElementById('dosePeso').value, cr=+document.getElementById('rCr').value;
+  const idade=+document.getElementById('rIdade').value, cr=+document.getElementById('rCr').value;
   const out=document.getElementById('rOut');
-  if(!idade||!peso||!cr){out.innerHTML='<div class="calc-out" style="background:#fdecea;border-color:#f5c6c0;color:#7a241b">Preencha o peso (campo acima), a idade e a creatinina.</div>';return;}
-  let clcr=((140-idade)*peso)/(72*cr);if(rSexo==='F')clcr*=0.85;clcr=Math.round(clcr);
-  document.getElementById('doseClcr').value=clcr;
-  out.innerHTML='<div class="calc-out"><b>ClCr ≈ '+clcr+' mL/min</b> — preenchido acima. Agora clique em <b>Calcular dose + prescrição</b>.</div>';
+  if(!idade||!cr){out.innerHTML='<div class="calc-out" style="background:#fdecea;border-color:#f5c6c0;color:#7a241b">Preencha a idade e a creatinina.</div>';return;}
+  // CKD-EPI 2021 (sem raça) — TFG em mL/min/1,73m²
+  const f=(rSexo==='F'),k=f?0.7:0.9,al=f?-0.241:-0.302;
+  let tfg=142*Math.pow(Math.min(cr/k,1),al)*Math.pow(Math.max(cr/k,1),-1.200)*Math.pow(0.9938,idade)*(f?1.012:1);tfg=Math.round(tfg);
+  document.getElementById('doseClcr').value=tfg;
+  out.innerHTML='<div class="calc-out"><b>TFG ≈ '+tfg+' mL/min/1,73m² (CKD-EPI 2021)</b> — preenchida acima. Agora clique em <b>Calcular dose + prescrição</b>.</div>';
 }
 function calcDoseTool(){
   const d=DRUGS.find(x=>x.id===document.getElementById('doseAtb').value);if(!d)return;
