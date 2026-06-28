@@ -627,7 +627,7 @@ function lineToHtml(line){
   if(/^> /.test(line))return esc(line.replace(/^>\s+/,'')); // linha ">" remanescente: sem marcador, peso normal
   return esc(line); // bullets/itens em peso normal (só cabeçalhos ficam em negrito)
 }
-function gerarEvolucaoHtml(p){return gerarEvolucao(p).split('\n').map(l=>'<div>'+(lineToHtml(l)||'<br>')+'</div>').join('');}
+function gerarEvolucaoHtml(p){return gerarEvolucao(p).split('\n').map(l=>lineToHtml(l)).join('<br>');}
 function copyEvoFmt(id,btnId){
   const p=state.pacientes.find(x=>x.id===id);if(!p)return;
   // O editor do ISGH (ars vitae) DESCARTA HTML na colagem e só quebra linha quando há LINHA EM BRANCO.
