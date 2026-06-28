@@ -1580,7 +1580,7 @@ const PROTOCOLS = [
   { id: 'apneia_sono_cv', icon: '😴', name: 'Apneia obstrutiva do sono', tags: 'STOP-BANG · Polissonografia · CPAP · Risco CV', specialty: 'cardio', guideline: 'AASM 2024' },
 
   // ====== EMERGÊNCIA ======
-  { id: 'sepse', icon: '🦠', name: 'Sepse e choque séptico', tags: 'SSC · Bundle 1h · Noradrenalina · Antibiótico empírico', specialty: 'emergencia', guideline: 'SSC 2021' },
+  { id: 'sepse', icon: '🦠', name: 'Sepse e choque séptico', tags: 'SSC 2026 · Noradrenalina precoce · Cristaloide balanceado · ATB', specialty: 'emergencia', guideline: 'SSC 2026' },
   { id: 'anafilaxia', icon: '⚡', name: 'Anafilaxia', tags: 'WAO · Adrenalina IM · Reposição · Anti-H1', specialty: 'emergencia', guideline: 'WAO 2020' },
   { id: 'politrauma', icon: '🚑', name: 'Politrauma — ATLS', tags: 'ATLS · ABCDE · FAST · Sangue maciço', specialty: 'emergencia', guideline: 'ATLS 2018' },
   { id: 'choque_hipov', icon: '🩸', name: 'Choque hipovolêmico/hemorrágico', tags: 'Cristaloide · Hemocomponentes · Ac. tranexâmico', specialty: 'emergencia', guideline: 'ATLS 2018' },
@@ -1644,7 +1644,7 @@ const PROTOCOLS = [
   // ====== PNEUMO ======
   { id: 'asma_exac', icon: '🫁', name: 'Exacerbação de asma', tags: 'GINA · SABA · Corticoide · Magnésio · VNI', specialty: 'pneumo', guideline: 'GINA 2024' },
   { id: 'dpoc_exac', icon: '🚬', name: 'Exacerbação de DPOC', tags: 'GOLD · Broncodilatador · Corticoide · ATB · VNI', specialty: 'pneumo', guideline: 'GOLD 2024' },
-  { id: 'tep', icon: '🩸', name: 'Tromboembolismo pulmonar (TEP)', tags: 'ESC · Wells · sPESI · DOAC · Trombólise', specialty: 'pneumo', guideline: 'ESC 2019' },
+  { id: 'tep', icon: '🩸', name: 'Tromboembolismo pulmonar (TEP)', tags: 'Wells/YEARS · sPESI · DOAC · Não trombolisar interm.', specialty: 'pneumo', guideline: 'ESC 2019 · SBPT 2025' },
   { id: 'pneumotorax', icon: '💨', name: 'Pneumotórax', tags: 'BTS · Drenagem · Punção · Espontâneo vs traumático', specialty: 'pneumo', guideline: 'BTS 2023' },
   { id: 'derrame', icon: '💧', name: 'Derrame pleural — investigação', tags: 'Light · Toracocentese · Exsudato vs transudato', specialty: 'pneumo', guideline: 'ATS 2022' },
   { id: 'empiema', icon: '🫁', name: 'Empiema pleural', tags: 'Drenagem torácica · Antibiótico · Fibrinolítico intrapleural', specialty: 'pneumo', guideline: 'BTS 2023' },
@@ -1679,7 +1679,7 @@ const PROTOCOLS = [
   { id: 'hipofosf', icon: '⚗️', name: 'Hipofosfatemia', tags: 'Refeeding · Reposição EV · Rabdomiólise', specialty: 'endocrino', guideline: 'ASPEN 2020' },
 
   // ====== NEURO ======
-  { id: 'avc_isq', icon: '🧠', name: 'AVC isquêmico em janela', tags: 'AHA · NIHSS · Alteplase · Trombectomia · ASPECTS', specialty: 'neuro', guideline: 'AHA 2024' },
+  { id: 'avc_isq', icon: '🧠', name: 'AVC isquêmico em janela', tags: 'NIHSS · Alteplase/Tenecteplase · Trombectomia 24h · DAPT', specialty: 'neuro', guideline: 'AHA/ASA 2026' },
   { id: 'avc_hem', icon: '🧠', name: 'AVC hemorrágico (HIP)', tags: 'AHA · Controle PA · Reversão de anticoagulação', specialty: 'neuro', guideline: 'AHA 2022' },
   { id: 'ait', icon: '🧠', name: 'AIT — abordagem e estratificação', tags: 'ABCD2 · Imagem · Antiplaquetário · Estatina', specialty: 'neuro', guideline: 'AHA 2021' },
   { id: 'hsa', icon: '🧠', name: 'Hemorragia subaracnóidea (HSA)', tags: 'Hunt-Hess · TC · PL · Nimodipina · Aneurisma', specialty: 'neuro', guideline: 'AHA 2023' },
@@ -8957,17 +8957,17 @@ Hipóxia, Hipovolemia, H⁺ (acidose), Hipo/Hipercalemia, Hipotermia · Pneumot�
 ## Pós-PCR (RCE)
 PAM ≥65, SpO₂ 92–98%, normocapnia, ECG 12 derivações (CAT se STEMI), controle de temperatura (32–37,5 °C), tratar a causa.`,
 sepse: `## Reconhecimento
-Infecção suspeita + disfunção orgânica. **qSOFA** (≥2 de: FR ≥22, PAS ≤100, alteração mental). Lactato como marcador de hipoperfusão.
+Infecção suspeita + disfunção orgânica (↑SOFA ≥2). **Triagem: NEWS/MEWS/SIRS — não o qSOFA isolado** (SSC 2026; qSOFA = marcador de gravidade, não rastreio). Lactato = hipoperfusão.
 
-## Pacote da 1ª hora (Surviving Sepsis)
-1. **Lactato** (repetir em 2–4 h se >2 mmol/L).
-2. **Hemoculturas** (2 pares) **antes** do antibiótico — sem atrasar o ATB.
-3. **Antibiótico de amplo espectro IV** na 1ª hora (empírico conforme foco e perfil local).
-4. **Cristaloide 30 mL/kg IV** em até 3 h se hipotensão ou lactato ≥4.
-5. **Vasopressor** se hipotensão refratária à volemia — **noradrenalina** 1ª escolha, alvo **PAM ≥65**.
+## Primeiras horas (SSC 2026)
+1. **Lactato** (seriar) e **hemoculturas antes do ATB** (sem atrasar).
+2. **ATB amplo espectro IV**: **≤1 h no choque/sepse provável**; **até 3 h** na sepse possível sem choque. Após ataque, **β-lactâmico em infusão estendida**.
+3. **Cristaloide balanceado** (Ringer) **> SF 0,9%**. **30 mL/kg = ponto de partida, não regra fixa** — individualizar e reavaliar (CLASSIC/CLOVERS).
+4. **Vasopressor PRECOCE — noradrenalina**, pode iniciar **em acesso periférico** sem esperar volume/acesso central. Alvo **PAM ≥65** (60–65 se ≥65 anos).
 
 ## Reavaliação
-Perfusão (PA, diurese, lactato, enchimento capilar, nível de consciência). **Controle do foco** (drenagem/cirurgia) o quanto antes. Vasopressina como 2ª droga; hidrocortisona 200 mg/dia se choque refratário.`,
+Perfusão dinâmica (enchimento capilar/ANDROMEDA-SHOCK, elevação de pernas — não só lactato). **Controle do foco** precoce. Vasopressina 2º agente; **hidrocortisona 200 mg/dia** no choque com vasopressor. Hb 7; glicemia 144–180. Após estabilizar: desressuscitar.
+> Fonte: Surviving Sepsis Campaign **2026**; ILAS (Brasil).`,
 cad: `## Diagnóstico
 Glicemia >250, **pH <7,3** e/ou HCO₃ <18, com cetonemia/cetonúria.
 
@@ -9013,20 +9013,20 @@ Glicemia <70 mg/dL com sintomas; **grave** quando exige terceiros (rebaixamento,
 ## Depois
 Glicemia capilar seriada. Investigar causa (jejum, dose, etilismo, sepse, IR/insuf. adrenal). Sulfonilureia → internar (recorrência); considerar octreotida.`,
 avc_isq: `## Tempo é cérebro
-- **NIHSS**, glicemia, **TC de crânio sem contraste** imediata (afastar hemorragia).
-- Definir o **horário de início** (ou último horário visto bem).
+- **NIHSS**, glicemia, **TC de crânio sem contraste** imediata (afastar hemorragia); TC simples basta p/ trombolisar na janela precoce. Definir **horário de início** (ou último visto bem).
 
-## Trombólise IV
-- Janela **até 4,5 h** (até 9 h / wake-up com mismatch em centros com neuroimagem avançada).
-- **Alteplase 0,9 mg/kg** (máx 90 mg): 10% em bolus, resto em 1 h. (Tenecteplase 0,25 mg/kg em bolus é alternativa.)
-- **PA <185/110** antes de trombolisar (labetalol/nicardipina); manter <180/105 por 24 h.
-- Checar contraindicações (sangramento, cirurgia recente, plaquetas <100 mil, INR >1,7…).
+## Trombólise IV (AHA/ASA 2026)
+- **Tenecteplase 0,25 mg/kg em bolus único** OU **alteplase 0,9 mg/kg** (10% bolus + resto em 1 h) — **co-iguais (Classe I)**. *No SUS, o agente oficial ainda é a **alteplase**.*
+- Janela **0–4,5 h**; **estendida com imagem**: wake-up (mismatch DWI-FLAIR) e 4,5–9 h com penumbra.
+- **PA <185/110** antes; manter **<180/105** por 24 h. **Não** baixar PAS <140.
 
-## Trombectomia mecânica
-- **Oclusão de grande vaso** (circ. anterior): até **6 h**; **6–24 h** se mismatch favorável (DAWN/DEFUSE-3). Acionar neuro/hemodinâmica cedo — não atrasa a trombólise.
+## Trombectomia mecânica (AHA/ASA 2026)
+- Grande vaso (circ. anterior): **até 24 h** com imagem favorável (DAWN/DEFUSE-3). **Núcleo grande ASPECTS 3–5 até 24 h = Classe I** (SELECT2/ANGEL-ASPECT) — não exclui mais. Basilar até 24 h.
+- **Pós-trombectomia bem-sucedida: NÃO mirar PAS <140 nas 72 h (dano).**
 
 ## Geral
-Se não trombolisar, tolerar PA até ~220/120. AAS após 24 h (ou após excluir trombólise). Avaliar deglutição; profilaxia de TEV.`,
+Sem trombólise: tolerar PA ~220/120. **AVC menor (NIHSS ≤3)/AIT de alto risco: DAPT precoce** (clopidogrel+AAS 21 d ou ticagrelor+AAS 30 d). Avaliar deglutição; profilaxia de TEV; unidade de AVC.
+> Fonte: AHA/ASA **2026** (Stroke); Brasil: PCDT/CONITEC 2023 (alteplase).`,
 epileptico: `## Definição
 Crise ≥5 min, ou crises sem recuperação da consciência entre elas. Emergência.
 
@@ -9104,20 +9104,23 @@ Piora de dispneia/tosse/expectoração (volume e purulência). Afastar TEP, IC, 
 3. **Corticoide sistêmico**: prednisona 40 mg/dia VO por 5 dias.
 4. **Antibiótico** se ≥2 dos 3 critérios de Anthonisen (↑dispneia, ↑volume, ↑purulência) ou em VM: amoxclav / macrolídeo / doxiciclina (quinolona se risco de Pseudomonas).
 5. **VNI** se acidose respiratória (pH <7,35 com pCO₂ alto) — reduz intubação e mortalidade.`,
-tep: `## Probabilidade
-Escore de Wells/Genebra. **Baixa probabilidade** → D-dímero (ajustado pela idade); negativo exclui. **Alta** → angio-TC de tórax direto.
+tep: `## Probabilidade e diagnóstico
+- **Wells/Genebra**. Baixa/intermediária → **D-dímero ajustado à idade** (idade×10 se >50a) ou **algoritmo YEARS** (500 vs 1000 ng/mL); negativo exclui. Alta → **angio-TC** direto.
+- Instável: **eco à beira-leito** (disfunção de VD); TC ao estabilizar.
 
-## Estratificação e tratamento
-- **Alto risco (instável / hipotensão)**: **trombólise** (alteplase) se sem contraindicação; trombectomia se contraindicada.
-- **Intermediário/baixo**: **anticoagulação plena**.
+## Estratificação (ESC 2019 / SBPT 2025)
+- **Alto risco** = instável (choque/hipotensão).
+- **Intermediário** = estável + sPESI ≥1; **-alto** se disfunção de VD (imagem) **E** troponina ↑.
+- **Baixo** = sPESI 0 → considerar **alta precoce/tratamento domiciliar** (Hestia).
 
-## Anticoagulação
-- Estável/ambulatorial: **DOAC** (rivaroxabana/apixabana).
-- Internado/instável ou candidato a trombólise: **heparina** (HNF se trombólise ou IRA grave).
-- Câncer: DOAC ou HBPM.
+## Anticoagulação — DOAC 1ª linha
+- **Apixabana** 10 mg 12/12h ×7 d → 5 mg 12/12h; **ou rivaroxabana** 15 mg 12/12h ×21 d → 20 mg/d (sem heparina prévia).
+- Alto risco/reperfusão: **HNF**. **SAF**: varfarina (DOAC contraindicado). **Câncer**: DOAC oral ok; em neoplasia **GI/urotelial** preferir **apixabana ou HBPM**.
 
-## Cuidado
-Choque + suspeita de TEP = ativar trombólise rápido; suporte (volume com cautela no VD, noradrenalina, O₂).`,
+## Reperfusão
+- **Alto risco**: **trombólise** (alteplase) se sem contraindicação; cateter/embolectomia se falha/contraindicação.
+- **Intermediário-alto: NÃO trombolisar de rotina** — monitorizar + **trombólise de resgate** se deteriorar (SBPT 2025). Volume com cautela no VD; noradrenalina; O₂.
+> Fonte: ESC 2019; **SBPT 2025** (J Bras Pneumol); AHA/ACC 2026.`,
 itu_comp: `## Reconhecimento
 Febre, dor lombar / Giordano +, sintomas urinários. "Complicada" = homem, gestante, cateter, obstrução, imunossupressão ou anomalia do trato.
 
