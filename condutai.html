@@ -10722,13 +10722,13 @@ async function runInv(q, forceIA) {
 // ============================================================
 //  PRESCRIÇÃO INTELIGENTE (IA) — doses por peso e função renal
 // ============================================================
-function calcClCr({ idade, peso, creat, sexo }) {
-  // Cockcroft-Gault — exige idade, peso, creatinina e sexo
-  if (!idade || !peso || !creat || creat <= 0 || !sexo) return null;
-  let v = ((140 - idade) * peso) / (72 * creat);
-  if (sexo === 'F') v *= 0.85;
-  if (!isFinite(v) || v <= 0) return null;
-  return Math.round(v);
+function estimarTFG({ idade, sexo, creat }) {
+  // CKD-EPI 2021 (sem raça) — TFG estimada em mL/min/1,73m². Requer idade, sexo e creatinina.
+  if (!idade || !creat || creat <= 0 || !sexo) return null;
+  const f = (sexo === 'F');
+  const k = f ? 0.7 : 0.9, al = f ? -0.241 : -0.302;
+  const v = 142 * Math.pow(Math.min(creat / k, 1), al) * Math.pow(Math.max(creat / k, 1), -1.200) * Math.pow(0.9938, idade) * (f ? 1.012 : 1);
+  return (isFinite(v) && v > 0) ? Math.round(v) : null;
 }
 function buildPromptPrescricao(d) {
   const L = [];
@@ -10738,7 +10738,7 @@ function buildPromptPrescricao(d) {
   if (d.sexo) L.push(`Sexo: ${d.sexo === 'F' ? 'feminino' : 'masculino'}`);
   if (d.peso) L.push(`Peso: ${d.peso} kg`);
   if (d.creat) L.push(`Creatinina sérica: ${d.creat} mg/dL`);
-  if (d.clcr != null) L.push(`Clearance de creatinina estimado (Cockcroft-Gault): ≈ ${d.clcr} mL/min — AJUSTE TODAS as doses a esta função renal.`);
+  if (d.tfg != null) L.push(`TFG estimada (CKD-EPI 2021): ≈ ${d.tfg} mL/min/1,73m² — AJUSTE TODAS as doses a esta função renal.`);
   L.push(`Alergias: ${d.alergias || 'não relatadas'}`);
   if (d.obs) L.push(`Observações adicionais: ${d.obs}`);
   return `Você é médico assistente experiente e farmacêutico clínico. Com base nos DADOS DO PACIENTE abaixo e nas DIRETRIZES vigentes (cite a diretriz/sociedade e o ano quando aplicável), elabore uma SUGESTÃO DE PRESCRIÇÃO inicial, prática e segura, para uso no Brasil. Responda em português do Brasil, em Markdown, com números concretos (mg, mg/kg, mL, gotas, mL/h) e ajustando as doses ao PESO e à FUNÇÃO RENAL informados.
@@ -10777,14 +10777,14 @@ async function runPrescricao() {
   const cenario = document.getElementById('p_cenario').value || '';
   const alergias = (document.getElementById('p_alergias').value || '').trim();
   const obs = (document.getElementById('p_obs').value || '').trim();
-  const clcr = calcClCr({ idade, peso, creat, sexo });
+  const tfg = estimarTFG({ idade, sexo, creat });
   if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span>⚠</span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
   box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Elaborando prescrição…</strong></div><div class="loading-sub">Doses por peso e função renal, alertas e evidência…</div></div>`;
-  const prompt = buildPromptPrescricao({ dx, idade, sexo, peso, creat, clcr, alergias, obs, cenario });
+  const prompt = buildPromptPrescricao({ dx, idade, sexo, peso, creat, tfg, alergias, obs, cenario });
   try {
     const { text } = await callGemini([{ role: 'user', parts: [{ text: prompt }] }]);
-    const clcrChip = clcr != null ? `<div style="display:inline-block;background:#eef6ff;color:#0b5cab;border:1px solid #cfe3fb;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;margin-bottom:10px">🫘 ClCr estimado ≈ ${clcr} mL/min (Cockcroft-Gault)</div>` : '';
-    box.innerHTML = `<div class="result content">${clcrChip}${accordionize(md(text))}<div class="alert alert-warn" style="margin-top:14px"><span>⚠</span><div><b>Apoio à decisão — não substitui o julgamento médico.</b> Confira doses, ajustes, interações e contraindicações antes de prescrever; a responsabilidade é do médico assistente.</div></div></div>`;
+    const tfgChip = tfg != null ? `<div style="display:inline-block;background:#eef6ff;color:#0b5cab;border:1px solid #cfe3fb;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;margin-bottom:10px">🫘 TFG estimada ≈ ${tfg} mL/min/1,73m² (CKD-EPI 2021)</div>` : '';
+    box.innerHTML = `<div class="result content">${tfgChip}${accordionize(md(text))}<div class="alert alert-warn" style="margin-top:14px"><span>⚠</span><div><b>Apoio à decisão — não substitui o julgamento médico.</b> Confira doses, ajustes, interações e contraindicações antes de prescrever; a responsabilidade é do médico assistente.</div></div></div>`;
     await renderMermaidIn(box);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (err) {
