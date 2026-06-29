@@ -165,29 +165,32 @@ function compute(){
   const nG=countChecked('gerais'), nE=countChecked('espec');
   const ppsLow=pps&&pps<=55, ppsVeryLow=pps&&pps<=35;
   const box=document.getElementById('resultBox'), iaCard=document.getElementById('iaCard');
-  if(!SQ){box.innerHTML='';iaCard.style.display='none';return;}
-  // lógica: SQ "Não" é o gatilho; positividade por indicadores/funcional
-  let positive=false, strong=false;
-  if(SQ==='nao'){
-    positive = (nG>=2) || (nE>=1) || ppsLow;
-    strong = ppsVeryLow || (nG>=2 && nE>=1) || (nE>=2);
-  }
+  if(!SQ && !pps && !nG && !nE){box.innerHTML='';iaCard.style.display='none';return;}
+  // Triagem MULTIFATORIAL: a Pergunta Surpresa é um gatilho, mas indicadores fortes pesam sozinhos (não são ignorados se a SQ for "Sim").
+  const sqTrig=(SQ==='nao');
+  const anyInd=(nG>=2)||(nE>=1)||ppsLow;
+  const strongProfile=ppsVeryLow||nE>=2||(nG>=2&&nE>=1)||(nE>=1&&ppsLow);
+  const positive=(sqTrig&&anyInd)||strongProfile;
+  const strong=strongProfile||(sqTrig&&nG>=2&&nE>=1);
   const why=[];
-  why.push(SQ==='nao'?'Pergunta Surpresa <b>negativa</b> ("Não ficaria surpreso") — gatilho positivo.':'Pergunta Surpresa positiva ("ficaria surpreso").');
+  why.push(SQ==='nao'?'Pergunta Surpresa <b>negativa</b> ("Não ficaria surpreso") — gatilho positivo.':(SQ==='sim'?'Pergunta Surpresa positiva ("ficaria surpreso").':'Pergunta Surpresa ainda não respondida.'));
   if(pps)why.push('Funcional: '+document.getElementById('pps').selectedOptions[0].text.split('—')[0].trim()+(ppsLow?' <b>(baixo)</b>':''));
   if(nG)why.push(nG+' indicador(es) geral(is) de deterioração.');
   if(nE)why.push(nE+' indicador(es) específico(s) da doença.');
+  if(SQ==='sim'&&positive)why.push('⚠️ <b>Os indicadores clínicos sugerem doença avançada apesar da Pergunta Surpresa positiva</b> — reavalie a resposta.');
   let cls,icon,title,msg;
-  if(SQ==='nao' && positive){
-    if(strong){cls='red';icon='ti-alert-triangle';title='Avaliação de cuidados paliativos RECOMENDADA';msg='Vários indicadores de doença avançada/deterioração. Acione avaliação paliativa e <b>reunião familiar estruturada</b> precocemente; discuta objetivos de cuidado e planejamento antecipado.';}
-    else{cls='amber';icon='ti-clipboard-check';title='Sugere avaliação de cuidados paliativos';msg='Há gatilho e indicadores presentes. Considere avaliação paliativa e conversa de objetivos de cuidado; reavalie a evolução.';}
-  } else if(SQ==='nao'){
-    cls='amber';icon='ti-eye';title='Vigilância — gatilho presente, poucos indicadores';msg='A Pergunta Surpresa foi negativa, mas há poucos indicadores. Reavalie em internações futuras / mudança clínica; considere conversa inicial sobre preferências.';
+  if(positive){
+    if(strong){cls='red';icon='ti-alert-triangle';title='Avaliação de cuidados paliativos RECOMENDADA';msg='Indicadores de doença avançada/deterioração presentes. Acione avaliação paliativa e <b>reunião familiar estruturada</b> precocemente; discuta objetivos de cuidado e planejamento antecipado.';}
+    else{cls='amber';icon='ti-clipboard-check';title='Sugere avaliação de cuidados paliativos';msg='Há indicadores que justificam considerar avaliação paliativa e conversa de objetivos de cuidado; reavalie a evolução.';}
+  } else if(sqTrig){
+    cls='amber';icon='ti-eye';title='Vigilância — gatilho presente, poucos indicadores';msg='A Pergunta Surpresa foi negativa, mas há poucos indicadores no momento. Reavalie em internações futuras / mudança clínica; considere conversa inicial sobre preferências.';
+  } else if(anyInd){
+    cls='amber';icon='ti-eye';title='Atenção — há indicadores; reavalie a Pergunta Surpresa';msg='A Pergunta Surpresa foi positiva, mas existem indicadores de deterioração. Reveja a impressão clínica e a evolução antes de descartar a avaliação paliativa.';
   } else {
-    cls='green';icon='ti-circle-check';title='Baixa probabilidade de necessidade no momento';msg='Sem gatilho na triagem. Reavaliar se houver deterioração, internação não planejada ou mudança funcional.';
+    cls='green';icon='ti-circle-check';title='Baixa probabilidade de necessidade no momento';msg='Sem gatilho nem indicadores relevantes. Reavaliar se houver deterioração, internação não planejada ou mudança funcional.';
   }
   box.innerHTML=`<div class="result ${cls}"><div class="rtitle"><i class="ti ${icon}"></i> ${title}</div><div class="rwhy">${msg}<ul>${why.map(w=>'<li>'+w+'</li>').join('')}</ul></div></div>`;
-  iaCard.style.display = (SQ==='nao' && positive) ? 'block' : 'none';
+  iaCard.style.display = positive ? 'block' : 'none';
 }
 async function gerarReuniao(){
   if(!window.MT||!MT.user){alert('Entre na sua conta MedTech para usar a IA.');return;}
