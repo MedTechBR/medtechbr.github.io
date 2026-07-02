@@ -11,11 +11,53 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
 <link rel="icon" type="image/png" href="favicon.png">
+<link rel="manifest" href="consultai.webmanifest">
+<link rel="apple-touch-icon" href="icone-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ConsultAI">
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"agendaai",name:"ConsultAI"};</script>
 <script type="module" src="_mtauth.js?v=8"></script>
 <style>
 :root{--petrol:#2563eb;--petrol-dark:#1e40af;--ink:#0f172a;--mint:#2563eb;--mint-dark:#1e40af;--bg:#f4f7fb;--soft:#e8f0fe;--line:#e6ebf3;--muted:#64748b;--green:#14794f;--green-bg:#e7f7f1;--amber:#c97a17;--amber-bg:#fdf0e0;--red:#c0392b;--red-bg:#fdecea;--blue:#2563a8;--blue-bg:#e8f1fb;--violet:#6b46c1;--violet-bg:#efe9fb;--wa:#25D366}
+/* ===== Início (dashboard) ===== */
+.ini{display:grid;gap:14px}
+.ini-hero{background:linear-gradient(135deg,var(--petrol),var(--petrol-dark));color:#fff;border-radius:16px;padding:20px 22px;box-shadow:0 8px 24px rgba(37,99,235,.20)}
+.ini-greet{font-size:22px;font-weight:700;letter-spacing:-.2px}
+.ini-greet b{font-weight:800}
+.ini-sub{opacity:.92;margin-top:4px;font-size:13.5px}
+.ini-cfg-hint{background:var(--amber-bg);color:var(--amber);border:1px solid #f0d9b5;border-radius:12px;padding:12px 14px;font-size:13.5px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.ini-cfg-hint i{font-size:18px;flex:none}
+.ini-next{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 10px rgba(15,23,42,.04)}
+.ini-time{font-size:28px;font-weight:800;color:var(--petrol);line-height:1;min-width:70px;text-align:center}
+.ini-time small{display:block;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);margin-top:5px}
+.ini-time.late{color:var(--red)}
+.ini-nx-info{flex:1;min-width:0}
+.ini-nx-info .h{font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+.ini-nx-nome{font-weight:700;font-size:16px;color:var(--ink);margin-top:2px}
+.ini-nx-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px;align-items:center}
+.ini-nx-obs{color:var(--muted);font-size:13px;margin-top:7px}
+.ini-nx-act{display:flex;flex-direction:column;gap:8px;flex:none}
+.ini-empty{background:#fff;border:1px dashed var(--line);border-radius:14px;padding:24px;text-align:center;color:var(--muted)}
+.ini-empty i{font-size:30px;color:var(--petrol);opacity:.55}
+.ini-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.ini-stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 10px;text-align:center}
+.ini-stat b{display:block;font-size:24px;font-weight:800;color:var(--ink);line-height:1}
+.ini-stat span{display:block;font-size:11.5px;color:var(--muted);margin-top:5px}
+.ini-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.ini-sc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;font-weight:600;font-size:13px;color:var(--ink);transition:.15s;text-align:center}
+.ini-sc:hover{border-color:var(--petrol);box-shadow:0 4px 14px rgba(37,99,235,.14);transform:translateY(-1px)}
+.ini-sc i{font-size:22px;color:var(--petrol)}
+.ini-today{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.ini-today h3{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin:0;padding:13px 16px 9px}
+.ini-row{display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid var(--line);cursor:pointer}
+.ini-row:hover{background:var(--soft)}
+.ini-row .rt{font-weight:700;color:var(--petrol);min-width:44px;font-size:14px}
+.ini-row.done .rt{color:var(--muted)}
+.ini-row .rn{flex:1;min-width:0;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:640px){.ini-stats{grid-template-columns:repeat(2,1fr)}.ini-grid{grid-template-columns:repeat(2,1fr)}.ini-next{flex-wrap:wrap}.ini-nx-act{flex-direction:row;width:100%}.ini-nx-act .btn{flex:1;justify-content:center}}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:-.011em;color:var(--ink);background:var(--bg)}
 header{background:var(--petrol);color:#fff;padding:14px 0}
@@ -210,9 +252,10 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 
 <main>
   <div class="tabs">
-    <button id="tab-agenda" class="on" onclick="setView('agenda')">📅 Agenda</button>
-    <button id="tab-pacientes" onclick="setView('pacientes')">👥 Pacientes</button>
-    <button id="tab-config" onclick="setView('config')">⚙️ Configurações</button>
+    <button id="tab-inicio" class="on" onclick="setView('inicio')"><i class="ti ti-home-2"></i> Início</button>
+    <button id="tab-agenda" onclick="setView('agenda')"><i class="ti ti-calendar-event"></i> Agenda</button>
+    <button id="tab-pacientes" onclick="setView('pacientes')"><i class="ti ti-users"></i> Pacientes</button>
+    <button id="tab-config" onclick="setView('config')"><i class="ti ti-settings"></i> Configurações</button>
   </div>
   <div id="view"></div>
   <div class="note" id="storenote">Carregando…</div>
@@ -375,7 +418,7 @@ const MED_DB=[
 
 let state={patients:[],appts:[],records:[],prescriptions:[],documentos:[],docs:[],labs:[],modelos:[],cfg:{medico:'',clinica:'',crm:'',esp:'',rqe:'',endereco:'',telefone:'',logo:'',rodape:'',agenda:{ini:'07:00',fim:'19:00',slot:30,dias:[1,2,3,4,5,6]}},migratedEvoluai:false};
 let cur=new Date();cur.setHours(0,0,0,0);
-let view='agenda', aTab='dia', busca='', curPac=null, pTab='evol', pSearch='', attendApptId=null;
+let view='inicio', aTab='dia', busca='', curPac=null, pTab='evol', pSearch='', attendApptId=null;
 
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
 function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -440,15 +483,102 @@ function renderUser(){const el=document.getElementById('usr');if(!el)return;
   el.innerHTML=`<span class="who">${esc(nm)}</span><button onclick="MT.signOut()">Sair</button>`;}
 
 /* ===== navegação ===== */
-function setView(v){view=v;curPac=null;['agenda','pacientes','config'].forEach(x=>{const b=document.getElementById('tab-'+x);if(b)b.className=(x===v?'on':'');});render();}
+function setView(v){view=v;curPac=null;['inicio','agenda','pacientes','config'].forEach(x=>{const b=document.getElementById('tab-'+x);if(b)b.className=(x===v?'on':'');});render();}
 function render(){
-  ['agenda','pacientes','config'].forEach(x=>{const b=document.getElementById('tab-'+x);if(b)b.className=((view===x||(view==='paciente'&&x==='pacientes'))?'on':'');});
-  if(view==='agenda')renderAgenda();
+  ['inicio','agenda','pacientes','config'].forEach(x=>{const b=document.getElementById('tab-'+x);if(b)b.className=((view===x||(view==='paciente'&&x==='pacientes'))?'on':'');});
+  if(view==='inicio')renderInicio();
+  else if(view==='agenda')renderAgenda();
   else if(view==='pacientes')renderPacientes();
   else if(view==='paciente')renderPaciente();
   else if(view==='config')renderConfig();
 }
 const apptsSorted=list=>list.slice().sort((a,b)=>a.date.localeCompare(b.date)||minutesOf(a.time)-minutesOf(b.time));
+
+/* ===== INÍCIO (dashboard) ===== */
+function renderInicio(){
+  const el=document.getElementById('view');if(!el)return;
+  const now=new Date(), h=now.getHours(), mn=now.getMinutes();
+  const saud=h<12?'Bom dia':(h<18?'Boa tarde':'Boa noite');
+  const nomeRaw=(state.cfg.medico||'').trim();
+  const nomeUser=nomeRaw||((MT&&MT.user&&(MT.user.displayName||''))||'');
+  let quem='doutor(a)';
+  if(nomeUser){
+    if(/^dr[ae]?\.?\s/i.test(nomeUser)) quem=nomeUser.split(/\s+/).slice(0,2).join(' ');
+    else quem='Dr(a). '+nomeUser.split(/\s+/)[0];
+  }
+  const hoje=ymd(now), nowMin=h*60+mn;
+  const todos=apptsSorted(state.appts.filter(a=>a.date===hoje));
+  const ativos=todos.filter(a=>a.status!=='cancelado');
+  const pend=ativos.filter(a=>a.status!=='atendido'&&a.status!=='faltou');
+  const prox=pend.find(a=>minutesOf(a.time)>=nowMin)||pend[0]||null;
+  const nConf=ativos.filter(a=>a.status==='confirmado').length;
+  const nAtend=ativos.filter(a=>a.status==='atendido').length;
+  let dataLonga=`${WDL[now.getDay()]}, ${now.getDate()} de ${MES[now.getMonth()]}`;
+  dataLonga=dataLonga.charAt(0).toUpperCase()+dataLonga.slice(1);
+
+  const chip=(bg,fg,txt)=>`<span style="display:inline-block;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:700;background:${bg};color:${fg}">${esc(txt)}</span>`;
+  const STC={agendado:['var(--soft)','var(--petrol)'],confirmado:['var(--green-bg)','var(--green)'],atendido:['var(--blue-bg)','var(--blue)'],faltou:['var(--red-bg)','var(--red)'],cancelado:['#eef1f5','var(--muted)']};
+  const typeChip=a=>{const c=WKC[a.type]||['var(--soft)','var(--petrol)'];return chip(c[0],c[1],(TYPES[a.type]||{}).l||'Consulta');};
+  const statChip=a=>{const c=STC[a.status]||['var(--soft)','var(--petrol)'];return chip(c[0],c[1],(STATUS[a.status]||{}).l||a.status);};
+  const nomeDe=a=>a.pacId?((patientById(a.pacId)||{}).nome||'—'):(a.pac||'Sem paciente vinculado');
+
+  let html=`<section class="ini">
+    <div class="ini-hero">
+      <div class="ini-greet">${saud}, <b>${esc(quem)}</b></div>
+      <div class="ini-sub">${dataLonga} · ${ativos.length} consulta${ativos.length===1?'':'s'} hoje</div>
+    </div>`;
+
+  if(!nomeRaw){
+    html+=`<div class="ini-cfg-hint" onclick="setView('config')"><i class="ti ti-user-cog"></i><span>Complete seu nome e os dados da clínica em <b>Configurações</b> para personalizar receituários e documentos.</span></div>`;
+  }
+
+  if(prox){
+    const late=minutesOf(prox.time)<nowMin;
+    html+=`<div class="ini-next">
+      <div class="ini-time${late?' late':''}">${prox.time}<small>${late?'atrasada':'próxima'}</small></div>
+      <div class="ini-nx-info">
+        <div class="h">Próximo atendimento</div>
+        <div class="ini-nx-nome">${esc(nomeDe(prox))}</div>
+        <div class="ini-nx-meta">${typeChip(prox)} ${statChip(prox)}</div>
+        ${prox.obs?`<div class="ini-nx-obs">${esc(prox.obs)}</div>`:''}
+      </div>
+      <div class="ini-nx-act">
+        <button class="btn btn-p" onclick="atender('${prox.id}')"><i class="ti ti-stethoscope"></i> Atender</button>
+        <button class="btn btn-g" onclick="setView('agenda')">Ver agenda</button>
+      </div>
+    </div>`;
+  } else {
+    html+=`<div class="ini-empty"><i class="ti ti-calendar-check"></i>
+      <div style="margin-top:8px;font-weight:600;color:var(--ink)">Nenhuma consulta pendente hoje</div>
+      <div style="font-size:13px;margin-top:2px">Aproveite para revisar prontuários ou organizar a agenda.</div></div>`;
+  }
+
+  html+=`<div class="ini-stats">
+    <div class="ini-stat"><b>${ativos.length}</b><span>Hoje</span></div>
+    <div class="ini-stat"><b>${nConf}</b><span>Confirmadas</span></div>
+    <div class="ini-stat"><b>${nAtend}</b><span>Atendidas</span></div>
+    <div class="ini-stat"><b>${state.patients.length}</b><span>Pacientes</span></div>
+  </div>`;
+
+  html+=`<div class="ini-grid">
+    <div class="ini-sc" onclick="setView('agenda')"><i class="ti ti-calendar-event"></i>Agenda</div>
+    <div class="ini-sc" onclick="setView('pacientes')"><i class="ti ti-users"></i>Pacientes</div>
+    <div class="ini-sc" onclick="setView('pacientes')"><i class="ti ti-user-plus"></i>Novo paciente</div>
+    <div class="ini-sc" onclick="setView('config')"><i class="ti ti-settings"></i>Configurações</div>
+  </div>`;
+
+  if(ativos.length){
+    html+=`<div class="ini-today"><h3>Consultas de hoje</h3>`+
+      ativos.map(a=>`<div class="ini-row${a.status==='atendido'?' done':''}" onclick="atender('${a.id}')">
+        <span class="rt">${a.time}</span>
+        <span class="rn">${esc(nomeDe(a))}</span>
+        ${typeChip(a)} ${statChip(a)}
+      </div>`).join('')+`</div>`;
+  }
+
+  html+=`</section>`;
+  el.innerHTML=html;
+}
 
 /* ===== AGENDA ===== */
 function renderAgenda(){
@@ -1293,5 +1423,6 @@ function modal(html){document.querySelectorAll('.modal').forEach(m=>m.remove());
 function closeModal(){const m=document.getElementById('modal');if(m)m.remove();}
 function closeModalMic(){attendApptId=null;stopRec();if(mediaRec&&mediaRec.state==='recording'){consultaAbort=true;try{mediaRec.stop();}catch(e){}}stopStream();if(recTimer){clearInterval(recTimer);recTimer=null;}closeModal();}
 </script>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}</script>
 </body>
 </html>
