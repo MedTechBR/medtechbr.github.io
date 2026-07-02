@@ -585,7 +585,7 @@ function addParamImgs(input){
     const origMime=f.type||guessMime(f.name);
     readFileRetry(f,2,dataUrl=>{
       if(!dataUrl){visitaImgErrs.push(f.name||'imagem');renderThumbs();doneOne();return;}
-      downscale(dataUrl,2600,.92,(outUrl,outMime)=>{
+      downscale(dataUrl,3200,.92,(outUrl,outMime)=>{
         const url=outUrl||dataUrl, mime=outMime||origMime||'image/jpeg', b64=(url.split(',')[1]||'');
         if(b64)visitaImgs.push({data:b64,mimeType:mime,thumb:url,heic:/heic|heif/i.test(mime)});
         else visitaImgErrs.push(f.name||'imagem');
@@ -608,8 +608,11 @@ function downscale(dataUrl,maxDim,q,cb){
   setTimeout(()=>finish(null,null),6000);
   img.src=dataUrl;
 }
-const PARAM_PROMPT='Você recebe FOTO(S) manuscritas: uma folha de CONTROLE HEMODINÂMICO (sinais vitais) e, possivelmente, uma folha SEPARADA de CONTROLE HÍDRICO (diurese/balanço hídrico) das últimas 24h de um paciente internado. Transcreva os sinais vitais e calcule as faixas mínimo–máximo do dia. Leia a grade MANUSCRITA com MUITA atenção, célula por célula (cada coluna é um horário; não troque valores de colunas/linhas; confira cada dígito). Responda APENAS UMA LINHA, em MAIÚSCULAS, exatamente neste formato, sem o rótulo "PARÂMETROS:" e sem nenhum texto extra:\n'
- +'PA [sis_min-sis_max] X [dia_min-dia_max] MMHG // FC [min-max] BPM // FR [min-max] IRPM // T [min-max] ºC // SPO2 [min-max]% // DX [valores em ordem de horário separados por hífen, sem espaços] MG/DL // DIURESE [valor] ML // BH [valor com sinal] ML\n'
+const PARAM_PROMPT='Você recebe FOTO(S) manuscritas das últimas 24h de um paciente internado: uma folha de CONTROLE HEMODINÂMICO (sinais vitais) e, possivelmente, uma folha SEPARADA de CONTROLE HÍDRICO (diurese/balanço). A PRECISÃO DOS DÍGITOS é o mais importante. TRABALHE EM ETAPAS e SÓ NO FINAL emita a linha:\n'
+ +'ETAPA 1 — LEITURA CÉLULA A CÉLULA: percorra a folha hemodinâmica COLUNA POR COLUNA (cada coluna = um horário). Para CADA horário, escreva exatamente o que está manuscrito, ex.: "08h: PA 130x80, FC 88, FR 18, T 36.5, SpO2 96, DX 110". Confira dígito por dígito; NÃO troque valores entre colunas/linhas; pule células vazias. Se houver folha hídrica, liste cada COLUNA com seu RÓTULO (entrada/ganho, ou saída: diurese/dreno/UF) e o total dela.\n'
+ +'ETAPA 2 — CÁLCULO: a partir da Etapa 1, determine as faixas mínimo–máximo do dia de cada sinal, a ordem cronológica das glicemias, a diurese total e o balanço hídrico.\n'
+ +'ETAPA 3 — LINHA FINAL: na ÚLTIMA linha, começando com "RESULTADO: " e em MAIÚSCULAS, escreva EXATAMENTE este formato (e nada depois):\n'
+ +'RESULTADO: PA [sis_min-sis_max] X [dia_min-dia_max] MMHG // FC [min-max] BPM // FR [min-max] IRPM // T [min-max] ºC // SPO2 [min-max]% // DX [valores em ordem de horário separados por hífen, sem espaços] MG/DL // DIURESE [valor] ML // BH [valor com sinal] ML\n'
  +'REGRAS: (0) A folha hemodinâmica costuma ter, ABAIXO dos valores, uma GRADE DE ESCORE (MEWS/alerta precoce) com números 0, 1, 2 e 3 nas células — IGNORE completamente esses escores; use SEMPRE os valores REAIS medidos. '
  +'(1) PA = curva sistólica × diastólica (ex.: PA 100-136 X 60-80). A pressão aparece como pares na linha "PRESSÃO ARTERIAL" do topo (ex.: 136/75, 130X80, 100X60); use a MENOR e a MAIOR sistólica e a MENOR e a MAIOR diastólica do dia. NUNCA inclua PAM. '
  +'(2) DX = glicemia/HGT: valores em ordem de horário separados por "-" sem espaços (ex.: DX 135-192-84-104 MG/DL) — o hífen é separador de horário, NÃO faixa; pule horários sem medida; se uma só medida, registre só ela; se não houver nenhuma, escreva DX NÃO AFERIDA (sem unidade). '
@@ -617,7 +620,7 @@ const PARAM_PROMPT='Você recebe FOTO(S) manuscritas: uma folha de CONTROLE HEMO
  +'(4) DIURESE = total do dia (24h) somando APENAS a coluna de diurese. '
  +'(5) BALANÇO HÍDRICO (BH): CALCULE você mesmo (NÃO copie um total que pode estar errado). BH = (SOMA de TODOS os GANHOS/entradas do dia) − (DIURESE + DIÁLISE/UF + DRENOS + outras perdas). Some todas as entradas, some todas as saídas e subtraia; informe BH com sinal (+ positivo, − negativo). Use os TOTAIS do dia; ignore subtotais parciais ("TP"/total parcial). Se não houver folha hídrica, escreva DIURESE NÃO AFERIDA e BH NÃO AFERIDO. '
  +'(6) DRENOS: se houver coluna de dreno preenchida, acrescente "// DEBITO DE DRENO [valor] ML" e INCLUA esse valor nas perdas do cálculo do BH; se não houver, omita. '
- +'(7) Se algum sinal não estiver nas fotos, omita esse campo (não invente). Responda só a linha.';
+ +'(7) Se algum sinal não estiver nas fotos, omita esse campo (não invente). Mantenha as Etapas 1 e 2 concisas; a Etapa 3 (linha "RESULTADO:") é OBRIGATÓRIA e deve ser a ÚLTIMA linha.';
 async function transcreverParams(){
   if(!visitaImgs.length){alert('Anexe ao menos uma foto dos parâmetros.');return;}
   const b=document.getElementById('transBtn');b.innerHTML='<span class="spin"></span> Transcrevendo...';b.disabled=true;
@@ -626,7 +629,12 @@ async function transcreverParams(){
     let out;
     try{ out=await MT.aiImage(imgs,PARAM_PROMPT,'gemini-2.5-pro'); }   // pro = melhor OCR de manuscrito
     catch(e1){ out=await MT.aiImage(imgs,PARAM_PROMPT); }              // fallback flash (backend ainda sem pro)
-    const clean=String(out||'').replace(/^```[a-z]*\s*/i,'').replace(/```\s*$/,'').replace(/^\s*PARÂMETROS:\s*/i,'').trim();
+    const rawTxt=String(out||'').replace(/```/g,'');
+    let clean='';
+    const hits=[...rawTxt.matchAll(/RESULTADO:\s*([^\n]+)/gi)];      // pega a ÚLTIMA linha "RESULTADO:"
+    if(hits.length){clean=hits[hits.length-1][1].trim();}
+    else{const ls=rawTxt.split('\n').map(s=>s.trim()).filter(Boolean);clean=[...ls].reverse().find(l=>/\/\//.test(l)||/^PA[\s\d]/i.test(l))||ls[ls.length-1]||'';}
+    clean=clean.replace(/^\s*(PAR[ÂA]METROS|RESULTADO):\s*/i,'').trim();
     if(clean)setVal('v_param',up(clean));
     b.innerHTML='✓ Transcrito';setTimeout(()=>{b.innerHTML='✨ Transcrever parâmetros';b.disabled=false;},1600);
     return;
