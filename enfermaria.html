@@ -55,7 +55,9 @@ main{max-width:980px;margin:0 auto;padding:16px 18px calc(60px + env(safe-area-i
 .bar .right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 input.search{padding:11px 12px;border:1px solid var(--line);border-radius:9px;font-size:16px;font-family:inherit;background:#fff;min-width:230px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:none;border-radius:10px;padding:12px 16px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;text-decoration:none;min-height:44px}
-.btn-p{background:var(--petrol);color:#fff}.btn-p:hover{background:var(--mint-dark)}
+.btn-p{background:var(--petrol);color:#fff}
+.btn-p:hover{background:var(--petrol-dark)}
+.btn-p .spin{border-color:#fff;border-top-color:transparent}.btn-p:hover{background:var(--mint-dark)}
 .btn-g{background:#fff;color:var(--petrol);border:1px solid var(--line)}
 .btn-v{background:var(--violet);color:#fff}
 .btn-sm{padding:9px 12px;font-size:13px;border-radius:9px;min-height:40px}
@@ -122,7 +124,7 @@ input.search{padding:11px 12px;border:1px solid var(--line);border-radius:9px;fo
 .row.actions .btn{flex:1}
 .hint{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5}
 .sec-h{font-weight:800;color:var(--petrol);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;margin:16px 0 9px;border-top:1px solid var(--line);padding-top:13px}
-.ai-box{background:#eef7f4;border:1px solid #bfe6db;border-radius:12px;padding:13px;margin-bottom:14px}
+.ai-box{background:var(--soft);border:1px solid #cfe0fb;border-radius:12px;padding:13px;margin-bottom:14px}
 .ai-box .ai-h{font-weight:800;color:var(--petrol-dark);font-size:14px;margin-bottom:7px;display:flex;align-items:center;gap:6px}
 .ai-box textarea{width:100%;min-height:90px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:16px;font-family:inherit;resize:vertical;background:#fff;line-height:1.5}
 .ai-box textarea:focus{outline:none;border-color:var(--mint)}
@@ -548,7 +550,7 @@ function openVisita(id){
      <div class="hint">Tire foto do controle hemodinâmico e, se tiver, da folha de diurese/balanço hídrico. A IA transcreve para a linha de parâmetros.</div>
      <input class="file-in" type="file" id="v_imgs" accept="image/*,.heic,.heif,.jpg,.jpeg,.png" multiple onchange="addParamImgs(this)">
      <div id="v_thumbs" class="thumbs"></div>
-     <div class="row"><button class="btn btn-p btn-sm" id="transBtn" onclick="transcreverParams()">✨ Transcrever parâmetros</button></div>
+     <div class="row"><button class="btn btn-p" id="transBtn" style="width:100%" onclick="transcreverParams()"><i class="ti ti-sparkles"></i> Transcrever com IA</button></div>
    </div>
    <div class="field"><label>Parâmetros</label><textarea id="v_param" autocapitalize="characters" spellcheck="false" placeholder="PA ... // FC ... // FR ... // T ... // SPO2 ... // DX ... // DIURESE ... // BH ..." style="min-height:78px">${esc(p.parametros||'')}</textarea></div>
    <div class="field"><label>Exame físico <span style="color:var(--muted);font-weight:400">(vem do dia anterior — edite o que mudou)</span></label>
@@ -619,19 +621,19 @@ function downscale(dataUrl,maxDim,q,cb){
   setTimeout(()=>finish(null,null),6000);
   img.src=dataUrl;
 }
-const PARAM_PROMPT='Você recebe FOTO(S) manuscritas das últimas 24h de um paciente internado: uma folha de CONTROLE HEMODINÂMICO (sinais vitais) e, possivelmente, uma folha SEPARADA de CONTROLE HÍDRICO (diurese/balanço). A PRECISÃO DOS DÍGITOS é o mais importante. TRABALHE EM ETAPAS e SÓ NO FINAL emita a linha:\n'
- +'ETAPA 1 — LEITURA CÉLULA A CÉLULA: percorra a folha hemodinâmica COLUNA POR COLUNA (cada coluna = um horário). Para CADA horário, escreva exatamente o que está manuscrito, ex.: "08h: PA 130x80, FC 88, FR 18, T 36.5, SpO2 96, DX 110". Confira dígito por dígito; NÃO troque valores entre colunas/linhas; pule células vazias. Se houver folha hídrica, liste cada COLUNA com seu RÓTULO (entrada/ganho, ou saída: diurese/dreno/UF) e o total dela.\n'
- +'ETAPA 2 — CÁLCULO: a partir da Etapa 1, determine as faixas mínimo–máximo do dia de cada sinal, a ordem cronológica das glicemias, a diurese total e o balanço hídrico.\n'
- +'ETAPA 3 — LINHA FINAL: na ÚLTIMA linha, começando com "RESULTADO: " e em MAIÚSCULAS, escreva EXATAMENTE este formato (e nada depois):\n'
- +'RESULTADO: PA [sis_min-sis_max] X [dia_min-dia_max] MMHG // FC [min-max] BPM // FR [min-max] IRPM // T [min-max] ºC // SPO2 [min-max]% // DX [valores em ordem de horário separados por hífen, sem espaços] MG/DL // DIURESE [valor] ML // BH [valor com sinal] ML\n'
- +'REGRAS: (0) A folha hemodinâmica costuma ter, ABAIXO dos valores, uma GRADE DE ESCORE (MEWS/alerta precoce) com números 0, 1, 2 e 3 nas células — IGNORE completamente esses escores; use SEMPRE os valores REAIS medidos. '
- +'(1) PA = curva sistólica × diastólica (ex.: PA 100-136 X 60-80). A pressão aparece como pares na linha "PRESSÃO ARTERIAL" do topo (ex.: 136/75, 130X80, 100X60); use a MENOR e a MAIOR sistólica e a MENOR e a MAIOR diastólica do dia. NUNCA inclua PAM. '
- +'(2) DX = glicemia/HGT: valores em ordem de horário separados por "-" sem espaços (ex.: DX 135-192-84-104 MG/DL) — o hífen é separador de horário, NÃO faixa; pule horários sem medida; se uma só medida, registre só ela; se não houver nenhuma, escreva DX NÃO AFERIDA (sem unidade). '
- +'(3) FOLHA DE CONTROLE HÍDRICO: ela tem CABEÇALHOS/TÍTULOS escritos EM CIMA de cada coluna ou bloco dizendo o que é cada coisa — GANHOS/ENTRADAS (soro/SF, hidratação, dieta, água, medicações diluídas) e SAÍDAS/PERDAS (DIURESE, DIÁLISE ou ultrafiltração/UF, DRENOS). LEIA esses cabeçalhos e CLASSIFIQUE cada coluna por eles. NÃO confunda GANHOS (entradas) com DIURESE (saída urinária): diurese é SOMENTE a coluna rotulada como diurese. '
- +'(4) DIURESE = total do dia (24h) somando APENAS a coluna de diurese. '
- +'(5) BALANÇO HÍDRICO (BH): CALCULE você mesmo (NÃO copie um total que pode estar errado). BH = (SOMA de TODOS os GANHOS/entradas do dia) − (DIURESE + DIÁLISE/UF + DRENOS + outras perdas). Some todas as entradas, some todas as saídas e subtraia; informe BH com sinal (+ positivo, − negativo). Use os TOTAIS do dia; ignore subtotais parciais ("TP"/total parcial). Se não houver folha hídrica, escreva DIURESE NÃO AFERIDA e BH NÃO AFERIDO. '
- +'(6) DRENOS: se houver coluna de dreno preenchida, acrescente "// DEBITO DE DRENO [valor] ML" e INCLUA esse valor nas perdas do cálculo do BH; se não houver, omita. '
- +'(7) Se algum sinal não estiver nas fotos, omita esse campo (não invente). Mantenha as Etapas 1 e 2 concisas; a Etapa 3 (linha "RESULTADO:") é OBRIGATÓRIA e deve ser a ÚLTIMA linha.';
+const PARAM_PROMPT='Você é um escriba clínico. Recebe FOTO(S) manuscritas das últimas 24h de um paciente internado: uma folha de CONTROLE HEMODINÂMICO (sinais vitais por horário) e, às vezes, uma folha SEPARADA de CONTROLE HÍDRICO (ganhos/perdas, diurese, balanço). Transcreva os DÍGITOS com precisão e resuma o dia em UMA linha padronizada.\n'
+ +'COMO PENSAR (faça isto internamente, em silêncio, e NÃO escreva na resposta): leia a folha hemodinâmica COLUNA POR COLUNA (cada coluna = um horário); confira dígito por dígito; não troque valores entre linhas ou colunas; pule células vazias; depois calcule as faixas mínimo–máximo do dia de cada sinal, a ordem cronológica das glicemias, a diurese total e o balanço.\n'
+ +'RESPONDA APENAS com a linha final abaixo, em MAIÚSCULAS, numa única linha, sem títulos, sem "ETAPA", sem mostrar o raciocínio, sem comentários. Omita por completo os campos sem dado (NÃO invente):\n'
+ +'PA [sist_min-sist_max] X [diast_min-diast_max] MMHG // FC [min-max] BPM // FR [min-max] IRPM // T [min-max] ºC // SPO2 [min-max]% // DX [glicemias em ordem de horário separadas por hífen] MG/DL // DIURESE [total] ML // BH [valor com sinal] ML\n'
+ +'REGRAS: '
+ +'(A) A folha hemodinâmica costuma ter, ABAIXO dos valores, uma GRADE DE ESCORE (MEWS/alerta precoce) com números 0, 1, 2 e 3 nas células — IGNORE esses escores; use SEMPRE o valor REAL medido, nunca o escore. '
+ +'(B) PA = sistólica × diastólica (linha "PRESSÃO ARTERIAL", pares tipo 136/75, 130X80): use a MENOR e a MAIOR sistólica e a MENOR e a MAIOR diastólica do dia (ex.: PA 100-136 X 60-80). NUNCA use PAM. '
+ +'(C) DX (glicemia/HGT): em ordem CRONOLÓGICA separadas por "-" (ex.: DX 229-165-148-110) — o hífen separa horários, NÃO é faixa; pule horários sem medida; se houver só uma, registre só ela; se nenhuma, escreva "DX NÃO AFERIDA". '
+ +'(D) FOLHA HÍDRICA: tem CABEÇALHOS escritos em cima de cada coluna. GANHOS/ENTRADAS = soro/SF, hidratação, dieta, água, medicações diluídas. PERDAS/SAÍDAS = DIURESE, DIÁLISE/ultrafiltração (UF), DRENOS, vômitos. Leia os cabeçalhos e classifique cada coluna por eles; DIURESE é SOMENTE a coluna rotulada como diurese (não confunda com ganhos). '
+ +'(E) DIURESE = total do dia (24h) somando apenas a coluna de diurese. '
+ +'(F) BH = (soma de TODOS os ganhos do dia) − (soma de TODAS as perdas: diurese + diálise/UF + drenos + vômitos). CALCULE você mesmo (não copie um total que pode estar errado), use os TOTAIS do dia e ignore subtotais parciais ("TP"); informe com sinal (+ ou −). Se houver dreno preenchido, some-o às perdas e acrescente "// DRENO [valor] ML". '
+ +'(G) Sem folha hídrica: escreva "DIURESE NÃO AFERIDA" e "BH NÃO AFERIDO". '
+ +'(H) Se um sinal não aparece nas fotos, omita o campo inteiro. Repito: a resposta é SÓ a linha de parâmetros, nada mais.';
 async function transcreverParams(){
   if(!visitaImgs.length){alert('Anexe ao menos uma foto dos parâmetros.');return;}
   const b=document.getElementById('transBtn');b.innerHTML='<span class="spin"></span> Transcrevendo...';b.disabled=true;
@@ -640,17 +642,18 @@ async function transcreverParams(){
     let out;
     try{ out=await MT.aiImage(imgs,PARAM_PROMPT,'gemini-2.5-pro'); }   // pro = melhor OCR de manuscrito
     catch(e1){ out=await MT.aiImage(imgs,PARAM_PROMPT); }              // fallback flash (backend ainda sem pro)
-    const rawTxt=String(out||'').replace(/```/g,'');
-    let clean='';
-    const hits=[...rawTxt.matchAll(/RESULTADO:\s*([^\n]+)/gi)];      // pega a ÚLTIMA linha "RESULTADO:"
-    if(hits.length){clean=hits[hits.length-1][1].trim();}
-    else{const ls=rawTxt.split('\n').map(s=>s.trim()).filter(Boolean);clean=[...ls].reverse().find(l=>/\/\//.test(l)||/^PA[\s\d]/i.test(l))||ls[ls.length-1]||'';}
-    clean=clean.replace(/^\s*(PAR[ÂA]METROS|RESULTADO):\s*/i,'').trim();
+    const rawTxt=String(out||'').replace(/```/g,'').replace(/\*\*/g,'').trim();
+    const ls=rawTxt.split('\n').map(s=>s.trim()).filter(Boolean);
+    // a resposta deve ser só a linha de parâmetros — pega a que tem o formato "//", senão a última com sinal vital
+    let clean=ls.find(l=>/\/\//.test(l))
+           || [...ls].reverse().find(l=>/\b(PA|FC|FR|SPO2|MMHG|DIURESE)\b/i.test(l))
+           || ls[ls.length-1] || '';
+    clean=clean.replace(/^\s*(PAR[ÂA]METROS|RESULTADO)\s*:\s*/i,'').trim();
     if(clean)setVal('v_param',up(clean));
-    b.innerHTML='✓ Transcrito';setTimeout(()=>{b.innerHTML='✨ Transcrever parâmetros';b.disabled=false;},1600);
+    b.innerHTML='<i class="ti ti-check"></i> Transcrito';setTimeout(()=>{b.innerHTML='<i class="ti ti-sparkles"></i> Transcrever com IA';b.disabled=false;},1600);
     return;
   }catch(e){alert('⚠️ '+(e.message||'Falha na IA.'));}
-  b.innerHTML='✨ Transcrever parâmetros';b.disabled=false;
+  b.innerHTML='<i class="ti ti-sparkles"></i> Transcrever com IA';b.disabled=false;
 }
 
 /* evolução pronta para colar */
