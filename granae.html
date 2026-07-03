@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&display=swap">
-  <link rel="stylesheet" href="granae.css?v=8" />
+  <link rel="stylesheet" href="granae.css?v=9" />
   <!-- garante inputs claros na tela de login central, mesmo com o tema escuro do Granaê -->
   <style>.mt-auth input{background:#fff;color:#0f172a}.mt-auth input::placeholder{color:#8aa0a8}</style>
   <!-- Login único MedTech + sincronização na nuvem (mesmo módulo do portal) -->
@@ -165,6 +165,16 @@
           <option value="income">Receitas</option>
           <option value="expense">Despesas</option>
         </select>
+      </div>
+      <div class="month-switcher tx-month">
+        <button id="txPrevMonth" class="round" aria-label="Mês anterior">‹</button>
+        <h2 id="txMonthLabel">—</h2>
+        <button id="txNextMonth" class="round" aria-label="Próximo mês">›</button>
+      </div>
+      <div class="tx-month-summary" id="txMonthSummary">
+        <div class="tms-cell"><span class="tms-label">Entradas</span><strong class="tms-val income" id="txSumIn">—</strong></div>
+        <div class="tms-cell"><span class="tms-label">Saídas</span><strong class="tms-val" id="txSumOut">—</strong></div>
+        <div class="tms-cell"><span class="tms-label">Saldo</span><strong class="tms-val" id="txSumBal">—</strong></div>
       </div>
       <div id="txFilterChip" class="tx-filter-chip" hidden>
         <span class="chip-label"></span>
@@ -452,6 +462,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="granae.gemini.js?v=7"></script>
-  <script src="granae.app.js?v=7"></script>
+  <script src="granae.app.js?v=8"></script>
 </body>
 </html>

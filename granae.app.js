@@ -65,6 +65,7 @@ function applyData(d) {
 const fmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 const monthLongFmt = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' });
 const dayFmt = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short' });
+const wdLongFmt = new Intl.DateTimeFormat('pt-BR', { weekday: 'long' });
 
 let currentMonth = startOfCurrentMonth();
 
@@ -134,7 +135,7 @@ document.querySelectorAll('[data-nav]').forEach(el => {
 document.getElementById('categoryBars').addEventListener('click', (e) => {
   const item = e.target.closest('.bar-item[data-cat]');
   if (!item) return;
-  categoryFilter = { name: item.dataset.cat, month: new Date(currentMonth) };
+  categoryFilter = { name: item.dataset.cat };
   navigate('transacoes');
 });
 document.getElementById('categoryBars').addEventListener('keydown', (e) => {
@@ -142,7 +143,7 @@ document.getElementById('categoryBars').addEventListener('keydown', (e) => {
   const item = e.target.closest('.bar-item[data-cat]');
   if (!item) return;
   e.preventDefault();
-  categoryFilter = { name: item.dataset.cat, month: new Date(currentMonth) };
+  categoryFilter = { name: item.dataset.cat };
   navigate('transacoes');
 });
 
@@ -154,6 +155,15 @@ document.getElementById('prevMonth').addEventListener('click', () => {
 document.getElementById('nextMonth').addEventListener('click', () => {
   currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
   renderDashboard();
+});
+// Seletor de mês da tela de Transações (compartilha o currentMonth com o dashboard)
+document.getElementById('txPrevMonth').addEventListener('click', () => {
+  currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1);
+  renderTransactions();
+});
+document.getElementById('txNextMonth').addEventListener('click', () => {
+  currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
+  renderTransactions();
 });
 
 function txOfMonth() {
@@ -485,7 +495,7 @@ function applyFlowRow(kind, real, budget, hasFixed) {
 }
 
 // ====== Transações ======
-function txItemHTML(t) {
+function txItemHTML(t, hideDate) {
   const cat = categoryByName(t.category) || { color: '#999', icon: '🏷️' };
   const sign = t.type === 'income' ? '+' : '−';
   const pendingCls = t.pending ? ' pending' : '';
@@ -496,7 +506,7 @@ function txItemHTML(t) {
   return `<li class="tx-item${pendingCls}" data-id="${t.id}">
     <div class="meta">
       <span class="desc">${escapeHTML(t.description)}${pendingBadge}</span>
-      <span class="sub">${dayFmt.format(new Date(t.date + 'T00:00:00'))}</span>
+      ${hideDate ? '' : `<span class="sub">${dayFmt.format(new Date(t.date + 'T00:00:00'))}</span>`}
     </div>
     <span class="tx-cat-chip" style="background:${chipBg};color:${chipFg}">
       <span class="ico">${cat.icon || '🏷️'}</span> ${escapeHTML(t.category)}
@@ -508,23 +518,68 @@ function escapeHTML(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
+function isYesterday(dateStr) {
+  const d = new Date(); d.setDate(d.getDate() - 1);
+  const tz = d.getTimezoneOffset() * 60000;
+  return new Date(d - tz).toISOString().slice(0, 10) === dateStr;
+}
+
+function renderTxMonthSummary(monthTx) {
+  const eff = monthTx.filter(t => !t.pending); // agendados não entram no resumo
+  const income = eff.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+  const expense = eff.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+  const bal = income - expense;
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = fmt.format(v); };
+  set('txSumIn', income);
+  set('txSumOut', expense);
+  const b = document.getElementById('txSumBal');
+  if (b) { b.textContent = fmt.format(bal); b.classList.toggle('negative', bal < 0); }
+}
+
 function renderTransactions() {
   const filter = document.getElementById('filterType').value;
-  let list = [...state.transactions].sort((a, b) => b.date.localeCompare(a.date));
+  // SEMPRE escopado ao mês vigente (navegável pelo seletor de mês acima da lista)
+  const monthTx = state.transactions.filter(t => inMonth(t.date, currentMonth));
+  let list = monthTx.slice();
   if (filter !== 'all') list = list.filter(t => t.type === filter);
-  // Filtro categoria + mês (vem do clique na bar do dashboard)
-  if (categoryFilter) {
-    list = list.filter(t => t.category === categoryFilter.name && inMonth(t.date, categoryFilter.month));
-  }
+  if (categoryFilter) list = list.filter(t => t.category === categoryFilter.name);
+  list.sort((a, b) => b.date.localeCompare(a.date));
+
+  const lbl = document.getElementById('txMonthLabel');
+  if (lbl) lbl.textContent = monthLongFmt.format(currentMonth);
+  renderTxMonthSummary(monthTx);
   renderTxFilterChip();
+
   const ul = document.getElementById('txList');
   if (!list.length) {
-    ul.innerHTML = categoryFilter
-      ? `<li class="empty">Nenhum lançamento de ${escapeHTML(categoryFilter.name)} em ${monthLongFmt.format(categoryFilter.month)}.</li>`
-      : `<li class="empty">Sem transações.</li>`;
-  } else {
-    ul.innerHTML = list.map(txItemHTML).join('');
+    const que = categoryFilter ? `Nenhum lançamento de ${escapeHTML(categoryFilter.name)}` : 'Nenhuma transação';
+    ul.innerHTML = `<li class="empty">${que} em ${monthLongFmt.format(currentMonth)}.</li>`;
+    attachTxClicks('txList');
+    return;
   }
+
+  // agrupa por dia: cabeçalho de dia (rótulo + saldo do dia) + itens
+  const order = [];
+  const byDay = new Map();
+  for (const t of list) {
+    if (!byDay.has(t.date)) { byDay.set(t.date, []); order.push(t.date); }
+    byDay.get(t.date).push(t);
+  }
+  const today = todayISO();
+  let html = '';
+  for (const day of order) {
+    const items = byDay.get(day);
+    const net = items.reduce((s, t) => s + (t.type === 'income' ? t.amount : -t.amount), 0);
+    const d = new Date(day + 'T00:00:00');
+    let friendly = wdLongFmt.format(d);
+    friendly = friendly.charAt(0).toUpperCase() + friendly.slice(1);
+    if (day === today) friendly = 'Hoje';
+    else if (isYesterday(day)) friendly = 'Ontem';
+    const dd = String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0');
+    html += `<li class="tx-day"><span class="tx-day-date">${friendly}<em>${dd}</em></span><span class="tx-day-net ${net < 0 ? 'neg' : 'pos'}">${net < 0 ? '−' : '+'} ${fmt.format(Math.abs(net))}</span></li>`;
+    html += items.map(t => txItemHTML(t, true)).join('');
+  }
+  ul.innerHTML = html;
   attachTxClicks('txList');
 }
 
@@ -533,7 +588,7 @@ function renderTxFilterChip() {
   if (!chip) return;
   if (categoryFilter) {
     chip.hidden = false;
-    chip.querySelector('.chip-label').textContent = `${categoryFilter.name} · ${monthLongFmt.format(categoryFilter.month)}`;
+    chip.querySelector('.chip-label').textContent = categoryFilter.name;
   } else {
     chip.hidden = true;
   }
