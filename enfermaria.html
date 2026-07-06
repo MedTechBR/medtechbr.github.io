@@ -199,6 +199,18 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 .row.actions .btn-g{flex:1;justify-content:center}
 .chip-wait{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:999px;background:var(--amber-bg);color:var(--amber);white-space:nowrap}
 .chip-hoje i,.chip-wait i{font-size:12px}
+/* ===== desktop: modal mais largo + campos de digitação maiores ===== */
+#f_hda{min-height:80px}
+#ec_txt{min-height:170px}
+@media(min-width:860px){
+  .modal .box{max-width:820px;padding:26px 30px}
+  .field textarea{min-height:92px}
+  #f_hda,#f_conduta{min-height:140px}
+  #f_lab,#f_culturas,#f_imagem{min-height:100px}
+  #f_pend{min-height:110px}
+  #ec_txt{min-height:220px}
+  .ai-box textarea{min-height:130px}
+}
 </style>
 </head>
 <body>
@@ -300,7 +312,7 @@ function editCampo(pid,campo){
   const M={dx:{l:'Diagnósticos / hipóteses',v:bullets(p.diagnosticos)},pendencias:{l:'Pendências',v:(p.pendencias||[]).map(x=>'- '+x.t).join('\n')}}[campo];
   if(!M)return;
   modal(`<h3>Editar ${M.l}</h3><div class="hint" style="margin-bottom:8px">${esc(p.nome||'Paciente')} · leito ${esc(p.leito||'—')} — um item por linha</div>
-   <div class="field"><textarea id="ec_txt" style="min-height:170px" placeholder="- um por linha">${esc(M.v)}</textarea></div>
+   <div class="field"><textarea id="ec_txt" placeholder="- um por linha">${esc(M.v)}</textarea></div>
    <div class="row actions"><button class="btn btn-p" onclick="saveCampo('${pid}','${campo}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
   const t=document.getElementById('ec_txt');if(t){t.focus();t.setSelectionRange(t.value.length,t.value.length);}
 }
@@ -431,7 +443,7 @@ function openForm(id){
    <div class="field"><label>Comorbidades</label><textarea id="f_comorb" placeholder="HAS, DM2...">${esc(p.comorbidades||'')}</textarea></div>
    <div class="two"><div class="field"><label>Alergias</label><input id="f_alergias" value="${esc(p.alergias||'')}" placeholder="Nega / ..."></div>
      <div class="field"><label>Uso contínuo (MUC)</label><input id="f_muc" value="${esc(p.muc||'')}" placeholder="Losartana 50 mg/dia"></div></div>
-   <div class="field"><label>HDA</label><textarea id="f_hda" placeholder="História da doença atual" style="min-height:80px">${esc(p.hda||'')}</textarea></div>
+   <div class="field"><label>HDA</label><textarea id="f_hda" placeholder="História da doença atual">${esc(p.hda||'')}</textarea></div>
    <div class="sec-h">Exames</div>
    <div class="field"><label>Laboratório <span style="color:var(--muted);font-weight:400">(um por linha)</span></label><textarea id="f_lab" placeholder="- investigativos (um por linha)">${esc(bullets(p.laboratorio||p.exames))}</textarea></div>
    <div class="field"><label>Culturas / sorologias <span style="color:var(--muted);font-weight:400">(um por linha)</span></label><textarea id="f_culturas" placeholder="- hemocultura, urocultura...">${esc(bullets(p.culturas))}</textarea></div>
