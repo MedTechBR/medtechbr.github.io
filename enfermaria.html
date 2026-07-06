@@ -40,17 +40,6 @@ main{max-width:980px;margin:0 auto;padding:16px 18px calc(60px + env(safe-area-i
 .tabs{display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:5px;margin-bottom:16px;width:fit-content;max-width:100%}
 .tabs button{border:none;background:none;padding:10px 18px;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;color:var(--muted);font-family:inherit;white-space:nowrap}
 .tabs button.on{background:var(--petrol);color:#fff}
-/* ===== modo app (PWA mobile): bottom nav ===== */
-@media(max-width:640px){
-  .subtitle{display:none}
-  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:55;width:auto;max-width:none;margin:0;border-radius:0;border:none;border-top:1px solid var(--line);padding:6px 10px calc(8px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(2,1fr);gap:4px;background:rgba(255,255,255,.96);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 -6px 22px rgba(15,23,42,.08)}
-  .tabs button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:7px 2px;font-size:10.5px;font-weight:600;border-radius:10px}
-  .tabs button i{font-size:21px;line-height:1}
-  .tabs button.on{background:var(--soft);color:var(--petrol);font-weight:700}
-  main{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
-  footer{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
-  .field input,.field select,.field textarea,input.search{font-size:16px}
-}
 .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap}
 .bar .right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 input.search{padding:11px 12px;border:1px solid var(--line);border-radius:9px;font-size:16px;font-family:inherit;background:#fff;min-width:230px}
@@ -176,6 +165,31 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
   .bar .right{width:100%}
   .bar .right .btn{flex:1}
 }
+/* ===== modo app (PWA mobile): bottom nav ===== */
+@media(max-width:640px){
+  .subtitle{display:none}
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:55;width:auto;max-width:none;margin:0;border-radius:0;border:none;border-top:1px solid var(--line);padding:6px 10px calc(8px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(2,1fr);gap:4px;background:rgba(255,255,255,.96);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 -6px 22px rgba(15,23,42,.08)}
+  .tabs button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:7px 2px;font-size:10.5px;font-weight:600;border-radius:10px}
+  .tabs button i{font-size:21px;line-height:1}
+  .tabs button.on{background:var(--soft);color:var(--petrol);font-weight:700}
+  main{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
+  footer{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
+  .field input,.field select,.field textarea,input.search{font-size:16px}
+}
+
+/* ===== usabilidade dos modais (2026-07-03) ===== */
+.modal .box{position:relative}
+.modal .box>h3{padding-right:46px}
+.modal-x{position:absolute;top:12px;right:12px;width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--muted);font-size:19px;display:grid;place-items:center;cursor:pointer;z-index:3;font-family:inherit}
+.modal-x:active{transform:scale(.93)}
+.draft-hint{display:flex;align-items:center;gap:8px;background:var(--amber-bg);color:var(--amber);border:1px solid #f0d9b5;border-radius:10px;padding:8px 12px;font-size:12.5px;font-weight:600;margin:0 0 12px}
+.draft-hint i{font-size:15px;flex:none}
+.draft-hint button{margin-left:auto;background:none;border:none;color:var(--amber);font-weight:800;font-size:12.5px;cursor:pointer;text-decoration:underline;font-family:inherit;padding:2px 4px}
+.ef-row{align-items:flex-start}
+.ef-lbl{padding-top:11px}
+.ef-row textarea{flex:1;min-width:0;padding:8px 10px;font-size:15px;min-height:38px;resize:none;overflow:hidden;line-height:1.4;border:1px solid var(--line);border-radius:8px;font-family:inherit;background:#fff}
+.ef-row textarea:focus{outline:none;border-color:var(--mint)}
+@media(max-width:680px){.ef-row textarea{font-size:16px}}
 </style>
 </head>
 <body>
@@ -211,7 +225,7 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','
 function nowISO(){return new Date().toISOString();}
 function ymd(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function fmtData(s){if(!s)return '';const d=new Date((s.length<=10?s+'T00:00:00':s));if(isNaN(d))return esc(s);return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();}
-function setVal(id,v){const e=document.getElementById(id);if(e!=null&&v!=null)e.value=v;}
+function setVal(id,v){const e=document.getElementById(id);if(e!=null&&v!=null){e.value=v;if(e.tagName==='TEXTAREA')autoGrow(e);const bx=document.querySelector('#modal .box');if(bx&&bx.contains(e))saveDraft();}}
 function getVal(id){const e=document.getElementById(id);return e?e.value.trim():'';}
 function up(s){return String(s==null?'':s).toUpperCase();}
 
@@ -421,6 +435,7 @@ function openForm(id){
    <div class="field"><label>Observações</label><textarea id="f_obs" placeholder="Anotações livres">${esc(p.obs)}</textarea></div>
    <textarea id="f_ef" style="display:none">${esc(p.exameFisico||'')}</textarea>
    <div class="row actions"><button class="btn btn-p" onclick="saveForm('${id||''}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
+  draftKey='ficha:'+(id||'nova')+':'+ymd();draftReopen=()=>openForm(id);restoreDraft();
 }
 function saveForm(id){
   const oldP=id?((state.pacientes.find(x=>x.id===id)||{}).pendencias||[]):[];
@@ -429,7 +444,7 @@ function saveForm(id){
   if(!o.leito&&!o.nome){alert('Informe ao menos o leito ou o nome do paciente.');return;}
   if(id){const cur=state.pacientes.find(x=>x.id===id);delete cur.exames;Object.assign(cur,o);}
   else{state.pacientes.push({id:uid(),status:'ativo',criadoEm:nowISO(),...o});}
-  persist();closeModal();render();
+  persist();clearDraft();closeModal();render();
 }
 function delPac(id){const p=state.pacientes.find(x=>x.id===id);if(!p)return;
   if(confirm(`Excluir definitivamente ${p.nome||'este paciente'} (leito ${p.leito||'—'})?`)){state.pacientes=state.pacientes.filter(x=>x.id!==id);persist();render();}}
@@ -544,7 +559,7 @@ function openVisita(id){
   const efP=parseEF(ef);
   modal(`<h3>👨‍⚕️ Visita · ${esc(p.nome||'Paciente')}</h3>
    <div class="hint" style="margin-bottom:6px">Leito ${esc(p.leito||'—')}${p.idade?(' · '+esc(p.idade)):''}. Atualize a evolução do dia — o exame físico já vem do dia anterior, edite só o que mudou.</div>
-   <div class="field"><label>Evolução do dia <span style="color:var(--muted);font-weight:400">(queixas / intercorrências)</span></label><textarea id="v_evol" autocapitalize="characters" spellcheck="false" placeholder="PACIENTE ESTÁVEL, SEM QUEIXAS NO PERÍODO..." style="min-height:152px">${esc(p.evolucao||'')}</textarea></div>
+   <div class="field"><label>Evolução do dia <span style="color:var(--muted);font-weight:400">(queixas / intercorrências)</span></label><textarea id="v_evol" autocapitalize="characters" spellcheck="false" placeholder="PACIENTE ESTÁVEL, SEM QUEIXAS NO PERÍODO..." style="min-height:190px">${esc(p.evolucao||'')}</textarea></div>
    <div class="ai-box">
      <div class="ai-h">📷 Parâmetros das últimas 24h (foto)</div>
      <div class="hint">Tire foto do controle hemodinâmico e, se tiver, da folha de diurese/balanço hídrico. A IA transcreve para a linha de parâmetros.</div>
@@ -552,16 +567,17 @@ function openVisita(id){
      <div id="v_thumbs" class="thumbs"></div>
      <div class="row"><button class="btn btn-p" id="transBtn" style="width:100%" onclick="transcreverParams()"><i class="ti ti-sparkles"></i> Transcrever com IA</button></div>
    </div>
-   <div class="field"><label>Parâmetros</label><textarea id="v_param" autocapitalize="characters" spellcheck="false" placeholder="PA ... // FC ... // FR ... // T ... // SPO2 ... // DX ... // DIURESE ... // BH ..." style="min-height:78px">${esc(p.parametros||'')}</textarea></div>
+   <div class="field"><label>Parâmetros</label><textarea id="v_param" autocapitalize="characters" spellcheck="false" placeholder="PA ... // FC ... // FR ... // T ... // SPO2 ... // DX ... // DIURESE ... // BH ..." style="min-height:110px">${esc(p.parametros||'')}</textarea></div>
    <div class="field"><label>Exame físico <span style="color:var(--muted);font-weight:400">(vem do dia anterior — edite o que mudou)</span></label>
-     <div class="ef-grid">${SISTEMAS.map(s=>`<div class="ef-row"><span class="ef-lbl">${s.l}</span><input id="ef_${s.k}" autocapitalize="characters" spellcheck="false" value="${esc(efP.map[s.k]||'')}" placeholder="—"></div>`).join('')}</div>
+     <div class="ef-grid">${SISTEMAS.map(s=>`<div class="ef-row"><span class="ef-lbl">${s.l}</span><textarea id="ef_${s.k}" rows="1" autocapitalize="characters" spellcheck="false" placeholder="—">${esc(efP.map[s.k]||'')}</textarea></div>`).join('')}</div>
      <textarea id="ef_outros" class="ef-outros" autocapitalize="characters" spellcheck="false" placeholder="+ OUTROS ACHADOS (OPCIONAL)">${esc(efP.outros||'')}</textarea></div>
-   <div class="field"><label>Conduta <span style="color:var(--muted);font-weight:400">(uma por linha — "EXPLICO PLANO TERAPEUTICO" entra automático)</span></label><textarea id="v_conduta" autocapitalize="characters" spellcheck="false" placeholder="- MANTENHO ATB&#10;- SOLICITO NOVA ROTINA&#10;- AGUARDO EXAMES" style="min-height:168px">${esc(p.conduta||'')}</textarea></div>
-   <div class="field"><label>Pendências <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="v_pend" autocapitalize="characters" spellcheck="false" placeholder="- ..." style="min-height:96px">${esc((p.pendencias||[]).map(x=>'- '+x.t).join('\n'))}</textarea></div>
+   <div class="field"><label>Conduta <span style="color:var(--muted);font-weight:400">(uma por linha — "EXPLICO PLANO TERAPEUTICO" entra automático)</span></label><textarea id="v_conduta" autocapitalize="characters" spellcheck="false" placeholder="- MANTENHO ATB&#10;- SOLICITO NOVA ROTINA&#10;- AGUARDO EXAMES" style="min-height:190px">${esc(p.conduta||'')}</textarea></div>
+   <div class="field"><label>Pendências <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="v_pend" autocapitalize="characters" spellcheck="false" placeholder="- ..." style="min-height:110px">${esc((p.pendencias||[]).map(x=>'- '+x.t).join('\n'))}</textarea></div>
    <div class="field"><label>🗓️ Previsão de alta <span style="color:var(--muted);font-weight:400">(opcional)</span></label><input type="date" id="v_prevAlta" value="${esc(p.previsaoAlta||'')}"></div>
    <div class="row" style="margin-top:2px"><button class="btn btn-g btn-sm" style="width:100%" onclick="rodarAnalise('${id}',document.getElementById('v_sug'),this)">🔎 Analisar evolução por IA — oportunidades de melhoria</button></div>
    <div id="v_sug"></div>
    <div class="row actions"><button class="btn btn-p" onclick="saveVisita('${id}',true)">📄 Gerar evolução</button><button class="btn btn-g" onclick="saveVisita('${id}',false)">Salvar</button></div>`);
+  draftKey='visita:'+id+':'+ymd();draftReopen=()=>openVisita(id);restoreDraft();
 }
 function saveVisita(id,gerar){
   const p=state.pacientes.find(x=>x.id===id);if(!p)return;
@@ -573,7 +589,7 @@ function saveVisita(id,gerar){
   p.pendencias=getVal('v_pend').toUpperCase().split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>o.t===t);return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});
   p.previsaoAlta=getVal('v_prevAlta');
   p.visitaEm=ymd();
-  persist();
+  persist();clearDraft();
   if(gerar)verEvolucao(id);else{closeModal();render();}
 }
 
@@ -819,8 +835,38 @@ async function extrairEvol(id){
 }
 
 /* ===== modal ===== */
-function modal(html){document.querySelectorAll('.modal').forEach(m=>m.remove());const d=document.createElement('div');d.className='modal';d.id='modal';d.innerHTML='<div class="box">'+html+'</div>';d.onclick=e=>{if(e.target===d)closeModal();};document.body.appendChild(d);}
+function modal(html){document.querySelectorAll('.modal').forEach(m=>m.remove());
+  draftKey=null;draftReopen=null; // cada tela decide se liga o rascunho (openVisita/openForm ligam depois)
+  const d=document.createElement('div');d.className='modal';d.id='modal';d.innerHTML='<div class="box">'+html+'</div>';
+  const box=d.querySelector('.box');
+  const x=document.createElement('button');x.className='modal-x';x.setAttribute('aria-label','Fechar');x.innerHTML='<i class="ti ti-x"></i>';x.onclick=closeModal;box.appendChild(x);
+  // tocar FORA só fecha modais sem edição — com campos, toque acidental não fecha nem perde nada
+  d.onclick=e=>{if(e.target!==d)return;const editing=box.querySelector('textarea,select,input:not([type=hidden]):not([type=file])');if(!editing)closeModal();};
+  box.addEventListener('input',e=>{if(e.target.tagName==='TEXTAREA')autoGrow(e.target);saveDraft();});
+  document.body.appendChild(d);
+  requestAnimationFrame(()=>box.querySelectorAll('textarea').forEach(autoGrow));
+}
 function closeModal(){const m=document.getElementById('modal');if(m)m.remove();}
+/* textareas crescem conforme o texto (campo maior sem scroll interno) */
+function autoGrow(t){if(!t||t.tagName!=='TEXTAREA'||t.style.display==='none')return;t.style.height='auto';const sh=t.scrollHeight+2;t.style.height=Math.min(sh,560)+'px';t.style.overflowY=sh>560?'auto':'hidden';}
+/* ===== rascunho automático: nada digitado se perde, mesmo fechando o modal ===== */
+let draftKey=null,draftReopen=null;
+function saveDraft(){if(!draftKey)return;const box=document.querySelector('#modal .box');if(!box)return;const o={};
+  box.querySelectorAll('input[id],textarea[id],select[id]').forEach(el=>{if(el.type==='file'||el.type==='hidden')return;o[el.id]=(el.type==='checkbox')?(el.checked?'1':''):el.value;});
+  try{localStorage.setItem('enfdraft:'+draftKey,JSON.stringify(o));}catch(e){}}
+function restoreDraft(){if(!draftKey)return;let o=null;try{o=JSON.parse(localStorage.getItem('enfdraft:'+draftKey)||'null');}catch(e){}if(!o)return;
+  let mudou=false;
+  Object.keys(o).forEach(id=>{const el=document.getElementById(id);if(!el)return;const cur=(el.type==='checkbox')?(el.checked?'1':''):el.value;
+    if(cur!==o[id]){mudou=true;if(el.type==='checkbox')el.checked=o[id]==='1';else el.value=o[id];}});
+  const box=document.querySelector('#modal .box');if(!box)return;
+  box.querySelectorAll('textarea').forEach(autoGrow);
+  if(mudou){const h=document.createElement('div');h.className='draft-hint';
+    h.innerHTML='<i class="ti ti-history"></i> Recuperei o que você digitou e não salvou <button type="button" onclick="descartarDraft()">descartar</button>';
+    const t=box.querySelector('h3');if(t)t.after(h);else box.prepend(h);}}
+function clearDraft(){if(!draftKey)return;try{localStorage.removeItem('enfdraft:'+draftKey);}catch(e){}}
+function descartarDraft(){clearDraft();const r=draftReopen;if(r)r();else closeModal();}
+/* rascunhos valem só pro dia — limpa os antigos ao abrir o app */
+try{const hoje=':'+ymd();Object.keys(localStorage).filter(k=>k.indexOf('enfdraft:')===0&&k.slice(-hoje.length)!==hoje).forEach(k=>localStorage.removeItem(k));}catch(e){}
 
 /* ===== PWA ===== */
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
