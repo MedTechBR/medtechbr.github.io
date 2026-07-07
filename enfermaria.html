@@ -156,7 +156,7 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
   .ai-box{padding:11px}
   .ef-lbl{flex-basis:84px}
   .modal{padding:0;align-items:flex-end}
-  .modal .box{max-width:100%;max-height:96vh;max-height:calc(100dvh - env(safe-area-inset-top) - 8px);border-radius:18px 18px 0 0;padding:18px 16px 14px}
+  .modal .box{max-width:100%;max-height:calc(100% - env(safe-area-inset-top) - 8px);border-radius:18px 18px 0 0;padding:18px 16px 14px}
   .pt-card{gap:10px;flex-wrap:wrap}
   .pt-acts{flex-direction:row;flex-wrap:wrap;align-items:stretch;width:100%}
   .pt-acts button{flex:1 1 44%}
@@ -248,7 +248,7 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','
 function nowISO(){return new Date().toISOString();}
 function ymd(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function fmtData(s){if(!s)return '';const d=new Date((s.length<=10?s+'T00:00:00':s));if(isNaN(d))return esc(s);return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();}
-function setVal(id,v){const e=document.getElementById(id);if(e!=null&&v!=null){e.value=v;if(e.tagName==='TEXTAREA')autoGrow(e);const bx=document.querySelector('#modal .box');if(bx&&bx.contains(e))saveDraft();}}
+function setVal(id,v){const e=document.getElementById(id);if(e!=null&&v!=null){e.value=v;if(e.tagName==='TEXTAREA')autoGrow(e,true);const bx=document.querySelector('#modal .box');if(bx&&bx.contains(e))saveDraft();}}
 function getVal(id){const e=document.getElementById(id);return e?e.value.trim():'';}
 function up(s){return String(s==null?'':s).toUpperCase();}
 
@@ -869,13 +869,30 @@ function modal(html){document.querySelectorAll('.modal').forEach(m=>m.remove());
   xw.appendChild(ok);xw.appendChild(x);box.prepend(xw);
   // tocar FORA só fecha modais sem edição — com campos, toque acidental não fecha nem perde nada
   d.onclick=e=>{if(e.target!==d)return;const editing=box.querySelector('textarea,select,input:not([type=hidden]):not([type=file])');if(!editing)closeModal();};
-  box.addEventListener('input',e=>{if(e.target.tagName==='TEXTAREA')autoGrow(e.target);saveDraft();});
+  box.addEventListener('input',e=>{if(e.target.tagName==='TEXTAREA'){autoGrow(e.target);keepCaretVisible(e.target);}saveDraft();});
+  if(window.visualViewport){d._vvFix=()=>fitModalVV(d);window.visualViewport.addEventListener('resize',d._vvFix);window.visualViewport.addEventListener('scroll',d._vvFix);}
   document.body.appendChild(d);
-  requestAnimationFrame(()=>box.querySelectorAll('textarea').forEach(autoGrow));
+  requestAnimationFrame(()=>box.querySelectorAll('textarea').forEach(t=>autoGrow(t,true)));
 }
-function closeModal(){const m=document.getElementById('modal');if(m)m.remove();}
-/* textareas crescem conforme o texto (campo maior sem scroll interno) */
-function autoGrow(t){if(!t||t.tagName!=='TEXTAREA'||t.style.display==='none')return;t.style.height='auto';const sh=t.scrollHeight+2;t.style.height=Math.min(sh,560)+'px';t.style.overflowY=sh>560?'auto':'hidden';}
+function closeModal(){const m=document.getElementById('modal');if(m){if(m._vvFix&&window.visualViewport){window.visualViewport.removeEventListener('resize',m._vvFix);window.visualViewport.removeEventListener('scroll',m._vvFix);}m.remove();}}
+/* textareas crescem conforme o texto (campo maior sem scroll interno).
+   Ao DIGITAR só cresce (nunca colapsa p/ remedir — evita o scroll "sambar");
+   full=true (abrir modal / setVal / restaurar rascunho) remede do zero. */
+function autoGrow(t,full){if(!t||t.tagName!=='TEXTAREA'||t.style.display==='none')return;
+  const box=t.closest('.box');const st=box?box.scrollTop:0;
+  if(full)t.style.height='auto';
+  const sh=t.scrollHeight+2;const alvo=Math.min(sh,560);
+  if(full||alvo>t.clientHeight+2)t.style.height=alvo+'px';
+  t.style.overflowY=sh>560?'auto':'hidden';
+  if(box&&box.scrollTop!==st)box.scrollTop=st;}
+/* mantém o cursor visível acima do teclado do celular */
+function keepCaretVisible(t){const vv=window.visualViewport;if(!vv)return;const box=t.closest('.box');if(!box)return;
+  const r=t.getBoundingClientRect();const limite=vv.offsetTop+vv.height-58;
+  if(r.bottom>limite)box.scrollTop+=Math.min(r.bottom-limite,400);}
+/* prende o modal à área visível quando o teclado abre/fecha (iOS) */
+function fitModalVV(m){const vv=window.visualViewport;if(!vv||!m||!document.body.contains(m))return;
+  if(window.innerWidth>680){m.style.top='';m.style.height='';m.style.bottom='';return;}
+  m.style.top=vv.offsetTop+'px';m.style.height=vv.height+'px';m.style.bottom='auto';}
 /* ===== rascunho automático: nada digitado se perde, mesmo fechando o modal ===== */
 let draftKey=null,draftReopen=null;
 function saveDraft(){if(!draftKey)return;const box=document.querySelector('#modal .box');if(!box)return;const o={};
@@ -887,7 +904,7 @@ function restoreDraft(){if(!draftKey)return;let o=null;try{o=JSON.parse(localSto
   Object.keys(o).forEach(id=>{const el=document.getElementById(id);if(!el)return;const cur=(el.type==='checkbox')?(el.checked?'1':''):el.value;
     if(cur!==o[id]){mudou=true;if(el.type==='checkbox')el.checked=o[id]==='1';else el.value=o[id];}});
   const box=document.querySelector('#modal .box');if(!box)return;
-  box.querySelectorAll('textarea').forEach(autoGrow);
+  box.querySelectorAll('textarea').forEach(t=>autoGrow(t,true));
   if(mudou){const h=document.createElement('div');h.className='draft-hint';
     h.innerHTML='<i class="ti ti-history"></i> Recuperei o que você digitou e não salvou <button type="button" onclick="descartarDraft()">descartar</button>';
     const t=box.querySelector('h3');if(t)t.after(h);else box.prepend(h);}}
