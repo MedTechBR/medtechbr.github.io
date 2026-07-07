@@ -9143,23 +9143,123 @@ Piora de dispneia/tosse/expectoração (volume e purulência). Afastar TEP, IC, 
 3. **Corticoide sistêmico**: prednisona 40 mg/dia VO por 5 dias.
 4. **Antibiótico** se ≥2 dos 3 critérios de Anthonisen (↑dispneia, ↑volume, ↑purulência) ou em VM: amoxclav / macrolídeo / doxiciclina (quinolona se risco de Pseudomonas).
 5. **VNI** se acidose respiratória (pH <7,35 com pCO₂ alto) — reduz intubação e mortalidade.`,
-tep: `## Probabilidade e diagnóstico
-- **Wells/Genebra**. Baixa/intermediária → **D-dímero ajustado à idade** (idade×10 se >50a) ou **algoritmo YEARS** (500 vs 1000 ng/mL); negativo exclui. Alta → **angio-TC** direto.
-- Instável: **eco à beira-leito** (disfunção de VD); TC ao estabilizar.
+tep: `**Tromboembolismo pulmonar agudo (adulto).** O que mata é a **falência aguda do ventrículo direito (VD)**, não a hipoxemia — a abordagem gira em torno de reconhecer instabilidade, estimar probabilidade antes de pedir exame, e estratificar o risco de morte precoce para decidir reperfusão.
 
-## Estratificação (ESC 2019 / SBPT 2025)
-- **Alto risco** = instável (choque/hipotensão).
-- **Intermediário** = estável + sPESI ≥1; **-alto** se disfunção de VD (imagem) **E** troponina ↑.
-- **Baixo** = sPESI 0 → considerar **alta precoce/tratamento domiciliar** (Hestia).
+## 🫁 Fisiopatologia — por que o VD falha
+- Obstrução do leito arterial pulmonar + vasoconstrição (tromboxano/serotonina) → **↑ resistência vascular pulmonar**. O VD de parede fina **não gera PAM pulmonar > 40 mmHg** de forma aguda → dilata e falha.
+- VD dilatado **abaula o septo para o VE** ("D-sign") → ↓ enchimento do VE → **↓ débito cardíaco** → hipotensão → **isquemia do VD** (base da troponina ↑) → **choque obstrutivo → PCR (AESP)**.
+- Repercussão hemodinâmica costuma exigir **> 30–50%** de obstrução do leito. **Atenção:** pode haver **desestabilização tardia em 24–48 h** mesmo em quem chega estável.
 
-## Anticoagulação — DOAC 1ª linha
-- **Apixabana** 10 mg 12/12h ×7 d → 5 mg 12/12h; **ou rivaroxabana** 15 mg 12/12h ×21 d → 20 mg/d (sem heparina prévia).
-- Alto risco/reperfusão: **HNF**. **SAF**: varfarina (DOAC contraindicado). **Câncer**: DOAC oral ok; em neoplasia **GI/urotelial** preferir **apixabana ou HBPM**.
+## 🩺 Apresentação clínica
+- **Sintomas (PIOPED II):** dispneia **73–79%** (mais comum; súbita em ~72%), dor pleurítica **44–47%**, tosse 34–43%, dor/edema de panturrilha ~40%, hemoptise ~5–13%, **síncope 6–15%** (marcador de gravidade — ~1 em 6 síncopes tem TEP).
+- **Sinais:** **taquipneia (FR ≥ 20) ~55%** (o mais frequente), taquicardia (FC > 100) ~25%, turgência jugular, sinais de TVP, hipotensão/choque.
+- **NÃO descartam TEP:** **gasometria normal** (até 40% com SatO₂ normal) e ECG normal. O ECG pode mostrar taquicardia sinusal (mais comum), **S1Q3T3**, T invertida em V1–V4 ou BRD novo (sugerem sobrecarga de VD).
 
-## Reperfusão
-- **Alto risco**: **trombólise** (alteplase) se sem contraindicação; cateter/embolectomia se falha/contraindicação.
-- **Intermediário-alto: NÃO trombolisar de rotina** — monitorizar + **trombólise de resgate** se deteriorar (SBPT 2025). Volume com cautela no VD; noradrenalina; O₂.
-> Fonte: ESC 2019; **SBPT 2025** (J Bras Pneumol); AHA/ACC 2026.`,
+## ⚠️ Fatores de risco (ESC 2019)
+- **Fortes (OR > 10):** fratura de MI, prótese de quadril/joelho, trauma maior, IAM ou internação por IC/FA nos 3 meses, **TEV prévio**, lesão medular.
+- **Moderados (OR 2–9):** **câncer ativo** (pior se metastático), quimioterapia, cateter venoso central, **ACO/reposição hormonal**, puerpério, autoimune, infecção (PNM/ITU/HIV), AVC com paresia, trombofilia.
+- **Fracos (OR < 2):** repouso > 3 dias, **viagem longa**, idade, obesidade, gravidez, varizes, DM, HAS.
+
+## 🎯 Probabilidade pré-teste (antes de pedir exame)
+- **Escore de Wells — versão de 2 níveis** (favorecida pela ESC 2019): **improvável ≤ 4** (TEP ~12%) × **provável ≥ 5** (TEP ~37%). *(componentes detalhados no bloco Critérios diagnósticos, ao final)*
+- **Geneva revisado:** alternativa 100% objetiva (não usa o item subjetivo "TEP é o diagnóstico mais provável") — improvável 0–5 × provável ≥ 6.
+- **PERC — só aplicar quando a probabilidade JÁ é clinicamente baixa:** idade < 50, FC < 100, SpO₂ ≥ 95% (ar ambiente), sem hemoptise, sem estrogênio, sem TEV prévio, sem edema unilateral de MI, sem trauma/cirurgia com internação nas 4 semanas. **Os 8 satisfeitos → descarta TEP sem nem dosar D-dímero** (pós-teste < 2%).
+
+## 🧭 Fluxograma diagnóstico
+\`\`\`mermaid
+flowchart TD
+  A[Suspeita clinica de TEP] --> B{Paciente instavel}
+  B -->|Sim| C[ALTO RISCO - eco a beira leito]
+  C --> C2[Sobrecarga de VD - reperfusao de emergencia]
+  B -->|Nao| D{Probabilidade - Wells}
+  D -->|Provavel maior que 4| E[AngioTC de torax]
+  D -->|Improvavel ate 4| F[D-dimero ajustado a idade ou YEARS]
+  F -->|Negativo| G[TEP excluido]
+  F -->|Positivo| E
+  E -->|Positivo| H[Confirmado - estratificar sPESI VD troponina]
+  E -->|Negativo| G
+\`\`\`
+
+## 🧪 D-dímero e algoritmos
+- Só é útil na probabilidade **não-alta**. Na **provável/alta → angioTC direto** (não dosar). Alta sensibilidade, baixa especificidade → **serve para EXCLUIR**, nunca confirmar.
+- **Corte fixo 500 ng/mL.**
+- **Ajuste por idade (ADJUST-PE, 2014):** **idade × 10** se > 50 anos (ex.: 75 a → 750). Aumenta a exclusão no idoso sem perder segurança (falha 0,3%).
+- **YEARS (2017):** 3 itens (sinais de TVP, hemoptise, TEP é o Dx mais provável) → **0 itens: corte 1000**; **≥ 1 item: corte 500**; reduz angioTC ~14%.
+- **PEGeD (2019):** Wells 0–4 → corte **1000**; 4,5–6 → 500; ≥ 6,5 → imagem direta.
+
+## 🖼️ Imagem
+- **AngioTC de tórax = 1ª linha** (sens ~83%, esp ~96% — PIOPED II). Interprete com a probabilidade (TC negativa + probabilidade baixa/intermediária exclui).
+- **Cintilografia V/Q:** preferir se **DRC/alergia a contraste** ou **jovem/gestante** (perfusão normal exclui); porém mais exames inconclusivos (SPECT reduz).
+- **POCUS/eco — disfunção de VD:** **VD/VE > 1,0**, **sinal de McConnell** (acinesia da parede livre com ápice preservado; esp ~94%), **TAPSE < 16 mm**, **D-sign**, sinal 60/60, trombo móvel em câmaras direitas.
+- **USG venoso de MMII:** **TVP proximal + suspeita = TEV confirmado → trata sem angioTC** (útil em gestante/DRC/instável).
+- **Instável demais para a TC:** **eco à beira-leito** decide — sobrecarga de VD **autoriza reperfusão de emergência**; ausência de disfunção de VD praticamente exclui TEP como causa do choque.
+
+## 📊 Estratificação de gravidade (ESC 2019)
+- **Instabilidade hemodinâmica define, sozinha, ALTO RISCO** (mortalidade > 15%). Qualquer uma: **PCR**; **choque obstrutivo** (PAS < 90 ou vasopressor + hipoperfusão); **hipotensão persistente** (PAS < 90 **ou** queda ≥ 40 mmHg por > 15 min).
+
+| Classe | Instável | PESI III–V / sPESI ≥ 1 | Disfunção de VD | Troponina |
+|---|---|---|---|---|
+| **Alto** | Sim | (±) | + | (±) |
+| **Interm-alto** | Não | Sim | **+  e** | **+** (ambos) |
+| **Interm-baixo** | Não | Sim | só um — ou nenhum — positivo | |
+| **Baixo** | Não | Não (PESI I–II / sPESI 0) | — | — |
+
+- Lógica: nos **normotensos**, o **sPESI/PESI** separa o baixo risco; entre os de escore alto, **disfunção de VD + troponina (os DOIS positivos) = intermediário-alto** — é quem pode "virar" para choque.
+> **Atualização AHA/ACC (fev/2026):** aposenta "maciço/submaciço" e cria as **categorias A–E** (A = incidental/subclínico → E = falência cardiopulmonar/PCR), com modificador respiratório "R"; recomenda **PERT** (time de resposta a TEP) como Classe 1.
+
+## 💊 Anticoagulação inicial
+- Iniciar **sem demora** se probabilidade alta/intermediária, **antes** de confirmar. **DOAC é 1ª linha** no paciente estável (ESC 2019 · SBPT 2025 · AHA/ACC 2026).
+
+| DOAC | Esquema | Heparina antes? |
+|---|---|---|
+| **Apixabana** | 10 mg 12/12h × 7 d → **5 mg 12/12h** | Não |
+| **Rivaroxabana** | 15 mg 12/12h × 21 d → **20 mg/dia** (com alimento) | Não |
+| **Edoxabana** | 60 mg/dia (30 mg se ClCr 30–50 ou ≤ 60 kg) | **Sim (5–10 d)** |
+| **Dabigatrana** | 150 mg 12/12h | **Sim (5–10 d)** |
+
+- **HBPM/fondaparinux preferidos à HNF** (menos sangramento e HIT): **enoxaparina 1 mg/kg 12/12h** (ClCr < 30 → 1 mg/kg **1×/dia**); fondaparinux por peso (5/7,5/10 mg; **CI se ClCr < 30**).
+- **HNF EV** (bólus 80 U/kg → 18 U/kg/h; alvo TTPa 1,5–2,5×) **quando:** instável / reperfusão iminente, **DRC grave**, obesidade extrema, alto risco de sangramento (reversível com protamina).
+
+## 🚨 Reperfusão — TEP de ALTO RISCO
+- **Trombólise sistêmica** (se sem contraindicação): **alteplase 100 mg EV em 2 h** (10 mg em bólus + 90 mg em 2 h; se < 65 kg, máx 1,5 mg/kg). **PCR por TEP:** alteplase **50 mg em bólus** + RCP prolongada (60–90 min).
+- **Contraindicações absolutas:** AVC hemorrágico (qualquer época), **AVC isquêmico < 6 meses**, neoplasia de SNC, **trauma/cirurgia/TCE maior < 3 semanas**, sangramento ativo, diátese hemorrágica.
+- **Se trombólise contraindicada ou falha:** **embolectomia cirúrgica** (I C) **ou cateter** (trombólise dirigida / trombectomia por aspiração; IIa C). **Trombólise de resgate** se deteriorar sob anticoagulação (I B).
+- **Suporte do VD:** volume com **cautela** (bólus ≤ 500 mL — sobrecarga distende o VD e piora o débito); **noradrenalina** é o vasopressor de 1ª linha; **dobutamina** se baixo débito com PA normal; **VA-ECMO** no colapso refratário.
+
+## 🩸 Intermediário-alto: NÃO trombolisar de rotina
+- **PEITHO (2014):** a trombólise reduziu o colapso, mas **triplicou o sangramento maior e o AVC hemorrágico** → **não trombolisar de rotina** o risco intermediário. Conduta: **anticoagular + monitorizar** e reservar **trombólise de resgate** se descompensar (SBPT 2025).
+
+## 👥 Situações especiais
+- **Gestação/puerpério:** **HBPM é a base** (dose por peso, 12/12h); **DOAC e varfarina CONTRAINDICADOS**. Suspender HBPM ≥ 24 h antes do parto/neuroeixo. Duração: **3 meses E ≥ 6 semanas pós-parto**. Trombólise só se risco de vida.
+- **Câncer:** HBPM **ou** DOAC (apixabana/rivaroxabana/edoxabana). **Caravaggio:** apixabana não inferior **sem excesso de sangramento**. **Evitar rivaroxabana/edoxabana em tumor GI/urotelial** (mais sangramento) → preferir **apixabana ou HBPM**. Manter enquanto câncer ativo.
+- **DRC grave (ClCr < 30)/diálise:** preferir **HNF** ou HBPM ajustada por anti-Xa (ou varfarina). **Dabigatrana CI < 30**; apixabana tem mais dados em ClCr muito baixo.
+- **Síndrome antifosfolípide:** **varfarina (INR 2–3)** — **DOAC não** (mais AVC/trombose arterial nos triplo-positivos; estudo TRAPS).
+- **TEP subsegmentar isolado sem TVP:** **vigilância** (se baixo risco + USG venoso negativo) × anticoagular (câncer, imobilização, má reserva).
+- **Obesidade extrema:** rivaroxabana/apixabana em **dose padrão** são aceitáveis (ISTH 2021); HBPM por peso com anti-Xa.
+
+## ⏳ Duração
+- **Mínimo 3 meses para todos.** Depois, decisão "estender × parar" pelo risco de recorrência:
+  - **Fator transitório MAIOR** (cirurgia > 30 min, trauma com fratura, acamado ≥ 3 d) → **parar aos 3 meses** (recorrência < 3%/ano).
+  - **Não provocado / fator persistente / transitório menor** → **considerar estender** (3–8%/ano).
+  - **Câncer ativo, TEV recorrente, SAF, trombofilia maior** → **indefinido** (> 8%/ano).
+- **Escores:** recorrência **HERDOO2** (mulher com 0–1 pode parar); sangramento **VTE-BLEED** (≥ 2 = alto risco).
+- **Extensão com dose reduzida** (após 6 meses, não-câncer): **rivaroxabana 10 mg/dia** ou **apixabana 2,5 mg 12/12h** — mantêm eficácia com pouco sangramento. Dose plena em câncer/alto risco.
+
+## 🏠 Alta precoce / ambulatorial
+- **Baixo risco (sPESI 0 ou Hestia negativo)** → considerar **alta precoce + anticoagulação domiciliar** (ESC IIa A; HoT-PE: recorrência 0,6%), se houver estrutura de seguimento.
+- **Hestia (qualquer "sim" interna):** instabilidade; necessidade de trombólise; sangramento ativo/alto risco; O₂ > 24 h para SatO₂ > 90%; TEP já em anticoagulação; dor com analgésico EV > 24 h; motivo médico/social para internar; **ClCr < 30**; hepatopatia grave; **gestação**; história de **HIT**.
+
+## 🔭 Seguimento e sequelas
+- **Reavaliar em 3–6 meses** (ESC I). Se **dispneia/limitação persistente ou nova → ecocardiograma** para rastrear **HPTEC** (hipertensão pulmonar tromboembólica crônica; ~2–4%, tipicamente em ~2 anos). Não há rastreio universal (é guiado por sintoma).
+- **HPTEC:** confirmar com **cintilografia V/Q** (normal exclui) → angioTC → **cateterismo direito**; **endarterectomia pulmonar** é potencialmente curativa; anticoagulação vitalícia.
+
+## 💡 Pérolas e erros comuns
+- **Estável agora ≠ seguro:** o intermediário-alto pode **descompensar em 24–48 h** — monitorize, não trombolise de rotina.
+- **Probabilidade alta? NÃO peça D-dímero** — vá direto à angioTC (D-dímero alto não confirma e atrasa).
+- **Gasometria e ECG normais NÃO excluem TEP.**
+- **Síncope inexplicada:** pense em TEP (1 em 6).
+- Na instabilidade, o **eco à beira-leito manda**: sobrecarga de VD → trombolisar mesmo sem TC.
+> Fontes: **ESC 2019** (Eur Heart J 2020;41:543-603) · **SBPT 2025** (J Bras Pneumol — tratamento) · **AHA/ACC 2026** (Circulation, fev/2026) · CHEST 2021 · ADJUST-PE (JAMA 2014) · YEARS (Lancet 2017) · PEGeD (NEJM 2019) · PEITHO (2014) · Caravaggio (NEJM 2020) · Hestia (2011). Doses/critérios verificados em ≥ 2 fontes; confirme sempre no protocolo institucional.`,
 itu_comp: `## Reconhecimento
 Febre, dor lombar / Giordano +, sintomas urinários. "Complicada" = homem, gestante, cateter, obstrução, imunossupressão ou anomalia do trato.
 
