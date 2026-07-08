@@ -132,24 +132,9 @@ const Gemini = (() => {
     return { text, mode: 'byok' };
   }
 
-  // A IA roda no MedTech central (aigateway → Vertex, SEM chave). O backend próprio
-  // radioia-a61ec foi aposentado; tudo passa pelo login central medtech-c658c.
-  const CENTRAL_AIGATEWAY = 'https://southamerica-east1-medtech-c658c.cloudfunctions.net/aigateway';
-  async function mtIdToken() {
-    const u = (typeof window !== 'undefined' && window.MT) ? window.MT.user : null;
-    if (!u) throw new Error('Entre na sua conta MedTech para gerar laudos.');
-    return await u.getIdToken();
-  }
-
-  // Os parts vêm no formato REST (inline_data/mime_type); o Vertex SDK do backend central
-  // espera camelCase (inlineData/mimeType). Converte antes de enviar.
-  function toVertexParts(parts) {
-    return parts.map(p => {
-      if (p && p.inline_data) return { inlineData: { mimeType: p.inline_data.mime_type, data: p.inline_data.data } };
-      return p; // { text: ... }
-    });
-  }
-
+  // A IA roda no MedTech central (callables gemini/geminiImage → Vertex, SEM chave).
+  // radioia-a61ec foi aposentado. Imagens vão pelo geminiImage (até 14 MB, até 6 imgs);
+  // laudos só-texto (ex.: valores laboratoriais digitados) vão pelo gemini.
   async function generateViaProxy(parts, model, media) {
     // Vídeo não suportado nesta versão (exigia BYOK, agora removido).
     if (media.some(m => m.kind === 'video')) {
@@ -157,30 +142,27 @@ const Gemini = (() => {
       err.code = 'video-byok-required';
       throw err;
     }
-    let idToken;
-    try { idToken = await mtIdToken(); }
-    catch (e) { throw new Error('Entre na sua conta MedTech para gerar laudos.'); }
-    let res, json = {};
-    try {
-      res = await fetch(CENTRAL_AIGATEWAY, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
-        body: JSON.stringify({
-          model,
-          contents: [{ role: 'user', parts: toVertexParts(parts) }],
-          generationConfig: { temperature: 0.35, topP: 0.95, maxOutputTokens: 8192 },
-          grounding: false,
-        }),
-      });
-    } catch (e) { throw new Error('Falha de conexão. Verifique sua internet.'); }
-    try { json = await res.json(); } catch (e) {}
-    if (!res.ok) {
-      if (res.status === 401) throw new Error('Sessão expirou. Entre na sua conta MedTech novamente.');
-      if (res.status === 429) throw new Error('Muitas requisições. Aguarde 1 minuto.');
-      throw new Error(json.error || ('Erro do servidor (HTTP ' + res.status + ').'));
+    const MT = (typeof window !== 'undefined') ? window.MT : null;
+    if (!MT || !MT.user) throw new Error('Entre na sua conta MedTech para gerar laudos.');
+    // separa imagens e texto dos parts já montados por buildParts
+    const images = [], texts = [];
+    for (const p of parts) {
+      if (p && p.inline_data && p.inline_data.data) images.push({ data: p.inline_data.data, mimeType: p.inline_data.mime_type || 'image/jpeg' });
+      else if (p && p.text) texts.push(p.text);
     }
-    if (!json.text) throw new Error('Resposta vazia da IA. Tente reformular a história clínica ou trocar o modelo.');
-    return { text: json.text, mode: 'central' };
+    const prompt = texts.join('\n\n');
+    if (images.length > 6) throw new Error('Máximo de 6 imagens por laudo — remova algumas e tente de novo.');
+    let text;
+    try {
+      text = images.length ? await MT.aiImage(images, prompt, model) : await MT.ai(prompt, model);
+    } catch (e) {
+      const msg = (e && e.message) || 'Falha na IA.';
+      if (/unauthenticated|Entre na sua conta/i.test(msg)) throw new Error('Entre na sua conta MedTech para gerar laudos.');
+      if (/grande|large|reduza|resoluç/i.test(msg)) throw new Error('Imagem muito grande — reduza a resolução e tente de novo.');
+      throw new Error(msg);
+    }
+    if (!text || !String(text).trim()) throw new Error('Resposta vazia da IA. Tente reformular a história clínica ou trocar o modelo.');
+    return { text: String(text), mode: 'central' };
   }
 
   // A IA vem incluída na conta MedTech (nível ecossistema) — sem paywall/trial por app.
