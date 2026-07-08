@@ -132,11 +132,22 @@ const Gemini = (() => {
     return { text, mode: 'byok' };
   }
 
-  const LAUDAI_API = 'https://southamerica-east1-radioia-a61ec.cloudfunctions.net';
+  // A IA roda no MedTech central (aigateway → Vertex, SEM chave). O backend próprio
+  // radioia-a61ec foi aposentado; tudo passa pelo login central medtech-c658c.
+  const CENTRAL_AIGATEWAY = 'https://southamerica-east1-medtech-c658c.cloudfunctions.net/aigateway';
   async function mtIdToken() {
     const u = (typeof window !== 'undefined' && window.MT) ? window.MT.user : null;
     if (!u) throw new Error('Entre na sua conta MedTech para gerar laudos.');
     return await u.getIdToken();
+  }
+
+  // Os parts vêm no formato REST (inline_data/mime_type); o Vertex SDK do backend central
+  // espera camelCase (inlineData/mimeType). Converte antes de enviar.
+  function toVertexParts(parts) {
+    return parts.map(p => {
+      if (p && p.inline_data) return { inlineData: { mimeType: p.inline_data.mime_type, data: p.inline_data.data } };
+      return p; // { text: ... }
+    });
   }
 
   async function generateViaProxy(parts, model, media) {
@@ -151,33 +162,32 @@ const Gemini = (() => {
     catch (e) { throw new Error('Entre na sua conta MedTech para gerar laudos.'); }
     let res, json = {};
     try {
-      res = await fetch(`${LAUDAI_API}/generateLaudoHttp`, {
+      res = await fetch(CENTRAL_AIGATEWAY, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
-        body: JSON.stringify({ parts, model }),
+        body: JSON.stringify({
+          model,
+          contents: [{ role: 'user', parts: toVertexParts(parts) }],
+          generationConfig: { temperature: 0.35, topP: 0.95, maxOutputTokens: 8192 },
+          grounding: false,
+        }),
       });
     } catch (e) { throw new Error('Falha de conexão. Verifique sua internet.'); }
     try { json = await res.json(); } catch (e) {}
     if (!res.ok) {
-      if (res.status === 403 && json.paywall) { const e = new Error('PAYWALL'); e.code = 'paywall'; throw e; }
-      if (res.status === 401) throw new Error('Sessão expirou. Faça login novamente.');
+      if (res.status === 401) throw new Error('Sessão expirou. Entre na sua conta MedTech novamente.');
       if (res.status === 429) throw new Error('Muitas requisições. Aguarde 1 minuto.');
       throw new Error(json.error || ('Erro do servidor (HTTP ' + res.status + ').'));
     }
-    return { text: json.text, mode: 'pro', freeRemaining: json.freeRemaining, isPaid: json.isPaid };
+    if (!json.text) throw new Error('Resposta vazia da IA. Tente reformular a história clínica ou trocar o modelo.');
+    return { text: json.text, mode: 'central' };
   }
 
+  // A IA vem incluída na conta MedTech (nível ecossistema) — sem paywall/trial por app.
   async function getSubscriptionStatus() {
     const u = (typeof window !== 'undefined' && window.MT) ? window.MT.user : null;
     if (!u) return null;
-    try {
-      const idToken = await u.getIdToken();
-      const res = await fetch(`${LAUDAI_API}/getSubStatusHttp`, { headers: { 'Authorization': 'Bearer ' + idToken } });
-      return res.ok ? await res.json() : null;
-    } catch (e) {
-      console.warn('getSubscriptionStatus falhou:', e);
-      return null;
-    }
+    return { isPaid: true, ecosystem: true };
   }
 
   // Detecta categoria do exame pelo nome da modalidade e devolve papel + seções + dicas técnicas
