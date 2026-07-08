@@ -238,7 +238,11 @@ async function refreshSubscriptionBadge() {
     badge.className = 'subscription-badge';
     return;
   }
-  if (sub.isPaid) {
+  if (sub.ecosystem) {
+    badge.innerHTML = `<span class="sub-icon">⭐</span><span>MedTech</span>`;
+    badge.className = 'subscription-badge pro';
+    badge.title = 'IA incluída na sua conta MedTech';
+  } else if (sub.isPaid) {
     const days = Math.ceil((sub.paidUntil - Date.now()) / 86400000);
     badge.innerHTML = `<span class="sub-icon">⭐</span><span>Pro · ${days}d</span>`;
     badge.className = 'subscription-badge pro';
