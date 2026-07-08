@@ -4870,7 +4870,8 @@ function onMTLogin(u) {
   window.MT.onData(() => { if (window.MT.user) onMTLogin(window.MT.user); });
 })();
 
-const MEDPROVAS_API = 'https://southamerica-east1-medprovas-app.cloudfunctions.net';
+const MEDPROVAS_API = 'https://southamerica-east1-medprovas-app.cloudfunctions.net'; // legado (aposentado)
+const CENTRAL_DOC_API = 'https://southamerica-east1-medtech-c658c.cloudfunctions.net/geminiDocHttp';
 async function mtIdToken() {
   const u = window.MT && window.MT.user;
   if (!u) throw new Error('Entre na sua conta MedTech para usar a IA.');
@@ -4878,15 +4879,8 @@ async function mtIdToken() {
 }
 
 async function atualizarStatusAssinatura() {
-  if (!(window.MT && window.MT.user)) { atualizarBadgePro(); return; }
-  try {
-    const idToken = await mtIdToken();
-    const res = await fetch(MEDPROVAS_API + '/getSubStatusHttp', { headers: { 'Authorization': 'Bearer ' + idToken } });
-    proState.status = res.ok ? await res.json() : null;
-  } catch (e) {
-    console.warn('Falha ao buscar status:', e.message);
-    proState.status = null;
-  }
+  // IA incluída na conta MedTech (nível ecossistema) — sem trial/paywall por app.
+  proState.status = (window.MT && window.MT.user) ? { isPaid: true, ecosystem: true } : null;
   atualizarBadgePro();
 }
 
@@ -4895,7 +4889,11 @@ function atualizarBadgePro() {
   if (!el) return;
   const s = proState.status;
   if (!s) { el.className = 'pro-badge hidden'; el.textContent = ''; el.onclick = null; return; }
-  if (s.isPaid) {
+  if (s.ecosystem) {
+    el.className = 'pro-badge pro';
+    el.textContent = '⭐ MedTech';
+    el.onclick = null;
+  } else if (s.isPaid) {
     const dias = Math.max(0, Math.floor((s.paidUntil - Date.now()) / 86400000));
     el.className = 'pro-badge pro';
     el.textContent = `⭐ Pro · ${dias}d`;
@@ -4930,19 +4928,20 @@ async function chamarGeminiNoServidor({ parts, generationConfig, model, intent }
   let idToken;
   try { idToken = await mtIdToken(); }
   catch (e) { throw new Error('Entre na sua conta MedTech para usar a IA.'); }
-  const res = await fetch(MEDPROVAS_API + '/callGeminiHttp', {
+  const res = await fetch(CENTRAL_DOC_API, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
-    body: JSON.stringify({ parts, generationConfig, model, intent })
+    body: JSON.stringify({ parts, generationConfig, model })
   });
   let json = {};
   try { json = await res.json(); } catch (e) {}
   if (!res.ok) {
-    if (res.status === 403 && json.paywall) { abrirPaywall(); throw new Error('Você precisa do Pro para gerar mais provas.'); }
+    if (res.status === 401) throw new Error('Sessão expirou. Entre na sua conta MedTech novamente.');
+    if (res.status === 413) throw new Error(json.error || 'Arquivo muito grande — reduza ou divida o PDF e tente de novo.');
     throw new Error(json.error || ('Erro da IA (HTTP ' + res.status + ').'));
   }
-  if (json.freeRemaining !== undefined || json.isPaid !== undefined) { atualizarStatusAssinatura(); }
-  return json.data; // { candidates: [...] } no formato Gemini
+  // geminiDocHttp devolve { text }; reembrulha no formato Gemini que os geradores de prova esperam.
+  return { candidates: [{ content: { parts: [{ text: json.text || '' }] } }] };
 }
 
 // IA sempre pelo backend central MedTech (plano do app / trial). BYOK removido.
