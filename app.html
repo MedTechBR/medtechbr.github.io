@@ -41,22 +41,13 @@ main{max-width:980px;margin:0 auto;padding:22px 18px calc(28px + env(safe-area-i
 .btnrow{display:flex;gap:8px;align-items:center}
 .install{background:var(--petrol);color:#fff;border:none;border-radius:10px;padding:9px 14px;font-weight:500;font-size:13.5px;cursor:pointer;font-family:inherit;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
 .install:hover{background:var(--petrol-dark)}
-.search{position:relative;margin-bottom:20px}
-.search input{width:100%;padding:11px 14px 11px 40px;border:1px solid var(--line);border-radius:12px;font-size:14.5px;font-family:inherit;background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
-.search input:focus{outline:none;border-color:var(--petrol)}
-.search i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:18px;pointer-events:none}
-.cat{margin-bottom:20px}
-.cat-h{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin:0 2px 9px}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:12px}
-.card{display:flex;flex-direction:row;align-items:center;gap:13px;text-decoration:none;color:inherit;padding:13px 14px;border-radius:14px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);transition:transform .12s,border-color .12s,box-shadow .12s}
-.card:hover{transform:translateY(-2px);border-color:var(--petrol);box-shadow:0 4px 16px rgba(37,99,235,.13)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(152px,1fr));gap:14px}
+.card{display:flex;flex-direction:column;align-items:flex-start;gap:12px;text-decoration:none;color:inherit;padding:16px;border-radius:14px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);transition:transform .12s,border-color .12s}
+.card:hover{transform:translateY(-2px);border-color:var(--petrol)}
+.card .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:23px;background:var(--soft);color:var(--petrol)}
 .card:active{transform:scale(.99)}
-.card .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:23px;background:var(--soft);color:var(--petrol);flex:0 0 auto}
-.card .tx{display:flex;flex-direction:column;gap:2px;min-width:0}
-.card .nm{font-weight:600;font-size:14px;color:var(--ink);line-height:1.2;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .nm{font-weight:600;font-size:14px;text-align:left;color:var(--ink);line-height:1.2;letter-spacing:-.01em}
 .card .nm b{color:var(--petrol)}
-.card .ds{font-size:12px;color:var(--muted);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.empty{color:var(--muted);text-align:center;padding:30px;font-size:14px}
 .note{background:var(--soft);border-radius:12px;padding:12px 15px;font-size:13px;color:#1e40af;margin-top:24px;display:flex;align-items:center;gap:9px}
 .note b{color:var(--petrol);font-weight:600}
 .note i{font-size:18px;color:var(--petrol);flex:0 0 auto}
@@ -86,12 +77,10 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
   .hello-row{margin-bottom:14px}
   .hello-row h1{font-size:16px}
   .subtitle{display:none}
-  .cards{grid-template-columns:1fr;gap:9px}
-  .card{padding:11px 12px;gap:11px;border-radius:12px}
-  .card .ic{width:40px;height:40px;font-size:20px;border-radius:10px}
-  .card .nm{font-size:13.5px}
-  .search{margin-bottom:14px}
-  .cat{margin-bottom:16px}
+  .grid{grid-template-columns:repeat(3,1fr);gap:10px}
+  .card{padding:12px;gap:9px;border-radius:12px}
+  .card .ic{width:38px;height:38px;font-size:19px;border-radius:10px}
+  .card .nm{font-size:12px}
   .note{font-size:12px;margin-top:16px;padding:10px 12px}
   footer{padding:14px;font-size:11px}
 }
@@ -117,9 +106,7 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
     </div>
   </div>
 
-  <div class="search"><i class="ti ti-search" aria-hidden="true"></i><input id="q" type="search" placeholder="Buscar app…" oninput="render(this.value)" autocomplete="off" spellcheck="false"></div>
-
-  <div id="grid"></div>
+  <div class="grid" id="grid"></div>
 
   <div class="note"><i class="ti ti-shield-check" aria-hidden="true"></i><span><b>Login único:</b> entre uma vez e todos os apps abrem logados, na mesma janela.</span></div>
 </main>
@@ -128,56 +115,33 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 
 <script>
 const BASE = 'https://medtechbr.github.io/';
-const CATS = [
-  { key:'clin',   t:'Decisão clínica' },
-  { key:'atend',  t:'Atendimento & pacientes' },
-  { key:'estudo', t:'Estudo & carreira' },
-  { key:'rotina', t:'Rotina & finanças' }
-];
 const APPS = [
-  { nm:'CondutAI',   ic:'ti-stethoscope',    cat:'clin',   ds:'Condutas, escores e bulas',            url:BASE+'condutai.html' },
-  { nm:'ATBguia',    ic:'ti-pill',           cat:'clin',   ds:'Guia de antibioticoterapia',           url:BASE+'atbguia.html' },
-  { nm:'PocusAI',    ic:'ti-scan',           cat:'clin',   ds:'POCUS / ultrassom à beira-leito',      url:BASE+'pocusai.html' },
-  { nm:'PaliAI',     ic:'ti-heart-handshake',cat:'clin',   ds:'Triagem de cuidados paliativos',       url:BASE+'paliai.html' },
-  { nm:'CalcMed',    ic:'ti-calculator',     cat:'clin',   ds:'Calculadoras e escores clínicos',      url:BASE+'calcmed.html' },
-  { nm:'ConsultAI',  ic:'ti-calendar-event', cat:'atend',  ds:'Ambulatório: prontuário e agenda',     url:BASE+'consultai.html' },
-  { nm:'EnfermarIA', ic:'ti-bed',            cat:'atend',  ds:'Pacientes internados e evolução',      url:BASE+'enfermaria.html' },
-  { nm:'LaudAI',     ic:'ti-report-medical', cat:'atend',  ds:'Laudos de radiologia por IA',          url:BASE+'laudai.html' },
-  { nm:'MedProvas',  ic:'ti-clipboard-text', cat:'estudo', ds:'Provas e questões geradas por IA',     url:BASE+'medprovas.html' },
-  { nm:'FlashMed',   ic:'ti-cards',          cat:'estudo', ds:'Flashcards com repetição espaçada',    url:BASE+'flashmed.html' },
-  { nm:'Guia do Interno', ic:'ti-school',    cat:'estudo', ds:'Manual de sobrevivência do internato', url:BASE+'guiainterno.html' },
-  { nm:'PlantãoHub', ic:'ti-clock',          cat:'rotina', ds:'Escala e ganhos de plantão',           url:BASE+'plantaohub.html' },
-  { nm:'Granaê',     ic:'ti-wallet',         cat:'rotina', ds:'Finanças pessoais com IA',             url:BASE+'granae.html' },
-  { nm:'Foco',       ic:'ti-target-arrow',   cat:'rotina', ds:'Produtividade e agenda',               url:BASE+'foco.html' }
+  { nm:'Foco',       ic:'ti-target-arrow',   url:BASE+'foco.html' },
+  { nm:'Granaê',     ic:'ti-wallet',         url:BASE+'granae.html' },
+  { nm:'MedProvas',  ic:'ti-clipboard-text', url:BASE+'medprovas.html' },
+  { nm:'LaudAI',     ic:'ti-report-medical', url:BASE+'laudai.html' },
+  { nm:'CondutAI',   ic:'ti-stethoscope',    url:BASE+'condutai.html' },
+  { nm:'PaliAI',     ic:'ti-heart-handshake',url:BASE+'paliai.html' },
+  { nm:'Guia do Interno', ic:'ti-school',   url:BASE+'guiainterno.html' },
+  { nm:'ConsultAI',  ic:'ti-calendar-event', url:BASE+'consultai.html' },
+  { nm:'EnfermarIA', ic:'ti-bed',            url:BASE+'enfermaria.html' },
+  { nm:'PocusAI',    ic:'ti-scan',           url:BASE+'pocusai.html' },
+  { nm:'ATBguia',    ic:'ti-pill',           url:BASE+'atbguia.html' },
+  { nm:'PlantãoHub', ic:'ti-clock',          url:BASE+'plantaohub.html' },
+  { nm:'CalcMed',    ic:'ti-calculator',     url:BASE+'calcmed.html' },
+  { nm:'FlashMed',   ic:'ti-cards',          url:BASE+'flashmed.html' }
 ];
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
-// realça o sufixo AI (inglês) ou IA (português) de forma consistente
-function fmtName(nm){ return /(AI|IA)$/.test(nm) ? esc(nm.slice(0,-2))+'<b>'+nm.slice(-2)+'</b>' : esc(nm); }
+function fmtName(nm){ return /AI$/.test(nm) ? esc(nm.slice(0,-2))+'<b>AI</b>' : esc(nm); }
 function card(a){
-  // Mesma janela: todos os apps estão no mesmo domínio → navegação DENTRO do PWA.
-  return `<a class="card" href="${a.url}" onclick="pushRecent('${esc(a.nm).replace(/'/g,"\\'")}')">
+  // Mesma janela: todos os apps estão no mesmo domínio (medtechbr.github.io),
+  // então a navegação fica DENTRO do PWA, sem abrir uma nova janela.
+  return `<a class="card" href="${a.url}">
     <span class="ic"><i class="ti ${a.ic}" aria-hidden="true"></i></span>
-    <span class="tx"><span class="nm">${fmtName(a.nm)}</span><span class="ds">${esc(a.ds)}</span></span>
+    <span class="nm">${fmtName(a.nm)}</span>
   </a>`;
 }
-/* "Continuar": últimos apps abertos (só neste navegador) */
-function getRecent(){ try{ return JSON.parse(localStorage.getItem('mt_recent')||'[]'); }catch(e){ return []; } }
-function pushRecent(nm){ try{ let r=getRecent().filter(x=>x!==nm); r.unshift(nm); localStorage.setItem('mt_recent', JSON.stringify(r.slice(0,4))); }catch(e){} }
-function section(title,list){ return `<div class="cat"><div class="cat-h">${esc(title)}</div><div class="cards">${list.map(card).join('')}</div></div>`; }
-function render(q){
-  q=(q||'').trim().toLowerCase();
-  const match=a=> !q || a.nm.toLowerCase().includes(q) || a.ds.toLowerCase().includes(q);
-  let html='';
-  if(!q){
-    const recent=getRecent().map(n=>APPS.find(a=>a.nm===n)).filter(Boolean).slice(0,4);
-    if(recent.length) html+=section('Continuar', recent);
-  }
-  let any=false;
-  CATS.forEach(c=>{ const list=APPS.filter(a=>a.cat===c.key && match(a)); if(list.length){ any=true; html+=section(c.t, list); } });
-  if(!any) html=`<div class="empty">Nenhum app encontrado para "${esc(q)}".</div>`;
-  document.getElementById('grid').innerHTML=html;
-}
-render('');
+document.getElementById('grid').innerHTML = APPS.map(card).join('');
 
 /* ===== Sugestões de funções (vão por e-mail para a equipe MedTech) ===== */
 const SUG_EMAIL = 'medtechbr1@gmail.com';
