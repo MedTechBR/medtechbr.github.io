@@ -186,9 +186,9 @@ const CALCS=[
  calc(){const p=num('p'),a=num('a'),alvo=num('alvo')||15;if(!p||isNaN(a))return null;const v=0.5*p*(alvo-a);return{val:fmt(v,0),unit:'mEq',interp:'Déficit estimado (repor parcial e reavaliar)',badge:'b-blue'}}},
 
 /* ---------------- CARDIOLOGIA & TEV ---------------- */
-{cat:'Cardiologia / TEV',id:'chads',name:'CHA₂DS₂-VASc',desc:'Risco tromboembólico na fibrilação atrial.',
- fields:`<div class="checks">${chk('c1','ICC / disfunção de VE')}${chk('c2','Hipertensão')}${chk('c3','Idade ≥ 75 anos (2 pts)')}${chk('c4','Diabetes')}${chk('c5','AVC/AIT/TE prévio (2 pts)')}${chk('c6','Doença vascular')}${chk('c7','Idade 65–74 anos')}${chk('c8','Sexo feminino')}</div>`,
- calc(){let s=(checked('c1')?1:0)+(checked('c2')?1:0)+(checked('c3')?2:0)+(checked('c4')?1:0)+(checked('c5')?2:0)+(checked('c6')?1:0)+(checked('c7')?1:0)+(checked('c8')?1:0);let c='Baixo',b='b-green';if(s>=2){c='Alto — anticoagulação recomendada';b='b-red'}else if(s===1){c='Intermediário';b='b-amber'}return{val:s,unit:'pontos',interp:c,badge:b}}},
+{cat:'Cardiologia / TEV',id:'chads',name:'CHA₂DS₂-VA',desc:'Risco tromboembólico na fibrilação atrial (ESC 2024 — sem o ponto por sexo).',
+ fields:`<div class="checks">${chk('c1','ICC / disfunção de VE')}${chk('c2','Hipertensão')}${chk('c3','Idade ≥ 75 anos (2 pts)')}${chk('c4','Diabetes')}${chk('c5','AVC/AIT/TE prévio (2 pts)')}${chk('c6','Doença vascular')}${chk('c7','Idade 65–74 anos')}</div>`,
+ calc(){const idade=checked('c3')?2:(checked('c7')?1:0);/* faixas etárias são excludentes */let s=(checked('c1')?1:0)+(checked('c2')?1:0)+idade+(checked('c4')?1:0)+(checked('c5')?2:0)+(checked('c6')?1:0);let c='Baixo — anticoagulação não indicada',b='b-green';if(s>=2){c='Anticoagulação recomendada (ESC 2024, classe I)';b='b-red'}else if(s===1){c='Anticoagulação deve ser considerada (ESC 2024, classe IIa)';b='b-amber'}return{val:s,unit:'/ 8 pontos',interp:c,badge:b}}},
 {cat:'Cardiologia / TEV',id:'hasbled',name:'HAS-BLED',desc:'Risco de sangramento em anticoagulação.',
  fields:`<div class="checks">${chk('h1','Hipertensão (PAS>160)')}${chk('h2','Função renal anormal')}${chk('h3','Função hepática anormal')}${chk('h4','AVC prévio')}${chk('h5','Sangramento prévio/predisposição')}${chk('h6','INR lábil')}${chk('h7','Idade > 65 anos')}${chk('h8','Drogas (AINE/antiplaq.)')}${chk('h9','Álcool')}</div>`,
  calc(){let s=0;for(let i=1;i<=9;i++)s+=checked('h'+i)?1:0;let c='Baixo',b='b-green';if(s>=3){c='Alto — cautela e monitorização';b='b-red'}else if(s===2){c='Moderado';b='b-amber'}return{val:s,unit:'pontos',interp:c,badge:b}}},
