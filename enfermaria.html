@@ -660,11 +660,13 @@ function downscale(dataUrl,maxDim,q,cb){
   setTimeout(()=>finish(null,null),6000);
   img.src=dataUrl;
 }
-const PARAM_PROMPT='Você é um escriba clínico. Recebe FOTO(S) manuscritas das últimas 24h de um paciente internado: uma folha de CONTROLE HEMODINÂMICO (sinais vitais por horário) e, às vezes, uma folha SEPARADA de CONTROLE HÍDRICO (ganhos/perdas, diurese, balanço). Transcreva os DÍGITOS com precisão e resuma o dia em UMA linha padronizada.\n'
+const PARAM_PROMPT='Você é um escriba clínico. Recebe a FOTO manuscrita de UMA folha das últimas 24h de um paciente internado: ou uma folha de CONTROLE HEMODINÂMICO (sinais vitais por horário), ou uma folha de CONTROLE HÍDRICO (ganhos/perdas, diurese, balanço). Identifique qual é, transcreva os DÍGITOS com precisão e termine com UMA linha padronizada. Campos que não existem nesta folha: simplesmente omita.\n'
  +'COMO PENSAR (faça isto internamente, em silêncio, e NÃO escreva na resposta): as fotos podem estar GIRADAS (deitadas) e ter FAIXAS DE SOMBRA — gire mentalmente e leia a folha INTEIRA, da primeira à ÚLTIMA coluna da direita. As ÚLTIMAS colunas são as medidas mais recentes e as mais importantes clinicamente (é onde aparecem hipotensão, febre, queda de saturação); sombra sobre a coluna NÃO significa coluna vazia — esforce-se para lê-la. Leia COLUNA POR COLUNA (cada coluna = um horário), dígito por dígito, sem trocar valores entre linhas nem entre colunas; pule células vazias. Depois faça uma SEGUNDA PASSADA apenas conferindo os EXTREMOS de cada linha (menor e maior do dia) — confirme que a MENOR PA da sua resposta é um par que está realmente ESCRITO na folha (ex.: se a folha tem 75X45, o mínimo é 75X45, nunca um valor maior). Então calcule as faixas mínimo–máximo, a lista cronológica COMPLETA das glicemias (até a última coluna), a diurese e o balanço.\n'
  +'PROIBIDO INVENTAR: todo número da resposta precisa estar ESCRITO em alguma célula da foto. Se um dígito ficou ilegível, OMITA esse valor e use os demais — nunca chute, nunca "arredonde", nunca complete. Antes de responder, confira os DOIS ÚLTIMOS dígitos dos números grandes (ex.: +1.695 é +1695, não +1659).\n'
- +'RESPONDA APENAS com a linha final abaixo, em MAIÚSCULAS, numa única linha, sem títulos, sem "ETAPA", sem mostrar o raciocínio, sem comentários. Omita por completo os campos sem dado (NÃO invente):\n'
- +'PA [sist_min-sist_max] X [diast_min-diast_max] MMHG // FC [min-max] BPM // FR [min-max] IRPM // T [min-max] ºC // SPO2 [min-max]% // DX [glicemias em ordem de horário separadas por hífen] MG/DL // DIURESE [total em ML — ou "PRESENTE, NÃO QUANTIFICADA"] // HEMODIÁLISE [valor] ML (só se houver) // BH [valor com sinal] ML\n'
+ +'FORMATO DA RESPOSTA — duas partes, nesta ordem:\n'
+ +'1) TRANSCRIÇÃO COLUNA A COLUNA (esta parte é rascunho de conferência; folha hemodinâmica: uma linha por horário, ex. "08:00 → PA 142X73; FC 90; FR 18; T 35,5; SAT 96; DX 139"; folha hídrica: uma linha por turno, ex. "TURNO 1 → DIURESE 300; HD 800; BH -800". Transcreva TODAS as colunas, inclusive as últimas; célula ilegível = escreva "?").\n'
+ +'2) A LINHA FINAL, começando EXATAMENTE com "FINAL: ", em MAIÚSCULAS, única, derivada SOMENTE da transcrição acima (se um valor não está no rascunho, não pode estar na linha final). Omita campos sem dado:\n'
+ +'FINAL: PA [sist_min-sist_max] X [diast_min-diast_max] MMHG // FC [min-max] BPM // FR [min-max] IRPM // T [min-max] ºC // SPO2 [min-max]% // DX [glicemias em ordem de horário separadas por hífen] MG/DL // DIURESE [total em ML — ou "PRESENTE, NÃO QUANTIFICADA"] // HEMODIÁLISE [valor] ML (só se houver) // BH [valor com sinal] ML\n'
  +'REGRAS: '
  +'(A) A folha hemodinâmica costuma ter, ABAIXO dos valores, uma GRADE DE ESCORE (MEWS/alerta precoce) com números 0, 1, 2 e 3 nas células — IGNORE esses escores; use SEMPRE o valor REAL medido, nunca o escore. '
  +'(B) PA = sistólica × diastólica (linha "PRESSÃO ARTERIAL", pares tipo 136/75, 130X80): use a MENOR e a MAIOR sistólica e a MENOR e a MAIOR diastólica do dia (ex.: PA 100-136 X 60-80). Valores HIPOTENSOS (sistólica < 90, ex.: 75X45, 85X49) são os MAIS importantes da folha — jamais podem faltar na faixa. Ao lado do par pode haver a PAM entre parênteses (ex.: 75X45 (55)) — NUNCA use a PAM nem o escore, só o par. '
@@ -678,18 +680,33 @@ const PARAM_PROMPT='Você é um escriba clínico. Recebe FOTO(S) manuscritas das
 async function transcreverParams(){
   if(!visitaImgs.length){alert('Anexe ao menos uma foto dos parâmetros.');return;}
   const b=document.getElementById('transBtn');b.innerHTML='<span class="spin"></span> Transcrevendo...';b.disabled=true;
-  const imgs=visitaImgs.map(im=>({data:im.data,mimeType:im.mimeType}));
+  // 1 chamada de IA POR FOTO (campo visual menor lê o manuscrito muito melhor que fotos juntas)
+  const extrairFinal=out=>{
+    const ls=String(out||'').replace(/```/g,'').replace(/\*\*/g,'').split('\n').map(s=>s.trim()).filter(Boolean);
+    let l=[...ls].reverse().find(x=>/^FINAL\s*:/i.test(x))          // âncora nova
+         ||[...ls].reverse().find(x=>/\/\//.test(x)&&/\b(PA|FC|MMHG|DIURESE|BH)\b/i.test(x)) // fallback formato antigo
+         ||'';
+    return l.replace(/^\s*FINAL\s*:\s*/i,'').replace(/^\s*(PAR[ÂA]METROS|RESULTADO)\s*:\s*/i,'').trim();
+  };
+  const mesclarLinhas=linhas=>{ // junta campos das fotos: valor real ganha de "NÃO AFERID*"; primeiro a chegar fica
+    const ORDEM=['PA','FC','FR','T','SPO2','DX','DIURESE','HEMODIÁLISE','HEMODIALISE','DRENO','BH'];
+    const chave=seg=>{const m=seg.toUpperCase().match(/^(HEMODIÁLISE|HEMODIALISE|DIURESE|DRENO|SPO2|PA|FC|FR|DX|BH|T)\b/);return m?(m[1]==='HEMODIALISE'?'HEMODIÁLISE':m[1]):null;};
+    const campos={};
+    linhas.forEach(l=>l.split('//').map(s=>s.trim()).filter(Boolean).forEach(seg=>{
+      const k=chave(seg); if(!k)return;
+      const na=/N[ÃA]O AFERID/i.test(seg);
+      if(!campos[k]||(/N[ÃA]O AFERID/i.test(campos[k])&&!na)) campos[k]=seg;
+    }));
+    return ORDEM.filter(k=>k!=='HEMODIALISE'&&campos[k]).map(k=>campos[k]).join(' // ');
+  };
   try{
-    let out;
-    try{ out=await MT.aiImage(imgs,PARAM_PROMPT,'gemini-2.5-pro'); }   // pro = melhor OCR de manuscrito
-    catch(e1){ out=await MT.aiImage(imgs,PARAM_PROMPT); }              // fallback flash (backend ainda sem pro)
-    const rawTxt=String(out||'').replace(/```/g,'').replace(/\*\*/g,'').trim();
-    const ls=rawTxt.split('\n').map(s=>s.trim()).filter(Boolean);
-    // a resposta deve ser só a linha de parâmetros — pega a que tem o formato "//", senão a última com sinal vital
-    let clean=ls.find(l=>/\/\//.test(l))
-           || [...ls].reverse().find(l=>/\b(PA|FC|FR|SPO2|MMHG|DIURESE)\b/i.test(l))
-           || ls[ls.length-1] || '';
-    clean=clean.replace(/^\s*(PAR[ÂA]METROS|RESULTADO)\s*:\s*/i,'').trim();
+    const outs=await Promise.all(visitaImgs.map(async im=>{
+      const um=[{data:im.data,mimeType:im.mimeType}];
+      try{ return await MT.aiImage(um,PARAM_PROMPT,'gemini-2.5-pro'); }  // pro = melhor OCR de manuscrito
+      catch(e1){ return await MT.aiImage(um,PARAM_PROMPT); }             // fallback flash
+    }));
+    const finais=outs.map(extrairFinal).filter(Boolean);
+    const clean=finais.length>1?mesclarLinhas(finais):(finais[0]||'');
     if(clean)setVal('v_param',up(clean));
     b.innerHTML='<i class="ti ti-check"></i> Transcrito';setTimeout(()=>{b.innerHTML='<i class="ti ti-sparkles"></i> Transcrever com IA';b.disabled=false;},1600);
     return;
