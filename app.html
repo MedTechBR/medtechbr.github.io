@@ -132,7 +132,7 @@ const APPS = [
   { nm:'FlashMed',   ic:'ti-cards',          url:BASE+'flashmed.html' }
 ];
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
-function fmtName(nm){ return /AI$/.test(nm) ? esc(nm.slice(0,-2))+'<b>AI</b>' : esc(nm); }
+function fmtName(nm){ return /(AI|IA)$/.test(nm) ? esc(nm.slice(0,-2))+'<b>'+nm.slice(-2)+'</b>' : esc(nm); }
 function card(a){
   // Mesma janela: todos os apps estão no mesmo domínio (medtechbr.github.io),
   // então a navegação fica DENTRO do PWA, sem abrir uma nova janela.
