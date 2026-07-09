@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
 <link rel="icon" type="image/png" href="favicon.png">
 <script src="_mtfb.js?v=1"></script>
+<script src="_mtui.js?v=1"></script>
 <script>window.MT_APP={id:"plantaohub",name:"PlantãoHub"};</script>
 <script type="module" src="_mtauth.js?v=8"></script>
 <style>
@@ -159,7 +160,7 @@ let dayClip=null;                         // {from:'YYYY-MM-DD', shifts:[{local,
 const money=v=>'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const money0=v=>'R$ '+Number(v||0).toLocaleString('pt-BR',{maximumFractionDigits:0});
 const hnum=h=>h.toLocaleString('pt-BR',{maximumFractionDigits:1});
-function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+const esc=MTUI.esc; /* compartilhado em _mtui.js */
 function hoursOf(s){const[a,b]=s.start.split(':').map(Number);const[c,d]=s.end.split(':').map(Number);let h=(c*60+d)-(a*60+b);if(h<=0)h+=1440;return h/60;}
 function monthKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
 function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -378,8 +379,7 @@ function saveForm(id){
   if(!state.locais)state.locais={};state.locais[o.local]={start:o.start,end:o.end,value:o.value};
   persist();closeModal();const od=new Date(o.date+'T00:00:00');cur=new Date(od);calCur=new Date(od.getFullYear(),od.getMonth(),1);if(tab==='ano')curY=od.getFullYear();render();
 }
-function modal(html){const d=document.createElement('div');d.className='modal';d.id='modal';d.innerHTML='<div class="box">'+html+'</div>';d.onclick=e=>{if(e.target===d)closeModal();};document.body.appendChild(d);}
-function closeModal(){const m=document.getElementById('modal');if(m)m.remove();}
+const modal=MTUI.modal, closeModal=MTUI.closeModal; /* compartilhados em _mtui.js (com fix de modal empilhado) */
 
 /* ---------- export CSV ---------- */
 function exportCSV(year){
