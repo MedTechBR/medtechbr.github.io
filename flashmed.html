@@ -208,7 +208,7 @@ function homeView(){
     </div><div class="row">
      <button class="btn btn-d btn-sm" onclick="study('${d.id}')">Estudar</button>
      <button class="btn btn-g btn-sm" onclick="manage('${d.id}')">Cartões</button>
-     ${d.builtin?`<button class="btn btn-g btn-sm" onclick="verifyDeck('${d.id}')">✨ Verificar (IA)</button>`:`<button class="btn btn-g btn-sm" onclick="delDeck('${d.id}')">🗑️</button>`}
+     ${d.builtin?`<button class="btn btn-g btn-sm" onclick="verifyDeck('${d.id}')"><i class="ti ti-sparkles"></i> Verificar (IA)</button>`:`<button class="btn btn-g btn-sm" onclick="delDeck('${d.id}')" title="Excluir baralho"><i class="ti ti-trash"></i></button>`}
     </div></div>`;
   }).join('')}
   <div class="note">📌 <b>Repetição espaçada (SM-2):</b> cada cartão volta no melhor momento — quanto mais fácil, mais distante. Os baralhos "prontos" são de nível avançado e a <b>IA verifica</b> se continuam atualizados (botão ✨).</div>`;
@@ -236,7 +236,7 @@ function manage(id){view.deck=id;view.mode='manage';render();window.scrollTo({to
 function manageView(){
   const d=decks.find(x=>x.id===view.deck);
   return `<div class="toolbar"><button class="btn btn-g btn-sm" onclick="go('home')">← Baralhos</button>
-   ${d.builtin?`<button class="btn btn-g btn-sm" onclick="verifyDeck('${d.id}')">✨ Verificar atualização (IA)</button>`:`<button class="btn btn-p btn-sm" onclick="newCard()">+ Novo cartão</button>`}
+   ${d.builtin?`<button class="btn btn-g btn-sm" onclick="verifyDeck('${d.id}')"><i class="ti ti-sparkles"></i> Verificar atualização (IA)</button>`:`<button class="btn btn-p btn-sm" onclick="newCard()">+ Novo cartão</button>`}
    <span class="muted">${esc(d.name)} · ${d.cards.length} cartões</span></div>
    <div class="card">${d.cards.length?d.cards.map(c=>`<div class="carditem"><div><b>${esc(c.front)}</b><br><span class="muted">${esc(c.back)}</span>${c.ref?`<br><span style="color:var(--mint-dark);font-size:12px;font-weight:700">📚 ${esc(c.ref)}</span>`:''}</div>${d.builtin?'':`<button class="x" onclick="delCard('${c.id}')">×</button>`}</div>`).join(''):'<div class="empty">Sem cartões.</div>'}</div>`;
 }

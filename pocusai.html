@@ -646,7 +646,7 @@ function abrirExame(id){const e=EXAMES.find(x=>x.id===id);if(!e)return;curView='
 function renderHome(){
   const q=busca.trim().toLowerCase();
   const filt=EXAMES.filter(e=>!q||(e.nome+' '+e.tags+' '+e.cat).toLowerCase().includes(q));
-  let html=`<div class="note">🔎 <b>Como usar:</b> escolha a região/exame para um guia prático — <b>sonda, posição, cortes, técnica e achados</b> — ou use o <b>Assistente POCUS</b> para perguntar qualquer coisa. ${MT.mode==='demo'?'<b>Entre na conta MedTech para a IA.</b>':''}</div>`;
+  let html=`<div class="note"><i class="ti ti-info-circle"></i> <b>Como usar:</b> escolha a região/exame para um guia prático — <b>sonda, posição, cortes, técnica e achados</b> — ou use o <b>Assistente POCUS</b> para perguntar qualquer coisa. ${MT.mode==='demo'?'<b>Entre na conta MedTech para a IA.</b>':''}</div>`;
   html+=`<div class="grid"><div class="card ai" onclick="abrirAssistente()"><div class="ci"><i class="ti ti-sparkles"></i></div><div class="cn">Assistente POCUS</div><div class="ct">Pergunte como avaliar qualquer região, dúvidas de técnica, achados…</div></div></div>`;
   if(!filt.length){html+='<div class="empty">Nada encontrado para "'+esc(busca)+'". Tente o Assistente POCUS acima.</div>';}
   else{
@@ -665,7 +665,7 @@ function renderExam(e){
    <div class="layout">
      <div><div class="content">${md(e.md)}</div>
        <div class="panel" style="margin-top:18px"><h4>Aprofundar com IA</h4>
-         <button class="btn btn-ai" id="aprBtn" onclick="aprofundar('${e.id}')">✨ Pedir mais detalhes / casos à IA</button>
+         <button class="btn btn-ai" id="aprBtn" onclick="aprofundar('${e.id}')"><i class="ti ti-sparkles"></i> Pedir mais detalhes / casos à IA</button>
          <div id="aprOut"></div>
        </div>
      </div>
@@ -703,8 +703,8 @@ function renderAssistente(){
   let html=`<button class="back" onclick="routeHome()">← Voltar</button>
    <div class="exam-head"><div class="ei"><i class="ti ti-sparkles"></i></div><div><h1>Assistente POCUS</h1><div class="tags">Pergunte sobre qualquer região, técnica ou achado</div></div></div>`;
   if(!chat.length){html+=`<div class="suggs">`+suggs.map(s=>`<button class="sugg" onclick="enviarSug(this)">${esc(s)}</button>`).join('')+`</div>`;}
-  html+=`<div class="chat" id="chat">`+chat.map(m=>`<div class="msg ${m.role==='user'?'u':'a'}"><div class="av">${m.role==='user'?'🧑‍⚕️':'🔎'}</div><div class="bub">${m.role==='user'?'<p>'+esc(m.text).replace(/\n/g,'<br>')+'</p>':md(m.text)}</div></div>`).join('')+`</div>
-   <div class="ask"><textarea id="ask" rows="1" placeholder="Ex.: como diferencio derrame de espessamento pleural?" oninput="growAsk(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviar();}"></textarea><button onclick="enviar()" aria-label="Enviar">➤</button></div>
+  html+=`<div class="chat" id="chat">`+chat.map(m=>`<div class="msg ${m.role==='user'?'u':'a'}"><div class="av"><i class="ti ${m.role==='user'?'ti-user':'ti-scan'}"></i></div><div class="bub">${m.role==='user'?'<p>'+esc(m.text).replace(/\n/g,'<br>')+'</p>':md(m.text)}</div></div>`).join('')+`</div>
+   <div class="ask"><textarea id="ask" rows="1" placeholder="Ex.: como diferencio derrame de espessamento pleural?" oninput="growAsk(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviar();}"></textarea><button onclick="enviar()" aria-label="Enviar"><i class="ti ti-send-2"></i></button></div>
    ${MT.mode==='demo'?'<div class="note" style="margin-top:12px">Entre na conta MedTech para usar a IA.</div>':''}`;
   document.getElementById('view').innerHTML=html;
   scrollChat();

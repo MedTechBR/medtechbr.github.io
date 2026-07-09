@@ -18,7 +18,52 @@ const MT = {
   onData(cb) { listeners.push(cb); if (MT._data !== undefined) cb(MT._data); },
   _emit(d) { MT._data = d; listeners.forEach(f => { try { f(d); } catch (e) { console.error(e); } }); },
   localGet() { try { return JSON.parse(localStorage.getItem(lsKey)); } catch (e) { return null; } },
-  localSet(d) { try { localStorage.setItem(lsKey, JSON.stringify(d)); } catch (e) {} }
+  localSet(d) { try { localStorage.setItem(lsKey, JSON.stringify(d)); } catch (e) {} },
+
+  /* ---------- Assinatura do ecossistema (Kiwify central) ----------
+     SUBS_ENFORCE=false → NADA muda para os usuários (retorna active provisional).
+     Quando o produto Kiwify existir: trocar KIWIFY_CHECKOUT_URL, SUBS_ENFORCE=true
+     e bump ?v= dos apps. O webhook central grava users/{uid}.subscription
+     ({status, plan, paidUntilMs, ...}) no Firestore medtech-c658c. */
+  SUBS_ENFORCE: false,
+  KIWIFY_CHECKOUT_URL: 'https://pay.kiwify.com.br/REPLACE_ME',
+  _subCache: null,
+  async subscription() {
+    if (!MT.SUBS_ENFORCE) return { active: true, provisional: true };
+    if (!MT.user || !MT._fb) return { active: false, reason: 'nologin' };
+    const now = Date.now();
+    if (MT._subCache && (now - MT._subCache.at) < 600000) return MT._subCache.val;
+    try {
+      const { db, F } = MT._fb;
+      const snap = await F.getDoc(F.doc(db, 'users', MT.user.uid));
+      const sub = (snap.exists() && snap.data().subscription) || {};
+      const val = {
+        active: sub.status === 'active' && Number(sub.paidUntilMs || 0) > now,
+        plan: sub.plan || null,
+        paidUntilMs: Number(sub.paidUntilMs || 0)
+      };
+      MT._subCache = { at: now, val };
+      return val;
+    } catch (e) { console.warn('MT.subscription falhou', e); return { active: true, degraded: true }; }
+  },
+  async requirePlan(onOk) {
+    const s = await MT.subscription();
+    if (s.active) { if (onOk) onOk(s); return true; }
+    const uid = MT.user ? MT.user.uid : '';
+    const url = MT.KIWIFY_CHECKOUT_URL + (MT.KIWIFY_CHECKOUT_URL.indexOf('?') > -1 ? '&' : '?') + 's1=' + encodeURIComponent(uid);
+    if (!document.getElementById('mt-paywall')) {
+      const d = document.createElement('div');
+      d.id = 'mt-paywall';
+      d.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:99990;display:flex;align-items:center;justify-content:center;padding:20px';
+      d.innerHTML = '<div style="background:#fff;border-radius:16px;max-width:400px;width:100%;padding:26px;font-family:Inter,system-ui,sans-serif;text-align:center">' +
+        '<div style="font-size:19px;font-weight:800;color:#0f172a;margin-bottom:8px">Assine o MedTech</div>' +
+        '<div style="font-size:14px;color:#64748b;line-height:1.5;margin-bottom:16px">Acesso a todos os apps do ecossistema, com IA incluída.<br>1 app R$ 19,90 · 2 apps R$ 34,90 · tudo R$ 59,90/mês.</div>' +
+        '<a href="' + url + '" target="_blank" rel="noopener" style="display:block;background:#2563eb;color:#fff;border-radius:10px;padding:13px;font-weight:700;text-decoration:none">Assinar agora</a>' +
+        '<button onclick="document.getElementById(\'mt-paywall\').remove()" style="margin-top:10px;background:none;border:none;color:#64748b;font-size:13px;cursor:pointer">Agora não</button></div>';
+      document.body.appendChild(d);
+    }
+    return false;
+  }
 };
 window.MT = MT;
 

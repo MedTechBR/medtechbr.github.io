@@ -138,7 +138,7 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
     <button id="tab-ano" onclick="setTab('ano')"><i class="ti ti-calendar-stats"></i> Ano</button>
   </div>
   <div id="view"></div>
-  <div class="note">📌 <b id="storenote">Carregando…</b> PlantãoHub te ajuda a saber quantas horas você fez, quanto vai receber e o que já caiu — por mês, por ano e por local. <span style="color:var(--muted)">(Em breve: troca de plantões entre colegas.)</span></div>
+  <div class="note"><i class="ti ti-pin" aria-hidden="true"></i> <b id="storenote">Carregando…</b> Suas horas, seus recebimentos e o que já caiu — por mês, por ano e por local.</div>
 </main>
 
 <footer>© 2026 <a href="index.html">MedTech</a> · <a href="privacidade.html">Privacidade</a></footer>
@@ -235,7 +235,7 @@ function renderComp(){
      Array.from({length:27},(_,i)=>i+2).map(n=>`<option value="${n}" ${cd===n?'selected':''}>fecha dia ${n}</option>`)).join('');
   let html=`<div class="bar">
     <div class="nav"><button class="arr" onclick="moveComp(-1)">‹</button><h2>${r.label}</h2><button class="arr" onclick="moveComp(1)">›</button></div>
-    <div class="right"><select class="flt" title="Período da competência" onchange="setCompDay(this.value)">${cutOpts}</select><select class="flt" onchange="fltLocal=this.value;render()">${opts}</select><button class="btn btn-g btn-sm" onclick="exportCSV()">⬇︎ CSV</button><button class="btn btn-p btn-sm" onclick="openForm()">+ Novo plantão</button></div>
+    <div class="right"><select class="flt" title="Período da competência" onchange="setCompDay(this.value)">${cutOpts}</select><select class="flt" onchange="fltLocal=this.value;render()">${opts}</select><button class="btn btn-g btn-sm" onclick="exportCSV()"><i class="ti ti-download"></i> CSV</button><button class="btn btn-p btn-sm" onclick="openForm()">+ Novo plantão</button></div>
   </div>
   <div class="cards">
     <div class="kpi"><div class="l">Plantões</div><div class="v">${ms.length}</div></div>
@@ -253,7 +253,7 @@ function renderComp(){
       <span class="stat ${s.status==='pago'?'s-pg':'s-ag'}" onclick="toggleStatus('${s.id}')">${s.status==='pago'?'✓ recebido':'agendado'}</span>
     </div>
     <div class="val">${money(s.value)}</div>
-    <div class="acts"><button title="Duplicar p/ semana seguinte" onclick="dup('${s.id}')">⧉</button><button onclick="openForm('${s.id}')">✏️</button><button onclick="del('${s.id}')">🗑️</button></div>
+    <div class="acts"><button title="Duplicar p/ semana seguinte" onclick="dup('${s.id}')"><i class="ti ti-copy"></i></button><button title="Editar" onclick="openForm('${s.id}')"><i class="ti ti-pencil"></i></button><button title="Excluir" onclick="del('${s.id}')"><i class="ti ti-trash"></i></button></div>
   </div>`;}).join('');}
   document.getElementById('view').innerHTML=html;
 }
@@ -340,7 +340,7 @@ function renderYear(){
   const topLoc=Object.entries(porLocal).sort((a,b)=>b[1]-a[1]);
   let html=`<div class="bar">
     <div class="nav"><button class="arr" onclick="moveYear(-1)">‹</button><h2>${curY}</h2><button class="arr" onclick="moveYear(1)">›</button></div>
-    <div class="right"><button class="btn btn-g btn-sm" onclick="exportCSV(true)">⬇︎ CSV do ano</button></div>
+    <div class="right"><button class="btn btn-g btn-sm" onclick="exportCSV(true)"><i class="ti ti-download"></i> CSV do ano</button></div>
   </div>
   <div class="cards">
     <div class="kpi"><div class="l">Plantões</div><div class="v">${tN}</div></div>
@@ -368,7 +368,7 @@ function openForm(id,presetDate){
    <div class="two"><div class="field"><label>Valor (R$)</label><input id="f_value" type="number" step="0.01" value="${s.value}" placeholder="0,00"></div>
    <div class="field"><label>Status</label><select id="f_status"><option value="agendado" ${s.status==='agendado'?'selected':''}>Agendado</option><option value="pago" ${s.status==='pago'?'selected':''}>Recebido</option></select></div></div>
    <div class="field"><label>Observação (opcional)</label><textarea id="f_note" placeholder="Ex.: levar carimbo, escala dupla...">${esc(s.note||'')}</textarea></div>
-   <div class="row"><button class="btn btn-p" onclick="saveForm('${id||''}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button>${id?`<button class="btn" style="background:#fdeceb;color:var(--red);margin-left:auto" onclick="delFromForm('${id}')">🗑️ Excluir</button>`:''}</div>`);
+   <div class="row"><button class="btn btn-p" onclick="saveForm('${id||''}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button>${id?`<button class="btn" style="background:#fdeceb;color:var(--red);margin-left:auto" onclick="delFromForm('${id}')"><i class="ti ti-trash"></i> Excluir</button>`:''}</div>`);
 }
 function fillLocal(){const v=document.getElementById('f_local').value;const m=(state.locais||{})[v];if(m){document.getElementById('f_start').value=m.start;document.getElementById('f_end').value=m.end;if(!document.getElementById('f_value').value)document.getElementById('f_value').value=m.value;}}
 function saveForm(id){
