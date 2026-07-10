@@ -3,22 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FlashMed — Flashcards prontos com repetição espaçada | MedTech</title>
-<meta name="description" content="FlashMed: baralhos prontos de medicina (nível avançado) com repetição espaçada (SM-2). A IA verifica periodicamente se os cartões estão atualizados.">
+<title>FlashMed — Questões, simulados e flashcards de medicina | MedTech</title>
+<meta name="description" content="FlashMed: estude por questões comentadas e simulados no estilo residência (Clínica, Cirurgia, GO, Pediatria, Preventiva), com a IA gerando mais questões. Flashcards com repetição espaçada.">
 <meta name="theme-color" content="#2563eb">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
 <link rel="icon" type="image/png" href="favicon.png">
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"flashmed",name:"FlashMed"};</script>
 <script type="module" src="_mtauth.js?v=8"></script>
+<script src="flashmed-banco.js?v=1"></script>
 <style>
-:root{--petrol:#2563eb;--petrol-dark:#1e40af;--ink:#0f172a;--mint:#2563eb;--mint-dark:#1e40af;--bg:#f4f7fb;--soft:#e8f0fe;--line:#e6ebf3;--muted:#64748b;--red:#c0392b;--amber:#c97a17}
+:root{--petrol:#2563eb;--petrol-dark:#1e40af;--ink:#0f172a;--bg:#f4f7fb;--soft:#e8f0fe;--line:#e6ebf3;--muted:#64748b;--green:#16a34a;--green-bg:#e7f7ee;--red:#c0392b;--red-bg:#fdecea;--amber:#c97a17}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:-.011em;color:var(--ink);background:var(--bg)}
-header{background:var(--petrol);color:#fff;padding:16px 0}
+header{background:var(--petrol);color:#fff;padding:15px 0}
 .wrap{max-width:880px;margin:0 auto;padding:0 18px}
 .top{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.5px}
@@ -27,53 +28,99 @@ header{background:var(--petrol);color:#fff;padding:16px 0}
 .logo b{color:#bfdbfe}
 .top a{color:#cfe3e6;text-decoration:none;font-size:14px;font-weight:600}
 .subtitle{color:#bcd6db;font-size:12.5px;margin-top:3px}
-main{max-width:880px;margin:0 auto;padding:22px 18px}
+/* tab bar */
+.tabbar{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.tabs{display:flex;gap:2px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tabs button{flex:0 0 auto;background:none;border:none;padding:13px 14px;font-family:inherit;font-size:13.5px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;display:flex;align-items:center;gap:6px}
+.tabs button.active{color:var(--petrol);border-bottom-color:var(--petrol)}
+.tabs button i{font-size:16px}
+main{max-width:880px;margin:0 auto;padding:20px 18px}
 .btn{display:inline-flex;align-items:center;gap:7px;border:none;border-radius:10px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
-.btn-p{background:var(--petrol);color:#fff}.btn-p:hover{background:var(--mint-dark)}
-.btn-d{background:var(--petrol);color:#fff}.btn-d:hover{background:var(--petrol-dark)}
+.btn-p{background:var(--petrol);color:#fff}.btn-p:hover{background:var(--petrol-dark)}
 .btn-g{background:#fff;color:var(--petrol);border:1px solid var(--line)}.btn-g:hover{background:var(--soft)}
 .btn-sm{padding:8px 12px;font-size:13px}
-.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;align-items:center}
+.btn:disabled{opacity:.55;cursor:default}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;align-items:center}
 .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 10px 30px -22px rgba(8,56,69,.3)}
+.muted{color:var(--muted);font-size:13.5px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.pill{display:inline-block;background:var(--soft);color:var(--petrol);font-weight:700;font-size:12px;padding:3px 10px;border-radius:999px}
+.pill.due{background:#fdf0e0;color:var(--amber)}
+.pill.bi{background:#e7f7f1;color:var(--green)}
+input,select,textarea{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit;background:#fff}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--petrol)}
+label{display:block;font-weight:600;font-size:14px;margin:0 0 6px}
+.field{margin-bottom:14px}
+/* área chips / grid */
+.areagrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.areagrid{grid-template-columns:1fr}}
+.areacard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;transition:.12s;border-left:5px solid var(--petrol)}
+.areacard:hover{transform:translateY(-2px);box-shadow:0 10px 24px -18px rgba(8,56,69,.4)}
+.areacard h3{font-size:16px}
+.areacard p{color:var(--muted);font-size:12.5px;margin-top:4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px}
+.chip{background:#fff;border:1px solid var(--line);color:var(--ink);font-weight:600;font-size:13px;padding:7px 13px;border-radius:999px;cursor:pointer}
+.chip.sel{background:var(--petrol);color:#fff;border-color:var(--petrol)}
+/* questão */
+.qwrap{max-width:720px;margin:0 auto}
+.qmeta{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.qstem{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;font-size:16px;line-height:1.6;box-shadow:0 10px 30px -24px rgba(8,56,69,.35)}
+.qopts{margin-top:14px;display:flex;flex-direction:column;gap:10px}
+.qopt{display:flex;gap:12px;align-items:flex-start;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:13px 15px;font-size:15px;line-height:1.45;cursor:pointer;font-family:inherit;color:var(--ink);transition:.1s}
+.qopt:hover:not(:disabled){border-color:var(--petrol);background:var(--soft)}
+.qopt .let{flex:0 0 26px;height:26px;border-radius:50%;background:var(--soft);color:var(--petrol);font-weight:800;font-size:13px;display:grid;place-items:center}
+.qopt.correct{border-color:var(--green);background:var(--green-bg)}
+.qopt.correct .let{background:var(--green);color:#fff}
+.qopt.wrong{border-color:var(--red);background:var(--red-bg)}
+.qopt.wrong .let{background:var(--red);color:#fff}
+.qopt:disabled{cursor:default}
+.coment{margin-top:14px;border:1px solid #cfe0f4;background:#f3f8ff;border-radius:12px;padding:14px 16px;font-size:14px;line-height:1.6}
+.coment .h{font-weight:800;color:var(--petrol);display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.coment .ref{display:inline-block;margin-top:8px;color:var(--green);font-weight:700;font-size:12.5px}
+.prog{height:7px;background:var(--soft);border-radius:99px;overflow:hidden;margin:0 0 14px}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--petrol),#60a5fa)}
+/* simulado */
+.simbar{position:sticky;top:47px;background:var(--bg);padding:10px 0;z-index:10;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.timer{font-weight:800;font-variant-numeric:tabular-nums;font-size:16px;background:#fff;border:1px solid var(--line);padding:6px 12px;border-radius:10px}
+.timer.warn{color:var(--red);border-color:var(--red)}
+.navdots{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.navdots button{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:#fff;font-size:12px;font-weight:700;cursor:pointer;color:var(--muted)}
+.navdots button.ans{background:var(--soft);color:var(--petrol);border-color:var(--petrol)}
+.navdots button.cur{outline:2px solid var(--petrol)}
+.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:8px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 10px;text-align:center}
+.stat .n{font-size:26px;font-weight:800}.stat .l{font-size:11px;color:var(--muted);margin-top:2px}
+.stat.green .n{color:var(--green)}.stat.red .n{color:var(--red)}
+.barrow{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:13px}
+.barrow .nm{flex:0 0 130px;font-weight:600}
+.barrow .bar{flex:1;height:10px;background:var(--soft);border-radius:99px;overflow:hidden}
+.barrow .bar i{display:block;height:100%;background:var(--green)}
+.barrow .pc{flex:0 0 46px;text-align:right;font-weight:700}
+/* flashcards (mantido) */
 .deck{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .deck .info h3{font-size:17px}
 .deck .info p{color:var(--muted);font-size:13px;margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.pill{display:inline-block;background:var(--soft);color:var(--petrol);font-weight:700;font-size:12px;padding:3px 10px;border-radius:999px}
-.pill.due{background:#fdf0e0;color:var(--amber)}
-.pill.bi{background:#e7f7f1;color:var(--mint-dark)}
-input,select,textarea{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit;background:#fff}
-input:focus,textarea:focus,select:focus{outline:none;border-color:var(--mint)}
-label{display:block;font-weight:600;font-size:14px;margin:0 0 6px}
-.field{margin-bottom:14px}
-.study{text-align:center}
-.flash{background:#fff;border:1px solid var(--line);border-radius:18px;min-height:230px;display:flex;align-items:center;justify-content:center;padding:30px;font-size:19px;line-height:1.55;cursor:pointer;box-shadow:0 16px 40px -26px rgba(8,56,69,.4);user-select:none}
-.flash .side{max-width:680px}
-.flash .q{font-weight:700}
-.flash .a{color:#28424a;text-align:left}
+.flash{background:#fff;border:1px solid var(--line);border-radius:18px;min-height:220px;display:flex;align-items:center;justify-content:center;padding:28px;font-size:18px;line-height:1.55;cursor:pointer;box-shadow:0 16px 40px -26px rgba(8,56,69,.4);user-select:none}
+.flash .side{max-width:680px}.flash .q{font-weight:700}.flash .a{color:#28424a;text-align:left}
 .flash small{display:block;color:var(--muted);font-size:13px;margin-top:16px;font-weight:600;text-align:center}
-.flash .ref{display:block;color:var(--mint-dark);font-size:12px;margin-top:10px;font-weight:700;text-align:center}
+.flash .refx{display:block;color:var(--green);font-size:12px;margin-top:10px;font-weight:700;text-align:center}
 .rate{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
 .rate button{border:none;border-radius:11px;padding:13px 6px;font-weight:800;font-size:14px;cursor:pointer;color:#fff}
 .r0{background:#c0392b}.r1{background:#c97a17}.r2{background:#1e40af}.r3{background:#2563eb}
 .rate small{display:block;font-weight:600;font-size:11px;opacity:.85;margin-top:2px}
-.prog{height:7px;background:var(--soft);border-radius:99px;overflow:hidden;margin:0 0 16px}
-.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--mint),var(--petrol))}
-.muted{color:var(--muted);font-size:13.5px}
-.row{display:flex;gap:8px;flex-wrap:wrap}
-.note{background:#fff8ed;border:1px solid #f4d9a8;color:#8a5a16;border-radius:12px;padding:12px 15px;font-size:13px;margin-top:8px}
 .carditem{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}
 .carditem:last-child{border-bottom:none}
 .carditem .x{color:var(--red);cursor:pointer;font-weight:800;background:none;border:none}
-.empty{text-align:center;color:var(--muted);padding:30px}
+.empty{text-align:center;color:var(--muted);padding:34px}
+.empty i{font-size:38px;opacity:.5;display:block;margin-bottom:8px}
+.note{background:#fff8ed;border:1px solid #f4d9a8;color:#8a5a16;border-radius:12px;padding:12px 15px;font-size:13px;margin-top:8px;line-height:1.5}
 footer{text-align:center;color:var(--muted);font-size:13px;padding:24px}
 footer a{color:var(--petrol);font-weight:600;text-decoration:none}
-.modal{position:fixed;inset:0;background:rgba(15,23,42,.5);display:flex;align-items:center;justify-content:center;padding:18px;z-index:50}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.5);display:flex;align-items:center;justify-content:center;padding:18px;z-index:60}
 .modal .box{background:#fff;border-radius:16px;padding:24px;max-width:560px;width:100%;max-height:90vh;overflow:auto}
-.modal h3{margin-bottom:14px}
-.verify-out{white-space:pre-wrap;font-size:14px;line-height:1.6;background:var(--soft);border-radius:12px;padding:14px;margin-top:10px}
-.spin{display:inline-block;width:16px;height:16px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-3px}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--petrol);border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-3px}
 @keyframes sp{to{transform:rotate(360deg)}}
-@media(max-width:560px){.rate{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.rate{grid-template-columns:1fr 1fr}.stats3{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
 <body>
@@ -81,14 +128,15 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
   <div class="wrap top">
     <div>
       <div class="logo"><span class="mark"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#2563eb" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Flash<b>Med</b></div>
-      <div class="subtitle">Baralhos prontos (nível avançado) + repetição espaçada · por MedTech</div>
+      <div class="subtitle">Questões comentadas · simulados · flashcards — por MedTech</div>
     </div>
     <a href="index.html">← MedTech</a>
   </div>
 </header>
+<div class="tabbar"><div class="wrap tabs" id="tabs"></div></div>
 <main id="app"></main>
 <footer>
-  Baralhos prontos do MedTech com repetição espaçada (SM-2). A IA verifica se o conteúdo está atualizado — você não precisa de chave.<br>
+  Estude por questões comentadas e simulados no estilo residência; a IA gera mais questões do tema. Flashcards com repetição espaçada (SM-2).<br>
   © 2026 <a href="index.html">MedTech</a> · <a href="privacidade.html">Privacidade</a>
 </footer>
 
@@ -96,12 +144,13 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 const $=s=>document.querySelector(s);
+const LETRAS=['A','B','C','D','E','F'];
+const AREAS=window.FM_AREAS||[];
+const areaNome=a=>{const x=AREAS.find(z=>z.id===a);return x?x.nome:a;};
+const areaCor=a=>{const x=AREAS.find(z=>z.id===a);return x?x.cor:'#2563eb';};
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 
-/* ============================================================
-   BARALHOS PRONTOS (built-in) — conteúdo AVANÇADO/difícil.
-   ids estáveis: ao atualizar o conteúdo aqui, o ensureBuiltin()
-   atualiza o cartão do usuário preservando o progresso (SM-2).
-   ============================================================ */
+/* ====== BARALHOS PRONTOS (flashcards) — preservado ====== */
 const BUILTIN = [
 { id:'b-emerg', name:'Emergência & UTI — avançado', cards:[
   {id:'e1', q:'Alvo de temperatura no controle direcionado pós-PCR na diretriz atual — e por que mudou?', a:'Manter entre 32–37,5 °C evitando ativamente a febre. O TTM2 não mostrou benefício de 33 vs 37,5 °C → o foco passou a ser PREVENIR hipertermia, não hipotermia profunda obrigatória.', ref:'ILCOR/AHA'},
@@ -157,11 +206,9 @@ const BUILTIN = [
 ];
 
 /* ====== Estado / persistência ====== */
-let decks=[];
+let decks=[], answers={}, marked=[], generated=[], sims=[];
 let mtReady=false;
-function save(){ if(window.MT&&MT.save){ MT.save({decks}); } }
-// Mescla os baralhos prontos no estado do usuário: cria os que faltam, atualiza
-// o conteúdo dos cartões prontos e PRESERVA o progresso (ef/intervalo/due).
+function save(){ if(window.MT&&MT.save){ MT.save({decks,answers,marked,generated,sims}); } }
 function ensureBuiltin(){
   BUILTIN.forEach(bd=>{
     let d=decks.find(x=>x.id===bd.id);
@@ -174,8 +221,254 @@ function ensureBuiltin(){
     });
   });
 }
+const allQ=()=>(window.QBANK||[]).concat(generated);
+const qById=id=>allQ().find(q=>q.id===id);
 
-/* ====== SM-2 ====== */
+/* ====== Navegação ====== */
+let nav='inicio';   // inicio | questoes | simulado | flashcards | revisao
+let sess=null;      // sessão de questões (prática/revisão)
+let sim=null;       // sessão de simulado
+let fc={mode:'home',deck:null,queue:[],idx:0,flip:false,done:0}; // flashcards
+const TABS=[['inicio','Início','ti-home-2'],['questoes','Questões','ti-list-check'],['simulado','Simulado','ti-clock-hour-4'],['flashcards','Flashcards','ti-cards'],['revisao','Revisão','ti-refresh']];
+function go(n){ nav=n; if(n!=='questoes'&&n!=='revisao')sess=null; if(n!=='simulado')sim=null; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+function renderTabs(){
+  $('#tabs').innerHTML=TABS.map(t=>`<button class="${nav===t[0]?'active':''}" onclick="go('${t[0]}')"><i class="ti ${t[2]}"></i>${t[1]}</button>`).join('');
+}
+function render(){
+  renderTabs();
+  const a=$('#app');
+  if(nav==='inicio')a.innerHTML=inicioView();
+  else if(nav==='questoes')a.innerHTML= sess? sessView() : questoesHome();
+  else if(nav==='simulado')a.innerHTML= sim? (sim.done?simResult():simRun()) : simConfig();
+  else if(nav==='revisao')a.innerHTML= sess? sessView() : revisaoHome();
+  else if(nav==='flashcards')a.innerHTML= fc.mode==='study'?studyView():(fc.mode==='manage'?manageView():flashHome());
+}
+
+/* ====== INÍCIO ====== */
+function statsGlobais(){
+  const ks=Object.keys(answers); const tot=ks.length; let ac=0; const porArea={};
+  ks.forEach(id=>{const a=answers[id];if(a.correct)ac++;const ar=a.area||(qById(id)||{}).area||'?';porArea[ar]=porArea[ar]||{t:0,c:0};porArea[ar].t++;if(a.correct)porArea[ar].c++;});
+  return {tot,ac,pct:tot?Math.round(ac/tot*100):0,porArea,erradas:ks.filter(id=>!answers[id].correct)};
+}
+function inicioView(){
+  const s=statsGlobais(); const nBanco=allQ().length; const nMarc=marked.length;
+  const dueFC=decks.reduce((a,d)=>a+d.cards.filter(c=>(c.due||0)<=Date.now()).length,0);
+  return `<div class="stats3">
+     <div class="stat"><div class="n">${nBanco}</div><div class="l">questões no banco</div></div>
+     <div class="stat green"><div class="n">${s.pct}%</div><div class="l">acerto (${s.ac}/${s.tot})</div></div>
+     <div class="stat"><div class="n">${dueFC}</div><div class="l">flashcards p/ revisar</div></div>
+   </div>
+   <div class="card">
+     <h3 style="margin-bottom:4px">Estudar por questões</h3>
+     <p class="muted" style="margin-bottom:12px">Escolha uma área e responda questões comentadas. A IA gera mais do tema que você quiser.</p>
+     <div class="row">
+       <button class="btn btn-p" onclick="go('questoes')"><i class="ti ti-list-check"></i> Ir para Questões</button>
+       <button class="btn btn-g" onclick="go('simulado')"><i class="ti ti-clock-hour-4"></i> Fazer simulado</button>
+       ${(s.erradas.length||nMarc)?`<button class="btn btn-g" onclick="go('revisao')"><i class="ti ti-refresh"></i> Revisar (${s.erradas.length+nMarc})</button>`:''}
+     </div>
+   </div>
+   ${s.tot?`<div class="card"><h3 style="margin-bottom:10px">Seu desempenho por área</h3>${
+     AREAS.filter(ar=>s.porArea[ar.id]).map(ar=>{const p=s.porArea[ar.id];const pc=Math.round(p.c/p.t*100);return `<div class="barrow"><span class="nm">${esc(ar.nome)}</span><span class="bar"><i style="width:${pc}%;background:${ar.cor}"></i></span><span class="pc">${pc}%</span></div>`;}).join('')
+   }</div>`:''}
+   <div class="note"><b>Híbrido:</b> o banco começa com questões curadas do MedTech e a <b>IA amplia</b> por tema. Os <b>Flashcards</b> (repetição espaçada) continuam disponíveis na aba própria.</div>`;
+}
+
+/* ====== QUESTÕES (home + sessão) ====== */
+function questoesHome(){
+  return `<h3 style="margin-bottom:4px">Questões por área</h3>
+   <p class="muted" style="margin-bottom:14px">Grandes áreas da residência. Toque para estudar.</p>
+   <div class="areagrid">${AREAS.map(ar=>{
+     const n=allQ().filter(q=>q.area===ar.id).length;
+     return `<div class="areacard" style="border-left-color:${ar.cor}" onclick="startPractice('${ar.id}')">
+        <h3>${esc(ar.nome)}</h3>
+        <p>${n} questão(ões) · ${ar.esp.slice(0,3).join(' · ')}${ar.esp.length>3?'…':''}</p>
+     </div>`;
+   }).join('')}</div>
+   <div class="row" style="margin-top:16px"><button class="btn btn-g btn-sm" onclick="startPractice('*')">Misturar todas as áreas</button></div>`;
+}
+function startPractice(area){
+  let pool=allQ().filter(q=>area==='*'||q.area===area);
+  if(!pool.length){ area!=='*'&&genMore(area,null,true); return; }
+  // não vistas primeiro, depois o resto — embaralhado
+  const naoVistas=shuffle(pool.filter(q=>!answers[q.id]));
+  const vistas=shuffle(pool.filter(q=>answers[q.id]));
+  sess={mode:'practice',area,pool:naoVistas.concat(vistas),idx:0,picked:null,revealed:false,right:0,done:0};
+  nav='questoes'; render(); window.scrollTo({top:0,behavior:'smooth'});
+}
+function sessView(){
+  if(!sess.pool.length) return `<div class="card empty"><i class="ti ti-checkbox"></i><h3>Nada por aqui</h3><p class="muted">Sem questões para esta seleção.</p><div style="margin-top:14px"><button class="btn btn-p" onclick="go('${nav}')">Voltar</button></div></div>`;
+  if(sess.idx>=sess.pool.length) return sessDone();
+  const q=sess.pool[sess.idx];
+  const pct=Math.round(sess.idx/sess.pool.length*100);
+  const isMk=marked.includes(q.id);
+  return `<div class="qwrap">
+    <div class="prog"><i style="width:${pct}%"></i></div>
+    <div class="qmeta">
+      <span class="pill" style="background:${areaCor(q.area)}1a;color:${areaCor(q.area)}">${esc(areaNome(q.area))}${q.esp?' · '+esc(q.esp):''}</span>
+      <span class="muted">${sess.idx+1} / ${sess.pool.length} · ${sess.right} certas</span>
+    </div>
+    <div class="qstem">${esc(q.q)}</div>
+    <div class="qopts">${q.ops.map((op,i)=>{
+      let cls='';
+      if(sess.revealed){ if(i===q.correct)cls='correct'; else if(i===sess.picked)cls='wrong'; }
+      return `<button class="qopt ${cls}" ${sess.revealed?'disabled':''} onclick="answerQ(${i})"><span class="let">${LETRAS[i]}</span><span>${esc(op)}</span></button>`;
+    }).join('')}</div>
+    ${sess.revealed?`<div class="coment"><div class="h"><i class="ti ti-bulb"></i> ${sess.picked===q.correct?'Correto':'Comentário'}</div>${esc(q.coment||'—')}${q.ref?`<span class="ref">📚 ${esc(q.ref)}</span>`:''}</div>
+      <div class="row" style="margin-top:16px;justify-content:space-between">
+        <button class="btn btn-g btn-sm" onclick="toggleMark('${q.id}')"><i class="ti ${isMk?'ti-bookmark-filled':'ti-bookmark'}"></i> ${isMk?'Marcada':'Marcar p/ revisão'}</button>
+        <button class="btn btn-p" onclick="nextQ()">${sess.idx+1>=sess.pool.length?'Terminar':'Próxima →'}</button>
+      </div>`
+    :`<div class="row" style="margin-top:16px"><button class="btn btn-g btn-sm" onclick="go('${nav}')">← Sair</button></div>`}
+    ${sess.revealed&&sess.mode==='practice'?`<div class="row" style="margin-top:10px"><button class="btn btn-g btn-sm" onclick="genMore('${q.area}',${q.esp?`'${esc(q.esp)}'`:'null'})"><i class="ti ti-sparkles"></i> Gerar mais deste tema (IA)</button></div>`:''}
+   </div>`;
+}
+function answerQ(i){
+  if(sess.revealed)return; const q=sess.pool[sess.idx];
+  sess.picked=i; sess.revealed=true; const ok=(i===q.correct); if(ok)sess.right++;
+  answers[q.id]={picked:i,correct:ok,area:q.area,at:Date.now()};
+  save(); render();
+}
+function nextQ(){ sess.idx++; sess.picked=null; sess.revealed=false; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+function sessDone(){
+  const tot=sess.pool.length, pc=Math.round(sess.right/tot*100);
+  return `<div class="card" style="text-align:center">
+    <i class="ti ti-confetti" style="font-size:42px;color:var(--petrol)"></i>
+    <h3 style="margin:8px 0 4px">Sessão concluída</h3>
+    <p class="muted">Você acertou <b>${sess.right} de ${tot}</b> (${pc}%).</p>
+    <div class="row" style="justify-content:center;margin-top:16px">
+      <button class="btn btn-p" onclick="go('questoes')">Escolher outra área</button>
+      <button class="btn btn-g" onclick="go('inicio')">Início</button>
+    </div>
+   </div>`;
+}
+function toggleMark(id){ const i=marked.indexOf(id); if(i<0)marked.push(id); else marked.splice(i,1); save(); render(); }
+
+/* ====== REVISÃO ====== */
+function revisaoHome(){
+  const s=statsGlobais(); const err=s.erradas, mk=marked.slice();
+  const uni=Array.from(new Set(err.concat(mk)));
+  return `<h3 style="margin-bottom:4px">Revisão</h3>
+   <p class="muted" style="margin-bottom:14px">Refaça o que você errou ou marcou.</p>
+   <div class="row">
+     <button class="btn btn-p" ${err.length?'':'disabled'} onclick="startReview('err')"><i class="ti ti-x"></i> Erradas (${err.length})</button>
+     <button class="btn btn-g" ${mk.length?'':'disabled'} onclick="startReview('mk')"><i class="ti ti-bookmark"></i> Marcadas (${mk.length})</button>
+     <button class="btn btn-g" ${uni.length?'':'disabled'} onclick="startReview('all')">Tudo (${uni.length})</button>
+   </div>
+   ${uni.length?'':'<div class="empty" style="margin-top:20px"><i class="ti ti-checks"></i>Nada para revisar ainda — responda questões e marque as difíceis.</div>'}`;
+}
+function startReview(kind){
+  const s=statsGlobais();
+  let ids = kind==='err'?s.erradas : kind==='mk'?marked.slice() : Array.from(new Set(s.erradas.concat(marked)));
+  const pool=shuffle(ids.map(qById).filter(Boolean));
+  if(!pool.length)return;
+  sess={mode:'review',area:'rev',pool,idx:0,picked:null,revealed:false,right:0};
+  nav='revisao'; render(); window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ====== SIMULADO ====== */
+let simTimer=null;
+function simConfig(){
+  return `<h3 style="margin-bottom:4px">Simulado</h3>
+   <p class="muted" style="margin-bottom:14px">Prova cronometrada no estilo residência: responde tudo e vê o resultado no fim.</p>
+   <div class="card">
+     <div class="field"><label>Área</label>
+       <select id="simArea"><option value="*">Misto (todas as áreas)</option>${AREAS.map(a=>`<option value="${a.id}">${esc(a.nome)}</option>`).join('')}</select></div>
+     <div class="field"><label>Nº de questões</label>
+       <select id="simN"><option>10</option><option>20</option><option>30</option></select></div>
+     <div class="field"><label>Tempo por questão</label>
+       <select id="simT"><option value="90">1min30 (padrão residência)</option><option value="120">2 min</option><option value="0">Sem cronômetro</option></select></div>
+     <button class="btn btn-p" onclick="startSim()"><i class="ti ti-player-play"></i> Iniciar simulado</button>
+   </div>
+   ${sims.length?`<div class="card"><h3 style="margin-bottom:8px">Últimos simulados</h3>${sims.slice(-5).reverse().map(r=>`<div class="carditem"><div><b>${r.pct}%</b> · ${r.right}/${r.n} <span class="muted">· ${esc(r.areaNome)}</span></div><span class="muted">${new Date(r.at).toLocaleDateString('pt-BR')}</span></div>`).join('')}</div>`:''}`;
+}
+function startSim(){
+  const area=$('#simArea').value, n=+$('#simN').value, tpq=+$('#simT').value;
+  let pool=allQ().filter(q=>area==='*'||q.area===area);
+  if(pool.length<n){ modal(`<h3>Poucas questões</h3><p class="muted">Esta área tem ${pool.length} questão(ões) e você pediu ${n}. Vou gerar mais com a IA ou reduza o número.</p><div class="row" style="margin-top:14px"><button class="btn btn-p" onclick="closeModal();genMore('${area==='*'?AREAS[0].id:area}',null,true)"><i class="ti ti-sparkles"></i> Gerar com IA</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`); if(!pool.length)return; }
+  pool=shuffle(pool).slice(0,Math.min(n,pool.length));
+  sim={area,areaNome:area==='*'?'Misto':areaNome(area),pool,idx:0,answers:{},tpq,left:tpq*pool.length,done:false};
+  nav='simulado'; render(); if(tpq){ startSimTimer(); }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function startSimTimer(){ clearInterval(simTimer); simTimer=setInterval(()=>{ if(!sim||sim.done){clearInterval(simTimer);return;} sim.left--; if(sim.left<=0){ sim.left=0; submitSim(); return;} const t=$('#simTimer'); if(t){ t.textContent=fmtT(sim.left); t.classList.toggle('warn',sim.left<60);} },1000); }
+const fmtT=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+function simRun(){
+  const q=sim.pool[sim.idx]; const pk=sim.answers[sim.idx];
+  return `<div class="simbar">
+      ${sim.tpq?`<span class="timer" id="simTimer">${fmtT(sim.left)}</span>`:'<span class="muted">Sem cronômetro</span>'}
+      <button class="btn btn-g btn-sm" onclick="askSubmitSim()">Finalizar agora</button>
+    </div>
+    <div class="qwrap">
+      <div class="qmeta"><span class="pill" style="background:${areaCor(q.area)}1a;color:${areaCor(q.area)}">${esc(areaNome(q.area))}</span><span class="muted">Questão ${sim.idx+1} / ${sim.pool.length}</span></div>
+      <div class="qstem">${esc(q.q)}</div>
+      <div class="qopts">${q.ops.map((op,i)=>`<button class="qopt ${pk===i?'':''}" style="${pk===i?'border-color:var(--petrol);background:var(--soft)':''}" onclick="simPick(${i})"><span class="let">${LETRAS[i]}</span><span>${esc(op)}</span></button>`).join('')}</div>
+      <div class="navdots">${sim.pool.map((_,i)=>`<button class="${sim.answers[i]!=null?'ans':''} ${i===sim.idx?'cur':''}" onclick="simGo(${i})">${i+1}</button>`).join('')}</div>
+      <div class="row" style="margin-top:14px;justify-content:space-between">
+        <button class="btn btn-g btn-sm" ${sim.idx?'':'disabled'} onclick="simGo(${sim.idx-1})">← Anterior</button>
+        ${sim.idx+1<sim.pool.length?`<button class="btn btn-p" onclick="simGo(${sim.idx+1})">Próxima →</button>`:`<button class="btn btn-p" onclick="askSubmitSim()">Finalizar</button>`}
+      </div>
+    </div>`;
+}
+function simPick(i){ sim.answers[sim.idx]=i; render(); }
+function simGo(i){ if(i<0||i>=sim.pool.length)return; sim.idx=i; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+function askSubmitSim(){ const resp=Object.keys(sim.answers).length; modal(`<h3>Finalizar simulado?</h3><p class="muted">Você respondeu ${resp} de ${sim.pool.length}.</p><div class="row" style="margin-top:14px"><button class="btn btn-p" onclick="closeModal();submitSim()">Finalizar e corrigir</button><button class="btn btn-g" onclick="closeModal()">Continuar</button></div>`); }
+function submitSim(){
+  clearInterval(simTimer);
+  let right=0; const porArea={};
+  sim.pool.forEach((q,i)=>{const ok=sim.answers[i]===q.correct;if(ok)right++;porArea[q.area]=porArea[q.area]||{t:0,c:0};porArea[q.area].t++;if(ok)porArea[q.area].c++;
+    // alimenta o histórico global de desempenho e revisão
+    if(sim.answers[i]!=null){answers[q.id]={picked:sim.answers[i],correct:ok,area:q.area,at:Date.now()};}
+  });
+  sim.right=right; sim.porArea=porArea; sim.done=true;
+  sims.push({at:Date.now(),n:sim.pool.length,right,pct:Math.round(right/sim.pool.length*100),area:sim.area,areaNome:sim.areaNome});
+  save(); render(); window.scrollTo({top:0,behavior:'smooth'});
+}
+function simResult(){
+  const pc=Math.round(sim.right/sim.pool.length*100);
+  return `<div class="stats3">
+     <div class="stat ${pc>=60?'green':'red'}"><div class="n">${pc}%</div><div class="l">aproveitamento</div></div>
+     <div class="stat green"><div class="n">${sim.right}</div><div class="l">acertos</div></div>
+     <div class="stat red"><div class="n">${sim.pool.length-sim.right}</div><div class="l">erros</div></div>
+   </div>
+   <div class="card"><h3 style="margin-bottom:10px">Por área</h3>${Object.keys(sim.porArea).map(a=>{const p=sim.porArea[a];const q=Math.round(p.c/p.t*100);return `<div class="barrow"><span class="nm">${esc(areaNome(a))}</span><span class="bar"><i style="width:${q}%;background:${areaCor(a)}"></i></span><span class="pc">${p.c}/${p.t}</span></div>`;}).join('')}</div>
+   <div class="row"><button class="btn btn-p" onclick="reviewSim()"><i class="ti ti-eye"></i> Ver correção comentada</button><button class="btn btn-g" onclick="go('simulado')">Novo simulado</button></div>`;
+}
+function reviewSim(){
+  // reaproveita a sessão de revisão com as questões do simulado
+  const pool=sim.pool.slice();
+  sess={mode:'review',area:'rev',pool,idx:0,picked:null,revealed:false,right:0,fromSim:true};
+  // marca já reveladas com a resposta dada
+  nav='revisao'; render(); window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ====== IA: gerar mais questões ====== */
+async function genMore(area,esp,fromEmpty){
+  if(!(window.MT&&MT.ai)){ modal(`<h3>IA indisponível</h3><p class="muted">Entre na sua conta MedTech para gerar questões.</p><div class="row" style="margin-top:12px"><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`); return; }
+  const alvo=esp?`${esp} (${areaNome(area)})`:areaNome(area);
+  modal(`<h3><i class="ti ti-sparkles"></i> Gerar questões — ${esc(alvo)}</h3><div id="gout" class="muted"><span class="spin"></span> A IA está elaborando 5 questões inéditas nível residência…</div>`);
+  const pr=`Gere 5 questões INÉDITAS de múltipla escolha, nível prova de residência médica (estilo ENARE), sobre ${alvo}. Cada questão: enunciado clínico objetivo, 5 alternativas plausíveis com apenas UMA correta, e um comentário explicativo curto citando a diretriz/fonte quando possível. Baseie-se nas diretrizes vigentes. Responda APENAS um array JSON válido, sem markdown, sem texto fora do array, no formato exato: [{"q":"enunciado","ops":["a","b","c","d","e"],"correct":0,"coment":"explicação","ref":"fonte"}] (correct = índice 0-4 da alternativa correta).`;
+  try{
+    const out=await MT.ai(pr,'gemini-2.5-pro');
+    let txt=String(out||'').replace(/```json/gi,'').replace(/```/g,'').trim();
+    const i=txt.indexOf('['), j=txt.lastIndexOf(']'); if(i>=0&&j>i)txt=txt.slice(i,j+1);
+    const arr=JSON.parse(txt);
+    let add=0;
+    arr.forEach(o=>{ if(o&&o.q&&Array.isArray(o.ops)&&o.ops.length>=4&&typeof o.correct==='number'&&o.correct>=0&&o.correct<o.ops.length){
+      generated.push({id:'g_'+uid(),area,esp:esp||'',q:String(o.q),ops:o.ops.map(String),correct:o.correct,coment:String(o.coment||''),ref:String(o.ref||''),ia:true}); add++;
+    }});
+    save(); closeModal();
+    if(add&&(fromEmpty||!sess)){ startPractice(area); }
+    else if(add&&sess){ // injeta as novas no fim da fila atual
+      const novas=generated.slice(-add); sess.pool=sess.pool.slice(0,sess.idx+1).concat(novas,sess.pool.slice(sess.idx+1)); render();
+      toast(add+' questões novas adicionadas à fila');
+    } else if(!add){ modal(`<h3>Não deu certo</h3><p class="muted">A IA não retornou questões válidas. Tente de novo.</p><div class="row" style="margin-top:12px"><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`); }
+  }catch(e){ const el=$('#gout'); if(el)el.innerHTML='⚠ '+(e.message||'Falha ao gerar. Tente novamente.'); }
+}
+function toast(m){const t=document.createElement('div');t.textContent=m;t.style.cssText='position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;z-index:80;box-shadow:0 8px 24px rgba(0,0,0,.3)';document.body.appendChild(t);setTimeout(()=>t.remove(),2600);}
+
+/* ============================================================
+   FLASHCARDS (SM-2) — preservado do FlashMed original
+   ============================================================ */
 function rate(card,q){
   let ef=(card.ef||2.5)+(0.1-(5-q)*(0.08+(5-q)*0.02)); if(ef<1.3)ef=1.3; card.ef=ef;
   if(q<3){card.reps=0;card.interval=0;card.due=Date.now();}
@@ -185,16 +478,7 @@ function rate(card,q){
 }
 const dueCount=d=>d.cards.filter(c=>(c.due||0)<=Date.now()).length;
 const daysAgo=t=>t?Math.floor((Date.now()-t)/86400000):null;
-
-/* ====== Views ====== */
-let view={mode:'home',deck:null,queue:[],idx:0,flip:false};
-function render(){
-  const a=document.getElementById('app');
-  if(view.mode==='study')a.innerHTML=studyView();
-  else if(view.mode==='manage')a.innerHTML=manageView();
-  else a.innerHTML=homeView();
-}
-function homeView(){
+function flashHome(){
   return `<div class="toolbar">
     <button class="btn btn-p" onclick="newDeck()">+ Meu baralho</button>
     <span class="muted">${decks.length} baralho(s) · prontos do MedTech + os seus</span>
@@ -206,76 +490,71 @@ function homeView(){
      <h3>${esc(d.name)} ${d.builtin?'<span class="pill bi">pronto</span>':''}</h3>
      <p><span class="pill">${d.cards.length} cartões</span> ${dueCount(d)?`<span class="pill due">${dueCount(d)} para revisar</span>`:'<span class="pill">em dia</span>'} ${chk}</p>
     </div><div class="row">
-     <button class="btn btn-d btn-sm" onclick="study('${d.id}')">Estudar</button>
+     <button class="btn btn-p btn-sm" onclick="study('${d.id}')">Estudar</button>
      <button class="btn btn-g btn-sm" onclick="manage('${d.id}')">Cartões</button>
      ${d.builtin?`<button class="btn btn-g btn-sm" onclick="verifyDeck('${d.id}')"><i class="ti ti-sparkles"></i> Verificar (IA)</button>`:`<button class="btn btn-g btn-sm" onclick="delDeck('${d.id}')" title="Excluir baralho"><i class="ti ti-trash"></i></button>`}
     </div></div>`;
   }).join('')}
-  <div class="note">📌 <b>Repetição espaçada (SM-2):</b> cada cartão volta no melhor momento — quanto mais fácil, mais distante. Os baralhos "prontos" são de nível avançado e a <b>IA verifica</b> se continuam atualizados (botão ✨).</div>`;
+  <div class="note"><b>Repetição espaçada (SM-2):</b> cada cartão volta no melhor momento — quanto mais fácil, mais distante. Os baralhos "prontos" são de nível avançado e a <b>IA verifica</b> se continuam atualizados.</div>`;
 }
-function study(id){const d=decks.find(x=>x.id===id);if(!d)return;view.deck=id;view.queue=d.cards.filter(c=>(c.due||0)<=Date.now());if(!view.queue.length)view.queue=d.cards.slice();view.idx=0;view.flip=false;view.mode='study';view.done=0;render();window.scrollTo({top:0,behavior:'smooth'});}
+function study(id){const d=decks.find(x=>x.id===id);if(!d)return;fc.deck=id;fc.queue=d.cards.filter(c=>(c.due||0)<=Date.now());if(!fc.queue.length)fc.queue=d.cards.slice();fc.idx=0;fc.flip=false;fc.mode='study';fc.done=0;render();window.scrollTo({top:0,behavior:'smooth'});}
 function studyView(){
-  const d=decks.find(x=>x.id===view.deck);
-  if(!view.queue.length)return `<div class="card study"><h3 style="margin-bottom:8px">✅ Sessão concluída!</h3><p class="muted">Você revisou os cartões disponíveis de "${esc(d.name)}".</p><div style="margin-top:18px"><button class="btn btn-d" onclick="go('home')">Voltar aos baralhos</button></div></div>`;
-  const card=view.queue[0];const pct=Math.round((view.done/(view.done+view.queue.length))*100);
-  return `<div class="toolbar"><button class="btn btn-g btn-sm" onclick="go('home')">← Baralhos</button><span class="muted">${esc(d.name)} · ${view.queue.length} na fila</span></div>
+  const d=decks.find(x=>x.id===fc.deck);
+  if(!fc.queue.length)return `<div class="card" style="text-align:center"><h3 style="margin-bottom:8px">✅ Sessão concluída!</h3><p class="muted">Você revisou os cartões disponíveis de "${esc(d.name)}".</p><div style="margin-top:18px"><button class="btn btn-p" onclick="fcHome()">Voltar aos baralhos</button></div></div>`;
+  const card=fc.queue[0];const pct=Math.round((fc.done/(fc.done+fc.queue.length))*100);
+  return `<div class="toolbar"><button class="btn btn-g btn-sm" onclick="fcHome()">← Baralhos</button><span class="muted">${esc(d.name)} · ${fc.queue.length} na fila</span></div>
    <div class="prog"><i style="width:${pct}%"></i></div>
-   <div class="study">
-     <div class="flash" onclick="doFlip()"><div class="side">${view.flip?`<div class="a">${esc(card.back)}</div>${card.ref?`<span class="ref">📚 ${esc(card.ref)}</span>`:''}<small>como você foi?</small>`:`<div class="q">${esc(card.front)}</div><small>toque para ver a resposta</small>`}</div></div>
-     ${view.flip?`<div class="rate">
-       <button class="r0" onclick="answer(2)">Errei<small>de novo</small></button>
-       <button class="r1" onclick="answer(3)">Difícil<small>logo</small></button>
-       <button class="r2" onclick="answer(4)">Bom<small>+dias</small></button>
-       <button class="r3" onclick="answer(5)">Fácil<small>++dias</small></button>
+   <div style="text-align:center">
+     <div class="flash" onclick="doFlip()"><div class="side">${fc.flip?`<div class="a">${esc(card.back)}</div>${card.ref?`<span class="refx">📚 ${esc(card.ref)}</span>`:''}<small>como você foi?</small>`:`<div class="q">${esc(card.front)}</div><small>toque para ver a resposta</small>`}</div></div>
+     ${fc.flip?`<div class="rate">
+       <button class="r0" onclick="answerFC(2)">Errei<small>de novo</small></button>
+       <button class="r1" onclick="answerFC(3)">Difícil<small>logo</small></button>
+       <button class="r2" onclick="answerFC(4)">Bom<small>+dias</small></button>
+       <button class="r3" onclick="answerFC(5)">Fácil<small>++dias</small></button>
      </div>`:`<div style="margin-top:16px"><button class="btn btn-p" onclick="doFlip()">Mostrar resposta</button></div>`}
    </div>`;
 }
-function doFlip(){view.flip=!view.flip;render();}
-function answer(q){const card=view.queue.shift();rate(card,q);if((card.due||0)<=Date.now())view.queue.push(card);else view.done++;view.flip=false;save();render();}
-function manage(id){view.deck=id;view.mode='manage';render();window.scrollTo({top:0,behavior:'smooth'});}
+function doFlip(){fc.flip=!fc.flip;render();}
+function answerFC(q){const card=fc.queue.shift();rate(card,q);if((card.due||0)<=Date.now())fc.queue.push(card);else fc.done++;fc.flip=false;save();render();}
+function manage(id){fc.deck=id;fc.mode='manage';render();window.scrollTo({top:0,behavior:'smooth'});}
 function manageView(){
-  const d=decks.find(x=>x.id===view.deck);
-  return `<div class="toolbar"><button class="btn btn-g btn-sm" onclick="go('home')">← Baralhos</button>
+  const d=decks.find(x=>x.id===fc.deck);
+  return `<div class="toolbar"><button class="btn btn-g btn-sm" onclick="fcHome()">← Baralhos</button>
    ${d.builtin?`<button class="btn btn-g btn-sm" onclick="verifyDeck('${d.id}')"><i class="ti ti-sparkles"></i> Verificar atualização (IA)</button>`:`<button class="btn btn-p btn-sm" onclick="newCard()">+ Novo cartão</button>`}
    <span class="muted">${esc(d.name)} · ${d.cards.length} cartões</span></div>
-   <div class="card">${d.cards.length?d.cards.map(c=>`<div class="carditem"><div><b>${esc(c.front)}</b><br><span class="muted">${esc(c.back)}</span>${c.ref?`<br><span style="color:var(--mint-dark);font-size:12px;font-weight:700">📚 ${esc(c.ref)}</span>`:''}</div>${d.builtin?'':`<button class="x" onclick="delCard('${c.id}')">×</button>`}</div>`).join(''):'<div class="empty">Sem cartões.</div>'}</div>`;
+   <div class="card">${d.cards.length?d.cards.map(c=>`<div class="carditem"><div><b>${esc(c.front)}</b><br><span class="muted">${esc(c.back)}</span>${c.ref?`<br><span style="color:var(--green);font-size:12px;font-weight:700">📚 ${esc(c.ref)}</span>`:''}</div>${d.builtin?'':`<button class="x" onclick="delCard('${c.id}')">×</button>`}</div>`).join(''):'<div class="empty">Sem cartões.</div>'}</div>`;
 }
-function go(m){view.mode=m;render();}
-
-/* ====== Ações (baralhos pessoais) ====== */
+function fcHome(){fc.mode='home';render();window.scrollTo({top:0,behavior:'smooth'});}
 function newDeck(){const n=prompt('Nome do seu baralho:');if(n&&n.trim()){decks.push({id:uid(),name:n.trim(),cards:[]});save();render();}}
 function delDeck(id){if(confirm('Excluir este baralho?')){decks=decks.filter(d=>d.id!==id);save();render();}}
-function newCard(){const d=decks.find(x=>x.id===view.deck);const f=prompt('Frente (pergunta):');if(!f)return;const b=prompt('Verso (resposta):');if(!b)return;d.cards.push({id:uid(),front:f.trim(),back:b.trim(),ef:2.5,interval:0,reps:0,due:0});save();render();}
-function delCard(id){const d=decks.find(x=>x.id===view.deck);d.cards=d.cards.filter(c=>c.id!==id);save();render();}
-
-/* ====== Verificação de atualização pela IA ====== */
+function newCard(){const d=decks.find(x=>x.id===fc.deck);const f=prompt('Frente (pergunta):');if(!f)return;const b=prompt('Verso (resposta):');if(!b)return;d.cards.push({id:uid(),front:f.trim(),back:b.trim(),ef:2.5,interval:0,reps:0,due:0});save();render();}
+function delCard(id){const d=decks.find(x=>x.id===fc.deck);d.cards=d.cards.filter(c=>c.id!==id);save();render();}
 async function verifyDeck(id){
   const d=decks.find(x=>x.id===id); if(!d)return;
-  modal(`<h3>✨ Verificar atualização — ${esc(d.name)}</h3>
-    <p class="muted">A IA confere se as respostas continuam corretas e atualizadas segundo a literatura médica atual. Pode levar 15–40 s.</p>
-    <div id="vout" class="verify-out"><span class="spin"></span> Analisando ${d.cards.length} cartões…</div>
+  modal(`<h3><i class="ti ti-sparkles"></i> Verificar atualização — ${esc(d.name)}</h3>
+    <p class="muted">A IA confere se as respostas continuam corretas e atualizadas. Pode levar 15–40 s.</p>
+    <div id="vout" class="coment" style="margin-top:10px"><span class="spin"></span> Analisando ${d.cards.length} cartões…</div>
     <div class="row" style="margin-top:14px"><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
   const lista=d.cards.map((c,i)=>`${i+1}. P: ${c.front}\n   R: ${c.back}`).join('\n');
-  const prompt=`Você é um revisor médico sênior. Abaixo há flashcards de estudo (Pergunta/Resposta) de "${d.name}". Verifique se cada RESPOSTA está CORRETA e ATUALIZADA segundo as diretrizes e a literatura médica vigentes. Liste APENAS os cartões com problema, no formato "Nº — problema e correção sugerida". Se estiver tudo certo, responda exatamente: "✅ Todos os cartões estão corretos e atualizados.". Seja específico e cite a diretriz quando possível.\n\nCartões:\n${lista}`;
+  const pr=`Você é um revisor médico sênior. Abaixo há flashcards (Pergunta/Resposta) de "${d.name}". Verifique se cada RESPOSTA está CORRETA e ATUALIZADA segundo as diretrizes vigentes. Liste APENAS os cartões com problema, no formato "Nº — problema e correção". Se tudo certo, responda exatamente: "✅ Todos os cartões estão corretos e atualizados.".\n\nCartões:\n${lista}`;
   try{
-    if(!(window.MT&&MT.ai)) throw new Error('IA indisponível — entre na sua conta MedTech.');
-    const out=await MT.ai(prompt);
-    const el=document.getElementById('vout'); if(el) el.textContent=out||'Sem retorno da IA.';
+    const out=await MT.ai(pr);
+    const el=$('#vout'); if(el) el.textContent=out||'Sem retorno da IA.';
     d.checkedAt=Date.now(); save();
-  }catch(err){
-    const el=document.getElementById('vout'); if(el) el.textContent='⚠ '+(err.message||'Falha ao verificar.');
-  }
+  }catch(err){ const el=$('#vout'); if(el) el.textContent='⚠ '+(err.message||'Falha ao verificar.'); }
 }
 
 /* ====== Modal ====== */
-function modal(html){const d=document.createElement('div');d.className='modal';d.id='modal';d.innerHTML='<div class="box">'+html+'</div>';d.onclick=e=>{if(e.target===d)closeModal();};document.body.appendChild(d);}
+function modal(html){closeModal();const d=document.createElement('div');d.className='modal';d.id='modal';d.innerHTML='<div class="box">'+html+'</div>';d.onclick=e=>{if(e.target===d)closeModal();};document.body.appendChild(d);}
 function closeModal(){const m=document.getElementById('modal');if(m)m.remove();}
 
-/* ====== Boot (login central MedTech) ====== */
+/* ====== Boot ====== */
 function whenMT(cb){if(window.MT){cb();}else{setTimeout(()=>whenMT(cb),30);}}
 whenMT(()=>{
   MT.onData(function(d){
     decks=(d&&Array.isArray(d.decks))?d.decks:[];
+    answers=(d&&d.answers)||{}; marked=(d&&Array.isArray(d.marked))?d.marked:[];
+    generated=(d&&Array.isArray(d.generated))?d.generated:[]; sims=(d&&Array.isArray(d.sims))?d.sims:[];
     ensureBuiltin();
     if(!mtReady){mtReady=true;}
     render();
