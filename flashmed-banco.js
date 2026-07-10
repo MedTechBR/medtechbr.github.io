@@ -83,3 +83,14 @@ window.QBANK = [
  ops:['Livre demanda sem território definido','Adscrição de território e população, com equipe multiprofissional de referência','Atendimento exclusivamente por especialistas focais','Porta de entrada hospitalar','Ações apenas curativas individuais'],correct:1,
  coment:'A ESF organiza a atenção básica com território e população ADSCRITOS a uma equipe de referência (médico, enfermeiro, técnico, ACS), com longitudinalidade, vínculo e coordenação do cuidado. É a principal porta de entrada e ordenadora da RAS.',ref:'PNAB'}
 ];
+
+/* Provas OFICIAIS e PÚBLICAS de residência — apenas LINKS às fontes oficiais
+   (governo/instituições públicas). O app NÃO reproduz os cadernos das bancas;
+   leva o estudante à prova+gabarito na fonte original. */
+window.FM_PROVAS = [
+  {titulo:'ENARE 2024/2025 — Acesso Direto (médica)', banca:'EBSERH/FGV', sub:'100 questões · 20 por área · gabarito definitivo', url:'https://mapa-vagas-enare-ebserh.conhecimento.fgv.br/provas-gabaritos-medica.html'},
+  {titulo:'ENARE — edições anteriores', banca:'EBSERH/MEC', sub:'2020/21 a 2023/24 · provas + gabaritos oficiais', url:'https://www.gov.br/ebserh/pt-br/ensino-e-pesquisa/exame-nacional-de-residencia-enare/edicoes-anteriores'},
+  {titulo:'Revalida — provas e gabaritos', banca:'INEP/MEC', sub:'2011 a 2025 · prova objetiva · 5 grandes áreas', url:'https://www.gov.br/inep/pt-br/areas-de-atuacao/avaliacao-e-exames-educacionais/revalida/provas-e-gabaritos'},
+  {titulo:'Residência USP (FUVEST)', banca:'FUVEST', sub:'provas e gabaritos oficiais · acesso direto e especialidades', url:'https://www.fuvest.br/residencia-medica-provas-e-gabarito/'},
+  {titulo:'Residência UNIFESP/EPM', banca:'COREME UNIFESP', sub:'provas e gabaritos oficiais da 1ª fase', url:'https://site.unifesp.br/coreme'}
+];

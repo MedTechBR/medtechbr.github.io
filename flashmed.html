@@ -488,21 +488,34 @@ function simConfig(){
    ${resume}
    <div class="card">
      <div class="field"><label>Área</label>
-       <select id="simArea"><option value="*">Misto (todas as áreas)</option>${AREAS.map(a=>`<option value="${a.id}">${esc(a.nome)}</option>`).join('')}</select></div>
+       <select id="simArea"><option value="ENARE">Estilo ENARE — equilibrado por área</option><option value="*">Misto (aleatório)</option>${AREAS.map(a=>`<option value="${a.id}">${esc(a.nome)}</option>`).join('')}</select></div>
      <div class="field"><label>Nº de questões</label>
        <select id="simN"><option>10</option><option>20</option><option>30</option></select></div>
      <div class="field"><label>Tempo por questão</label>
        <select id="simT"><option value="90">1min30 (padrão residência)</option><option value="120">2 min</option><option value="0">Sem cronômetro</option></select></div>
      <button class="btn btn-p" onclick="startSim()"><i class="ti ti-player-play"></i> Iniciar simulado</button>
    </div>
+   <div class="card">
+     <h3 style="margin-bottom:4px">Provas reais (oficiais)</h3>
+     <p class="muted" style="margin-bottom:12px">Cadernos e gabaritos oficiais de residência, na fonte do governo/instituição. Abrem no site oficial.</p>
+     ${(window.FM_PROVAS||[]).map(p=>`<div class="carditem"><div><b>${esc(p.titulo)}</b><br><span class="muted">${esc(p.banca)} · ${esc(p.sub)}</span></div><a class="btn btn-g btn-sm" href="${esc(p.url)}" target="_blank" rel="noopener">Abrir <i class="ti ti-external-link"></i></a></div>`).join('')}
+     <div class="note" style="margin-top:12px">Estas são as provas na íntegra, nas fontes oficiais (ENARE/EBSERH, INEP, universidades). O simulado <b>jogável</b> acima segue o mesmo formato (20 por área) com questões do banco.</div>
+   </div>
    ${sims.length?`<div class="card"><h3 style="margin-bottom:8px">Últimos simulados</h3>${sims.slice(-5).reverse().map(r=>`<div class="carditem"><div><b>${r.pct}%</b> · ${r.right}/${r.n} <span class="muted">· ${esc(r.areaNome)}</span></div><span class="muted">${new Date(r.at).toLocaleDateString('pt-BR')}</span></div>`).join('')}</div>`:''}`;
 }
 function startSim(){
   const area=$('#simArea').value, n=+$('#simN').value, tpq=+$('#simT').value;
-  let pool=allQ().filter(q=>area==='*'||q.area===area);
-  if(pool.length<n){ modal(`<h3>Poucas questões</h3><p class="muted">Esta área tem ${pool.length} questão(ões) e você pediu ${n}. Vou gerar mais com a IA ou reduza o número.</p><div class="row" style="margin-top:14px"><button class="btn btn-p" onclick="closeModal();genMore('${area==='*'?AREAS[0].id:area}',null,true)"><i class="ti ti-sparkles"></i> Gerar com IA</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`); if(!pool.length)return; }
-  pool=shuffle(pool).slice(0,Math.min(n,pool.length));
-  sim={area,areaNome:area==='*'?'Misto':areaNome(area),pool,idx:0,answers:{},tpq,left:tpq*pool.length,done:false};
+  let pool;
+  if(area==='ENARE'){ // blueprint ENARE: equilibrado entre as 5 grandes áreas
+    const per=Math.max(1,Math.round(n/AREAS.length)); pool=[];
+    AREAS.forEach(ar=>{ pool=pool.concat(shuffle(allQ().filter(q=>q.area===ar.id)).slice(0,per)); });
+    pool=shuffle(pool);
+  } else { pool=shuffle(allQ().filter(q=>area==='*'||q.area===area)); }
+  pool=pool.slice(0,n);
+  if(!pool.length){ alert('Sem questões para esta seleção. Gere questões na aba Questões primeiro.'); return; }
+  if(pool.length<n) toast('Só há '+pool.length+' questão(ões) — gere mais na aba Questões para provas maiores.');
+  const areaNm = area==='ENARE'?'Estilo ENARE':(area==='*'?'Misto':areaNome(area));
+  sim={area,areaNome:areaNm,pool,idx:0,answers:{},tpq,left:tpq*pool.length,done:false};
   persistSim(); nav='simulado'; render(); if(tpq){ startSimTimer(); }
   window.scrollTo({top:0,behavior:'smooth'});
 }
