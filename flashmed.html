@@ -121,6 +121,26 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 .spin{display:inline-block;width:16px;height:16px;border:2px solid var(--petrol);border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-3px}
 @keyframes sp{to{transform:rotate(360deg)}}
 @media(max-width:560px){.rate{grid-template-columns:1fr 1fr}.stats3{grid-template-columns:repeat(3,1fr)}}
+/* filtro */
+.filterbar{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.filterbar .fg{flex:1;min-width:120px}.filterbar label{font-size:12px;margin:0 0 4px}
+.filterbar select{padding:9px 11px;font-size:14px}
+/* riscar alternativa */
+.qopt.struck{opacity:.5;text-decoration:line-through;text-decoration-color:var(--red);text-decoration-thickness:2px}
+.qopt.struck .let{background:#e5e7eb;color:#94a3b8}
+.opt-hint{font-size:12px;color:var(--muted);margin:6px 2px 2px;display:flex;align-items:center;gap:5px}
+/* caneta / escrita à mão */
+.ink-canvas{position:fixed;inset:0;z-index:70;touch-action:none;pointer-events:none}
+.ink-canvas.active{pointer-events:auto;cursor:crosshair}
+.penbar{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:71;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.pen-tools{display:flex;gap:6px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:7px;box-shadow:0 12px 34px -14px rgba(8,56,69,.5)}
+.pen-color{width:26px;height:26px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}
+.pen-color.sel{box-shadow:0 0 0 2px var(--petrol)}
+.pen-btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink)}
+.pen-btn.sel{background:var(--petrol);color:#fff;border-color:var(--petrol)}
+.pen-fab{width:52px;height:52px;border-radius:50%;border:none;background:var(--petrol);color:#fff;box-shadow:0 12px 30px -8px rgba(37,99,235,.6);cursor:pointer;display:grid;place-items:center}
+.pen-fab i{font-size:24px}.pen-fab.on{background:#0f172a}
+@media print{.penbar,.ink-canvas{display:none}}
 </style>
 </head>
 <body>
@@ -140,6 +160,20 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
   © 2026 <a href="index.html">MedTech</a> · <a href="privacidade.html">Privacidade</a>
 </footer>
 
+<!-- Caneta / escrita à mão (Apple Pencil / dedo / mouse) -->
+<canvas id="inkCanvas" class="ink-canvas" aria-hidden="true"></canvas>
+<div class="penbar">
+  <div class="pen-tools" id="penTools" hidden>
+    <button class="pen-color sel" data-color="#0f172a" style="background:#0f172a" aria-label="Tinta"></button>
+    <button class="pen-color" data-color="#c0392b" style="background:#c0392b" aria-label="Vermelho"></button>
+    <button class="pen-color" data-color="#2563eb" style="background:#2563eb" aria-label="Azul"></button>
+    <button class="pen-color" data-color="#16a34a" style="background:#16a34a" aria-label="Verde"></button>
+    <button class="pen-btn" id="penEraser" type="button">Borracha</button>
+    <button class="pen-btn" id="penClear" type="button">Limpar</button>
+  </div>
+  <button class="pen-fab" id="penFab" type="button" aria-label="Escrever à mão"><i class="ti ti-pencil"></i></button>
+</div>
+
 <script>
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
@@ -149,6 +183,52 @@ const AREAS=window.FM_AREAS||[];
 const areaNome=a=>{const x=AREAS.find(z=>z.id===a);return x?x.nome:a;};
 const areaCor=a=>{const x=AREAS.find(z=>z.id===a);return x?x.cor:'#2563eb';};
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+let qFilter={area:'*',esp:'*'};
+
+/* ====== Riscar / eliminar alternativa (arraste para o lado; persiste por questão) ====== */
+let strikes={}; try{ strikes=JSON.parse(localStorage.getItem('flashmed_strikes')||'{}')||{}; }catch(e){ strikes={}; }
+function getStruck(qi){ return new Set(strikes[qi]||[]); }
+function saveStruck(qi,set){ if(set.size)strikes[qi]=[...set]; else delete strikes[qi]; try{localStorage.setItem('flashmed_strikes',JSON.stringify(strikes));}catch(e){} }
+function toggleStrike(qi,j,btn){ const s=getStruck(qi); if(s.has(j)){s.delete(j);btn.classList.remove('struck');} else {s.add(j);btn.classList.add('struck');} saveStruck(qi,s); }
+function attachStrikeSwipe(btn,qi,j){
+  let sx=0,sy=0,dragging=false;
+  btn.addEventListener('pointerdown',e=>{ if(e.pointerType==='mouse'&&e.button!==0)return; sx=e.clientX;sy=e.clientY;dragging=true;btn._swiped=false;btn.style.transition='none'; });
+  btn.addEventListener('pointermove',e=>{ if(!dragging)return; const dx=e.clientX-sx,dy=e.clientY-sy;
+    if(!btn._swiped&&Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>8){ try{btn.setPointerCapture(e.pointerId);}catch(_){} }
+    if(btn.hasPointerCapture&&btn.hasPointerCapture(e.pointerId)){ btn.style.transform='translateX('+(dx*0.5)+'px)'; if(Math.abs(dx)>48)btn._swiped=true; e.preventDefault(); } });
+  function up(){ if(!dragging)return; dragging=false; btn.style.transition='transform .18s ease'; btn.style.transform=''; if(btn._swiped)toggleStrike(qi,j,btn); }
+  btn.addEventListener('pointerup',up); btn.addEventListener('pointercancel',up);
+}
+
+/* ====== Caneta — escrever à mão sobre o app (Apple Pencil / dedo / mouse) ====== */
+(function(){
+  const canvas=document.getElementById('inkCanvas'); if(!canvas)return; const ctx=canvas.getContext('2d');
+  const fab=document.getElementById('penFab'), tools=document.getElementById('penTools');
+  let penMode=false,drawing=false,erasing=false,color='#0f172a',activeId=null,lastPen=0,lastX=0,lastY=0,curKey=null;
+  const inkStore=new Map();
+  function clearPixels(){ ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,canvas.width,canvas.height); ctx.restore(); }
+  function stash(){ if(curKey==null)return; let blank=true; try{const d=ctx.getImageData(0,0,canvas.width,canvas.height).data; for(let i=3;i<d.length;i+=4){if(d[i]!==0){blank=false;break;}} }catch(_){blank=false;} if(blank)inkStore.delete(curKey); else inkStore.set(curKey,canvas.toDataURL()); }
+  function sizeCanvas(){ const dpr=Math.min(window.devicePixelRatio||1,3); let prev=null; if(canvas.width){prev=document.createElement('canvas');prev.width=canvas.width;prev.height=canvas.height;prev.getContext('2d').drawImage(canvas,0,0);} const w=window.innerWidth,h=window.innerHeight; canvas.style.width=w+'px';canvas.style.height=h+'px'; canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.lineCap='round';ctx.lineJoin='round'; if(prev){ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(prev,0,0,prev.width,prev.height,0,0,canvas.width,canvas.height);ctx.restore();} }
+  sizeCanvas(); window.addEventListener('resize',sizeCanvas); window.addEventListener('orientationchange',()=>setTimeout(sizeCanvas,250));
+  function setMode(on){ penMode=on; canvas.classList.toggle('active',on); tools.hidden=!on; fab.classList.toggle('on',on); fab.innerHTML=on?'<i class="ti ti-x"></i>':'<i class="ti ti-pencil"></i>'; fab.setAttribute('aria-label',on?'Sair da caneta':'Escrever à mão'); }
+  fab.onclick=()=>setMode(!penMode);
+  tools.querySelectorAll('.pen-color').forEach(b=>{ b.onclick=()=>{color=b.dataset.color;erasing=false;refreshSel();}; });
+  document.getElementById('penEraser').onclick=()=>{erasing=!erasing;refreshSel();};
+  document.getElementById('penClear').onclick=()=>{clearPixels(); if(curKey!=null)inkStore.delete(curKey);};
+  window.QuizInk={ switchTo(key){ if(key===curKey)return; stash(); curKey=key; clearPixels(); const d=inkStore.get(key); if(d){const img=new Image();img.onload=()=>{if(curKey!==key)return;ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(img,0,0,canvas.width,canvas.height);ctx.restore();};img.src=d;} } };
+  function refreshSel(){ tools.querySelectorAll('.pen-color').forEach(b=>b.classList.toggle('sel',!erasing&&b.dataset.color===color)); document.getElementById('penEraser').classList.toggle('sel',erasing); }
+  refreshSel();
+  function seg(x,y,pressure){ ctx.globalCompositeOperation=erasing?'destination-out':'source-over'; ctx.strokeStyle=color; ctx.lineWidth=erasing?26:2.4*(0.35+1.3*(pressure||0.5)); ctx.beginPath();ctx.moveTo(lastX,lastY);ctx.lineTo(x,y);ctx.stroke(); lastX=x;lastY=y; }
+  canvas.addEventListener('pointerdown',e=>{ if(!penMode)return; if(e.pointerType==='touch'&&(performance.now()-lastPen)<1000){e.preventDefault();return;} if(e.pointerType==='pen')lastPen=performance.now(); drawing=true;activeId=e.pointerId; try{canvas.setPointerCapture(e.pointerId);}catch(_){} lastX=e.clientX;lastY=e.clientY; seg(e.clientX+0.01,e.clientY+0.01,e.pressure); e.preventDefault(); });
+  canvas.addEventListener('pointermove',e=>{ if(!drawing||e.pointerId!==activeId)return; if(e.pointerType==='pen')lastPen=performance.now(); let evs=e.getCoalescedEvents?e.getCoalescedEvents():null; if(!evs||!evs.length)evs=[e]; for(const ev of evs)seg(ev.clientX,ev.clientY,ev.pressure); e.preventDefault(); });
+  function endp(e){ if(e.pointerId===activeId){drawing=false;activeId=null;} }
+  canvas.addEventListener('pointerup',endp); canvas.addEventListener('pointercancel',endp);
+})();
+function inkKeyAtual(){
+  if(nav==='simulado'&&sim&&!sim.done){ const q=sim.pool[sim.idx]; return q?'S:'+q.id:'none'; }
+  if((nav==='questoes'||nav==='revisao')&&sess&&sess.pool[sess.idx]){ return 'Q:'+sess.pool[sess.idx].id; }
+  return 'none';
+}
 
 /* ====== BARALHOS PRONTOS (flashcards) — preservado ====== */
 const BUILTIN = [
@@ -206,9 +286,10 @@ const BUILTIN = [
 ];
 
 /* ====== Estado / persistência ====== */
-let decks=[], answers={}, marked=[], generated=[], sims=[];
+let decks=[], answers={}, marked=[], generated=[], sims=[], simActive=null;
 let mtReady=false;
-function save(){ if(window.MT&&MT.save){ MT.save({decks,answers,marked,generated,sims}); } }
+function save(){ if(window.MT&&MT.save){ MT.save({decks,answers,marked,generated,sims,simActive}); } }
+function persistSim(){ if(!sim||sim.done){simActive=null;} else { simActive={area:sim.area,areaNome:sim.areaNome,qids:sim.pool.map(q=>q.id),answers:sim.answers,idx:sim.idx,tpq:sim.tpq,left:sim.left}; } save(); }
 function ensureBuiltin(){
   BUILTIN.forEach(bd=>{
     let d=decks.find(x=>x.id===bd.id);
@@ -242,6 +323,23 @@ function render(){
   else if(nav==='simulado')a.innerHTML= sim? (sim.done?simResult():simRun()) : simConfig();
   else if(nav==='revisao')a.innerHTML= sess? sessView() : revisaoHome();
   else if(nav==='flashcards')a.innerHTML= fc.mode==='study'?studyView():(fc.mode==='manage'?manageView():flashHome());
+  postRender();
+}
+function postRender(){
+  // liga clique + arraste-para-riscar nas alternativas da questão atual
+  const emQuestao = (nav==='questoes'||nav==='revisao') && sess && sess.pool[sess.idx];
+  const emSim = nav==='simulado' && sim && !sim.done;
+  if(emQuestao || emSim){
+    const q = emSim ? sim.pool[sim.idx] : sess.pool[sess.idx];
+    const revelou = emQuestao && sess.revealed;
+    document.querySelectorAll('.qopt').forEach(btn=>{
+      const j=+btn.dataset.j; if(isNaN(j))return;
+      if(getStruck(q.id).has(j)) btn.classList.add('struck');
+      if(!revelou) attachStrikeSwipe(btn,q.id,j);
+      btn.onclick=()=>{ if(btn._swiped){btn._swiped=false;return;} if(emSim)simPick(j); else answerQ(j); };
+    });
+  }
+  if(window.QuizInk) window.QuizInk.switchTo(inkKeyAtual());
 }
 
 /* ====== INÍCIO ====== */
@@ -274,25 +372,36 @@ function inicioView(){
 }
 
 /* ====== QUESTÕES (home + sessão) ====== */
+function espPresentes(area){ const set=new Set(); allQ().forEach(q=>{ if((area==='*'||q.area===area)&&q.esp)set.add(q.esp); }); return Array.from(set).sort(); }
 function questoesHome(){
-  return `<h3 style="margin-bottom:4px">Questões por área</h3>
-   <p class="muted" style="margin-bottom:14px">Grandes áreas da residência. Toque para estudar.</p>
+  const fa=qFilter.area, fe=qFilter.esp, espOpts=espPresentes(fa);
+  const nFilt=allQ().filter(q=>(fa==='*'||q.area===fa)&&(fe==='*'||q.esp===fe)).length;
+  return `<h3 style="margin-bottom:4px">Questões</h3>
+   <p class="muted" style="margin-bottom:12px">Filtre por área e especialidade — ou toque direto numa área abaixo.</p>
+   <div class="filterbar">
+     <div class="fg"><label>Área</label>
+       <select onchange="setFilterArea(this.value)"><option value="*"${fa==='*'?' selected':''}>Todas as áreas</option>${AREAS.map(a=>`<option value="${a.id}"${fa===a.id?' selected':''}>${esc(a.nome)}</option>`).join('')}</select></div>
+     <div class="fg"><label>Especialidade</label>
+       <select onchange="setFilterEsp(this.value)"${espOpts.length?'':' disabled'}><option value="*">Todas</option>${espOpts.map(e=>`<option value="${esc(e)}"${fe===e?' selected':''}>${esc(e)}</option>`).join('')}</select></div>
+     <button class="btn btn-p" onclick="startPractice(qFilter.area,qFilter.esp)"${nFilt?'':' disabled'}>Estudar (${nFilt})</button>
+   </div>
    <div class="areagrid">${AREAS.map(ar=>{
      const n=allQ().filter(q=>q.area===ar.id).length;
-     return `<div class="areacard" style="border-left-color:${ar.cor}" onclick="startPractice('${ar.id}')">
+     return `<div class="areacard" style="border-left-color:${ar.cor}" onclick="startPractice('${ar.id}','*')">
         <h3>${esc(ar.nome)}</h3>
         <p>${n} questão(ões) · ${ar.esp.slice(0,3).join(' · ')}${ar.esp.length>3?'…':''}</p>
      </div>`;
-   }).join('')}</div>
-   <div class="row" style="margin-top:16px"><button class="btn btn-g btn-sm" onclick="startPractice('*')">Misturar todas as áreas</button></div>`;
+   }).join('')}</div>`;
 }
-function startPractice(area){
-  let pool=allQ().filter(q=>area==='*'||q.area===area);
-  if(!pool.length){ area!=='*'&&genMore(area,null,true); return; }
-  // não vistas primeiro, depois o resto — embaralhado
+function setFilterArea(v){ qFilter.area=v; qFilter.esp='*'; render(); }
+function setFilterEsp(v){ qFilter.esp=v; render(); }
+function startPractice(area,esp){
+  esp=esp||'*';
+  let pool=allQ().filter(q=>(area==='*'||q.area===area)&&(esp==='*'||q.esp===esp));
+  if(!pool.length){ area!=='*'&&genMore(area,esp==='*'?null:esp,true); return; }
   const naoVistas=shuffle(pool.filter(q=>!answers[q.id]));
   const vistas=shuffle(pool.filter(q=>answers[q.id]));
-  sess={mode:'practice',area,pool:naoVistas.concat(vistas),idx:0,picked:null,revealed:false,right:0,done:0};
+  sess={mode:'practice',area,esp,pool:naoVistas.concat(vistas),idx:0,picked:null,revealed:false,right:0,done:0};
   nav='questoes'; render(); window.scrollTo({top:0,behavior:'smooth'});
 }
 function sessView(){
@@ -308,10 +417,11 @@ function sessView(){
       <span class="muted">${sess.idx+1} / ${sess.pool.length} · ${sess.right} certas</span>
     </div>
     <div class="qstem">${esc(q.q)}</div>
+    ${sess.revealed?'':'<div class="opt-hint"><i class="ti ti-arrows-horizontal"></i> arraste uma alternativa para o lado para riscá-la</div>'}
     <div class="qopts">${q.ops.map((op,i)=>{
       let cls='';
       if(sess.revealed){ if(i===q.correct)cls='correct'; else if(i===sess.picked)cls='wrong'; }
-      return `<button class="qopt ${cls}" ${sess.revealed?'disabled':''} onclick="answerQ(${i})"><span class="let">${LETRAS[i]}</span><span>${esc(op)}</span></button>`;
+      return `<button class="qopt ${cls}" ${sess.revealed?'disabled':''} data-j="${i}"><span class="let">${LETRAS[i]}</span><span>${esc(op)}</span></button>`;
     }).join('')}</div>
     ${sess.revealed?`<div class="coment"><div class="h"><i class="ti ti-bulb"></i> ${sess.picked===q.correct?'Correto':'Comentário'}</div>${esc(q.coment||'—')}${q.ref?`<span class="ref">📚 ${esc(q.ref)}</span>`:''}</div>
       <div class="row" style="margin-top:16px;justify-content:space-between">
@@ -368,8 +478,14 @@ function startReview(kind){
 /* ====== SIMULADO ====== */
 let simTimer=null;
 function simConfig(){
+  const resume = simActive&&(simActive.qids||[]).length ? `<div class="card" style="border-color:var(--petrol);background:var(--soft)">
+     <h3 style="margin-bottom:4px"><i class="ti ti-player-play"></i> Simulado em andamento</h3>
+     <p class="muted" style="margin-bottom:12px">${esc(simActive.areaNome||'Misto')} · você parou na questão ${(simActive.idx||0)+1} de ${simActive.qids.length} (${Object.keys(simActive.answers||{}).length} respondidas).</p>
+     <div class="row"><button class="btn btn-p" onclick="resumeSim()">Continuar de onde parei</button><button class="btn btn-g" onclick="descartarSim()">Descartar</button></div>
+   </div>` : '';
   return `<h3 style="margin-bottom:4px">Simulado</h3>
    <p class="muted" style="margin-bottom:14px">Prova cronometrada no estilo residência: responde tudo e vê o resultado no fim.</p>
+   ${resume}
    <div class="card">
      <div class="field"><label>Área</label>
        <select id="simArea"><option value="*">Misto (todas as áreas)</option>${AREAS.map(a=>`<option value="${a.id}">${esc(a.nome)}</option>`).join('')}</select></div>
@@ -387,7 +503,7 @@ function startSim(){
   if(pool.length<n){ modal(`<h3>Poucas questões</h3><p class="muted">Esta área tem ${pool.length} questão(ões) e você pediu ${n}. Vou gerar mais com a IA ou reduza o número.</p><div class="row" style="margin-top:14px"><button class="btn btn-p" onclick="closeModal();genMore('${area==='*'?AREAS[0].id:area}',null,true)"><i class="ti ti-sparkles"></i> Gerar com IA</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`); if(!pool.length)return; }
   pool=shuffle(pool).slice(0,Math.min(n,pool.length));
   sim={area,areaNome:area==='*'?'Misto':areaNome(area),pool,idx:0,answers:{},tpq,left:tpq*pool.length,done:false};
-  nav='simulado'; render(); if(tpq){ startSimTimer(); }
+  persistSim(); nav='simulado'; render(); if(tpq){ startSimTimer(); }
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function startSimTimer(){ clearInterval(simTimer); simTimer=setInterval(()=>{ if(!sim||sim.done){clearInterval(simTimer);return;} sim.left--; if(sim.left<=0){ sim.left=0; submitSim(); return;} const t=$('#simTimer'); if(t){ t.textContent=fmtT(sim.left); t.classList.toggle('warn',sim.left<60);} },1000); }
@@ -401,7 +517,8 @@ function simRun(){
     <div class="qwrap">
       <div class="qmeta"><span class="pill" style="background:${areaCor(q.area)}1a;color:${areaCor(q.area)}">${esc(areaNome(q.area))}</span><span class="muted">Questão ${sim.idx+1} / ${sim.pool.length}</span></div>
       <div class="qstem">${esc(q.q)}</div>
-      <div class="qopts">${q.ops.map((op,i)=>`<button class="qopt ${pk===i?'':''}" style="${pk===i?'border-color:var(--petrol);background:var(--soft)':''}" onclick="simPick(${i})"><span class="let">${LETRAS[i]}</span><span>${esc(op)}</span></button>`).join('')}</div>
+      <div class="opt-hint"><i class="ti ti-arrows-horizontal"></i> arraste para riscar · toque para marcar</div>
+      <div class="qopts">${q.ops.map((op,i)=>`<button class="qopt" data-j="${i}" style="${pk===i?'border-color:var(--petrol);background:var(--soft)':''}"><span class="let">${LETRAS[i]}</span><span>${esc(op)}</span></button>`).join('')}</div>
       <div class="navdots">${sim.pool.map((_,i)=>`<button class="${sim.answers[i]!=null?'ans':''} ${i===sim.idx?'cur':''}" onclick="simGo(${i})">${i+1}</button>`).join('')}</div>
       <div class="row" style="margin-top:14px;justify-content:space-between">
         <button class="btn btn-g btn-sm" ${sim.idx?'':'disabled'} onclick="simGo(${sim.idx-1})">← Anterior</button>
@@ -409,8 +526,16 @@ function simRun(){
       </div>
     </div>`;
 }
-function simPick(i){ sim.answers[sim.idx]=i; render(); }
-function simGo(i){ if(i<0||i>=sim.pool.length)return; sim.idx=i; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+function simPick(i){ sim.answers[sim.idx]=i; persistSim(); render(); }
+function simGo(i){ if(i<0||i>=sim.pool.length)return; sim.idx=i; persistSim(); render(); window.scrollTo({top:0,behavior:'smooth'}); }
+function resumeSim(){
+  if(!simActive)return;
+  const pool=(simActive.qids||[]).map(qById).filter(Boolean);
+  if(!pool.length){ simActive=null; save(); render(); return; }
+  sim={area:simActive.area,areaNome:simActive.areaNome,pool,idx:Math.min(simActive.idx||0,pool.length-1),answers:simActive.answers||{},tpq:simActive.tpq||0,left:simActive.left||0,done:false};
+  nav='simulado'; render(); if(sim.tpq&&sim.left>0){ startSimTimer(); } window.scrollTo({top:0,behavior:'smooth'});
+}
+function descartarSim(){ if(confirm('Descartar o simulado em andamento?')){ simActive=null; save(); render(); } }
 function askSubmitSim(){ const resp=Object.keys(sim.answers).length; modal(`<h3>Finalizar simulado?</h3><p class="muted">Você respondeu ${resp} de ${sim.pool.length}.</p><div class="row" style="margin-top:14px"><button class="btn btn-p" onclick="closeModal();submitSim()">Finalizar e corrigir</button><button class="btn btn-g" onclick="closeModal()">Continuar</button></div>`); }
 function submitSim(){
   clearInterval(simTimer);
@@ -421,7 +546,7 @@ function submitSim(){
   });
   sim.right=right; sim.porArea=porArea; sim.done=true;
   sims.push({at:Date.now(),n:sim.pool.length,right,pct:Math.round(right/sim.pool.length*100),area:sim.area,areaNome:sim.areaNome});
-  save(); render(); window.scrollTo({top:0,behavior:'smooth'});
+  simActive=null; save(); render(); window.scrollTo({top:0,behavior:'smooth'});
 }
 function simResult(){
   const pc=Math.round(sim.right/sim.pool.length*100);
@@ -555,6 +680,7 @@ whenMT(()=>{
     decks=(d&&Array.isArray(d.decks))?d.decks:[];
     answers=(d&&d.answers)||{}; marked=(d&&Array.isArray(d.marked))?d.marked:[];
     generated=(d&&Array.isArray(d.generated))?d.generated:[]; sims=(d&&Array.isArray(d.sims))?d.sims:[];
+    simActive=(d&&d.simActive)||null;
     ensureBuiltin();
     if(!mtReady){mtReady=true;}
     render();
