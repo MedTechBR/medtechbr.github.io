@@ -213,7 +213,7 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
   footer{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
   .field input,.field select,.field textarea,input.search,input.datep,.lab-add input,.rx-nome,.rx-pos{font-size:16px}
 }
-.rx-sug{position:absolute;left:0;right:0;top:100%;z-index:5;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 32px -10px rgba(8,56,69,.32);max-height:300px;overflow:auto;margin-top:3px}
+.rx-sug{position:absolute;left:0;right:0;top:100%;z-index:5;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 32px -10px rgba(15,23,42,.32);max-height:300px;overflow:auto;margin-top:3px}
 .rx-sug-item{padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--soft)}
 .rx-sug-item:last-child{border-bottom:none}
 .rx-sug-item:hover{background:var(--soft)}
@@ -503,7 +503,7 @@ async function migrateEvoluai(){
 
 function renderUser(){const el=document.getElementById('usr');if(!el)return;
   const sn=document.getElementById('storenote');
-  if(sn)sn.innerHTML=(MT.mode==='demo')?'🔧 <b>Modo demonstração</b> — dados salvos só neste navegador. Entre na conta MedTech para sincronizar e usar a IA.':'☁️ Conectado — seus pacientes, prontuários e agenda sincronizam na nuvem MedTech.';
+  if(sn)sn.innerHTML=(MT.mode==='demo')?'<i class="ti ti-tool"></i> <b>Modo demonstração</b> — dados salvos só neste navegador. Entre na conta MedTech para sincronizar e usar a IA.':'<i class="ti ti-cloud"></i> Conectado — seus pacientes, prontuários e agenda sincronizam na nuvem MedTech.';
   if(MT.mode==='demo'){el.innerHTML='<span class="who">Modo demo</span><a href="index.html">← MedTech</a>';return;}
   const u=MT.user;const nm=u?(u.displayName||u.email||'Conta'):'';
   el.innerHTML=`<span class="who">${esc(nm)}</span><button onclick="MT.signOut()">Sair</button>`;}
