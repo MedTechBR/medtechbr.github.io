@@ -2,717 +2,984 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FlashMed — Questões, simulados e flashcards de medicina | MedTech</title>
-<meta name="description" content="FlashMed: estude por questões comentadas e simulados no estilo residência (Clínica, Cirurgia, GO, Pediatria, Preventiva), com a IA gerando mais questões. Flashcards com repetição espaçada.">
-<meta name="theme-color" content="#2563eb">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>FlashMed · Questões e Simulados · Residência Médica</title>
+<meta name="description" content="App de estudo de questões — ENARE Farmácia/Multiprofissional. Progresso e taxa de acerto salvos no aparelho.">
+<meta name="theme-color" content="#0A3F3B">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FlashMed">
 <link rel="icon" type="image/png" href="favicon.png">
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"flashmed",name:"FlashMed"};</script>
 <script type="module" src="_mtauth.js?v=8"></script>
-<script src="flashmed-banco.js?v=2"></script>
 <style>
-:root{--petrol:#2563eb;--petrol-dark:#1e40af;--ink:#0f172a;--bg:#f4f7fb;--soft:#e8f0fe;--line:#e6ebf3;--muted:#64748b;--green:#16a34a;--green-bg:#e7f7ee;--red:#c0392b;--red-bg:#fdecea;--amber:#c97a17}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:-.011em;color:var(--ink);background:var(--bg)}
-header{background:#fff;color:var(--ink);border-bottom:1px solid var(--line);padding:15px 0}
-.wrap{max-width:880px;margin:0 auto;padding:0 18px}
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;letter-spacing:-.5px}
-.logo .mark{width:34px;height:34px;border-radius:10px;background:var(--petrol);display:grid;place-items:center;flex:0 0 auto}
-.logo .mark svg{width:22px;height:22px}
-.logo b{color:var(--petrol)}
-.top a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:600}
-.subtitle{color:var(--muted);font-size:12.5px;margin-top:3px}
-/* tab bar */
-.tabbar{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
-.tabs{display:flex;gap:2px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.tabs button{flex:0 0 auto;background:none;border:none;padding:13px 14px;font-family:inherit;font-size:13.5px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;display:flex;align-items:center;gap:6px}
-.tabs button.active{color:var(--petrol);border-bottom-color:var(--petrol)}
-.tabs button i{font-size:16px}
-main{max-width:880px;margin:0 auto;padding:20px 18px}
-.btn{display:inline-flex;align-items:center;gap:7px;border:none;border-radius:10px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
-.btn-p{background:var(--petrol);color:#fff}.btn-p:hover{background:var(--petrol-dark)}
-.btn-g{background:#fff;color:var(--petrol);border:1px solid var(--line)}.btn-g:hover{background:var(--soft)}
-.btn-sm{padding:8px 12px;font-size:13px}
-.btn:disabled{opacity:.55;cursor:default}
-.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;align-items:center}
-.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 10px 30px -22px rgba(8,56,69,.3)}
-.muted{color:var(--muted);font-size:13.5px}
-.row{display:flex;gap:8px;flex-wrap:wrap}
-.pill{display:inline-block;background:var(--soft);color:var(--petrol);font-weight:700;font-size:12px;padding:3px 10px;border-radius:999px}
-.pill.due{background:#fdf0e0;color:var(--amber)}
-.pill.bi{background:#e7f7f1;color:var(--green)}
-input,select,textarea{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit;background:#fff}
-input:focus,textarea:focus,select:focus{outline:none;border-color:var(--petrol)}
-label{display:block;font-weight:600;font-size:14px;margin:0 0 6px}
-.field{margin-bottom:14px}
-/* área chips / grid */
-.areagrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:560px){.areagrid{grid-template-columns:1fr}}
-.areacard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;transition:.12s;border-left:5px solid var(--petrol)}
-.areacard:hover{transform:translateY(-2px);box-shadow:0 10px 24px -18px rgba(8,56,69,.4)}
-.areacard h3{font-size:16px}
-.areacard p{color:var(--muted);font-size:12.5px;margin-top:4px}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px}
-.chip{background:#fff;border:1px solid var(--line);color:var(--ink);font-weight:600;font-size:13px;padding:7px 13px;border-radius:999px;cursor:pointer}
-.chip.sel{background:var(--petrol);color:#fff;border-color:var(--petrol)}
-/* questão */
-.qwrap{max-width:720px;margin:0 auto}
-.qmeta{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
-.qstem{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;font-size:16px;line-height:1.6;box-shadow:0 10px 30px -24px rgba(8,56,69,.35)}
-.qopts{margin-top:14px;display:flex;flex-direction:column;gap:10px}
-.qopt{display:flex;gap:12px;align-items:flex-start;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:13px 15px;font-size:15px;line-height:1.45;cursor:pointer;font-family:inherit;color:var(--ink);transition:.1s}
-.qopt:hover:not(:disabled){border-color:var(--petrol);background:var(--soft)}
-.qopt .let{flex:0 0 26px;height:26px;border-radius:50%;background:var(--soft);color:var(--petrol);font-weight:800;font-size:13px;display:grid;place-items:center}
-.qopt.correct{border-color:var(--green);background:var(--green-bg)}
-.qopt.correct .let{background:var(--green);color:#fff}
-.qopt.wrong{border-color:var(--red);background:var(--red-bg)}
-.qopt.wrong .let{background:var(--red);color:#fff}
-.qopt:disabled{cursor:default}
-.coment{margin-top:14px;border:1px solid #cfe0f4;background:#f3f8ff;border-radius:12px;padding:14px 16px;font-size:14px;line-height:1.6}
-.coment .h{font-weight:800;color:var(--petrol);display:flex;align-items:center;gap:6px;margin-bottom:6px}
-.coment .ref{display:inline-block;margin-top:8px;color:var(--green);font-weight:700;font-size:12.5px}
-.prog{height:7px;background:var(--soft);border-radius:99px;overflow:hidden;margin:0 0 14px}
-.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--petrol),#60a5fa)}
-/* simulado */
-.simbar{position:sticky;top:47px;background:var(--bg);padding:10px 0;z-index:10;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-.timer{font-weight:800;font-variant-numeric:tabular-nums;font-size:16px;background:#fff;border:1px solid var(--line);padding:6px 12px;border-radius:10px}
-.timer.warn{color:var(--red);border-color:var(--red)}
-.navdots{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-.navdots button{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:#fff;font-size:12px;font-weight:700;cursor:pointer;color:var(--muted)}
-.navdots button.ans{background:var(--soft);color:var(--petrol);border-color:var(--petrol)}
-.navdots button.cur{outline:2px solid var(--petrol)}
-.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:8px}
-.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 10px;text-align:center}
-.stat .n{font-size:26px;font-weight:800}.stat .l{font-size:11px;color:var(--muted);margin-top:2px}
-.stat.green .n{color:var(--green)}.stat.red .n{color:var(--red)}
-.barrow{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:13px}
-.barrow .nm{flex:0 0 130px;font-weight:600}
-.barrow .bar{flex:1;height:10px;background:var(--soft);border-radius:99px;overflow:hidden}
-.barrow .bar i{display:block;height:100%;background:var(--green)}
-.barrow .pc{flex:0 0 46px;text-align:right;font-weight:700}
-/* flashcards (mantido) */
-.deck{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-.deck .info h3{font-size:17px}
-.deck .info p{color:var(--muted);font-size:13px;margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.flash{background:#fff;border:1px solid var(--line);border-radius:18px;min-height:220px;display:flex;align-items:center;justify-content:center;padding:28px;font-size:18px;line-height:1.55;cursor:pointer;box-shadow:0 16px 40px -26px rgba(8,56,69,.4);user-select:none}
-.flash .side{max-width:680px}.flash .q{font-weight:700}.flash .a{color:#28424a;text-align:left}
-.flash small{display:block;color:var(--muted);font-size:13px;margin-top:16px;font-weight:600;text-align:center}
-.flash .refx{display:block;color:var(--green);font-size:12px;margin-top:10px;font-weight:700;text-align:center}
-.rate{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
-.rate button{border:none;border-radius:11px;padding:13px 6px;font-weight:800;font-size:14px;cursor:pointer;color:#fff}
-.r0{background:#c0392b}.r1{background:#c97a17}.r2{background:#1e40af}.r3{background:#2563eb}
-.rate small{display:block;font-weight:600;font-size:11px;opacity:.85;margin-top:2px}
-.carditem{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}
-.carditem:last-child{border-bottom:none}
-.carditem .x{color:var(--red);cursor:pointer;font-weight:800;background:none;border:none}
-.empty{text-align:center;color:var(--muted);padding:34px}
-.empty i{font-size:38px;opacity:.5;display:block;margin-bottom:8px}
-.note{background:#fff8ed;border:1px solid #f4d9a8;color:#8a5a16;border-radius:12px;padding:12px 15px;font-size:13px;margin-top:8px;line-height:1.5}
-footer{text-align:center;color:var(--muted);font-size:13px;padding:24px}
-footer a{color:var(--petrol);font-weight:600;text-decoration:none}
-.modal{position:fixed;inset:0;background:rgba(15,23,42,.5);display:flex;align-items:center;justify-content:center;padding:18px;z-index:60}
-.modal .box{background:#fff;border-radius:16px;padding:24px;max-width:560px;width:100%;max-height:90vh;overflow:auto}
-.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--petrol);border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-3px}
-@keyframes sp{to{transform:rotate(360deg)}}
-@media(max-width:560px){.rate{grid-template-columns:1fr 1fr}.stats3{grid-template-columns:repeat(3,1fr)}}
-/* filtro */
-.filterbar{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
-.filterbar .fg{flex:1;min-width:120px}.filterbar label{font-size:12px;margin:0 0 4px}
-.filterbar select{padding:9px 11px;font-size:14px}
-/* riscar alternativa */
-.qopt.struck{opacity:.5;text-decoration:line-through;text-decoration-color:var(--red);text-decoration-thickness:2px}
-.qopt.struck .let{background:#e5e7eb;color:#94a3b8}
-.opt-hint{font-size:12px;color:var(--muted);margin:6px 2px 2px;display:flex;align-items:center;gap:5px}
-/* caneta / escrita à mão */
-.ink-canvas{position:fixed;inset:0;z-index:70;touch-action:none;pointer-events:none}
-.ink-canvas.active{pointer-events:auto;cursor:crosshair}
-.penbar{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:71;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-.pen-tools{display:flex;gap:6px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:7px;box-shadow:0 12px 34px -14px rgba(8,56,69,.5)}
-.pen-color{width:26px;height:26px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}
-.pen-color.sel{box-shadow:0 0 0 2px var(--petrol)}
-.pen-btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink)}
-.pen-btn.sel{background:var(--petrol);color:#fff;border-color:var(--petrol)}
-.pen-fab{width:52px;height:52px;border-radius:50%;border:none;background:var(--petrol);color:#fff;box-shadow:0 12px 30px -8px rgba(37,99,235,.6);cursor:pointer;display:grid;place-items:center}
-.pen-fab i{font-size:24px}.pen-fab.on{background:#0f172a}
-@media print{.penbar,.ink-canvas{display:none}}
+  :root{
+    --bg:#FAF8F3;
+    --ink:#15302E;
+    --ink-soft:#42605D;
+    --paper:#FFFFFF;
+    --teal:#0E5C57;
+    --teal-deep:#0A3F3B;
+    --teal-tint:#E5F0EE;
+    --line:#DCE6E3;
+    --right:#1F8A5B;
+    --right-bg:#E6F4EC;
+    --wrong:#C0432F;
+    --wrong-bg:#FBEAE6;
+    --amber:#C98A2B;
+    --shadow:0 1px 2px rgba(20,48,46,.06),0 8px 24px rgba(20,48,46,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.5;
+    padding:0 0 calc(64px + env(safe-area-inset-bottom));
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px}
+
+  /* Header */
+  header{
+    background:linear-gradient(180deg,var(--teal-deep),var(--teal));
+    color:#fff;padding:calc(22px + env(safe-area-inset-top)) 0 18px;margin-bottom:18px;
+    border-bottom:3px solid var(--amber);
+  }
+  .wrap{padding-left:calc(16px + env(safe-area-inset-left));padding-right:calc(16px + env(safe-area-inset-right))}
+  .brand{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .brand h1{font-family:Georgia,"Times New Roman",serif;font-size:1.35rem;font-weight:700;letter-spacing:.2px}
+  .brand .tag{font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;opacity:.82;border:1px solid rgba(255,255,255,.4);padding:2px 8px;border-radius:999px}
+  .brand p{width:100%;font-size:.85rem;opacity:.82;margin-top:4px}
+
+  /* Stats */
+  .stats{display:flex;align-items:center;gap:14px;background:var(--paper);border:1px solid var(--line);
+    border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);margin-bottom:14px}
+  .ring{width:64px;height:64px;flex:0 0 auto}
+  .ring text{font-family:-apple-system,sans-serif}
+  .metrics{display:flex;gap:22px;flex:1;flex-wrap:wrap}
+  .metric .v{font-size:1.25rem;font-weight:700;color:var(--teal-deep);line-height:1}
+  .metric .l{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin-top:3px}
+
+  /* Controls */
+  .controls{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+  select,.btn{font:inherit}
+  select{appearance:none;background:var(--paper);border:1px solid var(--line);border-radius:10px;
+    padding:9px 32px 9px 12px;color:var(--ink);font-size:.9rem;cursor:pointer;flex:1;min-width:180px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' stroke='%2342605D' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat:no-repeat;background-position:right 12px center}
+  .ghost{background:none;border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--ink-soft);
+    cursor:pointer;font-size:.85rem;white-space:nowrap}
+  .ghost:hover{border-color:var(--teal);color:var(--teal)}
+
+  /* Card */
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);
+    padding:20px 18px;}
+  .qhead{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+  .num{font-size:.78rem;font-weight:700;color:var(--teal-deep);background:var(--teal-tint);
+    border-radius:8px;padding:3px 9px}
+  .badge{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);
+    border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+  .enun{font-size:1.02rem;color:var(--ink);margin-bottom:16px;white-space:pre-line}
+  .enun em{font-style:italic;color:var(--ink-soft)}
+
+  .opts{display:flex;flex-direction:column;gap:9px}
+  .opt{display:flex;gap:11px;align-items:flex-start;text-align:left;width:100%;
+    background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:12px 13px;
+    cursor:pointer;font-size:.95rem;color:var(--ink);transition:border-color .12s,background .12s;
+    position:relative;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+  .opt:hover:not(:disabled){border-color:var(--teal)}
+  .opt:disabled{cursor:default}
+  /* alternativa eliminada (arraste para o lado para riscar) */
+  .opt.struck{border-style:dashed;border-color:var(--line);background:var(--paper);opacity:.65}
+  .opt.struck .txt{text-decoration:line-through;text-decoration-thickness:2px;color:var(--ink-soft)}
+  .opt.struck .key{text-decoration:line-through;color:var(--ink-soft)}
+  .opt.struck.right,.opt.struck.wrong{opacity:1}
+  .opts-hint{font-size:.76rem;color:var(--ink-soft);margin:2px 2px 10px;display:flex;align-items:center;gap:6px}
+  /* aba Exames — deck de flashcards embutido */
+  .exames-frame{width:100%;height:min(86vh,940px);min-height:600px;border:0;border-radius:14px;
+    box-shadow:var(--shadow);background:#111827;display:block}
+  /* figura anexada à questão */
+  .qfig{margin:0 0 16px;display:flex;justify-content:center}
+  .qfig img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:12px;background:#fff;padding:10px}
+  .opt .key{flex:0 0 auto;width:26px;height:26px;border-radius:7px;border:1.5px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;color:var(--ink-soft)}
+  .opt .txt{flex:1;padding-top:2px}
+  .opt.right{border-color:var(--right);background:var(--right-bg)}
+  .opt.right .key{border-color:var(--right);background:var(--right);color:#fff}
+  .opt.wrong{border-color:var(--wrong);background:var(--wrong-bg)}
+  .opt.wrong .key{border-color:var(--wrong);background:var(--wrong);color:#fff}
+  .opt.dim{opacity:.62}
+
+  .feedback{margin-top:16px;border-radius:12px;padding:13px 14px;font-size:.92rem;display:none}
+  .feedback.show{display:block}
+  .feedback .verdict{font-weight:700;margin-bottom:5px;display:flex;align-items:center;gap:7px}
+  .feedback.ok{background:var(--right-bg);border:1px solid var(--right)}
+  .feedback.ok .verdict{color:var(--right)}
+  .feedback.no{background:var(--wrong-bg);border:1px solid var(--wrong)}
+  .feedback.no .verdict{color:var(--wrong)}
+  .feedback .body{color:var(--ink);line-height:1.55}
+  .feedback .body b{color:var(--teal-deep)}
+
+  .nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px}
+  .btn{background:var(--teal);color:#fff;border:none;border-radius:11px;padding:12px 20px;
+    font-size:.95rem;font-weight:600;cursor:pointer}
+  .btn:hover{background:var(--teal-deep)}
+  .btn:disabled{background:#A9C2BF;cursor:not-allowed}
+  .btn.sec{background:none;color:var(--teal);border:1.5px solid var(--line)}
+  .btn.sec:hover{border-color:var(--teal);background:var(--teal-tint)}
+
+  .foot{text-align:center;margin-top:22px;font-size:.78rem;color:var(--ink-soft)}
+  .foot a{color:var(--teal);cursor:pointer;text-decoration:underline}
+
+  /* Tabs */
+  .tabs{display:flex;gap:8px;margin:0 0 16px;flex-wrap:wrap}
+  .tab{flex:1 1 auto;min-width:104px;font:inherit;font-weight:700;font-size:.92rem;padding:11px 14px;border-radius:12px;
+    border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:7px;transition:background .12s,color .12s,border-color .12s}
+  .tab:hover:not(.active){border-color:var(--teal);color:var(--teal)}
+  .tab.active{background:var(--teal);border-color:var(--teal);color:#fff;box-shadow:var(--shadow)}
+  .panel[hidden]{display:none}
+
+  /* Estudos */
+  .topics-intro{font-size:.9rem;color:var(--ink-soft);margin-bottom:14px}
+  .topics{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+  .topic{position:relative;display:flex;flex-direction:column;gap:7px;text-align:left;background:var(--paper);
+    border:1px solid var(--line);border-radius:14px;padding:15px 34px 15px 16px;cursor:pointer;
+    box-shadow:var(--shadow);transition:transform .12s,border-color .12s;font:inherit;color:var(--ink)}
+  .topic:hover{transform:translateY(-2px);border-color:var(--teal)}
+  .topic-del{position:absolute;top:9px;right:9px;width:24px;height:24px;border-radius:50%;
+    border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);font-size:15px;line-height:1;
+    cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;
+    transition:background .12s,color .12s,border-color .12s}
+  .topic-del:hover{background:var(--wrong-bg);border-color:var(--wrong);color:var(--wrong)}
+  .restore-bar{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:10px;
+    background:var(--teal-tint);border:1px solid var(--line);border-radius:12px;padding:9px 14px;
+    font-size:.85rem;color:var(--ink-soft)}
+  .restore-bar button{font:inherit;font-weight:700;font-size:.82rem;color:var(--teal);background:none;
+    border:1px solid var(--teal);border-radius:8px;padding:5px 12px;cursor:pointer;white-space:nowrap}
+  .restore-bar button:hover{background:var(--teal);color:#fff}
+  .topic .n{font-size:.7rem;font-weight:700;letter-spacing:.04em;color:var(--teal-deep);
+    background:var(--teal-tint);border-radius:7px;padding:2px 8px;align-self:flex-start}
+  .topic h3{font-size:1rem;color:var(--ink);line-height:1.25;font-weight:700}
+  .topic p{font-size:.82rem;color:var(--ink-soft);line-height:1.4}
+  .topic .kind{font-size:.68rem;font-weight:700;letter-spacing:.03em;color:var(--amber);text-transform:uppercase}
+  .group-head{grid-column:1/-1;font-weight:700;color:var(--teal-deep);font-size:.95rem;
+    margin:10px 0 -2px;padding-bottom:6px;border-bottom:1px solid var(--line);
+    display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .group-head:first-child{margin-top:0}
+  .group-head small{font-weight:500;color:var(--ink-soft);font-size:.8rem}
+  .viewer-bar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+  .viewer-bar .vt{font-weight:700;color:var(--teal-deep);font-size:.95rem;flex:1;min-width:130px}
+  .libframe{width:100%;height:calc(100vh - 200px);min-height:480px;border:1px solid var(--line);
+    border-radius:14px;background:#fff;box-shadow:var(--shadow);display:block}
+
+  /* Simulado */
+  .sim-topbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .sim-topbar .vt{font-weight:700;color:var(--teal-deep);font-size:.9rem;flex:1;min-width:120px}
+  .sim-palette{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px;margin-bottom:12px;
+    background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px;max-height:230px;overflow:auto}
+  .sim-cell{font:inherit;font-size:.8rem;font-weight:700;border:1px solid var(--line);border-radius:8px;padding:7px 0;
+    background:var(--paper);color:var(--ink-soft);cursor:pointer;text-align:center}
+  .sim-cell.ans{background:var(--teal-tint);border-color:var(--teal);color:var(--teal-deep)}
+  .sim-cell.cur{outline:2px solid var(--amber);outline-offset:1px}
+  .opt.sel{border-color:var(--teal);background:var(--teal-tint)}
+  .opt.sel .key{border-color:var(--teal);background:var(--teal);color:#fff}
+  .sim-scewrap{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin:6px 0 14px}
+  .sim-score{font-size:2.6rem;font-weight:800;color:var(--teal-deep);line-height:1}
+  .sim-rev{display:flex;flex-direction:column;gap:7px;margin-top:12px}
+  .sim-rev .it{border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:.85rem;color:var(--ink);
+    display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;
+    transition:transform .1s,box-shadow .1s}
+  .sim-rev .it:hover{box-shadow:var(--shadow);transform:translateY(-1px)}
+  .sim-rev .it:active{transform:none}
+  .sim-rev .it .chev{font-size:1.2rem;color:var(--ink-soft);font-weight:700;flex:0 0 auto}
+  .sim-rev .it.ok{border-color:var(--right);background:var(--right-bg)}
+  .sim-rev .it.no{border-color:var(--wrong);background:var(--wrong-bg)}
+  .sim-rev .it.an{border-color:var(--amber);background:#fdf4e6}
+  .sim-rev b{color:var(--ink)}
+
+  /* Caneta / escrita à mão (Apple Pencil) */
+  .ink-canvas{position:fixed;inset:0;width:100vw;height:100vh;z-index:9990;pointer-events:none;
+    touch-action:none;-webkit-user-select:none;user-select:none}
+  .ink-canvas.active{pointer-events:auto;cursor:crosshair}
+  .penbar{position:fixed;z-index:9999;
+    bottom:calc(16px + env(safe-area-inset-bottom));right:calc(16px + env(safe-area-inset-right));
+    display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+  .pen-fab{width:52px;height:52px;border-radius:50%;border:none;background:var(--teal);color:#fff;
+    font-size:22px;line-height:1;box-shadow:var(--shadow);cursor:pointer;display:flex;
+    align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+  .pen-fab.on{background:var(--wrong)}
+  .pen-tools{display:flex;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--line);
+    border-radius:14px;padding:8px 10px;box-shadow:var(--shadow);flex-wrap:wrap;max-width:88vw;justify-content:flex-end}
+  .pen-tools[hidden]{display:none}   /* só aparece no modo caneta (o atributo hidden precede o display:flex) */
+  .pen-color{width:28px;height:28px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);
+    cursor:pointer;padding:0}
+  .pen-color.sel{box-shadow:0 0 0 2px var(--teal)}
+  .pen-btn{font:inherit;font-size:.8rem;font-weight:700;border:1px solid var(--line);background:var(--paper);
+    color:var(--ink-soft);border-radius:9px;padding:6px 11px;cursor:pointer}
+  .pen-btn.sel{border-color:var(--wrong);color:var(--wrong);background:var(--wrong-bg)}
+
+  @media(max-width:480px){
+    .metrics{gap:16px}
+    .metric .v{font-size:1.1rem}
+    .enun{font-size:.98rem}
+    .nav{flex-direction:column-reverse}
+    .nav .btn,.nav .btn.sec{width:100%}
+  }
 </style>
 </head>
 <body>
 <header>
-  <div class="wrap top">
-    <div>
-      <div class="logo"><span class="mark"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Flash<b>Med</b></div>
-      <div class="subtitle">Questões comentadas · simulados · flashcards — por MedTech</div>
+  <div class="wrap">
+    <div class="brand">
+      <h1>FlashMed</h1>
+      <span class="tag">Residência Médica</span>
+      <p>Questões comentadas e <b>simulados de provas reais de residência</b> (ENARE, Revalida e mais). Aba <b>Questões</b>: responda e acompanhe sua taxa de acerto. Aba <b>Simulado</b>: faça a prova real cronometrada, sem ver o gabarito, e receba a nota no fim.</p>
     </div>
-    <a href="index.html">← MedTech</a>
   </div>
 </header>
-<div class="tabbar"><div class="wrap tabs" id="tabs"></div></div>
-<main id="app"></main>
-<footer>
-  Estude por questões comentadas e simulados no estilo residência; a IA gera mais questões do tema. Flashcards com repetição espaçada (SM-2).<br>
-  © 2026 <a href="index.html">MedTech</a> · <a href="privacidade.html">Privacidade</a>
-</footer>
 
-<!-- Caneta / escrita à mão (Apple Pencil / dedo / mouse) -->
+<div class="wrap">
+  <div class="tabs" role="tablist">
+    <button class="tab active" id="tabBtnQ" data-tab="questoes" role="tab">Questões</button>
+    <button class="tab" id="tabBtnSim" data-tab="simulado" role="tab">Simulado</button>
+  </div>
+
+  <div id="panel-questoes" class="panel">
+  <div class="stats">
+    <svg class="ring" viewBox="0 0 36 36" aria-hidden="true">
+      <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--line)" stroke-width="3"></circle>
+      <circle id="ringFill" cx="18" cy="18" r="15.9" fill="none" stroke="var(--teal)" stroke-width="3"
+        stroke-linecap="round" stroke-dasharray="0 100" transform="rotate(-90 18 18)"></circle>
+      <text id="ringTxt" x="18" y="19.5" text-anchor="middle" font-size="9" font-weight="700" fill="var(--teal-deep)">0%</text>
+    </svg>
+    <div class="metrics">
+      <div class="metric"><div class="v" id="mAns">0</div><div class="l">Respondidas</div></div>
+      <div class="metric"><div class="v" id="mRight">0</div><div class="l">Acertos</div></div>
+      <div class="metric"><div class="v" id="mTotal">0</div><div class="l">No banco</div></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <select id="filter" aria-label="Filtrar por tema"></select>
+    <button class="ghost" id="shuffle">Embaralhar</button>
+    <button class="ghost" id="reset">Zerar desempenho</button>
+  </div>
+
+  <div class="card" id="card"><!-- preenchido via JS --></div>
+
+  <div class="foot">
+    Leva atual: <b id="footCount">0</b> questões carregadas ·
+    <a id="more">banco autoral em expansão · a prova real completa está na aba Simulado</a>
+  </div>
+  </div><!-- /panel-questoes -->
+
+  <div id="panel-simulado" class="panel" hidden>
+    <div class="sim-list" data-view="list">
+      <p class="topics-intro">Simulados no formato da <b>prova real (FGV/ENARE)</b>: você responde tudo <b>sem ver o gabarito</b> e, ao finalizar, recebe a <b>nota final</b>. O progresso fica salvo — dá para pausar e continuar depois.</p>
+      <div class="topics" data-simgrid><!-- via JS --></div>
+    </div>
+    <div class="sim-run" data-view="run" hidden>
+      <div class="sim-topbar">
+        <button class="ghost" data-simback>← Sair</button>
+        <span class="vt" data-simtitle></span>
+        <button class="ghost" data-simpalette>Nº das questões</button>
+        <button class="btn" data-simfinish>Finalizar</button>
+      </div>
+      <div class="sim-palette" data-palette hidden></div>
+      <div class="card" data-simcard></div>
+    </div>
+    <div class="sim-result" data-view="result" hidden>
+      <div class="card" data-simresult></div>
+    </div>
+  </div>
+
+</div>
+
+<script src="flashmed-provas.js?v=1"></script>
+<script src="flashmed-medbank.js?v=1"></script>
+<script>
+/* ============================================================
+   BANCO DE QUESTÕES — Leva 1
+   Cada objeto: {tema, q (enunciado), ops[4], correct (índice 0-3), c (comentário)}
+   ============================================================ */
+const BANK = (window.MED_BANK||[]);
+/* questões autorais adicionais (nível ENARE, estilo equilibrado) */
+if (window.BANK_EXTRA && Array.isArray(window.BANK_EXTRA)) {
+  Array.prototype.push.apply(BANK, window.BANK_EXTRA);
+}
+/* lote 2 — 200 questões mais longas/difíceis com pegadinhas */
+if (window.BANK_EXTRA2 && Array.isArray(window.BANK_EXTRA2)) {
+  Array.prototype.push.apply(BANK, window.BANK_EXTRA2);
+}
+/* lote 3 — +200 autorais (longas/pegadinhas) + 10 questões reais (módulo cardiologia/adesão) */
+if (window.BANK_EXTRA3 && Array.isArray(window.BANK_EXTRA3)) {
+  Array.prototype.push.apply(BANK, window.BANK_EXTRA3);
+}
+
+/* ============================================================
+   MOTOR DO QUIZ
+   ============================================================ */
+const STORE_KEY = "enareFarmaProgress_v1";
+const POS_KEY = "enareFarmaPos_v1";   // continua de onde parou
+let answers = loadAnswers();          // { idx: {sel, ok} }
+let order = BANK.map((_,i)=>i);       // ordem de exibição (índices do BANK)
+let pos = 0;
+let activeFilter = "Todos os temas";
+
+function loadAnswers(){
+  try{ const r = localStorage.getItem(STORE_KEY); return r?JSON.parse(r):{}; }
+  catch(e){ return {}; }
+}
+function saveAnswers(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(answers)); }catch(e){}
+}
+
+/* ---- filtro de temas ---- */
+function buildFilter(){
+  const temas = ["Todos os temas", ...Array.from(new Set(BANK.map(q=>q.tema)))];
+  const sel = document.getElementById("filter");
+  sel.innerHTML = temas.map(t=>`<option>${t}</option>`).join("");
+  sel.onchange = ()=>{ activeFilter = sel.value; applyFilter(); };
+}
+function applyFilter(){
+  order = BANK.map((_,i)=>i).filter(i=> activeFilter==="Todos os temas" || BANK[i].tema===activeFilter);
+  pos = 0;
+  render();
+}
+
+/* ---- estatísticas ---- */
+function refreshStats(){
+  const ansKeys = Object.keys(answers);
+  const ans = ansKeys.length;
+  const right = ansKeys.filter(k=>answers[k].ok).length;
+  const rate = ans? Math.round((right/ans)*100):0;
+  document.getElementById("mAns").textContent = ans;
+  document.getElementById("mRight").textContent = right;
+  document.getElementById("mTotal").textContent = BANK.length;
+  document.getElementById("footCount").textContent = BANK.length;
+  document.getElementById("ringTxt").textContent = rate+"%";
+  document.getElementById("ringFill").setAttribute("stroke-dasharray", `${rate} ${100-rate}`);
+  document.getElementById("ringFill").setAttribute("stroke",
+    rate>=70?"var(--right)":rate>=50?"var(--teal)":"var(--amber)");
+}
+
+/* ---- render da questão ---- */
+const LETTERS = ["A","B","C","D","E"];
+function render(){
+  refreshStats();
+  const card = document.getElementById("card");
+  if(order.length===0){ card.innerHTML = `<p class="enun">Nenhuma questão neste tema.</p>`; return; }
+  const qi = order[pos];
+  const q = BANK[qi];
+  const prev = answers[qi]; // já respondida?
+  try{ localStorage.setItem(POS_KEY, JSON.stringify({filter:activeFilter, qi})); }catch(e){}
+
+  card.innerHTML = `
+    <div class="qhead">
+      <span class="num">Questão ${pos+1} de ${order.length}</span>
+      <span class="badge">${q.tema}</span>
+    </div>
+    <div class="enun">${q.q}</div>
+    ${q.img?`<figure class="qfig"><img src="${q.img}" alt="Figura da questão"></figure>`:""}
+    <div class="opts-hint">↔ Arraste uma alternativa para o lado para riscá-la</div>
+    <div class="opts" id="opts">
+      ${q.ops.map((o,j)=>`
+        <button class="opt" data-j="${j}">
+          <span class="key">${LETTERS[j]}</span>
+          <span class="txt">${o}</span>
+        </button>`).join("")}
+    </div>
+    <div class="feedback" id="fb">
+      <div class="verdict" id="verdict"></div>
+      <div class="body" id="fbbody"></div>
+    </div>
+    <div class="nav">
+      <button class="btn sec" id="prev" ${pos===0?"disabled":""}>← Anterior</button>
+      <button class="btn" id="next" ${pos>=order.length-1?"disabled":""}>Próxima →</button>
+    </div>`;
+
+  const optEls = [...card.querySelectorAll(".opt")];
+  const struck = getStruck(qi);
+  optEls.forEach(btn=>{
+    const j = parseInt(btn.dataset.j);
+    if(struck.has(j)) btn.classList.add("struck");
+    attachStrikeSwipe(btn, qi, j);
+    btn.addEventListener("click", ()=>{ if(btn._swiped){ btn._swiped=false; return; } choose(qi, j); });
+  });
+  document.getElementById("prev").onclick = ()=>{ if(pos>0){pos--;render();} };
+  document.getElementById("next").onclick = ()=>{ if(pos<order.length-1){pos++;render();} };
+
+  if(window.QuizInk && typeof window.QuizInk.switchTo==="function") window.QuizInk.switchTo("q"+qi);   // tinta da caneta fica só nesta questão
+  if(prev) revealState(qi, prev.sel);
+}
+
+/* ---- riscar alternativa: arraste para o lado (eliminar) ---- */
+const STRIKE_KEY = "enareStrikes_v1";
+let strikes = {};
+try{ strikes = JSON.parse(localStorage.getItem(STRIKE_KEY)||"{}") || {}; }catch(e){ strikes={}; }
+function getStruck(qi){ return new Set(strikes[qi] || []); }
+function saveStruck(qi, set){
+  if(set.size) strikes[qi] = [...set]; else delete strikes[qi];
+  try{ localStorage.setItem(STRIKE_KEY, JSON.stringify(strikes)); }catch(e){}
+}
+function toggleStrike(qi, j, btn){
+  const set = getStruck(qi);
+  if(set.has(j)){ set.delete(j); btn.classList.remove("struck"); }
+  else { set.add(j); btn.classList.add("struck"); }
+  saveStruck(qi, set);
+}
+function attachStrikeSwipe(btn, qi, j){
+  let sx=0, sy=0, dragging=false;
+  btn.addEventListener("pointerdown", e=>{
+    if(e.pointerType==="mouse" && e.button!==0) return;
+    sx=e.clientX; sy=e.clientY; dragging=true; btn._swiped=false;
+    btn.style.transition="none";
+  });
+  btn.addEventListener("pointermove", e=>{
+    if(!dragging) return;
+    const dx=e.clientX-sx, dy=e.clientY-sy;
+    if(!btn._swiped && Math.abs(dx)>Math.abs(dy) && Math.abs(dx)>8){
+      try{ btn.setPointerCapture(e.pointerId); }catch(_){}
+    }
+    if(btn.hasPointerCapture && btn.hasPointerCapture(e.pointerId)){
+      btn.style.transform="translateX("+(dx*0.5)+"px)";
+      if(Math.abs(dx)>48) btn._swiped=true;
+      e.preventDefault();
+    }
+  });
+  function up(){
+    if(!dragging) return; dragging=false;
+    btn.style.transition="transform .18s ease"; btn.style.transform="";
+    if(btn._swiped) toggleStrike(qi, j, btn);
+  }
+  btn.addEventListener("pointerup", up);
+  btn.addEventListener("pointercancel", up);
+}
+
+function choose(qi, j){
+  if(answers[qi]) return; // bloqueia re-resposta
+  const ok = (j === BANK[qi].correct);
+  answers[qi] = {sel:j, ok};
+  saveAnswers();
+  revealState(qi, j);
+  refreshStats();
+}
+
+function revealState(qi, sel){
+  const q = BANK[qi];
+  const optEls = [...document.querySelectorAll(".opt")];
+  optEls.forEach((btn,j)=>{
+    btn.disabled = true;
+    if(j===q.correct) btn.classList.add("right");
+    else if(j===sel) btn.classList.add("wrong");
+    else btn.classList.add("dim");
+  });
+  const ok = (sel===q.correct);
+  const fb = document.getElementById("fb");
+  fb.classList.add("show", ok?"ok":"no");
+  document.getElementById("verdict").innerHTML =
+    ok ? "✓ Resposta correta" : `✗ Resposta incorreta — gabarito: ${LETTERS[q.correct]}`;
+  document.getElementById("fbbody").innerHTML = q.c;
+}
+
+/* ---- controles globais ---- */
+document.getElementById("shuffle").onclick = ()=>{
+  for(let i=order.length-1;i>0;i--){ const r=Math.floor(Math.random()*(i+1)); [order[i],order[r]]=[order[r],order[i]]; }
+  pos=0; render();
+};
+document.getElementById("reset").onclick = ()=>{
+  if(confirm("Zerar seu desempenho (respostas e taxa de acerto)?")){
+    answers={}; saveAnswers(); render();
+  }
+};
+
+/* ---- init (continua de onde parou) ---- */
+buildFilter();
+(function initResume(){
+  let saved=null; try{ saved=JSON.parse(localStorage.getItem(POS_KEY)||"null"); }catch(e){}
+  if(saved && saved.filter){
+    const sel=document.getElementById("filter");
+    if([...sel.options].some(o=>o.value===saved.filter)){ activeFilter=saved.filter; sel.value=saved.filter; }
+  }
+  order = BANK.map((_,i)=>i).filter(i=> activeFilter==="Todos os temas" || BANK[i].tema===activeFilter);
+  pos = 0;
+  if(saved && typeof saved.qi==="number"){ const p=order.indexOf(saved.qi); if(p>=0) pos=p; }
+  render();
+})();
+/* salva a posição também ao sair/minimizar o app (reforço p/ iOS) */
+function savePosNow(){ try{ if(order[pos]!=null) localStorage.setItem(POS_KEY, JSON.stringify({filter:activeFilter, qi:order[pos]})); }catch(e){} }
+window.addEventListener("pagehide", savePosNow);
+document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="hidden") savePosNow(); });
+
+/* ============================================================
+   ABAS DE CONTEÚDO — bibliotecas (Saúde Pública e Farmácia)
+   ============================================================ */
+const LIBRARIES = {
+  saude: {
+    folder: "estudos/",
+    label: "Tema",
+    items: [
+      {f:"historia-politicas-saude-reforma-sanitaria.html", t:"História das Políticas de Saúde & Reforma Sanitária", s:"Do campanhismo ao SUS: CAPs, IAPs, INAMPS, 8ª CNS e CF/88."},
+      {f:"sus-principios-legislacao-controle-social.html", t:"SUS: Princípios, Legislação & Controle Social", s:"Leis 8.080 e 8.142, Decreto 7.508, conselhos e conferências."},
+      {f:"redes-atencao-saude.html", t:"Redes de Atenção à Saúde (RAS)", s:"Rede poliárquica, APS coordenadora e redes temáticas."},
+      {f:"esf-pnab-atencao-basica.html", t:"ESF & PNAB — Atenção Básica", s:"PNAB 2017, equipe da ESF, ACS, eMulti e financiamento."},
+      {f:"politica-nacional-humanizacao-pnh.html", t:"Política Nacional de Humanização (PNH)", s:"HumanizaSUS: princípios, diretrizes, acolhimento e PTS."},
+      {f:"politica-nacional-vigilancia-saude.html", t:"Política Nacional de Vigilância em Saúde", s:"As 4 vigilâncias, notificação, surto/epidemia e SINAN."},
+      {f:"educacao-permanente-saude-pneps.html", t:"Educação Permanente em Saúde (PNEPS)", s:"EPS × continuada, quadrilátero, CIES e Portarias 198 e 1.996."},
+      {f:"inclusao-grupos-vulnerabilizados-saude.html", t:"Inclusão de Grupos Vulnerabilizados", s:"Políticas de equidade: idoso, LGBT+, indígena, negra e mais."},
+      {f:"trabalho-equipe-multidisciplinar.html", t:"Trabalho em Equipe Multidisciplinar", s:"Multi/inter/trans, Peduzzi, núcleo × campo e apoio matricial."},
+      {f:"programa-nacional-seguranca-paciente.html", t:"Segurança do Paciente (PNSP)", s:"Portaria 529, RDC 36, as 6 metas e cultura de segurança."},
+      {f:"nr32-seguranca-saude-trabalho-servicos-saude.html", t:"NR 32 — Saúde do Trabalhador nos Serviços de Saúde", s:"Riscos biológicos/químicos, PGR, PCMSO e perfurocortantes."},
+      {f:"bioetica.html", t:"Bioética", s:"Principialismo, Nuremberg/Belmont, CEP/CONEP e fim de vida."}
+    ]
+  },
+  farmacia: {
+    folder: "farmacia/",
+    items: [
+      {header:"Apostila & questões", sub:"comece por aqui"},
+      {f:"apostila-revisao-residencia-farmacia.pdf", kind:"Apostila · PDF", t:"Apostila de Revisão — Residência em Farmácia", s:"Revisão completa: antimicrobianos, Portaria 344/98, interações/CYP450 e SNC (46 páginas)."},
+      {f:"caderno-questoes-comentadas.html", kind:"Questões comentadas", t:"Caderno de Questões Comentadas", s:"24 questões estilo banca com gabarito comentado, nos 4 temas da apostila."},
+
+      {header:"Mapas mentais", sub:"visão rápida em cards"},
+      {f:"antimicrobianos-mapa-mental.html", kind:"Mapa mental", t:"Antimicrobianos", s:"Classes por mecanismo, espectro, fármacos e resistência."},
+      {f:"bacterias_resistentes.html", kind:"Mapa mental", t:"Bactérias de Alta Resistência", s:"MRSA, VRE, KPC, ESBL, Pseudomonas e mais: mecanismos e tratamento."},
+      {f:"interacoes-cyp450-mapa-mental.html", kind:"Mapa mental", t:"Interações Medicamentosas & CYP450", s:"Inibidores × indutores, pró-fármacos, interações PK/PD e alimentares."},
+      {f:"medicamentos-snc-mapa-mental.html", kind:"Mapa mental", t:"Medicamentos do SNC", s:"Antidepressivos, antipsicóticos, ansiolíticos, anticonvulsivantes, opioides e mais."},
+      {f:"portaria-344-mapa-mental.html", kind:"Mapa mental", t:"Portaria 344/98", s:"Listas A–F, receituários, cores, validade e adendos de prova."},
+
+      {header:"Farmácia clínica & cuidado ao paciente", sub:"guias de revisão"},
+      {f:"processo-cuidado-paciente.html", kind:"Guia de revisão", t:"Processo de Cuidado ao Paciente", s:"5 etapas, PRM × RNM, método Dáder e registro SOAP."},
+      {f:"orientacao-farmaceutica-adesao.html", kind:"Guia de revisão", t:"Orientação Farmacêutica & Adesão", s:"Tipos de não adesão, 5 dimensões da OMS, como medir e melhorar."},
+      {f:"interacoes-medicamentosas.html", kind:"Guia de revisão", t:"Interpretação das Interações Medicamentosas", s:"PK × PD, CYP450, interações clássicas e manejo clínico."},
+      {f:"monitorizacao-terapeutica-it-estreito.html", kind:"Guia de revisão", t:"Monitorização Terapêutica (IT estreito)", s:"Quando/como colher (vale × pico), faixas e manejo da toxicidade."},
+
+      {header:"Seguimento por população/especialidade", sub:"guias de revisão"},
+      {f:"seguimento-cardiologia.html", kind:"Guia de revisão", t:"Seguimento em Cardiologia", s:"HAS, IC (4 pilares), SCA, FA/anticoagulação, dislipidemia, eletrólitos."},
+      {f:"seguimento-paciente-idoso.html", kind:"Guia de revisão", t:"Seguimento do Paciente Idoso", s:"PK/PD, polifarmácia, cascata iatrogênica, Beers e STOPP/START."},
+      {f:"seguimento-pediatria.html", kind:"Guia de revisão", t:"Seguimento em Pediatria", s:"Maturação, cálculo de dose, fármacos a evitar e excipientes."},
+      {f:"oncologia-terapia-nutricional.html", kind:"Guia de revisão", t:"Oncologia & Terapia Nutricional", s:"Quimioterápicos, toxicidades, manipulação, NE/NP e realimentação."},
+
+      {header:"Farmácia hospitalar & segurança", sub:"guias de revisão"},
+      {f:"infeccao-hospitalar-antimicrobianos.html", kind:"Guia de revisão", t:"Infecção Hospitalar & Antimicrobianos", s:"IRAS, precauções, stewardship, PK/PD e patógenos resistentes."},
+      {f:"gestao-logistica-medicamentos.html", kind:"Guia de revisão", t:"Gestão & Logística de Medicamentos", s:"Ciclo, curvas ABC/XYZ, estoque, licitação e distribuição."},
+      {f:"erros-de-medicacao.html", kind:"Guia de revisão", t:"Erros de Medicação", s:"Tipos, near miss, modelo de Reason, alta vigilância e prevenção."},
+      {f:"protocolo-seguranca-medicamentos.html", kind:"Guia de revisão", t:"Protocolo de Segurança de Medicamentos", s:"3 eixos, escrita segura da dose e os 9 certos da administração."},
+
+      {header:"Legislação & farmacoepidemiologia", sub:"guias de revisão"},
+      {f:"resolucoes-cff-585-586.html", kind:"Guia de revisão", t:"Resoluções CFF 585 e 586/2013", s:"Atribuições clínicas e prescrição farmacêutica (o que se pode prescrever)."},
+      {f:"farmacoepidemiologia.html", kind:"Guia de revisão", t:"Princípios de Farmacoepidemiologia", s:"Desenhos de estudo, RR/OR/NNT, viés × confusão e DDD/ATC."},
+      {f:"estudos-medicamentos-fases-eum.html", kind:"Guia de revisão", t:"Estudos, Fases da Farmacovigilância & EUM", s:"Desenhos, fases I–IV, farmacovigilância e uso de medicamentos."},
+      {f:"farmacovigilancia-ram.html", kind:"Guia de revisão", t:"Farmacovigilância & RAM", s:"Classificação A–F, tipo A × B, causalidade (Naranjo) e VigiMed."}
+    ]
+  }
+};
+
+const HIDDEN_KEY = "enareHidden_v1";
+function getHidden(){ try{ return new Set(JSON.parse(localStorage.getItem(HIDDEN_KEY)||"[]")); }catch(e){ return new Set(); } }
+function saveHidden(set){ try{ localStorage.setItem(HIDDEN_KEY, JSON.stringify([...set])); }catch(e){} }
+
+function initLibrary(name){
+  const cfg   = LIBRARIES[name];
+  const grid  = document.querySelector(`[data-grid="${name}"]`);
+  const list  = document.querySelector(`#panel-${name} .lib-list`);
+  const view  = document.querySelector(`#panel-${name} .lib-view`);
+  const frame = document.querySelector(`[data-frame="${name}"]`);
+  const title = document.querySelector(`[data-title="${name}"]`);
+  const open  = document.querySelector(`[data-open="${name}"]`);
+  const idOf  = (it)=> cfg.folder + it.f;
+
+  function openItem(it){
+    const url = cfg.folder + it.f;
+    title.textContent = it.t;
+    open.setAttribute("href", url);
+    if(frame.getAttribute("src") !== url) frame.setAttribute("src", url);
+    list.hidden = true; view.hidden = false;
+    window.scrollTo({top:0, behavior:"instant"});
+  }
+
+  function render(){
+    const hidden = getHidden();
+    grid.innerHTML = "";
+
+    // barra de restaurar (só desta biblioteca)
+    const mineHidden = cfg.items.filter(it=>!it.header && hidden.has(idOf(it)));
+    if(mineHidden.length){
+      const bar = document.createElement("div");
+      bar.className = "restore-bar";
+      const span = document.createElement("span");
+      span.textContent = `${mineHidden.length} conteúdo(s) removido(s)`;
+      const rb = document.createElement("button");
+      rb.type = "button"; rb.textContent = "Restaurar";
+      rb.onclick = ()=>{ const h=getHidden(); mineHidden.forEach(it=>h.delete(idOf(it))); saveHidden(h); render(); };
+      bar.appendChild(span); bar.appendChild(rb);
+      grid.appendChild(bar);
+    }
+
+    let pendingHeader = null, headerShown = false, n = 0;
+    cfg.items.forEach((it)=>{
+      if(it.header){ pendingHeader = it; headerShown = false; return; }
+      if(hidden.has(idOf(it))) return;
+      if(pendingHeader && !headerShown){
+        const h = document.createElement("div");
+        h.className = "group-head";
+        h.innerHTML = `<span>${pendingHeader.header}</span>${pendingHeader.sub?`<small>${pendingHeader.sub}</small>`:""}`;
+        grid.appendChild(h);
+        headerShown = true;
+      }
+      n++;
+      const card = document.createElement("div");
+      card.className = "topic"; card.setAttribute("role","button"); card.tabIndex = 0;
+      const numLabel = cfg.label ? `<span class="n">${cfg.label} ${n}</span>` : "";
+      const badge = it.kind ? `<span class="kind">${it.kind}</span>` : "";
+      card.innerHTML = `<button class="topic-del" type="button" title="Remover conteúdo" aria-label="Remover conteúdo">×</button>${numLabel}${badge}<h3>${it.t}</h3><p>${it.s}</p>`;
+      card.addEventListener("click",(e)=>{ if(e.target.closest(".topic-del")) return; openItem(it); });
+      card.addEventListener("keydown",(e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openItem(it); } });
+      card.querySelector(".topic-del").addEventListener("click",(e)=>{
+        e.stopPropagation();
+        if(confirm(`Remover "${it.t}" desta lista?\nVocê poderá restaurar depois.`)){
+          const h=getHidden(); h.add(idOf(it)); saveHidden(h); render();
+        }
+      });
+      grid.appendChild(card);
+    });
+  }
+
+  render();
+  view.querySelector("[data-back]").onclick = ()=>{
+    view.hidden = true; list.hidden = false;
+    window.scrollTo({top:0, behavior:"instant"});
+  };
+}
+
+/* ---- troca de abas ---- */
+const TABS = {
+  questoes: {panel:"panel-questoes", btn:"tabBtnQ"},
+  simulado: {panel:"panel-simulado", btn:"tabBtnSim"},
+};
+function setTab(name){
+  if(!TABS[name]) name = "questoes";
+  for(const k in TABS){
+    document.getElementById(TABS[k].panel).hidden = (k !== name);
+    document.getElementById(TABS[k].btn).classList.toggle("active", k === name);
+  }
+  if(name==="simulado" && window.__simRefresh) window.__simRefresh();
+  try{ localStorage.setItem("enareTab", name); }catch(e){}
+}
+document.getElementById("tabBtnQ").onclick = ()=> setTab("questoes");
+document.getElementById("tabBtnSim").onclick = ()=> setTab("simulado");
+
+/* ============================================================
+   SIMULADO — provas reais (window.SIMULADOS), com nota final
+   ============================================================ */
+(function(){
+  if(!window.SIMULADOS || !document.getElementById("panel-simulado")) return;
+  const panel  = document.getElementById("panel-simulado");
+  const grid   = panel.querySelector("[data-simgrid]");
+  const vList  = panel.querySelector('[data-view="list"]');
+  const vRun   = panel.querySelector('[data-view="run"]');
+  const vRes   = panel.querySelector('[data-view="result"]');
+  const card   = panel.querySelector("[data-simcard]");
+  const resCard= panel.querySelector("[data-simresult]");
+  const titleEl= panel.querySelector("[data-simtitle]");
+  const paletteEl = panel.querySelector("[data-palette]");
+  const LET = ["A","B","C","D","E"];
+  let cur = null;
+  const key = (id)=> "enareSim_"+id;
+  const loadState = (id)=>{ try{ return JSON.parse(localStorage.getItem(key(id))||"null"); }catch(e){ return null; } };
+  const saveState = ()=>{ if(cur){ try{ localStorage.setItem(key(cur.sim.id), JSON.stringify(cur.state)); }catch(e){} } };
+  const show = (v)=>{ vList.hidden=v!=="list"; vRun.hidden=v!=="run"; vRes.hidden=v!=="result"; };
+
+  function renderList(){
+    grid.innerHTML="";
+    window.SIMULADOS.forEach(sim=>{
+      const st=loadState(sim.id), total=sim.questions.length;
+      const answered = st ? Object.keys(st.answers||{}).length : 0;
+      const status = (st&&st.finished) ? "✓ Concluído — toque para ver a nota"
+                    : answered ? `Em andamento · ${answered}/${total} respondidas`
+                    : `${total} questões · toque para começar`;
+      const b=document.createElement("button"); b.className="topic"; b.type="button";
+      b.innerHTML=`<span class="kind">Simulado</span><h3>${sim.title}</h3><p>${sim.sub}</p><span class="n">${status}</span>`;
+      b.onclick=()=>openSim(sim);
+      grid.appendChild(b);
+    });
+  }
+  function openSim(sim){
+    const st=loadState(sim.id);
+    if(st && st.finished){ cur={sim,state:st}; renderResult(); return; }
+    cur={sim, state:(st && Object.keys(st.answers||{}).length)? st : {answers:{},pos:0,finished:false}};
+    startRun();
+  }
+  function startRun(){ show("run"); titleEl.textContent=cur.sim.title; paletteEl.hidden=true; renderQuestion(); }
+
+  function renderQuestion(){
+    const {sim,state}=cur, n=sim.questions.length, q=sim.questions[state.pos], sel=state.answers[state.pos];
+    card.innerHTML=`
+      <div class="qhead"><span class="num">Questão ${state.pos+1} de ${n}</span>
+        <span class="badge">${Object.keys(state.answers).length}/${n} respondidas</span></div>
+      <div class="enun">${q.q}</div>
+      ${q.img?`<figure class="qfig"><img src="${q.img}" alt="Figura da questão"></figure>`:""}
+      <div class="opts-hint">↔ Arraste uma alternativa para o lado para riscá-la</div>
+      <div class="opts">${q.ops.map((o,j)=>`<button class="opt${sel===j?' sel':''}" data-j="${j}"><span class="key">${LET[j]}</span><span class="txt">${o}</span></button>`).join("")}</div>
+      <div class="nav">
+        <button class="btn sec" data-prev ${state.pos===0?"disabled":""}>← Anterior</button>
+        ${state.pos>=n-1?'<button class="btn" data-finish2>Finalizar prova</button>':'<button class="btn" data-next>Próxima →</button>'}
+      </div>`;
+    const skey = "S:"+sim.id+":"+state.pos;          // risco isolado por simulado+questão
+    const sStruck = window.getStruck ? window.getStruck(skey) : new Set();
+    card.querySelectorAll(".opt").forEach(btn=>{
+      const j=parseInt(btn.dataset.j);
+      if(sStruck.has(j)) btn.classList.add("struck");
+      if(window.attachStrikeSwipe) window.attachStrikeSwipe(btn, skey, j);
+      btn.onclick=()=>{
+        if(btn._swiped){ btn._swiped=false; return; }   // foi arraste p/ riscar, não seleção
+        state.answers[state.pos]=parseInt(btn.dataset.j); saveState();
+        card.querySelectorAll(".opt").forEach(o=>o.classList.remove("sel")); btn.classList.add("sel");
+        card.querySelector(".badge").textContent=`${Object.keys(state.answers).length}/${n} respondidas`;
+      };
+    });
+    const p=card.querySelector("[data-prev]"); if(p) p.onclick=()=>{ if(state.pos>0){state.pos--;saveState();renderQuestion();} };
+    const nx=card.querySelector("[data-next]"); if(nx) nx.onclick=()=>{ if(state.pos<n-1){state.pos++;saveState();renderQuestion();} };
+    const f2=card.querySelector("[data-finish2]"); if(f2) f2.onclick=confirmFinish;
+    if(window.QuizInk && typeof window.QuizInk.switchTo==="function") window.QuizInk.switchTo(skey);  // tinta da caneta fica só nesta questão do simulado
+    window.scrollTo({top:0,behavior:"instant"});
+  }
+  function renderPalette(){
+    const {sim,state}=cur, n=sim.questions.length; paletteEl.innerHTML="";
+    for(let i=0;i<n;i++){
+      const c=document.createElement("button");
+      c.className="sim-cell"+(state.answers[i]!=null?" ans":"")+(i===state.pos?" cur":"");
+      c.textContent=i+1; c.onclick=()=>{ state.pos=i; saveState(); paletteEl.hidden=true; renderQuestion(); };
+      paletteEl.appendChild(c);
+    }
+  }
+  function confirmFinish(){
+    const {sim,state}=cur, n=sim.questions.length, answered=Object.keys(state.answers).length;
+    const msg = answered<n ? `Você respondeu ${answered} de ${n} questões. Finalizar e ver a nota mesmo assim?` : "Finalizar a prova e ver a nota final?";
+    if(confirm(msg)){ state.finished=true; saveState(); renderResult(); }
+  }
+  function grade(){
+    const {sim,state}=cur; let correct=0,annul=0,wrong=0,blank=0;
+    sim.questions.forEach((q,i)=>{
+      const sel=state.answers[i];
+      if(q.correct===-1){ annul++; correct++; }
+      else if(sel==null){ blank++; }
+      else if(sel===q.correct){ correct++; }
+      else { wrong++; }
+    });
+    return {correct,annul,wrong,blank,total:sim.questions.length};
+  }
+  function renderResult(){
+    show("result");
+    const {sim,state}=cur, g=grade(), pct=Math.round(100*g.correct/g.total);
+    const rev = sim.questions.map((q,i)=>{
+      if(q.correct===-1) return `<div class="it an" data-qidx="${i}"><span><b>Q${i+1}</b> · Anulada (ponto para todos)</span><span class="chev">›</span></div>`;
+      const sel=state.answers[i], ok=sel===q.correct, yours = sel==null? "em branco" : LET[sel];
+      return `<div class="it ${ok?'ok':'no'}" data-qidx="${i}"><span><b>Q${i+1}</b> · sua resposta: <b>${yours}</b> — gabarito: <b>${LET[q.correct]}</b></span><span class="chev">›</span></div>`;
+    }).join("");
+    resCard.innerHTML=`
+      <div class="qhead"><span class="num">Resultado</span><span class="badge">${sim.title}</span></div>
+      <div class="sim-scewrap">
+        <div><div class="sim-score">${g.correct}<span style="font-size:1.1rem;color:var(--ink-soft)">/${g.total}</span></div>
+        <div style="font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft)">Nota final · ${pct}%</div></div>
+        <div style="font-size:.86rem;color:var(--ink-soft);line-height:1.7">
+          ✓ ${g.correct-g.annul} certas &nbsp;·&nbsp; ✗ ${g.wrong} erradas<br>— ${g.blank} em branco &nbsp;·&nbsp; ⦿ ${g.annul} anuladas</div>
+      </div>
+      <div class="nav"><button class="btn sec" data-redo>Refazer do zero</button><button class="btn" data-toplist>Voltar aos simulados</button></div>
+      <div class="sim-rev">${rev}</div>`;
+    resCard.querySelector("[data-redo]").onclick=()=>{ if(confirm("Refazer este simulado do zero? Suas respostas serão apagadas.")){ cur.state={answers:{},pos:0,finished:false}; saveState(); startRun(); } };
+    resCard.querySelector("[data-toplist]").onclick=()=>{ renderList(); show("list"); };
+    resCard.querySelectorAll(".sim-rev .it").forEach(el=>{
+      el.onclick=()=>{ const idx=parseInt(el.dataset.qidx); if(!isNaN(idx)) renderReview(idx); };
+    });
+    window.scrollTo({top:0,behavior:"instant"});
+  }
+  function renderReview(i){
+    show("run");
+    const {sim,state}=cur, n=sim.questions.length, q=sim.questions[i], sel=state.answers[i];
+    const annul=q.correct===-1, ok=sel===q.correct;
+    const verdict = annul ? "⦿ Questão anulada — ponto para todos"
+      : ok ? "✓ Você acertou" : `✗ Você marcou ${sel==null?"em branco":LET[sel]} — gabarito: ${LET[q.correct]}`;
+    titleEl.textContent=sim.title; paletteEl.hidden=true;
+    card.innerHTML=`
+      <div class="qhead"><span class="num">Revisão · Questão ${i+1} de ${n}</span>
+        <span class="badge">${annul?"Anulada":(ok?"Acertou":"Errou")}</span></div>
+      <div class="enun">${q.q}</div>
+      ${q.img?`<figure class="qfig"><img src="${q.img}" alt="Figura da questão"></figure>`:""}
+      <div class="opts">${q.ops.map((o,j)=>{
+        let cls="opt";
+        if(!annul && j===q.correct) cls+=" right";
+        else if(j===sel && !ok) cls+=" wrong";
+        else cls+=" dim";
+        return `<button class="${cls}" disabled><span class="key">${LET[j]}</span><span class="txt">${o}</span></button>`;
+      }).join("")}</div>
+      <div class="feedback show ${annul?"ok":(ok?"ok":"no")}">
+        <div class="verdict">${verdict}</div>
+        ${q.c?`<div class="body">${q.c}</div>`:`<div class="body" style="color:var(--ink-soft)">Comentário em preparação para esta questão.</div>`}
+      </div>
+      <div class="nav">
+        <button class="btn sec" data-rprev ${i===0?"disabled":""}>← Anterior</button>
+        <button class="btn sec" data-rback>Voltar ao resultado</button>
+        <button class="btn" data-rnext ${i>=n-1?"disabled":""}>Próxima →</button>
+      </div>`;
+    const rp=card.querySelector("[data-rprev]"); if(rp) rp.onclick=()=>{ if(i>0) renderReview(i-1); };
+    const rn=card.querySelector("[data-rnext]"); if(rn) rn.onclick=()=>{ if(i<n-1) renderReview(i+1); };
+    card.querySelector("[data-rback]").onclick=()=>renderResult();
+    if(window.QuizInk && typeof window.QuizInk.switchTo==="function") window.QuizInk.switchTo("R:"+sim.id+":"+i);
+    window.scrollTo({top:0,behavior:"instant"});
+  }
+
+  panel.querySelector("[data-simback]").onclick   = ()=>{ renderList(); show("list"); };
+  panel.querySelector("[data-simfinish]").onclick = confirmFinish;
+  panel.querySelector("[data-simpalette]").onclick= ()=>{ if(paletteEl.hidden){ renderPalette(); paletteEl.hidden=false; } else { paletteEl.hidden=true; } };
+
+  window.__simRefresh = ()=>{ if(!vList.hidden) renderList(); };
+  renderList(); show("list");
+})();
+</script>
+
+<!-- ===== Caneta / escrita à mão (Apple Pencil) ===== -->
 <canvas id="inkCanvas" class="ink-canvas" aria-hidden="true"></canvas>
 <div class="penbar">
   <div class="pen-tools" id="penTools" hidden>
-    <button class="pen-color sel" data-color="#0f172a" style="background:#0f172a" aria-label="Tinta"></button>
-    <button class="pen-color" data-color="#c0392b" style="background:#c0392b" aria-label="Vermelho"></button>
-    <button class="pen-color" data-color="#2563eb" style="background:#2563eb" aria-label="Azul"></button>
-    <button class="pen-color" data-color="#16a34a" style="background:#16a34a" aria-label="Verde"></button>
+    <button class="pen-color" data-color="#15302E" style="background:#15302E" title="Tinta" aria-label="Cor tinta"></button>
+    <button class="pen-color" data-color="#C0432F" style="background:#C0432F" title="Vermelho" aria-label="Cor vermelho"></button>
+    <button class="pen-color" data-color="#2C5A74" style="background:#2C5A74" title="Azul" aria-label="Cor azul"></button>
+    <button class="pen-color" data-color="#1F8A5B" style="background:#1F8A5B" title="Verde" aria-label="Cor verde"></button>
     <button class="pen-btn" id="penEraser" type="button">Borracha</button>
     <button class="pen-btn" id="penClear" type="button">Limpar</button>
   </div>
-  <button class="pen-fab" id="penFab" type="button" aria-label="Escrever à mão"><i class="ti ti-pencil"></i></button>
+  <button class="pen-fab" id="penFab" type="button" aria-label="Escrever com a caneta">✏️</button>
 </div>
 
 <script>
-const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
-const $=s=>document.querySelector(s);
-const LETRAS=['A','B','C','D','E','F'];
-const AREAS=window.FM_AREAS||[];
-const areaNome=a=>{const x=AREAS.find(z=>z.id===a);return x?x.nome:a;};
-const areaCor=a=>{const x=AREAS.find(z=>z.id===a);return x?x.cor:'#2563eb';};
-function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-let qFilter={area:'*',esp:'*'};
-
-/* ====== Riscar / eliminar alternativa (arraste para o lado; persiste por questão) ====== */
-let strikes={}; try{ strikes=JSON.parse(localStorage.getItem('flashmed_strikes')||'{}')||{}; }catch(e){ strikes={}; }
-function getStruck(qi){ return new Set(strikes[qi]||[]); }
-function saveStruck(qi,set){ if(set.size)strikes[qi]=[...set]; else delete strikes[qi]; try{localStorage.setItem('flashmed_strikes',JSON.stringify(strikes));}catch(e){} }
-function toggleStrike(qi,j,btn){ const s=getStruck(qi); if(s.has(j)){s.delete(j);btn.classList.remove('struck');} else {s.add(j);btn.classList.add('struck');} saveStruck(qi,s); }
-function attachStrikeSwipe(btn,qi,j){
-  let sx=0,sy=0,dragging=false;
-  btn.addEventListener('pointerdown',e=>{ if(e.pointerType==='mouse'&&e.button!==0)return; sx=e.clientX;sy=e.clientY;dragging=true;btn._swiped=false;btn.style.transition='none'; });
-  btn.addEventListener('pointermove',e=>{ if(!dragging)return; const dx=e.clientX-sx,dy=e.clientY-sy;
-    if(!btn._swiped&&Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>8){ try{btn.setPointerCapture(e.pointerId);}catch(_){} }
-    if(btn.hasPointerCapture&&btn.hasPointerCapture(e.pointerId)){ btn.style.transform='translateX('+(dx*0.5)+'px)'; if(Math.abs(dx)>48)btn._swiped=true; e.preventDefault(); } });
-  function up(){ if(!dragging)return; dragging=false; btn.style.transition='transform .18s ease'; btn.style.transform=''; if(btn._swiped)toggleStrike(qi,j,btn); }
-  btn.addEventListener('pointerup',up); btn.addEventListener('pointercancel',up);
-}
-
-/* ====== Caneta — escrever à mão sobre o app (Apple Pencil / dedo / mouse) ====== */
-(function(){
-  const canvas=document.getElementById('inkCanvas'); if(!canvas)return; const ctx=canvas.getContext('2d');
-  const fab=document.getElementById('penFab'), tools=document.getElementById('penTools');
-  let penMode=false,drawing=false,erasing=false,color='#0f172a',activeId=null,lastPen=0,lastX=0,lastY=0,curKey=null;
-  const inkStore=new Map();
-  function clearPixels(){ ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,canvas.width,canvas.height); ctx.restore(); }
-  function stash(){ if(curKey==null)return; let blank=true; try{const d=ctx.getImageData(0,0,canvas.width,canvas.height).data; for(let i=3;i<d.length;i+=4){if(d[i]!==0){blank=false;break;}} }catch(_){blank=false;} if(blank)inkStore.delete(curKey); else inkStore.set(curKey,canvas.toDataURL()); }
-  function sizeCanvas(){ const dpr=Math.min(window.devicePixelRatio||1,3); let prev=null; if(canvas.width){prev=document.createElement('canvas');prev.width=canvas.width;prev.height=canvas.height;prev.getContext('2d').drawImage(canvas,0,0);} const w=window.innerWidth,h=window.innerHeight; canvas.style.width=w+'px';canvas.style.height=h+'px'; canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.lineCap='round';ctx.lineJoin='round'; if(prev){ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(prev,0,0,prev.width,prev.height,0,0,canvas.width,canvas.height);ctx.restore();} }
-  sizeCanvas(); window.addEventListener('resize',sizeCanvas); window.addEventListener('orientationchange',()=>setTimeout(sizeCanvas,250));
-  function setMode(on){ penMode=on; canvas.classList.toggle('active',on); tools.hidden=!on; fab.classList.toggle('on',on); fab.innerHTML=on?'<i class="ti ti-x"></i>':'<i class="ti ti-pencil"></i>'; fab.setAttribute('aria-label',on?'Sair da caneta':'Escrever à mão'); }
-  fab.onclick=()=>setMode(!penMode);
-  tools.querySelectorAll('.pen-color').forEach(b=>{ b.onclick=()=>{color=b.dataset.color;erasing=false;refreshSel();}; });
-  document.getElementById('penEraser').onclick=()=>{erasing=!erasing;refreshSel();};
-  document.getElementById('penClear').onclick=()=>{clearPixels(); if(curKey!=null)inkStore.delete(curKey);};
-  window.QuizInk={ switchTo(key){ if(key===curKey)return; stash(); curKey=key; clearPixels(); const d=inkStore.get(key); if(d){const img=new Image();img.onload=()=>{if(curKey!==key)return;ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(img,0,0,canvas.width,canvas.height);ctx.restore();};img.src=d;} } };
-  function refreshSel(){ tools.querySelectorAll('.pen-color').forEach(b=>b.classList.toggle('sel',!erasing&&b.dataset.color===color)); document.getElementById('penEraser').classList.toggle('sel',erasing); }
-  refreshSel();
-  function seg(x,y,pressure){ ctx.globalCompositeOperation=erasing?'destination-out':'source-over'; ctx.strokeStyle=color; ctx.lineWidth=erasing?26:2.4*(0.35+1.3*(pressure||0.5)); ctx.beginPath();ctx.moveTo(lastX,lastY);ctx.lineTo(x,y);ctx.stroke(); lastX=x;lastY=y; }
-  canvas.addEventListener('pointerdown',e=>{ if(!penMode)return; if(e.pointerType==='touch'&&(performance.now()-lastPen)<1000){e.preventDefault();return;} if(e.pointerType==='pen')lastPen=performance.now(); drawing=true;activeId=e.pointerId; try{canvas.setPointerCapture(e.pointerId);}catch(_){} lastX=e.clientX;lastY=e.clientY; seg(e.clientX+0.01,e.clientY+0.01,e.pressure); e.preventDefault(); });
-  canvas.addEventListener('pointermove',e=>{ if(!drawing||e.pointerId!==activeId)return; if(e.pointerType==='pen')lastPen=performance.now(); let evs=e.getCoalescedEvents?e.getCoalescedEvents():null; if(!evs||!evs.length)evs=[e]; for(const ev of evs)seg(ev.clientX,ev.clientY,ev.pressure); e.preventDefault(); });
-  function endp(e){ if(e.pointerId===activeId){drawing=false;activeId=null;} }
-  canvas.addEventListener('pointerup',endp); canvas.addEventListener('pointercancel',endp);
-})();
-function inkKeyAtual(){
-  if(nav==='simulado'&&sim&&!sim.done){ const q=sim.pool[sim.idx]; return q?'S:'+q.id:'none'; }
-  if((nav==='questoes'||nav==='revisao')&&sess&&sess.pool[sess.idx]){ return 'Q:'+sess.pool[sess.idx].id; }
-  return 'none';
-}
-
-/* ====== BARALHOS PRONTOS (flashcards) — preservado ====== */
-const BUILTIN = [
-{ id:'b-emerg', name:'Emergência & UTI — avançado', cards:[
-  {id:'e1', q:'Alvo de temperatura no controle direcionado pós-PCR na diretriz atual — e por que mudou?', a:'Manter entre 32–37,5 °C evitando ativamente a febre. O TTM2 não mostrou benefício de 33 vs 37,5 °C → o foco passou a ser PREVENIR hipertermia, não hipotermia profunda obrigatória.', ref:'ILCOR/AHA'},
-  {id:'e2', q:'Ventilação protetora na SDRA: volume corrente, platô e driving pressure?', a:'VC 4–6 mL/kg de peso PREDITO; pressão de platô <30 cmH₂O; driving pressure <15 cmH₂O; PEEP titulada. Prona >12 h/dia se PaO₂/FiO₂ <150.', ref:'ARDS'},
-  {id:'e3', q:'Sequência correta no tratamento da hipercalemia grave?', a:'1) Gluconato de cálcio (estabiliza a membrana, não baixa o K); 2) insulina+glicose e beta-2 (shift intracelular); 3) diurético/resina/diálise (remove o K).', ref:''},
-  {id:'e4', q:'Choque séptico: 2ª droga após noradrenalina e quando entrar corticoide?', a:'Vasopressina 0,03 U/min (poupador de catecolamina). Hidrocortisona 200 mg/dia se choque refratário (necessidade crescente de vasopressor).', ref:'SSC'},
-  {id:'e5', q:'Hipertermia maligna × síndrome neuroléptica maligna — manejo específico?', a:'HM (anestésicos halogenados/succinilcolina) → dantroleno. SNM (antipsicóticos / retirada de dopaminérgico) → suspender o agente, resfriar, dantroleno/bromocriptina, suporte.', ref:''},
-  {id:'e6', q:'Antídoto e alvo clínico da atropina na intoxicação por organofosforado?', a:'Atropina dobrando a dose até SECAR as secreções brônquicas (alvo = ausculta limpa, sem broncorreia). Pralidoxima para a crise nicotínica.', ref:''},
-  {id:'e7', q:'Indicações de diálise de urgência (mnemônico AEIOU)?', a:'Acidose refratária; Eletrólitos (hipercalemia refratária); Intoxicações dialisáveis; Overload (EAP refratário); Uremia (encefalopatia/pericardite).', ref:''},
-  {id:'e8', q:'PPC e alvos na hipertensão intracraniana?', a:'PPC = PAM − PIC. Manter PPC 60–70 mmHg e PIC <22 mmHg.', ref:''},
-  {id:'e9', q:'Na anafilaxia, via e local corretos da adrenalina (e por quê)?', a:'IM no VASTO LATERAL da coxa (absorção mais rápida e previsível que SC/deltoide), 0,5 mg, repetir a cada 5–15 min. IV só em refratário/em BIC.', ref:''},
-  {id:'e10', q:'Bicarbonato na acidose da PCR/choque — quando?', a:'Em geral NÃO. Considerar em hipercalemia grave ou intoxicação por tricíclicos / bloqueador de canal de sódio. pH <6,9 é exceção controversa.', ref:''}
-]},
-{ id:'b-cardio', name:'Cardiologia — avançado', cards:[
-  {id:'c1', q:'FA <48 h × ≥48 h: diferença na cardioversão?', a:'<48 h: pode cardioverter com anticoagulação periprocedimento. ≥48 h ou tempo incerto: 3 semanas de anticoagulação OU ECO transesofágico afastando trombo antes; + 4 semanas após.', ref:''},
-  {id:'c2', q:'Critérios de Sgarbossa para IAM no BRE/ritmo de marcapasso?', a:'Supra ST ≥1 mm concordante (5 pts); infra ST ≥1 mm em V1–V3 (3 pts); supra ST ≥5 mm discordante (2 pts). Sgarbossa modificada: razão ST/S ≤ −0,25.', ref:''},
-  {id:'c3', q:'Quando NÃO usar nitrato no IAM?', a:'IAM de VD/parede inferior dependente de pré-carga, hipotensão, ou uso de inibidor de PDE5 (sildenafila) nas últimas 24–48 h.', ref:''},
-  {id:'c4', q:'Quatro pilares da ICFEr?', a:'IECA/ARNI + betabloqueador + antagonista mineralocorticoide + iSGLT2 — titular às doses-alvo conforme PA, FC, K e função renal.', ref:'ESC/AHA'},
-  {id:'c5', q:'Síndrome de Wellens: achado no ECG e conduta proibida?', a:'Ondas T bifásicas ou profundamente invertidas em V2–V3 (estenose crítica de DA proximal). NÃO fazer teste ergométrico — encaminhar a cateterismo.', ref:''},
-  {id:'c6', q:'CDI para prevenção primária na ICFEr — critérios?', a:'FE ≤35%, NYHA II–III, apesar de terapia otimizada por ≥3 meses, com expectativa de vida >1 ano e bom estado funcional.', ref:''},
-  {id:'c7', q:'Emergência × urgência hipertensiva — meta de redução?', a:'Emergência (lesão de órgão-alvo): reduzir PAM ~10–20% na 1ª hora com IV (nitroprussiato/nicardipina). Urgência: VO em horas/dias, sem queda abrupta.', ref:''},
-  {id:'c8', q:'Pericardite × IAM no ECG?', a:'Pericardite: supra ST DIFUSO côncavo + infra do segmento PR, SEM imagem em espelho; evolui em 4 estágios. IAM: supra localizado com recíproca.', ref:''},
-  {id:'c9', q:'TV monomórfica sustentada: estável × instável?', a:'Instável (hipotensão, dor, IC, rebaixamento) → cardioversão SINCRONIZADA. Estável → amiodarona ou procainamida e preparar cardioversão.', ref:''},
-  {id:'c10', q:'TAVI × troca cirúrgica na estenose aórtica grave?', a:'Decisão do heart team. TAVI favorecida em idosos / risco cirúrgico alto-intermediário e anatomia favorável; cirurgia em jovens / baixo risco / anatomia desfavorável.', ref:''}
-]},
-{ id:'b-nefro', name:'Nefrologia & Eletrólitos — avançado', cards:[
-  {id:'n1', q:'Taxa máxima de correção do sódio na hiponatremia crônica e o risco?', a:'≤8 mEq/L/24 h (≤6 se alto risco) para evitar mielinólise pontina/desmielinização osmótica. Na hipo aguda sintomática grave: salina 3% 100–150 mL em bolus.', ref:''},
-  {id:'n2', q:'Fórmula do déficit de água livre na hipernatremia?', a:'Déficit = ACT × (Na atual / Na desejado − 1), com ACT = 0,6×peso (0,5 em mulher/idoso). Corrigir ≤10 mEq/L/24 h.', ref:''},
-  {id:'n3', q:'LRA pré-renal × NTA pela FeNa e FeUreia?', a:'Pré-renal: FeNa <1%, FeUreia <35%. NTA: FeNa >2%. Use a FeUreia quando o paciente está em uso de diurético.', ref:''},
-  {id:'n4', q:'Critérios KDIGO de LRA?', a:'↑Creatinina ≥0,3 mg/dL em 48 h; OU ↑ ≥1,5× o basal em 7 dias; OU diurese <0,5 mL/kg/h por ≥6 h.', ref:'KDIGO'},
-  {id:'n5', q:'ATR tipo 1 (distal) × tipo 2 (proximal) — K e pH urinário?', a:'Tipo 1: hipocalemia, pH urinário >5,5, nefrolitíase/nefrocalcinose. Tipo 2: hipocalemia, bicarbonatúria, síndrome de Fanconi, pH urinário variável.', ref:''},
-  {id:'n6', q:'PTT × SHU atípica — o que muda no tratamento?', a:'PTT (ADAMTS13 <10%) → plasmaférese de urgência ± corticoide/rituximabe/caplacizumabe. SHU atípica (complemento) → eculizumab. SHU típica (Shiga) → suporte.', ref:''},
-  {id:'n7', q:'Ânion-gap e para que serve o delta-gap?', a:'AG = Na − (Cl + HCO₃), normal 8–12 (corrigir pela albumina). Delta-gap (ΔAG vs ΔHCO₃) detecta distúrbio ácido-base MISTO associado.', ref:''}
-]},
-{ id:'b-infecto', name:'Infectologia & Antibióticos — avançado', cards:[
-  {id:'i1', q:'Esquema empírico da meningite bacteriana no adulto e quando associar ampicilina?', a:'Ceftriaxona + vancomicina. Associar ampicilina se >50 anos ou imunossuprimido (cobertura de Listeria). Dexametasona antes/junto da 1ª dose de ATB.', ref:''},
-  {id:'i2', q:'Quando o corticoide melhora desfecho: meningite e PCP?', a:'Meningite pneumocócica (dexametasona ANTES do ATB). PCP com PaO₂ <70 mmHg ou gradiente A-a >35 → prednisona antes do anti-PCP.', ref:''},
-  {id:'i3', q:'Cite 4 antibióticos com cobertura para Pseudomonas.', a:'Piperacilina-tazobactam, cefepime, meropenem, ciprofloxacino/levofloxacino (também ceftazidima, aztreonam, amicacina).', ref:''},
-  {id:'i4', q:'Endocardite por S. aureus em válvula nativa: MSSA × MRSA?', a:'MSSA → oxacilina ou cefazolina. MRSA → vancomicina ou daptomicina. Duração 4–6 semanas.', ref:''},
-  {id:'i5', q:'Indicações de cirurgia precoce na endocardite?', a:'IC por disfunção valvar; infecção não controlada (abscesso, vegetação persistente); risco embólico (vegetação >10 mm com embolia, ou >15 mm).', ref:''},
-  {id:'i6', q:'Profilaxia primária de oportunistas no HIV por CD4?', a:'<200 → SMX-TMP (PCP, também cobre toxoplasmose). <50 → considerar MAC (azitromicina), hoje menos usada com TARV precoce.', ref:''},
-  {id:'i7', q:'Neutropenia febril de alto risco: conduta e tempo?', a:'ATB IV antipseudomonas em <1 h (cefepime / pip-tazo / meropenem). MASCC <21 = alto risco → internar. Adicionar cobertura para Gram+ se instabilidade/cateter/mucosite.', ref:''}
-]},
-{ id:'b-endo', name:'Endócrino & Metabólico — avançado', cards:[
-  {id:'d1', q:'CAD × estado hiperosmolar (EHH) — critérios que diferenciam?', a:'CAD: glicemia >250, pH <7,3, HCO₃ <18, cetose. EHH: glicemia >600, osmolaridade >320, pH >7,3, sem cetose significativa, rebaixamento.', ref:''},
-  {id:'d2', q:'Por que repor K antes da insulina na CAD e os cortes?', a:'A insulina joga K para dentro da célula → hipocalemia grave/arritmia. K <3,3 → adiar insulina e repor; K 3,3–5,2 → repor junto (20–30 mEq/L); K >5,2 → não repor.', ref:''},
-  {id:'d3', q:'Crise tireotóxica: ordem das drogas?', a:'1) Betabloqueador (propranolol); 2) tionamida (PTU); 3) iodo (Lugol) ≥1 h DEPOIS da tionamida; 4) hidrocortisona. Tratar o fator desencadeante.', ref:''},
-  {id:'d4', q:'Insuficiência adrenal: diagnóstico e cuidado na crise?', a:'Cortisol basal baixo + teste de estímulo com cortrosina. Na crise, NÃO atrasar a hidrocortisona por causa da coleta — tratar empiricamente.', ref:''},
-  {id:'d5', q:'Rastreio e confirmação do hiperaldosteronismo primário?', a:'HAS resistente/hipocalemia → relação aldosterona/renina elevada (rastreio); confirmar com teste de sobrecarga salina; TC de adrenais + cateterismo de veias adrenais p/ lateralizar.', ref:''},
-  {id:'d6', q:'Alvo de HbA1c — quando relaxar?', a:'<7% em geral; <6,5% em jovem sem comorbidade/hipoglicemia; <8% em idoso frágil, expectativa limitada ou hipoglicemia recorrente.', ref:'ADA'},
-  {id:'d7', q:'Incidentaloma adrenal: o que sempre investigar?', a:'Funcionalidade (cortisol pós-1 mg dexametasona, metanefrinas plasmáticas, aldo/renina se HAS) e risco de malignidade (tamanho >4 cm, washout/atenuação na TC).', ref:''}
-]}
-];
-
-/* ====== Estado / persistência ====== */
-let decks=[], answers={}, marked=[], generated=[], sims=[], simActive=null;
-let mtReady=false;
-function save(){ if(window.MT&&MT.save){ MT.save({decks,answers,marked,generated,sims,simActive}); } }
-function persistSim(){ if(!sim||sim.done){simActive=null;} else { simActive={area:sim.area,areaNome:sim.areaNome,qids:sim.pool.map(q=>q.id),answers:sim.answers,idx:sim.idx,tpq:sim.tpq,left:sim.left}; } save(); }
-function ensureBuiltin(){
-  BUILTIN.forEach(bd=>{
-    let d=decks.find(x=>x.id===bd.id);
-    if(!d){ d={id:bd.id,name:bd.name,builtin:true,cards:[],checkedAt:0}; decks.unshift(d); }
-    d.builtin=true; d.name=bd.name;
-    bd.cards.forEach(bc=>{
-      let c=d.cards.find(x=>x.id===bc.id);
-      if(!c){ d.cards.push({id:bc.id,front:bc.q,back:bc.a,ref:bc.ref||'',builtin:true,ef:2.5,interval:0,reps:0,due:0}); }
-      else { c.front=bc.q; c.back=bc.a; c.ref=bc.ref||''; c.builtin=true; }
-    });
-  });
-}
-const allQ=()=>(window.QBANK||[]).concat(generated);
-function allExamQ(){ return (window.FM_EXAMS||[]).flatMap(ex=>(ex.questoes||[]).map(qq=>({id:ex.id+'_q'+qq.n,area:qq.area,q:qq.q,ops:qq.ops,correct:qq.correct,coment:qq.coment||('Gabarito oficial '+ex.banca+(ex.ano?' '+ex.ano:'')+(qq.correct<0?' - ANULADA (pontua para todos)':'')),ref:ex.titulo,img:qq.img}))); }
-const qById=id=>allQ().find(q=>q.id===id)||allExamQ().find(q=>q.id===id);
-
-/* ====== Navegação ====== */
-let nav='inicio';   // inicio | questoes | simulado | flashcards | revisao
-let sess=null;      // sessão de questões (prática/revisão)
-let sim=null;       // sessão de simulado
-let fc={mode:'home',deck:null,queue:[],idx:0,flip:false,done:0}; // flashcards
-const TABS=[['inicio','Início','ti-home-2'],['questoes','Questões','ti-list-check'],['simulado','Simulado','ti-clock-hour-4'],['flashcards','Flashcards','ti-cards'],['revisao','Revisão','ti-refresh']];
-function go(n){ nav=n; if(n!=='questoes'&&n!=='revisao')sess=null; if(n!=='simulado')sim=null; render(); window.scrollTo({top:0,behavior:'smooth'}); }
-function renderTabs(){
-  $('#tabs').innerHTML=TABS.map(t=>`<button class="${nav===t[0]?'active':''}" onclick="go('${t[0]}')"><i class="ti ${t[2]}"></i>${t[1]}</button>`).join('');
-}
-function render(){
-  renderTabs();
-  const a=$('#app');
-  if(nav==='inicio')a.innerHTML=inicioView();
-  else if(nav==='questoes')a.innerHTML= sess? sessView() : questoesHome();
-  else if(nav==='simulado')a.innerHTML= sim? (sim.done?simResult():simRun()) : simConfig();
-  else if(nav==='revisao')a.innerHTML= sess? sessView() : revisaoHome();
-  else if(nav==='flashcards')a.innerHTML= fc.mode==='study'?studyView():(fc.mode==='manage'?manageView():flashHome());
-  postRender();
-}
-function postRender(){
-  // liga clique + arraste-para-riscar nas alternativas da questão atual
-  const emQuestao = (nav==='questoes'||nav==='revisao') && sess && sess.pool[sess.idx];
-  const emSim = nav==='simulado' && sim && !sim.done;
-  if(emQuestao || emSim){
-    const q = emSim ? sim.pool[sim.idx] : sess.pool[sess.idx];
-    const revelou = emQuestao && sess.revealed;
-    document.querySelectorAll('.qopt').forEach(btn=>{
-      const j=+btn.dataset.j; if(isNaN(j))return;
-      if(getStruck(q.id).has(j)) btn.classList.add('struck');
-      if(!revelou) attachStrikeSwipe(btn,q.id,j);
-      btn.onclick=()=>{ if(btn._swiped){btn._swiped=false;return;} if(emSim)simPick(j); else answerQ(j); };
-    });
-  }
-  if(window.QuizInk) window.QuizInk.switchTo(inkKeyAtual());
-}
-
-/* ====== INÍCIO ====== */
-function statsGlobais(){
-  const ks=Object.keys(answers); const tot=ks.length; let ac=0; const porArea={};
-  ks.forEach(id=>{const a=answers[id];if(a.correct)ac++;const ar=a.area||(qById(id)||{}).area||'?';porArea[ar]=porArea[ar]||{t:0,c:0};porArea[ar].t++;if(a.correct)porArea[ar].c++;});
-  return {tot,ac,pct:tot?Math.round(ac/tot*100):0,porArea,erradas:ks.filter(id=>!answers[id].correct)};
-}
-function inicioView(){
-  const s=statsGlobais(); const nBanco=allQ().length; const nMarc=marked.length;
-  const dueFC=decks.reduce((a,d)=>a+d.cards.filter(c=>(c.due||0)<=Date.now()).length,0);
-  return `<div class="stats3">
-     <div class="stat"><div class="n">${nBanco}</div><div class="l">questões no banco</div></div>
-     <div class="stat green"><div class="n">${s.pct}%</div><div class="l">acerto (${s.ac}/${s.tot})</div></div>
-     <div class="stat"><div class="n">${dueFC}</div><div class="l">flashcards p/ revisar</div></div>
-   </div>
-   <div class="card">
-     <h3 style="margin-bottom:4px">Estudar por questões</h3>
-     <p class="muted" style="margin-bottom:12px">Escolha uma área e responda questões comentadas. A IA gera mais do tema que você quiser.</p>
-     <div class="row">
-       <button class="btn btn-p" onclick="go('questoes')"><i class="ti ti-list-check"></i> Ir para Questões</button>
-       <button class="btn btn-g" onclick="go('simulado')"><i class="ti ti-clock-hour-4"></i> Fazer simulado</button>
-       ${(s.erradas.length||nMarc)?`<button class="btn btn-g" onclick="go('revisao')"><i class="ti ti-refresh"></i> Revisar (${s.erradas.length+nMarc})</button>`:''}
-     </div>
-   </div>
-   ${s.tot?`<div class="card"><h3 style="margin-bottom:10px">Seu desempenho por área</h3>${
-     AREAS.filter(ar=>s.porArea[ar.id]).map(ar=>{const p=s.porArea[ar.id];const pc=Math.round(p.c/p.t*100);return `<div class="barrow"><span class="nm">${esc(ar.nome)}</span><span class="bar"><i style="width:${pc}%;background:${ar.cor}"></i></span><span class="pc">${pc}%</span></div>`;}).join('')
-   }</div>`:''}
-   <div class="note"><b>Híbrido:</b> o banco começa com questões curadas do MedTech e a <b>IA amplia</b> por tema. Os <b>Flashcards</b> (repetição espaçada) continuam disponíveis na aba própria.</div>`;
-}
-
-/* ====== QUESTÕES (home + sessão) ====== */
-function espPresentes(area){ const set=new Set(); allQ().forEach(q=>{ if((area==='*'||q.area===area)&&q.esp)set.add(q.esp); }); return Array.from(set).sort(); }
-function questoesHome(){
-  const fa=qFilter.area, fe=qFilter.esp, espOpts=espPresentes(fa);
-  const nFilt=allQ().filter(q=>(fa==='*'||q.area===fa)&&(fe==='*'||q.esp===fe)).length;
-  return `<h3 style="margin-bottom:4px">Questões</h3>
-   <p class="muted" style="margin-bottom:12px">Filtre por área e especialidade — ou toque direto numa área abaixo.</p>
-   <div class="filterbar">
-     <div class="fg"><label>Área</label>
-       <select onchange="setFilterArea(this.value)"><option value="*"${fa==='*'?' selected':''}>Todas as áreas</option>${AREAS.map(a=>`<option value="${a.id}"${fa===a.id?' selected':''}>${esc(a.nome)}</option>`).join('')}</select></div>
-     <div class="fg"><label>Especialidade</label>
-       <select onchange="setFilterEsp(this.value)"${espOpts.length?'':' disabled'}><option value="*">Todas</option>${espOpts.map(e=>`<option value="${esc(e)}"${fe===e?' selected':''}>${esc(e)}</option>`).join('')}</select></div>
-     <button class="btn btn-p" onclick="startPractice(qFilter.area,qFilter.esp)"${nFilt?'':' disabled'}>Estudar (${nFilt})</button>
-   </div>
-   <div class="areagrid">${AREAS.map(ar=>{
-     const n=allQ().filter(q=>q.area===ar.id).length;
-     return `<div class="areacard" style="border-left-color:${ar.cor}" onclick="startPractice('${ar.id}','*')">
-        <h3>${esc(ar.nome)}</h3>
-        <p>${n} questão(ões) · ${ar.esp.slice(0,3).join(' · ')}${ar.esp.length>3?'…':''}</p>
-     </div>`;
-   }).join('')}</div>`;
-}
-function setFilterArea(v){ qFilter.area=v; qFilter.esp='*'; render(); }
-function setFilterEsp(v){ qFilter.esp=v; render(); }
-function startPractice(area,esp){
-  esp=esp||'*';
-  let pool=allQ().filter(q=>(area==='*'||q.area===area)&&(esp==='*'||q.esp===esp));
-  if(!pool.length){ area!=='*'&&genMore(area,esp==='*'?null:esp,true); return; }
-  const naoVistas=shuffle(pool.filter(q=>!answers[q.id]));
-  const vistas=shuffle(pool.filter(q=>answers[q.id]));
-  sess={mode:'practice',area,esp,pool:naoVistas.concat(vistas),idx:0,picked:null,revealed:false,right:0,done:0};
-  nav='questoes'; render(); window.scrollTo({top:0,behavior:'smooth'});
-}
-function sessView(){
-  if(!sess.pool.length) return `<div class="card empty"><i class="ti ti-checkbox"></i><h3>Nada por aqui</h3><p class="muted">Sem questões para esta seleção.</p><div style="margin-top:14px"><button class="btn btn-p" onclick="go('${nav}')">Voltar</button></div></div>`;
-  if(sess.idx>=sess.pool.length) return sessDone();
-  const q=sess.pool[sess.idx];
-  const pct=Math.round(sess.idx/sess.pool.length*100);
-  const isMk=marked.includes(q.id);
-  return `<div class="qwrap">
-    <div class="prog"><i style="width:${pct}%"></i></div>
-    <div class="qmeta">
-      <span class="pill" style="background:${areaCor(q.area)}1a;color:${areaCor(q.area)}">${esc(areaNome(q.area))}${q.esp?' · '+esc(q.esp):''}</span>
-      <span class="muted">${sess.idx+1} / ${sess.pool.length} · ${sess.right} certas</span>
-    </div>
-    <div class="qstem">${esc(q.q)}</div>
-    ${sess.revealed?'':'<div class="opt-hint"><i class="ti ti-arrows-horizontal"></i> arraste uma alternativa para o lado para riscá-la</div>'}
-    <div class="qopts">${q.ops.map((op,i)=>{
-      let cls='';
-      if(sess.revealed){ if(q.correct<0){ if(i===sess.picked)cls='correct'; } else if(i===q.correct)cls='correct'; else if(i===sess.picked)cls='wrong'; }
-      return `<button class="qopt ${cls}" ${sess.revealed?'disabled':''} data-j="${i}"><span class="let">${LETRAS[i]}</span><span>${esc(op)}</span></button>`;
-    }).join('')}</div>
-    ${sess.revealed?`<div class="coment"><div class="h"><i class="ti ti-bulb"></i> ${sess.picked===q.correct?'Correto':'Comentário'}</div>${esc(q.coment||'—')}${q.ref?`<span class="ref"><i class="ti ti-book"></i> ${esc(q.ref)}</span>`:''}</div>
-      <div class="row" style="margin-top:16px;justify-content:space-between">
-        <button class="btn btn-g btn-sm" onclick="toggleMark('${q.id}')"><i class="ti ${isMk?'ti-bookmark-filled':'ti-bookmark'}"></i> ${isMk?'Marcada':'Marcar p/ revisão'}</button>
-        <button class="btn btn-p" onclick="nextQ()">${sess.idx+1>=sess.pool.length?'Terminar':'Próxima →'}</button>
-      </div>`
-    :`<div class="row" style="margin-top:16px"><button class="btn btn-g btn-sm" onclick="go('${nav}')">← Sair</button></div>`}
-    ${sess.revealed&&sess.mode==='practice'?`<div class="row" style="margin-top:10px"><button class="btn btn-g btn-sm" onclick="genMore('${q.area}',${q.esp?`'${esc(q.esp)}'`:'null'})"><i class="ti ti-sparkles"></i> Gerar mais deste tema (IA)</button></div>`:''}
-   </div>`;
-}
-function answerQ(i){
-  if(sess.revealed)return; const q=sess.pool[sess.idx];
-  sess.picked=i; sess.revealed=true; const ok=(q.correct<0?true:(i===q.correct)); if(ok)sess.right++;
-  answers[q.id]={picked:i,correct:ok,area:q.area,at:Date.now()};
-  save(); render();
-}
-function nextQ(){ sess.idx++; sess.picked=null; sess.revealed=false; render(); window.scrollTo({top:0,behavior:'smooth'}); }
-function sessDone(){
-  const tot=sess.pool.length, pc=Math.round(sess.right/tot*100);
-  return `<div class="card" style="text-align:center">
-    <i class="ti ti-confetti" style="font-size:42px;color:var(--petrol)"></i>
-    <h3 style="margin:8px 0 4px">Sessão concluída</h3>
-    <p class="muted">Você acertou <b>${sess.right} de ${tot}</b> (${pc}%).</p>
-    <div class="row" style="justify-content:center;margin-top:16px">
-      <button class="btn btn-p" onclick="go('questoes')">Escolher outra área</button>
-      <button class="btn btn-g" onclick="go('inicio')">Início</button>
-    </div>
-   </div>`;
-}
-function toggleMark(id){ const i=marked.indexOf(id); if(i<0)marked.push(id); else marked.splice(i,1); save(); render(); }
-
-/* ====== REVISÃO ====== */
-function revisaoHome(){
-  const s=statsGlobais(); const err=s.erradas, mk=marked.slice();
-  const uni=Array.from(new Set(err.concat(mk)));
-  return `<h3 style="margin-bottom:4px">Revisão</h3>
-   <p class="muted" style="margin-bottom:14px">Refaça o que você errou ou marcou.</p>
-   <div class="row">
-     <button class="btn btn-p" ${err.length?'':'disabled'} onclick="startReview('err')"><i class="ti ti-x"></i> Erradas (${err.length})</button>
-     <button class="btn btn-g" ${mk.length?'':'disabled'} onclick="startReview('mk')"><i class="ti ti-bookmark"></i> Marcadas (${mk.length})</button>
-     <button class="btn btn-g" ${uni.length?'':'disabled'} onclick="startReview('all')">Tudo (${uni.length})</button>
-   </div>
-   ${uni.length?'':'<div class="empty" style="margin-top:20px"><i class="ti ti-checks"></i>Nada para revisar ainda — responda questões e marque as difíceis.</div>'}`;
-}
-function startReview(kind){
-  const s=statsGlobais();
-  let ids = kind==='err'?s.erradas : kind==='mk'?marked.slice() : Array.from(new Set(s.erradas.concat(marked)));
-  const pool=shuffle(ids.map(qById).filter(Boolean));
-  if(!pool.length)return;
-  sess={mode:'review',area:'rev',pool,idx:0,picked:null,revealed:false,right:0};
-  nav='revisao'; render(); window.scrollTo({top:0,behavior:'smooth'});
-}
-
-/* ====== SIMULADO ====== */
-let simTimer=null;
-function simConfig(){
-  const resume = simActive&&(simActive.qids||[]).length ? `<div class="card" style="border-color:var(--petrol);background:var(--soft)">
-     <h3 style="margin-bottom:4px"><i class="ti ti-player-play"></i> Simulado em andamento</h3>
-     <p class="muted" style="margin-bottom:12px">${esc(simActive.areaNome||'Misto')} · você parou na questão ${(simActive.idx||0)+1} de ${simActive.qids.length} (${Object.keys(simActive.answers||{}).length} respondidas).</p>
-     <div class="row"><button class="btn btn-p" onclick="resumeSim()">Continuar de onde parei</button><button class="btn btn-g" onclick="descartarSim()">Descartar</button></div>
-   </div>` : '';
-  return `<h3 style="margin-bottom:4px">Simulado</h3>
-   <p class="muted" style="margin-bottom:14px">Prova cronometrada no estilo residência: responde tudo e vê o resultado no fim.</p>
-   ${resume}
-   <div class="card">
-     <div class="field"><label>Área</label>
-       <select id="simArea"><option value="ENARE">Estilo ENARE — equilibrado por área</option><option value="*">Misto (aleatório)</option>${AREAS.map(a=>`<option value="${a.id}">${esc(a.nome)}</option>`).join('')}</select></div>
-     <div class="field"><label>Nº de questões</label>
-       <select id="simN"><option>10</option><option>20</option><option>30</option></select></div>
-     <div class="field"><label>Tempo por questão</label>
-       <select id="simT"><option value="90">1min30 (padrão residência)</option><option value="120">2 min</option><option value="0">Sem cronômetro</option></select></div>
-     <button class="btn btn-p" onclick="startSim()"><i class="ti ti-player-play"></i> Iniciar simulado</button>
-   </div>
-   ${(window.FM_EXAMS||[]).length?`<div class="card">
-     <h3 style="margin-bottom:4px"><i class="ti ti-file-certificate"></i> Provas reais — jogáveis</h3>
-     <p class="muted" style="margin-bottom:12px">Cadernos oficiais de residência, cronometrados e com correção comentada (gabarito definitivo). Questões anuladas pontuam para todos.</p>
-     ${window.FM_EXAMS.map(ex=>`<div class="carditem"><div><b>${esc(ex.titulo)}</b><br><span class="muted">${esc(ex.banca)} · ${(ex.questoes||[]).length} questões</span></div><button class="btn btn-p btn-sm" onclick="startExam('${esc(ex.id)}')">Fazer <i class="ti ti-player-play"></i></button></div>`).join('')}
-   </div>`:''}
-   <div class="card">
-     <h3 style="margin-bottom:4px">Provas reais (oficiais)</h3>
-     <p class="muted" style="margin-bottom:12px">Cadernos e gabaritos oficiais de residência, na fonte do governo/instituição. Abrem no site oficial.</p>
-     ${(window.FM_PROVAS||[]).map(p=>`<div class="carditem"><div><b>${esc(p.titulo)}</b><br><span class="muted">${esc(p.banca)} · ${esc(p.sub)}</span></div><a class="btn btn-g btn-sm" href="${esc(p.url)}" target="_blank" rel="noopener">Abrir <i class="ti ti-external-link"></i></a></div>`).join('')}
-     <div class="note" style="margin-top:12px">Estas são as provas na íntegra, nas fontes oficiais (ENARE/EBSERH, INEP, universidades). O simulado <b>jogável</b> acima segue o mesmo formato (20 por área) com questões do banco.</div>
-   </div>
-   ${sims.length?`<div class="card"><h3 style="margin-bottom:8px">Últimos simulados</h3>${sims.slice(-5).reverse().map(r=>`<div class="carditem"><div><b>${r.pct}%</b> · ${r.right}/${r.n} <span class="muted">· ${esc(r.areaNome)}</span></div><span class="muted">${new Date(r.at).toLocaleDateString('pt-BR')}</span></div>`).join('')}</div>`:''}`;
-}
-function startSim(){
-  const area=$('#simArea').value, n=+$('#simN').value, tpq=+$('#simT').value;
-  let pool;
-  if(area==='ENARE'){ // blueprint ENARE: equilibrado entre as 5 grandes áreas
-    const per=Math.max(1,Math.round(n/AREAS.length)); pool=[];
-    AREAS.forEach(ar=>{ pool=pool.concat(shuffle(allQ().filter(q=>q.area===ar.id)).slice(0,per)); });
-    pool=shuffle(pool);
-  } else { pool=shuffle(allQ().filter(q=>area==='*'||q.area===area)); }
-  pool=pool.slice(0,n);
-  if(!pool.length){ alert('Sem questões para esta seleção. Gere questões na aba Questões primeiro.'); return; }
-  if(pool.length<n) toast('Só há '+pool.length+' questão(ões) — gere mais na aba Questões para provas maiores.');
-  const areaNm = area==='ENARE'?'Estilo ENARE':(area==='*'?'Misto':areaNome(area));
-  sim={area,areaNome:areaNm,pool,idx:0,answers:{},tpq,left:tpq*pool.length,done:false};
-  persistSim(); nav='simulado'; render(); if(tpq){ startSimTimer(); }
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-function startExam(id){
-  const ex=(window.FM_EXAMS||[]).find(e=>e.id===id); if(!ex||!(ex.questoes||[]).length){ alert('Prova nao disponivel.'); return; }
-  const pool=ex.questoes.map(qq=>({id:ex.id+'_q'+qq.n,area:qq.area,q:qq.q,ops:qq.ops,correct:qq.correct,coment:qq.coment||('Gabarito oficial '+ex.banca+(ex.ano?' '+ex.ano:'')+(qq.correct<0?' - ANULADA (pontua para todos)':'')),ref:ex.titulo,img:qq.img}));
-  const tpq=90;
-  sim={area:'exam:'+ex.id,areaNome:ex.titulo,pool,idx:0,answers:{},tpq,left:tpq*pool.length,done:false};
-  persistSim(); nav='simulado'; render(); if(tpq)startSimTimer(); window.scrollTo({top:0,behavior:'smooth'});
-}
-function startSimTimer(){ clearInterval(simTimer); simTimer=setInterval(()=>{ if(!sim||sim.done){clearInterval(simTimer);return;} sim.left--; if(sim.left<=0){ sim.left=0; submitSim(); return;} const t=$('#simTimer'); if(t){ t.textContent=fmtT(sim.left); t.classList.toggle('warn',sim.left<60);} },1000); }
-const fmtT=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
-function simRun(){
-  const q=sim.pool[sim.idx]; const pk=sim.answers[sim.idx];
-  return `<div class="simbar">
-      ${sim.tpq?`<span class="timer" id="simTimer">${fmtT(sim.left)}</span>`:'<span class="muted">Sem cronômetro</span>'}
-      <button class="btn btn-g btn-sm" onclick="askSubmitSim()">Finalizar agora</button>
-    </div>
-    <div class="qwrap">
-      <div class="qmeta"><span class="pill" style="background:${areaCor(q.area)}1a;color:${areaCor(q.area)}">${esc(areaNome(q.area))}</span><span class="muted">Questão ${sim.idx+1} / ${sim.pool.length}</span></div>
-      <div class="qstem">${esc(q.q)}</div>
-      <div class="opt-hint"><i class="ti ti-arrows-horizontal"></i> arraste para riscar · toque para marcar</div>
-      <div class="qopts">${q.ops.map((op,i)=>`<button class="qopt" data-j="${i}" style="${pk===i?'border-color:var(--petrol);background:var(--soft)':''}"><span class="let">${LETRAS[i]}</span><span>${esc(op)}</span></button>`).join('')}</div>
-      <div class="navdots">${sim.pool.map((_,i)=>`<button class="${sim.answers[i]!=null?'ans':''} ${i===sim.idx?'cur':''}" onclick="simGo(${i})">${i+1}</button>`).join('')}</div>
-      <div class="row" style="margin-top:14px;justify-content:space-between">
-        <button class="btn btn-g btn-sm" ${sim.idx?'':'disabled'} onclick="simGo(${sim.idx-1})">← Anterior</button>
-        ${sim.idx+1<sim.pool.length?`<button class="btn btn-p" onclick="simGo(${sim.idx+1})">Próxima →</button>`:`<button class="btn btn-p" onclick="askSubmitSim()">Finalizar</button>`}
-      </div>
-    </div>`;
-}
-function simPick(i){ sim.answers[sim.idx]=i; persistSim(); render(); }
-function simGo(i){ if(i<0||i>=sim.pool.length)return; sim.idx=i; persistSim(); render(); window.scrollTo({top:0,behavior:'smooth'}); }
-function resumeSim(){
-  if(!simActive)return;
-  const pool=(simActive.qids||[]).map(qById).filter(Boolean);
-  if(!pool.length){ simActive=null; save(); render(); return; }
-  sim={area:simActive.area,areaNome:simActive.areaNome,pool,idx:Math.min(simActive.idx||0,pool.length-1),answers:simActive.answers||{},tpq:simActive.tpq||0,left:simActive.left||0,done:false};
-  nav='simulado'; render(); if(sim.tpq&&sim.left>0){ startSimTimer(); } window.scrollTo({top:0,behavior:'smooth'});
-}
-function descartarSim(){ if(confirm('Descartar o simulado em andamento?')){ simActive=null; save(); render(); } }
-function askSubmitSim(){ const resp=Object.keys(sim.answers).length; modal(`<h3>Finalizar simulado?</h3><p class="muted">Você respondeu ${resp} de ${sim.pool.length}.</p><div class="row" style="margin-top:14px"><button class="btn btn-p" onclick="closeModal();submitSim()">Finalizar e corrigir</button><button class="btn btn-g" onclick="closeModal()">Continuar</button></div>`); }
-function submitSim(){
-  clearInterval(simTimer);
-  let right=0; const porArea={};
-  sim.pool.forEach((q,i)=>{const ok=q.correct<0?true:(sim.answers[i]===q.correct);if(ok)right++;porArea[q.area]=porArea[q.area]||{t:0,c:0};porArea[q.area].t++;if(ok)porArea[q.area].c++;
-    // alimenta o histórico global de desempenho e revisão
-    if(sim.answers[i]!=null){answers[q.id]={picked:sim.answers[i],correct:ok,area:q.area,at:Date.now()};}
-  });
-  sim.right=right; sim.porArea=porArea; sim.done=true;
-  sims.push({at:Date.now(),n:sim.pool.length,right,pct:Math.round(right/sim.pool.length*100),area:sim.area,areaNome:sim.areaNome});
-  simActive=null; save(); render(); window.scrollTo({top:0,behavior:'smooth'});
-}
-function simResult(){
-  const pc=Math.round(sim.right/sim.pool.length*100);
-  return `<div class="stats3">
-     <div class="stat ${pc>=60?'green':'red'}"><div class="n">${pc}%</div><div class="l">aproveitamento</div></div>
-     <div class="stat green"><div class="n">${sim.right}</div><div class="l">acertos</div></div>
-     <div class="stat red"><div class="n">${sim.pool.length-sim.right}</div><div class="l">erros</div></div>
-   </div>
-   <div class="card"><h3 style="margin-bottom:10px">Por área</h3>${Object.keys(sim.porArea).map(a=>{const p=sim.porArea[a];const q=Math.round(p.c/p.t*100);return `<div class="barrow"><span class="nm">${esc(areaNome(a))}</span><span class="bar"><i style="width:${q}%;background:${areaCor(a)}"></i></span><span class="pc">${p.c}/${p.t}</span></div>`;}).join('')}</div>
-   <div class="row"><button class="btn btn-p" onclick="reviewSim()"><i class="ti ti-eye"></i> Ver correção comentada</button><button class="btn btn-g" onclick="go('simulado')">Novo simulado</button></div>`;
-}
-function reviewSim(){
-  // reaproveita a sessão de revisão com as questões do simulado
-  const pool=sim.pool.slice();
-  sess={mode:'review',area:'rev',pool,idx:0,picked:null,revealed:false,right:0,fromSim:true};
-  // marca já reveladas com a resposta dada
-  nav='revisao'; render(); window.scrollTo({top:0,behavior:'smooth'});
-}
-
-/* ====== IA: gerar mais questões ====== */
-async function genMore(area,esp,fromEmpty){
-  if(!(window.MT&&MT.ai)){ modal(`<h3>IA indisponível</h3><p class="muted">Entre na sua conta MedTech para gerar questões.</p><div class="row" style="margin-top:12px"><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`); return; }
-  const alvo=esp?`${esp} (${areaNome(area)})`:areaNome(area);
-  modal(`<h3><i class="ti ti-sparkles"></i> Gerar questões — ${esc(alvo)}</h3><div id="gout" class="muted"><span class="spin"></span> A IA está elaborando 5 questões inéditas nível residência…</div>`);
-  const pr=`Gere 5 questões INÉDITAS de múltipla escolha, nível prova de residência médica (estilo ENARE), sobre ${alvo}. Cada questão: enunciado clínico objetivo, 5 alternativas plausíveis com apenas UMA correta, e um comentário explicativo curto citando a diretriz/fonte quando possível. Baseie-se nas diretrizes vigentes. Responda APENAS um array JSON válido, sem markdown, sem texto fora do array, no formato exato: [{"q":"enunciado","ops":["a","b","c","d","e"],"correct":0,"coment":"explicação","ref":"fonte"}] (correct = índice 0-4 da alternativa correta).`;
-  try{
-    const out=await MT.ai(pr,'gemini-2.5-pro');
-    let txt=String(out||'').replace(/```json/gi,'').replace(/```/g,'').trim();
-    const i=txt.indexOf('['), j=txt.lastIndexOf(']'); if(i>=0&&j>i)txt=txt.slice(i,j+1);
-    const arr=JSON.parse(txt);
-    let add=0;
-    arr.forEach(o=>{ if(o&&o.q&&Array.isArray(o.ops)&&o.ops.length>=4&&typeof o.correct==='number'&&o.correct>=0&&o.correct<o.ops.length){
-      generated.push({id:'g_'+uid(),area,esp:esp||'',q:String(o.q),ops:o.ops.map(String),correct:o.correct,coment:String(o.coment||''),ref:String(o.ref||''),ia:true}); add++;
-    }});
-    save(); closeModal();
-    if(add&&(fromEmpty||!sess)){ startPractice(area); }
-    else if(add&&sess){ // injeta as novas no fim da fila atual
-      const novas=generated.slice(-add); sess.pool=sess.pool.slice(0,sess.idx+1).concat(novas,sess.pool.slice(sess.idx+1)); render();
-      toast(add+' questões novas adicionadas à fila');
-    } else if(!add){ modal(`<h3>Não deu certo</h3><p class="muted">A IA não retornou questões válidas. Tente de novo.</p><div class="row" style="margin-top:12px"><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`); }
-  }catch(e){ const el=$('#gout'); if(el)el.innerHTML='⚠ '+(e.message||'Falha ao gerar. Tente novamente.'); }
-}
-function toast(m){const t=document.createElement('div');t.textContent=m;t.style.cssText='position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;z-index:80;box-shadow:0 8px 24px rgba(0,0,0,.3)';document.body.appendChild(t);setTimeout(()=>t.remove(),2600);}
-
 /* ============================================================
-   FLASHCARDS (SM-2) — preservado do FlashMed original
+   CANETA — escrever à mão sobre o app (Apple Pencil / dedo / mouse)
    ============================================================ */
-function rate(card,q){
-  let ef=(card.ef||2.5)+(0.1-(5-q)*(0.08+(5-q)*0.02)); if(ef<1.3)ef=1.3; card.ef=ef;
-  if(q<3){card.reps=0;card.interval=0;card.due=Date.now();}
-  else{card.reps=(card.reps||0)+1;
-    if(card.reps===1)card.interval=1;else if(card.reps===2)card.interval=6;else card.interval=Math.max(1,Math.round((card.interval||1)*ef));
-    card.due=Date.now()+card.interval*86400000;}
-}
-const dueCount=d=>d.cards.filter(c=>(c.due||0)<=Date.now()).length;
-const daysAgo=t=>t?Math.floor((Date.now()-t)/86400000):null;
-function flashHome(){
-  return `<div class="toolbar">
-    <button class="btn btn-p" onclick="newDeck()">+ Meu baralho</button>
-    <span class="muted">${decks.length} baralho(s) · prontos do MedTech + os seus</span>
-  </div>
-  ${decks.map(d=>{
-    const dc=daysAgo(d.checkedAt);
-    const chk=d.builtin?`<span class="pill ${dc===null||dc>30?'due':''}">${dc===null?'nunca verificado':('verificado há '+dc+'d')}</span>`:'';
-    return `<div class="card deck"><div class="info">
-     <h3>${esc(d.name)} ${d.builtin?'<span class="pill bi">pronto</span>':''}</h3>
-     <p><span class="pill">${d.cards.length} cartões</span> ${dueCount(d)?`<span class="pill due">${dueCount(d)} para revisar</span>`:'<span class="pill">em dia</span>'} ${chk}</p>
-    </div><div class="row">
-     <button class="btn btn-p btn-sm" onclick="study('${d.id}')">Estudar</button>
-     <button class="btn btn-g btn-sm" onclick="manage('${d.id}')">Cartões</button>
-     ${d.builtin?`<button class="btn btn-g btn-sm" onclick="verifyDeck('${d.id}')"><i class="ti ti-sparkles"></i> Verificar (IA)</button>`:`<button class="btn btn-g btn-sm" onclick="delDeck('${d.id}')" title="Excluir baralho"><i class="ti ti-trash"></i></button>`}
-    </div></div>`;
-  }).join('')}
-  <div class="note"><b>Repetição espaçada (SM-2):</b> cada cartão volta no melhor momento — quanto mais fácil, mais distante. Os baralhos "prontos" são de nível avançado e a <b>IA verifica</b> se continuam atualizados.</div>`;
-}
-function study(id){const d=decks.find(x=>x.id===id);if(!d)return;fc.deck=id;fc.queue=d.cards.filter(c=>(c.due||0)<=Date.now());if(!fc.queue.length)fc.queue=d.cards.slice();fc.idx=0;fc.flip=false;fc.mode='study';fc.done=0;render();window.scrollTo({top:0,behavior:'smooth'});}
-function studyView(){
-  const d=decks.find(x=>x.id===fc.deck);
-  if(!fc.queue.length)return `<div class="card" style="text-align:center"><h3 style="margin-bottom:8px">✅ Sessão concluída!</h3><p class="muted">Você revisou os cartões disponíveis de "${esc(d.name)}".</p><div style="margin-top:18px"><button class="btn btn-p" onclick="fcHome()">Voltar aos baralhos</button></div></div>`;
-  const card=fc.queue[0];const pct=Math.round((fc.done/(fc.done+fc.queue.length))*100);
-  return `<div class="toolbar"><button class="btn btn-g btn-sm" onclick="fcHome()">← Baralhos</button><span class="muted">${esc(d.name)} · ${fc.queue.length} na fila</span></div>
-   <div class="prog"><i style="width:${pct}%"></i></div>
-   <div style="text-align:center">
-     <div class="flash" onclick="doFlip()"><div class="side">${fc.flip?`<div class="a">${esc(card.back)}</div>${card.ref?`<span class="refx">📚 ${esc(card.ref)}</span>`:''}<small>como você foi?</small>`:`<div class="q">${esc(card.front)}</div><small>toque para ver a resposta</small>`}</div></div>
-     ${fc.flip?`<div class="rate">
-       <button class="r0" onclick="answerFC(2)">Errei<small>de novo</small></button>
-       <button class="r1" onclick="answerFC(3)">Difícil<small>logo</small></button>
-       <button class="r2" onclick="answerFC(4)">Bom<small>+dias</small></button>
-       <button class="r3" onclick="answerFC(5)">Fácil<small>++dias</small></button>
-     </div>`:`<div style="margin-top:16px"><button class="btn btn-p" onclick="doFlip()">Mostrar resposta</button></div>`}
-   </div>`;
-}
-function doFlip(){fc.flip=!fc.flip;render();}
-function answerFC(q){const card=fc.queue.shift();rate(card,q);if((card.due||0)<=Date.now())fc.queue.push(card);else fc.done++;fc.flip=false;save();render();}
-function manage(id){fc.deck=id;fc.mode='manage';render();window.scrollTo({top:0,behavior:'smooth'});}
-function manageView(){
-  const d=decks.find(x=>x.id===fc.deck);
-  return `<div class="toolbar"><button class="btn btn-g btn-sm" onclick="fcHome()">← Baralhos</button>
-   ${d.builtin?`<button class="btn btn-g btn-sm" onclick="verifyDeck('${d.id}')"><i class="ti ti-sparkles"></i> Verificar atualização (IA)</button>`:`<button class="btn btn-p btn-sm" onclick="newCard()">+ Novo cartão</button>`}
-   <span class="muted">${esc(d.name)} · ${d.cards.length} cartões</span></div>
-   <div class="card">${d.cards.length?d.cards.map(c=>`<div class="carditem"><div><b>${esc(c.front)}</b><br><span class="muted">${esc(c.back)}</span>${c.ref?`<br><span style="color:var(--green);font-size:12px;font-weight:700">📚 ${esc(c.ref)}</span>`:''}</div>${d.builtin?'':`<button class="x" onclick="delCard('${c.id}')">×</button>`}</div>`).join(''):'<div class="empty">Sem cartões.</div>'}</div>`;
-}
-function fcHome(){fc.mode='home';render();window.scrollTo({top:0,behavior:'smooth'});}
-function newDeck(){const n=prompt('Nome do seu baralho:');if(n&&n.trim()){decks.push({id:uid(),name:n.trim(),cards:[]});save();render();}}
-function delDeck(id){if(confirm('Excluir este baralho?')){decks=decks.filter(d=>d.id!==id);save();render();}}
-function newCard(){const d=decks.find(x=>x.id===fc.deck);const f=prompt('Frente (pergunta):');if(!f)return;const b=prompt('Verso (resposta):');if(!b)return;d.cards.push({id:uid(),front:f.trim(),back:b.trim(),ef:2.5,interval:0,reps:0,due:0});save();render();}
-function delCard(id){const d=decks.find(x=>x.id===fc.deck);d.cards=d.cards.filter(c=>c.id!==id);save();render();}
-async function verifyDeck(id){
-  const d=decks.find(x=>x.id===id); if(!d)return;
-  modal(`<h3><i class="ti ti-sparkles"></i> Verificar atualização — ${esc(d.name)}</h3>
-    <p class="muted">A IA confere se as respostas continuam corretas e atualizadas. Pode levar 15–40 s.</p>
-    <div id="vout" class="coment" style="margin-top:10px"><span class="spin"></span> Analisando ${d.cards.length} cartões…</div>
-    <div class="row" style="margin-top:14px"><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
-  const lista=d.cards.map((c,i)=>`${i+1}. P: ${c.front}\n   R: ${c.back}`).join('\n');
-  const pr=`Você é um revisor médico sênior. Abaixo há flashcards (Pergunta/Resposta) de "${d.name}". Verifique se cada RESPOSTA está CORRETA e ATUALIZADA segundo as diretrizes vigentes. Liste APENAS os cartões com problema, no formato "Nº — problema e correção". Se tudo certo, responda exatamente: "✅ Todos os cartões estão corretos e atualizados.".\n\nCartões:\n${lista}`;
-  try{
-    const out=await MT.ai(pr);
-    const el=$('#vout'); if(el) el.textContent=out||'Sem retorno da IA.';
-    d.checkedAt=Date.now(); save();
-  }catch(err){ const el=$('#vout'); if(el) el.textContent='⚠ '+(err.message||'Falha ao verificar.'); }
-}
+(function(){
+  const canvas = document.getElementById("inkCanvas");
+  const ctx    = canvas.getContext("2d");
+  const fab    = document.getElementById("penFab");
+  const tools  = document.getElementById("penTools");
+  let penMode=false, drawing=false, erasing=false, color="#15302E";
+  let activeId=null, lastPen=0, lastX=0, lastY=0;
+  const inkStore = new Map();   // tinta por questão (na memória): chave -> dataURL
+  let curKey = null;
 
-/* ====== Modal ====== */
-function modal(html){closeModal();const d=document.createElement('div');d.className='modal';d.id='modal';d.innerHTML='<div class="box">'+html+'</div>';d.onclick=e=>{if(e.target===d)closeModal();};document.body.appendChild(d);}
-function closeModal(){const m=document.getElementById('modal');if(m)m.remove();}
+  function clearPixels(){ ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,canvas.width,canvas.height); ctx.restore(); }
+  function stash(){
+    if(curKey==null) return;
+    // guarda só se houver algo desenhado; senão, remove a chave
+    let blank=true;
+    try{
+      const d=ctx.getImageData(0,0,canvas.width,canvas.height).data;
+      for(let i=3;i<d.length;i+=4){ if(d[i]!==0){ blank=false; break; } }
+    }catch(_){ blank=false; }
+    if(blank) inkStore.delete(curKey);
+    else inkStore.set(curKey, canvas.toDataURL());
+  }
 
-/* ====== Boot ====== */
-function whenMT(cb){if(window.MT){cb();}else{setTimeout(()=>whenMT(cb),30);}}
-whenMT(()=>{
-  MT.onData(function(d){
-    decks=(d&&Array.isArray(d.decks))?d.decks:[];
-    answers=(d&&d.answers)||{}; marked=(d&&Array.isArray(d.marked))?d.marked:[];
-    generated=(d&&Array.isArray(d.generated))?d.generated:[]; sims=(d&&Array.isArray(d.sims))?d.sims:[];
-    simActive=(d&&d.simActive)||null;
-    ensureBuiltin();
-    if(!mtReady){mtReady=true;}
-    render();
+  function sizeCanvas(){
+    const dpr = Math.min(window.devicePixelRatio||1, 3);
+    // preserva o desenho existente ao redimensionar/girar
+    let prev=null;
+    if(canvas.width){ prev=document.createElement("canvas"); prev.width=canvas.width; prev.height=canvas.height; prev.getContext("2d").drawImage(canvas,0,0); }
+    const w=window.innerWidth, h=window.innerHeight;
+    canvas.style.width=w+"px"; canvas.style.height=h+"px";
+    canvas.width=Math.round(w*dpr); canvas.height=Math.round(h*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.lineCap="round"; ctx.lineJoin="round";
+    if(prev){ ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.drawImage(prev,0,0,prev.width,prev.height,0,0,canvas.width,canvas.height); ctx.restore(); }
+  }
+  sizeCanvas();
+  window.addEventListener("resize", sizeCanvas);
+  window.addEventListener("orientationchange", ()=>setTimeout(sizeCanvas,250));
+
+  function setMode(on){
+    penMode = on;
+    canvas.classList.toggle("active", on);
+    tools.hidden = !on;
+    fab.classList.toggle("on", on);
+    fab.textContent = on ? "✕" : "✏️";
+    fab.setAttribute("aria-label", on ? "Sair do modo caneta" : "Escrever com a caneta");
+  }
+  fab.onclick = ()=> setMode(!penMode);
+
+  tools.querySelectorAll(".pen-color").forEach(b=>{
+    b.onclick = ()=>{ color=b.dataset.color; erasing=false; refreshSel(); };
   });
-});
-render();
+  document.getElementById("penEraser").onclick = ()=>{ erasing=!erasing; refreshSel(); };
+  document.getElementById("penClear").onclick = ()=>{
+    clearPixels();
+    if(curKey!=null) inkStore.delete(curKey);
+  };
+
+  // API usada pelo quiz para manter a tinta só na questão em que foi feita
+  window.QuizInk = {
+    switchTo(key){
+      if(key===curKey) return;
+      stash();                 // salva a tinta da questão anterior
+      curKey = key;
+      clearPixels();
+      const d = inkStore.get(key);
+      if(d){ const img=new Image(); img.onload=()=>{ if(curKey!==key) return; ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.drawImage(img,0,0,canvas.width,canvas.height); ctx.restore(); }; img.src=d; }
+    }
+  };
+  function refreshSel(){
+    tools.querySelectorAll(".pen-color").forEach(b=>b.classList.toggle("sel", !erasing && b.dataset.color===color));
+    document.getElementById("penEraser").classList.toggle("sel", erasing);
+  }
+  refreshSel();
+
+  function seg(x,y,pressure){
+    ctx.globalCompositeOperation = erasing ? "destination-out" : "source-over";
+    ctx.strokeStyle = color;
+    ctx.lineWidth = erasing ? 26 : 2.4*(0.35 + 1.3*(pressure||0.5));
+    ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(x,y); ctx.stroke();
+    lastX=x; lastY=y;
+  }
+  canvas.addEventListener("pointerdown", e=>{
+    if(!penMode) return;
+    // rejeição de palma: se a caneta foi usada há pouco, ignora o toque da mão
+    if(e.pointerType==="touch" && (performance.now()-lastPen)<1000){ e.preventDefault(); return; }
+    if(e.pointerType==="pen") lastPen=performance.now();
+    drawing=true; activeId=e.pointerId;
+    try{ canvas.setPointerCapture(e.pointerId); }catch(_){}
+    lastX=e.clientX; lastY=e.clientY;
+    seg(e.clientX+0.01, e.clientY+0.01, e.pressure); // pontinho ao tocar
+    e.preventDefault();
+  });
+  canvas.addEventListener("pointermove", e=>{
+    if(!drawing || e.pointerId!==activeId) return;
+    if(e.pointerType==="pen") lastPen=performance.now();
+    let evs = e.getCoalescedEvents ? e.getCoalescedEvents() : null;
+    if(!evs || !evs.length) evs = [e];
+    for(const ev of evs) seg(ev.clientX, ev.clientY, ev.pressure);
+    e.preventDefault();
+  });
+  function end(e){ if(e.pointerId===activeId){ drawing=false; activeId=null; } }
+  canvas.addEventListener("pointerup", end);
+  canvas.addEventListener("pointercancel", end);
+})();
+</script>
+
+<script>
+/* ---- PWA: registro do service worker + auto-atualização ---- */
+if ("serviceWorker" in navigator) {
+  const hadController = !!navigator.serviceWorker.controller;
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (refreshing) return; refreshing = true;
+    if (hadController) window.location.reload();   // pega a versão nova automaticamente
+  });
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").then(reg => { try{ reg.update(); }catch(e){} }).catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
