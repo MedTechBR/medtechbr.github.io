@@ -131,7 +131,7 @@ footer a{color:var(--primary);font-weight:600;text-decoration:none}
       <b>Base:</b> Pergunta Surpresa (GSF); indicadores gerais de deterioração e por doença derivados de instrumentos validados (SPICT™, NECPAL CCOMS-ICO©) e dos critérios CMS/NHPCO de status terminal; escalas funcionais PPS/ECOG/Karnofsky; contexto brasileiro: ANCP, Política Nacional de Cuidados Paliativos (Portaria GM/MS 3.681/2024) e Resoluções CFM 1.805/2006 e 2.156/2016.<br>
       <span style="color:var(--muted)">SPICT™, NECPAL© e PPS são instrumentos registrados; o PaliAI usa os indicadores clínicos publicados, sem reproduzir o material proprietário.</span>
     </div>
-    <div class="disclaimer">⚠️ Ferramenta de apoio à decisão. Resultado positivo significa "considerar avaliação de cuidados paliativos / reunião familiar", <b>não</b> prognóstico de morte. A decisão é sempre do médico, com o paciente e a família.</div>
+    <div class="disclaimer"><i class="ti ti-alert-triangle"></i> Ferramenta de apoio à decisão. Resultado positivo significa "considerar avaliação de cuidados paliativos / reunião familiar", <b>não</b> prognóstico de morte. A decisão é sempre do médico, com o paciente e a família.</div>
   </div>
 </main>
 <footer>PaliAI · <a href="app.html">Portal MedTech</a> — apoio à decisão; confirme condutas e elegibilidade no contexto do seu serviço.</footer>
@@ -177,7 +177,7 @@ function compute(){
   if(pps)why.push('Funcional: '+document.getElementById('pps').selectedOptions[0].text.split('—')[0].trim()+(ppsLow?' <b>(baixo)</b>':''));
   if(nG)why.push(nG+' indicador(es) geral(is) de deterioração.');
   if(nE)why.push(nE+' indicador(es) específico(s) da doença.');
-  if(SQ==='sim'&&positive)why.push('⚠️ <b>Os indicadores clínicos sugerem doença avançada apesar da Pergunta Surpresa positiva</b> — reavalie a resposta.');
+  if(SQ==='sim'&&positive)why.push('<i class="ti ti-alert-triangle"></i> <b>Os indicadores clínicos sugerem doença avançada apesar da Pergunta Surpresa positiva</b> — reavalie a resposta.');
   let cls,icon,title,msg;
   if(positive){
     if(strong){cls='red';icon='ti-alert-triangle';title='Avaliação de cuidados paliativos RECOMENDADA';msg='Indicadores de doença avançada/deterioração presentes. Acione avaliação paliativa e <b>reunião familiar estruturada</b> precocemente; discuta objetivos de cuidado e planejamento antecipado.';}
