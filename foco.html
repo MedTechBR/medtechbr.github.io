@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#0f172a">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#0A0E14">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,24 +15,26 @@
 <!-- Login único MedTech + sincronização na nuvem (mesmo módulo do portal) -->
 <script>window.MT_APP={id:"foco",name:"Foco"};</script>
 <script src="_mtfb.js?v=1"></script>
-<script type="module" src="_mtauth.js?v=8"></script>
+<script type="module" src="_mtauth.js?v=9"></script>
 <style>
   :root{
-    --bg:#0b1220; --surface:#0f172a; --surface2:#1e293b; --border:#334155;
-    --txt:#e2e8f0; --muted:#94a3b8;
-    --petrol:#2563eb; --petrol-d:#1e40af; --mint:#60a5fa; --mint-d:#3b82f6; --ink:#0f172a;
-    --accent:#60a5fa; --accent2:#93c5fd; --on-mint:#0b2545;
-    --green:#22c55e; --amber:#f59e0b; --red:#ef4444; --blue:#38bdf8;
-    --radius:16px; --shadow:0 10px 34px rgba(0,0,0,.45);
+    --bg:#0A0E14; --surface:#111823; --surface2:#18222f; --border:rgba(140,160,185,.16);
+    --txt:#E7EEF7; --muted:#8A98AC;
+    --petrol:#4C8DFF; --petrol-d:#2f6ae0; --mint:#4C8DFF; --mint-d:#2f6ae0; --ink:#0A0E14;
+    --accent:#4C8DFF; --accent2:#7FB0FF; --on-mint:#08111f;
+    --green:#3FB950; --amber:#E3B341; --red:#F85149; --blue:#38bdf8;
+    --glow:rgba(76,141,255,.42); --line:rgba(88,166,255,.12); --teal:#38E1C6;
+    --radius:16px; --shadow:0 12px 34px rgba(0,0,0,.55);
     --nav-h:58px;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   body{
     font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-    background:var(--bg); color:var(--txt); min-height:100vh;
+    background-color:#0A0E14; color:var(--txt); min-height:100vh;
     padding-bottom:calc(var(--nav-h) + 100px + env(safe-area-inset-bottom));
-    background-image:radial-gradient(1200px 620px at 82% -12%,rgba(96,165,250,.11),transparent),
-                     radial-gradient(950px 540px at -12% 6%,rgba(14,90,109,.26),transparent);
+    background-image:radial-gradient(1100px 460px at 84% -10%,rgba(76,141,255,.12),transparent 60%),radial-gradient(840px 460px at 4% 110%,rgba(56,225,198,.06),transparent 55%),linear-gradient(rgba(140,160,185,.032) 1px,transparent 1px),linear-gradient(90deg,rgba(140,160,185,.032) 1px,transparent 1px);
+    background-size:auto,auto,34px 34px,34px 34px;
+    background-attachment:fixed;
   }
   header{
     padding:calc(14px + env(safe-area-inset-top)) 20px 14px; position:sticky; top:0; z-index:20;
@@ -115,7 +117,7 @@
   /* notas */
   .note-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;
              cursor:pointer;position:relative;border-left:4px solid var(--mint);transition:transform .15s,border-color .2s,box-shadow .2s}
-  .note-card:hover{border-color:rgba(96,165,250,.4);box-shadow:0 6px 18px rgba(0,0,0,.25)}
+  .note-card:hover{border-color:rgba(76,141,255,.4);box-shadow:0 6px 18px rgba(0,0,0,.25)}
   .note-card:active{transform:scale(.99)}
   .note-card .nt{font-size:15px;font-weight:700;margin-bottom:5px;word-break:break-word}
   .note-card .nx{font-size:13.5px;color:var(--muted);line-height:1.5;white-space:pre-wrap;word-break:break-word;
@@ -136,9 +138,9 @@
   .fab{position:fixed;right:18px;bottom:calc(var(--nav-h) + 18px + env(safe-area-inset-bottom));
        width:56px;height:56px;border-radius:50%;
        background:linear-gradient(135deg,var(--mint),var(--mint-d));color:var(--on-mint);border:none;font-size:28px;font-weight:400;cursor:pointer;z-index:30;
-       box-shadow:0 8px 22px rgba(96,165,250,.38);display:flex;align-items:center;justify-content:center;
+       box-shadow:0 8px 22px rgba(76,141,255,.38);display:flex;align-items:center;justify-content:center;
        transition:transform .18s cubic-bezier(.2,.8,.2,1),box-shadow .2s}
-  .fab:hover{box-shadow:0 12px 30px rgba(96,165,250,.52)}
+  .fab:hover{box-shadow:0 12px 30px rgba(76,141,255,.52)}
   .fab:active{transform:scale(.9)}
   .fab svg{width:26px;height:26px}
   .fab-mic{right:84px;bottom:calc(var(--nav-h) + 20px + env(safe-area-inset-bottom));width:52px;height:52px;
@@ -182,8 +184,8 @@
   .prio-pick button{flex:1;padding:11px;border-radius:11px;border:1px solid var(--border);background:var(--surface2);
                     color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:.15s}
   .prio-pick button.sel.alta{background:var(--red);border-color:var(--red);color:#fff}
-  .prio-pick button.sel.media{background:var(--amber);border-color:var(--amber);color:#fff}
-  .prio-pick button.sel.baixa{background:var(--blue);border-color:var(--blue);color:#fff}
+  .prio-pick button.sel.media{background:var(--amber);border-color:var(--amber);color:#0A0E14}
+  .prio-pick button.sel.baixa{background:var(--blue);border-color:var(--blue);color:#0A0E14}
   .row{display:flex;gap:10px}
   .row .field{flex:1}
   .actions{display:flex;gap:10px;margin-top:8px}
@@ -191,8 +193,8 @@
   .btn.primary{background:linear-gradient(135deg,var(--mint),var(--mint-d));color:var(--on-mint);font-weight:800}
   .btn.ghost{background:var(--surface2);color:var(--muted)}
 
-  .hl-card{background:linear-gradient(135deg,rgba(14,90,109,.30),rgba(96,165,250,.08));
-           border:1px solid rgba(96,165,250,.22)}
+  .hl-card{background:linear-gradient(135deg,rgba(14,90,109,.30),rgba(76,141,255,.08));
+           border:1px solid rgba(76,141,255,.22)}
   .hl-card .ev{background:rgba(255,255,255,.03)}
 
   /* header layout + gear */
@@ -211,16 +213,16 @@
   .iconbtn.del:hover{color:var(--red)}
 
   /* AI panel */
-  .ai-card{background:linear-gradient(135deg,rgba(96,165,250,.13),rgba(14,90,109,.10));
-           border:1px solid rgba(96,165,250,.28);border-radius:var(--radius);padding:16px;margin-bottom:6px}
+  .ai-card{background:linear-gradient(135deg,rgba(76,141,255,.13),rgba(14,90,109,.10));
+           border:1px solid rgba(76,141,255,.28);border-radius:var(--radius);padding:16px;margin-bottom:6px}
   .ai-head{display:flex;align-items:center;gap:8px;margin-bottom:4px}
   .ai-head .t{font-size:15px;font-weight:700}
-  .ai-head .badge{font-size:10px;font-weight:800;letter-spacing:.4px;background:rgba(96,165,250,.20);color:var(--accent2);padding:2px 7px;border-radius:20px}
+  .ai-head .badge{font-size:10px;font-weight:800;letter-spacing:.4px;background:rgba(76,141,255,.20);color:var(--accent2);padding:2px 7px;border-radius:20px}
   .ai-sub{font-size:12.5px;color:var(--muted);line-height:1.4;margin-bottom:12px}
   .ai-btn{width:100%;padding:13px;border-radius:11px;border:none;background:linear-gradient(135deg,var(--mint),var(--mint-d));
           color:var(--on-mint);font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;
-          box-shadow:0 6px 18px rgba(96,165,250,.30);transition:transform .15s,box-shadow .2s}
-  .ai-btn:hover{box-shadow:0 8px 22px rgba(96,165,250,.42)}
+          box-shadow:0 6px 18px rgba(76,141,255,.30);transition:transform .15s,box-shadow .2s}
+  .ai-btn:hover{box-shadow:0 8px 22px rgba(76,141,255,.42)}
   .ai-btn:active{transform:scale(.98)} .ai-btn:disabled{opacity:.6;box-shadow:none}
   .ai-out{margin-top:14px;display:none}
   .ai-out.show{display:block;animation:fade .3s}
@@ -230,7 +232,7 @@
   .ai-rank:last-child{border-bottom:none}
   .ai-rank .num{flex:0 0 26px;height:26px;border-radius:50%;background:var(--surface2);color:var(--accent2);font-size:13px;
                 font-weight:800;display:flex;align-items:center;justify-content:center;border:1px solid var(--border)}
-  .ai-rank.top .num{background:linear-gradient(135deg,var(--mint),var(--mint-d));color:var(--on-mint);border:none;box-shadow:0 0 0 4px rgba(96,165,250,.18)}
+  .ai-rank.top .num{background:linear-gradient(135deg,var(--mint),var(--mint-d));color:var(--on-mint);border:none;box-shadow:0 0 0 4px rgba(76,141,255,.18)}
   .ai-rank .rb{flex:1;min-width:0}
   .ai-rank .rt{font-size:14px;font-weight:600;line-height:1.3}
   .ai-rank .rm{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.4}
@@ -245,13 +247,16 @@
   .btn.danger{background:rgba(239,68,68,.15);color:#fca5a5}
 
   /* ====== microinterações & polimento ====== */
-  .title{background:linear-gradient(90deg,var(--txt),var(--accent2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .title{color:var(--txt)}
+  .title,.sheet h3,.section-h h2,.day-h .dow,.ai-head .t,.note-card .nt{font-family:'Space Grotesk','Inter',sans-serif}
+  .stat .n,.ev .time .h,.rec-timer,.date,.ai-head .badge,.section-h .count{font-family:'JetBrains Mono',ui-monospace,monospace}
+  input:-webkit-autofill,input:-webkit-autofill:focus,textarea:-webkit-autofill,select:-webkit-autofill{-webkit-box-shadow:0 0 0 100px #0E141D inset;-webkit-text-fill-color:#E7EEF7;caret-color:#E7EEF7;transition:background-color 99999s}
   .stat{transition:transform .15s,border-color .2s}
-  .stat:hover{border-color:rgba(96,165,250,.3)}
+  .stat:hover{border-color:rgba(76,141,255,.3)}
   .item{transition:transform .15s,border-color .2s,box-shadow .2s,opacity .2s}
-  .item:hover{border-color:rgba(96,165,250,.28)}
+  .item:hover{border-color:rgba(76,141,255,.28)}
   .ev{transition:transform .15s,border-color .2s}
-  .ev:hover{border-color:rgba(96,165,250,.28)}
+  .ev:hover{border-color:rgba(76,141,255,.28)}
   .check{transition:transform .15s,background .2s,border-color .2s}
   .check:active{transform:scale(.85)}
   .check.done{animation:checkPop .3s cubic-bezier(.2,.9,.3,1.4)}

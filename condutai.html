@@ -3,67 +3,78 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#2563eb">
+<meta name="theme-color" content="#0A0E14">
 <title>CondutAI — Abordagem clínica baseada em diretrizes</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%95%EF%B8%8F%3C/text%3E%3C/svg%3E">
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"condutai",name:"CondutAI"};</script>
-<script type="module" src="_mtauth.js?v=8"></script>
+<script type="module" src="_mtauth.js?v=9"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
 <style>
 :root {
-  --bg: #f7f9fb;
-  --bg-card: #ffffff;
-  --bg-soft: #eef2f5;
-  --text: #0f172a;
-  --text-soft: #475569;
-  --text-mute: #94a3b8;
-  --border: #e2e8f0;
-  --primary: #2563eb;
-  --primary-dark: #1e40af;
-  --primary-soft: #e8f0fe;
-  --danger: #dc2626;
-  --warn: #d97706;
-  --warn-soft: #fef3c7;
-  --info: #2563eb;
-  --info-soft: #dbeafe;
-  --success: #16a34a;
-  --success-soft: #dcfce7;
-  --purple: #7c3aed;
-  --purple-soft: #ede9fe;
-  --caso: #ea580c;
-  --caso-dark: #c2410c;
-  --caso-soft: #ffedd5;
-  --shadow: 0 1px 3px rgba(15,23,42,.06), 0 1px 2px rgba(15,23,42,.04);
-  --shadow-lg: 0 10px 25px -5px rgba(15,23,42,.08), 0 8px 10px -6px rgba(15,23,42,.04);
+  /* Console Dark — padrão (sem toggle) */
+  --bg: #0A0E14;
+  --bg-card: #111823;
+  --bg-soft: #18222f;
+  --panel2: #0E141D;
+  --text: #E7EEF7;
+  --text-soft: #8A98AC;
+  --text-mute: #5A6B80;
+  --border: rgba(140,160,185,.16);
+  --line: rgba(88,166,255,.12);
+  --line-strong: rgba(140,160,185,.16);
+  --soft: rgba(76,141,255,.12);
+  --glow: rgba(76,141,255,.42);
+  --primary: #4C8DFF;
+  --primary-dark: #2f6ae0;
+  --primary-soft: #15294d;
+  --teal: #38E1C6;
+  --danger: #F85149;
+  --warn: #E3B341;
+  --warn-soft: #2a1e08;
+  --info: #4C8DFF;
+  --info-soft: #14243f;
+  --success: #3FB950;
+  --success-soft: #10281a;
+  --purple: #a78bfa;
+  --purple-soft: #241a44;
+  --caso: #fb923c;
+  --caso-dark: #fdba74;
+  --caso-soft: #2c1808;
+  --shadow: 0 1px 3px rgba(0,0,0,.42), 0 1px 2px rgba(0,0,0,.3);
+  --shadow-lg: 0 14px 34px -10px rgba(0,0,0,.6), 0 0 0 1px var(--line);
 }
 [data-theme="dark"] {
-  --bg: #0b1220;
-  --bg-card: #111a2e;
-  --bg-soft: #1a2540;
-  --text: #f1f5f9;
-  --text-soft: #cbd5e1;
-  --text-mute: #64748b;
-  --border: #1e293b;
-  --primary: #3b82f6;
-  --primary-dark: #2563eb;
-  --primary-soft: #1e3a8a;
-  --warn-soft: #422006;
-  --info-soft: #1e3a8a;
-  --success-soft: #14532d;
-  --purple-soft: #3b1d6b;
-  --caso-soft: #431407;
+  --bg: #0A0E14;
+  --bg-card: #111823;
+  --bg-soft: #18222f;
+  --panel2: #0E141D;
+  --text: #E7EEF7;
+  --text-soft: #8A98AC;
+  --text-mute: #5A6B80;
+  --border: rgba(140,160,185,.16);
+  --primary: #4C8DFF;
+  --primary-dark: #2f6ae0;
+  --primary-soft: #15294d;
+  --warn-soft: #2a1e08;
+  --info-soft: #14243f;
+  --success-soft: #10281a;
+  --purple-soft: #241a44;
+  --caso-soft: #2c1808;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   letter-spacing: -.011em;
-  background: var(--bg);
+  background-color: #0A0E14;
+  background-image: radial-gradient(1100px 460px at 84% -10%,rgba(76,141,255,.12),transparent 60%),radial-gradient(840px 460px at 4% 110%,rgba(56,225,198,.06),transparent 55%),linear-gradient(rgba(140,160,185,.032) 1px,transparent 1px),linear-gradient(90deg,rgba(140,160,185,.032) 1px,transparent 1px);
+  background-size: auto,auto,34px 34px,34px 34px;
+  background-attachment: fixed;
   color: var(--text);
   font-size: 15px;
   line-height: 1.55;
@@ -75,9 +86,15 @@ body {
   height: 100vh;
   overflow: hidden;
 }
+/* Console Dark — tipografia + inputs */
+.logo, .result-title, .content h1, .content h2, .content h3, .wb-hero h3, .wb-section-title, .wb-hi, .wb-card .ttl, .modal h2, .modal h3 { font-family: 'Space Grotesk', 'Inter', sans-serif; }
+.mode-badge, .result-title .badge, .result-meta, .history-date, .wb-badge, .chip, .option-select { font-family: 'JetBrains Mono', ui-monospace, monospace; letter-spacing: 0; }
+input:-webkit-autofill, input:-webkit-autofill:focus, textarea:-webkit-autofill, select:-webkit-autofill { -webkit-box-shadow: 0 0 0 100px #0E141D inset; -webkit-text-fill-color: #E7EEF7; caret-color: #E7EEF7; transition: background-color 99999s; }
+.wb-card .ic { background: var(--soft) !important; color: var(--primary) !important; box-shadow: inset 0 0 0 1px var(--line); }
 header {
   grid-area: head;
-  background: var(--bg-card);
+  background: rgba(10,14,20,.72);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -93,7 +110,7 @@ header {
   border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
   color: white; font-size: 18px;
-  box-shadow: 0 2px 8px rgba(15,23,42,.3);
+  box-shadow: 0 2px 14px var(--glow);
 }
 .subtitle { color: var(--text-mute); font-size: 13px; font-weight: 400; margin-left: 4px; }
 .header-actions { margin-left: auto; display: flex; gap: 8px; }
@@ -126,7 +143,7 @@ aside {
   border-radius: 6px;
   transition: all .15s;
 }
-.side-tab.active { background: var(--primary-soft); color: var(--primary-dark); }
+.side-tab.active { background: var(--primary-soft); color: var(--primary); }
 [data-theme="dark"] .side-tab.active { color: var(--primary); }
 .side-list { flex: 1; overflow-y: auto; padding: 8px; }
 .history-item {
@@ -141,7 +158,7 @@ aside {
   display: flex; align-items: flex-start; gap: 8px;
 }
 .history-item:hover { background: var(--bg-soft); }
-.history-item.active { background: var(--primary-soft); color: var(--primary-dark); border-color: var(--primary); }
+.history-item.active { background: var(--primary-soft); color: var(--text); border-color: var(--primary); }
 [data-theme="dark"] .history-item.active { color: var(--text); }
 .history-content { flex: 1; min-width: 0; }
 .history-title { font-weight: 500; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
@@ -150,7 +167,7 @@ aside {
   border-radius: 6px; flex-shrink: 0;
   text-transform: uppercase; letter-spacing: .03em;
 }
-.mode-badge.direta { background: var(--primary-soft); color: var(--primary-dark); }
+.mode-badge.direta { background: var(--primary-soft); color: var(--primary); }
 .mode-badge.socratica { background: var(--purple-soft); color: var(--purple); }
 .mode-badge.caso { background: var(--caso-soft); color: var(--caso); }
 .mode-badge.protocolo { background: var(--success-soft); color: var(--success); }
@@ -226,7 +243,7 @@ main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
   font-size: 12px; color: var(--text-soft); cursor: pointer;
   transition: all .15s;
 }
-.chip:hover { background: var(--primary-soft); color: var(--primary-dark); border-color: var(--primary); }
+.chip:hover { background: var(--primary-soft); color: var(--primary); border-color: var(--primary); }
 
 .options-row {
   max-width: 900px; margin: 0 auto 16px;
@@ -257,7 +274,7 @@ main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
   border-radius: 6px; margin-left: 8px; vertical-align: middle;
   text-transform: uppercase;
 }
-.result-title .badge.direta { background: var(--primary-soft); color: var(--primary-dark); }
+.result-title .badge.direta { background: var(--primary-soft); color: var(--primary); }
 .result-title .badge.socratica { background: var(--purple-soft); color: var(--purple); }
 .result-title .badge.caso { background: var(--caso-soft); color: var(--caso); }
 .result-title .badge.protocolo { background: var(--success-soft); color: var(--success); }
@@ -276,12 +293,12 @@ main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
 .content h1 { font-size: 22px; }
 .content h2 {
   font-size: 17px; padding: 10px 14px;
-  background: var(--primary-soft); color: var(--primary-dark);
+  background: var(--primary-soft); color: var(--text);
   border-left: 4px solid var(--primary); border-radius: 6px;
   margin-top: 24px;
 }
 [data-theme="dark"] .content h2 { color: var(--text); }
-.content h3 { font-size: 15px; color: var(--primary-dark); margin-top: 16px; }
+.content h3 { font-size: 15px; color: var(--primary); margin-top: 16px; }
 [data-theme="dark"] .content h3 { color: var(--primary); }
 .content p { margin: 8px 0; color: var(--text-soft); }
 .content ul, .content ol { margin: 8px 0 12px 22px; color: var(--text-soft); }
@@ -424,12 +441,12 @@ main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
   margin: 16px 0; font-size: 13px;
   display: flex; gap: 10px;
 }
-.alert-warn { background: var(--warn-soft); border: 1px solid #fbbf24; color: #92400e; }
+.alert-warn { background: var(--warn-soft); border: 1px solid var(--warn); color: var(--warn); }
 [data-theme="dark"] .alert-warn { color: #fbbf24; }
-.alert-info { background: var(--info-soft); border: 1px solid #60a5fa; color: #1e40af; }
+.alert-info { background: var(--info-soft); border: 1px solid var(--info); color: var(--info); }
 [data-theme="dark"] .alert-info { color: #93c5fd; }
 .alert-socratic { background: var(--purple-soft); border: 1px solid var(--purple); color: var(--purple); }
-.alert-caso { background: var(--caso-soft); border: 1px solid var(--caso); color: var(--caso-dark); }
+.alert-caso { background: var(--caso-soft); border: 1px solid var(--caso); color: var(--caso); }
 [data-theme="dark"] .alert-caso { color: #fb923c; }
 
 /* Destaque especial para seção "discussão com residente" no modo caso */
@@ -703,7 +720,9 @@ main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
 .help-link:hover { text-decoration: underline; }
 
 @media print {
-  body { display: block; height: auto; overflow: visible; background: white; }
+  body { display: block; height: auto; overflow: visible; background: #fff; color: #111; }
+  .content, .content p, .content li, .content ul, .content ol, .result-title, .result-meta, .content strong { color: #111 !important; }
+  .content h3 { color: #1e40af !important; }
   header, aside, .search-box, .options-row, .result-actions, .followup-box, .mode-toggle, .mermaid-controls, .mermaid-modal { display: none !important; }
   main { padding: 0; overflow: visible; }
   .result, .chat-container { border: none; box-shadow: none; padding: 0; max-width: none; }
@@ -760,7 +779,7 @@ aside, .aside-backdrop { display: none !important; }
 header {
   display: block !important;
   position: static !important;
-  background: var(--primary);
+  background: linear-gradient(160deg, #16233f, #0E141D);
   color: #fff;
   padding: calc(18px + env(safe-area-inset-top)) 18px 20px !important;
   border: 0 !important;
@@ -774,9 +793,9 @@ header .logo, header > .header-actions { display: none !important; }
 .wb-headbtns { display: flex; gap: 8px; flex: 0 0 auto; }
 .wb-headbtns button { background: rgba(255,255,255,.16); color: #fff; border: 0; width: 38px; height: 38px; border-radius: 11px; font-size: 17px; cursor: pointer; transition: background .12s; }
 .wb-headbtns button:hover { background: rgba(255,255,255,.28); }
-.wb-search { margin-top: 16px; background: #fff; border-radius: 14px; display: flex; align-items: center; gap: 10px; padding: 0 14px; box-shadow: 0 8px 20px rgba(0,0,0,.14); }
+.wb-search { margin-top: 16px; background: var(--panel2); border: 1px solid var(--line); border-radius: 14px; display: flex; align-items: center; gap: 10px; padding: 0 14px; box-shadow: 0 8px 20px rgba(0,0,0,.35); }
 .wb-search span { color: var(--primary); font-size: 18px; }
-.wb-search input { flex: 1; border: 0; outline: 0; background: transparent; padding: 15px 0; font-size: 15px; color: #0f172a; font-family: inherit; }
+.wb-search input { flex: 1; border: 0; outline: 0; background: transparent; padding: 15px 0; font-size: 15px; color: var(--text); font-family: inherit; }
 
 /* Main vira coluna scrollável */
 main, #main { display: block !important; height: auto !important; overflow: visible !important; padding: 16px 16px 8px !important; max-width: none !important; }
@@ -788,7 +807,7 @@ main, #main { display: block !important; height: auto !important; overflow: visi
 .wb-section-title { font-size: 12.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--text-soft); margin: 4px 2px 12px; }
 
 /* Banner IA em destaque */
-.wb-hero { background: var(--primary); color: #fff; border-radius: 16px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; cursor: pointer; box-shadow: 0 8px 20px rgba(37,99,235,.22); }
+.wb-hero { background: linear-gradient(135deg, var(--primary-dark), #16233f); color: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; cursor: pointer; box-shadow: 0 10px 26px -6px var(--glow); }
 .wb-hero .he-ic { font-size: 30px; flex: 0 0 auto; }
 .wb-hero h3 { font-size: 16px; font-weight: 800; }
 .wb-hero p { font-size: 12.5px; opacity: .92; margin-top: 2px; line-height: 1.35; }
@@ -957,7 +976,7 @@ main, #main { display: block !important; height: auto !important; overflow: visi
         </button>
         <button class="wb-card" data-go="prescricao">
           <span class="wb-badge new">Novo</span>
-          <span class="ic" style="background:#ffe4e6;color:#be123c"><i class="ti ti-prescription"></i></span>
+          <span class="ic" style="background:rgba(248,81,73,.16);color:#ff9d9d"><i class="ti ti-prescription"></i></span>
           <span class="ttl">Prescrição</span><span class="sub">Doses por peso e função renal</span>
         </button>
         <button class="wb-card" data-go="ia">
@@ -965,12 +984,12 @@ main, #main { display: block !important; height: auto !important; overflow: visi
           <span class="ttl">CondutAI IA</span><span class="sub">Conduta sob medida</span>
         </button>
         <button class="wb-card" data-go="gaso">
-          <span class="ic" style="background:#fee2e2;color:#dc2626"><i class="ti ti-droplet"></i></span>
+          <span class="ic" style="background:rgba(248,81,73,.16);color:#ff9d9d"><i class="ti ti-droplet"></i></span>
           <span class="ttl">Gasometria</span><span class="sub">Interpretador ácido-base</span>
         </button>
         <button class="wb-card" data-go="interacoes">
           <span class="wb-badge new">Novo</span>
-          <span class="ic" style="background:#fef3c7;color:#b45309"><i class="ti ti-alert-triangle"></i></span>
+          <span class="ic" style="background:rgba(227,179,65,.16);color:#e7c260"><i class="ti ti-alert-triangle"></i></span>
           <span class="ttl">Interações</span><span class="sub">Checar interação medicamentosa</span>
         </button>
         <button class="wb-card" data-go="ddx">
@@ -990,7 +1009,7 @@ main, #main { display: block !important; height: auto !important; overflow: visi
         </button>
         <button class="wb-card" data-go="vacinas">
           <span class="wb-badge new">Novo</span>
-          <span class="ic" style="background:#fce7f3;color:#be185d"><i class="ti ti-vaccine"></i></span>
+          <span class="ic" style="background:rgba(244,114,182,.15);color:#f48fc4"><i class="ti ti-vaccine"></i></span>
           <span class="ttl">Vacinação</span><span class="sub">Calendário PNI/SBIm</span>
         </button>
         <button class="wb-card" data-go="orientacoes">
@@ -1000,12 +1019,12 @@ main, #main { display: block !important; height: auto !important; overflow: visi
         </button>
         <button class="wb-card" data-go="cid">
           <span class="wb-badge new">Novo</span>
-          <span class="ic" style="background:#f1f5f9;color:#475569"><i class="ti ti-bookmark"></i></span>
+          <span class="ic" style="background:rgba(140,160,185,.14);color:#b9c6d6"><i class="ti ti-bookmark"></i></span>
           <span class="ttl">CID-10</span><span class="sub">Busca de códigos</span>
         </button>
         <button class="wb-card" data-go="ecg">
           <span class="wb-badge new">Novo</span>
-          <span class="ic" style="background:#fee2e2;color:#b91c1c"><i class="ti ti-activity"></i></span>
+          <span class="ic" style="background:rgba(248,81,73,.16);color:#ff9d9d"><i class="ti ti-activity"></i></span>
           <span class="ttl">ECG</span><span class="sub">Guia prático + FC e QTc</span>
         </button>
         <button class="wb-card" data-go="vm">
