@@ -921,6 +921,9 @@ main, #main { display: block !important; height: auto !important; overflow: visi
   }
   .wb-nav button.center.active .nic { color: var(--primary-dark); }
 }
+/* pulso p/ guiar o clique quando chega deep-link do FlashMed (?busca=) */
+@keyframes condPulse{0%,100%{box-shadow:0 0 0 0 rgba(76,141,255,.0)}50%{box-shadow:0 0 0 6px rgba(76,141,255,.35)}}
+.send-btn.pulse{animation:condPulse 1.2s ease-in-out 2}
 </style>
 </head>
 <body>
@@ -10682,6 +10685,18 @@ function bindSend(inputId, btnId) {
 }
 bindSend('searchInput', 'sendBtn');
 bindSend('searchInput2', 'sendBtn2');
+
+// Deep-link vindo do FlashMed: ?busca=<termo> -> pré-preenche a busca (sem disparar IA)
+(function(){ try{
+  const termo = new URLSearchParams(location.search).get('busca');
+  if(!termo) return;
+  setTimeout(()=>{ try{
+    if(typeof showView==='function') showView('ia');
+    const si = document.getElementById('searchInput');
+    if(si){ si.value = termo; si.focus(); si.scrollIntoView({block:'center'}); }
+    const sb = document.getElementById('sendBtn'); if(sb){ sb.classList.add('pulse'); setTimeout(()=>sb.classList.remove('pulse'),2400); }
+  }catch(e){} }, 60);
+}catch(e){} })();
 
 document.querySelectorAll('.chip').forEach(c => { c.onclick = () => run(c.dataset.q); });
 

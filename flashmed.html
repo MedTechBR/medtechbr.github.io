@@ -243,6 +243,9 @@
     .nav{flex-direction:column-reverse}
     .nav .btn,.nav .btn.sec{width:100%}
   }
+  /* link cruzado p/ o CondutAI (revisar a conduta da questão) */
+  .cond-xlink{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:9px 15px;border:1px solid rgba(76,141,255,.30);border-radius:11px;font-weight:600;font-size:13px;color:#8fb6ff;background:rgba(76,141,255,.12);text-decoration:none;transition:.15s}
+  .cond-xlink:hover{background:rgba(76,141,255,.20);border-color:rgba(76,141,255,.5)}
 </style>
 </head>
 <body>
@@ -497,7 +500,8 @@ function revealState(qi, sel){
   fb.classList.add("show", ok?"ok":"no");
   document.getElementById("verdict").innerHTML =
     ok ? "✓ Resposta correta" : `✗ Resposta incorreta — gabarito: ${LETTERS[q.correct]}`;
-  document.getElementById("fbbody").innerHTML = q.c;
+  document.getElementById("fbbody").innerHTML = q.c +
+    `<a class="cond-xlink" href="condutai.html?busca=${encodeURIComponent(q.conduta||q.tema||"")}" target="_blank" rel="noopener">📋 Revisar conduta no CondutAI →</a>`;
 }
 
 /* ---- controles globais ---- */
@@ -519,6 +523,10 @@ buildFilter();
     const sel=document.getElementById("filter");
     if([...sel.options].some(o=>o.value===saved.filter)){ activeFilter=saved.filter; sel.value=saved.filter; }
   }
+  // Deep-link vindo do CondutAI: ?tema=<especialidade> tem precedência
+  try{ const ut=new URLSearchParams(location.search).get("tema");
+    if(ut){ const sel=document.getElementById("filter"); const hit=[...sel.options].find(o=>o.value.toLowerCase()===ut.toLowerCase());
+      if(hit){ activeFilter=hit.value; sel.value=hit.value; } } }catch(e){}
   order = BANK.map((_,i)=>i).filter(i=> activeFilter==="Todos os temas" || BANK[i].tema===activeFilter);
   pos = 0;
   if(saved && typeof saved.qi==="number"){ const p=order.indexOf(saved.qi); if(p>=0) pos=p; }
