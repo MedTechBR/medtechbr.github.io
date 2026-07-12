@@ -1654,15 +1654,15 @@ const PROTOCOLS = [
   { id: 'intox_co', icon: '☁️', name: 'Intoxicação por monóxido de carbono', tags: 'O2 100% · O2 hiperbárico · COHb · Sequelas tardias', specialty: 'emergencia', guideline: 'UHMS 2019' },
   { id: 'mordedura_anim', icon: '🐕', name: 'Mordedura animal — abordagem e raiva', tags: 'Profilaxia raiva · Antibiótico · MS · Tétano', specialty: 'emergencia', guideline: 'MS 2022' },
   { id: 'picada_cobra', icon: '🐍', name: 'Picada de cobra peçonhenta', tags: 'Soro antiveneno · Bothrops/Crotalus · MS', specialty: 'emergencia', guideline: 'MS 2019' },
-  { id: 'picada_escorp', icon: '🦂', name: 'Picada de escorpião', tags: 'Soro antiescorpiônico · Suporte cardiovascular', specialty: 'emergencia', guideline: 'MS 2019' },
+  { id: 'picada_escorp', icon: '🦂', name: 'Picada de escorpião', tags: 'Soro antiescorpiônico · Suporte cardiovascular', specialty: 'emergencia', guideline: 'PCDT Escorpionismo MS 2025' },
   { id: 'picada_aranha', icon: '🕷️', name: 'Picada de aranha (Loxosceles/Phoneutria)', tags: 'Soro · Lesão cutânea · Hemólise · Suporte', specialty: 'emergencia', guideline: 'MS 2019' },
   { id: 'queimadura', icon: '🔥', name: 'Queimaduras — abordagem inicial', tags: 'Parkland · Via aérea · Analgesia · SBQ', specialty: 'emergencia', guideline: 'ABA 2023' },
-  { id: 'afogamento', icon: '🌊', name: 'Afogamento', tags: 'Classificação Szpilman · O2 · VM · Hipotermia', specialty: 'emergencia', guideline: 'SOBRASA 2020' },
+  { id: 'afogamento', icon: '🌊', name: 'Afogamento', tags: 'Classificação Szpilman · O2 · VM · Hipotermia', specialty: 'emergencia', guideline: 'ILCOR/AHA 2025' },
   { id: 'hipotermia', icon: '🥶', name: 'Hipotermia grave', tags: 'Reaquecimento ativo · ECMO · Arritmias', specialty: 'emergencia', guideline: 'Wilderness 2019' },
   { id: 'heatstroke', icon: '🥵', name: 'Hipertermia maligna / heat stroke', tags: 'Resfriamento agressivo · Dantroleno · Rabdomiólise', specialty: 'emergencia', guideline: 'ACSM 2023' },
   { id: 'eletrocussao', icon: '⚡', name: 'Lesão por eletricidade', tags: 'Rabdomiólise · Arritmia · Queimadura profunda', specialty: 'emergencia', guideline: 'ABA 2022' },
   { id: 'ovace', icon: '🆘', name: 'Obstrução de via aérea por corpo estranho', tags: 'Heimlich · Adulto vs criança · Inconsciente', specialty: 'emergencia', guideline: 'AHA 2025' },
-  { id: 'sd_compart', icon: '🦵', name: 'Síndrome compartimental aguda', tags: 'Pressão >30mmHg · Fasciotomia · Rabdomiólise', specialty: 'emergencia', guideline: 'AAOS 2018' },
+  { id: 'sd_compart', icon: '🦵', name: 'Síndrome compartimental aguda', tags: 'Pressão >30mmHg · Fasciotomia · Rabdomiólise', specialty: 'emergencia', guideline: 'AAOS 2025' },
   { id: 'rabdomio', icon: '💪', name: 'Rabdomiólise', tags: 'CPK · LRA · Hidratação · Bicarbonato', specialty: 'emergencia', guideline: 'KDIGO 2020' },
 
   // ====== INFECTO ======
@@ -5435,151 +5435,360 @@ mordedura_anim: `**Toda mordedura animal exige avaliação simultânea de duas f
 - Não perder o prazo — soro após o 7º dia da 1ª dose de vacina perde a indicação; a vacina, por outro lado, deve seguir o cronograma 0/3/7/14 sem atraso.
 - Sempre verificar tétano junto com a raiva — são profilaxias independentes e ambas costumam ser esquecidas quando a atenção vai só para a raiva.`,
 
-picada_aranha: `# Araneísmo (Picada de Aranha)
+picada_aranha: `## 🕷️ Fisiopatologia
 
-> No Brasil: **Loxosceles** (aranha-marrom — loxoscelismo), **Phoneutria** (armadeira — dor intensa), Latrodectus (viúva-negra).
+No Brasil, três gêneros têm relevância clínica:
 
-## 🩺 Quadros
-- **Loxosceles:** dor tardia, lesão necrótica (placa marmórea) → úlcera; forma cutâneo-visceral com **hemólise** e LRA.
-- **Phoneutria:** dor local intensa imediata, sudorese, agitação; grave em crianças (sistêmica).
-- **Latrodectus:** dor, cãibras musculares, sudorese, hipertensão.
+- **Loxosceles** (aranha-marrom): veneno com ação **esfingomielinase D**, que ativa complemento e desencadeia lesão endotelial, agregação plaquetária e trombose de pequenos vasos, causando necrose dermonecrótica progressiva no local. Em uma minoria dos casos, o veneno provoca **hemólise intravascular mediada por complemento**, configurando a forma cutâneo-visceral (hemolítica), potencialmente fatal por lesão renal aguda e coagulação intravascular disseminada.
+- **Phoneutria** (armadeira): veneno neurotóxico que atua em canais de sódio, promovendo despolarização de terminações nervosas sensitivas e autonômicas — resulta em dor local imediata e intensa e, em casos sistêmicos (mais comuns em crianças), tempestade autonômica semelhante à do escorpionismo (sudorese, sialorreia, taquicardia, agitação, podendo evoluir a choque/EAP).
+- **Latrodectus** (viúva-negra, menos comum no Brasil que nas Américas do Norte/Central): veneno com α-latrotoxina, que causa liberação maciça e sustentada de acetilcolina e catecolaminas nas terminações nervosas, gerando contraturas musculares dolorosas generalizadas (a síndrome latrodectísmica).
+
+## 🩺 Apresentação clínica
+
+**Loxosceles:** picada frequentemente indolor ou pouco dolorosa no momento (por isso o paciente muitas vezes não percebe/relata o acidente) — a dor e o eritema surgem horas depois. Evolui em 24–72h para a **placa marmórea** (área de eritema, equimose e isquemia central com bordas irregulares) que pode progredir para necrose seca e ulceração, com cicatrização lenta. Na forma cutâneo-visceral (mais rara, mas mais letal), 24–72h após a picada surgem palidez, icterícia, colúria (urina escura por hemoglobinúria) e mal-estar sistêmico — sinais de hemólise.
+
+**Phoneutria:** dor local imediata, intensa, irradiada, com edema discreto, sudorese local e eventualmente equimose — sem necrose. Em crianças pequenas pode evoluir para forma sistêmica com sudorese profusa, sialorreia, vômitos, agitação, taquicardia/hipertensão e, raramente, choque ou edema pulmonar.
+
+**Latrodectus:** dor local seguida de contraturas musculares dolorosas progressivas (abdome "em tábua" pode simular abdome agudo), sudorese, tremores, hipertensão, taquicardia e ansiedade — o chamado latrodectismo.
+
+## 🔍 Diagnóstico diferencial
+
+- Celulite/erisipela bacteriana — principal diferencial da lesão loxoscélica inicial (frequentemente confundida e tratada só com antibiótico, atrasando corticoide/soro).
+- Picada de escorpião (Tityus) — dor imediata intensa semelhante à de Phoneutria.
+- Abdome agudo cirúrgico — diferencial do latrodectismo pela rigidez muscular.
+- Outras causas de anemia hemolítica aguda (autoimune, G6PD, sepse) no loxoscelismo cutâneo-visceral quando a história de picada não é clara.
+- Outras dermatoses necrosantes (vasculite, pioderma gangrenoso, picada de inseto secundariamente infectada).
+
+## 📊 Classificação e soroterapia
+
+| Quadro | Forma | Tratamento específico |
+| --- | --- | --- |
+| **Loxoscelismo cutâneo** (mais comum, 87–98% dos casos) | Lesão local sem hemólise | **5 ampolas** de soro antiloxoscélico (SALox) ou antiaracnídico (SAA) nos casos com lesão sugestiva de evolução necrótica ou identificação do agente; corticoide sistêmico |
+| **Loxoscelismo cutâneo-visceral/hemolítico** (1–13%, mais grave) | Hemólise, LRA | **10 ampolas** de SALox/SAA + corticoterapia + suporte à hemólise/LRA |
+| **Foneutrismo leve** | Dor local isolada | Sem soro — analgesia e bloqueio local |
+| **Foneutrismo sistêmico/grave** (raro, mais em crianças) | Sinais autonômicos sistêmicos | Soro antiaracnídico (SAA) + suporte intensivo |
+| **Latrodectismo** | Contraturas, sudorese, hipertensão | Analgesia/benzodiazepínico; soro antilatrodectus (quando disponível) nos casos graves |
+
+A soroterapia loxoscélica é mais eficaz quanto mais precoce — a eficácia cai significativamente após cerca de 36h da picada, mas ainda deve ser considerada mesmo tardiamente em formas graves.
 
 ## 🧪 Exames complementares
+
 | Exame | Objetivo |
 | --- | --- |
-| Hemograma, função renal, urina | Hemólise/LRA (Loxosceles) |
-| Avaliação clínica | Gravidade |
-
-## 💊 Tratamento (com doses)
-- **Loxosceles:** cuidados locais; corticoide; **soro antiloxoscélico** nas formas cutâneo-visceral/graves; tratar hemólise/LRA.
-- **Phoneutria:** analgesia (bloqueio com lidocaína), observação; **soro antiaracnídico** nos casos graves/sistêmicos.
-- **Latrodectus:** analgesia, benzodiazepínico para os espasmos; soro específico se grave.
-
-## 💡 Pérolas
-- Loxoscelismo: lesão necrótica tardia → vigiar hemólise/LRA.
-- Phoneutria: dor intensa imediata; criança pode evoluir grave.`,
-
-afogamento: `# Afogamento
-
-> Insuficiência respiratória por submersão/imersão. A **hipóxia** é o problema central.
-
-## 🚑 Abordagem
-- Resgate seguro; **prioridade = ventilação/oxigenação** (no afogado em PCR, iniciar pela via aérea/ventilações). Proteção cervical só se trauma suspeito.
-
-## 🩺 Avaliação
-- Grau de insuficiência respiratória; risco de **SDRA tardia**, arritmia (hipotermia), broncoaspiração.
-
-## 🧪 Exames complementares
-| Exame | Objetivo |
-| --- | --- |
-| Gasometria, SatO₂ | Hipóxia |
-| RX de tórax | Lesão pulmonar |
-| Temperatura | Hipotermia associada |
+| Hemograma, reticulócitos, bilirrubina indireta, DHL, haptoglobina | Confirmar e quantificar hemólise (Loxosceles) |
+| Função renal, urina I | LRA secundária à hemólise |
+| Coagulograma | Excluir CIVD nos casos graves |
+| ECG, avaliação hemodinâmica | Formas sistêmicas de Phoneutria/Latrodectus |
 
 ## 💊 Tratamento
-- **O₂/suporte ventilatório** (VNI ou ventilação protetora se SDRA); reaquecer se hipotermia.
-- Observação por horas mesmo se assintomático (a lesão pulmonar pode ser tardia).
-- Não há indicação de antibiótico/corticoide de rotina.
 
-## 💡 Pérolas
-- O tratamento é da hipóxia — começar pela ventilação.
-- Observar pela possibilidade de piora respiratória tardia.`,
+- **Loxosceles:** cuidados locais (lavagem, compressa fria, elevação do membro), analgesia, **corticoide sistêmico** (prednisona, geralmente por 3–5 dias) reduz a resposta inflamatória local mesmo nas formas cutâneas mais extensas; **soro antiloxoscélico/antiaracnídico** conforme a tabela acima; debridamento cirúrgico apenas tardiamente, após delimitação da necrose (nunca na fase aguda); tratar hemólise/LRA com hidratação e, se necessário, transfusão e suporte dialítico.
+- **Phoneutria:** analgesia potente (bloqueio anestésico local com lidocaína sem vasoconstritor costuma controlar bem a dor intensa), observação por algumas horas; soro antiaracnídico reservado aos casos sistêmicos/graves, sobretudo em crianças.
+- **Latrodectus:** analgesia, **benzodiazepínico** para os espasmos musculares, gluconato de cálcio tem uso controverso para as cãibras; soro específico nos casos graves refratários.
+- Antibioticoterapia não é rotina no loxoscelismo — reservar para infecção secundária confirmada da lesão necrótica.
 
-heatstroke: `# Heat Stroke (Intermação) / Hipertermia Grave
+## 🏥 Quando internar/UTI
 
-> Temperatura central > 40 °C + **disfunção do SNC** (confusão, convulsão, coma). Emergência — o resfriamento rápido salva.
+- **Loxoscelismo:** internar toda forma cutâneo-visceral (hemólise) para monitorar função renal e hemoglobina seriadas; lesões cutâneas extensas ou de face também podem justificar internação para cuidado da ferida.
+- **Foneutrismo:** internar toda criança com sinais sistêmicos; UTI se choque, EAP ou arritmia.
+- **Latrodectismo:** internar casos com contraturas intensas refratárias à analgesia ou instabilidade autonômica.
+
+## 💡 Pérolas e erros comuns
+
+- Loxoscelismo: a picada quase sempre passa despercebida — pensar na hipótese diante de lesão necrótica progressiva sem história clara, sobretudo se houver contato com roupas/entulho guardados.
+- Vigiar hemólise/LRA mesmo em lesões cutâneas aparentemente localizadas — solicitar hemograma e função renal seriados nas primeiras 72h.
+- Phoneutria: dor intensa imediata (ao contrário do loxoscelismo) é a pista clínica; criança pequena pode evoluir para forma sistêmica grave rapidamente.
+- Erro comum: tratar a placa marmórea inicial só como celulite bacteriana e perder a janela de corticoide/soro — reavaliar a evolução em 24–48h quando a lesão não responde a antibiótico.
+- Erro comum: indicar debridamento cirúrgico precoce na fase aguda do loxoscelismo — a extensão real da necrose só se delimita depois de dias.`,
+
+afogamento: `> Insuficiência respiratória por submersão/imersão. A **hipóxia** é o problema central.
+
+## 🔬 Fisiopatologia
+
+O afogamento é definido como um processo de comprometimento respiratório por submersão ou imersão em líquido. A sequência fisiopatológica começa com apneia voluntária, seguida de laringoespasmo reflexo (proteção contra aspiração) e, com a persistência da hipóxia, perda desse espasmo com aspiração de líquido para a via aérea. O líquido aspirado lava o surfactante alveolar, causa colapso alveolar, shunt intrapulmonar e edema pulmonar não cardiogênico — mecanismo essencialmente igual em água doce ou salgada, ao contrário do que sugeriam modelos antigos baseados em distúrbios eletrolíticos (hoje considerados irrelevantes na prática clínica, pois o volume aspirado costuma ser pequeno). A hipóxia tecidual resultante é o evento central: leva a acidose, disfunção miocárdica, arritmia e, se prolongada, lesão neurológica anóxica — o principal determinante de morbimortalidade a longo prazo. Hipotermia concomitante (água fria) pode ter efeito parcialmente protetor no SNC quando a submersão é breve, mas também predispõe a arritmias.
+
+## 🩺 Apresentação clínica
+
+- **Anamnese:** tempo estimado de submersão, temperatura da água, presença de testemunhas, manobras de resgate já realizadas, uso de álcool/drogas, convulsão ou síncope prévia à submersão (pode indicar causa primária, não afogamento puro), trauma associado (mergulho em água rasa).
+- **Exame físico:** espectro amplo — desde paciente assintomático após episódio breve até parada cardiorrespiratória. Podem estar presentes tosse, taquipneia, uso de musculatura acessória, estertores/roncos difusos, espuma rosada em via aérea (edema pulmonar), cianose, alteração do nível de consciência (de agitação a coma), hipotermia. Ausculta pode ser normal mesmo com lesão pulmonar significativa nas primeiras horas.
+
+## 🔍 Diagnóstico diferencial
+
+- Causas de síncope/convulsão que precederam a submersão (arritmia, epilepsia, hipoglicemia, AVC) — relevante pois muda a investigação subsequente.
+- Trauma raquimedular (mergulho, esportes aquáticos, água rasa) — considerar sempre que o mecanismo for compatível.
+- Intoxicação exógena (álcool é o principal fator de risco associado a afogamento em adultos).
+- Barotrauma/embolia gasosa em mergulhadores (contexto de mergulho autônomo).
+- Hipotermia acidental como diagnóstico concomitante, não excludente.
+
+## 📊 Classificação/gravidade
+
+A gravidade é definida basicamente pelo grau de comprometimento respiratório e neurológico no momento da avaliação, não pelo tempo de submersão isoladamente:
+- **Sem sintomas respiratórios** após resgate (ausculta limpa, SatO₂ normal): baixo risco, mas exige período de observação.
+- **Insuficiência respiratória leve a moderada:** taquipneia, estertores, hipoxemia leve corrigível com O₂ suplementar.
+- **Insuficiência respiratória grave/SDRA:** hipoxemia refratária, infiltrado bilateral extenso, necessidade de ventilação mecânica.
+- **Parada cardiorrespiratória:** o desfecho mais grave; prognóstico neurológico correlaciona-se principalmente com o tempo de submersão e o tempo até o início de RCP eficaz, mais do que com a temperatura da água (o benefício da hipotermia protetora é mais teórico que comprovado na maioria dos casos).
+
+## 🚑 Abordagem inicial
+
+- Resgate seguro — o socorrista nunca deve se colocar em risco desnecessário.
+- **Prioridade é ventilação/oxigenação**, diferente do ACLS "padrão": no afogado em PCR, a sequência recomendada inicia pela via aérea e ventilações (não pelas compressões torácicas isoladas), já que a causa da parada é hipóxica, não isquêmica primária. Ventilações de resgate podem ser iniciadas ainda na água por socorrista treinado, se não colocar a própria segurança em risco.
+- Proteção cervical **apenas se houver suspeita real de trauma** (mergulho, história de impacto, água rasa) — imobilização rotineira sem indicação atrasa o manejo da via aérea e não é recomendada.
+- Retirar roupas molhadas e iniciar prevenção/tratamento de hipotermia em paralelo.
+
+## 💊 Tratamento
+
+- **Oxigênio suplementar** para todos os sintomáticos; **ventilação não invasiva (VNI)** para hipoxemia moderada em paciente colaborativo e hemodinamicamente estável; **intubação e ventilação mecânica protetora** (baixo volume corrente) se insuficiência respiratória grave, rebaixamento do nível de consciência ou SDRA estabelecida.
+- Suporte hemodinâmico conforme necessário; reaquecimento ativo se hipotermia associada.
+- **Não há indicação de antibioticoterapia profilática de rotina** — reservar para sinais clínicos de infecção ou submersão em água grosseiramente contaminada (esgoto, ambiente hospitalar), com cobertura guiada pelo contexto.
+- **Corticoide não tem papel comprovado** e não deve ser usado rotineiramente.
+- Manejo de possível broncoespasmo associado com broncodilatador inalatório, se presente.
+
+## 🏥 Quando internar / UTI
+
+- Todo paciente sintomático (tosse persistente, taquipneia, hipoxemia, ausculta alterada) deve ser observado por pelo menos **4 a 6 horas**, pois a lesão pulmonar e o edema podem ser tardios e progressivos mesmo com apresentação inicial discreta.
+- Paciente completamente assintomático, com ausculta e SatO₂ normais, sustentado por esse período de observação, pode receber alta com orientação de retorno se piora.
+- Indicação de internação: qualquer hipoxemia persistente, necessidade de suporte ventilatório (VNI ou invasivo), rebaixamento do nível de consciência, instabilidade hemodinâmica ou arritmia.
+- UTI: insuficiência respiratória grave/SDRA, necessidade de ventilação mecânica, parada cardiorrespiratória revertida, coma pós-anóxico ou instabilidade hemodinâmica significativa.
+
+## 💡 Pérolas e erros comuns
+
+- O tratamento é da hipóxia — começar pela ventilação, não pelas compressões, na sequência de RCP do afogado.
+- Erro comum: liberar paciente assintomático sem período de observação — a piora respiratória pode surgir horas depois.
+- Erro comum: imobilizar a coluna cervical rotineiramente sem mecanismo de trauma compatível, atrasando o manejo da via aérea.
+- Água doce x água salgada não muda a conduta clínica — o mecanismo predominante é hipóxia por lesão de surfactante/edema, não distúrbio eletrolítico.
+- Antibiótico e corticoide não são rotina — reservar para indicação específica.`,
+
+heatstroke: `> Temperatura central > 40 °C + **disfunção do SNC** (confusão, convulsão, coma). Emergência — o resfriamento rápido salva.
+
+## 🔬 Fisiopatologia
+
+O heat stroke (intermação) ocorre quando os mecanismos termorregulatórios são sobrepujados pelo calor gerado (esforço muscular) e/ou pelo calor ambiental, levando a hipertermia extrema. Acima de determinado limiar térmico, há disfunção direta de proteínas celulares e das membranas, resposta inflamatória sistêmica intensa (síndrome de resposta inflamatória sistêmica de origem térmica) e aumento da permeabilidade intestinal, com translocação de endotoxinas que amplificam a inflamação — mecanismo que explica por que o heat stroke se comporta clinicamente de forma semelhante à sepse grave, com risco de disfunção de múltiplos órgãos. O tempo de exposição à hipertermia é o principal determinante de lesão: quanto mais prolongado o intervalo acima do limiar crítico, maior o dano celular — daí a importância de resfriar o mais rápido possível, independentemente de outras medidas.
 
 ## 🔬 Tipos
-- **Clássica** (idoso, onda de calor, sem sudorese) e **por esforço** (atleta/trabalhador).
 
-## 🩺 Quadro
-- Hipertermia, pele quente, rebaixamento/convulsão; pode haver rabdomiólise, LRA, CIVD, disfunção hepática.
+- **Clássica:** tipicamente idosos, crianças pequenas, pacientes com comorbidades ou uso de medicações que prejudicam a termorregulação (diuréticos, anticolinérgicos, antipsicóticos), durante ondas de calor; instalação mais insidiosa, frequentemente **sem sudorese** (pele quente e seca).
+- **Por esforço:** atletas, militares, trabalhadores expostos ao calor durante atividade física intensa; instalação mais rápida (minutos a horas), **sudorese geralmente presente** até fases tardias, acomete indivíduos mais jovens e previamente hígidos.
 
-## 🧪 Exames complementares
-| Exame | Objetivo |
-| --- | --- |
-| Temperatura central | Diagnóstico |
-| CPK, função renal, eletrólitos | Rabdomiólise/LRA |
-| Coagulograma, função hepática | CIVD/disfunção |
+## 🩺 Apresentação clínica
 
-## 💊 Tratamento (com doses)
-- **Resfriamento imediato e agressivo** — meta: baixar para ~38,5 °C rapidamente (imersão em água fria no esforço; evaporativo + bolsas de gelo na clássica).
-- Suporte (via aérea, fluidos, benzodiazepínico para convulsão, manejo da rabdomiólise).
-- **Antitérmico NÃO funciona** (não é mediado por prostaglandina) — evitar.
+- **Anamnese:** contexto de exposição ao calor e/ou esforço físico intenso, medicações em uso, hidratação prévia, aclimatação ao calor, comorbidades (cardiopatia, uso de álcool).
+- **Exame físico:** hipertermia (geralmente > 40 °C), pele quente (seca na forma clássica, pode estar úmida na forma por esforço), taquicardia, hipotensão, disfunção do sistema nervoso central variável — confusão, irritabilidade, ataxia, convulsão, coma. Sinais de gravidade incluem taquipneia, hipotensão persistente e sangramentos (sugerindo coagulopatia).
+- Complicações possíveis: **rabdomiólise**, **lesão renal aguda**, **coagulação intravascular disseminada (CIVD)**, disfunção hepática (às vezes com pico enzimático tardio, em 24–48h), lesão miocárdica.
 
-## 💡 Pérolas
-- Resfriar JÁ (cada minuto conta); antipirético não ajuda.
-- Diferenciar de hipertermia maligna / síndrome neuroléptica maligna (contexto de drogas).`,
+## 🔍 Diagnóstico diferencial
 
-eletrocussao: `# Lesão por Eletricidade
+- **Síndrome neuroléptica maligna** e **síndrome serotoninérgica** — contexto de uso de antipsicóticos ou serotoninérgicos, rigidez muscular proeminente, instalação em dias (não minutos/horas).
+- **Hipertermia maligna anestésica** — relação temporal com anestésicos halogenados/succinilcolina.
+- Meningoencefalite e outras infecções do SNC — sempre considerar quando há febre alta e rebaixamento, especialmente se o contexto de exposição ao calor for duvidoso.
+- Intoxicação por estimulantes (cocaína, anfetaminas, "ecstasy") e abstinência alcoólica grave.
+- Tireotoxicose (crise tireotóxica) e feocromocitoma como causas de hipertermia com hiperadrenergia.
 
-> A corrente atravessa o corpo → lesões cardíacas, neurológicas, queimaduras (entrada/saída) e **lesão muscular profunda** (mais grave do que a pele sugere).
+## 📊 Classificação/gravidade
 
-## 🩺 Quadro
-- Arritmias (FV/assistolia, sobretudo alta tensão/raio), parada, queimaduras, rabdomiólise, lesão neurológica, fraturas (contração tetânica/queda).
-
-## 🚑 Abordagem
-- Segurança da cena (desligar a fonte); ABCDE; imobilização cervical se queda/raio; ECG/monitorização.
+- **Exaustão pelo calor:** temperatura elevada, mas geralmente < 40 °C, **sem disfunção significativa do SNC** — sintomas inespecíficos (fadiga, cefaleia, náusea, tontura). É o estágio que precede o heat stroke e a distinção-chave é justamente a ausência de disfunção neurológica grave.
+- **Heat stroke (intermação):** hipertermia + disfunção do SNC — é a emergência verdadeira, com risco de falência de múltiplos órgãos se o resfriamento não for imediato.
+- Gravidade adicional é sinalizada por: tempo prolongado até o início do resfriamento, hipotensão refratária, coagulopatia, elevação importante de CPK/creatinina e rebaixamento profundo do nível de consciência.
 
 ## 🧪 Exames complementares
+
 | Exame | Objetivo |
 | --- | --- |
-| ECG + monitorização | Arritmia |
-| CPK, função renal, urina | Rabdomiólise/LRA |
-| Avaliação de lesões traumáticas | Fraturas/compartimento |
+| Temperatura central | Diagnóstico e monitorização da resposta ao resfriamento |
+| CPK, função renal, eletrólitos | Rabdomiólise/lesão renal aguda |
+| Coagulograma, função hepática | CIVD/disfunção hepática (pode ser tardia) |
+| Hemograma, lactato | Gravidade sistêmica |
+| ECG | Lesão miocárdica/arritmia associada |
 
 ## 💊 Tratamento (com doses)
-- Suporte/ACLS nas arritmias; **hidratação IV agressiva** se queimadura extensa/rabdomiólise (meta de diurese alta).
-- Tratar queimaduras; vigiar **síndrome compartimental**; profilaxia antitetânica.
-- Alta tensão / sintomático / ECG alterado → monitorização cardíaca.
 
-## 💡 Pérolas
-- A lesão muscular profunda costuma ser maior que a cutânea → vigiar rabdomiólise/compartimento.
-- Alta tensão/raio: monitorização cardíaca.`,
+- **Resfriamento imediato e agressivo** é a prioridade absoluta, antes mesmo de exames complementares completos — meta é reduzir rapidamente a temperatura central para a faixa de ~38,5 °C, interrompendo o resfriamento ativo próximo a esse valor para evitar hipotermia iatrogênica de rebote.
+- **Imersão em água fria/gelada** é o método mais eficaz e o padrão-ouro na forma por esforço (paciente jovem, hemodinamicamente estável o suficiente para tolerar a imersão); quando a imersão total não é viável (paciente instável, forma clássica em idoso), usar métodos evaporativos associados a bolsas de gelo em grandes vasos (pescoço, axilas, virilhas) e ventilação com névoa de água morna sobre a pele.
+- Suporte: via aérea/O₂ conforme necessidade, reposição volêmica guiada por resposta hemodinâmica, benzodiazepínico para controle de convulsões, monitorização cardíaca contínua e manejo ativo da rabdomiólise (hidratação para manter boa diurese).
+- **Antitérmico (dipirona, paracetamol, AINEs) NÃO tem eficácia** no heat stroke, pois o mecanismo não é mediado por prostaglandinas hipotalâmicas como na febre infecciosa — além de agregar risco de hepatotoxicidade/coagulopatia em paciente já com disfunção hepática; a conduta é resfriamento físico, não farmacológico.
+- Corrigir distúrbios hidroeletrolíticos e acompanhar de perto função renal e coagulograma nas primeiras 24–48h, pela possibilidade de piora tardia.
 
-ovace: `# Obstrução de Via Aérea por Corpo Estranho (OVACE)
+## 🏥 Quando internar / UTI
 
-> Engasgo — obstrução súbita da via aérea. Reconhecer e desobstruir rápido evita a parada hipóxica.
+- Todo caso de heat stroke confirmado (hipertermia + disfunção do SNC) deve ser internado para monitorização, mesmo após resposta inicial ao resfriamento, pela possibilidade de disfunção orgânica tardia (hepática, renal, coagulopatia).
+- UTI: instabilidade hemodinâmica, necessidade de suporte ventilatório, rebaixamento persistente do nível de consciência, rabdomiólise significativa com risco renal, coagulopatia ou disfunção de múltiplos órgãos.
+- Exaustão pelo calor sem disfunção do SNC, responsiva a resfriamento simples e hidratação, pode eventualmente ser observada em ambiente não crítico e liberada após melhora completa.
 
-## 🩺 Reconhecimento
+## 💡 Pérolas e erros comuns
+
+- Resfriar JÁ — cada minuto de hipertermia extrema aumenta o dano celular; não aguardar exames ou acesso venoso para iniciar o resfriamento físico.
+- Antipirético não ajuda e pode agravar disfunção hepática/coagulopatia — erro comum é prescrevê-lo por reflexo diante de "febre alta".
+- Diferenciar de hipertermia maligna anestésica e síndrome neuroléptica maligna pelo contexto (anestesia recente vs. uso de antipsicóticos/serotoninérgicos) — o tratamento específico dessas condições difere (ex.: dantrolene na hipertermia maligna).
+- Erro comum: interromper o resfriamento assim que o paciente "parece melhor", sem confirmar queda objetiva da temperatura central — a temperatura periférica/axilar não reflete bem a temperatura central nesse contexto.
+- Lembrar de vigiar disfunção hepática e coagulopatia mesmo após estabilização inicial, pois podem se manifestar apenas 24–48h depois.`,
+
+eletrocussao: `> A corrente atravessa o corpo → lesões cardíacas, neurológicas, queimaduras (entrada/saída) e **lesão muscular profunda** (mais grave do que a pele sugere).
+
+## 🔬 Fisiopatologia
+
+A lesão elétrica resulta da conversão de energia elétrica em calor ao longo do trajeto de menor resistência entre os pontos de contato (entrada e saída), causando dano térmico direto aos tecidos internos — músculo, vasos, nervos — além do efeito elétrico direto sobre membranas celulares e sobre o sistema de condução cardíaco. A gravidade depende de múltiplos fatores: voltagem (alta tensão, geralmente > 1000 V, causa lesões mais profundas e extensas), tipo de corrente (corrente alternada tende a causar tetania muscular sustentada, o que pode prolongar o contato com a fonte e aumentar o tempo de exposição), trajeto através do corpo (trajetos que cruzam o tórax/coração são mais perigosos), resistência dos tecidos e tempo de contato. Como a corrente segue o caminho de menor resistência (nervos e vasos conduzem melhor que a pele/gordura/osso), a lesão muscular profunda ao longo do trajeto costuma ser desproporcionalmente maior do que a queimadura cutânea visível nos pontos de entrada/saída — por isso a extensão do dano é sistematicamente subestimada quando se avalia apenas a pele. O raio é um caso particular: descarga de altíssima energia mas de duração extremamente curta, que tende a causar o fenômeno de "flashover" (corrente percorre a superfície externa do corpo em vez de atravessá-lo), resultando em menos queimaduras profundas, porém com risco elevado de parada cardiorrespiratória imediata por assistolia (efeito de desfibrilação/despolarização maciça simultânea).
+
+## 🩺 Apresentação clínica
+
+- **Anamnese:** tipo de fonte (residencial/baixa tensão vs. industrial/rede elétrica/alta tensão vs. raio), tempo de contato, se houve queda ou arremesso associado (lesão traumática concomitante), perda de consciência, dor torácica, mialgia, alterações sensitivas.
+- **Exame físico:** procurar sempre **pontos de entrada e saída** (podem ser discretos), avaliar pulsos e perfusão distal, força e sensibilidade em todos os membros, ausculta cardíaca, exame neurológico completo. Queimaduras podem ser superficiais na pele e mascarar necrose muscular profunda subjacente — a ausência de queimadura extensa não exclui lesão interna grave.
+
+## 🔍 Diagnóstico diferencial e avaliação de risco
+
+- Trauma associado (queda de altura, arremesso pela contração tetânica) — sempre pesquisar ativamente fraturas, especialmente de coluna, e lesões internas por mecanismo contundente.
+- Síndrome compartimental de membro — considerar em qualquer membro que sofreu passagem de corrente, mesmo sem fratura.
+- Lesão ocular (catarata pode surgir tardiamente, semanas a meses após o choque) e lesão auditiva/vestibular no raio.
+- Rabdomiólise e lesão renal aguda secundária — buscar ativamente, não esperar sintomas.
+
+## 📊 Classificação/gravidade
+
+- **Baixa tensão (< 1000 V, doméstica):** geralmente menor risco de lesão muscular profunda extensa, mas ainda capaz de causar arritmia significativa, especialmente se a corrente cruzar o tórax (ex.: mão a mão).
+- **Alta tensão (≥ 1000 V, industrial/rede de transmissão):** maior risco de queimaduras profundas extensas, necrose muscular maciça, síndrome compartimental, rabdomiólise grave e necessidade de desbridamento/amputação.
+- **Lesão por raio:** maior risco de parada cardiorrespiratória súbita imediata (assistolia primária, que pode ser seguida de parada respiratória secundária por paralisia do centro respiratório — se a ventilação não for mantida, evolui para PCR secundária por hipóxia), porém geralmente menos queimadura profunda/rabdomiólise que a alta tensão de contato direto.
+
+## 🚑 Abordagem inicial
+
+- **Segurança da cena em primeiro lugar** — nunca tocar a vítima antes de garantir que a fonte de energia foi desligada/isolada; em acidentes com rede elétrica, aguardar equipe especializada.
+- ABCDE completo; **imobilização cervical** se houve queda de altura, arremesso ou mecanismo de trauma compatível.
+- **ECG e monitorização cardíaca contínua** desde o primeiro atendimento, mesmo em paciente assintomático.
+- Em múltiplas vítimas de raio, inverter a triagem habitual: priorizar quem está em parada cardiorrespiratória, pois a chance de reversão é alta se o atendimento for imediato (diferente do trauma múltiplo convencional, onde a PCR costuma indicar baixa prioridade).
+
+## 🧪 Exames complementares
+
+| Exame | Objetivo |
+| --- | --- |
+| ECG + monitorização contínua | Arritmia, isquemia |
+| CPK, função renal, urina (mioglobinúria) | Rabdomiólise/lesão renal aguda |
+| Eletrólitos (K⁺ em especial) | Distúrbios por lise celular/lesão renal |
+| Avaliação de lesões traumáticas (imagem conforme mecanismo) | Fraturas, trauma associado, síndrome compartimental |
+| Avaliação oftalmológica (se alta tensão/raio) | Catarata tardia |
+
+## 💊 Tratamento (com doses)
+
+- **Suporte/ACLS padrão** nas arritmias e na parada cardiorrespiratória; **hidratação venosa agressiva** é a pedra angular do manejo em queimadura extensa/rabdomiólise significativa, com meta de manter **diurese elevada** (na prática, buscando algo próximo de 1,5–2 mL/kg/h, e ainda maior se houver mioglobinúria macroscópica visível na urina) — ajustar a taxa de infusão conforme resposta de diurese e não apenas por fórmulas fixas de queimado, já que a lesão elétrica costuma subestimar a extensão real pela superfície cutânea.
+- Tratamento local das queimaduras conforme protocolo padrão (limpeza, cobertura, avaliação por equipe de queimados se extensas ou profundas).
+- **Vigilância ativa de síndrome compartimental** — dor desproporcional, parestesia, tensão do compartimento; fasciotomia precoce se confirmada, sem aguardar todos os sinais clássicos.
+- **Profilaxia antitetânica** conforme status vacinal.
+- Correção de hipercalemia e demais distúrbios eletrolíticos decorrentes de lise celular, com monitorização seriada.
+
+## 🏥 Quando internar / UTI
+
+- **Todo paciente com alta tensão, perda de consciência, ECG alterado, arritmia documentada ou sintomático deve ser monitorizado** — internação com telemetria cardíaca por período de observação (a duração exata varia conforme o serviço, mas tipicamente cobre pelo menos as primeiras 24h, já que a maioria das arritmias significativas se manifesta nesse intervalo).
+- Baixa tensão, assintomático, ECG normal e exame físico sem alterações: pode ser considerada alta com orientações, após período breve de observação — desde que não haja outros fatores de risco (comorbidade cardíaca, trajeto de risco, gestante).
+- UTI: rabdomiólise significativa, instabilidade hemodinâmica, arritmia maligna, necessidade de desbridamento extenso/fasciotomia, queimadura extensa ou insuficiência respiratória associada.
+- Gestantes expostas a choque elétrico, mesmo leve, merecem avaliação obstétrica adicional pelo risco à unidade fetoplacentária.
+
+## 💡 Pérolas e erros comuns
+
+- A lesão muscular profunda costuma ser maior do que a cutânea sugere — vigiar ativamente rabdomiólise e síndrome compartimental mesmo com queimadura de aparência discreta.
+- Alta tensão e lesão por raio exigem monitorização cardíaca, mesmo sem sintomas iniciais.
+- Erro comum: liberar paciente assintomático de alta tensão sem período de monitorização cardíaca — arritmias podem surgir horas depois.
+- Erro comum: não considerar trauma associado (queda, arremesso) em choques com contração tetânica importante.
+- Em vítimas múltiplas de raio, inverter a triagem clássica — priorizar quem está em PCR, pois a taxa de reversão é alta com atendimento imediato.`,
+
+ovace: `## 🩺 Reconhecimento
 - **Obstrução leve (tosse eficaz):** consegue tossir/falar → **estimular a tosse**, não interferir.
 - **Obstrução grave (tosse ineficaz):** não fala, tosse silenciosa, cianose, sinal universal (mãos no pescoço).
 
+## 🔬 Fisiopatologia
+Obstrução mecânica da via aérea superior por corpo estranho (alimento, prótese, objeto), impactado em faringe, laringe ou traqueia proximal. O reflexo de tosse tenta expelir o corpo estranho; se ineficaz, o volume corrente cai a zero, sobrevém hipóxia progressiva, perda de consciência e parada cardiorrespiratória por hipóxia (não por causa primariamente cardíaca) em poucos minutos. Em adultos é mais comum durante refeições (bolo alimentar, carne mal mastigada), sob efeito de álcool, com próteses dentárias mal ajustadas, idade avançada e disfagia de base. Em crianças pequenas, objetos pequenos e redondos (balas, amendoim, peças de brinquedo) são as causas típicas.
+
+## 🩺 Apresentação clínica
+- Início súbito durante ou logo após alimentação/manipulação oral.
+- Sinal universal do engasgo (mãos ao pescoço) é o achado mais específico.
+- **Obstrução leve:** tosse forte e eficaz, consegue falar/chorar, pode haver estridor leve — ainda troca ar.
+- **Obstrução grave:** tosse fraca ou silenciosa, incapaz de falar ou emitir som, dificuldade respiratória crescente, cianose progressiva, agitação seguida de rebaixamento do nível de consciência.
+- Sem tratamento: perda de consciência, apneia, parada cardiorrespiratória.
+
+## 🔀 Diagnósticos diferenciais
+- Anafilaxia (edema de glote/laringe) — geralmente com urticária, exposição a alérgeno, estridor progressivo sem engasgo súbito.
+- Crise de asma/broncoespasmo — sibilos difusos, sem sinal universal.
+- Epiglotite aguda — febre, disfagia, posição em tripé, sem história de corpo estranho.
+- Laringoespasmo — geralmente pós-manipulação de via aérea, autolimitado.
+- Convulsão/síncope — sem obstrução mecânica associada.
+
+## 📊 Classificação de gravidade
+- **Leve:** tosse eficaz, entrada de ar audível, paciente fala.
+- **Grave:** tosse ausente/inaudível, incapaz de falar ou respirar, cianose — intervenção imediata.
+- **Inconsciente:** obstrução completa não resolvida → inicia sequência de RCP.
+
 ## 💊 Conduta
-- **Adulto/criança consciente com obstrução grave:** **manobra de Heimlich** (compressões abdominais), alternando com tapas nas costas; em gestante/obeso, compressões torácicas.
-- **Lactente:** 5 tapas nas costas + 5 compressões torácicas (não Heimlich).
-- **Se ficar inconsciente:** iniciar **RCP** (as compressões ajudam a expelir) + checar a boca a cada ciclo; pinça de Magill/laringoscopia se disponível.
+**Obstrução leve (tosse eficaz):** não intervir mecanicamente — apenas encorajar a tosse e observar continuamente, pronto para agir se evoluir para obstrução grave. Não fazer varredura digital às cegas (risco de empurrar o corpo estranho mais fundo).
+
+**Adulto/criança consciente com obstrução grave (AHA 2025):** sequência de **5 tapas interescapulares (golpes nas costas)** seguidos de **5 compressões abdominais (manobra de Heimlich)**, alternando os dois ciclos até desobstruir ou o paciente ficar inconsciente — a alternância combinada é mais eficaz do que a manobra de Heimlich isolada. Em gestante/obeso (abdome inacessível), substituir as compressões abdominais por **compressões torácicas**.
+
+**Lactente:** 5 tapas nas costas (decúbito ventral, cabeça mais baixa que o tronco) alternando com 5 compressões torácicas (2 dedos no terço inferior do esterno) — nunca Heimlich em lactente (risco de lesão visceral).
+
+**Autoaplicação:** compressões abdominais contra a própria mão ou apoiando o abdome sobre superfície rígida.
+
+**Se ficar inconsciente:** iniciar **RCP** imediatamente (não checar pulso antes) — as compressões torácicas também ajudam a expelir o corpo estranho. A cada abertura de via aérea, inspecionar a boca e remover o corpo estranho **somente se visível** (pinça de Magill sob laringoscopia direta é a técnica mais segura); evitar varredura digital às cegas.
+
+**Insucesso e hipóxia grave sem outra via disponível:** cricotireoidostomia de emergência por profissional treinado, como medida de resgate.
+
+## 🏥 Quando encaminhar/observar
+- Após desobstrução, avaliar clinicamente: manobras podem causar lesões (fratura de costela, lesão hepática/esplênica, perfuração visceral) — exame abdominal e, se suspeita, imagem.
+- Encaminhar para avaliação de via aérea (endoscopia/laringoscopia) se suspeita de fragmento residual, estridor persistente ou disfonia.
+- Internar/observar se houve hipóxia, perda de consciência, aspiração ou uso de compressões torácicas com risco de lesão interna.
 
 ## 💡 Pérolas
-- Tosse eficaz → só estimular a tosse.
-- Inconsciente → RCP imediata (não procurar pulso primeiro).`,
+- Tosse eficaz → só estimular a tosse; intervir mecanicamente pode piorar e converter obstrução parcial em total.
+- AHA 2025: sequência atual é **tapas nas costas primeiro**, alternando com compressões abdominais — não mais "Heimlich isolado" como conduta primária.
+- Inconsciente → RCP imediata (não procurar pulso primeiro).
+- Nunca fazer varredura digital às cegas na boca.
+- Reavaliar sempre após a manobra: risco de lesão visceral por compressões.`,
 
-sd_compart: `# Síndrome Compartimental Aguda
+sd_compart: `## 🔬 Causas
+- Fratura (mais comum, sobretudo diáfise de tíbia e antebraço), trauma/esmagamento, reperfusão pós-revascularização, queimadura circunferencial, gesso apertado, sangramento (anticoagulados, punção arterial), exercício extenuante incomum, injeção/extravasamento IV, mordida de cobra.
 
-> Aumento da pressão num compartimento fascial → isquemia muscular/nervosa. **Emergência cirúrgica** — perda de membro/função se atrasar.
-
-## 🔬 Causas
-- Fratura (mais comum), trauma/esmagamento, reperfusão, queimadura circunferencial, gesso apertado, sangramento.
+## 🔬 Fisiopatologia
+O aumento da pressão dentro de um compartimento osteofascial inextensível reduz o gradiente de perfusão capilar (pressão de perfusão = PA diastólica − pressão intracompartimental). Quando esse gradiente cai, ocorre isquemia de músculo e nervo, gerando um ciclo vicioso: isquemia → edema celular → mais aumento de pressão → mais isquemia. O músculo tolera isquemia por poucas horas (lesão irreversível a partir de ~4–6h, necrose estabelecida em 6–8h); os nervos são ainda mais sensíveis, com disfunção sensitiva já em 30–60 minutos de hipoperfusão. Sem descompressão, evolui para necrose muscular, contratura isquêmica de Volkmann, perda funcional permanente, rabdomiólise sistêmica e, em casos extremos, perda do membro ou morte. Populações de risco: politraumatizados, fraturas de alta energia, anticoagulados, uso de bloqueio regional/analgesia potente que mascara a dor (fator de confusão diagnóstica importante).
 
 ## 🩺 Quadro — "6 P"
-- **Dor desproporcional** e à extensão passiva (precoce e mais sensível), Parestesia, Palidez, Paralisia, Poiquilotermia, **Pulso ausente (tardio)**. Não esperar a ausência de pulso.
+- **Dor desproporcional** à lesão aparente, que não melhora (ou piora) com analgesia habitual — sinal mais precoce e mais sensível.
+- **Dor à extensão passiva** dos músculos do compartimento (ex.: dorsiflexão passiva do tornozelo na síndrome de perna) — deve ser testada ativamente.
+- Parestesia/hipoestesia no território nervoso do compartimento (precoce, mas sub-relatada).
+- Compartimento tenso, endurecido à palpação, edema local.
+- Palidez e Paralisia são achados mais tardios, já indicam isquemia estabelecida.
+- **Pulso ausente é sinal tardio** — geralmente preservado até fases avançadas; não esperar sua ausência para o diagnóstico.
+- Em pacientes sedados, com bloqueio regional, rebaixamento de consciência ou lesão medular, o quadro clássico pode estar mascarado — manter alto índice de suspeição e reavaliação seriada.
+
+## 🔀 Diagnósticos diferenciais
+- Trombose venosa profunda (edema/dor sem tensão compartimental característica).
+- Lesão neurológica periférica isolada.
+- Celulite/fasciite necrosante (sinais infecciosos sistêmicos, crepitação).
+- Isquemia arterial aguda por oclusão vascular (pulsos ausentes desde o início).
+- Dor pós-operatória/pós-traumática comum (responde à analgesia habitual, sem piora progressiva).
 
 ## ✅ Diagnóstico
-- **Clínico** (dor desproporcional + dor à mobilização passiva). **Medida da pressão compartimental** confirma (Δ entre PA diastólica e pressão compartimental < 30 mmHg).
+- **Clínico** (dor desproporcional + dor à mobilização passiva já bastam para indicar fasciotomia em casos claros — não esperar todos os "6 P").
+- **Medida da pressão compartimental** é útil quando o exame clínico é duvidoso ou o paciente não pode ser examinado: pressão absoluta > 30 mmHg sugere o diagnóstico; **Δ entre PA diastólica e pressão compartimental < 30 mmHg** é o parâmetro mais acurado, e < 20 mmHg é indicação praticamente definitiva de fasciotomia. Uma única medida normal não exclui o diagnóstico em paciente de risco — reavaliar.
 
 ## 🧪 Exames complementares
 | Exame | Objetivo |
 | --- | --- |
-| Pressão compartimental | Confirmar |
-| CPK, função renal | Rabdomiólise |
+| Pressão compartimental (Δp) | Confirmar/quantificar |
+| CPK seriada, função renal | Rabdomiólise |
+| K, eletrólitos | Complicações sistêmicas |
+| Radiografia/TC | Fratura associada |
+| Doppler/exame vascular | Excluir lesão arterial concomitante |
 
 ## 💊 Tratamento
-- **Fasciotomia de emergência** (descompressão) — tratamento definitivo.
-- Remover gesso/curativo constritivo; manter o membro ao nível do coração (**não elevar**); analgesia; hidratação (rabdomiólise).
+- **Fasciotomia de emergência** (descompressão) — tratamento definitivo; todos os compartimentos envolvidos devem ser liberados amplamente, geralmente com incisões mantidas abertas (fechamento tardio ou enxerto).
+- Remover imediatamente gesso/curativo constritivo; manter o membro **ao nível do coração** (**não elevar** — piora a perfusão; não baixar abaixo do nível cardíaco, que aumenta o edema).
+- Analgesia adequada, sem mascarar a dor a ponto de impedir a reavaliação seriada.
+- Hidratação e monitorização de função renal/eletrólitos, antecipando rabdomiólise.
+- Corrigir coagulopatia se presente, sem atrasar a fasciotomia em isquemia iminente.
+
+## 🏥 Quando internar/UTI
+- Toda síndrome compartimental confirmada ou fortemente suspeita exige internação para cirurgia em caráter de emergência (idealmente dentro de 6h do início dos sintomas).
+- UTI/monitorização intensiva no pós-operatório se rabdomiólise significativa, grande extensão de tecido desvitalizado, instabilidade hemodinâmica ou necessidade de suporte renal.
+- Pacientes de risco em observação (gesso recente, fratura de alta energia, bloqueio regional) devem ter reavaliação clínica seriada, mesmo sem sinais floridos.
 
 ## 💡 Pérolas
 - Dor desproporcional + dor à extensão passiva = operar (não esperar a ausência de pulso, que é tardia).
-- NÃO elevar o membro (piora a perfusão).`,
+- NÃO elevar o membro (piora a perfusão).
+- Bloqueio regional/sedação mascaram o sintoma mais precoce (a dor) — nesses casos, priorizar medida seriada de pressão.
+- Pressão intracompartimental normal isolada não exclui o diagnóstico em quadro clínico sugestivo.
+- Fasciotomia atrasada é a principal causa de sequela permanente nessa condição.`,
 
 politrauma: `**Politraumatizado.** Paciente com lesões traumáticas múltiplas, envolvendo dois ou mais sistemas/órgãos, com potencial risco à vida — a principal causa de morte evitável em adultos jovens no Brasil. O manejo segue a abordagem sistemática do ATLS (Advanced Trauma Life Support), com avaliação primária, reanimação simultânea e reavaliação contínua; a **hemorragia não controlada** é a causa mais comum de morte evitável nas primeiras horas.
 
@@ -5971,119 +6180,287 @@ intox_tca: `**Intoxicação por antidepressivo tricíclico (ATC).** Uma das into
 - Melhora clínica inicial não significa alta segura — a absorção retardada pelo efeito anticolinérgico pode causar piora tardia; manter monitorização.
 - R em aVR e QRS são melhores preditores de gravidade do que o nível sérico do fármaco.`,
 
-queimadura: `# Queimaduras — abordagem inicial
+queimadura: `## 🔥 Fisiopatologia
 
-> Avaliar profundidade, **extensão (SCQ — regra dos 9)**, via aérea (inalação) e necessidade de transferência.
+A lesão térmica desnatura proteínas e causa necrose de coagulação tecidual, com três zonas concêntricas descritas por Jackson: **zona de coagulação** (necrose irreversível no centro), **zona de estase** (tecido viável mas em risco — pode necrosar se houver hipoperfusão, infecção ou ressuscitação inadequada) e **zona de hiperemia** (inflamação reversível na periferia). O objetivo da ressuscitação e do cuidado local é justamente preservar a zona de estase. Em queimaduras extensas (geralmente ≥15–20% da superfície corporal queimada — SCQ), a liberação sistêmica de mediadores inflamatórios (histamina, citocinas, radicais livres) aumenta a permeabilidade capilar generalizada, não apenas na área queimada, causando extravasamento maciço de líquido para o interstício (edema) e queda do volume intravascular efetivo — a base fisiopatológica do choque de queimadura e da necessidade de reposição volêmica calculada. A lesão inalatória, por sua vez, ocorre por injúria térmica direta das vias aéreas superiores (edema progressivo que pode obstruir a via aérea em horas) associada à injúria química das vias aéreas inferiores por produtos da combustão incompleta (fuligem, aldeídos) e, em incêndios em ambiente fechado, intoxicação concomitante por monóxido de carbono e cianeto.
 
-## 🚑 Abordagem
-- ABCDE; suspeitar de **lesão inalatória** (queimadura facial, rouquidão, fuligem, espaço fechado) → via aérea precoce. Remover roupas/anéis; analgesia; prevenir hipotermia.
+## 🩺 Apresentação clínica
 
-## ✅ Avaliação
-- **Profundidade** (1º / 2º superficial-profundo / 3º) e **% SCQ** (regra dos 9; palma ~1%).
+**Anamnese:** mecanismo (chama, escaldadura, elétrica, química), tempo de exposição, ambiente fechado ou aberto, perda de consciência no local (sugere intoxicação por CO/cianeto ou trauma associado), agente químico específico se aplicável.
 
-## 💊 Tratamento (com doses)
-- **Reposição volêmica (2º/3º graus, SCQ ≥ 15–20%):** **Parkland** = 2–4 mL × peso(kg) × %SCQ de Ringer lactato em 24h (**metade nas primeiras 8h**); ajustar pela **diurese (0,5–1 mL/kg/h)**.
-- Curativos; **profilaxia antitetânica**; analgesia; nutrição.
-- **Centro de queimados:** SCQ extensa, face/mãos/períneo, 3º grau, inalação, elétrica/química, extremos de idade.
+**Exame físico dirigido:**
+- Sinais de **lesão inalatória**: queimadura facial/de vibrissas, rouquidão ou estridor, escarro carbonáceo, fuligem em orofaringe, história de exposição em espaço fechado — exigem avaliação precoce da via aérea, antes que o edema progressivo a torne impossível de garantir.
+- **Profundidade:** 1º grau (eritema, dor, sem bolhas — epiderme), 2º grau superficial (bolhas, base rósea, dolorosa, boa perfusão capilar — derme superficial), 2º grau profundo (base pálida/marmórea, hipoestesia, enchimento capilar lento — derme profunda, cicatrização lenta e frequentemente cirúrgica) e 3º grau (couro esbranquiçado/carbonizado, indolor, sem enchimento capilar — espessura total, sempre necessita enxerto).
+- **Extensão (%SCQ):** regra dos nove no adulto (cabeça 9%, cada membro superior 9%, tronco anterior/posterior 18% cada, cada membro inferior 18%, períneo 1%) — em crianças a proporção da cabeça é maior e exige tabelas específicas (Lund-Browder); a palma da mão do próprio paciente (incluindo dedos) equivale a aproximadamente 1% da SCQ, útil para estimar áreas irregulares pequenas.
 
-## 💡 Pérolas
-- Parkland é estimativa — titular pela diurese.
-- Lesão inalatória → via aérea precoce (antes do edema).`,
+## 🔍 Diagnóstico diferencial
 
-picada_cobra: `# Acidente Ofídico (Picada de Cobra)
+- Síndrome de pele escaldada estafilocócica e necrólise epidérmica tóxica (Stevens-Johnson/NET) — diferenciais de lesões bolhosas extensas sem história de exposição térmica clara.
+- Celulite necrosante/fasciite necrosante em queimaduras que evoluem com deterioração local e toxicidade sistêmica desproporcional.
+- Congelamento (frostbite) e outras lesões por frio — mecanismo oposto, mas abordagem inicial de via aérea/exposição semelhante em politrauma.
+- Considerar sempre queimadura elétrica com trajeto interno maior que a lesão cutânea visível (risco de rabdomiólise e arritmia) e queimadura química com necessidade de irrigação prolongada e neutralização específica de alguns agentes.
 
-> Identificar o gênero define o soro. No Brasil: **Bothrops** (jararaca), **Crotalus** (cascavel), **Micrurus** (coral), Lachesis.
+## 📊 Avaliação e critérios de gravidade
 
-## 🩺 Quadros por gênero
-- **Botrópico:** dor/edema/equimose local, bolhas, necrose; **coagulopatia** (sangramento), LRA.
-- **Crotálico:** pouca dor local; **neurotóxico** (fácies miastênica, ptose) + mialgia/**rabdomiólise** + coagulopatia + LRA.
-- **Elapídico (coral):** neurotoxicidade (paralisia, insuficiência respiratória); local discreto.
+Profundidade + %SCQ + localização definem a gravidade e a necessidade de transferência para centro de queimados. Queimaduras de 2º grau profundo/3º grau com SCQ ≥15-20%, ou qualquer queimadura envolvendo face, mãos, pés, genitália/períneo, grandes articulações, queimadura circunferencial, elétrica de alta tensão, química, ou associada a lesão inalatória, definem alto risco e indicação de centro especializado.
+
+## 💊 Tratamento
+
+- **ABCDE do trauma** com atenção especial à via aérea: suspeita de lesão inalatória (queimadura facial, rouquidão, fuligem, ambiente fechado) → via aérea definitiva precoce (intubação eletiva), pois o edema progressivo pode tornar a via aérea impossível de garantir horas depois. Remover roupas e adereços (anéis, pulseiras) antes que o edema os torne garrotes; analgesia potente (opioide IV); prevenção ativa de hipotermia (o paciente queimado perde a barreira térmica da pele).
+- **Reposição volêmica** (indicada em queimaduras de 2º/3º graus com SCQ ≥ 15–20%): fórmula de **Parkland** — 2–4 mL × peso (kg) × %SCQ de Ringer lactato nas primeiras 24h, com **metade do volume infundida nas primeiras 8h** contadas a partir do momento da queimadura (não da chegada ao hospital) e a outra metade nas 16h seguintes. Diretrizes mais recentes da American Burn Association (2023) recomendam **iniciar pela extremidade inferior da fórmula (próximo de 2 mL/kg/%SCQ)** e titular agressivamente pela resposta clínica, para reduzir o excesso de volume ("fluid creep") e suas complicações (síndrome compartimental abdominal, de extremidades e edema pulmonar). O volume calculado é sempre uma **estimativa inicial**, ajustada em tempo real pela **diurese-alvo de 0,5–1 mL/kg/h** no adulto (maior em criança e em lesão elétrica/mioglobinúria).
+- Cuidados locais: limpeza, desbridamento de bolhas rotas, curativos oclusivos (ou específicos, como sulfadiazina de prata ou coberturas modernas conforme disponibilidade local); **profilaxia antitetânica** sempre; analgesia regular (não apenas se dor); suporte nutricional precoce (hipermetabolismo é intenso em grandes queimados).
+- Queimadura elétrica: monitorar ECG contínuo (risco de arritmia), CPK e mioglobinúria (hidratação vigorosa e alcalinização da urina se rabdomiólise significativa), atenção a compartimentos musculares (a lesão interna costuma ser maior que a aparência externa).
+- Queimadura química: irrigação copiosa e prolongada com água corrente (exceção a poucos agentes específicos que reagem com água), remover roupas contaminadas, identificar o agente para manejo dirigido.
+- **Critérios de transferência para centro de queimados:** SCQ extensa, face/mãos/pés/genitália/grandes articulações, 3º grau, lesão inalatória, queimadura elétrica ou química significativa, extremos de idade, comorbidade relevante ou trauma associado.
+
+## 🏥 Quando internar/UTI
+
+- Internar: SCQ ≥10% em criança ou idoso, ≥15-20% em adulto, queimaduras de 2º grau profundo/3º grau em áreas críticas, qualquer suspeita de lesão inalatória, queimadura elétrica/química relevante.
+- UTI: necessidade de via aérea definitiva, instabilidade hemodinâmica, grandes SCQ com necessidade de monitorização hemodinâmica intensiva, rabdomiólise significativa, intoxicação concomitante por CO/cianeto.
+
+## 💡 Pérolas e erros comuns
+
+- Parkland é ponto de partida, não meta — titular sempre pela diurese; excesso de volume tem custo real (síndrome compartimental, edema pulmonar).
+- Lesão inalatória mata pela obstrução progressiva da via aérea — garantir via aérea antes que o edema a torne impossível, não depois.
+- A palma da mão do paciente ≈1% da SCQ é atalho útil para estimar áreas irregulares, mas não substitui a regra dos nove/Lund-Browder para o cálculo total.
+- Erro comum: contar o tempo do Parkland a partir da chegada ao hospital, e não do momento da queimadura — isso subestima o volume já necessário nas primeiras 8h.
+- Erro comum: aplicar gelo diretamente na queimadura — piora a lesão por vasoconstrição e hipotermia; usar água em temperatura ambiente/fria, nunca gelada.`,
+
+picada_cobra: `## 🐍 Fisiopatologia
+
+O veneno ofídico brasileiro varia conforme o gênero e determina o quadro clínico e a conduta:
+
+- **Bothrops** (jararaca, jararacuçu, urutu — responsável pela maioria dos acidentes no Brasil): veneno com ação **proteolítica** (necrosante local), **coagulante** (ativa a cascata de coagulação, consumindo fibrinogênio e gerando incoagulabilidade sanguínea — síndrome do tipo "consumo") e **hemorrágica** (lesão endotelial direta). A necrose tecidual e a queda de perfusão renal (por hipotensão, hemólise ou depósito de fibrina) explicam a lesão renal aguda (LRA).
+- **Crotalus** (cascavel): veneno com ação **neurotóxica pré-sináptica** (crotoxina, que bloqueia a liberação de acetilcolina na junção neuromuscular), **miotóxica** (rabdomiólise sistêmica) e coagulante (menos intensa que a botrópica). A pouca reação inflamatória local é característica — dor e edema costumam ser discretos, o que pode levar a subestimar a gravidade.
+- **Lachesis** (surucucu-pico-de-jaca): veneno com componentes proteolítico, coagulante e hemorrágico semelhantes ao botrópico, mas com um componente **neurotóxico de estímulo vagal** que causa a chamada síndrome vagal (bradicardia, hipotensão, diarreia, cólicas). Todo acidente laquético é considerado **moderado ou grave** — não existe forma leve.
+- **Micrurus** (coral-verdadeira): veneno **neurotóxico pós-sináptico** (bloqueio competitivo dos receptores nicotínicos), levando a paralisia flácida descendente e insuficiência respiratória; manifestação local mínima ou ausente, o que torna o diagnóstico dependente da história de exposição.
+
+## 🩺 Apresentação clínica
+
+**Anamnese:** horário da picada, características da serpente (quando possível — fotos ajudam), local, presença de dor imediata (sugere Bothrops/Lachesis/Crotalus vs. dor mínima no acidente elapídico), sintomas sistêmicos precoces (náusea, sudorese, sialorreia sugerem envenenamento crotálico ou laquético).
+
+**Exame físico por gênero:**
+- **Botrópico:** dor local imediata e intensa, edema progressivo, equimose, bolhas (por vezes hemorrágicas), sangramento em ferimentos/gengivas/pele (gengivorragia é sinal clássico de incoagulabilidade), podendo evoluir para necrose extensa e síndrome compartimental.
+- **Crotálico:** dor e edema local discretos ou ausentes — atenção para não subestimar. **Fácies miastênica/ptose palpebral bilateral** (fácies neurotóxica de Rosenfeld), diplopia, turvação visual, mialgia generalizada com urina escura (mioglobinúria).
+- **Laquético:** quadro local semelhante ao botrópico (dor, edema, equimose, sangramento) associado a **síndrome vagal** (bradicardia, hipotensão, diarreia, cólicas abdominais).
+- **Elapídico (coral):** dor e edema mínimos no local; evolução para ptose palpebral, oftalmoplegia, disfagia, sialorreia, fraqueza muscular progressiva e **insuficiência respiratória** — pode ser rápida e fatal se não reconhecida.
+
+## 🔍 Diagnóstico diferencial
+
+- Picada de aranha (Loxosceles/Phoneutria) e escorpião — diferenciar pela história de exposição e pelo padrão de veneno (necrose tardia na aranha-marrom vs. necrose precoce e sangramento no botrópico).
+- Outras causas de coagulopatia aguda (CIVD por sepse, hepatopatia).
+- Síndrome de Guillain-Barré e miastenia gravis — diagnóstico diferencial do quadro neurotóxico do acidente crotálico/elapídico quando a história de picada não é clara.
+- Celulite/erisipela infecciosa — diferencial do edema local botrópico, sobretudo em picadas não testemunhadas.
+
+## 📊 Classificação de gravidade e soroterapia
+
+O número de ampolas de soro é definido pela gravidade clínica (achados locais + sistêmicos + tempo de coagulação), conforme o Manual de Diagnóstico e Tratamento de Acidentes por Animais Peçonhentos do Ministério da Saúde:
+
+| Gênero | Leve | Moderado | Grave |
+| --- | --- | --- | --- |
+| **Botrópico** (SAB) | 2–4 ampolas | 4–8 ampolas | 12 ampolas |
+| **Crotálico** (SAC) | 5 ampolas | 10 ampolas | 20 ampolas |
+| **Laquético** (SABL) | não existe forma leve | 10 ampolas | 20 ampolas |
+| **Elapídico** (SAE) | dose única de 10 ampolas independentemente da gravidade | | |
+
+O soro é sempre **intravenoso**, diluído em SF 0,9% ou SG 5%, infundido lentamente com o paciente monitorado (risco de reação anafilactoide — ter adrenalina disponível). Repetir o tempo de coagulação (TC) em 6, 12 e 24h após a soroterapia botrópica/laquética; se persistir incoagulável, considerar dose adicional.
 
 ## 🧪 Exames complementares
+
 | Exame | Objetivo |
 | --- | --- |
-| Tempo de coagulação / coagulograma | Coagulopatia (botrópico/crotálico) |
-| CPK, função renal, urina | Rabdomiólise/LRA |
+| Tempo de coagulação (TC) / coagulograma, fibrinogênio | Documentar e monitorar a coagulopatia (botrópico/laquético/crotálico) |
+| CPK, DHL, função renal, urina I (mioglobinúria) | Rabdomiólise e lesão renal aguda (crotálico) |
+| Hemograma | Anemia por sangramento, plaquetopenia |
+| ECG | Distúrbio de condução na síndrome vagal laquética |
 
-## 💊 Tratamento (com doses)
-- **Soro antiveneno específico IV** o quanto antes (nº de ampolas pela gravidade — protocolo do MS).
-- **NÃO** fazer torniquete/cortar/sugar; lavar, imobilizar e elevar; analgesia; hidratação (proteção renal); profilaxia antitetânica.
-- Suporte ventilatório no elapídico/crotálico grave.
+## 💊 Tratamento
 
-## 💡 Pérolas
-- O soro é o tratamento — não perder tempo com medidas caseiras.
-- Crotálico: vigiar rabdomiólise/LRA; coral: paralisia respiratória.`,
+- **Soro antiveneno específico IV** o quanto antes — é a única terapia que neutraliza o veneno circulante; não há teto de tempo para indicar, mas a eficácia cai quanto mais tardia a administração.
+- **NÃO** fazer torniquete, incisão, sucção ou aplicação de substâncias no local — essas medidas aumentam necrose e infecção sem benefício.
+- Lavar o local com água e sabão, imobilizar o membro em posição funcional e mantê-lo elevado; analgesia sistêmica (evitar AAS/AINE pelo risco de sangramento em coagulopatia); hidratação venosa para proteção renal; profilaxia antitetânica.
+- Antibioticoterapia empírica não é rotina — reservar para sinais de infecção secundária (frequente em botrópico por necrose).
+- Suporte ventilatório precoce (considerar intubação eletiva) no quadro neurotóxico elapídico/crotálico grave, antes de insuficiência respiratória franca.
+- Síndrome compartimental (botrópico grave): monitorar pressão compartimental; fasciotomia é exceção, não rotina — a maioria dos edemas graves melhora só com o soro.
 
-picada_escorp: `# Escorpionismo (Picada de Escorpião)
+## 🏥 Quando internar/UTI
 
-> No Brasil, Tityus. A maioria é leve (dor local), mas crianças podem evoluir para forma grave sistêmica.
+- Todo acidente **moderado ou grave** de qualquer gênero deve ser internado.
+- **UTI:** insuficiência respiratória (elapídico/crotálico), choque, LRA estabelecida, sangramento ativo importante, instabilidade hemodinâmica (síndrome vagal laquética).
+- Mesmo acidentes leves exigem observação hospitalar mínima de 24h pelo risco de evolução tardia da coagulopatia.
 
-## 🩺 Quadro
-- **Leve:** dor local intensa, parestesia.
-- **Moderado/grave** (sobretudo crianças): vômitos, sudorese, agitação, taquicardia/bradicardia, **edema agudo de pulmão**, choque, arritmia.
+## 💡 Pérolas e erros comuns
+
+- O soro é o tratamento — não perder tempo com torniquete, sucção ou "chá caseiro"; esses atrasam o antídoto real.
+- Crotálico: a dor local discreta engana — sempre procurar fácies miastênica e vigiar rabdomiólise/LRA mesmo sem sinais locais.
+- Coral: manifestação local mínima não afasta gravidade — vigiar paralisia respiratória de perto e ter via aérea pronta.
+- Laquético: pensar em síndrome vagal (bradicardia + hipotensão + diarreia) associada a quadro local tipo botrópico.
+- Erro comum: aplicar soro antibotrópico isolado em picada por Lachesis não diferenciada — na dúvida entre Bothrops e Lachesis, usar o soro antibotrópico-laquético (SABL), que cobre ambos.`,
+
+picada_escorp: `## 🦂 Fisiopatologia
+
+No Brasil, o escorpionismo grave é causado majoritariamente por espécies do gênero **Tityus** (*T. serrulatus* — escorpião-amarelo — é a principal espécie envolvida em óbitos). O veneno contém neurotoxinas que atuam sobre canais de sódio voltagem-dependentes de neurônios do sistema nervoso autônomo, promovendo despolarização e **liberação maciça de catecolaminas e acetilcolina** na fenda sináptica. É essa "tempestade autonômica" — não uma ação direta sobre o coração ou pulmão — que explica o espectro de manifestações sistêmicas: taquicardia/hipertensão inicial (efeito adrenérgico), seguida por vômitos, sialorreia e bradicardia (efeito colinérgico), e, nos casos mais graves, miocardite tóxica e edema agudo de pulmão de origem não cardiogênica associado a disfunção miocárdica. Crianças pequenas são desproporcionalmente mais suscetíveis à forma grave por menor massa corporal relativa à quantidade de veneno inoculada e por sistema cardiovascular menos tolerante à sobrecarga catecolaminérgica.
+
+## 🩺 Apresentação clínica
+
+**Anamnese:** hora da picada, dor imediata e de forte intensidade é a queixa mais comum e não indica, por si só, gravidade sistêmica; perguntar sobre sintomas associados (sudorese, vômitos, agitação, palpitações) e sempre estratificar por idade (crianças < 7 anos e idosos têm maior risco de forma grave).
+
+**Exame físico:**
+- **Leve** (>85–90% dos casos): dor local intensa em queimação, às vezes irradiada, parestesia, eritema/sudorese localizada — sem manifestações sistêmicas.
+- **Moderado:** um ou mais sinais sistêmicos discretos — náusea/vômitos ocasionais, sudorese discreta, taquicardia, agitação leve, sem comprometimento hemodinâmico ou respiratório.
+- **Grave** (mais comum em crianças pequenas): vômitos profusos e repetidos, sudorese profusa, sialorreia, agitação intensa ou prostração, taquipneia, taquicardia ou bradicardia, arritmias, hipertensão ou hipotensão/choque, e **edema agudo de pulmão** — dispneia, estertores, hipoxemia — configurando a principal causa de óbito.
+
+## 🔍 Diagnóstico diferencial
+
+- Picada de aranha (Phoneutria também causa dor local intensa imediata e pode ter manifestação sistêmica em crianças) — diferenciar pela identificação do animal quando possível.
+- Miocardite viral e outras causas de edema agudo de pulmão em criança sem história de picada relatada.
+- Abdome agudo — vômitos e dor intensa podem simular quadro cirúrgico, sobretudo em crianças pequenas que não conseguem relatar a picada.
+- Intoxicação exógena com síndrome colinérgica/adrenérgica mista.
+
+## 📊 Classificação e indicação de soro
+
+A classificação clínica (leve/moderado/grave) determina a conduta:
+
+| Gravidade | Achados | Soroterapia |
+| --- | --- | --- |
+| Leve | Dor local isolada, sem sinais sistêmicos | Não indicada — apenas analgesia |
+| Moderado | Sinais sistêmicos discretos, sem repercussão hemodinâmica/respiratória | **3 ampolas** de soro antiescorpiônico (SAEsc) IV |
+| Grave | Sinais sistêmicos intensos, EAP, choque, arritmia | **6 ampolas** de soro antiescorpiônico IV (dose máxima recomendada) |
+
+O soro deve ser aplicado o mais precocemente possível nos casos moderados/graves, sob monitorização, pelo risco de reação anafilactoide.
 
 ## 🧪 Exames complementares
+
 | Exame | Objetivo |
 | --- | --- |
-| ECG, enzimas cardíacas | Cardiotoxicidade |
-| Glicemia | Hiperglicemia (grave) |
-| Ecocardiograma | Disfunção (grave) |
+| ECG, troponina/CK-MB | Cardiotoxicidade, miocardite |
+| Glicemia | Hiperglicemia é achado comum nos casos graves (efeito adrenérgico) |
+| Ecocardiograma | Avaliar disfunção sistólica nos casos graves |
+| Radiografia de tórax | Edema agudo de pulmão |
+| Gasometria arterial | Hipoxemia/insuficiência respiratória nos casos graves |
 
-## 💊 Tratamento (com doses)
-- **Leve:** analgesia (dipirona; **bloqueio local com lidocaína** sem vasoconstritor), observação.
-- **Moderado/grave:** **soro antiescorpiônico/antiaracnídico IV** (nº de ampolas pela gravidade — protocolo MS) + suporte intensivo (manejo de EAP/choque).
+## 💊 Tratamento
 
-## 💡 Pérolas
-- Criança com sintomas sistêmicos = grave → soro + UTI.
-- Adulto com dor isolada: analgesia e observação (soro nas formas sistêmicas).`,
+- **Leve:** analgesia sistêmica (dipirona ou opioide se refratário) e **bloqueio anestésico local com lidocaína sem vasoconstritor** infiltrado ao redor do local da picada — alivia rapidamente a dor intensa; observação por algumas horas.
+- **Moderado/grave:** soro antiescorpiônico (ou soro antiaracnídico, que também neutraliza veneno de Tityus) conforme a tabela acima, associado a suporte intensivo: oxigenoterapia, manejo do edema agudo de pulmão (diuréticos, ventilação não invasiva ou invasiva se necessário), suporte inotrópico em caso de disfunção miocárdica/choque, controle de arritmias.
+- Evitar hiper-hidratação nos casos com miocardite/EAP — o quadro é de disfunção miocárdica, não de hipovolemia.
+- Antieméticos para controlar vômitos profusos, que agravam desidratação e desequilíbrio hidroeletrolítico em crianças.
 
-rabdomio: `# Rabdomiólise
+## 🏥 Quando internar/UTI
 
-> Lise muscular → liberação de mioglobina/CK → risco de **LRA**, hipercalemia e distúrbios eletrolíticos.
+- **Observação hospitalar (algumas horas):** todo caso moderado, mesmo sem indicação clara de UTI.
+- **UTI:** todo caso grave — EAP, choque, arritmia, disfunção miocárdica — e toda criança pequena (especialmente < 7 anos) com qualquer sinal sistêmico, dado o potencial de deterioração rápida.
+- Reavaliação clínica seriada é mandatória nas primeiras horas, pois a evolução de moderado para grave pode ser rápida, sobretudo em crianças.
 
-## 🔬 Causas
+## 💡 Pérolas e erros comuns
+
+- Criança com qualquer sintoma sistêmico após picada de escorpião = tratar como grave até prova em contrário → soro + monitorização em UTI/observação intensiva.
+- Adulto com dor local isolada, sem sinais sistêmicos: analgesia (incluindo bloqueio local) e observação — soro reservado às formas sistêmicas.
+- Erro comum: subestimar dor intensa como "só dor" em criança pequena e não reavaliar em poucas horas — o edema agudo de pulmão pode se instalar rapidamente após período de latência.
+- Erro comum: hiper-hidratar um paciente com EAP escorpiônico pensando em "reposição volêmica" — o mecanismo é miocardiotóxico/catecolaminérgico, não hipovolêmico.`,
+
+rabdomio: `## 🔬 Causas
 - Trauma/compressão (esmagamento, imobilização prolongada), exercício extremo, convulsão, isquemia, drogas/toxinas (estatina, cocaína), infecções, hipertermia.
 
+## 🔬 Fisiopatologia
+A lesão da membrana da célula muscular esquelética (trauma direto, isquemia, toxinas, calor, distúrbios metabólicos) provoca extravasamento do conteúdo intracelular — mioglobina, creatina-quinase (CK), potássio, fósforo e ácido úrico — para a circulação. A mioglobina livre é filtrada pelo glomérulo e, em ambiente urinário ácido, precipita nos túbulos renais formando cilindros, além de ter efeito tóxico direto e vasoconstritor na microcirculação renal — mecanismo central da lesão renal aguda (LRA) mioglobinúrica. Simultaneamente, o influxo de cálcio para dentro da célula lesada perpetua a necrose, e a liberação de potássio e fósforo intracelulares pode causar hiperpotassemia e hiperfosfatemia graves e rápidas, com risco de arritmia fatal, especialmente quando há LRA associada limitando a excreção. Causas frequentemente multifatoriais: trauma/compressão (esmagamento, imobilização prolongada — inclusive queda com permanência no chão), exercício extremo, convulsão prolongada/agitação psicomotora, hipertermia maligna, síndrome neuroléptica maligna, isquemia (oclusão arterial, síndrome compartimental), drogas/toxinas (estatina — isolada ou em interação com fibrato/macrolídeo —, álcool, cocaína, anfetaminas), infecções (miosite viral, sepse) e distúrbios metabólicos (hipofosfatemia grave, hipotireoidismo, miopatias metabólicas genéticas).
+
 ## 🩺 Quadro
-- Mialgia, fraqueza, **urina escura ("cor de chá")**; pode ser oligossintomática.
+- A tríade clássica (mialgia, fraqueza, **urina escura "cor de chá"**) está presente em apenas uma minoria dos casos — a maioria é oligossintomática, identificada por CK elevada incidental.
+- Dor e edema muscular localizados, sensibilidade à palpação; fraqueza proximal predominante quando extensa.
+- Sinais da causa de base: confusão/agitação, febre alta, sinais de compartimento tenso.
+- Casos graves: sinais de hipercalemia (palpitações, fraqueza extrema, parada cardíaca), oligúria/anúria por LRA, parestesias/tetania por hipocalcemia inicial (sequestro de cálcio no músculo lesado).
+
+## 🔀 Diagnósticos diferenciais
+- Hematúria verdadeira (dipstick "sangue" positivo COM hemácias ao sedimento — diferente da mioglobinúria).
+- Hemólise intravascular/hemoglobinúria (CK normal ou pouco elevada, haptoglobina baixa, LDH e bilirrubina indireta elevadas).
+- Infarto agudo do miocárdio (CK-MB/troponina elevadas isoladamente, sem CK total tão elevada).
+- Miosite inflamatória crônica (instalação mais insidiosa).
+
+## 📊 Gravidade
+- CK não prediz risco de LRA de forma linear, mas CK muito elevada (milhares a dezenas de milhares de U/L), desidratação, sepse, acidose e idade avançada aumentam o risco.
+- Considerar grave: hipercalemia sintomática/ECG alterado, LRA já instalada, CK em ascensão rápida, causa contínua não controlada (ex. síndrome compartimental não tratada).
 
 ## ✅ Diagnóstico
-- **CK muito elevada** (> 5× o limite, em geral milhares); urina com mioglobina (dipstick "sangue" sem hemácias). Vigiar **K, Ca, P, função renal**.
+- **CK muito elevada** (> 5× o limite, em geral milhares), com pico em 24–72h e queda de ~40–50%/dia após cessar a causa; urina com dipstick "sangue" positivo sem hemácias ao sedimento (mioglobinúria — mioglobina não é dosada rotineiramente). Vigiar **K, Ca, P, ácido úrico e função renal** de forma seriada.
 
 ## 🧪 Exames complementares
 | Exame | Objetivo |
 | --- | --- |
-| CPK | Diagnóstico/gravidade |
-| K, Ca, P, função renal | Complicações |
-| Urina (mioglobina) | Confirmar/risco renal |
+| CPK seriada | Diagnóstico/gravidade |
+| K, Ca, P, ácido úrico, função renal | Complicações |
+| Urina (dipstick + sedimento) | Confirmar mioglobinúria, afastar hematúria |
 | ECG | Hipercalemia |
+| Gasometria | Acidose metabólica |
 
 ## 💊 Tratamento (com doses)
-- **Hidratação IV agressiva e precoce** (SF 0,9%, ~1–2 L/h inicial, ajustar) — meta de **diurese 200–300 mL/h** — prevenção da LRA.
-- Tratar **hipercalemia**; corrigir distúrbios; tratar a causa. (Alcalinização urinária/manitol são controversos.)
+- **Hidratação IV agressiva e precoce** (SF 0,9%, ~1–2 L/h inicial, ajustar ao estado volêmico) — meta de **diurese 200–300 mL/h** até a CK começar a declinar — é a medida com maior impacto comprovado na prevenção de LRA; reavaliar seriadamente para evitar sobrecarga hídrica em idosos/cardiopatas.
+- Tratar **hipercalemia** conforme protocolo padrão (gluconato de cálcio se alteração de ECG, insulina+glicose, beta-agonista, diálise se refratária).
+- **Alcalinização urinária com bicarbonato de sódio e manitol** são medidas historicamente propostas, mas o benefício adicional sobre a hidratação isolada **não está bem estabelecido** e carregam riscos (alcalose metabólica e hipocalcemia com bicarbonato; sobrecarga osmótica com manitol) — não são rotina.
+- Corrigir a causa de base (retirar droga, tratar convulsão/agitação, resfriar se hipertermia, descomprimir compartimento se associado).
+- Terapia renal substitutiva se LRA estabelecida com hipercalemia refratária, acidose grave, sobrecarga volêmica ou uremia.
+
+## 🏥 Quando internar/UTI
+- Internar praticamente todo caso clinicamente relevante para hidratação monitorizada e vigilância eletrolítica seriada.
+- UTI se hipercalemia sintomática/instabilidade elétrica, LRA oligúrica/necessidade dialítica, instabilidade hemodinâmica, síndrome compartimental associada, ou causa sistêmica grave concomitante.
+- Observação ambulatorial só em casos leves, oligossintomáticos, CK em queda, função renal normal e causa autolimitada já resolvida.
 
 ## 💡 Pérolas
-- Hidratação precoce e abundante protege o rim.
-- Atenção à hipercalemia (pode ser fatal).`,
+- Hidratação precoce e abundante protege o rim — não atrasar aguardando confirmação laboratorial completa.
+- Atenção à hipercalemia (pode ser fatal e evoluir rapidamente, sobretudo com LRA associada).
+- A maioria dos pacientes é oligossintomática — suspeitar sempre diante de CK elevada incidental em contexto de imobilização, trauma, convulsão ou uso de estatina.
+- Bicarbonato e manitol são condutas controversas — não usar como rotina.
+- Sem tratar a causa de base, a lesão muscular continua e o quadro não estabiliza.`,
 
-hipotermia: `# Hipotermia Grave
+hipotermia: `> Temperatura central < 35 °C (grave < 28 °C). Reaquecimento + cuidado com arritmias.
 
-> Temperatura central < 35 °C (grave < 28 °C). Reaquecimento + cuidado com arritmias.
+## 🔬 Fisiopatologia
+
+A hipotermia acidental resulta do desequilíbrio entre produção e perda de calor, geralmente por exposição ambiental (imersão em água fria, altitude, trauma com exposição prolongada), agravada por fatores predisponentes como extremos de idade, uso de álcool/sedativos, hipoglicemia, hipotireoidismo, sepse e trauma. À medida que a temperatura central cai, o organismo tenta compensar com tremor (aumenta a produção de calor em várias vezes) e vasoconstrição periférica; quando essas respostas se esgotam, a temperatura continua caindo progressivamente. O frio deprime o metabolismo celular, reduz a frequência cardíaca e a contratilidade, torna o miocárdio eletricamente instável (risco de fibrilação ventricular, sobretudo com manuseio brusco) e desloca a curva de dissociação da hemoglobina, comprometendo a liberação de oxigênio aos tecidos. Coagulopatia e disfunção enzimática também ocorrem pelo frio, o que explica por que gasometrias e coagulogramas devem ser interpretados com cautela (muitos analisadores aquecem a amostra a 37 °C antes de medir, mascarando a real gravidade da acidose/coagulopatia).
 
 ## 🩺 Quadro por gravidade
-- Leve (32–35°): tremor, taquicardia. Moderada (28–32°): ↓ consciência, bradicardia, cessa o tremor. Grave (< 28°): coma, risco de **FV/assistolia**; pode parecer morto.
+
+- **Leve (32–35 °C):** tremor presente, taquicardia, taquipneia, disartria leve, ainda capaz de se autoproteger (andar, gerar calor).
+- **Moderada (28–32 °C):** rebaixamento progressivo do nível de consciência, bradicardia, cessação do tremor (sinal de mau prognóstico se não tratado), arritmias atriais, rigidez muscular, pupilas podem ficar lentas.
+- **Grave (< 28 °C):** coma, pulso e respiração podem ser imperceptíveis à avaliação superficial (paciente pode "parecer morto"), alto risco de **fibrilação ventricular ou assistolia**, sobretudo com manuseio inadequado.
+
+## 🔍 Diagnóstico diferencial / causas associadas a excluir
+
+- Hipoglicemia (sempre checar glicemia capilar — pode coexistir e mimetizar/agravar o rebaixamento).
+- Intoxicação exógena (álcool, sedativos, opioides) — frequentemente concomitante.
+- Sepse com vasodilatação e perda de calor associada, especialmente em idosos.
+- Hipotireoidismo grave (mixedema) e insuficiência adrenal — considerar em hipotermia sem exposição ambiental clara.
+- Trauma associado (avaliar sempre, pois pode ser causa e consequência da exposição).
 
 ## ✅ Avaliação
-- **Temperatura central** (esofágica/retal); ECG (**onda J de Osborn**, arritmias); glicemia, eletrólitos, gasometria.
+
+- **Temperatura central** medida em local confiável (esofágica é a mais precisa em paciente intubado; retal como alternativa) — termômetros de pele/axilares subestimam a gravidade real.
+- **ECG:** procurar a clássica **onda J de Osborn** (mais proeminente quanto mais grave a hipotermia), além de bradiarritmias, fibrilação atrial e risco de fibrilação ventricular.
+- Glicemia capilar, eletrólitos, função renal, coagulograma e gasometria — com a ressalva de que valores podem estar artificialmente melhores do que a realidade fisiológica pelo aquecimento da amostra no analisador.
+- Investigar e tratar causas associadas (infecção, hipoglicemia, intoxicação).
 
 ## 💊 Tratamento (com doses)
-- **Manuseio gentil** (movimento brusco → FV); ABC; O₂ aquecido.
-- **Reaquecimento:** passivo (cobertores) na leve; **ativo externo** (manta térmica) e **interno** (fluidos IV aquecidos, lavagens) na moderada/grave; ECMO na grave/PCR.
-- **PCR hipotérmica:** RCP prolongada — **"não está morto até estar quente e morto"** (reaquecer até ≥ 32–35° antes de cessar).
 
-## 💡 Pérolas
-- Reaquecer antes de declarar óbito.
-- Movimentos bruscos podem desencadear FV — manuseio cuidadoso.`,
+- **Manuseio extremamente gentil** — movimentação brusca ou agitação do paciente hipotérmico pode desencadear fibrilação ventricular refratária; evitar procedimentos desnecessários e transportar em posição horizontal.
+- **ABC** com atenção especial à via aérea e oxigenação; **O₂ aquecido e umidificado** quando disponível.
+- **Reaquecimento passivo** (retirar roupas molhadas, cobertores, ambiente aquecido): suficiente na hipotermia leve, em paciente capaz de gerar calor próprio.
+- **Reaquecimento ativo externo** (mantas térmicas, bolsas de água morna em tronco/axilas/virilha — evitar extremidades isoladamente, pelo risco de vasodilatação periférica precoce e "afterdrop") e **reaquecimento ativo interno** (fluidos IV aquecidos, lavagem de cavidades aquecida) na hipotermia moderada a grave.
+- **ECMO (circulação extracorpórea)** é o método mais eficaz de reaquecimento na hipotermia grave, especialmente em parada cardiorrespiratória hipotérmica — deve ser considerado precocemente e o paciente encaminhado a centro com capacidade para isso sempre que possível.
+- **PCR hipotérmica:** RCP deve ser prolongada — o dogma da área é **"não está morto até estar quente e morto"**: reaquecer (idealmente até ≥ 32–35 °C) antes de considerar cessar os esforços, pois o metabolismo cerebral reduzido pelo frio pode conferir proteção neurológica mesmo após parada prolongada. Desfibrilação e drogas cardioativas podem ter eficácia reduzida em temperaturas muito baixas — nesses casos, priorizar RCP contínua e reaquecimento em vez de repetir tentativas de desfibrilação/drogas indefinidamente até atingir temperaturas mais altas.
+
+## 🏥 Quando internar / UTI
+
+- Hipotermia leve isolada, corrigida com reaquecimento passivo e sem comorbidade associada, pode eventualmente ser manejada em observação breve.
+- Hipotermia moderada a grave, arritmia, rebaixamento do nível de consciência, instabilidade hemodinâmica ou necessidade de reaquecimento ativo interno/ECMO: internação em UTI.
+- Toda causa associada identificada (infecção, intoxicação, endocrinopatia) direciona a necessidade e o nível de internação.
+
+## 💡 Pérolas e erros comuns
+
+- Reaquecer antes de declarar óbito — "não está morto até estar quente e morto".
+- Movimentos bruscos podem desencadear fibrilação ventricular — manuseio cuidadoso é prioridade desde o resgate.
+- Erro comum: confiar em exames laboratoriais "normais" sem considerar que o analisador aqueceu a amostra e pode estar mascarando acidose/coagulopatia real.
+- Erro comum: aplicar calor diretamente nas extremidades antes do tronco, o que pode causar "afterdrop" (retorno de sangue frio e acidótico periférico à circulação central, piorando a instabilidade).
+- Sempre checar glicemia e pensar em causas associadas — hipotermia isolada sem fator predisponente claro deve levantar suspeita de sepse, endocrinopatia ou intoxicação.`,
 
 zika: `# Zika
 
@@ -8973,56 +9350,71 @@ ic_descomp: `# Insuficiência Cardíaca Aguda Descompensada
 ## 🏥 UTI / encaminhar
 - Choque, EAP refratário, necessidade de inotrópico/vasopressor, SCA, arritmia instável.`,
 
-nstemi: `# Síndrome Coronariana Aguda SEM Supra de ST (NSTEMI / Angina Instável)
-
-> Isquemia miocárdica aguda sem supra de ST persistente: **angina instável** (troponina normal) ou **NSTEMI** (troponina elevada). Conduta guiada pelo **risco**.
-
-## 🔬 Fisiopatologia
-- Rotura/erosão de placa → trombo **suboclusivo** → isquemia subendocárdica. Tipo 2: desequilíbrio oferta/demanda (anemia, taquiarritmia, sepse, crise hipertensiva).
+nstemi: `## 🔬 Fisiopatologia
+Rotura ou erosão de placa aterosclerótica vulnerável expõe material trombogênico subendotelial, ativando a cascata de coagulação e formando trombo intraluminal **suboclusivo** (diferente do STEMI, em que o trombo costuma ser oclusivo total). O resultado é isquemia predominantemente subendocárdica, sem supra de ST persistente. Angina instável e NSTEMI compartilham o mesmo mecanismo de base — diferem pela ausência (angina instável) ou presença (NSTEMI) de necrose miocárdica detectável por troponina. Existe ainda o **infarto tipo 2**, sem rotura de placa primária, mas com desequilíbrio entre oferta e demanda de oxigênio miocárdico — anemia grave, taquiarritmia sustentada, sepse, crise hipertensiva, hipóxia — precipitando isquemia em miocárdio com reserva coronariana já limitada.
 
 ## 🩺 Quadro clínico
-- Dor torácica em repouso ou progressiva, irradiação, sudorese, dispneia; equivalentes anginosos em idosos, diabéticos e mulheres.
+- Dor/desconforto torácico em aperto, opressão ou peso, em repouso ou aos mínimos esforços, duração tipicamente > 10–20 minutos, podendo ser recorrente; irradiação para membro superior esquerdo, mandíbula, epigástrio ou dorso, associada a sudorese fria, náuseas/vômitos, dispneia.
+- Padrões: angina de início recente (< 2 meses) e grave, angina em crescendo (piora progressiva) ou angina em repouso.
+- **Equivalentes anginosos** em idosos, diabéticos (neuropatia autonômica) e mulheres: dispneia isolada, fadiga inexplicada, síncope, mal-estar epigástrico, confusão mental em idosos frágeis.
+- Exame físico frequentemente inespecífico; buscar sinais de gravidade: terceira bulha, estertores pulmonares, hipotensão, sopro novo de regurgitação mitral (isquemia de músculo papilar), sinais de choque cardiogênico.
+
+## 🔀 Diagnósticos diferenciais
+- **STEMI** — exclusão prioritária pelo ECG (muda imediatamente a conduta).
+- Dissecção aguda de aorta — dor lancinante, irradiação para dorso, assimetria de pulsos/PA entre membros.
+- Tromboembolismo pulmonar — dispneia súbita, dor pleurítica, fatores de risco para TVP.
+- Pericardite/miocardite aguda — dor pleurítica que piora em decúbito e melhora ao inclinar para frente; supra de ST difuso/côncavo na pericardite.
+- Espasmo coronariano (Prinzmetal) — dor em repouso, frequentemente noturna, supra transitório.
+- Causas não cardíacas: musculoesquelética/costocondrite, DRGE/espasmo esofágico, úlcera péptica, colecistite.
 
 ## ✅ Diagnóstico
-- **ECG em ≤ 10 min** (e seriado): infra de ST, inversão de T — pode ser normal.
-- **Troponina de alta sensibilidade** com curva (0/1h ou 0/3h): elevação/queda = NSTEMI.
-- Excluir STEMI (que exige reperfusão imediata).
+- **ECG em ≤ 10 min** (e seriado, inclusive durante episódios de dor): infra de ST, inversão de T — pode ser normal (não exclui SCA).
+- **Troponina de alta sensibilidade** com curva (0/1h ou 0/2–3h): elevação/queda dinâmica = NSTEMI; valores estáveis e muito baixos permitem alta precoce em baixo risco.
+- Excluir STEMI (supra de ST persistente ou equivalente, como BRE novo com critérios de Sgarbossa) — exige reperfusão imediata.
 
 ## 🧪 Exames complementares
 | Exame | Objetivo |
 | --- | --- |
-| ECG seriado | Isquemia dinâmica |
+| ECG seriado | Isquemia dinâmica, excluir STEMI |
 | Troponina hs (0/1–3h) | Diagnóstico de IAM |
-| Ecocardiograma | Contratilidade, complicações, DDx |
+| Ecocardiograma | Contratilidade, complicações mecânicas, DDx |
 | Função renal, hemograma, eletrólitos, glicemia, lípides | Risco e manejo |
+| Radiografia de tórax | Congestão, DDx |
 
 ## 📊 Estratificação de risco
 - **TIMI (0–7, 1 ponto cada):** idade ≥ 65; ≥ 3 fatores de risco para DAC; DAC conhecida (estenose ≥ 50%); uso de AAS nos últimos 7 dias; ≥ 2 episódios de angina em 24h; desvio de ST ≥ 0,5 mm; marcador cardíaco positivo. (0–2 baixo · 3–4 intermediário · 5–7 alto.)
-- **GRACE (mortalidade)** — variáveis: idade, FC, PAS, creatinina, classe de Killip, parada na admissão, desvio de ST, troponina. **> 140 = alto risco** → estratégia invasiva precoce.
-- Outros marcadores de alto risco: troponina dinâmica, alterações dinâmicas de ST, instabilidade hemodinâmica/elétrica.
-
-## 🔀 Diagnósticos diferenciais
-- STEMI, dissecção de aorta, TEP, pericardite/miocardite, espasmo coronário, dor musculoesquelética, DRGE.
+- **GRACE (mortalidade)** — idade, FC, PAS, creatinina, classe de Killip, parada na admissão, desvio de ST, troponina. **> 140 = alto risco** → estratégia invasiva precoce.
+- Outros marcadores de alto risco: troponina dinâmica, alterações dinâmicas de ST, instabilidade hemodinâmica/elétrica (arritmia ventricular sustentada), diabetes, disfunção renal.
 
 ## 💊 Tratamento (com doses)
 **Antiagregação:**
-- **AAS** 150–300 mg de ataque → 100 mg/dia.
-- **2º antiplaquetário (iniciar na sala de cateterismo):** Prasugrel 60→10 mg/dia **ou** Ticagrelor 180→90 mg 12/12h (preferíveis ao clopidogrel; ESC 2023 prefere prasugrel no invasivo). Clopidogrel 300–600→75 mg/dia se idoso/alto risco de sangramento/anticoagulado.
+- **AAS** 150–300 mg de ataque → 100 mg/dia indefinidamente.
+- **2º antiplaquetário (iniciar preferencialmente na sala de cateterismo):** Prasugrel 60→10 mg/dia **ou** Ticagrelor 180→90 mg 12/12h (preferíveis ao clopidogrel; ESC 2023 prefere prasugrel quando a anatomia já é conhecida e o paciente vai para PCI). Clopidogrel 300–600→75 mg/dia se idoso frágil/alto risco de sangramento/já anticoagulado.
+
 **Anticoagulação:**
-- Enoxaparina 1 mg/kg SC 12/12h; ou Fondaparinux 2,5 mg/dia (menor sangramento); ou HNF.
-**Anti-isquêmico:**
-- Nitrato (dor/HAS; evitar se PDE5 recente ou IAM de VD); Betabloqueador (se sem IC aguda/baixo débito); **estatina de alta potência** (atorvastatina 80 mg).
+- Enoxaparina 1 mg/kg SC 12/12h; ou Fondaparinux 2,5 mg/dia (menor sangramento, preferível se estratégia não invasiva imediata); ou HNF (bolus + infusão guiada por TTPa), sobretudo se PCI iminente ou disfunção renal.
+
+**Anti-isquêmico e adjuvante:**
+- Nitrato (dor/HAS; evitar se PDE5 recente ou suspeita de IAM de VD); Betabloqueador oral nas primeiras 24h (se sem IC aguda/baixo débito/risco de choque); **estatina de alta potência** (atorvastatina 80 mg) desde a admissão; O₂ só se SatO₂ < 90%; IECA/BRA precoce se disfunção de VE, HAS, diabetes ou DRC.
+
 **Estratégia invasiva (cateterismo):**
-- **Imediata (< 2h):** instabilidade hemodinâmica/elétrica, dor refratária, IC aguda.
+- **Imediata (< 2h):** instabilidade hemodinâmica/choque, arritmia ventricular ameaçadora, dor refratária, complicação mecânica, IC aguda.
 - **Precoce (< 24h):** GRACE > 140, troponina dinâmica, alterações de ST.
-- **Em até 72h:** risco intermediário.
+- **Em até 72h:** risco intermediário (diabetes, DRC, FE reduzida, revascularização prévia, GRACE 109–140).
+- Baixo risco sem recorrência: conduta seletiva/não invasiva com teste funcional antes da alta.
+
+## 🏥 Quando internar/UTI
+- Toda SCA-SST confirmada exige internação para monitorização contínua e definição da estratégia invasiva.
+- Unidade coronariana/UTI: instabilidade hemodinâmica, choque cardiogênico, arritmia ventricular sustentada, complicação mecânica, necessidade de suporte circulatório, disfunção de VE importante.
+- Enfermaria com telemetria: maioria dos casos de risco intermediário/baixo já estratificados e estáveis.
+- Alta precoce (unidades de dor torácica): troponina seriada negativa, ECG sem alterações dinâmicas, escore de risco baixo, sem recorrência da dor, teste funcional/anatômico negativo ou não indicado.
 
 ## 💡 Pérolas / erros comuns
 - ECG normal NÃO exclui SCA — seriar + troponina.
 - **Não pré-tratar com inibidor de P2Y12 de rotina** se a estratégia invasiva é precoce e a anatomia é desconhecida — iniciar na sala de cateterismo (ESC 2023; SBC).
-- **Revascularização completa** das lesões significativas; **estatina alta potência, alvo LDL < 55 mg/dL** (± ezetimiba/iPCSK9).
+- **Revascularização completa** das lesões significativas, não só da "culpada"; **estatina alta potência, alvo LDL < 55 mg/dL** (± ezetimiba/iPCSK9).
 - Não dar nitrato com inibidor de PDE5 recente ou IAM de VD; O₂ só se SatO₂ < 90%.
-> Fonte: ESC 2023 / AHA-ACC 2025 / SBC 2021.`,
+- Considerar infarto tipo 2 (desequilíbrio oferta-demanda) em pacientes graves com troponina elevada sem quadro clássico de SCA — a conduta é distinta, focada na causa de base.`,
 
 pericardite: `# Pericardite Aguda
 
