@@ -939,6 +939,12 @@ main, #main { display: block !important; height: auto !important; overflow: visi
 /* ===== Salvar (bookmark) ===== */
 .action-btn.saved{background:var(--primary-soft);color:var(--primary);border-color:var(--primary)}
 
+/* ===== Cross-link inline (menção a outra conduta dentro do texto) ===== */
+.inline-xlink{background:none;border:none;padding:0;margin:0;font:inherit;display:inline;
+  color:var(--primary);text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;
+  cursor:pointer;transition:color .12s}
+.inline-xlink:hover{color:var(--success);text-decoration-style:solid}
+
 /* ===== Tópicos relacionados ===== */
 .wb-related{margin-top:22px;padding-top:16px;border-top:1px solid var(--border)}
 .wb-related-title{font-size:11.5px;font-weight:700;color:var(--text-mute);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
@@ -10318,6 +10324,103 @@ function bindRelated(container) {
   });
 }
 
+// ============================================================
+//  CROSS-LINKS INLINE — menções a OUTRAS condutas dentro do texto
+//  viram links clicáveis (ex.: "...investigar choque séptico..." → abre a conduta).
+// ============================================================
+// Palavras isoladas (1 termo) que NUNCA viram alias sozinhas — muito genéricas p/ link seguro.
+const GENERIC_ALIAS_BLOCK = new Set(['manejo','abordagem','tratamento','diagnóstico','diagnostico',
+  'investigação','investigacao','geral','emergência','emergencia','urgência','urgencia','crônica',
+  'cronica','aguda','crise','síndrome','sindrome','doença','doenca','classificação','classificacao',
+  'estratificação','estratificacao','prevenção','prevencao','complicações','complicacoes','choque',
+  'apresentação','apresentacao','cuidados','contenção','contencao','fragilidade','generalizada',
+  'hemorrágico','hemorragico','hospitalar','surto','úlcera','ulcera']);
+// Deriva termos "linkáveis" do nome do protocolo (nome completo + siglas entre parênteses + segmentos
+// após " — "), sem gerar conteúdo novo — só reaproveita PROTOCOLS.name que já existe.
+function protocolAliases(p) {
+  const raw = p.name;
+  const aliases = new Set([raw]);
+  const addIfGood = (t) => {
+    t = t.trim();
+    if (t.length < 4) return;
+    const words = t.split(/\s+/).filter(Boolean);
+    if (words.length > 5) return;
+    if (words.length === 1 && GENERIC_ALIAS_BLOCK.has(t.toLowerCase())) return;
+    aliases.add(t);
+  };
+  raw.split(/\s+—\s+/).forEach(seg => {
+    const paren = seg.match(/\(([^)]+)\)/);
+    if (paren) paren[1].split('/').forEach(addIfGood);
+    seg.replace(/\([^)]*\)/g, '').trim().split('/').forEach(addIfGood);
+  });
+  return [...aliases];
+}
+function linkifyRelated(container, protocolMeta) {
+  if (!container) return;
+  const excludeId = protocolMeta ? protocolMeta.id : null;
+  const candidates = [];
+  PROTOCOLS.forEach(p => {
+    if (p.id === excludeId) return;
+    protocolAliases(p).forEach(alias => candidates.push({ alias, id: p.id, name: p.name }));
+  });
+  if (!candidates.length) return;
+  candidates.sort((a, b) => b.alias.length - a.alias.length); // maximal munch: termo mais longo primeiro
+  const seen = new Set(); const uniq = [];
+  candidates.forEach(c => { const k = c.alias.toLowerCase(); if (seen.has(k)) return; seen.add(k); uniq.push(c); });
+  const byLower = new Map(uniq.map(c => [c.alias.toLowerCase(), c]));
+  const escRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const bigRe = new RegExp('\\b(' + uniq.map(c => escRe(c.alias)).join('|') + ')\\b', 'gi');
+
+  const usedIds = new Set();
+  let linkCount = 0;
+  const MAX_LINKS = 8; // trava p/ não poluir uma conduta longa de links
+
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      if (linkCount >= MAX_LINKS) return NodeFilter.FILTER_REJECT;
+      let el = node.parentElement;
+      while (el && el !== container) {
+        const tag = el.tagName;
+        if (tag === 'A' || tag === 'SUMMARY' || tag === 'SCRIPT' || tag === 'STYLE' || tag === 'SVG' || tag === 'PRE' || tag === 'CODE') return NodeFilter.FILTER_REJECT;
+        if (el.classList && el.classList.contains('mermaid')) return NodeFilter.FILTER_REJECT;
+        el = el.parentElement;
+      }
+      return (node.nodeValue && node.nodeValue.trim().length > 3) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+    }
+  });
+  const nodes = []; let n;
+  while ((n = walker.nextNode())) nodes.push(n);
+
+  nodes.forEach(node => {
+    if (linkCount >= MAX_LINKS) return;
+    const text = node.nodeValue;
+    bigRe.lastIndex = 0;
+    let match, lastIndex = 0, pieces = [], changed = false;
+    while ((match = bigRe.exec(text))) {
+      if (linkCount >= MAX_LINKS) break;
+      const c = byLower.get(match[0].toLowerCase());
+      if (!c || usedIds.has(c.id)) continue; // já linkado uma vez nesta conduta — deixa como texto simples
+      pieces.push(document.createTextNode(text.slice(lastIndex, match.index)));
+      const a = document.createElement('button');
+      a.type = 'button'; a.className = 'inline-xlink'; a.textContent = match[0];
+      a.title = 'Abrir conduta: ' + c.name; a.dataset.relId = c.id;
+      pieces.push(a);
+      lastIndex = match.index + match[0].length;
+      usedIds.add(c.id); linkCount++; changed = true;
+    }
+    if (changed) {
+      pieces.push(document.createTextNode(text.slice(lastIndex)));
+      const frag = document.createDocumentFragment();
+      pieces.forEach(p => frag.appendChild(p));
+      node.parentNode.replaceChild(frag, node);
+    }
+  });
+
+  container.querySelectorAll('.inline-xlink').forEach(btn => {
+    btn.onclick = () => runProtocol(btn.dataset.relId);
+  });
+}
+
 async function renderResultDireto(item) {
   const { query, text, sources, ctxLabel, cenarioLabel, date, mode, protocolMeta } = item;
   const isCaso = mode === 'caso';
@@ -10368,6 +10471,7 @@ async function renderResultDireto(item) {
     </div>
   `;
   await renderMermaidIn(document.getElementById('resultContainer'));
+  linkifyRelated(document.querySelector('#resultContainer .content'), protocolMeta);
   bindToc(document.getElementById('resultContainer'));
   bindRelated(document.getElementById('resultContainer'));
   document.getElementById('copyBtn').onclick = () => {
