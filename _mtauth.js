@@ -72,22 +72,23 @@ function injectCSS() {
   if (document.getElementById('mt-style')) return;
   const s = document.createElement('style'); s.id = 'mt-style';
   s.textContent = `
-  .mt-auth{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#2563eb,#1e40af)}
-  .mt-card{background:#fff;border-radius:20px;padding:30px 26px;max-width:380px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.25)}
-  .mt-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px;letter-spacing:.5px;color:#0f172a}
+  .mt-auth{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(700px 360px at 80% -12%,rgba(76,141,255,.16),transparent 60%),radial-gradient(560px 320px at 8% 112%,rgba(56,225,198,.09),transparent 55%),#0A0E14}
+  .mt-card{background:linear-gradient(160deg,#131B26,#0E141D);border:1px solid rgba(88,166,255,.14);border-radius:20px;padding:30px 26px;max-width:380px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.25)}
+  .mt-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px;letter-spacing:-.01em;color:#E7EEF7;font-family:'Space Grotesk',system-ui,sans-serif}
   .mt-brand .mk{width:38px;height:38px;border-radius:11px;background:#2563eb;display:grid;place-items:center}
   .mt-brand .mk svg{width:24px;height:24px}
-  .mt-brand b{color:#1d4ed8}
-  .mt-sub{color:#64748b;font-size:13px;margin:4px 0 20px}
-  .mt-auth h2{font-size:18px;color:#0f172a;margin-bottom:14px}
-  .mt-auth input{width:100%;padding:12px 13px;border:1px solid #e6ebf3;border-radius:11px;font-size:15px;font-family:inherit;margin-bottom:11px}
-  .mt-auth input:focus{outline:none;border-color:#2563eb}
-  .mt-auth .mt-btn{width:100%;padding:13px;border:none;border-radius:11px;background:#2563eb;color:#fff;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit}
-  .mt-auth .mt-btn:hover{background:#1d4ed8}
-  .mt-auth .mt-link{background:none;border:none;color:#2563eb;font-weight:700;font-size:13.5px;cursor:pointer;margin-top:12px;font-family:inherit;display:block;width:100%}
-  .mt-err{color:#c0392b;font-size:13px;margin:2px 0 8px;min-height:16px}
-  .mt-consent{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:#64748b;text-align:left;margin:2px 0 12px}
-  .mt-consent a{color:#2563eb;font-weight:700}
+  .mt-brand b{color:#4C8DFF}
+  .mt-sub{color:#8A98AC;font-size:13px;margin:4px 0 20px}
+  .mt-auth h2{font-size:18px;color:#E7EEF7;font-family:'Space Grotesk',system-ui,sans-serif;margin-bottom:14px}
+  .mt-auth input{width:100%;padding:12px 13px;border:1px solid rgba(140,160,185,.18);background:#0E141D;color:#E7EEF7;border-radius:11px;font-size:15px;font-family:inherit;margin-bottom:11px}
+  .mt-auth input:focus{outline:none;border-color:#4C8DFF;box-shadow:0 0 0 3px rgba(76,141,255,.15)}
+  .mt-auth input:-webkit-autofill,.mt-auth input:-webkit-autofill:hover,.mt-auth input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 100px #0E141D inset;-webkit-text-fill-color:#E7EEF7;caret-color:#E7EEF7;transition:background-color 99999s ease-in-out 0s}
+  .mt-auth .mt-btn{width:100%;padding:13px;border:none;border-radius:11px;background:linear-gradient(145deg,#4C8DFF,#2f6ae0);color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;box-shadow:0 8px 22px rgba(76,141,255,.38)}
+  .mt-auth .mt-btn:hover{filter:brightness(1.08)}
+  .mt-auth .mt-link{background:none;border:none;color:#4C8DFF;font-weight:700;font-size:13.5px;cursor:pointer;margin-top:12px;font-family:inherit;display:block;width:100%}
+  .mt-err{color:#F85149;font-size:13px;margin:2px 0 8px;min-height:16px}
+  .mt-consent{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:#8A98AC;text-align:left;margin:2px 0 12px}
+  .mt-consent a{color:#4C8DFF;font-weight:700}
   .mt-demobar{position:fixed;left:0;right:0;bottom:0;z-index:9000;background:#fdf0e0;color:#8a5410;font-size:13px;text-align:center;padding:9px 14px;border-top:1px solid #f0d6a8}
   .mt-demobar b{color:#2563eb}
   .mt-demobar button{margin-left:8px;background:#2563eb;color:#fff;border:none;border-radius:7px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer}
@@ -96,10 +97,10 @@ function injectCSS() {
   .mt-home:active{transform:scale(.94)}
   .mt-home svg{width:13px;height:13px;flex:0 0 auto}
   body.mt-shell{padding-top:calc(env(safe-area-inset-top) + 42px) !important}
-  .mt-splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:linear-gradient(135deg,#2563eb,#1e40af)}
+  .mt-splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(700px 360px at 80% -12%,rgba(76,141,255,.16),transparent 60%),radial-gradient(560px 320px at 8% 112%,rgba(56,225,198,.09),transparent 55%),#0A0E14}
   .mt-splash .mk{width:62px;height:62px;border-radius:18px;background:#2563eb;display:grid;place-items:center}
   .mt-splash .mk svg{width:38px;height:38px}
-  .mt-splash .sp{width:26px;height:26px;border:3px solid rgba(255,255,255,.25);border-top-color:#2563eb;border-radius:50%;animation:mtspin .8s linear infinite}
+  .mt-splash .sp{width:26px;height:26px;border:3px solid rgba(140,160,185,.2);border-top-color:#4C8DFF;border-radius:50%;animation:mtspin .8s linear infinite}
   @keyframes mtspin{to{transform:rotate(360deg)}}
   `;
   document.head.appendChild(s);
@@ -123,11 +124,11 @@ function removeHomeButton() { const h = document.getElementById('mt-home'); if (
 function mountSplash() {
   if (!document.body || document.getElementById('mt-splash')) return;
   const d = document.createElement('div'); d.id = 'mt-splash'; d.className = 'mt-splash';
-  d.innerHTML = '<span class="mk"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#172554" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="sp"></span>';
+  d.innerHTML = '<span class="mk"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="sp"></span>';
   document.body.appendChild(d);
 }
 function removeSplash() { const s = document.getElementById('mt-splash'); if (s) s.remove(); }
-const LOGO = `<span class="mk"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#172554" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+const LOGO = `<span class="mk"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
 
 function authMarkup() {
   return `<div class="mt-auth" id="mt-auth"><div class="mt-card">
