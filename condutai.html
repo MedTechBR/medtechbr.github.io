@@ -181,6 +181,67 @@ aside {
 .history-item .history-star.starred { opacity: 1; color: #f59e0b; }
 .empty-state { padding: 40px 20px; text-align: center; color: var(--text-mute); font-size: 13px; }
 
+/* ============ Painel de IA contextual ============ */
+.ai-panel-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,.45);
+  z-index: 90; display: none;
+}
+.ai-panel-backdrop.show { display: block; }
+.ai-panel {
+  position: fixed; top: 0; bottom: 0; right: 0;
+  width: 400px; max-width: 92vw;
+  background: var(--bg-card); border-left: 1px solid var(--border);
+  z-index: 91; display: flex; flex-direction: column;
+  transform: translateX(100%); transition: transform .22s ease;
+  box-shadow: -8px 0 30px rgba(0,0,0,.35);
+}
+.ai-panel.open { transform: translateX(0); }
+.ai-panel-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 10px; padding: 16px 16px 12px; border-bottom: 1px solid var(--border);
+}
+.ai-panel-title { font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 15px; color: var(--text); }
+.ai-panel-subtitle { font-size: 12px; color: var(--text-mute); margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ai-panel-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.ai-panel-chip {
+  background: var(--bg-soft); border: 1px solid var(--border); color: var(--text-soft);
+  font-size: 12px; padding: 6px 10px; border-radius: 20px; cursor: pointer;
+  transition: all .15s; font-family: inherit;
+}
+.ai-panel-chip:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
+.ai-panel-messages { flex: 1; overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+.ai-panel-msg { max-width: 92%; font-size: 13.5px; line-height: 1.6; padding: 10px 13px; border-radius: 12px; }
+.ai-panel-msg.user { align-self: flex-end; background: var(--primary-soft); color: var(--text); border-bottom-right-radius: 3px; }
+.ai-panel-msg.assistant { align-self: flex-start; background: var(--bg-soft); color: var(--text-soft); border-bottom-left-radius: 3px; }
+.ai-panel-msg.assistant p { margin: 0 0 8px; }
+.ai-panel-msg.assistant p:last-child { margin-bottom: 0; }
+.ai-panel-msg.typing { display: flex; gap: 4px; align-items: center; padding: 12px 14px; }
+.ai-panel-msg.typing span { width: 6px; height: 6px; border-radius: 50%; background: var(--text-mute); animation: aiTypingDot 1.2s infinite ease-in-out; }
+.ai-panel-msg.typing span:nth-child(2) { animation-delay: .2s; }
+.ai-panel-msg.typing span:nth-child(3) { animation-delay: .4s; }
+@keyframes aiTypingDot { 0%, 60%, 100% { opacity: .3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+.ai-panel-empty { color: var(--text-mute); font-size: 13px; text-align: center; padding: 30px 10px; }
+.ai-panel-inputrow { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--border); align-items: flex-end; }
+.ai-panel-inputrow textarea {
+  flex: 1; resize: none; max-height: 100px; min-height: 38px;
+  background: var(--bg-soft); border: 1px solid var(--border); border-radius: 10px;
+  color: var(--text); font-family: inherit; font-size: 13.5px; padding: 9px 12px;
+}
+.ai-panel-inputrow textarea:focus { outline: none; border-color: var(--primary); }
+.ai-panel-send {
+  background: var(--primary); border: none; color: #fff;
+  width: 38px; height: 38px; border-radius: 10px; cursor: pointer;
+  font-size: 15px; flex-shrink: 0; transition: opacity .15s;
+}
+.ai-panel-send:disabled { opacity: .4; cursor: default; }
+.ai-panel-disclaimer { font-size: 10.5px; color: var(--text-mute); padding: 0 16px 12px; text-align: center; }
+@media (max-width: 860px) {
+  .ai-panel { width: 100%; max-width: 100%; }
+}
+@media print {
+  .ai-panel, .ai-panel-backdrop { display: none !important; }
+}
+
 main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
 
 .mode-toggle {
@@ -1450,6 +1511,24 @@ main, #main { display: block !important; height: auto !important; overflow: visi
   </div>
 </div>
 
+<div class="ai-panel-backdrop" id="aiPanelBackdrop"></div>
+<aside class="ai-panel" id="aiPanel">
+  <div class="ai-panel-header">
+    <div style="min-width:0;">
+      <div class="ai-panel-title">💬 Pergunte sobre esta conduta</div>
+      <div class="ai-panel-subtitle" id="aiPanelSubtitle">—</div>
+    </div>
+    <button class="icon-btn" id="aiPanelClose" title="Fechar">✕</button>
+  </div>
+  <div class="ai-panel-chips" id="aiPanelChips"></div>
+  <div class="ai-panel-messages" id="aiPanelMessages"></div>
+  <div class="ai-panel-inputrow">
+    <textarea id="aiPanelInput" placeholder="Pergunte algo sobre esta conduta…" rows="1"></textarea>
+    <button class="ai-panel-send" id="aiPanelSend" title="Enviar">➤</button>
+  </div>
+  <div class="ai-panel-disclaimer">Respondo com base no conteúdo desta conduta. Verifique se a resposta se aplica ao seu caso.</div>
+</aside>
+
 <script>
 // ============ Mermaid setup ============
 let mermaidCounter = 0;
@@ -1504,6 +1583,8 @@ let currentTab = 'history';
 let currentId = null;
 let currentMode = 'direta'; // direta | socratica
 let currentConversation = null; // {id, query, mode, messages: [{role, text, sources}], ...}
+let aiPanelContext = null; // item da conduta atualmente aberta no painel de IA lateral
+let aiPanelHistory = []; // [{role:'user'|'model', display: text}]
 
 // Tema
 const theme = localStorage.getItem(LS_THEME) || 'light';
@@ -11921,6 +12002,7 @@ async function renderResultDireto(item) {
         <div class="result-actions">
           ${protocolMeta ? `<button class="action-btn${savedNow ? ' saved' : ''}" id="saveBtn">${savedNow ? '🔖 Salvo' : '🔖 Salvar'}</button>` : ''}
           ${isCaso ? '<button class="action-btn" id="viewEvolBtn">📄 Ver evolução</button>' : ''}
+          <button class="action-btn" id="aiPanelBtn">💬 Perguntar</button>
           <button class="action-btn" id="copyBtn">📋 Copiar</button>
           <button class="action-btn" id="printBtn">🖨 PDF</button>
           <button class="action-btn" id="refreshBtn">🔄 Refazer</button>
@@ -11947,6 +12029,8 @@ async function renderResultDireto(item) {
   };
   document.getElementById('printBtn').onclick = () => window.print();
   document.getElementById('refreshBtn').onclick = () => run(query);
+  document.getElementById('aiPanelBtn').onclick = () => { updateAIPanelContext(item); openAIPanel(); };
+  if (document.getElementById('aiPanel').classList.contains('open')) updateAIPanelContext(item);
   const saveBtn = document.getElementById('saveBtn');
   if (saveBtn && protocolMeta) {
     saveBtn.onclick = () => {
@@ -11961,6 +12045,104 @@ async function renderResultDireto(item) {
     alert('Evolução colada:\n\n' + query);
   };
 }
+
+// ============ Painel de IA contextual (lateral) ============
+function openAIPanel() {
+  document.getElementById('aiPanel').classList.add('open');
+  document.getElementById('aiPanelBackdrop').classList.add('show');
+}
+function closeAIPanel() {
+  document.getElementById('aiPanel').classList.remove('open');
+  document.getElementById('aiPanelBackdrop').classList.remove('show');
+}
+function updateAIPanelContext(item) {
+  aiPanelContext = item;
+  aiPanelHistory = [];
+  const sub = document.getElementById('aiPanelSubtitle');
+  if (sub) sub.textContent = item.protocolMeta ? item.protocolMeta.name : item.query;
+  const chipsBox = document.getElementById('aiPanelChips');
+  if (chipsBox) {
+    const chips = ['Critérios diagnósticos', 'Quando internar/UTI', 'Doses e ajuste renal', 'Diagnóstico diferencial', 'Resuma em 3 pontos'];
+    chipsBox.innerHTML = chips.map(c => `<button class="ai-panel-chip">${escapeHtml(c)}</button>`).join('');
+    chipsBox.querySelectorAll('.ai-panel-chip').forEach(btn => {
+      btn.onclick = () => sendAIPanelMessage(btn.textContent);
+    });
+  }
+  renderAIPanelMessages();
+}
+function buildAIPanelContents(newQuestion) {
+  const item = aiPanelContext;
+  const titulo = item.protocolMeta ? item.protocolMeta.name : item.query;
+  const systemMsg = `Você é um assistente clínico dentro do CondutAI, respondendo dúvidas sobre UMA conduta específica que o usuário está lendo agora. Responda com base principalmente no texto da conduta abaixo; pode complementar com conhecimento médico geral quando fizer sentido, mas avise quando a informação não vier do texto. Seja direto — respostas curtas, sem saudação, sem repetir a pergunta, sem inventar seção de referências.
+
+CONDUTA: ${titulo}
+
+TEXTO DA CONDUTA:
+${item.text}`;
+  const contents = [
+    { role: 'user', parts: [{ text: systemMsg }] },
+    { role: 'model', parts: [{ text: 'Entendido. Pode perguntar sobre esta conduta.' }] }
+  ];
+  for (const m of aiPanelHistory) {
+    contents.push({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.display }] });
+  }
+  contents.push({ role: 'user', parts: [{ text: newQuestion }] });
+  return contents;
+}
+function renderAIPanelMessages() {
+  const box = document.getElementById('aiPanelMessages');
+  if (!box) return;
+  if (!aiPanelHistory.length) {
+    box.innerHTML = '<div class="ai-panel-empty">Tire dúvidas específicas sobre esta conduta — critérios, doses, diferenciais. Respondo com base no texto que você está lendo.</div>';
+    return;
+  }
+  box.innerHTML = aiPanelHistory.map(m => m.role === 'user'
+    ? `<div class="ai-panel-msg user">${escapeHtml(m.display)}</div>`
+    : `<div class="ai-panel-msg assistant">${md(m.display)}</div>`
+  ).join('');
+  box.scrollTop = box.scrollHeight;
+}
+function showAIPanelTyping(show) {
+  const box = document.getElementById('aiPanelMessages');
+  if (!box) return;
+  const existing = document.getElementById('aiPanelTypingMsg');
+  if (show) {
+    if (!existing) box.insertAdjacentHTML('beforeend', '<div class="ai-panel-msg assistant typing" id="aiPanelTypingMsg"><span></span><span></span><span></span></div>');
+    box.scrollTop = box.scrollHeight;
+  } else if (existing) {
+    existing.remove();
+  }
+}
+async function sendAIPanelMessage(text) {
+  const q = (text || '').trim();
+  if (!q || !aiPanelContext) return;
+  aiPanelHistory.push({ role: 'user', display: q });
+  renderAIPanelMessages();
+  const input = document.getElementById('aiPanelInput');
+  if (input) { input.value = ''; input.style.height = 'auto'; }
+  const sendBtn = document.getElementById('aiPanelSend');
+  if (sendBtn) sendBtn.disabled = true;
+  showAIPanelTyping(true);
+  try {
+    const { text: resp } = await callGemini(buildAIPanelContents(q));
+    aiPanelHistory.push({ role: 'model', display: resp });
+  } catch (err) {
+    aiPanelHistory.push({ role: 'model', display: '⚠ ' + (err.message || 'Erro ao consultar a IA.') });
+  }
+  showAIPanelTyping(false);
+  if (sendBtn) sendBtn.disabled = false;
+  renderAIPanelMessages();
+}
+document.getElementById('aiPanelClose').onclick = closeAIPanel;
+document.getElementById('aiPanelBackdrop').onclick = closeAIPanel;
+document.getElementById('aiPanelSend').onclick = () => sendAIPanelMessage(document.getElementById('aiPanelInput').value);
+(() => {
+  const aiInput = document.getElementById('aiPanelInput');
+  aiInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAIPanelMessage(aiInput.value); }
+  });
+  aiInput.addEventListener('input', () => { aiInput.style.height = 'auto'; aiInput.style.height = Math.min(aiInput.scrollHeight, 100) + 'px'; });
+})();
 
 // ============ Render: MODO SOCRÁTICO ============
 async function renderSocratic(item) {
