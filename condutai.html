@@ -343,12 +343,11 @@ main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
   position: relative;
 }
 .mermaid-scroll {
-  overflow: auto;
-  max-height: 70vh;
+  overflow-x: auto;
+  overflow-y: hidden;
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 6px;
-  cursor: zoom-in;
   position: relative;
 }
 .mermaid-scroll .mermaid {
@@ -359,80 +358,11 @@ main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
 .mermaid-scroll .mermaid svg {
   max-width: none !important;
   height: auto !important;
-  transform-origin: top left;
-  transition: transform .15s ease;
 }
 .mermaid-label {
   font-size: 11px; color: var(--text-mute);
   text-transform: uppercase; letter-spacing: .05em;
   margin-bottom: 8px; font-weight: 600;
-  display: flex; align-items: center; gap: 6px;
-  justify-content: space-between;
-}
-.mermaid-label .hint { text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--primary); }
-
-.mermaid-controls {
-  display: flex; gap: 4px;
-}
-.mermaid-controls button {
-  background: var(--bg-soft); border: 1px solid var(--border);
-  width: 30px; height: 30px; border-radius: 6px;
-  cursor: pointer; font-size: 14px; line-height: 1;
-  display: inline-flex; align-items: center; justify-content: center;
-  color: var(--text-soft);
-  transition: all .15s;
-  font-family: inherit;
-}
-.mermaid-controls button:hover { background: var(--primary-soft); border-color: var(--primary); color: var(--primary-dark); }
-
-/* ===== Modal tela cheia para fluxograma ===== */
-.mermaid-modal {
-  position: fixed; inset: 0;
-  background: rgba(15,23,42,.92);
-  z-index: 200;
-  display: flex; flex-direction: column;
-  animation: fadeIn .2s;
-}
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-.mermaid-modal-bar {
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border);
-  padding: 12px 20px;
-  display: flex; justify-content: space-between; align-items: center;
-  gap: 12px;
-}
-.mermaid-modal-title {
-  font-weight: 600; color: var(--text); font-size: 15px;
-  display: flex; align-items: center; gap: 8px;
-}
-.mermaid-modal-actions { display: flex; gap: 6px; }
-.mermaid-modal-actions button {
-  background: var(--bg-soft); border: 1px solid var(--border);
-  padding: 7px 12px; border-radius: 7px;
-  cursor: pointer; font-size: 13px; font-weight: 500;
-  color: var(--text-soft); font-family: inherit;
-  display: inline-flex; align-items: center; gap: 4px;
-  transition: all .15s;
-}
-.mermaid-modal-actions button:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
-.mermaid-modal-actions button.close { color: var(--danger); }
-.mermaid-modal-actions button.close:hover { background: rgba(248,81,73,.15); border-color: var(--danger); color: var(--danger); }
-.mermaid-modal-body {
-  flex: 1; overflow: auto;
-  background: var(--bg); padding: 24px;
-}
-.mermaid-modal-body .mermaid {
-  display: inline-block;
-  transform-origin: top left;
-  transition: transform .15s ease;
-}
-.mermaid-modal-body .mermaid svg { max-width: none !important; height: auto !important; }
-.mermaid-modal-zoom-badge {
-  position: fixed; bottom: 20px; right: 20px;
-  background: var(--bg-card); border: 1px solid var(--border);
-  padding: 6px 12px; border-radius: 20px;
-  font-size: 12px; font-weight: 600; color: var(--text-soft);
-  box-shadow: var(--shadow-lg);
 }
 
 .alert {
@@ -11241,15 +11171,7 @@ function md(text) {
     const code = mermaidBlocks[parseInt(i)];
     const id = `mmd_${++mermaidCounter}`;
     return `<div class="mermaid-wrap">
-      <div class="mermaid-label">
-        <span>🔀 Fluxograma de abordagem <span class="hint">— clique para ampliar</span></span>
-        <div class="mermaid-controls">
-          <button data-act="zoomout" data-tgt="${id}" title="Reduzir">−</button>
-          <button data-act="zoomin" data-tgt="${id}" title="Aumentar">＋</button>
-          <button data-act="reset" data-tgt="${id}" title="Tamanho original">⟲</button>
-          <button data-act="fullscreen" data-tgt="${id}" title="Tela cheia">⛶</button>
-        </div>
-      </div>
+      <div class="mermaid-label"><span>🔀 Fluxograma de abordagem</span></div>
       <div class="mermaid-scroll" data-tgt="${id}">
         <div class="mermaid" id="${id}" data-source="${escapeHtml(code)}">${escapeHtml(code)}</div>
       </div>
@@ -11322,132 +11244,9 @@ async function renderMermaidIn(container) {
         el.innerHTML = `<div style="color:var(--danger); font-size:12px; text-align:left; padding:8px;">⚠ Não foi possível renderizar o fluxograma. Mostro o código abaixo (você pode copiar e colar em <a href="https://mermaid.live" target="_blank" style="color:var(--primary)">mermaid.live</a> para editar):<br><pre style="margin-top:8px; font-size:11px; max-height:300px; overflow:auto;">${escapeHtml(code)}</pre></div>`;
       }
     }
-    if (success) bindMermaidControls(el, code);
   }
 }
 
-function bindMermaidControls(mermaidEl, code) {
-  const wrap = mermaidEl.closest('.mermaid-wrap');
-  if (!wrap) return;
-  const scroll = wrap.querySelector('.mermaid-scroll');
-  mermaidEl._scale = 1;
-
-  const applyZoom = (delta) => {
-    mermaidEl._scale = Math.max(0.5, Math.min(4, +(mermaidEl._scale + delta).toFixed(2)));
-    const svg = mermaidEl.querySelector('svg');
-    if (svg) svg.style.transform = `scale(${mermaidEl._scale})`;
-    // Ajustar tamanho do container interno para o scroll funcionar com o scale
-    mermaidEl.style.transform = `scale(1)`; // placeholder, scaling SVG é melhor
-  };
-  const resetZoom = () => {
-    mermaidEl._scale = 1;
-    const svg = mermaidEl.querySelector('svg');
-    if (svg) svg.style.transform = 'scale(1)';
-    if (scroll) { scroll.scrollLeft = 0; scroll.scrollTop = 0; }
-  };
-
-  wrap.querySelectorAll('.mermaid-controls button').forEach(b => {
-    if (b._bound) return;
-    b._bound = true;
-    b.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const act = b.dataset.act;
-      if (act === 'zoomin') applyZoom(0.25);
-      else if (act === 'zoomout') applyZoom(-0.25);
-      else if (act === 'reset') resetZoom();
-      else if (act === 'fullscreen') openMermaidModal(code);
-    });
-  });
-
-  // Click no diagrama → tela cheia
-  if (scroll && !scroll._bound) {
-    scroll._bound = true;
-    scroll.addEventListener('click', (e) => {
-      if (e.target.closest('button')) return;
-      openMermaidModal(code);
-    });
-    // Ctrl/Cmd + scroll para zoom dentro do container
-    scroll.addEventListener('wheel', (e) => {
-      if (e.ctrlKey || e.metaKey) {
-        e.preventDefault();
-        applyZoom(e.deltaY < 0 ? 0.1 : -0.1);
-      }
-    }, { passive: false });
-  }
-}
-
-async function openMermaidModal(code) {
-  // Remove modal anterior se existir
-  document.querySelectorAll('.mermaid-modal').forEach(m => m.remove());
-
-  const modal = document.createElement('div');
-  modal.className = 'mermaid-modal';
-  modal.innerHTML = `
-    <div class="mermaid-modal-bar">
-      <div class="mermaid-modal-title">🔀 Fluxograma de abordagem — tela cheia</div>
-      <div class="mermaid-modal-actions">
-        <button data-act="zoomout">−</button>
-        <button data-act="zoomin">＋</button>
-        <button data-act="reset">⟲ Original</button>
-        <button data-act="fit">⊡ Ajustar</button>
-        <button class="close" data-act="close">✕ Fechar (Esc)</button>
-      </div>
-    </div>
-    <div class="mermaid-modal-body" id="mmdModalBody">
-      <div class="mermaid" id="mmd_fs_target"></div>
-    </div>
-    <div class="mermaid-modal-zoom-badge" id="mmdZoomBadge">100%</div>
-  `;
-  document.body.appendChild(modal);
-  const target = modal.querySelector('#mmd_fs_target');
-  const body = modal.querySelector('#mmdModalBody');
-  const badge = modal.querySelector('#mmdZoomBadge');
-
-  try {
-    const { svg } = await mermaid.render('mmd_fs_svg_' + Date.now(), sanitizeMermaid(code));
-    target.innerHTML = svg;
-    let scale = 1.4; // começa um pouco maior pra leitura
-    const svgEl = target.querySelector('svg');
-    const apply = () => {
-      if (svgEl) svgEl.style.transform = `scale(${scale})`;
-      badge.textContent = Math.round(scale * 100) + '%';
-    };
-    apply();
-    modal.querySelector('[data-act="zoomin"]').onclick = () => { scale = Math.min(5, +(scale + 0.2).toFixed(2)); apply(); };
-    modal.querySelector('[data-act="zoomout"]').onclick = () => { scale = Math.max(0.4, +(scale - 0.2).toFixed(2)); apply(); };
-    modal.querySelector('[data-act="reset"]').onclick = () => { scale = 1; apply(); };
-    modal.querySelector('[data-act="fit"]').onclick = () => {
-      // Calcula escala para caber largura/altura
-      const rect = svgEl.getBoundingClientRect();
-      const naturalW = svgEl.viewBox?.baseVal?.width || svgEl.getBBox().width;
-      const naturalH = svgEl.viewBox?.baseVal?.height || svgEl.getBBox().height;
-      const availW = body.clientWidth - 48;
-      const availH = body.clientHeight - 48;
-      scale = Math.min(availW / naturalW, availH / naturalH);
-      apply();
-      body.scrollTop = 0; body.scrollLeft = 0;
-    };
-    modal.querySelector('[data-act="close"]').onclick = () => modal.remove();
-    // Esc
-    const escHandler = (e) => {
-      if (e.key === 'Escape') {
-        modal.remove();
-        document.removeEventListener('keydown', escHandler);
-      }
-    };
-    document.addEventListener('keydown', escHandler);
-    // Ctrl/Cmd + scroll zoom
-    body.addEventListener('wheel', (e) => {
-      if (e.ctrlKey || e.metaKey) {
-        e.preventDefault();
-        scale = Math.max(0.4, Math.min(5, scale + (e.deltaY < 0 ? 0.1 : -0.1)));
-        apply();
-      }
-    }, { passive: false });
-  } catch (err) {
-    target.innerHTML = `<div style="color:#dc2626; padding:20px;">Erro ao renderizar em tela cheia: ${escapeHtml(err.message || String(err))}</div>`;
-  }
-}
 
 // ============ Prompts ============
 function ctxLabels(ctx, cenario) {
