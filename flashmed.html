@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>FlashMed · Questões e Simulados · Residência Médica</title>
 <meta name="description" content="App de estudo de questões — ENARE Farmácia/Multiprofissional. Progresso e taxa de acerto salvos no aparelho.">
-<meta name="theme-color" content="#0A3F3B">
+<meta name="theme-color" content="#0A0E14">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -14,44 +14,56 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FlashMed">
 <link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"flashmed",name:"FlashMed"};</script>
-<script type="module" src="_mtauth.js?v=8"></script>
+<script type="module" src="_mtauth.js?v=9"></script>
 <style>
   :root{
-    --bg:#FAF8F3;
-    --ink:#15302E;
-    --ink-soft:#42605D;
-    --paper:#FFFFFF;
-    --teal:#0E5C57;
-    --teal-deep:#0A3F3B;
-    --teal-tint:#E5F0EE;
-    --line:#DCE6E3;
-    --right:#1F8A5B;
-    --right-bg:#E6F4EC;
-    --wrong:#C0432F;
-    --wrong-bg:#FBEAE6;
-    --amber:#C98A2B;
-    --shadow:0 1px 2px rgba(20,48,46,.06),0 8px 24px rgba(20,48,46,.06);
+    --bg:#0A0E14;
+    --ink:#E7EEF7;
+    --ink-soft:#8A98AC;
+    --paper:#111823;
+    --panel2:#0E141D;
+    --teal:#4C8DFF;
+    --teal-deep:#2f6ae0;
+    --teal-tint:rgba(76,141,255,.12);
+    --line:rgba(88,166,255,.12);
+    --line-strong:rgba(140,160,185,.16);
+    --right:#3FB950;
+    --right-bg:rgba(63,185,80,.12);
+    --wrong:#F85149;
+    --wrong-bg:rgba(248,81,73,.12);
+    --amber:#E3B341;
+    --glow:rgba(76,141,255,.42);
+    --shadow:0 1px 2px rgba(0,0,0,.32),0 10px 30px rgba(0,0,0,.38);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{-webkit-text-size-adjust:100%}
   body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:var(--bg);color:var(--ink);line-height:1.5;
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background-color:#0A0E14;
+    background-image:radial-gradient(1100px 460px at 84% -10%,rgba(76,141,255,.12),transparent 60%),radial-gradient(840px 460px at 4% 110%,rgba(56,225,198,.06),transparent 55%),linear-gradient(rgba(140,160,185,.032) 1px,transparent 1px),linear-gradient(90deg,rgba(140,160,185,.032) 1px,transparent 1px);
+    background-size:auto,auto,34px 34px,34px 34px;
+    background-attachment:fixed;
+    color:var(--ink);line-height:1.5;
     padding:0 0 calc(64px + env(safe-area-inset-bottom));
   }
+  input:-webkit-autofill,input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 100px #0E141D inset;-webkit-text-fill-color:#E7EEF7;caret-color:#E7EEF7;transition:background-color 99999s}
   .wrap{max-width:760px;margin:0 auto;padding:0 16px}
 
   /* Header */
   header{
-    background:linear-gradient(180deg,var(--teal-deep),var(--teal));
-    color:#fff;padding:calc(22px + env(safe-area-inset-top)) 0 18px;margin-bottom:18px;
-    border-bottom:3px solid var(--amber);
+    background:linear-gradient(180deg,#0E141D,#111823);
+    color:var(--ink);padding:calc(22px + env(safe-area-inset-top)) 0 18px;margin-bottom:18px;
+    border-bottom:1px solid var(--line-strong);
+    box-shadow:0 1px 0 rgba(76,141,255,.10),0 14px 34px rgba(0,0,0,.34);
   }
   .wrap{padding-left:calc(16px + env(safe-area-inset-left));padding-right:calc(16px + env(safe-area-inset-right))}
   .brand{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-  .brand h1{font-family:Georgia,"Times New Roman",serif;font-size:1.35rem;font-weight:700;letter-spacing:.2px}
+  .brand h1{font-family:'Space Grotesk',-apple-system,sans-serif;font-size:1.35rem;font-weight:700;letter-spacing:.2px}
   .brand .tag{font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;opacity:.82;border:1px solid rgba(255,255,255,.4);padding:2px 8px;border-radius:999px}
   .brand p{width:100%;font-size:.85rem;opacity:.82;margin-top:4px}
 
@@ -59,18 +71,19 @@
   .stats{display:flex;align-items:center;gap:14px;background:var(--paper);border:1px solid var(--line);
     border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);margin-bottom:14px}
   .ring{width:64px;height:64px;flex:0 0 auto}
-  .ring text{font-family:-apple-system,sans-serif}
+  .ring text{font-family:'JetBrains Mono',ui-monospace,monospace}
   .metrics{display:flex;gap:22px;flex:1;flex-wrap:wrap}
-  .metric .v{font-size:1.25rem;font-weight:700;color:var(--teal-deep);line-height:1}
+  .metric .v{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:1.25rem;font-weight:700;color:var(--teal-deep);line-height:1}
   .metric .l{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin-top:3px}
 
   /* Controls */
   .controls{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
   select,.btn{font:inherit}
-  select{appearance:none;background:var(--paper);border:1px solid var(--line);border-radius:10px;
+  select{appearance:none;background:var(--panel2);border:1px solid var(--line-strong);border-radius:10px;
     padding:9px 32px 9px 12px;color:var(--ink);font-size:.9rem;cursor:pointer;flex:1;min-width:180px;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' stroke='%2342605D' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' stroke='%238A98AC' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
     background-repeat:no-repeat;background-position:right 12px center}
+  select:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(76,141,255,.15)}
   .ghost{background:none;border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--ink-soft);
     cursor:pointer;font-size:.85rem;white-space:nowrap}
   .ghost:hover{border-color:var(--teal);color:var(--teal)}
@@ -128,7 +141,7 @@
   .btn{background:var(--teal);color:#fff;border:none;border-radius:11px;padding:12px 20px;
     font-size:.95rem;font-weight:600;cursor:pointer}
   .btn:hover{background:var(--teal-deep)}
-  .btn:disabled{background:#A9C2BF;cursor:not-allowed}
+  .btn:disabled{background:#1b2532;color:#5A6B80;cursor:not-allowed}
   .btn.sec{background:none;color:var(--teal);border:1.5px solid var(--line)}
   .btn.sec:hover{border-color:var(--teal);background:var(--teal-tint)}
 
@@ -175,7 +188,7 @@
   .viewer-bar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
   .viewer-bar .vt{font-weight:700;color:var(--teal-deep);font-size:.95rem;flex:1;min-width:130px}
   .libframe{width:100%;height:calc(100vh - 200px);min-height:480px;border:1px solid var(--line);
-    border-radius:14px;background:#fff;box-shadow:var(--shadow);display:block}
+    border-radius:14px;background:var(--panel2);box-shadow:var(--shadow);display:block}
 
   /* Simulado */
   .sim-topbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
@@ -189,7 +202,7 @@
   .opt.sel{border-color:var(--teal);background:var(--teal-tint)}
   .opt.sel .key{border-color:var(--teal);background:var(--teal);color:#fff}
   .sim-scewrap{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin:6px 0 14px}
-  .sim-score{font-size:2.6rem;font-weight:800;color:var(--teal-deep);line-height:1}
+  .sim-score{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:2.6rem;font-weight:800;color:var(--teal-deep);line-height:1}
   .sim-rev{display:flex;flex-direction:column;gap:7px;margin-top:12px}
   .sim-rev .it{border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:.85rem;color:var(--ink);
     display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;
@@ -199,7 +212,7 @@
   .sim-rev .it .chev{font-size:1.2rem;color:var(--ink-soft);font-weight:700;flex:0 0 auto}
   .sim-rev .it.ok{border-color:var(--right);background:var(--right-bg)}
   .sim-rev .it.no{border-color:var(--wrong);background:var(--wrong-bg)}
-  .sim-rev .it.an{border-color:var(--amber);background:#fdf4e6}
+  .sim-rev .it.an{border-color:var(--amber);background:rgba(227,179,65,.12)}
   .sim-rev b{color:var(--ink)}
 
   /* Caneta / escrita à mão (Apple Pencil) */
@@ -846,10 +859,10 @@ document.getElementById("tabBtnSim").onclick = ()=> setTab("simulado");
 <canvas id="inkCanvas" class="ink-canvas" aria-hidden="true"></canvas>
 <div class="penbar">
   <div class="pen-tools" id="penTools" hidden>
-    <button class="pen-color" data-color="#15302E" style="background:#15302E" title="Tinta" aria-label="Cor tinta"></button>
-    <button class="pen-color" data-color="#C0432F" style="background:#C0432F" title="Vermelho" aria-label="Cor vermelho"></button>
-    <button class="pen-color" data-color="#2C5A74" style="background:#2C5A74" title="Azul" aria-label="Cor azul"></button>
-    <button class="pen-color" data-color="#1F8A5B" style="background:#1F8A5B" title="Verde" aria-label="Cor verde"></button>
+    <button class="pen-color" data-color="#E7EEF7" style="background:#E7EEF7" title="Tinta" aria-label="Cor tinta"></button>
+    <button class="pen-color" data-color="#F85149" style="background:#F85149" title="Vermelho" aria-label="Cor vermelho"></button>
+    <button class="pen-color" data-color="#4C8DFF" style="background:#4C8DFF" title="Azul" aria-label="Cor azul"></button>
+    <button class="pen-color" data-color="#3FB950" style="background:#3FB950" title="Verde" aria-label="Cor verde"></button>
     <button class="pen-btn" id="penEraser" type="button">Borracha</button>
     <button class="pen-btn" id="penClear" type="button">Limpar</button>
   </div>
@@ -865,7 +878,7 @@ document.getElementById("tabBtnSim").onclick = ()=> setTab("simulado");
   const ctx    = canvas.getContext("2d");
   const fab    = document.getElementById("penFab");
   const tools  = document.getElementById("penTools");
-  let penMode=false, drawing=false, erasing=false, color="#15302E";
+  let penMode=false, drawing=false, erasing=false, color="#E7EEF7";
   let activeId=null, lastPen=0, lastX=0, lastY=0;
   const inkStore = new Map();   // tinta por questão (na memória): chave -> dataURL
   let curKey = null;

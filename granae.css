@@ -1,48 +1,57 @@
 :root {
-  /* Tema CLARO inspirado no Monerix — fundo creme, preto puro, único acento verde */
-  --bg: #F6F4F0;             /* creme quente, não branco gelado */
-  --bg-2: #FFFFFF;
-  --bg-3: #FAF8F3;
-  --surface: #FFFFFF;
-  --surface-2: #F0EEE8;
-  --border: #E8E4DC;          /* hairline */
-  --border-2: #D6D0C2;
+  /* Tema CONSOLE DARK — fundo tecnológico escuro, acento azul MedTech */
+  --bg: #0A0E14;             /* base escura */
+  --bg-2: #111823;
+  --bg-3: #0E141D;
+  --surface: #111823;
+  --surface-2: #0E141D;
+  --border: rgba(88,166,255,.12);      /* hairline */
+  --border-2: rgba(140,160,185,.16);
 
-  --text: #0A0A0A;            /* preto puro pros números */
-  --muted: #6B7280;
-  --muted-2: #9CA3AF;
+  --text: #E7EEF7;            /* tinta clara pros números */
+  --muted: #8A98AC;
+  --muted-2: #5A6B80;
 
-  /* Acento único — verde mint MedTech */
-  --primary: #2563eb;
-  --primary-2: #1d4ed8;
-  --accent: #2563eb;
+  /* Acento único — azul MedTech */
+  --primary: #4C8DFF;
+  --primary-2: #2f6ae0;
+  --accent: #4C8DFF;
 
-  /* Dinheiro — verde pra income, preto pra expense (estilo Monerix) */
-  --income: #1d4ed8;
-  --income-2: #1e40af;
-  --expense: #0A0A0A;         /* mesmo preto do texto pra leitura limpa */
-  --expense-2: #DC2626;       /* só pra estouros / alertas */
-  --warning: #F59E0B;
+  /* Dinheiro — azul pra income, tinta clara pra expense (leitura limpa) */
+  --income: #4C8DFF;
+  --income-2: #2f6ae0;
+  --expense: #E7EEF7;         /* mesma tinta do texto pra leitura limpa */
+  --expense-2: #F85149;       /* só pra estouros / alertas */
+  --warning: #E3B341;
 
-  --shadow: 0 1px 0 rgba(10,10,10,.04), 0 4px 16px rgba(10,10,10,.04);
-  --shadow-glow: 0 8px 24px rgba(37,99,235,.20);
-  --shadow-glow-pink: 0 8px 24px rgba(37,99,235,.12);
+  --glow: rgba(76,141,255,.42);
+  --shadow: 0 1px 0 rgba(0,0,0,.30), 0 8px 24px rgba(0,0,0,.36);
+  --shadow-glow: 0 8px 24px rgba(76,141,255,.28);
+  --shadow-glow-pink: 0 8px 24px rgba(56,225,198,.14);
   /* Raios variados — não tudo no mesmo radius */
   --radius: 16px;        /* cards principais */
   --radius-sm: 10px;     /* cards menores */
   --radius-input: 8px;   /* inputs */
   --radius-pill: 999px;  /* chips, badges */
-  --serif: 'IBM Plex Serif', Georgia, 'Times New Roman', serif;
+  --serif: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
 }
 /* Tema sempre claro — referência Monerix. Sem dark mode automático. */
 
 * { box-sizing: border-box; }
+html { color-scheme: dark; }
 html, body { margin: 0; padding: 0; }
 /* Garante que o atributo [hidden] sempre vence display:flex/grid de outros seletores */
 [hidden] { display: none !important; }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, system-ui, sans-serif;
-  background: var(--bg);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+  background-color: #0A0E14;
+  background-image:
+    radial-gradient(1100px 460px at 84% -10%, rgba(76,141,255,.12), transparent 60%),
+    radial-gradient(840px 460px at 4% 110%, rgba(56,225,198,.06), transparent 55%),
+    linear-gradient(rgba(140,160,185,.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(140,160,185,.032) 1px, transparent 1px);
+  background-size: auto, auto, 34px 34px, 34px 34px;
+  background-attachment: fixed;
   color: var(--text);
   min-height: 100dvh;
   padding-bottom: 170px;
@@ -50,6 +59,7 @@ body {
   letter-spacing: -0.01em;
   font-feature-settings: "cv11", "ss01";
 }
+input:-webkit-autofill, input:-webkit-autofill:focus { -webkit-box-shadow: 0 0 0 100px #0E141D inset; -webkit-text-fill-color: #E7EEF7; caret-color: #E7EEF7; transition: background-color 99999s; }
 
 /* TOP BAR */
 .topbar {
@@ -57,8 +67,9 @@ body {
   padding: 14px 18px;
   padding-top: max(14px, env(safe-area-inset-top));
   position: sticky; top: 0; z-index: 10;
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
+  background: rgba(10,14,20,.72);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-2);
 }
 .topbar .icon-btn {
   background: transparent;
@@ -70,13 +81,14 @@ body {
 .brand { display: flex; align-items: center; gap: 12px; }
 .brand .logo {
   width: 42px; height: 42px; border-radius: 12px;
-  background: var(--text); /* logo em preto puro tipo Monerix */
-  display: grid; place-items: center; color: var(--bg);
+  background: linear-gradient(135deg, var(--primary), var(--primary-2)); /* tile azul com glow */
+  box-shadow: 0 6px 20px var(--glow);
+  display: grid; place-items: center; color: #fff;
   font-weight: 900; font-size: 20px;
 }
 .brand h1 { font-size: 18px; }
 .brand .brand-text { display: grid; line-height: 1.1; }
-.brand h1 { font-size: 20px; margin: 0; letter-spacing: -0.3px; font-weight: 800; }
+.brand h1 { font-family: var(--serif); font-size: 20px; margin: 0; letter-spacing: -0.3px; font-weight: 800; }
 .brand .user-name { font-size: 12px; color: var(--muted); margin-top: 2px; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .topbar-actions { display: flex; gap: 8px; }
 .topbar-actions button {
@@ -142,7 +154,7 @@ main { padding: 8px 16px; max-width: 760px; margin: 0 auto; }
   color: var(--muted);
 }
 .hero-number {
-  font-family: inherit;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: clamp(46px, 13vw, 64px);
   font-weight: 800;
   letter-spacing: -0.03em;
@@ -257,12 +269,12 @@ main { padding: 8px 16px; max-width: 760px; margin: 0 auto; }
 .tx-item .val { font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; }
 .tx-item .val.income { color: var(--income); }
 .tx-item .val.expense { color: var(--text); }
-.tx-item.pending { border-style: dashed; background: linear-gradient(180deg, var(--surface), rgba(37,99,235,.06)); }
+.tx-item.pending { border-style: dashed; background: linear-gradient(180deg, var(--surface), rgba(76,141,255,.06)); }
 .tx-item.pending .val { font-style: italic; opacity: .85; }
 .badge-pending {
   display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .4px;
   padding: 2px 8px; margin-left: 6px; border-radius: 999px;
-  background: rgba(37,99,235,.18); color: var(--primary-2);
+  background: rgba(76,141,255,.18); color: var(--primary-2);
   vertical-align: middle; text-transform: uppercase;
 }
 
@@ -289,7 +301,7 @@ main { padding: 8px 16px; max-width: 760px; margin: 0 auto; }
 .scheduled-hint {
   display: flex; gap: 10px; align-items: center;
   margin: 0; padding: 10px 14px;
-  background: rgba(37,99,235,.10); border: 1px solid rgba(37,99,235,.30);
+  background: rgba(76,141,255,.10); border: 1px solid rgba(76,141,255,.30);
   color: var(--text); border-radius: 12px; font-size: 13px;
 }
 .scheduled-hint svg { width: 20px; height: 20px; color: var(--primary-2); flex-shrink: 0; }
@@ -379,8 +391,8 @@ main { padding: 8px 16px; max-width: 760px; margin: 0 auto; }
 /* Filter chip — mostra filtro ativo na tela de Transações */
 .tx-filter-chip {
   display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(37,99,235,.12); color: var(--primary-2);
-  border: 1px solid rgba(37,99,235,.30);
+  background: rgba(76,141,255,.12); color: var(--primary-2);
+  border: 1px solid rgba(76,141,255,.30);
   padding: 8px 6px 8px 14px;
   border-radius: var(--radius-pill);
   font-size: 13px; font-weight: 700;
@@ -509,7 +521,7 @@ select, input[type=text], input[type=number], input[type=date], input[type=passw
   transition: border-color .15s ease;
 }
 select:focus, input:focus, textarea:focus {
-  outline: none; border-color: var(--primary);
+  outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(76,141,255,.15);
 }
 textarea { resize: vertical; }
 
@@ -604,13 +616,13 @@ textarea { resize: vertical; }
 .pulse {
   width: 84px; height: 84px; border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, var(--primary-2), var(--primary));
-  box-shadow: 0 0 0 0 rgba(37,99,235,.6);
+  box-shadow: 0 0 0 0 rgba(76,141,255,.6);
 }
 .audio-visual.rec .pulse { animation: pulse 1.4s infinite; }
 @keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(37,99,235,.55); transform: scale(1); }
-  70% { box-shadow: 0 0 0 28px rgba(37,99,235,0); transform: scale(1.08); }
-  100% { box-shadow: 0 0 0 0 rgba(37,99,235,0); transform: scale(1); }
+  0% { box-shadow: 0 0 0 0 rgba(76,141,255,.55); transform: scale(1); }
+  70% { box-shadow: 0 0 0 28px rgba(76,141,255,0); transform: scale(1.08); }
+  100% { box-shadow: 0 0 0 0 rgba(76,141,255,0); transform: scale(1); }
 }
 
 /* TOAST */
@@ -627,8 +639,8 @@ hr { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
 .auth-screen {
   position: fixed; inset: 0; z-index: 100;
   background:
-    radial-gradient(900px 500px at 80% 10%, rgba(37,99,235,.22), transparent 60%),
-    radial-gradient(900px 500px at 10% 90%, rgba(37,99,235,.18), transparent 55%),
+    radial-gradient(900px 500px at 80% 10%, rgba(76,141,255,.22), transparent 60%),
+    radial-gradient(900px 500px at 10% 90%, rgba(76,141,255,.18), transparent 55%),
     linear-gradient(180deg, var(--bg), var(--bg-2));
   display: grid; place-items: start center; padding: 28px 18px;
   padding-top: calc(40px + env(safe-area-inset-top));
