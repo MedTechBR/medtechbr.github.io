@@ -928,6 +928,31 @@ main, #main { display: block !important; height: auto !important; overflow: visi
 .train-flash{margin-left:auto;align-self:center;display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border:1px solid rgba(76,141,255,.28);border-radius:10px;font-weight:600;font-size:12.5px;color:#8fb6ff;background:rgba(76,141,255,.10);text-decoration:none;white-space:nowrap;transition:.15s}
 .train-flash:hover{background:rgba(76,141,255,.18);border-color:rgba(76,141,255,.5)}
 @media(max-width:560px){.train-flash{margin-left:0;width:100%;justify-content:center}}
+
+/* ===== Sumário (TOC) ===== */
+.wb-toc{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin:0 0 16px}
+.wb-toc-title{font-size:11.5px;font-weight:700;color:var(--text-mute);text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px;display:flex;align-items:center;gap:6px}
+.wb-toc-list{display:flex;flex-wrap:wrap;gap:6px}
+.toc-item{padding:5px 12px;border:1px solid var(--border);background:var(--bg);color:var(--primary);border-radius:999px;font-size:12px;font-weight:500;cursor:pointer;text-decoration:none;transition:all .12s;font-family:inherit}
+.toc-item:hover{background:var(--primary-soft);border-color:var(--primary)}
+
+/* ===== Salvar (bookmark) ===== */
+.action-btn.saved{background:var(--primary-soft);color:var(--primary);border-color:var(--primary)}
+
+/* ===== Tópicos relacionados ===== */
+.wb-related{margin-top:22px;padding-top:16px;border-top:1px solid var(--border)}
+.wb-related-title{font-size:11.5px;font-weight:700;color:var(--text-mute);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.wb-related-list{display:flex;flex-wrap:wrap;gap:8px}
+.wb-related-chip{display:inline-flex;align-items:center;gap:7px;padding:8px 13px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;font-size:12.5px;color:var(--text);cursor:pointer;transition:all .12s;font-family:inherit;text-align:left}
+.wb-related-chip:hover{border-color:var(--success);color:var(--success)}
+
+/* ===== Salvo/Visto na biblioteca ===== */
+.protocol-flags{display:flex;gap:4px;flex-shrink:0;margin-right:2px}
+.pflag{width:20px;height:20px;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:11px;flex-shrink:0}
+.pflag.saved{background:var(--primary-soft);color:var(--primary)}
+.pflag.seen{background:var(--success-soft);color:var(--success)}
+.library-tab.saved-toggle{margin-left:auto}
+.library-tab.saved-toggle.active{background:var(--primary);border-color:var(--primary);color:#fff}
 </style>
 </head>
 <body>
@@ -1893,6 +1918,7 @@ const PROTOCOLS = [
 let currentProtocol = null; // protocolo selecionado da biblioteca (se for o caso)
 let libActiveSpec = 'all';
 let libSearch = '';
+let libShowSavedOnly = false;
 
 function renderLibrary() {
   const tabs = document.getElementById('libraryTabs');
@@ -1902,11 +1928,16 @@ function renderLibrary() {
 
   // Tabs
   const specKeys = Object.keys(SPECIALTIES);
+  const savedSet = getSavedSet();
+  const seenMap = getSeenMap();
   tabs.innerHTML = `<button class="library-tab ${libActiveSpec==='all'?'active':''}" data-spec="all">Todos</button>` +
-    specKeys.map(s => `<button class="library-tab ${libActiveSpec===s?'active':''}" data-spec="${s}">${SPECIALTIES[s].icon} ${SPECIALTIES[s].label}</button>`).join('');
-  tabs.querySelectorAll('.library-tab').forEach(t => {
+    specKeys.map(s => `<button class="library-tab ${libActiveSpec===s?'active':''}" data-spec="${s}">${SPECIALTIES[s].icon} ${SPECIALTIES[s].label}</button>`).join('') +
+    `<button class="library-tab saved-toggle ${libShowSavedOnly?'active':''}" id="libSavedToggle">🔖 Salvos${savedSet.size?` (${savedSet.size})`:''}</button>`;
+  tabs.querySelectorAll('.library-tab[data-spec]').forEach(t => {
     t.onclick = () => { libActiveSpec = t.dataset.spec; renderLibrary(); };
   });
+  const savedToggleBtn = document.getElementById('libSavedToggle');
+  if (savedToggleBtn) savedToggleBtn.onclick = () => { libShowSavedOnly = !libShowSavedOnly; renderLibrary(); };
 
   // Filter — ignora autofill de e-mail do navegador (uma busca real nunca contém "@")
   if (libSearch.includes('@')) {
@@ -1916,6 +1947,7 @@ function renderLibrary() {
   }
   const q = libSearch.trim().toLowerCase();
   const filtered = PROTOCOLS.filter(p => {
+    if (libShowSavedOnly && !savedSet.has(p.id)) return false;
     if (libActiveSpec !== 'all' && p.specialty !== libActiveSpec) return false;
     if (q) {
       const haystack = (p.name + ' ' + p.tags + ' ' + p.guideline).toLowerCase();
@@ -1933,9 +1965,12 @@ function renderLibrary() {
         <div class="protocol-name">${escapeHtml(p.name)}</div>
         <div class="protocol-tags">${escapeHtml(p.tags)}</div>
       </div>
+      <div class="protocol-flags">${savedSet.has(p.id) ? '<span class="pflag saved" title="Salvo">🔖</span>' : ''}${seenMap[p.id] ? '<span class="pflag seen" title="Visto">👁</span>' : ''}</div>
       <div class="protocol-badge">${escapeHtml(p.guideline)}</div>
     </div>
-  `).join('') : `<div class="library-empty">Nenhum protocolo encontrado para "${escapeHtml(libSearch)}".</div>`;
+  `).join('') : (libShowSavedOnly
+      ? `<div class="library-empty">Você ainda não salvou nenhum protocolo — toque em 🔖 dentro de uma conduta.</div>`
+      : `<div class="library-empty">Nenhum protocolo encontrado para "${escapeHtml(libSearch)}".</div>`);
 
   grid.querySelectorAll('.protocol-card').forEach(c => {
     c.onclick = () => runProtocol(c.dataset.id);
@@ -10216,6 +10251,7 @@ function renderSourcesHtml(sources) {
 
 // Converte as seções "## ..." (já renderizadas como <h2>) em blocos recolhíveis (estilo acordeão).
 // O conteúdo antes do 1º <h2> (título + resumo) fica sempre visível; a 1ª seção abre por padrão.
+// Cada seção ganha um id (acc-sec-N) para o sumário (TOC) poder abrir/rolar até ela.
 function accordionize(html) {
   const parts = html.split(/(?=<h2)/);
   if (parts.length <= 1) return html;
@@ -10223,8 +10259,63 @@ function accordionize(html) {
     const m = p.match(/^<h2[^>]*>([\s\S]*?)<\/h2>([\s\S]*)$/);
     if (!m) return p;
     const open = (i === 1) ? ' open' : '';
-    return `<details class="wb-acc"${open}><summary>${m[1]}</summary><div class="wb-acc-body">${m[2]}</div></details>`;
+    return `<details class="wb-acc" id="acc-sec-${i}"${open}><summary>${m[1]}</summary><div class="wb-acc-body">${m[2]}</div></details>`;
   }).join('');
+}
+
+// ============================================================
+//  SUMÁRIO, TEMPO DE LEITURA, SALVAR/VISTO, RELACIONADOS
+// ============================================================
+function estimateReadMinutes(text) {
+  const words = String(text || '').trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200)); // ~200 palavras/min em PT-BR
+}
+// Monta o sumário clicável a partir dos MESMOS índices de seção do accordionize (i>=1 = h2 real).
+function buildToc(html) {
+  const parts = html.split(/(?=<h2)/);
+  const secs = [];
+  parts.forEach((p, i) => {
+    const m = p.match(/^<h2[^>]*>([\s\S]*?)<\/h2>/);
+    if (m) secs.push({ idx: i, label: m[1].replace(/<[^>]+>/g, '').trim() });
+  });
+  if (secs.length < 3) return ''; // conduta curta não precisa de sumário
+  return `<nav class="wb-toc"><div class="wb-toc-title">📑 Nesta conduta (${secs.length} seções)</div><div class="wb-toc-list">` +
+    secs.map(s => `<button type="button" class="toc-item" data-idx="${s.idx}">${escapeHtml(s.label)}</button>`).join('') +
+    `</div></nav>`;
+}
+function bindToc(container) {
+  container.querySelectorAll('.toc-item').forEach(btn => {
+    btn.onclick = () => {
+      const target = document.getElementById('acc-sec-' + btn.dataset.idx);
+      if (!target) return;
+      target.open = true;
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+  });
+}
+
+const COND_SAVED_KEY = 'condSaved_v1';
+const COND_SEEN_KEY = 'condSeen_v1';
+function getSavedSet() { try { return new Set(JSON.parse(localStorage.getItem(COND_SAVED_KEY) || '[]')); } catch (e) { return new Set(); } }
+function setSavedSet(s) { try { localStorage.setItem(COND_SAVED_KEY, JSON.stringify([...s])); } catch (e) { } }
+function isSaved(id) { return getSavedSet().has(id); }
+function toggleSaved(id) { const s = getSavedSet(); if (s.has(id)) s.delete(id); else s.add(id); setSavedSet(s); return s.has(id); }
+function getSeenMap() { try { return JSON.parse(localStorage.getItem(COND_SEEN_KEY) || '{}'); } catch (e) { return {}; } }
+function markSeen(id) { try { const m = getSeenMap(); m[id] = new Date().toISOString(); localStorage.setItem(COND_SEEN_KEY, JSON.stringify(m)); } catch (e) { } }
+function wasSeen(id) { return !!getSeenMap()[id]; }
+// Chips de "Tópicos relacionados" — mesma especialidade do protocolo atual, excluindo ele mesmo.
+function buildRelated(protocolMeta) {
+  if (!protocolMeta || !protocolMeta.specialty) return '';
+  const rel = PROTOCOLS.filter(p => p.specialty === protocolMeta.specialty && p.id !== protocolMeta.id).slice(0, 5);
+  if (!rel.length) return '';
+  return `<div class="wb-related"><div class="wb-related-title">🔗 Tópicos relacionados</div><div class="wb-related-list">` +
+    rel.map(p => `<button type="button" class="wb-related-chip" data-rel-id="${p.id}"><span>${p.icon}</span>${escapeHtml(p.name)}</button>`).join('') +
+    `</div></div>`;
+}
+function bindRelated(container) {
+  container.querySelectorAll('.wb-related-chip').forEach(btn => {
+    btn.onclick = () => { runProtocol(btn.dataset.relId); };
+  });
 }
 
 async function renderResultDireto(item) {
@@ -10244,14 +10335,22 @@ async function renderResultDireto(item) {
     ? (query.length > 80 ? escapeHtml(query.slice(0, 80)) + '…' : escapeHtml(query))
     : escapeHtml(query);
 
+  const mdHtml = md(text);
+  const readMin = estimateReadMinutes(text);
+  const wasSeenBefore = protocolMeta ? wasSeen(protocolMeta.id) : false;
+  const savedNow = protocolMeta ? isSaved(protocolMeta.id) : false;
+  const tocHtml = buildToc(mdHtml);
+  const relatedHtml = buildRelated(protocolMeta);
+
   document.getElementById('resultContainer').innerHTML = `
     <div class="result">
       <div class="result-header">
         <div style="flex:1;min-width:0;">
           <div class="result-title">${isCaso ? 'Caso clínico' : titleDisplay} <span class="badge ${badgeCls}">${item.offline ? '📚 Banco MedTech' : badgeText}</span></div>
-          <div class="result-meta">${ctxLabel} • ${cenarioLabel} • ${formatDate(date)}${isCaso ? ` • <span title="${escapeHtml(query)}">${query.length} caracteres na evolução</span>` : ''}${isProto && protocolMeta ? ` • <strong style="color:var(--success)">${escapeHtml(protocolMeta.guideline)}</strong>` : ''}</div>
+          <div class="result-meta">${ctxLabel} • ${cenarioLabel} • ${formatDate(date)}${isCaso ? ` • <span title="${escapeHtml(query)}">${query.length} caracteres na evolução</span>` : ` • ⏱ ${readMin} min de leitura`}${isProto && protocolMeta ? ` • <strong style="color:var(--success)">${escapeHtml(protocolMeta.guideline)}</strong>` : ''}${wasSeenBefore ? ' • <span style="color:var(--text-mute)">👁 já visto</span>' : ''}</div>
         </div>
         <div class="result-actions">
+          ${protocolMeta ? `<button class="action-btn${savedNow ? ' saved' : ''}" id="saveBtn">${savedNow ? '🔖 Salvo' : '🔖 Salvar'}</button>` : ''}
           ${isCaso ? '<button class="action-btn" id="viewEvolBtn">📄 Ver evolução</button>' : ''}
           <button class="action-btn" id="copyBtn">📋 Copiar</button>
           <button class="action-btn" id="printBtn">🖨 PDF</button>
@@ -10262,11 +10361,15 @@ async function renderResultDireto(item) {
         <span>${item.offline ? '📚' : alertIcon}</span>
         <div>${item.offline ? 'Conteúdo do <strong>banco MedTech</strong> (offline, sem IA) — referência rápida. Confira doses e adapte ao paciente. Toque em 🔄 <strong>Refazer</strong> para a versão detalhada com IA.' : alertText}</div>
       </div>
-      <div class="content">${accordionize(md(text))}</div>
+      ${tocHtml}
+      <div class="content">${accordionize(mdHtml)}</div>
       ${renderSourcesHtml(sources)}
+      ${relatedHtml}
     </div>
   `;
   await renderMermaidIn(document.getElementById('resultContainer'));
+  bindToc(document.getElementById('resultContainer'));
+  bindRelated(document.getElementById('resultContainer'));
   document.getElementById('copyBtn').onclick = () => {
     navigator.clipboard.writeText(text);
     const b = document.getElementById('copyBtn');
@@ -10274,6 +10377,15 @@ async function renderResultDireto(item) {
   };
   document.getElementById('printBtn').onclick = () => window.print();
   document.getElementById('refreshBtn').onclick = () => run(query);
+  const saveBtn = document.getElementById('saveBtn');
+  if (saveBtn && protocolMeta) {
+    saveBtn.onclick = () => {
+      const nowSaved = toggleSaved(protocolMeta.id);
+      saveBtn.classList.toggle('saved', nowSaved);
+      saveBtn.textContent = nowSaved ? '🔖 Salvo' : '🔖 Salvar';
+    };
+  }
+  if (protocolMeta) markSeen(protocolMeta.id);
   const ve = document.getElementById('viewEvolBtn');
   if (ve) ve.onclick = () => {
     alert('Evolução colada:\n\n' + query);
