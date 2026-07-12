@@ -1641,8 +1641,8 @@ const PROTOCOLS = [
   // ====== EMERGÊNCIA ======
   { id: 'sepse', icon: '🦠', name: 'Sepse e choque séptico', tags: 'SSC 2026 · Noradrenalina precoce · Cristaloide balanceado · ATB', specialty: 'emergencia', guideline: 'SSC 2026' },
   { id: 'anafilaxia', icon: '⚡', name: 'Anafilaxia', tags: 'WAO · Adrenalina IM · Reposição · Anti-H1', specialty: 'emergencia', guideline: 'WAO 2020' },
-  { id: 'politrauma', icon: '🚑', name: 'Politrauma — ATLS', tags: 'ATLS · ABCDE · FAST · Sangue maciço', specialty: 'emergencia', guideline: 'ATLS 2018' },
-  { id: 'choque_hipov', icon: '🩸', name: 'Choque hipovolêmico/hemorrágico', tags: 'Cristaloide · Hemocomponentes · Ac. tranexâmico', specialty: 'emergencia', guideline: 'ATLS 2018' },
+  { id: 'politrauma', icon: '🚑', name: 'Politrauma — ATLS', tags: 'ATLS · ABCDE · FAST · Sangue maciço', specialty: 'emergencia', guideline: 'ATLS 11 (2025)' },
+  { id: 'choque_hipov', icon: '🩸', name: 'Choque hipovolêmico/hemorrágico', tags: 'Cristaloide · Hemocomponentes · Ac. tranexâmico', specialty: 'emergencia', guideline: 'ATLS 11 (2025)' },
   { id: 'intox_geral', icon: '☠️', name: 'Intoxicação medicamentosa — abordagem geral', tags: 'Toxidromes · Descontaminação · Antídotos', specialty: 'emergencia', guideline: 'AACT 2023' },
   { id: 'intox_opio', icon: '💊', name: 'Intoxicação por opioides', tags: 'Naloxona · Reversão · Suporte ventilatório', specialty: 'emergencia', guideline: 'ACMT 2021' },
   { id: 'intox_paracet', icon: '💊', name: 'Intoxicação por paracetamol', tags: 'N-acetilcisteína · Nomograma Rumack-Matthew', specialty: 'emergencia', guideline: 'AAPCC 2023' },
@@ -5157,116 +5157,283 @@ cauda_eq: `# Síndrome da Cauda Equina
 - Retenção urinária + anestesia em sela + lombalgia = RM urgente + cirurgia.
 - Janela curta — não esperar para preservar a função esfincteriana.`,
 
-intox_metanol: `# Intoxicação por Metanol / Etilenoglicol
-
-> Álcoois tóxicos → metabólitos ácidos → **acidose metabólica com ânion-gap E gap osmolar aumentados**. Metanol → cegueira; etilenoglicol → LRA por oxalato.
-
-## 🩺 Quadro
-- Embriaguez → após latência: acidose, taquipneia; **metanol:** alteração visual/cegueira; **etilenoglicol:** LRA, hipocalcemia, cristais de oxalato na urina.
-
+intox_metanol: `**Intoxicação por álcoois tóxicos (metanol e etilenoglicol).** Os álcoois-mãe são pouco tóxicos por si — a gravidade vem dos metabólitos ácidos gerados pela álcool-desidrogenase: formato (metanol, toxicidade retiniana/óptica) e glicolato/oxalato (etilenoglicol, toxicidade renal), causando acidose metabólica com ânion-gap E gap osmolar aumentados.
+## ⚙️ Fisiopatologia
+- Metanol e etilenoglicol são metabolizados pela **álcool-desidrogenase (ADH)** hepática, a mesma enzima que metaboliza o etanol, gerando intermediários (formaldeído/ácido glicólico) que a **aldeído-desidrogenase** converte em **ácido fórmico/formato** (metanol) e **ácido glicólico → glioxílico → oxálico** (etilenoglicol).
+- O **formato** inibe a citocromo-oxidase mitocondrial (mecanismo semelhante ao cianeto) no nervo óptico e no SNC → toxicidade retiniana/do nervo óptico e acidose lática secundária.
+- O **oxalato** precipita com cálcio formando cristais de oxalato de cálcio que se depositam nos túbulos renais → lesão renal aguda; também pode causar hipocalcemia sintomática (tetania, prolongamento de QT).
+- Enquanto a ADH ainda está metabolizando o álcool-mãe (fase inicial, "embriaguez"), a acidose ainda não se instalou — é a **janela terapêutica** para bloquear a ADH antes que se acumule metabólito tóxico. Com o tempo, o álcool-mãe cai e os metabólitos ácidos sobem — o gap osmolar tende a cair e o ânion-gap a subir conforme a intoxicação progride.
+- Etanol e fomepizol competem pela mesma ADH (etanol tem afinidade ainda maior), por isso ambos bloqueiam a formação de metabólitos tóxicos — é a base racional dos dois antídotos.
+## 🩺 Quadro clínico
+- **Fase inicial (30 min–12h):** embriaguez, sonolência, ataxia — indistinguível de intoxicação etílica simples nessa fase, daí a importância da história/contexto (uso de bebida adulterada, tentativa de suicídio com anticongelante/produtos de limpeza).
+- **Fase de latência (até 12–24h, mais curta se houver coingestão com etanol, que atrasa o metabolismo do tóxico):** relativamente assintomático enquanto o álcool-mãe ainda está sendo metabolizado.
+- **Fase tardia (acidose estabelecida):** taquipneia (compensação respiratória — respiração de Kussmaul), dor abdominal, náusea/vômito.
+- **Metanol:** toxicidade visual característica — visão turva, sensação de "campo de neve", fotofobia, midríase pouco reativa, podendo evoluir para cegueira definitiva por neurite óptica; pode haver também parkinsonismo tardio (necrose de putame).
+- **Etilenoglicol:** lesão renal aguda (24–72h), hipocalcemia (tetania, QT longo, arritmia), cristais de oxalato de cálcio na urina (achado sugestivo, mas pouco sensível).
+## 🔍 Diagnóstico diferencial
+- Outras causas de **acidose metabólica com ânion-gap aumentado** (mnemônico GOLD MARK): Glicóis (etilenoglicol/propilenoglicol), Oxoprolina (uso crônico de paracetamol), L-lactato, D-lactato, Metanol, Aspirina/salicilato, Renal failure (urêmica), Cetoacidose (diabética, alcoólica, de jejum).
+- Diferenciar de cetoacidose diabética (glicemia alta, cetonemia/cetonúria) e cetoacidose alcoólica (história de etilismo, cetonas positivas, gap osmolar pode estar levemente aumentado pelo próprio etanol).
+- Intoxicação por salicilato também causa gap aumentado com taquipneia, mas tipicamente com alcalose respiratória associada (padrão misto) e sem gap osmolar tão elevado.
+- Sempre calcular o gap osmolar mesmo com ânion-gap normal na fase inicial (pode estar alto antes de a acidose se instalar) e vice-versa (o gap osmolar pode normalizar na fase tardia, quando todo o álcool-mãe já foi metabolizado — isso não exclui o diagnóstico).
 ## ✅ Diagnóstico
-- **Ânion-gap alto + gap osmolar alto** + acidose; nível sérico se disponível.
+- **Ânion-gap alto** [(Na) − (Cl + HCO3), VR ~8–12] **+ gap osmolar alto** [osmolaridade medida − calculada; VR < 10 mOsm/kg] associados à acidose metabólica são a base do diagnóstico presuntivo quando o nível sérico do álcool tóxico não está disponível rapidamente (exame pouco acessível na maioria dos serviços brasileiros).
+- Osmolaridade calculada = 2×Na + glicose/18 + ureia/6 (ou BUN/2,8) + etanol/3,7 (mg/dL) — sempre descontar o etanol se dosado, pois é a maior fonte de gap osmolar confundidor.
+- Nível sérico de metanol/etilenoglicol confirma o diagnóstico, mas a conduta não deve esperar o resultado se a suspeita clínica e o gap forem compatíveis.
+## 🧪 Exames complementares
+| Exame | Objetivo |
+| --- | --- |
+| Gasometria arterial + ânion-gap | Grau de acidose |
+| Osmolaridade sérica (gap osmolar) | Rastreio de álcool tóxico |
+| Função renal, cálcio, potássio | Lesão renal / hipocalcemia (etilenoglicol) |
+| Nível de metanol/etilenoglicol (se disponível) | Confirmação diagnóstica |
+| Lactato | Pode estar falsamente elevado (glicolato interfere no método de dosagem) |
+| EQU (cristais de oxalato) | Sugestivo de etilenoglicol |
+## 📊 Gravidade / indicação de diálise
+- Critérios de intoxicação grave/necessidade de tratamento agressivo: pH < 7,3, bicarbonato < 20 mEq/L, gap osmolar > 25 mOsm/kg, nível sérico de metanol ou etilenoglicol > 50 mg/dL, alteração visual (metanol) ou lesão renal (etilenoglicol), instabilidade hemodinâmica.
+- **Hemodiálise** indicada se: acidose grave refratária, LRA, alteração visual, instabilidade hemodinâmica, ou nível sérico muito alto (> 50 mg/dL) mesmo assintomático — remove tanto o álcool-mãe quanto os metabólitos tóxicos e corrige a acidose de forma mais eficiente que medidas isoladas.
+## 💊 Tratamento (com doses)
+- **Bloquear a álcool-desidrogenase é a prioridade**, antes mesmo de aguardar confirmação laboratorial se a suspeita for razoável:
+- **Fomepizol** (antídoto de escolha, maior afinidade pela ADH que o etanol, sem depressão do SNC): **ataque 15 mg/kg IV em 30 min, depois 10 mg/kg 12/12h por 4 doses, depois 15 mg/kg 12/12h** (a dose aumenta após a 4ª dose por autoindução do próprio metabolismo do fomepizol); manter até nível sérico do tóxico < 20 mg/dL e resolução da acidose. **No Brasil o fomepizol é pouco disponível/de acesso restrito** (não costuma estar em estoque na maioria dos prontos-socorros) — o etanol IV é a alternativa prática mais usada aqui.
+- **Etanol** (alternativa quando o fomepizol está indisponível — cenário comum no Brasil): dose de ataque para atingir etanolemia-alvo de 100–150 mg/dL, seguida de infusão de manutenção; requer monitorização seriada de etanolemia/glicemia (risco de hipoglicemia, sedação, flebite) — via preferencialmente IV (etanol 10% em SG5%), podendo ser oral em serviços sem apresentação IV.
+- **Bicarbonato de sódio IV** para corrigir a acidose metabólica (alvo pH > 7,3) — também favorece a forma ionizada do formato/glicolato, reduzindo sua difusão para os tecidos-alvo (retina/rim).
+- **Hemodiálise** nos casos graves (ver critérios acima) — remove o álcool-mãe e os metabólitos e corrige o distúrbio ácido-base rapidamente; durante a diálise, aumentar a dose/frequência de fomepizol ou etanol (ambos são dialisáveis).
+- **Cofatores metabólicos** (aceleram a via não tóxica de metabolização, baixo risco/alto benefício teórico): **ácido folínico (leucovorina) 50 mg IV 6/6h** — ou ácido fólico se folínico indisponível — para metanol (acelera a conversão de formato em CO2 + água); **tiamina 100 mg IV e piridoxina 50 mg IV 6/6h** para etilenoglicol (desviam o glicolato para vias menos tóxicas).
+- Corrigir hipocalcemia sintomática (etilenoglicol) com gluconato de cálcio IV.
+## 🏥 Internação / UTI
+- Todo caso confirmado ou fortemente suspeito (gap + acidose compatíveis) deve ser internado para antídoto e monitorização seriada de gasometria/função renal/eletrólitos.
+- UTI se acidose grave, necessidade de diálise, instabilidade hemodinâmica ou alteração visual/neurológica.
+## 💡 Pérolas e erros comuns
+- Acidose metabólica com ânion-gap alto **e** gap osmolar alto = pensar em álcool tóxico até prova em contrário → iniciar fomepizol (ou etanol, se fomepizol indisponível) sem esperar o nível sérico.
+- **Metanol = visão** (neurite óptica/cegueira); **etilenoglicol = rim** (LRA por oxalato) + hipocalcemia — memorizar essa distinção orienta o exame-alvo (fundoscopia vs. função renal/cálcio).
+- O gap osmolar pode estar normal em apresentação tardia (todo álcool-mãe já metabolizado) — isso não descarta o diagnóstico se a acidose e a história forem compatíveis.
+- O lactato pode estar falsamente elevado por interferência do glicolato no método de dosagem (etilenoglicol) — não confundir com acidose lática primária.
+- Etanol IV é alternativa aceita e amplamente usada no Brasil pela baixa disponibilidade de fomepizol — não atrasar o tratamento por falta do antídoto "ideal".`,
+
+intox_cocaina: `**Toxíndrome simpaticomimética clássica: agitação, hipertermia, taquicardia e hipertensão, com risco de SCA, AVC, arritmia maligna e convulsão** — o benzodiazepínico em dose adequada resolve a maior parte do quadro, e o betabloqueador está proscrito.
+
+## 🧬 Fisiopatologia
+- A cocaína bloqueia a recaptação pré-sináptica de **noradrenalina, dopamina e serotonina**, gerando excesso de catecolaminas na fenda sináptica → estado simpaticomimético (taquicardia, hipertensão, midríase, agitação, hipertermia).
+- Bloqueia canais de **sódio rápidos cardíacos** (efeito tipo antiarrítmico classe IA), podendo alargar QRS e favorecer arritmias ventriculares e bloqueios de condução — mecanismo semelhante ao dos antidepressivos tricíclicos.
+- Causa **vasoespasmo coronariano** (mediado por alfa-1) e acelera trombose (ativação plaquetária, disfunção endotelial), além de acelerar a aterosclerose com uso crônico — por isso pode causar infarto mesmo em coronárias angiograficamente normais e em pacientes jovens sem outros fatores de risco.
+- Também é vasoconstritora cerebral, favorecendo AVC isquêmico e hemorrágico (inclusive por ruptura de aneurisma/HSA) mesmo em pacientes jovens.
+- A hipertermia decorre de aumento da produção de calor (agitação/atividade muscular) somado a vasoconstrição periférica, que prejudica a dissipação.
+
+## 🩺 Quadro clínico
+- **Simpaticomimético:** agitação psicomotora, ansiedade, midríase, diaforese, taquicardia, hipertensão, tremor.
+- **Cardiovascular:** dor torácica (a queixa mais comum que leva à emergência), palpitações, síncope; no grave — infarto, dissecção de aorta, arritmia ventricular, morte súbita.
+- **Neurológico:** cefaleia intensa (pensar em HSA), déficit focal (AVC), convulsão, agitação extrema evoluindo para delirium — quadro de **excited delirium**, com hipertermia grave, é emergência com risco de parada cardiorrespiratória.
+- **Hipertermia** — pode ultrapassar 40°C, associada a rabdomiólise, coagulopatia e falência de múltiplos órgãos nos casos graves.
+- **Rabdomiólise** por agitação/hipertermia/isquemia muscular, com risco de lesão renal aguda.
+- Uso de crack/inalado pode causar dor torácica de origem pulmonar ("crack lung": pneumotórax, pneumomediastino, hemorragia alveolar).
+
+## 🔍 Diagnóstico diferencial
+- Outras causas de dor torácica no jovem: pericardite, pneumotórax espontâneo, dissecção de aorta (cocaína também é fator de risco para dissecção), causas musculoesqueléticas.
+- Outras toxíndromes simpaticomiméticas: anfetaminas/metanfetamina, MDMA, cafeína/energéticos em excesso, abstinência alcoólica/benzodiazepínica, síndrome serotoninérgica (rigidez, hiper-reflexia, clônus — diferencia da simpaticomimética pura), hipertireoidismo/tempestade tireoidiana, feocromocitoma.
+- Excited delirium/agitação: descartar hipoglicemia, meningite/encefalite, quadro psiquiátrico primário associado.
+- Sempre considerar **coingestão** (álcool, outras drogas) — comum e altera o quadro.
 
 ## 🧪 Exames complementares
 | Exame | Objetivo |
 | --- | --- |
-| Gasometria + ânion-gap | Acidose |
-| Osmolaridade (gap osmolar) | Álcool tóxico |
-| Função renal, cálcio | Etilenoglicol |
-| Nível de metanol/etilenoglicol | Confirmar |
+| ECG seriado | SCA, alargamento de QRS, arritmia |
+| Troponina seriada | Lesão miocárdica (interpretar com cautela — pode haver lesão sem SCA obstrutiva clássica) |
+| CPK, função renal, EAS | Rabdomiólise / LRA |
+| Eletrólitos (K, Mg), glicemia | Base e diferenciais |
+| Temperatura central | Gravidade da hipertermia |
+| Toxicológico de urina | Confirma exposição (não muda conduta aguda) |
+| TC de crânio | Se cefaleia súbita intensa ou déficit focal (suspeita de HSA/AVC) |
 
 ## 💊 Tratamento (com doses)
-- **Bloquear a álcool-desidrogenase: fomepizol** (ou etanol se indisponível).
-- **Bicarbonato** para a acidose; **hemodiálise** (remove o tóxico e corrige a acidose) nos casos graves/com lesão de órgão.
-- Cofatores: ácido folínico (metanol); tiamina/piridoxina (etilenoglicol).
+- **Benzodiazepínico é a base do tratamento** — controla agitação, hipertensão, taquicardia, hipertermia (reduz atividade muscular) e previne/trata convulsão. **Diazepam 5–10 mg IV** ou **midazolam 2–5 mg IV**, repetir/titular a cada 5–10 min até sedação leve — doses cumulativas altas costumam ser necessárias e são seguras.
+- **Dor torácica / suspeita de SCA:** benzodiazepínico em dose plena + **nitrato** (nitroglicerina SL/IV) + **AAS**; se vasoespasmo refratário, **bloqueador de canal de cálcio** (ex.: diltiazem/verapamil) pode ajudar. Antiagregação e anticoagulação seguem o protocolo de SCA se houver evidência de infarto.
+- **EVITAR betabloqueador** (incluindo os de ação mista como labetalol) na fase aguda — bloqueia apenas o efeito beta, deixando o estímulo alfa sem oposição, o que **piora vasoespasmo coronariano e hipertensão** ("unopposed alpha stimulation"). Essa recomendação vem do posicionamento da AHA (2008), ainda a principal referência formal sobre o tema; revisões mais recentes questionam o risco absoluto do betabloqueador cardiosseletivo tardio, mas a conduta padrão na fase aguda continua sendo evitá-lo.
+- **Hipertermia:** resfriamento ativo (compressas geladas, ventilação, imersão se disponível) — meta é baixar a temperatura rapidamente; benzodiazepínico já ajuda por reduzir a atividade muscular.
+- **Rabdomiólise:** hidratação venosa vigorosa guiada por diurese.
+- **Hipertensão refratária ao benzodiazepínico:** vasodilatador direto (nitroprussiato) ou fentolamina (bloqueio alfa); evitar agentes que deixem efeito alfa sem oposição.
+- **Arritmia com QRS alargado (efeito de canal de sódio):** bicarbonato de sódio IV, como no antidepressivo tricíclico.
+- **Convulsão:** benzodiazepínico em dose plena; se refratária, seguir escada de status epiléptico.
+- **Agitação extrema/excited delirium:** considerar sedação com cetamina IM/IV além do benzodiazepínico em ambiente monitorado, por risco de PCR súbita.
 
-## 💡 Pérolas
-- Acidose com gap osmolar alto = álcool tóxico → fomepizol + diálise.
-- Metanol = visão; etilenoglicol = rim/oxalato.`,
+## 🏥 Quando internar/UTI
+- Dor torácica com troponina elevada, alteração eletrocardiográfica, arritmia, instabilidade hemodinâmica → internação/observação cardiológica.
+- Hipertermia grave, rabdomiólise significativa, coagulopatia, rebaixamento de consciência, convulsão ou déficit neurológico → UTI.
+- Excited delirium com necessidade de sedação repetida → monitorização contínua (risco de PCR mesmo após controle aparente).
+- Dor torácica leve, sem alteração de ECG/troponina, assintomático após algumas horas de observação → alta é possível com orientação e encaminhamento para cessação do uso.
 
-intox_cocaina: `# Intoxicação por Cocaína / Simpaticomiméticos
+## 💡 Pérolas e erros comuns
+- Benzodiazepínico em dose alta e repetida resolve a maior parte do quadro — não tenha medo de titular.
+- **Nunca usar betabloqueador puro ou misto na fase aguda** — é o erro mais citado e mais perigoso ("unopposed alpha").
+- Cefaleia thunderclap em usuário de cocaína = pensar em HSA, não só enxaqueca.
+- Dor torácica pode ser SCA mesmo em pacientes jovens e sem fatores de risco clássicos — a cocaína por si só é fator de risco.
+- Rabdomiólise e hipertermia são subestimadas — medir temperatura central e CPK em todo paciente agitado/simpaticomimético.
+- Excited delirium é uma emergência de risco vital por si só, independente da causa desencadeante.`,
 
-> Toxíndrome simpaticomimética: agitação, hipertermia, taquicardia, hipertensão; risco de **SCA, AVC, arritmia, convulsão**.
+intox_orgfos: `**Inibição irreversível da acetilcolinesterase pelos organofosforados (com "envelhecimento" da ligação) e reversível pelos carbamatos gera a crise colinérgica — a morte ocorre por broncorreia e insuficiência respiratória, e é isso que se titula com atropina.**
 
-## 🩺 Quadro
-- Agitação, midríase, diaforese, taquicardia/HAS, dor torácica, hipertermia, convulsão; rabdomiólise.
+## 🧬 Fisiopatologia
+- Organofosforados (inseticidas agrícolas, alguns agentes de guerra química) **fosforilam** o sítio ativo da acetilcolinesterase de forma covalente; com o tempo essa ligação sofre "**envelhecimento**" (aging), tornando-se irreversível — depois disso, a pralidoxima não consegue mais reativar a enzima, por isso o antídoto deve ser dado o quanto antes.
+- Carbamatos inibem a colinesterase de forma **reversível/espontânea** (a ligação se desfaz em horas), geralmente causando quadro mais breve e mais leve, mas ainda potencialmente grave.
+- O acúmulo de acetilcolina na fenda sináptica hiperestimula receptores **muscarínicos** (glândulas exócrinas, musculatura lisa, coração) e **nicotínicos** (junção neuromuscular, gânglios autonômicos) e o SNC.
+- A **broncorreia e o broncoespasmo** (efeito muscarínico) somados à **fraqueza/paralisia da musculatura respiratória** (efeito nicotínico) são a via final de óbito — insuficiência respiratória.
+
+## 🩺 Quadro clínico (toxíndrome colinérgica)
+- **Muscarínicos — mnemônico SLUDGE/DUMBELS:** salivação, lacrimejamento, sudorese, diarreia/cólica, miose (pupilas puntiformes), **broncorreia e broncoespasmo** (a manifestação mais letal), bradicardia, vômito, incontinência urinária.
+- **Nicotínicos:** fasciculações musculares, cãibras, fraqueza progressiva podendo evoluir para paralisia flácida e insuficiência respiratória; taquicardia e hipertensão (podem mascarar a bradicardia muscarínica).
+- **SNC:** ansiedade, confusão, tremor, convulsão, coma, depressão do centro respiratório.
+- Hálito característico de solvente/inseticida (odor de alho ou petróleo); pele e roupas contaminadas.
+- **Síndrome intermediária:** fraqueza muscular proximal e de pares cranianos, com insuficiência respiratória, surgindo 24–96h após aparente melhora da crise colinérgica aguda — decorre de down-regulation de receptores nicotínicos e/ou reativação insuficiente da colinesterase.
+- **Neuropatia tardia induzida por organofosforado (OPIDN):** polineuropatia sensitivo-motora que surge 1–3 semanas depois, por inibição de outra enzima (NTE), independente da crise colinérgica.
+
+## 🔍 Diagnóstico diferencial
+- Outras causas de miose + rebaixamento: intoxicação por opioide (mas sem broncorreia/fasciculação), clonidina.
+- Outras toxíndromes: colinérgica por nicotina/cogumelos muscarínicos (Inocybe, Clitocybe), gás nervoso (sarin, VX — mecanismo idêntico ao organofosforado).
+- Crise asmática/DPOC exacerbada — a broncorreia profusa e a miose associada apontam para colinérgico, não broncoespasmo primário.
+- Síndrome de Guillain-Barré (para a fraqueza tardia/síndrome intermediária).
+- Gastroenterite aguda (pela diarreia/vômito isolados, sem os outros achados).
+
+## 🧪 Diagnóstico e gravidade
+- **Clínico**, pela toxíndrome associada a história de exposição/ambiente rural, tentativa de suicídio com agrotóxico ou exposição ocupacional.
+- **Dosagem de colinesterase** (eritrocitária/plasmática) confirma e ajuda a estimar gravidade, mas não deve atrasar o tratamento.
+- **Classificação de gravidade (clínica):**
+  - *Leve:* apenas sintomas muscarínicos localizados (miose, sialorreia leve), sem repercussão respiratória/hemodinâmica.
+  - *Moderada:* sintomas muscarínicos sistêmicos (broncorreia, vômitos, diarreia, bradicardia) + fasciculações, sem insuficiência respiratória franca.
+  - *Grave:* broncorreia maciça, insuficiência respiratória, rebaixamento de consciência, convulsão, coma, colapso hemodinâmico — necessidade de via aérea avançada.
+- Gasometria, ECG (bradicardia/QT), radiografia de tórax (edema/aspiração) auxiliam a gravidade.
+
+## 💊 Tratamento (com doses)
+- **Proteção da equipe primeiro:** EPI (luvas, avental impermeável, máscara) — contaminação secundária de profissionais por contato com pele/roupas/vômito é descrita e grave.
+- **Descontaminação:** retirar toda a roupa contaminada, lavar a pele com água e sabão em abundância; irrigação ocular se exposição ocular.
+- **Via aérea e oxigênio** precocemente — aspirar secreções continuamente; considerar intubação precoce se broncorreia maciça ou rebaixamento (evitar succinilcolina, pois é metabolizada pela colinesterase — ação prolongada).
+- **Atropina** — antagoniza os efeitos muscarínicos (não os nicotínicos): dose inicial **1–2 mg IV** (adulto) ou **0,02–0,05 mg/kg IV** (criança), **dobrando a dose a cada 5 minutos** se não houver resposta, até atropinização adequada. **O alvo é o controle das secreções pulmonares/broncorreia** (e não a midríase ou a frequência cardíaca) — doses cumulativas podem chegar a dezenas de miligramas nos casos graves; manter infusão contínua (10–20% da dose de atropinização por hora) após o controle inicial.
+- **Pralidoxima (reativador da colinesterase)** — indicada no organofosforado (não tem papel comprovado no carbamato isolado, mas pode ser mantida se houver dúvida diagnóstica): dose de ataque **30 mg/kg IV em 30 minutos** (adulto, tipicamente 1–2 g), podendo repetir em 1 hora se necessário, seguida de **infusão contínua de 8 mg/kg/h** por até 7 dias ou até resolução dos sinais nicotínicos; em crianças, **20–50 mg/kg** de ataque seguido de **5–10 mg/kg/h**. Quanto mais precoce, maior a chance de reativar a enzima antes do "envelhecimento" da ligação.
+- **Convulsão:** benzodiazepínico (diazepam ou midazolam) em dose plena.
+- Suporte hemodinâmico e ventilatório conforme necessário; monitorar eletrólitos (hipocalemia é comum).
+
+## 🏥 Quando internar/UTI
+- Todo paciente sintomático deve ser observado por pelo menos 24h pelo risco de síndrome intermediária.
+- Broncorreia importante, necessidade de atropinização repetida/infusão contínua, insuficiência respiratória, rebaixamento de consciência, convulsão ou instabilidade hemodinâmica → UTI com suporte ventilatório disponível.
+- Ingestão intencional (tentativa de suicídio) → internação + avaliação psiquiátrica obrigatória, independente da gravidade inicial.
+
+## 💡 Pérolas e erros comuns
+- **A morte é por broncorreia/insuficiência respiratória** — titule a atropina pelo controle das secreções pulmonares, não pela frequência cardíaca ou pelo tamanho da pupila.
+- Doses de atropina muito maiores que as "habituais" costumam ser necessárias e são seguras nesse contexto — não subdosar por medo de taquicardia/midríase.
+- Proteja a equipe: contaminação secundária por contato com roupas/vômito do paciente é um erro recorrente em pronto-socorro.
+- Pralidoxima funciona melhor quanto mais cedo é administrada — não atrasar esperando confirmação laboratorial.
+- Não confundir melhora inicial com cura: vigiar a síndrome intermediária (24–96h depois) e orientar sobre a neuropatia tardia (1–3 semanas depois).`,
+
+intox_co: `**O monóxido de carbono é um gás incolor e inodoro que se liga à hemoglobina com afinidade cerca de 200 a 250 vezes maior que o oxigênio, causando hipóxia tecidual grave mesmo com SpO₂ do oxímetro comum falsamente normal.**
+
+## 🧬 Fisiopatologia
+- O CO liga-se à hemoglobina formando **carboxiemoglobina (COHb)**, com afinidade ~200–250x maior que a do O₂, deslocando o oxigênio da molécula e **desviando a curva de dissociação da oxi-hemoglobina para a esquerda** — o pouco O₂ que resta fica mais preso à hemoglobina, dificultando sua liberação para os tecidos (efeito Haldane).
+- O CO também se liga diretamente à **mioglobina e às enzimas mitocondriais (citocromo c oxidase)**, prejudicando a respiração celular independente da COHb — por isso a gravidade clínica nem sempre é proporcional ao nível de COHb medido.
+- Gera lesão por **estresse oxidativo e inflamação** (peroxidação lipídica, adesão leucocitária, desmielinização), o que explica a **síndrome neurológica tardia** (dias a semanas após exposição aparentemente resolvida): alterações cognitivas, de personalidade, parkinsonismo.
+- Os órgãos mais sensíveis à hipóxia (cérebro e coração) são os mais afetados — isquemia miocárdica e encefalopatia são as complicações mais temidas.
+- **A oximetria de pulso convencional não diferencia COHb de oxi-hemoglobina** e mostra SpO₂ falsamente normal/elevada — só a co-oximetria (gasometria) mede COHb corretamente.
+
+## 🩺 Quadro clínico
+- **Leve/moderado:** cefaleia (sintoma mais comum), náusea, vômito, tontura, mal-estar tipo "gripal", visão turva — facilmente confundido com virose, especialmente no inverno (uso de aquecedores/lareiras/chuveiro a gás em ambiente fechado).
+- **Grave:** confusão, síncope, ataxia, dor torácica/isquemia miocárdica, arritmia, convulsão, coma, edema pulmonar, choque, óbito.
+- **Achado epidemiológico-chave:** múltiplas pessoas (ou animais de estimação) no mesmo ambiente com sintomas semelhantes e simultâneos — forte pista para CO, especialmente em espaços fechados com combustão (motor em garagem, gerador, carvão, aquecedor a gás, incêndio).
+- Pele "vermelho-cereja" é um achado clássico de livro-texto, mas **raro e tardio** — sua ausência não exclui o diagnóstico.
+- Gestantes: feto é mais vulnerável (hemoglobina fetal tem maior afinidade pelo CO e eliminação mais lenta) — sofrimento fetal pode ocorrer mesmo com COHb materna moderada.
+
+## 🔍 Diagnóstico diferencial
+- Outras causas de cefaleia + náusea + confusão em grupo: intoxicação alimentar, gripe/virose comum (mas sem o padrão "melhora ao sair de casa, piora ao voltar"), outros gases asfixiantes (CO₂, cianeto — considerar exposição concomitante em incêndios), meningite.
+- Síndrome coronariana aguda primária (o CO pode causar isquemia real, mas também mimetizar/descompensar quadro cardíaco de base).
+- AVC/encefalopatia de outras causas quando há déficit focal ou rebaixamento predominante.
+- Enxaqueca, labirintite (nos quadros leves inespecíficos).
 
 ## 🧪 Exames complementares
 | Exame | Objetivo |
 | --- | --- |
-| ECG, troponina | SCA/arritmia |
-| CPK, função renal | Rabdomiólise |
-| Temperatura | Hipertermia |
+| Gasometria arterial/venosa com **co-oximetria (COHb)** | Diagnóstico e nível de exposição |
+| ECG e troponina seriados | Isquemia miocárdica/arritmia |
+| Lactato | Marcador de gravidade da hipóxia tecidual |
+| Glicemia, função renal, CPK | Rabdomiólise, diferenciais |
+| TC/RM de crânio | Se rebaixamento importante ou déficit focal, avaliar edema/lesão em núcleos da base (globo pálido) |
+| Beta-hCG | Toda mulher em idade fértil (define urgência de HBO) |
+
+## 🩹 Classificação de gravidade
+- Não existe corte único de COHb que defina gravidade isoladamente — a correlação entre nível e sintomas é imperfeita — mas orienta a decisão:
+  - **Leve:** COHb até ~10–15%, sintomas inespecíficos (cefaleia, náusea), sem alteração neurológica/cardíaca.
+  - **Moderada:** COHb ~15–25% ou sintomas mais definidos (confusão leve, dor torácica sem alteração isquêmica).
+  - **Grave:** perda de consciência (mesmo transitória), déficit neurológico focal, convulsão, coma, isquemia miocárdica/arritmia, acidose metabólica significativa, ou COHb muito elevada (geralmente >25%, >20% em gestante) — indicação forte de terapia hiperbárica.
+- Tabagistas têm COHb basal mais alta (até 5–10%), o que deve ser considerado na interpretação.
 
 ## 💊 Tratamento (com doses)
-- **Benzodiazepínico** é a base (controla agitação, HAS, taquicardia, convulsão) — titular.
-- **Dor torácica/SCA:** benzodiazepínico + nitrato/BCC; **EVITAR betabloqueador** (estímulo alfa sem oposição).
-- Resfriamento ativo na hipertermia; hidratação (rabdomiólise); manejar arritmia.
+- **Remoção imediata da fonte** de exposição e do ambiente contaminado.
+- **Oxigênio a 100% em máscara não reinalante** (ou ventilação mecânica com FiO₂ 100% se intubado) para todo paciente com suspeita/confirmação — reduz a meia-vida da COHb de ~4–6h (ar ambiente) para **~60–90 minutos**. Manter até normalização da COHb e resolução dos sintomas (geralmente algumas horas).
+- **Oxigenoterapia hiperbárica (HBO₂)** reduz a meia-vida da COHb para ~20–30 minutos e diminui a incidência de sequela neurológica cognitiva tardia. Segundo o posicionamento da UHMS (2019), deve ser **considerada em todo caso de intoxicação sintomática por CO**, sendo formalmente indicada nos casos graves: perda de consciência (mesmo transitória), déficit neurológico ou alteração cognitiva, isquemia miocárdica/arritmia, acidose metabólica importante, gestante (limiar mais baixo, pelo risco fetal), ou COHb muito elevada — quanto menor o intervalo entre exposição e a câmara, maior o benefício.
+- Suporte hemodinâmico, tratamento de arritmia e de convulsão conforme protocolo geral; hidratação se rabdomiólise associada.
+- Se suspeita de exposição a fumaça de incêndio em ambiente fechado, considerar **coexposição a cianeto** (acidose lática desproporcional, instabilidade hemodinâmica refratária a O₂) e tratar empiricamente com hidroxocobalamina se alta suspeita.
 
-## 💡 Pérolas
-- Benzodiazepínico resolve a maior parte.
-- NÃO usar betabloqueador (HAS paradoxal por alfa sem oposição).`,
+## 🏥 Quando internar/UTI
+- Qualquer perda de consciência, déficit neurológico, convulsão, isquemia miocárdica/arritmia, acidose metabólica significativa ou gestante com exposição relevante → internação, com UTI se instabilidade ou necessidade de HBO₂ com suporte intensivo.
+- Casos leves, assintomáticos após oxigenoterapia e COHb normalizada, sem gestação → alta é possível, com orientação sobre risco de síndrome neurológica tardia (retornar se surgirem alterações cognitivas/comportamentais em 2–6 semanas) e investigação da fonte de exposição antes de retornar ao ambiente.
 
-intox_orgfos: `# Intoxicação por Organofosforado / Carbamato
+## 💡 Pérolas e erros comuns
+- **SpO₂ normal no oxímetro comum NÃO exclui intoxicação por CO** — é o erro mais perigoso; sempre dosar COHb por co-oximetria/gasometria quando houver suspeita.
+- Múltiplas pessoas com sintomas "gripais" simultâneos no mesmo ambiente fechado = pensar em CO até prova em contrário.
+- Pele vermelho-cereja é achado tardio e raro — não esperar por ele para suspeitar.
+- O₂ a 100% é o tratamento inicial obrigatório em todos; a câmara hiperbárica deve ser considerada em todo sintomático e é formalmente indicada nos graves e nas gestantes.
+- Orientar todo paciente sobre a possibilidade de sintomas neuropsiquiátricos tardios, mesmo após alta aparentemente assintomática.`,
 
-> Inibição da acetilcolinesterase → **crise colinérgica** (inseticidas/agrotóxicos).
+mordedura_anim: `**Toda mordedura animal exige avaliação simultânea de duas frentes: o risco infeccioso local da ferida e o risco de raiva, doença de letalidade praticamente de 100% após início dos sintomas — por isso a profilaxia antirrábica nunca pode ser adiada.**
 
-## 🩺 Quadro (toxíndrome colinérgica)
-- **Muscarínicos (SLUDGE):** sialorreia, lacrimejamento, diarreia, miose, **broncorreia/broncoespasmo**, bradicardia, vômito. **Nicotínicos:** fasciculações, fraqueza, taquicardia. SNC: convulsão, coma. Hálito de inseticida.
+## 🧬 Fisiopatologia e mecanismo do risco
+- A saliva de cães, gatos e morcegos contém flora polimicrobiana (aeróbia e anaeróbia) que contamina a ferida por inoculação direta — mordidas por gato, por terem dentes finos e perfurantes, causam lesões puntiformes profundas com alto risco de infecção apesar da aparência benigna.
+- O vírus da raiva (Lyssavirus) presente na saliva do animal infectado penetra pela ferida e migra por via **axonal retrógrada** até o SNC — o intervalo entre exposição e sintomas (período de incubação, tipicamente semanas a meses, podendo variar de dias a anos) é a **janela terapêutica** em que a profilaxia pós-exposição (vacina ± imunoglobulina) ainda pode impedir a doença; uma vez estabelecidos os sintomas neurológicos, a letalidade é próxima de 100%.
+- A imunoglobulina/soro antirrábico fornece **imunidade passiva imediata** infiltrada ao redor da ferida (neutraliza o vírus localmente, antes que ele alcance terminações nervosas), enquanto a vacina induz **imunidade ativa** que só atinge títulos protetores após alguns dias — por isso os dois se complementam nos casos graves.
 
-## ✅ Diagnóstico
-- Clínico (toxíndrome + exposição); dosagem de colinesterase apoia.
+## 🩺 Avaliação inicial
+- **Tipo e localização da mordida:** face, mãos, pescoço e genitália têm maior risco (rica inervação = raiva mais rápida; e maior risco funcional/estético da infecção); mordidas profundas/puntiformes (gato) vs. lacerações (cão).
+- **Espécie do animal:** cão e gato domiciliados vs. animal de rua; **morcego** (sempre considerado exposição grave, mesmo sem mordida evidente, pelo risco de contato não percebido); animais silvestres (macaco, raposa, gambá) e herbívoros também transmitem raiva no Brasil.
+- **Estado vacinal do animal agressor** e possibilidade de observação (cão/gato domiciliado, saudável, passível de observação por 10 dias).
+- **Circunstância da agressão:** mordida provocada (menor risco, comportamento defensivo) vs. não provocada/espontânea (maior suspeita de raiva).
+- **Tempo decorrido** desde a mordida (define se ainda há benefício de lavagem/infiltração de soro) e **estado vacinal prévio da vítima** (esquema completo anterior muda o protocolo).
 
-## 💊 Tratamento (com doses)
-- **EPI** (proteger a equipe) + descontaminação (retirar roupas, lavar a pele).
-- **Atropina** em dose alta e crescente (ex.: 2 mg IV, **dobrar a cada 5 min**) até atropinização — **alvo = controlar as secreções pulmonares/broncorreia**.
-- **Pralidoxima** (reativador da colinesterase) no organofosforado.
-- Suporte ventilatório; benzodiazepínico para convulsão.
+## 🔍 Diagnóstico diferencial
+- **Mordedura humana** (inclusive lesão em "soco fechado" contra dentes de outra pessoa) — flora oral humana (incluindo Eikenella corrodens) exige antibiótico profilático mais amplo e tem alto risco de infecção articular/tendínea; não há profilaxia antirrábica indicada.
+- Arranhadura de gato sem mordida — considerar doença da arranhadura do gato (Bartonella) se linfadenopatia regional evoluir dias depois.
+- Picada de inseto/aracnídeo confundida com mordedura pequena.
+- Ferida por corpo estranho/trauma penetrante sem etiologia animal clara.
 
-## 💡 Pérolas
-- A morte é por broncorreia/insuficiência respiratória → titular atropina pelas secreções pulmonares.
-- Proteger a equipe (contaminação secundária).`,
-
-intox_co: `# Intoxicação por Monóxido de Carbono (CO)
-
-> Gás incolor e inodoro (combustão — incêndio, aquecedor, motor) → carboxiemoglobina → hipóxia tecidual. **A SpO₂ do oxímetro comum é falsamente normal.**
-
-## 🩺 Quadro
-- Cefaleia, náusea, tontura, confusão; grave: síncope, convulsão, coma, isquemia miocárdica. Suspeitar com múltiplas vítimas no mesmo ambiente.
-
-## 🧪 Exames complementares
-| Exame | Objetivo |
-| --- | --- |
-| Gasometria com co-oximetria (COHb) | Diagnóstico |
-| ECG, troponina | Isquemia |
-| Lactato | Gravidade |
-
-## 💊 Tratamento (com doses)
-- **Oxigênio a 100%** (máscara não reinalante) — reduz a meia-vida da COHb; manter até COHb baixa/assintomático.
-- **Oxigenoterapia hiperbárica** em casos selecionados (rebaixamento, isquemia, gestante, COHb muito alta) — reduz sequela neurológica.
-
-## 💡 Pérolas
-- SpO₂ normal NÃO exclui — dosar COHb.
-- O₂ a 100% é o tratamento; considerar câmara hiperbárica nos graves.`,
-
-mordedura_anim: `# Mordedura Animal — abordagem e raiva
-
-> Risco de infecção da ferida + necessidade de **profilaxia antirrábica e antitetânica**.
-
-## 🩺 Avaliação
-- Tipo/local da mordida, animal (cão/gato/morcego/silvestre), estado vacinal do animal e da vítima, tempo decorrido.
+## ☣️ Classificação de risco de exposição (esquema do MS)
+- **Contato indireto** (manipulação de utensílios, lambedura de pele íntegra): **não requer profilaxia**.
+- **Acidente leve:** ferimentos superficiais, únicos, em tronco/membros (exceto mãos/polpas digitais/planta), causados por cão/gato sem sinais de raiva no momento da agressão → **observar o animal por 10 dias**; se o animal permanecer sadio, não é necessário vacinar (ou interromper esquema já iniciado); se o animal adoecer/morrer/desaparecer, iniciar/completar o esquema.
+- **Acidente grave:** ferimentos na cabeça, face, pescoço, mãos, polpas digitais e planta dos pés; lesões múltiplas ou profundas; lambedura de mucosas; qualquer mordida por **morcego** (sempre grave, independente do local/gravidade aparente) ou por animal silvestre → **vacina + soro/imunoglobulina antirrábica**, sem aguardar observação do animal.
+- Animal de rua/desconhecido ou impossível de observar → tratar como acidente grave/indeterminado conforme gravidade da lesão.
 
 ## 💊 Manejo da ferida (com doses)
-- **Lavagem abundante** com água e sabão (reduz a raiva); desbridamento; em geral **não suturar** (ou fechamento tardio).
-- **Antibiótico profilático** (amoxicilina-clavulanato) em mordidas de gato, mão/face, profundas ou imunossuprimido (cobrir Pasteurella).
-- **Profilaxia antitetânica** conforme a vacinação.
+- **Lavagem abundante e imediata com água corrente e sabão** por vários minutos — reduz mecanicamente a carga viral do vírus rábico no local e diminui a chance de infecção bacteriana; é a medida isolada mais custo-efetiva.
+- Desbridamento de tecido desvitalizado; irrigação com soro fisiológico.
+- Em geral, **não suturar primariamente** feridas por mordedura (risco infeccioso alto), especialmente mão e punção de gato; considerar fechamento primário apenas em feridas de face bem lavadas e precoces (<6–12h), por motivo estético, ou fechamento tardio (após 3–5 dias) nas demais.
+- **Antibiótico profilático (amoxicilina-clavulanato)** indicado em: mordida de gato, localização em mão/punho/face/próxima a articulação ou osso, ferida profunda/por esmagamento, paciente imunossuprimido/asplênico/diabético/hepatopata, mordida com >8h de evolução ou já com sinais de infecção — cobre a flora mista incluindo *Pasteurella multocida* (típica do gato) e anaeróbios; alternativa em alérgicos a penicilina: clindamicina + fluoroquinolona (ou sulfametoxazol-trimetoprima).
+- **Profilaxia antitetânica** conforme situação vacinal: esquema incompleto/desconhecido → iniciar/completar vacina dT e considerar imunoglobulina antitetânica se ferida de alto risco (profunda, contaminada) e vacinação incerta/ausente.
 
-## ☣️ Profilaxia antirrábica (esquema do MS)
-- Conforme a gravidade da exposição e o animal: **vacina** ± **soro/imunoglobulina antirrábica** (infiltrar na ferida) nos acidentes graves (morcego é sempre grave). Observar cão/gato sadio por 10 dias quando possível.
+## ☣️ Profilaxia antirrábica — esquema completo do Ministério da Saúde
+- **Esquema de vacina pós-exposição (vacina de cultivo celular):** **4 doses**, aplicadas por via intramuscular (deltoide ou vasto lateral da coxa em crianças pequenas), nos **dias 0, 3, 7 e 14** — não é mais necessária a 5ª dose (dia 28), que era usada em esquemas antigos e permanece reservada a situações especiais (ex.: imunossuprimidos).
+- **Soro/imunoglobulina antirrábica**, indicada nos acidentes graves, junto com a 1ª dose de vacina:
+  - **Imunoglobulina humana antirrábica (IGHAR):** **20 UI/kg**.
+  - **Soro antirrábico heterólogo (equino, SAR):** **40 UI/kg**.
+  - **Infiltrar a maior parte da dose ao redor e dentro da ferida** (o local de maior concentração viral); o volume restante, se sobrar após infiltração completa de todas as lesões, pode ser aplicado IM em local diferente da vacina.
+  - Deve ser administrado preferencialmente no **dia 0** (junto com a 1ª dose de vacina); se não disponível de imediato, pode ser aplicado **até o 7º dia** após a 1ª dose de vacina — **após esse prazo está contraindicado**, pois a resposta imune ativa à vacina já está se estabelecendo.
+- **Reexposição** (pessoa já vacinada previamente e mordida novamente): esquema reduzido, geralmente 2 doses (dias 0 e 3), sem necessidade de soro, se o esquema anterior foi completo e dentro do prazo — confirmar no protocolo local/CRIE.
+- Observação do cão/gato agressor por **10 dias**: se permanecer saudável, encerra o risco e permite não iniciar (ou suspender) a profilaxia nos acidentes leves.
 
-## 💡 Pérolas
-- Lavar muito a ferida (reduz a carga viral da raiva).
-- Morcego = exposição grave → vacina + soro.`,
+## 🏥 Quando internar/UTI
+- Sinais de infecção sistêmica (celulite extensa, sepse, fasciíte), necessidade de exploração/limpeza cirúrgica extensa (mão, face grave), amputação ou lesão de estrutura nobre (tendão, nervo, vaso, articulação).
+- Paciente imunossuprimido com ferida extensa ou sinais de infecção.
+- Sintomas neurológicos sugestivos de raiva já instalada (encefalite/hidrofobia) → isolamento e cuidados paliativos em UTI — não há tratamento curativo eficaz uma vez estabelecido o quadro clínico.
+- A maioria dos casos é manejada ambulatorialmente (limpeza + profilaxia + antibiótico + retorno para completar o esquema vacinal).
+
+## 💡 Pérolas e erros comuns
+- **Lavar muito e bem a ferida** é a medida que mais reduz a carga viral da raiva — não pular essa etapa mesmo em pronto atendimento cheio.
+- **Morcego = sempre exposição grave** (vacina + soro), mesmo sem lesão visível ou com contato aparentemente trivial.
+- Não suturar mordedura de gato/mão sem necessidade — o fechamento primário nessas feridas aumenta o risco de infecção grave.
+- Erro comum: esquecer de infiltrar a imunoglobulina/soro na ferida (aplicar só IM em outro local reduz muito a eficácia).
+- Não perder o prazo — soro após o 7º dia da 1ª dose de vacina perde a indicação; a vacina, por outro lado, deve seguir o cronograma 0/3/7/14 sem atraso.
+- Sempre verificar tétano junto com a raiva — são profilaxias independentes e ambas costumam ser esquecidas quando a atenção vai só para a raiva.`,
 
 picada_aranha: `# Araneísmo (Picada de Aranha)
 
@@ -5414,158 +5581,395 @@ sd_compart: `# Síndrome Compartimental Aguda
 - Dor desproporcional + dor à extensão passiva = operar (não esperar a ausência de pulso, que é tardia).
 - NÃO elevar o membro (piora a perfusão).`,
 
-politrauma: `# Politrauma — ATLS
+politrauma: `**Politraumatizado.** Paciente com lesões traumáticas múltiplas, envolvendo dois ou mais sistemas/órgãos, com potencial risco à vida — a principal causa de morte evitável em adultos jovens no Brasil. O manejo segue a abordagem sistemática do ATLS (Advanced Trauma Life Support), com avaliação primária, reanimação simultânea e reavaliação contínua; a **hemorragia não controlada** é a causa mais comum de morte evitável nas primeiras horas.
 
-> Trauma com lesões múltiplas/potencialmente fatais. Abordagem sistemática **ABCDE** + reavaliação contínua.
+## 🩸 Fisiopatologia e mecanismo
 
-## 🚑 Avaliação primária (ABCDE)
-- **A** — via aérea + **proteção da coluna cervical** (colar); via aérea definitiva se rebaixamento/obstrução.
-- **B** — respiração: O₂; descartar pneumotórax hipertensivo/aberto e hemotórax maciço.
-- **C** — circulação: controlar hemorragia externa, 2 acessos calibrosos, **cristaloide** + transfusão precoce; FAST/pelve.
-- **D** — neurológico: Glasgow, pupilas, glicemia.
-- **E** — exposição: despir, prevenir hipotermia.
+- **Tríade letal:** hipotermia + acidose + coagulopatia — cada uma agrava as outras num círculo vicioso que piora o sangramento e a mortalidade. Prevenir hipotermia (cobertores, fluidos aquecidos) e corrigir acidose/coagulopatia precocemente é tão importante quanto estancar o sangramento.
+- **Mecanismo de lesão** orienta a suspeita: trauma contuso (colisão, queda, atropelamento) tende a lesão de múltiplos órgãos e hemorragia interna; trauma penetrante (arma de fogo, arma branca) tem trajetória previsível e maior necessidade de exploração cirúrgica.
+- Energia cinética e desaceleração predizem lesões associadas (ex.: lesão aórtica em desaceleração súbita, lesão de víscera oca em cinto de segurança mal posicionado).
+
+## 🚑 Avaliação primária (ABCDE / xABCDE)
+
+A edição mais recente do ATLS (11ª edição, 2025) reforça o controle imediato de **hemorragia exsanguinante externa** antes mesmo da via aérea em cenários de sangramento maciço visível — daí a nomenclatura **xABCDE** (X de eXsanguinating hemorrhage), com uso precoce de torniquete/compressão direta já no primeiro contato.
+
+- **X — Hemorragia exsanguinante:** torniquete ou compressão direta imediata se sangramento maciço de extremidade, antes de prosseguir.
+- **A — Via aérea + proteção da coluna cervical:** colar cervical, manobras de elevação do mento/tração da mandíbula sem hiperextensão; via aérea definitiva (intubação orotraqueal, cricotireoidostomia) se Glasgow ≤ 8, obstrução ou risco de broncoaspiração.
+- **B — Respiração:** oxigênio suplementar, inspeção/ausculta/percussão do tórax; descartar e tratar de imediato **pneumotórax hipertensivo** (descompressão com agulho/toracostomia), **pneumotórax aberto** (curativo de 3 pontas) e **hemotórax maciço** (drenagem + reposição volêmica).
+- **C — Circulação:** controle de hemorragia externa (compressão, torniquete, curativo hemostático), dois acessos venosos calibrosos (14–16G), **cristaloide aquecido** em bolus criterioso e **transfusão precoce** em choque; FAST/e-FAST e RX de pelve para localizar sangramento oculto (tórax, abdome, retroperitôneo/pelve, ossos longos, externo).
+- **D — Neurológico:** escala de Glasgow, tamanho/reatividade pupilar, sinais de lateralização, glicemia capilar (hipoglicemia mimetiza rebaixamento).
+- **E — Exposição:** despir completamente, inspecionar dorso (rolamento em bloco), e **prevenir hipotermia** ativamente assim que a exposição terminar.
+
+## 🔍 Diagnóstico diferencial da instabilidade
+
+Nem toda hipotensão no politrauma é hemorrágica — pesquisar ativamente:
+
+- **Pneumotórax hipertensivo:** turgência jugular, desvio de traqueia, hipertimpanismo, murmúrio abolido unilateral.
+- **Tamponamento cardíaco:** tríade de Beck (hipotensão, turgência jugular, bulhas abafadas), FAST subxifoide positivo.
+- **Lesão medular alta (choque neurogênico):** hipotensão **sem** taquicardia compensatória (pode haver bradicardia), pele quente/seca abaixo da lesão — diferente do choque hipovolêmico (pele fria, taquicárdica).
+- **IAM/arritmia como causa do trauma** (ex.: colisão por síncope prévia) — ECG de rotina em politrauma significativo.
+- **Intoxicação exógena associada** (álcool, drogas) que altera o exame neurológico.
+
+## 🩺 Classificação de gravidade
+
+- Classes de choque hemorrágico (I a IV) orientam a estimativa de perda volêmica e a resposta à reposição (ver conduta "Choque hipovolêmico/hemorrágico").
+- Escores de gravidade (ISS, RTS) são usados em triagem e prognóstico, mas **não devem atrasar a reanimação**.
+- Trauma cranioencefálico (TCE) associado: classificar por Glasgow — leve (13–15), moderado (9–12), grave (≤ 8) — define necessidade de via aérea definitiva e TC de crânio imediata.
+- **Pelve instável** ao exame (compressão ântero-posterior/lateral positiva, encurtamento de membro): suspeitar de fratura pélvica complexa com hemorragia retroperitoneal maciça.
 
 ## 🧪 Exames complementares
+
 | Exame | Objetivo |
 | --- | --- |
-| FAST / e-FAST | Líquido livre, pneumotórax |
-| RX de tórax e pelve | Lesões com risco de vida |
-| TC (estável) | Mapear lesões |
-| Tipagem, gasometria/lactato | Transfusão/perfusão |
+| FAST / e-FAST | Líquido livre peritoneal/pericárdico, pneumotórax |
+| RX de tórax e de pelve | Triagem rápida de lesões com risco de vida |
+| TC de corpo inteiro (se estável) | Mapeamento completo das lesões |
+| Tipagem sanguínea + prova cruzada, gasometria/lactato | Guiar transfusão e monitorar perfusão/resposta |
+| Coagulograma, cálcio iônico | Rastrear coagulopatia induzida pelo trauma |
 
-## 💊 Pontos-chave (com doses)
-- **Hemorragia:** controle + **protocolo de transfusão maciça** (hemácias:plasma:plaquetas ~1:1:1); **ácido tranexâmico 1 g** (em ≤ 3h) → 1 g em 8h.
-- **Hipotensão permissiva** até o controle cirúrgico (exceto TCE).
-- Analgesia; profilaxia antitetânica; cirurgia precoce do foco hemorrágico.
+## 💊 Conduta com doses
 
-## 💡 Pérolas
-- "Choque no trauma é hemorrágico até prova em contrário."
-- Ácido tranexâmico precoce (≤ 3h) reduz mortalidade.`,
+- **Controle de hemorragia:** compressão direta, torniquete em extremidade, curativo hemostático; **protocolo de transfusão maciça** com relação hemácias:plasma:plaquetas próxima de **1:1:1** no choque hemorrágico grave.
+- **Ácido tranexâmico 1 g IV** em bolus lento (10 min) nas primeiras **3 horas** do trauma, seguido de **1 g IV em infusão ao longo de 8 horas** — reduz mortalidade por hemorragia; sem benefício comprovado (e possível dano) após 3h.
+- **Hipotensão permissiva** (PAS-alvo ~80–90 mmHg / palpação de pulso radial) até o controle cirúrgico do foco hemorrágico — **exceto** em TCE associado, onde se deve manter PAS ≥ 100–110 mmHg para preservar a pressão de perfusão cerebral.
+- **TCE grave:** cabeceira elevada 30°, normocapnia (evitar hiper/hipoventilação), evitar hipotensão e hipóxia (os dois principais agravantes secundários), neurocirurgia/TC urgente; considerar solução hipertônica (salina 3%) ou manitol se sinais de herniação.
+- **Pelve instável:** estabilização externa precoce com cinta pélvica (na altura dos trocânteres), evitar mobilização excessiva; angioembolização ou packing pélvico se sangramento persistente apesar da estabilização.
+- Analgesia adequada (opioides titulados), profilaxia antitetânica conforme status vacinal, cirurgia precoce do foco hemorrágico (damage control surgery quando indicado).
 
-choque_hipov: `# Choque Hipovolêmico / Hemorrágico
+## 🏥 Quando internar / UTI
 
-> Hipoperfusão por perda de volume (hemorragia, perdas GI, queimadura). Reconhecer cedo — taquicardia precede a hipotensão.
+- Todo politrauma com instabilidade hemodinâmica, necessidade de transfusão, TCE moderado/grave, lesão de via aérea/tórax com repercussão, ou pelve instável → **UTI**.
+- Observação hospitalar mesmo em pacientes inicialmente estáveis se mecanismo de alta energia, exame abdominal duvidoso, ou lesões que podem se manifestar tardiamente (lesão de víscera oca, contusão pulmonar evolutiva).
+- Reavaliação seriada é mandatória — a avaliação primária deve ser repetida a cada deterioração clínica.
 
-## 🩺 Classes (hemorragia)
-- I (< 15%): taquicardia leve. II (15–30%): taquicardia, ↑ FR, ↓ pressão de pulso. III (30–40%): hipotensão, confusão. IV (> 40%): grave, letárgico.
+## 💡 Pérolas e erros comuns
+
+- "Choque no trauma é hemorrágico até prova em contrário" — procurar ativamente a fonte antes de atribuir a outra causa.
+- Ácido tranexâmico só funciona se dado **cedo** (≤ 3h); fora dessa janela, não repor.
+- Erro comum: excesso de cristaloide antes do controle da hemorragia — dilui fatores de coagulação e piora a tríade letal; priorizar sangue e controle cirúrgico.
+- Erro comum: esquecer de prevenir hipotermia durante o exame (fase "E") — cobrir o paciente assim que a exposição terminar.
+- Não confundir choque neurogênico (lesão medular, bradicárdico/pele quente) com choque hipovolêmico (taquicárdico/pele fria) — tratamento é diferente.
+- Reavaliação contínua do ABCDE após qualquer intervenção ou mudança do quadro.`,
+
+choque_hipov: `**Choque hipovolêmico/hemorrágico.** Estado de hipoperfusão tecidual decorrente de perda significativa de volume intravascular — hemorragia (a causa mais comum e mais tempo-dependente), perdas gastrointestinais, queimaduras extensas ou terceiro espaço. Reconhecer precocemente é crítico: a **taquicardia compensatória antecede a queda da pressão arterial**, e esperar a hipotensão para agir é reconhecer o choque tarde demais.
+
+## 🩸 Fisiopatologia
+
+- A perda de volume circulante reduz o retorno venoso e o débito cardíaco; mecanismos compensatórios (taquicardia, vasoconstrição periférica, redistribuição de fluxo para órgãos nobres) mantêm a pressão arterial até que a perda seja significativa (~30%), quando a compensação falha e a pressão despenca.
+- A hipoperfusão sustentada leva a metabolismo anaeróbico, acidose lática, disfunção de órgãos e, se hemorrágico, à **tríade letal** (hipotermia + acidose + coagulopatia), que se autoalimenta e agrava o sangramento.
+- Na hemorragia, a coagulopatia pode já estar presente **antes** da reposição volêmica (coagulopatia induzida pelo trauma), por consumo de fatores e hipoperfusão — reforça a importância de hemocomponentes precoces em vez de apenas cristaloide.
+
+## 🩺 Apresentação clínica e classes de gravidade
+
+- **Classe I (perda < 15%, ~< 750 mL):** taquicardia leve ou ausente, PA normal — quase assintomático.
+- **Classe II (15–30%, ~750–1500 mL):** taquicardia, taquipneia, **redução da pressão de pulso** (diastólica sobe antes da sistólica cair) — sinal precoce mais sensível que a PA isolada.
+- **Classe III (30–40%, ~1500–2000 mL):** hipotensão franca, confusão mental, oligúria — já indica hemorragia grave com necessidade de transfusão.
+- **Classe IV (> 40%, > 2000 mL):** choque descompensado, letargia/inconsciência, pele fria e pegajosa, pulsos filiformes — risco iminente de parada.
+- Sinais adicionais: extremidades frias e pálidas, enchimento capilar lentificado, oligúria (< 0,5 mL/kg/h), alteração do nível de consciência progressiva.
+
+## 🔍 Diagnóstico diferencial
+
+- **Choque distributivo** (séptico, anafilático, neurogênico) — geralmente com extremidades quentes (exceto neurogênico) e sem foco hemorrágico evidente.
+- **Choque cardiogênico** — turgência jugular, estertores pulmonares, história de cardiopatia; ecocardiograma à beira-leito ajuda a diferenciar.
+- **Choque obstrutivo** (tamponamento, pneumotórax hipertensivo, TEP maciço) — turgência jugular, bulhas abafadas ou assimetria torácica.
+- Em politraumatizados, sempre excluir causas não hemorrágicas de hipotensão (ver conduta "Politrauma") antes de atribuir tudo à perda volêmica.
+- Fonte hemorrágica oculta: tórax, abdome, retroperitôneo/pelve, ossos longos — "sangue no chão e mais quatro lugares" é a mnemônica clássica do ATLS.
 
 ## 🧪 Exames complementares
+
 | Exame | Objetivo |
 | --- | --- |
-| Lactato, gasometria | Perfusão/gravidade |
-| Hemograma, tipagem | Transfusão |
-| FAST / EDA / imagem | Fonte |
+| Lactato, gasometria arterial | Gravidade da hipoperfusão e resposta ao tratamento |
+| Hemograma, tipagem sanguínea + prova cruzada | Definir necessidade e disponibilidade de transfusão |
+| Coagulograma, fibrinogênio, cálcio iônico | Rastrear coagulopatia induzida pelo trauma/consumo |
+| FAST / EDA / angio-TC (conforme suspeita) | Localizar a fonte de sangramento |
 
-## 💊 Tratamento (com doses)
-- **Controle da fonte** (compressão, cirurgia, endoscopia) — prioridade.
-- 2 acessos calibrosos; **cristaloide** inicial e **transfusão precoce** (protocolo maciço 1:1:1 na hemorragia grave); **ácido tranexâmico** no trauma.
-- **Hipotensão permissiva** até o controle (exceto TCE); evitar excesso de cristaloide.
+## 💊 Tratamento com doses
 
-## 💡 Pérolas
-- Taquicardia + estreitamento da pressão de pulso = choque precoce.
-- Controlar a fonte > infundir volume; sangue, não só cristaloide.`,
+- **Controle da fonte é prioridade absoluta** — compressão direta, torniquete em extremidade (aplicado o mais precocemente possível em hemorragia exsanguinante, antes até de acessos venosos, se necessário), cirurgia, angioembolização ou endoscopia conforme o foco. Volume sem controle da fonte é "encher um balde furado".
+- Dois acessos venosos calibrosos (14–16G); se acesso periférico difícil, considerar via intraóssea.
+- **Cristaloide aquecido** em bolus inicial limitado (ex.: 1 L em adulto) enquanto se mobiliza sangue — evitar diluição excessiva.
+- **Transfusão precoce** no choque hemorrágico moderado-grave: **protocolo de transfusão maciça** com relação hemácias:plasma:plaquetas próxima de **1:1:1**, guiada por resposta clínica e não apenas por número de bolsas.
+- **Ácido tranexâmico 1 g IV** em 10 min nas primeiras 3h do trauma, seguido de **1 g IV em 8h** de infusão — reduz mortalidade quando dado precocemente; sem indicação em hemorragia não traumática de rotina.
+- **Hipotensão permissiva** (PAS-alvo ~80–90 mmHg) até o controle cirúrgico do foco — **exceto** em TCE associado (manter PAS mais alta para perfusão cerebral).
+- **Torniquete:** primeira linha em hemorragia exsanguinante de extremidade não controlável por compressão — aplicar proximal à lesão, anotar o horário de aplicação; risco de isquemia é aceitável frente ao risco de morte por exsanguinação.
+- **REBOA** (Resuscitative Endovascular Balloon Occlusion of the Aorta): opção em centros com expertise para hemorragia infradiafragmática exsanguinante refratária, como ponte para controle cirúrgico definitivo — não substitui o controle da fonte.
 
-intox_geral: `# Intoxicação — Abordagem Geral
+## 🏥 Quando internar / UTI
 
-> Suporte + identificação do agente + descontaminação/antídoto quando indicado. "Trate o paciente, não o veneno."
+- Classe II em diante, ou qualquer paciente que recebeu hemocomponentes → **UTI ou unidade de cuidado intensivo**.
+- Monitorização contínua de PA, FC, débito urinário e lactato seriado até normalização da perfusão.
+- Vigilância para coagulopatia, hipotermia e hipocalcemia (comum após transfusão maciça) mesmo após estabilização inicial.
 
-## 🚑 Suporte (ABCDE)
-- Via aérea/ventilação, acesso, monitorização; glicemia; tratar convulsão/arritmia/hipotensão.
+## 💡 Pérolas e erros comuns
+
+- Taquicardia + estreitamento da pressão de pulso = choque precoce, **mesmo com PA sistólica "normal"** — não esperar a hipotensão.
+- Controlar a fonte vale mais que infundir volume; priorizar sangue, não apenas cristaloide.
+- Erro comum: reposição excessiva de cristaloide antes do controle cirúrgico — piora a coagulopatia por diluição e o edema tecidual, sem sustentar a perfusão de forma duradoura.
+- Erro comum: atribuir hipotensão a "vagal" ou "ansiedade" em trauma sem excluir hemorragia ativa — todo paciente hipotenso pós-trauma merece investigação sistemática das cinco fontes clássicas (tórax, abdome, retroperitôneo/pelve, ossos longos, externo).
+- Torniquete aplicado cedo salva vidas — o medo infundado de "perder o membro" não deve atrasar sua colocação em hemorragia exsanguinante; a literatura militar e civil mostra isquemia clinicamente relevante apenas após 2h de tempo de aplicação contínua.
+- Reavaliar a resposta à reposição (FC, PA, lactato, débito urinário) para guiar a necessidade de mais hemocomponentes ou de intervenção definitiva — classificar o paciente como "respondedor", "respondedor transitório" ou "não respondedor" à prova de volume orienta a urgência do controle cirúrgico.
+- Idosos e pacientes em uso de betabloqueador podem não desenvolver taquicardia compensatória mesmo em choque significativo — não confiar isoladamente na frequência cardíaca nessas populações; observar sinais indiretos (enchimento capilar, nível de consciência, lactato).
+- Gestantes toleram perda volêmica maior antes de manifestar sinais clássicos de choque, pelo aumento fisiológico da volemia — quando os sinais aparecem, a perda já é significativa e o feto pode estar em sofrimento antes da mãe.`,
+
+intox_geral: `**Intoxicação exógena — abordagem geral.** Emergência tóxica de causa medicamentosa, recreacional, industrial ou ambiental, cujo manejo combina **suporte vital**, **identificação do agente/toxíndrome** e **descontaminação/antídoto** quando indicados. Regra de ouro: "trate o paciente, não o veneno" — a maioria das intoxicações se resolve com suporte adequado, e antídotos específicos são a exceção, não a regra.
+
+## 🧪 Fisiopatologia e conceitos-chave
+
+- Toxicidade depende de dose, via, tempo desde a exposição e coingestão de múltiplos agentes — sempre investigar ativamente coingestões (frascos vazios, relato de terceiros, histórico psiquiátrico).
+- **Ânion-gap elevado** sugere acidose metabólica por álcoois tóxicos (metanol, etilenoglicol), salicilatos, metformina/biguanidas, ou cetoacidose associada.
+- **Gap osmolar** elevado (> 10) reforça suspeita de álcoois tóxicos mesmo antes do resultado do nível sérico.
+- O tempo até a apresentação clínica varia muito por agente — liberação prolongada, coingestão com anticolinérgicos (retarda esvaziamento gástrico) ou metabólitos tóxicos tardios (metanol, paracetamol) exigem observação prolongada mesmo com paciente assintomático inicialmente.
+
+## 🚑 Suporte inicial (ABCDE)
+
+- Via aérea protegida se rebaixamento (considerar intubação antes da descontaminação se Glasgow baixo); ventilação e oxigenação; acesso venoso calibroso; monitorização cardíaca contínua.
+- **Glicemia capilar** em todo paciente com rebaixamento — hipoglicemia é causa reversível comum e mimetiza intoxicação.
+- Tratar convulsões (benzodiazepínicos), arritmias (conforme o agente — evitar antiarrítmicos classe Ia/Ic em intoxicação por tricíclicos) e hipotensão (cristaloide; vasopressor se refratária).
+- Temperatura: hipertermia grave (simpaticomiméticos, síndrome serotoninérgica, hipertermia maligna) exige resfriamento ativo agressivo.
 
 ## 🔎 Toxíndromes
-- **Colinérgica** (SLUDGE, miose), **anticolinérgica** (quente/seco/midríase/delírio), **simpaticomimética** (agitado, taquicárdico, midríase), **opioide** (miose, hipoventilação, rebaixamento), **sedativo-hipnótica**.
+
+- **Colinérgica:** SLUDGE (salivação, lacrimejamento, êmese, diarreia, cólica), miose, bradicardia, broncorreia, fasciculações — organofosforados/carbamatos.
+- **Anticolinérgica:** "quente como lebre, seco como osso, vermelho como beterraba, cego como morcego, louco como chapeleiro" — hipertermia, pele seca, midríase, delírio, retenção urinária.
+- **Simpaticomimética:** agitação, taquicardia, hipertensão, midríase, diaforese (cocaína, anfetaminas) — semelhante à anticolinérgica, mas com **pele úmida** (diferencial-chave).
+- **Opioide:** miose puntiforme, hipoventilação, rebaixamento — ver conduta específica "Intoxicação por opioides".
+- **Sedativo-hipnótica:** rebaixamento, ataxia, fala arrastada, sinais vitais relativamente preservados (benzodiazepínicos, álcool, GHB).
+- **Serotoninérgica:** agitação, clônus, hiper-reflexia, hipertermia, diaforese — associação de múltiplos serotoninérgicos (ISRS + tramadol/linezolida, por exemplo).
+
+## 🔍 Diagnóstico diferencial
+
+- Causas orgânicas de rebaixamento sem intoxicação: hipoglicemia, AVC, meningoencefalite, distúrbio hidroeletrolítico, hipóxia, pós-ictal.
+- Distinguir toxíndromes semelhantes (anticolinérgica × simpaticomimética pela pele seca × úmida; sedativo × opioide pelo tamanho pupilar e resposta à naloxona).
+- Considerar causa psiquiátrica primária associada (tentativa de autoextermínio) — avaliação de risco de suicídio é parte obrigatória do atendimento após estabilização clínica.
 
 ## 🧪 Exames complementares
+
 | Exame | Objetivo |
 | --- | --- |
-| Glicemia, eletrólitos, função renal/hepática | Suporte |
-| Gasometria + ânion-gap, gap osmolar | Acidose/álcoois tóxicos |
-| ECG (QRS/QT) | Cardiotoxicidade |
-| Paracetamol/salicilato | Coingestões comuns |
+| Glicemia, eletrólitos, função renal/hepática | Suporte e ajuste terapêutico |
+| Gasometria + ânion-gap, gap osmolar | Rastrear acidose metabólica e álcoois tóxicos |
+| ECG (intervalo QRS e QT) | Cardiotoxicidade (tricíclicos, antiarrítmicos) |
+| Paracetamol e salicilato séricos | Coingestões comuns, muitas vezes assintomáticas inicialmente |
+| Nível sérico específico (lítio, digoxina, etc.) | Quando disponível e relevante ao agente suspeito |
 
-## 💊 Conduta (com doses)
-- **Descontaminação:** **carvão ativado 1 g/kg** se ingestão recente (< 1–2h) e via aérea protegida (não em álcoois/cáusticos/metais).
-- **Antídotos:** naloxona (opioide), N-acetilcisteína (paracetamol), flumazenil (cauteloso), bicarbonato (tricíclico/QRS largo), atropina + pralidoxima (organofosforado).
-- Aumentar eliminação (alcalinização, hemodiálise) conforme o agente. Contatar **Centro de Intoxicações**.
+## 💊 Conduta com doses
 
-## 💡 Pérolas
-- Glicemia + ECG + paracetamol/salicilato em toda intoxicação relevante.
-- Identificar a toxíndrome guia o antídoto.`,
+- **Descontaminação gastrointestinal:** **carvão ativado 1 g/kg VO ou por sonda** (dose usual em adultos 25–100 g) se ingestão recente (idealmente < 1–2h) **e** via aérea protegida — contraindicado em ingestão de álcoois, cáusticos/corrosivos e metais pesados (não adsorvem ao carvão).
+- **Antídotos específicos:**
+  - **Naloxona** — opioides (ver conduta específica).
+  - **N-acetilcisteína** — paracetamol, conforme nomograma de Rumack-Matthew ou dose/tempo de ingestão.
+  - **Flumazenil** — reversão de benzodiazepínicos, uso **cauteloso** (risco de convulsão em dependentes crônicos ou coingestão com pró-convulsivante).
+  - **Bicarbonato de sódio** — tricíclicos/QRS alargado (> 100–120 ms) ou acidose por salicilato.
+  - **Atropina + pralidoxima** — organofosforados (atropina titulada até secreções secarem; pralidoxima reativa a colinesterase se administrada precocemente).
+  - **Fomepizol (ou etanol, se indisponível)** — álcoois tóxicos (metanol, etilenoglicol).
+- **Aumento da eliminação:** alcalinização urinária (salicilatos), hemodiálise (álcoois tóxicos, lítio, salicilatos graves, metformina com acidose lática grave).
+- **Sempre contatar o Centro de Informação e Assistência Toxicológica (CIATox/Disque-Intoxicação 0800-722-6001)** para orientação específica do agente e da dose.
 
-intox_paracet: `# Intoxicação por Paracetamol
+## 🏥 Quando internar / UTI
 
-> Hepatotoxicidade dose-dependente (metabólito NAPQI). O antídoto (NAC) é muito eficaz se precoce.
+- Rebaixamento de consciência, instabilidade hemodinâmica, arritmia, necessidade de antídoto contínuo (ex.: N-acetilcisteína em infusão, atropina em bomba) ou risco de deterioração tardia (liberação prolongada, coingestões) → internação, considerar UTI.
+- Observação mínima de 4–6h mesmo em assintomáticos para muitos agentes; estender conforme cinética do fármaco específico.
+- Avaliação psiquiátrica obrigatória antes da alta em tentativas de autoextermínio.
 
-## 🩺 Fases
-- 0–24h: assintomático/náusea. 24–72h: dor em HD, ↑ transaminases. 72–96h: insuficiência hepática (pico). Depois: recuperação ou falência.
+## 💡 Pérolas e erros comuns
 
-## ✅ Diagnóstico
-- **Nível sérico de paracetamol (≥ 4h pós-ingestão)** no **nomograma de Rumack-Matthew**; transaminases, INR, função renal.
+- Solicitar glicemia + ECG + paracetamol/salicilato em toda intoxicação relevante, mesmo sem suspeita direta — coingestões silenciosas são comuns.
+- Identificar a toxíndrome guia a escolha do antídoto mais do que o relato (muitas vezes impreciso) do paciente ou familiares.
+- Erro comum: dar carvão ativado sem proteger a via aérea em paciente rebaixado — risco de broncoaspiração.
+- Erro comum: usar flumazenil indiscriminadamente em coma de causa indeterminada — pode precipitar convulsão refratária, sobretudo em coingestão com tricíclicos ou uso crônico de benzodiazepínicos.
+- Erro comum: dispensar o paciente logo após melhora clínica inicial sem considerar a farmacocinética do agente — metabólitos tóxicos tardios (metanol → ácido fórmico; paracetamol → NAPQI) podem causar deterioração horas depois, mesmo com paciente assintomático na chegada.
+- Reavaliação seriada é essencial: muitos agentes têm cinética de absorção atrasada e o quadro pode piorar horas após a apresentação inicial.
+- Sempre perguntar sobre uso de múltiplas substâncias, medicações de outros moradores da casa e produtos de limpeza/agrícolas — a história espontânea costuma subestimar a quantidade e os agentes envolvidos.
+- Em crianças, mesmo pequenas quantidades de certos medicamentos (opioides, antiarrítmicos, hipoglicemiantes orais, bloqueadores de canal de cálcio) podem ser letais — limiar de internação para observação deve ser mais baixo do que em adultos.
+- Documentar sempre o horário estimado da ingestão, a quantidade e a formulação (liberação imediata × prolongada), pois isso determina a janela de descontaminação e o tempo de observação necessário.`,
 
+intox_paracet: `**Intoxicação por paracetamol (acetaminofeno).** Hepatotoxicidade dose-dependente por acúmulo do metabólito reativo NAPQI; é a causa mais comum de insuficiência hepática aguda induzida por droga nos EUA e uma causa importante também no Brasil, tanto em ingestão aguda intencional quanto em uso terapêutico supraterapêutico repetido ("staggered").
+## ⚙️ Fisiopatologia
+- Em doses terapêuticas, mais de 90% do paracetamol é metabolizado por glicuronidação/sulfatação (vias saturáveis) e eliminado; uma fração pequena passa pelo CYP2E1 (e CYP3A4/1A2) gerando NAPQI, imediatamente conjugado pela glutationa hepática e eliminado como mercapturato.
+- Em sobredose, as vias de conjugação saturam, desviando mais substrato para o CYP2E1 → geração de NAPQI excede a capacidade de glutationa → NAPQI livre liga-se covalentemente a proteínas mitocondriais dos hepatócitos → necrose centrolobular (zona 3, rica em CYP2E1).
+- Fatores que aumentam o risco: jejum/desnutrição (menos glutationa), etilismo crônico (indução do CYP2E1 associada a depleção de glutationa), uso de indutores enzimáticos (isoniazida, rifampicina, anticonvulsivantes). Doença hepática crônica não aumenta muito o risco de novo dano, mas reduz a reserva funcional.
+- Dose tóxica de referência (ingestão aguda única): > 150 mg/kg (adulto) ou > 7,5–10 g em 24h; risco maior com ingestões repetidas supraterapêuticas mesmo com doses menores, especialmente em desnutridos/etilistas.
+## 🩺 Fases (evolução temporal clássica)
+- **Fase I (0–24h):** frequentemente assintomático ou náusea/vômito/mal-estar inespecíficos; transaminases ainda normais — não subestimar por "paciente bem".
+- **Fase II (24–72h):** dor em hipocôndrio direito, hepatomegalia dolorosa; ↑ progressivo de TGO/TGP (podem chegar a milhares), ↑ bilirrubina, prolongamento de INR; pode haver melhora transitória dos sintomas gastrointestinais da fase I — não confundir com resolução.
+- **Fase III (72–96h, pico):** insuficiência hepática fulminante nos casos graves — icterícia, coagulopatia, encefalopatia, acidose lática, LRA (síndrome hepatorrenal ou nefrotoxicidade direta); é o pico de transaminases e também de mortalidade.
+- **Fase IV (4 dias a 2 semanas):** recuperação (regeneração hepatocitária, comum se sobreviver à fase III) ou progressão para falência multiorgânica/óbito/transplante.
+## 🔍 Diagnóstico diferencial
+- Outras causas de hepatite aguda tóxica/medicamentosa (isoniazida, valproato, cogumelo Amanita, ecstasy), hepatite viral aguda, hepatite isquêmica ("choque hepático"), síndrome de Budd-Chiari, esteatose aguda da gravidez.
+- Diferencial de dor em HD com transaminases altas: colecistite/coledocolitíase (transaminases costumam ser menos extremas), hepatite autoimune.
+- Sempre investigar coingestão (opioide, álcool, outros analgésicos combinados — muitos comprimidos associam paracetamol a opioide/AINE).
+## ✅ Diagnóstico e avaliação inicial
+- **Nível sérico de paracetamol (colhido ≥ 4h após a ingestão, nunca antes)**, plotado no **nomograma de Rumack-Matthew** (linha de tratamento a partir de 150 µg/mL às 4h).
+- Se a hora da ingestão for desconhecida, houver ingestão em múltiplas doses (staggered) ou apresentação tardia (> 24h), o nomograma não se aplica — tratar com base na história de dose tóxica e nas alterações laboratoriais.
+- Transaminases (TGO/TGP), bilirrubina, INR/TAP, função renal, gasometria com lactato, glicemia — repetir seriadamente para acompanhar a curva evolutiva.
 ## 🧪 Exames complementares
 | Exame | Objetivo |
 | --- | --- |
 | Paracetamol sérico (≥ 4h) | Nomograma / indicação de NAC |
-| TGO/TGP, INR, BT | Hepatotoxicidade |
-| Função renal, gasometria | Gravidade |
-
+| TGO/TGP, INR, bilirrubina | Grau de hepatotoxicidade |
+| Função renal, gasometria, lactato | Gravidade / critérios de transplante |
+| Glicemia, fósforo | Prognóstico (hipoglicemia e hipofosfatemia = mau sinal) |
+## 📊 Gravidade / critérios de King's College (indicação de transplante)
+- **pH < 7,3** (após reidratação) isoladamente já indica, OU a associação de **INR > 6,5 (TAP > 100s) + creatinina > 3,4 mg/dL + encefalopatia grau III/IV**.
+- Lactato > 3,5 mmol/L após reidratação inicial e hipofosfatemia persistente são marcadores adicionais de mau prognóstico — discutir precocemente com centro de transplante hepático.
 ## 💊 Tratamento (com doses)
-- **N-acetilcisteína (NAC)** — iniciar se nível acima da linha do nomograma, ingestão tóxica com nível indisponível, ou apresentação tardia com lesão hepática. Esquema IV (ou VO); **eficácia máxima se < 8–10h**.
-- Carvão ativado se < 1–2h. Critérios de King's College → transplante na falência.
+- **N-acetilcisteína (NAC)** — antídoto de escolha; repõe/poupa glutationa e tem ação antioxidante e hemodinâmica adicional na falência já estabelecida. Indicações: nível acima da linha de tratamento no nomograma; ingestão de dose potencialmente tóxica com nível indisponível ou apresentação tardia; qualquer paciente com hepatotoxicidade (TGO/TGP elevadas) de causa compatível, mesmo com nível indetectável.
+- **Protocolo IV clássico (3 bolsas, padrão FDA):** 150 mg/kg em 200 mL SG5% em 60 min → 50 mg/kg em 500 mL SG5% em 4h → 100 mg/kg em 1000 mL SG5% em 16h (total 300 mg/kg em 21h). Reações anafilactoides (rash, broncoespasmo) são comuns na 1ª bolsa — desacelerar a infusão e tratar com anti-histamínico costuma bastar, raramente exige suspender.
+- **Protocolo de 2 bolsas** (alternativa off-label cada vez mais adotada, mesma dose total de 300 mg/kg): 200 mg/kg em 3h → 100 mg/kg nas 20h seguintes; menor taxa de reações e erros de programação em séries recentes — o protocolo de 3 bolsas segue sendo o padrão/aprovado.
+- **NAC oral** (se IV indisponível): dose de ataque 140 mg/kg, depois 70 mg/kg de 4/4h por 17 doses.
+- **Eficácia:** praticamente 100% de proteção hepática se iniciada em **< 8h** da ingestão; eficácia decrescente após isso, mas ainda benéfica mesmo tardiamente, inclusive na falência hepática já instalada (reduz mortalidade, melhora hemodinâmica e oferta de O2 tecidual).
+- **Carvão ativado 1 g/kg VO** se ingestão < 1–2h (ideal < 1h) e via aérea protegida/paciente colaborativo.
+- Corrigir coagulopatia apenas se sangramento ativo ou procedimento invasivo (não "profilaticamente", pois o INR é usado para seguir a evolução e os critérios de transplante).
+## 🏥 Internação / UTI / diálise
+- Internar todo paciente com nível acima da linha do nomograma, ingestão significativa de dose desconhecida, ou já com alteração de transaminases/coagulograma.
+- UTI/discussão com transplante: encefalopatia, INR > 3, acidose, LRA, hipoglicemia, lactato elevado — ativar cedo os critérios de King's College.
+- **Hemodiálise:** pode remover paracetamol em níveis extremamente altos (> 1000 µg/mL) ou em acidose grave refratária; não substitui a NAC (manter/aumentar a infusão durante a diálise).
+## 💡 Pérolas e erros comuns
+- NAC iniciada em < 8h praticamente previne a hepatotoxicidade — não espere o nível para "confirmar" se a história sugere ingestão tóxica e o paciente está fora da janela de 8h.
+- Na dúvida ou em apresentação tardia, iniciar NAC empiricamente (relação risco-benefício muito favorável) e ajustar depois.
+- Erro comum: colher nível antes de 4h e descartar por estar "baixo" — o nomograma só é válido a partir das 4h.
+- Erro comum: não pensar em ingestão staggered/crônica em paciente com uso repetido de combinados (paracetamol+codeína) e dor abdominal — um nível único pode estar "normal" e ainda assim haver toxicidade acumulada.
+- Reação à NAC geralmente não é alergia verdadeira — não costuma contraindicar reiniciar a infusão mais lentamente.`,
 
-## 💡 Pérolas
-- NAC precoce (< 8h) praticamente previne a hepatotoxicidade.
-- Na dúvida/tardio, iniciar NAC (baixo risco).`,
-
-intox_benzo: `# Intoxicação por Benzodiazepínicos
-
-> Síndrome sedativo-hipnótica: rebaixamento e depressão respiratória (em geral leve isolada; grave se coingestão com álcool/opioide).
-
-## 🩺 Quadro
-- Sonolência, fala arrastada, ataxia, depressão respiratória; sinais vitais relativamente preservados.
-
+intox_benzo: `**Intoxicação por benzodiazepínicos.** Síndrome sedativo-hipnótica pura raramente é letal isoladamente; a gravidade real quase sempre vem de coingestão (álcool, opioides, outros depressores do SNC) ou de população de risco (idosos, insuficiência respiratória de base).
+## ⚙️ Fisiopatologia
+- Benzodiazepínicos são moduladores alostéricos positivos do receptor GABA-A, aumentando a frequência de abertura do canal de cloro mediada pelo GABA (diferente dos barbitúricos, que aumentam a duração de abertura e podem ativar o canal diretamente em doses altas — por isso os barbitúricos são mais letais em overdose isolada).
+- Esse mecanismo de "teto" (ceiling effect) explica por que a intoxicação isolada por benzodiazepínico raramente causa depressão respiratória grave ou colapso hemodinâmico em pacientes hígidos — há um limite de hiperpolarização neuronal induzida.
+- Meia-vida e metabólitos ativos variam muito entre os fármacos (ex.: diazepam tem metabólito ativo de meia-vida longa — desmetildiazepam — podendo prolongar a sedação por dias; midazolam é de ação curta) — isso influencia o tempo de observação necessário.
+- Coingestão com álcool, opioides, outros hipnóticos (Z-drugs), gabapentinoides ou antipsicóticos sedativos tem efeito sinérgico (não apenas aditivo) sobre a depressão do SNC e respiratória.
+## 🩺 Quadro clínico
+- Sonolência, fala arrastada, ataxia, nistagmo, hiporreflexia; em doses maiores, coma com sinais vitais **relativamente preservados** (FC, PA e temperatura pouco alteradas) — esse padrão diferencia de outras causas de coma tóxico.
+- Depressão respiratória (hipoventilação, queda de FR) é o principal risco vital, mais evidente quando há coingestão ou em extremos de idade/DPOC.
+- Em idosos, mesmo doses terapêuticas podem causar quedas, delirium e depressão respiratória desproporcional — atenção especial nessa população.
+- Síndrome de abstinência (uso crônico, retirada abrupta) é o quadro oposto: agitação, tremor, convulsão, disautonomia — não confundir com a intoxicação aguda.
+## 🔍 Diagnóstico diferencial
+- Outras causas de rebaixamento com sinais vitais preservados: intoxicação por Z-drugs (zolpidem), gabapentina/pregabalina, baclofeno.
+- Diferenciar de intoxicação por opioide (miose intensa + bradipneia marcante, responde a naloxona), por álcool (hálito etílico, nistagmo mais grosseiro), por antipsicóticos/anticolinérgicos (midríase, pele seca, taquicardia — sugerem outra classe), AVC/hipoglicemia/hiponatremia (sempre descartar glicemia capilar em todo rebaixamento).
+- Encefalopatias metabólicas (urêmica, hepática) e sepse/meningoencefalite devem ser consideradas se o quadro não for compatível com ingestão isolada.
 ## ✅ Diagnóstico
-- Clínico/história; triagem urinária apoia. Avaliar coingestões.
-
+- Essencialmente clínico e pela história (frascos, prescrições, relato de terceiros); triagem toxicológica urinária pode apoiar mas tem alta taxa de falso-negativo (não detecta bem benzodiazepínicos de alta potência como alprazolam/clonazepam nos imunoensaios comuns) e falso-positivo — não deve guiar isoladamente a conduta.
+- Avaliar ativamente coingestões: glicemia, gasometria, ECG (QT/QRS se suspeita de coingestão com tricíclico ou outro cardiotóxico), paracetamol e salicilato séricos em toda tentativa de autoextermínio.
+## 📊 Gravidade
+- **Leve:** sonolência, orientado, respondendo a estímulo verbal — observação.
+- **Moderada:** torpor, resposta só a estímulo doloroso, via aérea pérvia — monitorização contínua, decúbito lateral.
+- **Grave:** coma, perda de reflexo de proteção de via aérea e/ou depressão respiratória — risco de aspiração/insuficiência respiratória, considerar via aérea definitiva.
 ## 💊 Tratamento (com doses)
-- **Suporte (base):** via aérea/ventilação, monitorização — a maioria resolve com observação.
-- **Flumazenil** (0,2 mg IV, repetir) **com muita cautela** — risco de **convulsão** (uso crônico, coingestão de tricíclico/pró-convulsivante); evitar de rotina.
+- **Suporte é a base do tratamento** para a grande maioria dos casos: monitorização (oximetria, capnografia se disponível), posição lateral de segurança, proteção de via aérea, suporte ventilatório (O2, VNI ou intubação se necessário) — a maioria dos pacientes recupera apenas com observação em algumas horas.
+- Carvão ativado geralmente não é indicado rotineiramente (baixo risco de vida isolado, e risco de sedação/aspiração supera o benefício), exceto em coingestão relevante e ingestão muito recente com via aérea protegida.
+- **Flumazenil** (antagonista competitivo do receptor benzodiazepínico): **0,2 mg IV em 15–30 seg**, pode repetir 0,2–0,3 mg a cada 1 min até resposta ou dose máxima cumulativa de **3 mg** (alguns protocolos citam até 5 mg). **Uso com muita cautela e não de rotina** — reservado a situações selecionadas (ex.: reversão de sedação iatrogênica em procedimento, criança com ingestão exploratória isolada confirmada).
+- **Contraindicações/riscos do flumazenil:** uso crônico de benzodiazepínico ou dependência (risco de abstinência/convulsão), coingestão com substância pró-convulsivante ou cardiotóxica (tricíclicos, cocaína, bupropiona, outros que baixam limiar convulsivo), história de convulsão, TCE/lesão estrutural do SNC — nesses cenários o risco de precipitar convulsão refratária supera o benefício de reverter a sedação.
+- Se depressão respiratória associada a opioide, **naloxona** é a prioridade antes de considerar flumazenil.
+## 🏥 Internação / alta
+- Casos leves a moderados com boa evolução em algumas horas de observação (considerar a meia-vida do fármaco envolvido) podem ter alta após avaliação psiquiátrica se for tentativa intencional.
+- Internar: rebaixamento importante, necessidade de suporte ventilatório, coingestão de risco, uso de benzodiazepínico de ação prolongada com sedação ainda significativa, idosos/comorbidades relevantes.
+- Não há indicação de diálise (alto volume de distribuição e ligação proteica da maioria dos benzodiazepínicos).
+## 💡 Pérolas e erros comuns
+- O tratamento é fundamentalmente suporte — a maioria dos pacientes "só" precisa de tempo e monitorização.
+- Flumazenil pode precipitar convulsão grave e refratária a benzodiazepínico (paradoxo terapêutico) em uso crônico ou coingestão com pró-convulsivante — usar apenas em cenários bem selecionados.
+- Sinais vitais muito alterados (hipotensão franca, taquicardia importante, hipertermia) não são típicos de benzodiazepínico isolado — procurar ativamente coingestão ou outro diagnóstico.
+- Sempre checar glicemia capilar em todo paciente rebaixado, mesmo com forte suspeita de intoxicação por benzodiazepínico.
+- Em crianças com ingestão exploratória única e sem coingestão, o flumazenil é mais bem tolerado e pode evitar intubação/UTI pediátrica — cenário em que o benefício supera claramente o risco de convulsão.
+- Após reversão com flumazenil, manter observação por pelo menos 1–2h (meia-vida curta do antagonista, ~1h) pelo risco de ressedação quando o efeito do flumazenil passa antes do benzodiazepínico ingerido.`,
 
-## 💡 Pérolas
-- O tratamento é suporte; flumazenil pode precipitar convulsão (evitar em uso crônico/coingestão).`,
+intox_opio: `**Intoxicação por opioides.** Tríade clássica: **rebaixamento do nível de consciência + miose puntiforme + depressão respiratória**. É uma das causas mais comuns e mais facilmente reversíveis de parada respiratória atendida em emergência — o reconhecimento rápido e a naloxona salvam vidas em minutos.
 
-intox_opio: `# Intoxicação por Opioides
+## 🧬 Fisiopatologia
 
-> Tríade: **rebaixamento + miose + depressão respiratória**. Causa reversível de parada respiratória.
+- Opioides agem em receptores μ (mu) no sistema nervoso central, deprimindo o centro respiratório bulbar (reduzindo a resposta ventilatória à hipercapnia) e o nível de consciência, além de causar miose por ação em núcleos do nervo oculomotor.
+- A **depressão respiratória** é o mecanismo de morte — hipoventilação progressiva leva a hipóxia, hipercapnia e parada respiratória, seguida de parada cardíaca hipóxica se não revertida.
+- Opioides sintéticos potentes (fentanil e análogos) têm início de ação mais rápido e podem causar rigidez torácica ("chest wall rigidity"), dificultando a ventilação mesmo antes da apnea completa — contaminação de drogas ilícitas com fentanil é uma causa crescente de overdose grave e rápida.
+- Formulações de liberação prolongada, metadona (meia-vida longa e imprevisível) e coingestão com outros depressores do SNC (álcool, benzodiazepínicos) prolongam e agravam o risco de depressão respiratória recorrente.
 
-## 🩺 Quadro
-- Bradipneia/apneia, miose puntiforme, rebaixamento; marcas de injeção.
+## 🩺 Apresentação clínica
 
-## 💊 Tratamento (com doses)
-- **Naloxona 0,04–0,4 mg IV** (titular pela respiração; IM/IN 0,4–2 mg), repetir a cada 2–3 min; meta = ventilação adequada (não despertar completo, para evitar abstinência aguda).
-- Suporte ventilatório; **observar** (opioides de ação longa/liberação prolongada exigem monitorização; pode precisar de infusão de naloxona).
+- **Bradipneia ou apneia**, miose puntiforme (pode estar ausente em hipóxia grave/coingestão com midriático, ou em intoxicação por meperidina/tramadol que podem cursar com pupilas normais e até convulsão), rebaixamento de consciência progressivo.
+- Pele fria, cianose, bradicardia secundária à hipóxia; hipotensão em quadros graves.
+- Sinais indiretos de uso: marcas de injeção, adesivos transdérmicos (fentanil), frascos/embalagens no local, histórico de uso/prescrição de opioides.
+- Edema pulmonar não cardiogênico é uma complicação possível, especialmente após reversão abrupta com naloxona em dose alta.
 
-## 💡 Pérolas
-- Miose + bradipneia + rebaixamento = opioide → naloxona.
-- A naloxona dura menos que muitos opioides → vigiar recidiva.`,
+## 🔍 Diagnóstico diferencial
 
-intox_tca: `# Intoxicação por Antidepressivo Tricíclico
+- Outras causas de rebaixamento com pupilas mióticas: intoxicação por clonidina, organofosforados (colinérgica — mas com broncorreia/salivação proeminentes), lesão pontina.
+- Hipoglicemia, AVC de tronco, outras intoxicações sedativas (benzodiazepínicos — geralmente sem miose tão marcada e sem bradipneia tão intensa).
+- Coingestão é a regra, não a exceção — investigar álcool, benzodiazepínicos, estimulantes associados, especialmente em overdose por drogas de uso recreacional (risco de contaminação por fentanil).
+- Resposta clínica à naloxona (reversão de miose e melhora respiratória) tem valor diagnóstico retrospectivo, mas resposta parcial não exclui coingestão.
 
-> Potencialmente letal: cardiotoxicidade (bloqueio de canais de sódio) + efeito anticolinérgico + convulsão.
+## 🩺 Classificação de gravidade
 
-## 🩺 Quadro
-- Anticolinérgico (taquicardia, midríase, delírio), rebaixamento, convulsão, **arritmia/hipotensão**.
+- **Leve:** sonolência, miose, respiração e sinais vitais preservados — observação, sem necessidade obrigatória de naloxona imediata se ventilação adequada.
+- **Moderada:** rebaixamento mais importante, bradipneia (FR < 12), saturação em queda, ainda responsivo a estímulo — indicação de naloxona titulada.
+- **Grave:** apneia ou respiração agônica, cianose, inconsciência, risco iminente de parada — naloxona imediata + suporte ventilatório concomitante (não atrasar ventilação esperando a naloxona agir).
 
+## 💊 Tratamento com doses
+
+- **Naloxona 0,04–0,4 mg IV**, titulada progressivamente conforme resposta respiratória (objetivo é restaurar ventilação adequada, não o despertar completo); via **IM/intranasal 0,4–2 mg** quando acesso IV não disponível.
+- **Repetir a cada 2–3 minutos**, aumentando a dose se não houver resposta (doses cumulativas mais altas podem ser necessárias em opioides sintéticos potentes como fentanil).
+- **Meta terapêutica:** ventilação adequada (FR e saturação normalizadas) — evitar reversão completa/despertar abrupto, que precipita **síndrome de abstinência aguda** (agitação, taquicardia, hipertensão, vômitos, piloereção, dor difusa) e é desconfortável e potencialmente perigosa, especialmente em dependentes crônicos.
+- **Suporte ventilatório** (bolsa-válvula-máscara, oxigênio suplementar) deve ser iniciado **antes ou simultaneamente** à naloxona em apneia — a ventilação não pode esperar a droga fazer efeito.
+- **Observação obrigatória:** a meia-vida da naloxona (30–90 min) é **mais curta** que a de muitos opioides (heroína, morfina, e principalmente metadona e formulações de liberação prolongada) — risco real de **recidiva da depressão respiratória** após reversão inicial aparentemente bem-sucedida.
+- **Infusão contínua de naloxona** pode ser necessária em opioides de ação longa: iniciar com dose horária equivalente a ~2/3 da dose de bolus que reverteu o quadro, titulando conforme resposta.
+- **Manejo da abstinência precipitada pela naloxona:** sintomático — hidratação, antieméticos, analgesia não opioide, benzodiazepínicos se agitação intensa; evitar redosagem desnecessária de naloxona (que apenas prolonga o desconforto); geralmente autolimitada em minutos a poucas horas.
+
+## 🏥 Quando internar / UTI
+
+- Todo paciente que necessitou de naloxona deve ficar em **observação monitorizada por no mínimo 4–6 horas** (mais tempo para opioides de ação longa/liberação prolongada ou metadona) pelo risco de recidiva.
+- Necessidade de infusão contínua de naloxona, instabilidade ventilatória recorrente, aspiração ou edema pulmonar → **UTI**.
+- Avaliação para encaminhamento a programa de redução de danos/tratamento de dependência antes da alta, quando aplicável.
+
+## 💡 Pérolas e erros comuns
+
+- Miose + bradipneia + rebaixamento = opioide, até prova em contrário → naloxona.
+- A naloxona dura **menos** que muitos opioides — nunca liberar o paciente logo após a reversão sem período de observação.
+- Erro comum: reverter "completamente" e de forma abrupta, precipitando abstinência agressiva e agitação — titular a dose pelo objetivo respiratório, não pelo nível de consciência.
+- Erro comum: atrasar a ventilação manual esperando a naloxona fazer efeito em paciente apneico — ventilar primeiro.
+- Overdose por opioides sintéticos (fentanil e análogos) pode exigir doses cumulativas maiores e vigilância mais prolongada que a overdose "clássica" por heroína/morfina, além de risco de rigidez torácica que dificulta a ventilação mesmo pré-parada.
+- Erro comum: descartar intoxicação por opioide só porque as pupilas não estão mióticas — hipóxia grave, coingestão com midriático (cocaína, anfetamina) ou meperidina/tramadol podem cursar sem miose típica.
+- Naloxona intranasal é uma opção segura e eficaz para leigos/familiares treinados em programas de redução de danos — orientar sobre isso na alta de pacientes com uso crônico de opioides ou histórico de overdose prévia.
+- Tramadol e meperidina têm risco adicional de convulsão (efeito serotoninérgico/anticolinérgico), que não é revertido pela naloxona — tratar convulsão com benzodiazepínico se ocorrer.
+- Sempre investigar e tratar coingestões associadas (álcool, benzodiazepínicos, estimulantes) — a reversão isolada do componente opioide pode mascarar temporariamente outros riscos, especialmente cardiovasculares em uso concomitante de estimulantes.`,
+
+intox_tca: `**Intoxicação por antidepressivo tricíclico (ATC).** Uma das intoxicações por medicamento mais letais em overdose — a mesma dose que trata a depressão em semanas pode matar em horas por bloqueio de canal de sódio cardíaco, efeito anticolinérgico central e convulsão.
+## ⚙️ Fisiopatologia
+- **Bloqueio dos canais rápidos de sódio dependentes de voltagem no miocárdio** (efeito quinidina-símile/classe Ia): lentifica a fase 0 de despolarização → alarga o QRS → predispõe a arritmias ventriculares e bloqueios de condução; é o mecanismo central da cardiotoxicidade e a razão de o bicarbonato de sódio funcionar (aumenta o gradiente de sódio extracelular, "empurrando" mais sódio pelos canais ainda funcionantes, e a alcalinização reduz a fração de fármaco ligada ao canal).
+- **Bloqueio de canais de potássio (hERG)** contribui para prolongamento de QT e risco de torsades, além do bloqueio alfa-1-adrenérgico (vasodilatação/hipotensão) e da inibição da recaptação de noradrenalina/serotonina.
+- **Efeito anticolinérgico central e periférico** (bloqueio muscarínico): taquicardia, midríase, retenção urinária, íleo, pele seca, delirium/agitação, hipertermia.
+- **Bloqueio GABA-A** contribui para o limiar convulsivo reduzido.
+- A absorção é retardada pelo próprio efeito anticolinérgico (íleo), então a piora pode ser tardia e prolongada mesmo após as medidas iniciais — não relaxar cedo.
+## 🩺 Quadro clínico
+- Toxíndrome anticolinérgica: taquicardia sinusal, midríase, pele/mucosas secas, rubor, hipertermia, retenção urinária, ruídos hidroaéreos diminuídos, agitação/delirium alternando com rebaixamento.
+- Neurológico: sonolência evoluindo rapidamente para coma, **convulsão** (geralmente única e breve, mas pode ser refratária).
+- Cardiovascular: **taquicardia, hipotensão, arritmias ventriculares, bloqueios de condução** — a principal causa de óbito; a deterioração pode ser súbita, com progressão de QRS largo para TV/FV em minutos.
+- Sinais de alarme para desfecho grave: QRS ≥ 100 ms (risco de arritmia), QRS ≥ 160 ms (alto risco de TV), R em aVR ≥ 3 mm ou relação R/S em aVR > 0,7.
+## 🔍 Diagnóstico diferencial
+- Outras causas de **QRS alargado**: hipercalemia, outros bloqueadores de canal de sódio (cocaína, difenidramina, propranolol, carbamazepina, propafenona, flecainida, alguns antipsicóticos como tioridazina/quetiapina em altas doses, citalopram em overdose), bloqueio de ramo pré-existente, ritmo de marcapasso ventricular.
+- Diferencial da toxíndrome anticolinérgica: intoxicação por anti-histamínicos, antipsicóticos, atropina/escopolamina, plantas anticolinérgicas (ex. Datura); diferenciar de toxíndrome simpaticomimética (cocaína/anfetamina — também cursa com taquicardia/midríase, mas com pele suada, não seca).
+- Coma com convulsão: sempre descartar hipoglicemia e outras coingestões (especialmente ISRS/bupropiona em polifarmácia de tentativa de suicídio).
 ## ✅ Diagnóstico / ECG
-- **ECG:** **QRS alargado (> 100 ms)** e R em aVR — marcadores de toxicidade e risco de arritmia/convulsão.
-
+- **O ECG seriado é o exame-chave**: QRS > 100 ms e onda R terminal proeminente em aVR são os marcadores mais sensíveis de toxicidade significativa e preditores de arritmia e convulsão — mais úteis na urgência do que o nível sérico do fármaco (pouco disponível e não muda a conduta aguda).
+- Monitorização cardíaca contínua obrigatória; eletrólitos (potássio, cálcio), gasometria com lactato, glicemia; nível de paracetamol/salicilato (coingestão frequente em tentativa de suicídio).
+## 📊 Gravidade
+- QRS < 100 ms: baixo risco.
+- QRS 100–160 ms: risco intermediário — arritmia e convulsão possíveis, bicarbonato indicado.
+- QRS > 160 ms: alto risco de TV/arritmia maligna — tratamento agressivo imediato.
+- Hipotensão refratária, coma profundo e acidose associada indicam pior prognóstico.
 ## 💊 Tratamento (com doses)
-- **Bicarbonato de sódio IV em bolus** se **QRS > 100 ms**, arritmia ou hipotensão (alcalinização) — pilar do tratamento.
-- Suporte; benzodiazepínico para convulsão; **evitar antiarrítmicos Ia/Ic**; hipotensão refratária → vasopressor.
-
-## 💡 Pérolas
-- QRS largo = dar bicarbonato (não esperar a arritmia).
-- Evitar antiarrítmicos Ia/Ic.`,
+- **Bicarbonato de sódio IV em bolus 1–2 mEq/kg** (ampola a 8,4% = 1 mEq/mL) — indicado se **QRS > 100 ms**, arritmia ventricular, hipotensão refratária ou acidose; repetir bolus a cada 3–5 min conforme resposta do QRS/PA. Meta: estreitamento do QRS e **pH arterial-alvo 7,45–7,55** (alcalinização terapêutica); se resposta favorável, manter infusão contínua de manutenção (ex.: 150 mEq de bicarbonato em 1L de SG5% em taxa que mantenha o pH-alvo), monitorando o potássio (o bicarbonato desloca K para dentro da célula → repor se hipocalemia).
+- Hiperventilação (se via aérea definitiva) pode ser usada como medida-ponte para alcalinizar rapidamente enquanto se prepara o bicarbonato.
+- **Benzodiazepínico** (diazepam ou midazolam IV) para convulsão — via padrão; evitar fenitoína (pode piorar a cardiotoxicidade por também bloquear canal de sódio).
+- **Hipotensão refratária a bicarbonato/volume:** vasopressor — **noradrenalina** é a droga de escolha (efeito alfa predominante contrapõe o bloqueio alfa-1 do tricíclico); evitar dopamina isolada (menos eficaz nesse contexto).
+- **Contraindicados/evitar:** antiarrítmicos classe Ia (procainamida, quinidina) e Ic (flecainida, propafenona) — pioram o bloqueio de sódio; beta-bloqueador e amiodarona também devem ser evitados/usados com cautela nas arritmias ventriculares desse contexto (podem piorar condução/repolarização).
+- Carvão ativado 1 g/kg VO se via aérea protegida e ingestão recente (< 1–2h); considerar múltiplas doses se íleo/ingestão maciça, mas sem atrasar via aérea/monitorização.
+- **Emulsão lipídica IV 20%** e/ou **ECMO** como resgate em parada cardíaca refratária/choque cardiogênico grave não responsivo às medidas acima (indicação de exceção, discutir com toxicologia/UTI).
+## 🏥 Internação / UTI
+- Todo paciente sintomático (mesmo leve) ou com ECG alterado: monitorização cardíaca contínua em UTI/emergência por no mínimo 12–24h após normalização do ECG e ausência de novos sintomas (recorrência tardia é descrita, sobretudo com absorção retardada pelo íleo anticolinérgico).
+- Assintomático, ECG normal e sem alteração neurológica após 6h de observação: risco de deterioração tardia é baixo — pode liberar (com avaliação psiquiátrica se intencional).
+## 💡 Pérolas e erros comuns
+- **QRS largo = dar bicarbonato imediatamente, não esperar a arritmia se instalar** — é tratamento, não só monitorização.
+- Evitar antiarrítmicos Ia/Ic e ter cautela com amiodarona — podem piorar a cardiotoxicidade em vez de ajudar.
+- Fenitoína não é a escolha para convulsão nesse contexto (também bloqueia sódio); usar benzodiazepínico.
+- Melhora clínica inicial não significa alta segura — a absorção retardada pelo efeito anticolinérgico pode causar piora tardia; manter monitorização.
+- R em aVR e QRS são melhores preditores de gravidade do que o nível sérico do fármaco.`,
 
 queimadura: `# Queimaduras — abordagem inicial
 
