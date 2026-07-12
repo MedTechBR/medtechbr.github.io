@@ -1116,6 +1116,7 @@ async function startRecording() {
       const s = Math.floor((Date.now() - recStart) / 1000);
       const m = Math.floor(s / 60);
       audioTime.textContent = `${m}:${String(s % 60).padStart(2, '0')}`;
+      if (s >= 30) stopRecording();   // trava ~30s: mantém o áudio pequeno o bastante p/ o gateway
     }, 250);
     audioRecord.hidden = true;
     audioStop.hidden = false;

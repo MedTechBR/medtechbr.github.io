@@ -812,7 +812,7 @@ async function callGeminiVoice(blob){
   if(!user) throw new Error('Entre na sua conta MedTech para usar a criação por voz.');
   const idToken=await user.getIdToken();
   const base64=await blobToBase64(blob);
-  if(base64.length>56000) throw new Error('Áudio muito longo. Grave algo mais curto (até ~20s).');
+  if(base64.length>2000000) throw new Error('Áudio muito grande. Tente gravar de novo, mais curto.');
   const mimeType=blob.type||'audio/webm';
   const today=todayStr();
   const sys='Você converte uma fala em UMA demanda (tarefa a fazer) OU UM compromisso (evento de agenda) para um app de produtividade brasileiro. Regra: se a fala descreve um encontro/atividade com data ou horário marcado, é "evento"; se é algo a fazer/resolver/lembrar, é "demanda". Datas sempre no formato YYYY-MM-DD; horário em HH:MM (24h). Prioridade só para demanda: alta, media ou baixa (padrão media). Não invente dados não ditos: deixe vazio/null.';
