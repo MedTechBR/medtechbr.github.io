@@ -88,6 +88,28 @@
     cursor:pointer;font-size:.85rem;white-space:nowrap}
   .ghost:hover{border-color:var(--teal);color:var(--teal)}
 
+  /* Painel de desempenho por tema */
+  .perf-panel{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:15px 16px;margin-bottom:16px}
+  .perf-head{font-size:.85rem;font-weight:700;color:var(--ink);margin-bottom:12px}
+  .perf-sub{font-weight:400;color:var(--ink-soft);font-size:.78rem}
+  .perf-list{display:flex;flex-direction:column;gap:9px}
+  .perf-row{display:flex;align-items:center;gap:10px;cursor:pointer;padding:5px 6px;border-radius:8px;transition:background .12s}
+  .perf-row:hover{background:var(--panel2)}
+  .perf-tema{flex:0 0 150px;font-size:.82rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .perf-bar-wrap{flex:1;height:7px;background:var(--panel2);border-radius:99px;overflow:hidden}
+  .perf-bar{height:100%;border-radius:99px;transition:width .25s}
+  .perf-bar.na{background:var(--line-strong)}
+  .perf-pct{flex:0 0 78px;text-align:right;font-size:.78rem;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+  .perf-focus{margin-top:14px;width:100%;background:var(--wrong-bg);color:var(--wrong);border:1px solid var(--wrong);
+    border-radius:10px;padding:10px 14px;font-size:.85rem;font-weight:600;cursor:pointer}
+  .perf-focus:hover{background:var(--wrong);color:#fff}
+  .focus-banner{display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:var(--wrong-bg);border:1px solid var(--wrong);border-radius:12px;padding:11px 14px;
+    margin-bottom:16px;font-size:.85rem;color:var(--ink)}
+  .focus-banner button{background:none;border:1px solid var(--wrong);color:var(--wrong);border-radius:8px;
+    padding:5px 12px;font-size:.8rem;cursor:pointer;flex:0 0 auto}
+  .focus-banner button:hover{background:var(--wrong);color:#fff}
+
   /* Card */
   .card{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);
     padding:20px 18px;}
@@ -283,7 +305,19 @@
   <div class="controls">
     <select id="filter" aria-label="Filtrar por tema"></select>
     <button class="ghost" id="shuffle">Embaralhar</button>
+    <button class="ghost" id="perfToggle">📊 Desempenho</button>
     <button class="ghost" id="reset">Zerar desempenho</button>
+  </div>
+
+  <div class="perf-panel" id="perfPanel" hidden>
+    <div class="perf-head">Desempenho por tema <span class="perf-sub">— toque num tema fraco pra praticar só ele</span></div>
+    <div class="perf-list" id="perfList"><!-- preenchido via JS --></div>
+    <button class="perf-focus" id="focusBtn" hidden>🎯 Focar nos pontos fracos</button>
+  </div>
+
+  <div class="focus-banner" id="focusBanner" hidden>
+    <span>🎯 Modo foco ativo — praticando só os temas fracos</span>
+    <button id="focusExit">Sair</button>
   </div>
 
   <div class="card" id="card"><!-- preenchido via JS --></div>
@@ -360,7 +394,10 @@ function buildFilter(){
   const temas = ["Todos os temas", ...Array.from(new Set(BANK.map(q=>q.tema)))];
   const sel = document.getElementById("filter");
   sel.innerHTML = temas.map(t=>`<option>${t}</option>`).join("");
-  sel.onchange = ()=>{ activeFilter = sel.value; applyFilter(); };
+  sel.onchange = ()=>{
+    if(focusMode){ focusMode=false; document.getElementById("focusBanner").hidden=true; }
+    activeFilter = sel.value; applyFilter();
+  };
 }
 function applyFilter(){
   order = BANK.map((_,i)=>i).filter(i=> activeFilter==="Todos os temas" || BANK[i].tema===activeFilter);
@@ -382,7 +419,73 @@ function refreshStats(){
   document.getElementById("ringFill").setAttribute("stroke-dasharray", `${rate} ${100-rate}`);
   document.getElementById("ringFill").setAttribute("stroke",
     rate>=70?"var(--right)":rate>=50?"var(--teal)":"var(--amber)");
+  const pp = document.getElementById("perfPanel");
+  if(pp && !pp.hidden) renderPerfPanel();
 }
+
+/* ---- desempenho por tema (painel + provas personalizadas) ---- */
+let focusMode = false;
+function perfByTema(){
+  const temas = Array.from(new Set(BANK.map(q=>q.tema)));
+  return temas.map(tema=>{
+    const idxs = BANK.map((q,i)=>({q,i})).filter(x=>x.q.tema===tema).map(x=>x.i);
+    const answered = idxs.filter(i=>answers[i]);
+    const right = answered.filter(i=>answers[i].ok).length;
+    const rate = answered.length ? Math.round((right/answered.length)*100) : null;
+    return { tema, total: idxs.length, answered: answered.length, right, rate };
+  }).sort((a,b)=>{
+    const ra = a.rate===null ? -1 : a.rate;   // não respondido some pro topo, junto com os piores
+    const rb = b.rate===null ? -1 : b.rate;
+    return ra - rb;
+  });
+}
+function renderPerfPanel(){
+  const list = document.getElementById("perfList");
+  const perf = perfByTema();
+  list.innerHTML = perf.map(p=>{
+    const pct = p.rate===null ? "—" : p.rate+"%";
+    const barPct = p.rate===null ? 0 : p.rate;
+    const cls = p.rate===null ? "na" : p.rate>=70 ? "" : p.rate>=50 ? "amber" : "wrong";
+    const color = cls==="wrong" ? "var(--wrong)" : cls==="amber" ? "var(--amber)" : cls==="na" ? "var(--line-strong)" : "var(--right)";
+    return `<div class="perf-row" data-tema="${escapeAttr(p.tema)}">
+      <div class="perf-tema">${escapeAttr(p.tema)}</div>
+      <div class="perf-bar-wrap"><div class="perf-bar ${cls}" style="width:${barPct}%;background:${color}"></div></div>
+      <div class="perf-pct">${p.answered}/${p.total} · ${pct}</div>
+    </div>`;
+  }).join("");
+  list.querySelectorAll(".perf-row").forEach(row=>{
+    row.onclick = ()=>{
+      exitFocusMode(false);
+      activeFilter = row.dataset.tema;
+      const sel = document.getElementById("filter"); if(sel) sel.value = activeFilter;
+      applyFilter();
+    };
+  });
+  // "Focar nos pontos fracos": temas com <70% de acerto (já respondidos) OU nunca respondidos
+  const weak = perf.filter(p=> p.rate===null || p.rate<70).map(p=>p.tema);
+  const focusBtn = document.getElementById("focusBtn");
+  if(focusBtn) focusBtn.hidden = weak.length===0 || weak.length===perf.length; // nada a focar se já foi tudo bem, ou se é tudo fraco (=banco todo)
+}
+function activateFocusMode(){
+  const perf = perfByTema();
+  const weakTemas = new Set(perf.filter(p=> p.rate===null || p.rate<70).map(p=>p.tema));
+  focusMode = true;
+  order = BANK.map((_,i)=>i).filter(i=> weakTemas.has(BANK[i].tema));
+  for(let i=order.length-1;i>0;i--){ const r=Math.floor(Math.random()*(i+1)); [order[i],order[r]]=[order[r],order[i]]; }
+  pos = 0;
+  document.getElementById("focusBanner").hidden = false;
+  document.getElementById("perfPanel").hidden = true;
+  render();
+}
+function exitFocusMode(rerender){
+  if(!focusMode) return;
+  focusMode = false;
+  document.getElementById("focusBanner").hidden = true;
+  activeFilter = "Todos os temas";
+  const sel = document.getElementById("filter"); if(sel) sel.value = activeFilter;
+  if(rerender!==false) applyFilter();
+}
+function escapeAttr(s){ return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;"); }
 
 /* ---- render da questão ---- */
 const LETTERS = ["A","B","C","D","E"];
@@ -514,6 +617,13 @@ document.getElementById("reset").onclick = ()=>{
     answers={}; saveAnswers(); render();
   }
 };
+document.getElementById("perfToggle").onclick = ()=>{
+  const pp = document.getElementById("perfPanel");
+  pp.hidden = !pp.hidden;
+  if(!pp.hidden) renderPerfPanel();
+};
+document.getElementById("focusBtn").onclick = activateFocusMode;
+document.getElementById("focusExit").onclick = ()=>exitFocusMode();
 
 /* ---- init (continua de onde parou) ---- */
 buildFilter();
