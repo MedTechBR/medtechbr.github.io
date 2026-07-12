@@ -300,9 +300,9 @@ main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
 [data-theme="dark"] .content h2 { color: var(--text); }
 .content h3 { font-size: 15px; color: var(--primary); margin-top: 16px; }
 [data-theme="dark"] .content h3 { color: var(--primary); }
-.content p { margin: 8px 0; color: var(--text-soft); }
-.content ul, .content ol { margin: 8px 0 12px 22px; color: var(--text-soft); }
-.content li { margin: 4px 0; }
+.content p { margin: 0 0 14px; line-height: 1.7; color: var(--text-soft); }
+.content ul, .content ol { margin: 0 0 16px 22px; color: var(--text-soft); }
+.content li { margin: 6px 0; line-height: 1.6; }
 .content li::marker { color: var(--primary); }
 .content strong { color: var(--text); font-weight: 600; }
 .content code {
@@ -337,7 +337,7 @@ main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
 .content a:hover { text-decoration: underline; }
 
 .mermaid-wrap {
-  background: white; border: 1px solid var(--border);
+  background: var(--bg-card); border: 1px solid var(--border);
   border-radius: 10px; padding: 16px; margin: 16px 0;
   box-shadow: var(--shadow);
   position: relative;
@@ -345,7 +345,8 @@ main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
 .mermaid-scroll {
   overflow: auto;
   max-height: 70vh;
-  background: white;
+  background: var(--bg);
+  border: 1px solid var(--border);
   border-radius: 6px;
   cursor: zoom-in;
   position: relative;
@@ -369,13 +370,12 @@ main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
   justify-content: space-between;
 }
 .mermaid-label .hint { text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--primary); }
-[data-theme="dark"] .mermaid-wrap, [data-theme="dark"] .mermaid-scroll { background: #f8fafc; }
 
 .mermaid-controls {
   display: flex; gap: 4px;
 }
 .mermaid-controls button {
-  background: var(--bg-card); border: 1px solid var(--border);
+  background: var(--bg-soft); border: 1px solid var(--border);
   width: 30px; height: 30px; border-radius: 6px;
   cursor: pointer; font-size: 14px; line-height: 1;
   display: inline-flex; align-items: center; justify-content: center;
@@ -384,7 +384,6 @@ main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
   font-family: inherit;
 }
 .mermaid-controls button:hover { background: var(--primary-soft); border-color: var(--primary); color: var(--primary-dark); }
-[data-theme="dark"] .mermaid-controls button { background: white; color: #475569; }
 
 /* ===== Modal tela cheia para fluxograma ===== */
 .mermaid-modal {
@@ -417,10 +416,10 @@ main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
 }
 .mermaid-modal-actions button:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
 .mermaid-modal-actions button.close { color: var(--danger); }
-.mermaid-modal-actions button.close:hover { background: #fee2e2; border-color: var(--danger); color: var(--danger); }
+.mermaid-modal-actions button.close:hover { background: rgba(248,81,73,.15); border-color: var(--danger); color: var(--danger); }
 .mermaid-modal-body {
   flex: 1; overflow: auto;
-  background: white; padding: 24px;
+  background: var(--bg); padding: 24px;
 }
 .mermaid-modal-body .mermaid {
   display: inline-block;
@@ -1525,12 +1524,30 @@ main, #main { display: block !important; height: auto !important; overflow: visi
 let mermaidCounter = 0;
 mermaid.initialize({
   startOnLoad: false,
-  theme: 'default',
+  theme: 'base',
   securityLevel: 'loose',
-  fontSize: 16,
+  fontSize: 15,
   themeVariables: {
-    fontSize: '16px',
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif'
+    fontSize: '15px',
+    fontFamily: '"Space Grotesk", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
+    background: '#0A0E14',
+    mainBkg: '#18222f',
+    primaryColor: '#18222f',
+    primaryTextColor: '#E7EEF7',
+    primaryBorderColor: '#4C8DFF',
+    secondaryColor: '#15294d',
+    secondaryTextColor: '#E7EEF7',
+    secondaryBorderColor: '#4C8DFF',
+    tertiaryColor: '#111823',
+    tertiaryTextColor: '#8A98AC',
+    tertiaryBorderColor: 'rgba(140,160,185,.35)',
+    lineColor: '#4C8DFF',
+    textColor: '#E7EEF7',
+    nodeTextColor: '#E7EEF7',
+    edgeLabelBackground: '#111823',
+    clusterBkg: '#111823',
+    clusterBorder: 'rgba(140,160,185,.25)',
+    titleColor: '#E7EEF7'
   },
   flowchart: {
     useMaxWidth: false,   // renderiza no tamanho natural; o container faz scroll
