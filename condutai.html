@@ -1872,19 +1872,19 @@ const PROTOCOLS = [
   { id: 'mola', icon: '🤰', name: 'Doença trofoblástica gestacional', tags: 'βHCG · USG · Esvaziamento · Quimio em coriocarcinoma', specialty: 'gineco', guideline: 'FIGO 2021' },
 
   // ====== PSIQUIATRIA ======
-  { id: 'tent_suicid', icon: '🆘', name: 'Tentativa de suicídio — manejo', tags: 'Estratificação · Internação · Antídotos · Acompanhamento', specialty: 'psiq', guideline: 'APA 2024' },
+  { id: 'tent_suicid', icon: '🆘', name: 'Tentativa de suicídio — manejo', tags: 'Estratificação · Internação · Antídotos · Acompanhamento', specialty: 'psiq', guideline: 'APA 2003' },
   { id: 'surto_psic', icon: '🌀', name: 'Surto psicótico agudo', tags: 'Haloperidol · Olanzapina · Contenção · Internação', specialty: 'psiq', guideline: 'APA 2020' },
-  { id: 'agitacao', icon: '⚡', name: 'Agitação psicomotora — contenção', tags: 'Verbal · Química · Mecânica · Haldol+Prometazina', specialty: 'psiq', guideline: 'WPA 2023' },
-  { id: 'depressao_grave', icon: '😔', name: 'Depressão grave / risco suicida', tags: 'ISRS · Internação · ECT · Risco-tempo', specialty: 'psiq', guideline: 'APA 2023' },
-  { id: 'mania', icon: '⚡', name: 'Episódio maníaco', tags: 'Lítio · Valproato · Antipsicótico · Internação', specialty: 'psiq', guideline: 'APA 2024' },
-  { id: 'panico', icon: '😨', name: 'Crise de pânico — manejo agudo', tags: 'Reasseguramento · BZD curto · TCC · ISRS profilaxia', specialty: 'psiq', guideline: 'APA 2023' },
+  { id: 'agitacao', icon: '⚡', name: 'Agitação psicomotora — contenção', tags: 'Verbal · Química · Mecânica · Haldol+Prometazina', specialty: 'psiq', guideline: 'Project BETA 2012' },
+  { id: 'depressao_grave', icon: '😔', name: 'Depressão grave / risco suicida', tags: 'ISRS · Internação · ECT · Risco-tempo', specialty: 'psiq', guideline: 'APA 2010' },
+  { id: 'mania', icon: '⚡', name: 'Episódio maníaco', tags: 'Lítio · Valproato · Antipsicótico · Internação', specialty: 'psiq', guideline: 'CANMAT 2018' },
+  { id: 'panico', icon: '😨', name: 'Crise de pânico — manejo agudo', tags: 'Reasseguramento · BZD curto · TCC · ISRS profilaxia', specialty: 'psiq', guideline: 'APA 2009' },
   { id: 'abst_etanol', icon: '🍷', name: 'Síndrome de abstinência alcoólica / DT', tags: 'CIWA-Ar · BZD · Tiamina · Eletrólitos', specialty: 'psiq', guideline: 'ASAM 2020' },
   { id: 'abst_opio', icon: '💊', name: 'Abstinência de opioide', tags: 'COWS · Buprenorfina · Metadona · Clonidina', specialty: 'psiq', guideline: 'SAMHSA 2021' },
   { id: 'abst_benzo', icon: '💊', name: 'Abstinência de benzodiazepínico', tags: 'Redução gradual · Convulsão · Substituição', specialty: 'psiq', guideline: 'BAP 2014' },
-  { id: 'snm', icon: '⚠️', name: 'Síndrome neuroléptica maligna', tags: 'Suspender neuroléptico · Dantroleno · Bromocriptina', specialty: 'psiq', guideline: 'APA 2020' },
-  { id: 'serotoninerg', icon: '⚠️', name: 'Síndrome serotoninérgica', tags: 'Hunter · Ciproheptadina · Suporte · BZD', specialty: 'psiq', guideline: 'AACT 2019' },
-  { id: 'catatonia', icon: '🧠', name: 'Catatonia', tags: 'Bush-Francis · Lorazepam teste · ECT · Diferencial', specialty: 'psiq', guideline: 'APA 2023' },
-  { id: 'intox_etanol_ag', icon: '🍷', name: 'Intoxicação alcoólica aguda', tags: 'Glicose · Tiamina · Suporte · Diferencial', specialty: 'psiq', guideline: 'ASAM 2020' },
+  { id: 'snm', icon: '⚠️', name: 'Síndrome neuroléptica maligna', tags: 'Suspender neuroléptico · Dantroleno · Bromocriptina', specialty: 'psiq', guideline: 'Consenso' },
+  { id: 'serotoninerg', icon: '⚠️', name: 'Síndrome serotoninérgica', tags: 'Hunter · Ciproheptadina · Suporte · BZD', specialty: 'psiq', guideline: 'Critérios de Hunter' },
+  { id: 'catatonia', icon: '🧠', name: 'Catatonia', tags: 'Bush-Francis · Lorazepam teste · ECT · Diferencial', specialty: 'psiq', guideline: 'BAP 2023' },
+  { id: 'intox_etanol_ag', icon: '🍷', name: 'Intoxicação alcoólica aguda', tags: 'Glicose · Tiamina · Suporte · Diferencial', specialty: 'psiq', guideline: 'Consenso' },
 
   // ====== DERMATO ======
   { id: 'sjs_net', icon: '🔥', name: 'Stevens-Johnson / NET', tags: 'SCORTEN · Suspender droga · Suporte UTI · IVIG', specialty: 'derm', guideline: 'IDSC 2023' },
@@ -3319,306 +3319,1471 @@ herpes_zoster: `# Herpes Zóster
 - Antiviral precoce (< 72h) reduz a dor e a neuralgia pós-herpética.
 - Lesão na ponta do nariz (Hutchinson) = risco ocular → oftalmo urgente.`,
 
-tent_suicid: `# Tentativa de Suicídio / Avaliação de Risco
+tent_suicid: `## 🧭 Do que estamos falando
 
-> Emergência. Primeiro estabilizar clinicamente (intoxicação/trauma), depois avaliar o risco e garantir a segurança.
+Comportamento suicida não é um diagnóstico, é um desfecho que atravessa quase toda a psiquiatria e boa parte da clínica. Ele existe num espectro: ideação passiva (desejo de não acordar, de sumir), ideação ativa (pensar em se matar), planejamento, preparação, tentativa e suicídio consumado.
+
+O modelo mais útil na beira do leito combina três eixos: sofrimento psíquico intenso e percebido como interminável, sensação de aprisionamento (não há saída), e capacidade adquirida de se ferir — familiaridade com dor, com o método, com a violência. Quando os três se somam e o meio letal está à mão, o risco sobe de forma abrupta.
+
+Isso explica por que uma pessoa em depressão grave pode adoecer por meses sem tentar nada e cometer uma tentativa numa tarde, dias depois de começar a melhorar: a intenção estava lá, faltava energia para executar. Melhora psicomotora precoce não é sinônimo de segurança.
+
+O paciente que chega depois de uma tentativa é, estatisticamente, o paciente de maior risco que você vai atender naquele plantão. Tentativa prévia é o preditor isolado mais forte de suicídio, e o período de maior risco é justamente as semanas que seguem a alta da emergência.
 
 ## 🩺 Conduta inicial
-- **Tratar o quadro clínico agudo** (intoxicação, lesão) — ABCDE, antídotos quando houver. Ambiente seguro, remover meios letais, vigilância contínua (não deixar sozinho).
+
+**Tratar o quadro clínico agudo** (intoxicação, lesão) — ABCDE, antídotos quando houver. Ambiente seguro, remover meios letais, vigilância contínua (não deixar sozinho).
+
+Na prática: quem ingeriu medicação precisa de avaliação toxicológica formal (o que, quanto, quando, com o quê), ECG quando houve tricíclico/antipsicótico, paracetamolemia quando disponível e ingestão suspeita, glicemia sempre. Lesão por arma branca ou queda exige avaliação cirúrgica antes de qualquer conversa sobre risco.
+
+Vigilância contínua significa acompanhante ou funcionário à vista, não "porta entreaberta". Retire o que puder ser usado: cintos, cadarços, sacos plásticos, escalpe, fios, medicações no bolso da bolsa. Isso é conduta médica, não excesso de zelo.
+
+Registre a avaliação. Prontuário mal preenchido em comportamento suicida é o problema jurídico mais comum dessa área — e o registro do raciocínio protege muito mais do que o registro de uma escala.
+
+## 💬 Como conversar (e o que perguntar)
+
+Perguntar sobre suicídio **não** induz o ato. Essa é a evidência mais consolidada e mais ignorada do tema. O que induz sofrimento é o silêncio, o julgamento e a pressa.
+
+Pergunte de forma direta e sem eufemismo, depois de acolher: "com tudo isso que está acontecendo, você chegou a pensar em tirar a própria vida?". Evite perguntas negativas embutidas ("você não está pensando besteira, né?"), que só ensinam o paciente a dizer não.
+
+Evite as palavras que carregam estigma: "suicídio consumado" ou "morreu por suicídio" no lugar de "cometeu suicídio"; "tentativa de suicídio" no lugar de "gesto", "chantagem", "manipulação", "tentativa frustrada". Rotular como manipulação é um erro clínico com desfecho — pessoas com comportamento repetido e baixa letalidade também morrem de suicídio.
+
+Explore, em ordem: ideação (passiva ou ativa), plano (existe? qual?), método e acesso real a ele, letalidade percebida pelo paciente (mais importante que a letalidade objetiva), preparativos (carta, doação de objetos, pesquisa sobre métodos, acerto de pendências), intenção atual e ambivalência, arrependimento ou frustração por ter sobrevivido.
+
+Colha história colateral. Familiar, colega, quem trouxe. O que o paciente minimiza, o acompanhante costuma detalhar — e a discordância entre as duas versões é, em si, um dado de risco.
 
 ## 📊 Avaliação de risco
-- **Ideação** (passiva × ativa), **plano**, **método e acesso** (letalidade), tentativas prévias, intencionalidade/arrependimento; fatores: transtorno do humor, abuso de substância, dor/doença crônica, isolamento, perdas, sexo masculino, idade extrema.
+
+**Ideação** (passiva × ativa), **plano**, **método e acesso** (letalidade), tentativas prévias, intencionalidade/arrependimento; fatores: transtorno do humor, abuso de substância, dor/doença crônica, isolamento, perdas, sexo masculino, idade extrema.
+
+Some a esses: psicose com alucinação de comando, insônia grave persistente, agitação e ansiedade intensas, desesperança marcada, alta psiquiátrica recente, luto recente, perda de emprego, exposição a suicídio de pessoa próxima, história familiar de suicídio, violência ou abuso, dor crônica e doença incurável. No Brasil, acrescente populações de risco elevado: indígenas, população LGBTQIA+ jovem sem suporte familiar, e pessoas privadas de liberdade.
+
+Fatores de proteção também precisam ser perguntados e registrados: vínculo com filhos pequenos, religiosidade, projetos concretos de curto prazo, adesão a tratamento, rede de apoio disponível e disposta, ausência de acesso a meio letal. Proteção não anula risco alto, mas define a intensidade do plano de cuidado.
+
+Escalas (Columbia/C-SSRS, por exemplo) organizam a coleta e ajudam a padronizar, mas **nenhuma escala prediz suicídio individual**. Escala não substitui julgamento clínico e não deve ser usada para justificar alta de alguém que você acha inseguro.
+
+## 🔀 Descartar causa orgânica
+
+Antes de rotular como quadro psiquiátrico, exclua o que imita: delirium, hipoglicemia, hipóxia, hipo/hipernatremia, hipotireoidismo, encefalopatia hepática, TCE, encefalite, uso de corticoide, intoxicação ou abstinência.
+
+Um paciente que se autolesionou em estado confusional agudo não está necessariamente com transtorno psiquiátrico: pode estar em delirium, e o tratamento é outro. Alteração do nível de consciência, flutuação, desorientação, febre, déficit focal ou primeiro episódio em idoso pedem investigação clínica antes do rótulo.
+
+Não se esqueça também da violência de terceiros: lesões incompatíveis com o relato, história mutável, medo do acompanhante. Nesses casos há dever de proteção e de notificação.
 
 ## 💊 Conduta
-- **Risco alto → internação** (involuntária se necessário) e segurança; risco moderado/baixo → plano de segurança, retirada de meios, suporte e seguimento próximo.
-- **Tratar o transtorno de base** (depressão, psicose, abuso) e a dor; envolver rede de apoio; encaminhamento psiquiátrico.
-- Escuta empática; perguntar sobre suicídio **não** induz o ato.
 
-## 💡 Pérolas
-- Estabilizar o clínico (intoxicação) antes do psiquiátrico.
-- Acesso a método letal é fator-chave — remover meios salva vidas.`,
+**Risco alto → internação** (involuntária se necessário) e segurança; risco moderado/baixo → plano de segurança, retirada de meios, suporte e seguimento próximo.
 
-surto_psic: `# Surto Psicótico Agudo
+**Tratar o transtorno de base** (depressão, psicose, abuso) e a dor; envolver rede de apoio; encaminhamento psiquiátrico.
 
-> Quadro agudo com delírios, alucinações e desorganização. Excluir causa orgânica antes de atribuir a transtorno primário.
+Escuta empática; perguntar sobre suicídio **não** induz o ato.
+
+O plano de segurança é um documento curto, escrito junto com o paciente, e é intervenção com evidência de redução de comportamento suicida: sinais de alerta pessoais, estratégias de enfrentamento que ele mesmo já usou, pessoas e lugares que distraem, contatos de familiares, contatos profissionais, número do CVV (188) e da emergência, e — o item mais importante — restrição de acesso a meios.
+
+Restrição de meios é a intervenção populacional mais eficaz que existe. Traduza para o caso: quem guarda a medicação em casa, quantos comprimidos ficam disponíveis por vez, onde está a arma, quem tem a chave. Combine isso com o familiar na frente do paciente, sem tom de vigilância punitiva.
+
+Sobre fármacos: nenhum psicotrópico age em horas contra o risco suicida. Trate o transtorno de base (ISRS na depressão, antipsicótico na psicose, estabilizador na bipolaridade), trate insônia e ansiedade porque são fatores modificáveis de curto prazo, e lembre que **lítio** na bipolaridade e **clozapina** na esquizofrenia têm dados de redução de comportamento suicida. Prescreva quantidades limitadas para quem vai para casa.
+
+Manejo do familiar: informe o risco de forma clara, sem culpabilizar; combine tarefas concretas (guardar medicação, acompanhar até a consulta, não deixar sozinho nos primeiros dias); acolha a raiva e o medo, que são reações normais. Familiar exausto e sem orientação é fator de risco adicional.
+
+No Brasil, o encaminhamento é para a RAPS: CAPS de referência (CAPS III quando há acolhimento noturno), UBS com matriciamento, e leito de saúde mental em hospital geral quando indicado. Marque data e local — encaminhamento sem agendamento tem baixa adesão. Contato telefônico proativo nos dias seguintes à alta reduz reincidência.
+
+\`\`\`mermaid
+flowchart TD
+    A["Chegada apos tentativa<br/>ou ideacao"] --> B["Estabilizacao clinica<br/>ABCDE, antidoto, glicemia"]
+    B --> C["Ambiente seguro<br/>retirar meios, vigilancia"]
+    C --> D["Causa organica ou delirium?"]
+    D -->|Sim| E["Tratar causa clinica"]
+    D -->|Nao| F["Avaliar risco<br/>plano, acesso, intencao"]
+    F --> G["Risco alto ou<br/>sem suporte?"]
+    G -->|Sim| H["Internacao, voluntaria ou<br/>involuntaria Lei 10.216"]
+    G -->|Nao| I["Plano de seguranca<br/>restricao de meios, familiar"]
+    I --> J["Seguimento agendado<br/>CAPS/UBS + contato precoce"]
+    H --> K["Notificar violencia<br/>autoprovocada em 24h"]
+    J --> K
+    class G critical;
+    class H action;
+    class J action;
+\`\`\`
+
+## 🏥 Quando internar e aspectos legais
+
+Internar quando há intenção persistente, plano estruturado com meio disponível, tentativa de alta letalidade ou com precauções para não ser encontrado, psicose com comando, agitação grave, ausência de crítica, incapacidade de aderir ao plano de segurança, ou quando não há qualquer suporte que garanta as próximas 48 horas.
+
+No Brasil a internação psiquiátrica é regida pela **Lei 10.216/2001**, em três modalidades: **voluntária** (com consentimento escrito do paciente), **involuntária** (a pedido de terceiro, sem consentimento do paciente, mediante laudo médico circunstanciado) e **compulsória** (determinada por ordem judicial).
+
+A internação involuntária deve ser comunicada ao **Ministério Público estadual em até 72 horas**, assim como a alta. Ela exige laudo médico que justifique a indicação e o fracasso dos recursos extra-hospitalares — a lei privilegia o tratamento em meio aberto e a internação é medida de exceção, pelo menor tempo possível.
+
+Alta contra recomendação médica em paciente de risco alto não é apenas assinar um termo: reavalie capacidade de decisão, acione família, considere involuntária se a incapacidade for evidente. Registre tudo.
+
+**Notificação compulsória**: pela **Lei 13.819/2019** (Política Nacional de Prevenção da Automutilação e do Suicídio), estabelecimentos de saúde públicos e privados devem notificar casos suspeitos ou confirmados de violência autoprovocada, incluindo tentativa de suicídio e autolesão, à autoridade sanitária, pela ficha de violência interpessoal/autoprovocada do SINAN — tentativa de suicídio é de notificação **imediata, em até 24 horas**. A notificação tem caráter sigiloso. Em crianças e adolescentes, há também comunicação ao Conselho Tutelar.
+
+## 💡 Pérolas e erros comuns
+
+Estabilizar o clínico (intoxicação) antes do psiquiátrico.
+
+Acesso a método letal é fator-chave — remover meios salva vidas.
+
+Perguntar não induz. Não perguntar é que deixa o risco invisível.
+
+Erro comum: tratar baixa letalidade objetiva como baixo risco. O que prediz é a intenção e a letalidade percebida, não o número de comprimidos.
+
+Erro comum: chamar de "manipulação" ou "chamada de atenção". Além de antiético, é clinicamente errado e afasta o paciente do serviço.
+
+Erro comum: dar alta porque "agora está calmo e arrependido". Arrependimento na emergência é frequente e volátil; o risco das semanas seguintes permanece.
+
+Erro comum: prescrever caixa fechada de tricíclico ou benzodiazepínico para quem vai para casa sozinho.
+
+Erro comum: melhora rápida do humor sem mudança na desesperança — atenção redobrada, não relaxamento.
+
+Erro comum: não registrar a avaliação de risco, os fatores de proteção e o plano combinado no prontuário.`,
+
+surto_psic: `## 🧬 Mecanismo e o que está acontecendo
+
+Psicose é a perda do contato com a realidade compartilhada: delírios, alucinações, desorganização do pensamento e do comportamento. Não é um diagnóstico — é uma síndrome, e o primeiro trabalho do médico é descobrir a causa.
+
+O modelo neuroquímico dominante envolve hiperatividade dopaminérgica na via mesolímbica (sintomas positivos) e hipoatividade mesocortical (sintomas negativos e cognitivos), com participação glutamatérgica (hipofunção de receptores NMDA) que ajuda a explicar por que antagonistas NMDA, como a cetamina, reproduzem sintomas psicóticos.
+
+Isso tem consequência prática direta: todo antipsicótico disponível bloqueia D2 em algum grau, e é daí que vêm tanto o efeito quanto os efeitos adversos extrapiramidais e a hiperprolactinemia.
+
+Vale lembrar que qualquer insulto suficientemente intenso ao cérebro — infeccioso, metabólico, tóxico, autoimune, estrutural — pode produzir psicose. Por isso a psicose de causa orgânica é regra a excluir, não exceção rara.
 
 ## 🩺 Quadro clínico
-- Delírios, alucinações (auditivas mais comuns), pensamento/comportamento desorganizado, agitação, perda do juízo crítico.
+
+Delírios, alucinações (auditivas mais comuns), pensamento/comportamento desorganizado, agitação, perda do juízo crítico.
+
+Delírios persecutórios são os mais frequentes; delírios de referência, de controle, místicos e de grandeza aparecem conforme o quadro de base. Alucinações auditivas típicas de transtorno primário são vozes em terceira pessoa, comentando ou comandando.
+
+**Alucinações visuais proeminentes, táteis ou olfativas apontam para causa orgânica** — delirium, intoxicação, abstinência, epilepsia de lobo temporal, demência com corpos de Lewy.
+
+A desorganização aparece na fala (descarrilamento, tangencialidade, neologismo, salada de palavras) e no comportamento (vestir-se de forma bizarra, catatonia, comportamento sem propósito).
+
+Sintomas negativos (embotamento afetivo, alogia, avolição, anedonia, retraimento social) costumam preceder o surto em semanas a meses e são o que mais compromete funcionalidade a longo prazo.
+
+Pergunte sempre sobre insônia dos últimos dias, uso de substância, adesão à medicação e estressor recente — a maioria das recaídas tem pelo menos um desses.
 
 ## 🚩 Excluir orgânico (1ª crise, idoso, atípico)
-- Intoxicação/abstinência (álcool, drogas, corticoide), infecção/sepse, distúrbio metabólico, neurológico (AVC, tumor, encefalite), delirium. **Alerta:** início abrupto em idoso, alteração do nível de consciência, febre, déficit focal.
+
+Intoxicação/abstinência (álcool, drogas, corticoide), infecção/sepse, distúrbio metabólico, neurológico (AVC, tumor, encefalite), delirium. **Alerta:** início abrupto em idoso, alteração do nível de consciência, febre, déficit focal.
+
+Acrescente à lista: encefalite autoimune (anti-NMDA, sobretudo em mulher jovem com psicose de instalação rápida, discinesias orofaciais, crises convulsivas e disautonomia), lúpus neuropsiquiátrico, neurossífilis, HIV, tireotoxicose, hipo/hipercalcemia, hiponatremia, deficiência de B12, porfiria, epilepsia de lobo temporal, hidrocefalia de pressão normal.
+
+Medicamentos que provocam psicose: corticoide em dose alta, anticolinérgicos, levodopa e agonistas dopaminérgicos, isoniazida, interferon, efavirenz, mefloquina, estimulantes e anfetamínicos, cetamina, canabinoides sintéticos.
+
+## 🔀 Diagnóstico diferencial psiquiátrico
+
+**Delirium** é o principal diferencial e o mais perigoso de perder: flutuação ao longo do dia, alteração da atenção e do nível de consciência, inversão do ciclo sono-vigília, alucinações visuais. Psicose primária cursa com sensório limpo.
+
+**Mania com sintomas psicóticos**: humor elevado ou irritável, redução da necessidade de sono, aceleração, grandiosidade. **Depressão psicótica**: delírios congruentes de ruína, culpa, niilismo.
+
+**Esquizofrenia** exige ≥ 6 meses de sintomas (incluindo prodromos); **transtorno esquizofreniforme** entre 1 e 6 meses; **transtorno psicótico breve** < 1 mês com retorno ao funcionamento prévio. **Transtorno esquizoafetivo** quando há período de psicose sem sintomas de humor proeminentes.
+
+**Psicose induzida por substância**: relação temporal com uso ou abstinência, remissão com o tempo de abstinência. Cannabis, cocaína, anfetamínicos e alucinógenos são os mais comuns no Brasil.
+
+**Demência** em idoso, com declínio cognitivo prévio; **transtorno de personalidade** com sintomas quase psicóticos transitórios ligados a estresse; **transtorno factício e simulação** também entram na lista.
 
 ## ✅ Investigação
-- Glicemia, eletrólitos, função renal/hepática, TSH, hemograma, toxicológico, urina; TC de crânio/punção lombar se suspeita neurológica/infecciosa.
+
+Glicemia, eletrólitos, função renal/hepática, TSH, hemograma, toxicológico, urina; TC de crânio/punção lombar se suspeita neurológica/infecciosa.
+
+Complete conforme o cenário: cálcio, B12, sorologias (sífilis, HIV), gasometria e culturas se sepse, ECG antes de antipsicótico (QT), beta-hCG em mulher em idade fértil. Ressonância e líquor quando houver suspeita de encefalite, crise convulsiva ou déficit focal; EEG se suspeita de estado de mal não convulsivo.
 
 ## 💊 Tratamento (com doses)
-- **Antipsicótico:** **haloperidol** (± prometazina) ou de 2ª geração (risperidona, olanzapina); via IM se recusa/agitação grave.
-- Ambiente seguro, desescalada verbal; benzodiazepínico adjuvante na agitação.
-- Tratar a causa orgânica se identificada; encaminhamento psiquiátrico.
 
-## 💡 Pérolas
-- Primeira psicose, idoso ou com alteração de consciência/febre = investigar organicidade antes.
-- Desescalada verbal primeiro; medicação conforme risco.`,
+**Antipsicótico:** **haloperidol** (± prometazina) ou de 2ª geração (risperidona, olanzapina); via IM se recusa/agitação grave.
 
-agitacao: `# Agitação Psicomotora
+Ambiente seguro, desescalada verbal; benzodiazepínico adjuvante na agitação.
 
-> Atividade motora/verbal aumentada com risco de auto/heteroagressão. Manejo escalonado priorizando a segurança.
+Tratar a causa orgânica se identificada; encaminhamento psiquiátrico.
+
+Na prática brasileira, para o paciente que aceita via oral: **risperidona 1–2 mg VO**, repetível, com alvo usual de 2–6 mg/dia; **olanzapina 5–10 mg VO**; **quetiapina** quando se quer mais sedação e menos extrapiramidal; **haloperidol 2,5–5 mg VO**. Em recusa ou agitação intensa, **haloperidol 2,5–5 mg IM associado a prometazina 25–50 mg IM** é o esquema mais usado e mais estudado no país, com boa tolerabilidade e menos distonia que haloperidol isolado. **Olanzapina IM** é alternativa — não associar a benzodiazepínico parenteral pelo risco de depressão cardiorrespiratória.
+
+Comece baixo em primeiro episódio: pacientes virgens de tratamento respondem a doses menores e fazem mais efeito adverso. Titule em dias, não em horas, e evite associar dois antipsicóticos.
+
+Vigie distonia aguda (responde a **biperideno IM/VO**), acatisia (frequentemente confundida com piora da agitação — trate reduzindo dose e com betabloqueador ou benzodiazepínico, não aumentando o antipsicótico), parkinsonismo e prolongamento de QT.
+
+Tempo importa: quanto maior a duração de psicose não tratada, pior o prognóstico funcional. Isso justifica iniciar tratamento assim que a causa orgânica for razoavelmente excluída.
+
+Manutenção após remissão do primeiro episódio deve durar pelo menos 1 a 2 anos. **Clozapina** é o tratamento da esquizofrenia refratária (falha de dois antipsicóticos em dose e tempo adequados) e está disponível no SUS por protocolo, exigindo hemograma seriado pelo risco de agranulocitose. Antipsicótico injetável de longa ação melhora adesão e reduz reinternação.
+
+\`\`\`mermaid
+flowchart TD
+    A["Psicose aguda"] --> B["Sinais vitais, glicemia<br/>nivel de consciencia"]
+    B --> C["Consciencia flutuante,<br/>febre ou deficit focal?"]
+    C -->|Sim| D["Investigar delirium<br/>ou causa neurologica"]
+    C -->|Nao| E["Ambiente seguro<br/>desescalada verbal"]
+    E --> F["Aceita via oral?"]
+    F -->|Sim| G["Antipsicotico VO<br/>risperidona ou olanzapina"]
+    F -->|Nao| H["Haloperidol 2,5-5 mg IM<br/>+ prometazina 25-50 mg IM"]
+    G --> I["Reavaliar, tratar causa<br/>encaminhar a RAPS"]
+    H --> I
+    class C critical;
+    class I action;
+\`\`\`
+
+## 🏥 Quando internar e aspectos legais
+
+Interne quando há risco de auto ou heteroagressão, alucinação de comando, recusa alimentar, incapacidade de autocuidado, ausência de suporte familiar, necessidade de investigação clínica que não se faz ambulatorialmente ou falha do manejo em CAPS.
+
+No Brasil o cuidado ocorre preferencialmente na RAPS — CAPS (idealmente CAPS III, com acolhimento noturno), leitos de saúde mental em hospital geral e, quando necessário, hospital psiquiátrico. A **Lei 10.216/2001** define internação voluntária, involuntária (comunicada ao Ministério Público em até 72 horas) e compulsória (judicial), com a internação sempre como recurso de exceção e pelo menor tempo possível.
+
+Documente a indicação, o que foi tentado antes e a comunicação com a família.
+
+## 💡 Pérolas e erros comuns
+
+Primeira psicose, idoso ou com alteração de consciência/febre = investigar organicidade antes.
+
+Desescalada verbal primeiro; medicação conforme risco.
+
+Alucinação visual, tátil ou olfativa proeminente = pense em orgânico até prova em contrário.
+
+Erro comum: confundir acatisia com piora da psicose e subir a dose do antipsicótico — piora tudo.
+
+Erro comum: haloperidol isolado em dose alta em quem está intoxicado por estimulante ou em abstinência alcoólica; nesses casos o benzodiazepínico é a base.
+
+Erro comum: não pedir beta-hCG e ECG antes de iniciar antipsicótico.
+
+Erro comum: dar alta sem antipsicótico e sem vaga agendada no CAPS; a recaída volta pela porta da emergência.
+
+Erro comum: esquecer encefalite anti-NMDA em mulher jovem com psicose rápida, movimentos anormais e crises.`,
+
+agitacao: `## 🧬 Mecanismo e por que a abordagem é escalonada
+
+Agitação psicomotora é um estado de excitação motora e verbal com perda de controle, que existe num contínuo: inquietação, irritabilidade, hostilidade verbal, agressão a objetos, agressão a pessoas. Quanto mais cedo se intervém no contínuo, menos coerção é necessária.
+
+Neurobiologicamente há hiperativação de circuitos límbicos com falência do controle pré-frontal — e isso pode acontecer por psicose, mania, intoxicação, abstinência, dor, hipóxia, hipoglicemia, delirium ou demência. Agitação é sintoma, não diagnóstico.
+
+O princípio central do manejo moderno é que **contenção física e sedação forçada são o último recurso, não o primeiro**. Elas têm mortalidade associada, geram trauma, quebram a aliança terapêutica e frequentemente pioram o comportamento na próxima crise.
+
+O objetivo do tratamento não é "apagar" o paciente, e sim **acalmá-lo o suficiente para que ele possa ser avaliado e colaborar**. Sedação profunda impede o exame neurológico e mascara a causa orgânica que você ainda não descartou.
+
+## 🩺 Reconhecimento precoce
+
+Sinais que antecedem a agressão: andar de um lado para o outro, punhos cerrados, mandíbula tensa, tom de voz crescente, invasão de espaço, recusa a sentar, olhar fixo, resposta lenta a comandos, ameaças verbais.
+
+Escalas como PANSS-EC ou ACES ajudam a padronizar, mas na porta da emergência o mais útil é treinar a equipe a nomear o risco cedo e chamar reforço antes que a situação escale.
+
+Segurança da equipe vem primeiro: mantenha distância de dois braços, posicione-se em ângulo (não frontal), deixe rota de saída livre para você e para o paciente, retire objetos arremessáveis, não atenda sozinho.
 
 ## 🧬 Causas (sempre considerar orgânica)
-- **Orgânica/delirium:** hipoglicemia, hipóxia, intoxicação/abstinência, infecção, dor, TCE. Psiquiátrica: psicose, mania, transtorno de personalidade. **Checar glicemia e sinais vitais sempre.**
+
+**Orgânica/delirium:** hipoglicemia, hipóxia, intoxicação/abstinência, infecção, dor, TCE. Psiquiátrica: psicose, mania, transtorno de personalidade. **Checar glicemia e sinais vitais sempre.**
+
+Acrescente: hiponatremia, hipercalcemia, uremia, encefalopatia hepática, hipertireoidismo, encefalite, AVC, crise parcial complexa e estado pós-ictal, retenção urinária e fecaloma no idoso, abstinência de benzodiazepínico, síndrome anticolinérgica, síndrome serotoninérgica.
+
+Pistas de organicidade: idade > 40 anos sem história psiquiátrica prévia, início abrupto, flutuação, desorientação, alucinação visual, febre, taquipneia, dessaturação, sinal focal, incontinência, pupilas anormais.
+
+## 🔀 Diagnóstico diferencial
+
+**Delirium hiperativo** — flutuação, desatenção, alteração do sensório. É a causa que mais se confunde com "paciente psiquiátrico agressivo" e a que mais mata se tratada só com contenção.
+
+**Intoxicação por estimulante** (cocaína, crack, anfetamínicos) — midríase, taquicardia, hipertensão, sudorese, hipertermia. **Abstinência alcoólica** — tremor, sudorese, taquicardia, história de uso pesado, últimas 6–96 horas.
+
+**Acatisia** induzida por antipsicótico — inquietação subjetiva intensa nas pernas, necessidade de se mover; medicar com mais antipsicótico piora.
+
+**Mania**, **psicose**, **transtorno de personalidade borderline** em crise, **deficiência intelectual e autismo** com sobrecarga sensorial (aqui, reduzir estímulo resolve mais que fármaco), **demência** com sintomas comportamentais.
 
 ## 💊 Manejo escalonado
+
 1. **Desescalada verbal** + ambiente seguro, retirar objetos perigosos, equipe presente.
+
 2. **Medicação:**
+
 - **Psicose/mania:** **antipsicótico** (haloperidol ± prometazina; ou olanzapina/risperidona).
 - **Abstinência alcoólica / intoxicação por estimulante:** **benzodiazepínico** (diazepam/lorazepam).
 - Evitar haloperidol isolado na intoxicação por estimulante e na abstinência alcoólica.
+
 3. **Contenção física** só se falharem as anteriores e houver risco iminente, por tempo mínimo e com monitorização.
 
+**Como desescalar, na prática**: um único profissional fala (voz única evita confusão), apresenta-se pelo nome, mantém tom baixo e ritmo lento, respeita o espaço pessoal, não cruza os braços nem aponta o dedo, não confronta o delírio mas também não concorda com ele ("eu não estou vendo isso, mas entendo que para você é real e assustador").
+
+Ofereça escolhas concretas e pequenas — água, comida, um lugar mais silencioso, medicação oral em vez de injetável, telefonar para alguém. Escolha devolve controle, e sensação de controle reduz agitação. Estabeleça limites de forma respeitosa, explicando a consequência sem ameaçar.
+
+Prefira sempre a **via oral** quando o paciente aceita: comprimido dispersível ou solução tem início de ação razoável e evita a violência simbólica da injeção.
+
+**Esquemas usuais no Brasil**: **haloperidol 2,5–5 mg IM associado a prometazina 25–50 mg IM** é o esquema mais estudado (ensaios TREC, boa parte deles brasileiros) — a prometazina reduz distonia e acrescenta sedação. **Olanzapina 5–10 mg** (oral dispersível ou IM). **Risperidona 1–2 mg VO**. **Diazepam 5–10 mg VO** ou **midazolam IM** quando a causa é abstinência ou estimulante. Lorazepam parenteral, padrão em outros países, tem disponibilidade limitada no Brasil.
+
+Regras que evitam dano: não associar **olanzapina IM com benzodiazepínico parenteral** (depressão cardiorrespiratória); cuidado com benzodiazepínico em idoso, DPOC e intoxicação por depressor; ECG e atenção ao QT com haloperidol, sobretudo em dose repetida, distúrbio eletrolítico ou uso de outras drogas que alargam QT; **evitar haloperidol isolado na abstinência alcoólica** (reduz limiar convulsivo e não trata a causa) **e na intoxicação por estimulante** (não trata a hiperadrenergia e aumenta risco de hipertermia).
+
+Reavalie em 15–30 minutos e repita a dose se necessário, respeitando teto diário e monitorizando. Depois de sedado, o paciente segue sendo um paciente: sinais vitais, oximetria, glicemia, exame físico e busca de causa orgânica.
+
+**Contenção física**, quando inevitável: indicação médica registrada, no mínimo cinco pessoas treinadas (uma por membro e uma para a cabeça), **nunca em decúbito ventral** (risco de asfixia posicional), membros em posições anatômicas com faixas apropriadas, cabeceira elevada, acesso venoso, monitorização de sinais vitais e perfusão periférica em intervalos curtos, reavaliação frequente da necessidade, profilaxia de TEV em contenção prolongada, hidratação, e retirada progressiva assim que possível. Registrar horário de início, motivo, quem indicou, reavaliações e horário de retirada. Riscos: asfixia, rabdomiólise, TEV, lesão de plexo, aspiração, hipertermia e morte súbita — mais ainda se associada a sedação profunda e a estimulantes.
+
+Depois da crise, faça o *debriefing* com o paciente e com a equipe: o que disparou, o que ajudou, o que combinar para a próxima vez. Isso reduz recorrência.
+
+\`\`\`mermaid
+flowchart TD
+    A["Paciente agitado"] --> B["Seguranca da equipe<br/>sinais vitais e glicemia"]
+    B --> C["Hipoglicemia, hipoxia<br/>ou delirium?"]
+    C -->|Sim| D["Tratar a causa clinica"]
+    C -->|Nao| E["Desescalada verbal<br/>ambiente calmo, escolhas"]
+    E --> F["Acalmou?"]
+    F -->|Sim| G["Avaliar e tratar causa base"]
+    F -->|Nao| H["Qual o contexto?"]
+    H -->|Psicose ou mania| I["Haloperidol 2,5-5 mg IM<br/>+ prometazina 25-50 mg IM"]
+    H -->|Abstinencia alcoolica<br/>ou estimulante| J["Benzodiazepinico<br/>diazepam ou midazolam"]
+    I --> K["Reavaliar em 15-30 min<br/>monitorizar"]
+    J --> K
+    K --> L["Contencao fisica so se<br/>risco iminente, tempo minimo"]
+    class C critical;
+    class L critical;
+    class G action;
+    class K action;
+\`\`\`
+
 ## 🧪 Exames complementares
+
 | Exame | Objetivo |
 | --- | --- |
 | Glicemia capilar | Hipoglicemia |
 | Sinais vitais, SatO₂ | Causa orgânica |
 | Toxicológico/eletrólitos | Conforme suspeita |
+| ECG | QT antes de antipsicótico |
+| CK | Rabdomiólise após contenção/estimulante |
 
-## 💡 Pérolas
-- Sempre cheque glicemia e sinais vitais — agitação pode ser orgânica.
-- Benzodiazepínico na abstinência alcoólica; antipsicótico na psicose.`,
+## 🏥 Quando internar e aspectos legais
 
-depressao_grave: `# Depressão Maior (e Episódio Grave)
+Interne quando persiste risco de auto ou heteroagressão, quando a causa exige investigação hospitalar, ou quando não há retaguarda para as próximas horas. Agitação por causa clínica interna no leito clínico, não no psiquiátrico.
 
-> Humor deprimido/anedonia por ≥ 2 semanas + sintomas. Avaliar risco de suicídio em todos.
+Contenção e sedação involuntárias são medidas restritivas de liberdade e se justificam pelo risco iminente; devem ser proporcionais, temporárias e registradas. Se evoluir para internação sem consentimento, aplica-se a **Lei 10.216/2001**, com comunicação da internação involuntária ao Ministério Público em até 72 horas.
+
+## 💡 Pérolas e erros comuns
+
+Sempre cheque glicemia e sinais vitais — agitação pode ser orgânica.
+
+Benzodiazepínico na abstinência alcoólica; antipsicótico na psicose.
+
+Meta é paciente calmo e avaliável, não paciente apagado.
+
+Erro comum: partir direto para a contenção porque "é mais rápido". A desescalada leva minutos e evita horas de complicação.
+
+Erro comum: contenção em decúbito ventral — pode matar por asfixia posicional.
+
+Erro comum: sedar profundamente sem antes checar glicemia e oximetria; delirium hipoglicêmico sedado é diagnóstico perdido.
+
+Erro comum: repetir haloperidol indefinidamente sem ECG e sem reavaliar a causa.
+
+Erro comum: tratar acatisia com mais antipsicótico.
+
+Erro comum: contenção sem registro de indicação, horário e reavaliações.`,
+
+depressao_grave: `## 🧬 Fisiopatologia e o que isso muda na prática
+
+A depressão maior não é "falta de serotonina". O modelo atual é multifatorial: desregulação de monoaminas (serotonina, noradrenalina, dopamina), hiperatividade do eixo hipotálamo-hipófise-adrenal com cortisol elevado, inflamação de baixo grau, redução de neuroplasticidade e de BDNF no hipocampo e no córtex pré-frontal, e vulnerabilidade genética interagindo com adversidade precoce.
+
+Isso explica dois fatos clínicos importantes. Primeiro, o antidepressivo eleva a monoamina em horas, mas a resposta clínica leva semanas — o efeito depende de adaptação de receptores e de neuroplasticidade, não da concentração imediata. Segundo, intervenções não farmacológicas (psicoterapia, exercício, sono) atuam nas mesmas vias e por isso somam efeito.
+
+Depressão grave também é doença sistêmica: aumenta mortalidade cardiovascular, piora controle de diabetes, reduz adesão a qualquer tratamento e encurta expectativa de vida. Tratar depressão é intervenção clínica, não "apoio emocional".
 
 ## ✅ Critérios diagnósticos (DSM)
-- ≥ 5 sintomas por ≥ 2 semanas (um deve ser humor deprimido ou anedonia): humor deprimido, anedonia, alteração de peso/apetite, insônia/hipersonia, agitação/lentificação, fadiga, culpa/inutilidade, dificuldade de concentração, **ideação de morte/suicídio**.
+
+≥ 5 sintomas por ≥ 2 semanas (um deve ser humor deprimido ou anedonia): humor deprimido, anedonia, alteração de peso/apetite, insônia/hipersonia, agitação/lentificação, fadiga, culpa/inutilidade, dificuldade de concentração, **ideação de morte/suicídio**.
+
+Na população brasileira, sobretudo em atenção primária, a queixa de abertura costuma ser somática: dor difusa, cansaço, insônia, "nervoso", tontura, queixa digestiva. Perguntar ativamente sobre humor e anedonia nesses pacientes muda o diagnóstico.
+
+Rastreamento com PHQ-2 e PHQ-9 é prático e validado; escalas de gravidade (Hamilton, MADRS) ajudam a acompanhar resposta, mas o diagnóstico permanece clínico.
+
+Especificadores que mudam conduta: **com sintomas psicóticos**, **com catatonia**, **com ansiedade proeminente**, **atípica**, **melancólica**, **periparto**, **sazonal**, e **com características mistas** — este último é bandeira vermelha para bipolaridade.
 
 ## 🚩 Gravidade / alerta
-- Sintomas psicóticos, risco de suicídio, incapacidade funcional grave, catatonia, recusa alimentar.
+
+Sintomas psicóticos, risco de suicídio, incapacidade funcional grave, catatonia, recusa alimentar.
+
+Acrescente: desidratação, perda ponderal rápida, imobilidade, incapacidade de autocuidado, idoso com recusa alimentar (mortalidade alta e frequentemente subestimada), depressão periparto com risco para o bebê.
+
+Avalie risco de suicídio em **todos** — não só nos que "parecem" graves. Pergunte diretamente sobre ideação, plano e acesso a meios; perguntar não induz.
+
+## 🔀 Diagnóstico diferencial (inclusive orgânico)
+
+Antes de rotular, descarte o que imita depressão: **hipotireoidismo**, anemia, deficiência de B12 e folato, deficiência de vitamina D, diabetes descompensado, doença de Addison e síndrome de Cushing, hepatopatia, uremia, apneia obstrutiva do sono, doença de Parkinson, demência (a "pseudodemência depressiva" e a depressão como pródromo de demência convivem), AVC, esclerose múltipla, HIV, sífilis, neoplasia oculta (pâncreas, pulmão), lúpus.
+
+Medicamentos e substâncias: corticoide, interferon, isotretinoína, betabloqueador em suscetíveis, anticoncepcional em algumas mulheres, álcool (o depressor mais subdiagnosticado), abstinência de estimulantes, cannabis.
+
+Diferenciais psiquiátricos: **transtorno bipolar em fase depressiva** (o mais importante e o mais perdido), distimia/transtorno depressivo persistente, transtorno de ajustamento, luto (que tem ondas, preserva autoestima e não costuma trazer inutilidade global), transtorno de ansiedade, transtorno por uso de substância, transtorno de personalidade, transtorno disfórico pré-menstrual, hipoatividade por dor crônica.
+
+**Como rastrear bipolaridade**: episódios prévios de energia aumentada com menos sono, início antes dos 25 anos, história familiar de bipolaridade, múltiplos episódios depressivos, sintomas psicóticos, resposta rápida e depois perda de efeito de antidepressivos, virada de humor com antidepressivo, sintomas mistos. Instrumentos como o MDQ ajudam a levantar suspeita.
 
 ## 💊 Tratamento (com doses)
-- **1ª linha: ISRS** (sertralina, escitalopram) — titular; resposta em 2–4 semanas, manter ≥ 6 meses após remissão. Alternativas: IRSN (venlafaxina, duloxetina), bupropiona, mirtazapina.
-- **Psicoterapia** (TCC) associada.
-- **Grave/refratária/com risco:** internação, **ECT** (depressão psicótica/catatônica/risco iminente), associação por especialista.
-- Investigar bipolaridade antes (antidepressivo isolado pode precipitar mania).
 
-## 💡 Pérolas
-- Pergunte sobre suicídio em toda depressão.
-- Exclua bipolar antes de antidepressivo isolado (risco de virada maníaca).`,
+**1ª linha: ISRS** (sertralina, escitalopram) — titular; resposta em 2–4 semanas, manter ≥ 6 meses após remissão. Alternativas: IRSN (venlafaxina, duloxetina), bupropiona, mirtazapina.
 
-mania: `# Episódio Maníaco (Transtorno Bipolar)
+**Psicoterapia** (TCC) associada.
 
-> Humor elevado/irritável + energia aumentada por ≥ 1 semana com prejuízo. Emergência quando há psicose ou risco.
+**Grave/refratária/com risco:** internação, **ECT** (depressão psicótica/catatônica/risco iminente), associação por especialista.
+
+Investigar bipolaridade antes (antidepressivo isolado pode precipitar mania).
+
+Doses habituais de início e alvo: **sertralina 50 mg/dia**, alvo 50–200 mg; **escitalopram 10 mg/dia**, alvo 10–20 mg; **fluoxetina 20 mg/dia**, alvo 20–60 mg; **venlafaxina** a partir de 75 mg/dia; **bupropiona 150 mg/dia** (evitar se risco convulsivo ou transtorno alimentar); **mirtazapina 15–30 mg à noite** (útil quando há insônia e perda de peso). Em idoso, comece com metade da dose e titule mais devagar.
+
+Escolha guiada por perfil: insônia e inapetência favorecem mirtazapina; disfunção sexual ou fadiga favorecem bupropiona; dor neuropática associada favorece duloxetina; risco de interação e polifarmácia favorece sertralina ou escitalopram.
+
+Efeitos adversos que fazem o paciente abandonar na primeira semana e por isso devem ser antecipados: náusea, ansiedade inicial, insônia, cefaleia, disfunção sexual. Avise que melhoram e que o efeito terapêutico demora. Vigie hiponatremia (idoso), sangramento com anti-inflamatório ou anticoagulante, e prolongamento de QT com citalopram em dose alta.
+
+Reavalie em 2 semanas (tolerância e risco) e em 4 semanas (resposta). Sem resposta parcial em 4 semanas com dose otimizada, mude de estratégia: otimizar dose, trocar de classe, associar psicoterapia, ou potencializar (lítio, antipsicótico atípico em dose baixa, hormônio tireoidiano) — potencialização é decisão de especialista.
+
+Manutenção: mínimo de 6 a 12 meses após remissão no primeiro episódio; tratamento prolongado ou indefinido após múltiplos episódios, episódio grave ou tentativa de suicídio. Retirada sempre gradual (síndrome de descontinuação, sobretudo com paroxetina e venlafaxina).
+
+**ECT** continua sendo o tratamento mais eficaz para depressão grave com psicose, catatonia, recusa alimentar, risco suicida iminente, gestante com quadro grave e idoso frágil. No Brasil o acesso é limitado a poucos serviços universitários e privados, o que precisa entrar no planejamento do encaminhamento.
+
+\`\`\`mermaid
+flowchart TD
+    A["Suspeita de depressao maior"] --> B["Avaliar risco de suicidio<br/>em todos"]
+    B --> C["Risco alto, psicose,<br/>catatonia ou recusa alimentar?"]
+    C -->|Sim| D["Internacao<br/>considerar ECT"]
+    C -->|Nao| E["Excluir causa organica<br/>TSH, B12, hemograma"]
+    E --> F["Historia de mania<br/>ou hipomania?"]
+    F -->|Sim| G["Nao usar antidepressivo isolado<br/>tratar como bipolar"]
+    F -->|Nao| H["ISRS: sertralina 50 mg/dia<br/>ou escitalopram 10 mg/dia"]
+    H --> I["Associar psicoterapia<br/>reavaliar em 2 e 4 semanas"]
+    I --> J["Manter 6-12 meses<br/>apos remissao"]
+    class C critical;
+    class G critical;
+    class D action;
+    class J action;
+\`\`\`
+
+## 🏥 Quando internar e aspectos legais
+
+Interne quando há risco suicida alto, sintomas psicóticos, catatonia, recusa alimentar ou hídrica, incapacidade de autocuidado, ausência de suporte, necessidade de ECT ou falha ambulatorial com piora progressiva.
+
+No Brasil, a rede de referência é a RAPS: UBS com apoio matricial para quadros leves e moderados, CAPS para quadros graves e persistentes, CAPS III e leito de saúde mental em hospital geral para crise. A **Lei 10.216/2001** regula internação voluntária, involuntária (comunicação ao Ministério Público em até 72 horas) e compulsória.
+
+Se houve tentativa de suicídio ou autolesão, há **notificação compulsória** de violência autoprovocada em até 24 horas (Lei 13.819/2019, ficha do SINAN).
+
+## 💡 Pérolas e erros comuns
+
+Pergunte sobre suicídio em toda depressão.
+
+Exclua bipolar antes de antidepressivo isolado (risco de virada maníaca).
+
+Erro comum: dose subterapêutica mantida por meses — "não respondeu" sem nunca ter chegado à dose alvo.
+
+Erro comum: trocar de antidepressivo antes de 4 semanas em dose otimizada.
+
+Erro comum: prescrever benzodiazepínico como tratamento da depressão; ele alivia ansiedade e insônia por poucas semanas e cria dependência.
+
+Erro comum: suspender o antidepressivo assim que o paciente melhora — recaída é a regra.
+
+Erro comum: esquecer TSH, B12 e hemograma antes de rotular depressão resistente.
+
+Erro comum: interpretar melhora da lentificação psicomotora como segurança; o risco suicida pode aumentar justamente aí.
+
+Erro comum: não perguntar sobre uso de álcool, que sustenta e perpetua o quadro.`,
+
+mania: `## 🧬 Fisiopatologia e por que é emergência
+
+O transtorno bipolar é um transtorno do neurodesenvolvimento e do ritmo: instabilidade na regulação de circuitos límbico-pré-frontais, desregulação de sinalização intracelular (proteína G, inositol, GSK-3 — alvos do lítio e do valproato), alterações de ritmo circadiano e alta herdabilidade.
+
+A privação de sono é ao mesmo tempo sintoma e motor da mania: menos sono acelera o quadro, que reduz mais o sono, num ciclo que se fecha em dias. É por isso que restaurar o sono é intervenção terapêutica, não conforto.
+
+Mania é emergência médica por três motivos: o julgamento comprometido leva a perdas irreversíveis (financeiras, jurídicas, relacionais, exposição sexual), o risco de acidente e de agressão é alto, e episódios repetidos deixam cicatriz cognitiva e funcional — cada episódio aumenta a chance do próximo.
+
+O risco de suicídio no transtorno bipolar é dos maiores em psiquiatria, concentrado nas fases depressiva e mista, o que torna a busca por sintomas mistos obrigatória mesmo num paciente eufórico.
 
 ## ✅ Critérios diagnósticos (DSM)
-- Humor anormalmente elevado/expansivo/irritável + ≥ 3 (4 se só irritável): **grandiosidade, menor necessidade de sono, fala acelerada, fuga de ideias, distratibilidade, aumento de atividade/agitação, atividades de risco** (gastos, sexo). Mania = ≥ 7 dias/hospitalização; hipomania = ≥ 4 dias sem prejuízo grave.
+
+Humor anormalmente elevado/expansivo/irritável + ≥ 3 (4 se só irritável): **grandiosidade, menor necessidade de sono, fala acelerada, fuga de ideias, distratibilidade, aumento de atividade/agitação, atividades de risco** (gastos, sexo). Mania = ≥ 7 dias/hospitalização; hipomania = ≥ 4 dias sem prejuízo grave.
+
+Note que "menor necessidade de sono" é diferente de insônia: o paciente dorme pouco e acorda cheio de energia, sem cansaço no dia seguinte.
+
+Cerca de metade dos episódios maníacos cursa com sintomas psicóticos, em geral congruentes com o humor (grandeza, missão, poderes) mas às vezes incongruentes, o que gera confusão com esquizofrenia.
+
+Colha história colateral sempre. O paciente maníaco quase nunca reconhece o próprio estado — a falta de crítica é parte do quadro, não má-fé.
+
+## 🔀 Diagnóstico diferencial (inclusive orgânico)
+
+Mania secundária existe e precisa ser buscada, sobretudo em primeiro episódio, idade atípica (após os 40–50 anos), sintomas neurológicos ou ausência de história familiar.
+
+Causas orgânicas: **hipertireoidismo e tireotoxicose**, uso de **corticoide** em dose alta, levodopa e agonistas dopaminérgicos, isoniazida, interferon, antidepressivo (virada), estimulantes, cocaína, anfetamínicos, cannabis; lesão frontal ou de núcleos da base, esclerose múltipla, epilepsia, neurossífilis, HIV, encefalite, demência frontotemporal, hipercortisolismo, deficiência de B12, delirium.
+
+Diferenciais psiquiátricos: **esquizofrenia** e transtorno esquizoafetivo, **TDAH** em adulto (sintomas crônicos e não episódicos), **transtorno de personalidade borderline** (instabilidade de humor em horas, reativa a vínculo, sem redução da necessidade de sono), transtorno por uso de substância, transtorno de conduta em adolescente, agitação por delirium.
+
+Distinção prática de ouro: mania tem **curso episódico** com mudança clara em relação ao funcionamento habitual e **redução da necessidade de sono**; borderline e TDAH têm padrão contínuo desde cedo.
 
 ## 💊 Tratamento (com doses)
-- **Estabilizador do humor:** **lítio** ou **valproato**; e/ou **antipsicótico de 2ª geração** (quetiapina, olanzapina, risperidona, aripiprazol).
-- **Suspender antidepressivo** (precipita/mantém a mania).
-- Agitação/psicose: antipsicótico ± benzodiazepínico; internação se risco; manutenção para prevenir recaídas.
+
+**Estabilizador do humor:** **lítio** ou **valproato**; e/ou **antipsicótico de 2ª geração** (quetiapina, olanzapina, risperidona, aripiprazol).
+
+**Suspender antidepressivo** (precipita/mantém a mania).
+
+Agitação/psicose: antipsicótico ± benzodiazepínico; internação se risco; manutenção para prevenir recaídas.
+
+Na mania grave, a combinação de estabilizador com antipsicótico de segunda geração é mais eficaz e mais rápida que monoterapia. Na mania leve a moderada, monoterapia é razoável.
+
+**Lítio** é o fármaco com melhor evidência de prevenção de recaída e de redução de comportamento suicida; a resposta antimaníaca leva de 1 a 2 semanas. A litemia alvo em fase aguda fica na faixa de 0,8–1,2 mEq/L e na manutenção em torno de 0,6–0,8 mEq/L, colhida 12 horas após a dose. Janela terapêutica estreita: intoxicação com desidratação, diurético tiazídico, IECA, AINE, insuficiência renal, dieta hipossódica, vômitos e diarreia. Monitorar função renal, TSH e cálcio periodicamente.
+
+**Valproato** age mais rápido e é útil em mania mista, irritável e com muitos episódios; exige hemograma e função hepática, e é **absolutamente evitado em mulheres em idade fértil sem contracepção eficaz** pela teratogenicidade e pelo comprometimento do neurodesenvolvimento. **Carbamazepina** é alternativa, com muitas interações (indutor enzimático) e risco de hiponatremia e reações cutâneas graves.
+
+**Antipsicóticos de segunda geração** (quetiapina, olanzapina, risperidona, aripiprazol) são eficazes em monoterapia ou associados, com início mais rápido; vigie sedação, síndrome metabólica, extrapiramidais e acatisia. **Benzodiazepínico** é adjuvante para agitação e para restaurar o sono, por curto prazo.
+
+Restaurar o sono é meta explícita das primeiras 48 horas; higiene do sono, ambiente com pouco estímulo e medicação sedativa quando necessário.
+
+**Suspender o antidepressivo** é conduta padrão na mania. Na depressão bipolar, o tratamento se apoia em quetiapina, lítio, lamotrigina e lurasidona, e antidepressivo isolado é contraindicado.
+
+Manutenção é regra, não exceção: após um episódio maníaco, o tratamento continua por anos. Psicoeducação sobre pródromos, regularidade de sono, abstinência de álcool e drogas e adesão medicamentosa reduzem recaída de forma comparável a fármacos.
+
+\`\`\`mermaid
+flowchart TD
+    A["Episodio maniaco"] --> B["Suspender antidepressivo<br/>e estimulantes"]
+    B --> C["Excluir causa secundaria<br/>TSH, corticoide, drogas"]
+    C --> D["Ha psicose, agitacao<br/>ou risco?"]
+    D -->|Sim| E["Antipsicotico de 2a geracao<br/>+ estabilizador; BZD se preciso"]
+    D -->|Nao| F["Estabilizador em monoterapia<br/>litio ou valproato"]
+    E --> G["Restaurar o sono<br/>ambiente com pouco estimulo"]
+    F --> G
+    G --> H["Exames antes: TSH, funcao renal<br/>e hepatica, beta-hCG"]
+    H --> I["Manutencao e psicoeducacao<br/>prevenir recaida"]
+    class D critical;
+    class I action;
+    class G action;
+\`\`\`
 
 ## 🧪 Exames complementares
+
 | Exame | Objetivo |
 | --- | --- |
 | TSH, função renal/hepática | Antes de lítio/valproato |
 | Beta-hCG | Antes de valproato/lítio (teratogênicos) |
 | Toxicológico | Excluir uso de substância |
+| Hemograma | Antes de valproato/carbamazepina |
+| ECG | QT, antes de antipsicótico e em cardiopata |
+| Litemia | Ajuste e segurança do lítio |
 
-## 💡 Pérolas
-- Suspender o antidepressivo na mania.
-- Lítio exige monitorização (nível sérico, função renal e tireoidiana).`,
+## 🏥 Quando internar e aspectos legais
 
-panico: `# Crise e Transtorno de Pânico
+Interne quando há psicose, agitação grave, risco de auto ou heteroagressão, exposição financeira ou sexual de grande impacto, insônia total com exaustão física, ausência de crítica com recusa de tratamento e risco associado, ou falha do manejo ambulatorial.
 
-> Crises súbitas de medo intenso com sintomas físicos. Na emergência é diagnóstico de exclusão (descartar causa orgânica).
+Como o paciente maníaco raramente aceita internar-se, a **internação involuntária** prevista na **Lei 10.216/2001** é frequentemente necessária: requer laudo médico circunstanciado, pedido de terceiro (em geral familiar) e **comunicação ao Ministério Público em até 72 horas**, tanto da internação quanto da alta. A internação compulsória depende de ordem judicial e é menos usada nesse contexto.
+
+Explique à família que a medida é temporária e proporcional, e documente o que foi tentado antes. O seguimento é no CAPS de referência, com plano terapêutico singular.
+
+## 💡 Pérolas e erros comuns
+
+Suspender o antidepressivo na mania.
+
+Lítio exige monitorização (nível sérico, função renal e tireoidiana).
+
+Menor necessidade de sono, e não insônia, é o sintoma mais discriminativo.
+
+Erro comum: valproato em mulher em idade fértil sem contracepção — teratogênico e com efeito sobre o neurodesenvolvimento.
+
+Erro comum: tratar depressão bipolar com antidepressivo isolado e provocar virada ou ciclagem rápida.
+
+Erro comum: confundir irritabilidade crônica de borderline ou TDAH com bipolaridade e medicar sem episódio definido.
+
+Erro comum: não pedir TSH em primeiro episódio — tireotoxicose imita mania.
+
+Erro comum: suspender lítio abruptamente após estabilização, o que aumenta risco de recaída precoce.
+
+Erro comum: subestimar risco suicida no episódio misto, quando o paciente tem energia e desesperança ao mesmo tempo.`,
+
+panico: `## 🧬 Fisiopatologia e por que o corpo reage assim
+
+O ataque de pânico é uma descarga aguda do sistema de alarme: disparo da amígdala com ativação simpática e do eixo do estresse, sem ameaça externa proporcional. O corpo executa uma resposta de luta ou fuga completa — taquicardia, taquipneia, sudorese, midríase, redistribuição de fluxo.
+
+A hiperventilação explica boa parte dos sintomas mais assustadores: a queda da pCO₂ causa alcalose respiratória, vasoconstrição cerebral (tontura, sensação de desmaio, desrealização) e redução do cálcio ionizado (parestesias periorais e nas mãos, espasmo carpopedal).
+
+O que transforma um ataque isolado em transtorno é a interpretação catastrófica: o paciente lê a taquicardia como infarto iminente, o que aumenta a ansiedade, que aumenta a taquicardia. Some-se a isso o comportamento de evitação e a busca repetida por emergências, e o quadro se cronifica.
+
+Teorias complementares falam em hipersensibilidade de quimiorreceptores ao CO₂ ("alarme de sufocamento" mal calibrado) e em disfunção de circuitos gabaérgicos e serotoninérgicos — que é onde os fármacos agem.
 
 ## 🩺 Quadro clínico
-- Início súbito, pico em ~10 min: palpitação, dor torácica, dispneia, sudorese, tremor, parestesias, tontura, **medo de morrer/enlouquecer**, despersonalização. Transtorno = crises recorrentes + medo antecipatório.
+
+Início súbito, pico em ~10 min: palpitação, dor torácica, dispneia, sudorese, tremor, parestesias, tontura, **medo de morrer/enlouquecer**, despersonalização. Transtorno = crises recorrentes + medo antecipatório.
+
+A crise costuma durar de 20 a 30 minutos e raramente ultrapassa uma hora; sintomas que persistem por horas com a mesma intensidade devem fazer você duvidar do diagnóstico.
+
+O transtorno de pânico se define pela recorrência de crises inesperadas somada a pelo menos um mês de preocupação persistente com novas crises ou mudança de comportamento para evitá-las. **Agorafobia** aparece com frequência: evitar transporte público, filas, multidões, sair sozinho.
+
+Comorbidades são a regra: depressão, outros transtornos ansiosos, uso de álcool como automedicação, e maior utilização de serviços de emergência.
 
 ## 🚩 Excluir orgânico (1ª vez/atípico)
-- **SCA, arritmia, TEP, hipoglicemia, hipertireoidismo, asma, intoxicação/abstinência**. ECG, glicemia conforme risco.
+
+**SCA, arritmia, TEP, hipoglicemia, hipertireoidismo, asma, intoxicação/abstinência**. ECG, glicemia conforme risco.
+
+Amplie a lista conforme o paciente: síndrome coronariana aguda em quem tem fator de risco, arritmias paroxísticas (taquicardia supraventricular é a grande imitadora — início e fim abruptos, frequência muito alta, poliúria pós-crise), tromboembolismo pulmonar, pneumotórax, anemia grave, tireotoxicose, hipoglicemia, feocromocitoma (raro, mas com hipertensão paroxística e cefaleia), crise parcial complexa, vertigem vestibular, asma e DPOC.
+
+Substâncias: cafeína em excesso, cocaína, anfetamínicos, cannabis, descongestionantes, broncodilatadores, levotiroxina em excesso, abstinência de álcool ou de benzodiazepínico.
+
+Sinais que devem tirar o pânico do topo da lista: primeira crise após os 45 anos, sintoma focal neurológico, síncope verdadeira, dessaturação, febre, dor torácica com alteração de ECG ou troponina, hipotensão, crise que não cede com repouso, ou crise sempre desencadeada por esforço.
+
+## 🔀 Diagnóstico diferencial psiquiátrico
+
+**Transtorno de ansiedade generalizada** — preocupação difusa e contínua, sem crises em pico. **Fobia específica e social** — crises previsíveis e ligadas ao contexto. **TEPT** — crises com gatilho traumático, revivescência, hipervigilância.
+
+**Transtorno de sintomas somáticos**, **depressão com ansiedade**, **transtorno por uso de substância** e **crises não epilépticas psicogênicas** completam o diferencial.
+
+Ponto prático: o ataque de pânico é um *fenômeno*, não um diagnóstico. Ele pode ocorrer em qualquer transtorno ansioso, na depressão e em quadros clínicos. O diagnóstico de transtorno de pânico exige crises inesperadas e recorrentes.
 
 ## 💊 Tratamento (com doses)
-- **Crise aguda:** acolhimento, reasseguramento, técnicas de respiração; **benzodiazepínico** pontual se muito intensa.
-- **Transtorno (manutenção):** **ISRS/IRSN** (1ª linha) + **TCC**; evitar benzodiazepínico crônico (dependência).
+
+**Crise aguda:** acolhimento, reasseguramento, técnicas de respiração; **benzodiazepínico** pontual se muito intensa.
+
+**Transtorno (manutenção):** **ISRS/IRSN** (1ª linha) + **TCC**; evitar benzodiazepínico crônico (dependência).
+
+Na crise, o mais eficaz costuma ser o mais simples: ambiente calmo, presença de alguém, explicação de que o sintoma é real mas não é perigoso, e respiração lenta e diafragmática com expiração prolongada (por exemplo, inspirar em 4 e expirar em 6 segundos), que corrige a hipocapnia. **Não use saco de papel** — a prática é insegura e pode causar hipóxia se o diagnóstico estiver errado.
+
+Se a crise é muito intensa e não cede, um benzodiazepínico pontual (por exemplo, **clonazepam 0,25–0,5 mg** ou **alprazolam 0,25–0,5 mg VO**) alivia rapidamente. Use dose única, prescrição limitada e explicando que é ponte, não tratamento.
+
+Na manutenção, **ISRS** é primeira linha: **sertralina 25 mg/dia** ou **escitalopram 5 mg/dia** no início — metade da dose habitual da depressão, porque pacientes com pânico são especialmente sensíveis ao aumento inicial de ansiedade — com titulação progressiva até a dose eficaz. **Paroxetina**, **fluoxetina** e **venlafaxina** também têm evidência. Resposta em 4 a 6 semanas; manter 12 meses ou mais após remissão, com retirada gradual.
+
+**TCC** com exposição interoceptiva e reestruturação cognitiva tem eficácia comparável à medicação e menor recaída após o término; associar as duas é o padrão nos casos moderados a graves.
+
+Benzodiazepínico contínuo cria tolerância, dependência, prejuízo cognitivo e dificuldade de retirada, e interfere na exposição terapêutica. Se já houver uso crônico, o desmame é lento e programado, nunca abrupto.
+
+Oriente também redução de cafeína, nicotina e álcool, e regularidade de sono e exercício — o efeito é real e o paciente sente controle sobre o próprio quadro.
+
+\`\`\`mermaid
+flowchart TD
+    A["Crise de medo intenso<br/>pico em 10 min"] --> B["Sinais vitais, glicemia,<br/>ECG conforme risco"]
+    B --> C["Dor toracica tipica, dessaturacao,<br/>sincope ou sinal focal?"]
+    C -->|Sim| D["Investigar causa organica<br/>SCA, arritmia, TEP"]
+    C -->|Nao| E["Acolhimento, ambiente calmo<br/>respiracao lenta"]
+    E --> F["Cedeu?"]
+    F -->|Nao| G["Benzodiazepinico pontual<br/>dose unica"]
+    F -->|Sim| H["Explicar o quadro<br/>orientar sinais de alarme"]
+    G --> H
+    H --> I["Crises recorrentes?<br/>iniciar ISRS em dose baixa + TCC"]
+    class C critical;
+    class I action;
+    class H action;
+\`\`\`
 
 ## 🧪 Exames complementares
+
 | Exame | Objetivo |
 | --- | --- |
 | ECG | Excluir cardíaco |
 | Glicemia, TSH | Hipoglicemia/tireoide |
+| Hemograma | Anemia |
+| Toxicológico | Estimulantes, abstinência |
+| Troponina, D-dímero | Conforme risco de SCA/TEP |
 
-## 💡 Pérolas
-- Primeira crise: exclua causa orgânica (não rotular cedo demais).
-- O tratamento de base é ISRS + TCC, não benzodiazepínico contínuo.`,
+## 🏥 Quando internar e encaminhamento
 
-abst_etanol: `# Abstinência Alcoólica
+Transtorno de pânico raramente exige internação. Interne se houver risco suicida, depressão grave associada, dependência de substância com necessidade de desintoxicação ou incapacidade funcional extrema.
 
-> Síndrome após redução/parada do álcool em dependentes. Espectro: tremores → alucinose → convulsões → **delirium tremens** (grave).
+Encaminhe para a UBS com apoio matricial nos casos leves e moderados, e para CAPS quando houver comorbidade grave, agorafobia incapacitante ou risco. Marque retorno curto — pacientes com pânico que saem da emergência sem plano voltam à emergência.
+
+## 💡 Pérolas e erros comuns
+
+Primeira crise: exclua causa orgânica (não rotular cedo demais).
+
+O tratamento de base é ISRS + TCC, não benzodiazepínico contínuo.
+
+Não use saco de papel; ensine respiração lenta.
+
+Erro comum: dar alta com receita de benzodiazepínico e nenhum plano — é assim que se fabrica dependência.
+
+Erro comum: iniciar ISRS em dose plena, o paciente piorar na primeira semana e abandonar o tratamento.
+
+Erro comum: repetir bateria de exames a cada visita, o que reforça a crença de doença grave oculta.
+
+Erro comum: dizer "não é nada, é só ansiedade" — invalida o sofrimento e destrói a adesão. O sintoma é real; o perigo é que não é.
+
+Erro comum: esquecer taquicardia supraventricular paroxística e hipertireoidismo em quem tem crises "de pânico" atípicas.
+
+Erro comum: não perguntar sobre álcool e cafeína.`,
+
+abst_etanol: `## 🧬 Fisiopatologia
+
+O álcool potencia o GABA-A (inibitório) e inibe receptores NMDA (excitatórios). No uso crônico, o cérebro compensa: reduz e dessensibiliza receptores GABA-A e aumenta a expressão de receptores NMDA e de canais de cálcio.
+
+Quando o álcool é retirado, essa compensação fica exposta — sobra excitação glutamatérgica e falta inibição gabaérgica. O resultado é hiperexcitabilidade do sistema nervoso central e descarga adrenérgica: tremor, taquicardia, hipertensão, sudorese, convulsão e, no extremo, delirium tremens.
+
+O fenômeno de *kindling* explica por que cada episódio de abstinência tende a ser pior que o anterior: abstinências repetidas sensibilizam o sistema e aumentam o risco de convulsão nas próximas. História de abstinência complicada prévia é um dos melhores preditores de gravidade.
+
+A base do tratamento decorre direto da fisiopatologia: repor atividade gabaérgica com benzodiazepínico (ou barbitúrico), o que substitui o álcool em um dos seus mecanismos e permite retirada controlada.
 
 ## 🩺 Quadro clínico e tempo
-- 6–24h: tremor, ansiedade, sudorese, taquicardia, náusea. 12–48h: convulsões, alucinose. 48–96h: **delirium tremens** (confusão, agitação, febre, instabilidade autonômica — alta mortalidade).
+
+6–24h: tremor, ansiedade, sudorese, taquicardia, náusea. 12–48h: convulsões, alucinose. 48–96h: **delirium tremens** (confusão, agitação, febre, instabilidade autonômica — alta mortalidade).
+
+A **convulsão da abstinência** é tipicamente tônico-clônica generalizada, única ou em pequeno número, precoce. Crise focal, estado de mal ou crise tardia obrigam a investigar outra causa — TCE, hematoma subdural, hipoglicemia, hiponatremia, neuroinfecção.
+
+A **alucinose alcoólica** cursa com alucinações (frequentemente visuais ou auditivas) em paciente **lúcido e orientado** — é o que a diferencia do delirium tremens, no qual há rebaixamento e desorientação.
+
+O **delirium tremens** é a forma mais grave: delirium franco, alucinações, agitação intensa, febre, taquicardia, hipertensão, sudorese profusa, tremor grosseiro. Não tratado, tem mortalidade elevada; tratado adequadamente, ela cai muito. Fatores de risco: história prévia de DT ou de convulsão por abstinência, uso pesado e prolongado, doença clínica aguda concomitante, idade avançada, plaquetopenia, hipopotassemia.
+
+## ✅ Avaliação e classificação de gravidade
+
+A escala **CIWA-Ar** (Clinical Institute Withdrawal Assessment for Alcohol, revisada) avalia dez domínios — náusea, tremor, sudorese, ansiedade, agitação, distúrbios táteis, auditivos e visuais, cefaleia e orientação. Aplique de forma seriada.
+
+Classificação usual: **leve com CIWA-Ar < 10**, **moderada entre 10 e 18**, **grave a partir de 19**. A escala só é válida em paciente que consegue se comunicar; em intubado, delirium ou barreira de idioma, ela não serve e a avaliação passa a ser clínica e por escalas de sedação.
+
+Não se esqueça de que CIWA-Ar mede sintomas, não causa: taquicardia e agitação por sepse, hipoglicemia ou dor pontuam alto e levam a sedar o paciente errado.
+
+## 🔀 Diagnóstico diferencial
+
+Sempre descartar causa clínica antes de rotular como abstinência pura: **hipoglicemia**, hiponatremia, hipomagnesemia e hipopotassemia, sepse (pneumonia e ITU são frequentes nesse perfil), pancreatite, hepatopatia com encefalopatia, TCE e hematoma subdural (queda é regra em etilista), meningite, hemorragia digestiva, cetoacidose alcoólica, intoxicação por metanol ou etilenoglicol, intoxicação anticolinérgica, síndrome serotoninérgica, tireotoxicose, abstinência de benzodiazepínico associada.
+
+**Encefalopatia de Wernicke** merece destaque próprio: confusão, oftalmoplegia e ataxia — a tríade completa é minoria, e a confusão isolada em etilista já justifica tratamento empírico com tiamina.
+
+Encefalopatia hepática, ao contrário da abstinência, cursa com flapping, sonolência e hipoatividade; abstinência é hiperativa e adrenérgica.
 
 ## 💊 Tratamento (com doses)
-- **Benzodiazepínico** é a base (previne convulsão e DT): **diazepam** ou lorazepam, idealmente **guiado por escala (CIWA-Ar)**.
-- **Tiamina 100 mg parenteral ANTES da glicose** (prevenir Wernicke); repor magnésio/potássio; hidratação.
-- Delirium tremens: benzodiazepínico em doses altas, ambiente monitorizado/UTI, suporte.
+
+**Benzodiazepínico** é a base (previne convulsão e DT): **diazepam** ou lorazepam, idealmente **guiado por escala (CIWA-Ar)**.
+
+**Tiamina 100 mg parenteral ANTES da glicose** (prevenir Wernicke); repor magnésio/potássio; hidratação.
+
+Delirium tremens: benzodiazepínico em doses altas, ambiente monitorizado/UTI, suporte.
+
+Sobre o esquema: o regime **sintomático (guiado por CIWA-Ar)** é preferido ao de dose fixa porque encurta o tempo de tratamento e reduz a dose cumulativa de benzodiazepínico — mas exige equipe treinada e reavaliações frequentes. O **esquema de dose fixa** com redução programada é a alternativa quando não há como aplicar a escala com segurança, no ambulatório, ou em paciente que não colabora; pode-se associar doses adicionais conforme sintomas.
+
+Escolha do benzodiazepínico: os de meia-vida longa (**diazepam**, clordiazepóxido) produzem autodesmame suave e protegem melhor contra convulsão; os de meia-vida curta e sem metabólito ativo (**lorazepam**) são preferidos em hepatopatia grave, idoso e risco de acúmulo. No Brasil, diazepam VO é o mais disponível; lorazepam parenteral tem acesso limitado.
+
+Wernicke é a prioridade metabólica: **tiamina parenteral antes de qualquer glicose**, porque a infusão de glicose consome a tiamina remanescente e pode precipitar a encefalopatia. Em suspeita de Wernicke instalada, doses maiores e mais frequentes que a profilática são recomendadas. Reponha **magnésio** (a hipomagnesemia perpetua hipopotassemia e reduz limiar convulsivo), potássio, fósforo e folato, e atenção à síndrome de realimentação no desnutrido.
+
+Hidratação conforme perdas e estado volêmico — nem todo paciente está hipovolêmico, e excesso de volume em hepatopata é problema.
+
+**Delirium tremens** é emergência: ambiente monitorizado ou UTI, benzodiazepínico em doses altas e escalonadas até sedação leve com o paciente calmo e despertável, correção eletrolítica, busca ativa de infecção. **Fenobarbital** é adjuvante quando há refratariedade ao benzodiazepínico, em ambiente com monitorização e via aérea disponível. Antipsicótico pode ser adjuvante para alucinação e agitação, **nunca isolado**, porque reduz limiar convulsivo e não trata a causa. Dexmedetomidina e propofol são recursos de UTI, também adjuvantes.
+
+Antes da alta, comece o tratamento do transtorno por uso de álcool: naltrexona ou acamprosato quando disponíveis, dissulfiram em casos selecionados com supervisão, e vinculação a CAPS-AD, grupos de mútua ajuda e atenção primária. Desintoxicação sem plano de seguimento tem recaída quase universal.
+
+\`\`\`mermaid
+flowchart TD
+    A["Suspeita de abstinencia alcoolica"] --> B["Tiamina 100 mg parenteral<br/>ANTES da glicose"]
+    B --> C["Glicemia, eletrolitos, Mg<br/>buscar infeccao e TCE"]
+    C --> D["Aplicar CIWA-Ar"]
+    D --> E["CIWA-Ar maior ou igual a 19<br/>ou delirium tremens?"]
+    E -->|Sim| F["Ambiente monitorizado ou UTI<br/>BZD em doses altas"]
+    E -->|Nao| G["BZD guiado por sintomas<br/>reavaliar com a escala"]
+    F --> H["Refratario ao BZD?<br/>fenobarbital adjuvante"]
+    G --> I["Repor Mg, K, folato<br/>hidratar conforme perdas"]
+    H --> I
+    I --> J["Encaminhar ao CAPS-AD<br/>tratar o transtorno de uso"]
+    class E critical;
+    class F action;
+    class J action;
+\`\`\`
 
 ## 🧪 Exames complementares
+
 | Exame | Objetivo |
 | --- | --- |
 | Glicemia, eletrólitos, Mg | Correção |
 | Função hepática | Hepatopatia |
 | Escala CIWA-Ar | Guiar benzodiazepínico |
+| Hemograma, PCR, culturas | Infecção associada |
+| TC de crânio | TCE, queda, sinal focal |
+| ECG | QT, distúrbio eletrolítico |
 
-## 💡 Pérolas
-- Tiamina antes da glicose (evita encefalopatia de Wernicke).
-- Tratar guiado por sintomas (CIWA) reduz dose e complicações.
-- DT refratário a benzodiazepínico: **fenobarbital** adjuvante (ambiente monitorizado).
-> Fonte: ASAM 2020.`,
+## 🏥 Quando internar
 
-abst_opio: `# Abstinência de Opioides
+Interne quando há delirium tremens ou risco alto de evoluir para ele, convulsão na abstinência atual, CIWA-Ar grave, comorbidade clínica descompensada, gestação, história prévia de DT, ausência de suporte domiciliar ou falha do manejo ambulatorial. UTI para instabilidade autonômica, necessidade de sedação profunda, refratariedade ou rebaixamento com risco de via aérea.
 
-> Síndrome após parada/redução de opioides. Muito desconfortável, mas **raramente fatal** (diferente da alcoólica).
+O manejo ambulatorial é possível na abstinência leve, com acompanhante responsável, sem comorbidade grave e com retorno diário nos primeiros dias, articulado com a UBS e o CAPS-AD.
+
+## 💡 Pérolas e erros comuns
+
+Tiamina antes da glicose (evita encefalopatia de Wernicke).
+
+Tratar guiado por sintomas (CIWA) reduz dose e complicações.
+
+DT refratário a benzodiazepínico: **fenobarbital** adjuvante (ambiente monitorizado).
+
+Alucinose com sensório limpo não é delirium tremens.
+
+Erro comum: usar haloperidol isolado — reduz limiar convulsivo e não trata a abstinência.
+
+Erro comum: aplicar CIWA-Ar em paciente que não se comunica ou com delirium instalado, e sedar sem procurar sepse, TCE ou distúrbio metabólico.
+
+Erro comum: parar a tiamina no dia seguinte ou dar só via oral em paciente grave.
+
+Erro comum: esquecer o magnésio, que sustenta hipopotassemia refratária e convulsões.
+
+Erro comum: subdosar benzodiazepínico no DT por medo de sedar — a subdose é o que mais mata nesse cenário.
+
+Erro comum: alta sem encaminhamento para tratamento do transtorno por uso de álcool.`,
+
+abst_opio: `## 🧬 Fisiopatologia
+
+Os opioides agem em receptores mu, kappa e delta, inibindo a atividade neuronal — inclusive a do locus coeruleus, principal núcleo noradrenérgico do tronco cerebral. Com uso continuado, esses neurônios se adaptam e aumentam sua atividade basal para compensar a inibição crônica.
+
+Retirado o opioide, a inibição desaparece e sobra uma **descarga noradrenérgica** intensa: lacrimejamento, rinorreia, sudorese, piloereção, midríase, taquicardia, hipertensão, cólicas, diarreia, ansiedade e insônia. É por isso que a **clonidina**, agonista alfa-2 que reduz a liberação de noradrenalina, alivia os sintomas autonômicos sem ser opioide.
+
+Tolerância, dependência física e transtorno por uso são coisas diferentes: tolerância e dependência física são fenômenos farmacológicos esperados em quem usa opioide por semanas (inclusive o paciente oncológico), enquanto o transtorno por uso envolve perda de controle, fissura e prejuízo. Confundir os três leva a estigmatizar paciente com dor crônica e a subtratar quem tem transtorno.
 
 ## 🩺 Quadro clínico
-- Midríase, lacrimejamento, rinorreia, bocejos, piloereção, sudorese, dor muscular, cãibras, **diarreia, náusea/vômito**, ansiedade, insônia, taquicardia. Escala COWS quantifica.
+
+Midríase, lacrimejamento, rinorreia, bocejos, piloereção, sudorese, dor muscular, cãibras, **diarreia, náusea/vômito**, ansiedade, insônia, taquicardia. Escala COWS quantifica.
+
+Cronologia depende da meia-vida: com opioides de ação curta (heroína, morfina, oxicodona), os sintomas começam em 6 a 12 horas, atingem o pico em 1 a 3 dias e cedem em cerca de 5 a 7 dias; com **metadona** e outros de ação longa, o início é mais tardio (1 a 3 dias) e o quadro se arrasta por 2 a 3 semanas, com sintomas residuais (insônia, disforia, fissura) por meses.
+
+Fissura intensa, disforia e insônia são o que faz o paciente recair — não a dor muscular. Tratar só o físico e ignorar o psíquico é receita de abandono.
+
+Em gestante, a abstinência não tratada traz risco fetal (sofrimento, parto prematuro, perda), o que torna o tratamento com agonista ainda mais indicado; desintoxicação isolada na gravidez não é recomendada.
+
+## ✅ Avaliação e gravidade
+
+A escala **COWS** (Clinical Opiate Withdrawal Scale) pontua 11 itens objetivos e subjetivos — frequência cardíaca, sudorese, inquietação, tamanho pupilar, dor óssea/articular, coriza/lacrimejamento, sintomas gastrointestinais, tremor, bocejos, ansiedade/irritabilidade e piloereção.
+
+Faixas usuais: **5 a 12 = leve**, **13 a 24 = moderada**, **25 a 36 = moderadamente grave**, **37 a 48 = grave**. A escala serve tanto para medir gravidade quanto para definir o momento seguro de iniciar buprenorfina.
+
+Avalie também: qual opioide, dose, via, última dose, coingestões (benzodiazepínico e álcool aumentam muito o risco de óbito por overdose), sinais de infecção em usuário de via injetável (endocardite, abscesso, celulite), sorologias para HIV e hepatites B e C, gravidez, e dor crônica subjacente.
+
+## 🔀 Diagnóstico diferencial
+
+Descartar causa clínica antes de rotular: **gastroenterite infecciosa**, sepse, pancreatite, abdome agudo, hipertireoidismo, feocromocitoma, hipoglicemia, **abstinência alcoólica ou de benzodiazepínico** (essas sim potencialmente fatais), intoxicação por estimulante, síndrome serotoninérgica, transtorno de ansiedade, e simulação para obtenção de opioide.
+
+Duas diferenças de exame ajudam muito: na abstinência de opioide a pupila está **midriática** e o paciente está **lúcido**; na intoxicação por opioide há miose, rebaixamento e depressão respiratória — quadro oposto e este sim de risco imediato, tratado com **naloxona**.
+
+Febre alta, dor abdominal localizada, sopro novo, rigidez de nuca ou confusão não pertencem à abstinência de opioide e exigem investigação.
 
 ## 💊 Tratamento (com doses)
-- **Escolha:** agonista — **metadona** ou **buprenorfina** (esta só quando já em abstinência, para não precipitar).
-- **Sintomático:** **clonidina** (sintomas autonômicos), antiemético, loperamida (diarreia), AINE (dor), hidratação.
-- Encaminhar para tratamento da dependência; orientar **risco de overdose por perda de tolerância** após período sem uso.
+
+**Escolha:** agonista — **metadona** ou **buprenorfina** (esta só quando já em abstinência, para não precipitar).
+
+**Sintomático:** **clonidina** (sintomas autonômicos), antiemético, loperamida (diarreia), AINE (dor), hidratação.
+
+Encaminhar para tratamento da dependência; orientar **risco de overdose por perda de tolerância** após período sem uso.
+
+O tratamento com agonista (metadona ou buprenorfina) é superior à desintoxicação isolada em qualquer desfecho relevante: retenção em tratamento, uso de opioide ilícito, transmissão de HIV e, sobretudo, **mortalidade**. Desintoxicar e mandar embora sem manutenção aumenta o risco de morte por overdose.
+
+**Buprenorfina** é agonista parcial de alta afinidade: por isso desloca o agonista pleno do receptor e **precipita abstinência** se administrada cedo demais. Por segurança, inicia-se apenas com sinais objetivos de abstinência — na prática, com **COWS a partir de 8 a 12**, ou pelo menos 12 a 24 horas após a última dose de opioide curto e 24 a 72 horas após metadona. A primeira dose é baixa, com incrementos conforme resposta no mesmo dia, e ajuste nos dias seguintes até dose de manutenção.
+
+**Metadona** é agonista pleno, de meia-vida longa e variável, com risco de acúmulo e de prolongamento de QT; a titulação é lenta e o período de maior risco de óbito é a primeira semana. No Brasil, o uso é restrito a serviços habilitados.
+
+**Clonidina** alivia os sintomas adrenérgicos e é o esquema não agonista mais usado onde não há disponibilidade de agonista; doses típicas partem de 0,1 a 0,2 mg VO com repetições conforme sintomas, limitadas por hipotensão e sedação — monitorar pressão arterial antes de cada dose. Lofexidina, alternativa com menos hipotensão, não está disponível no país.
+
+Sintomáticos: antiemético para náusea, **loperamida** para diarreia (sem exceder dose usual, pelo risco cardíaco em doses altas), antiespasmódico para cólica, anti-inflamatório ou dipirona para mialgia, hidratação e reposição eletrolítica, e algo para insônia por poucos dias.
+
+**Reduza danos**: oriente sobre o risco de overdose por perda de tolerância após abstinência, prisão ou internação; oriente a não usar sozinho e a não associar benzodiazepínico ou álcool; ofereça naloxona quando disponível; ofereça testagem para HIV e hepatites, vacinação e material estéril.
+
+No Brasil, a referência é o **CAPS-AD**, articulado com atenção primária, consultório na rua e serviços de redução de danos.
+
+\`\`\`mermaid
+flowchart TD
+    A["Suspeita de abstinencia<br/>de opioide"] --> B["Pupila midriatica e lucido?<br/>excluir infeccao e outras causas"]
+    B --> C["Aplicar COWS"]
+    C --> D["Ha agonista disponivel?"]
+    D -->|Sim| E["COWS 8-12 com sinais objetivos?"]
+    D -->|Nao| F["Clonidina + sintomaticos<br/>monitorar pressao arterial"]
+    E -->|Sim| G["Iniciar buprenorfina<br/>titular no mesmo dia"]
+    E -->|Nao| H["Aguardar; risco de<br/>abstinencia precipitada"]
+    H --> E
+    G --> I["Manutencao com agonista<br/>vincular ao CAPS-AD"]
+    F --> I
+    I --> J["Orientar risco de overdose<br/>por perda de tolerancia"]
+    class H critical;
+    class J critical;
+    class I action;
+\`\`\`
 
 ## 🧪 Exames complementares
+
 | Exame | Objetivo |
 | --- | --- |
 | Escala COWS | Gravidade |
 | Toxicológico | Confirmar/associadas |
+| Beta-hCG | Gestação muda a conduta |
+| Sorologias HIV, HBV, HCV | Rastreio em usuário injetável |
+| ECG | QT antes/durante metadona |
+| Eletrólitos, função renal | Perdas por vômito e diarreia |
 
-## 💡 Pérolas
-- Abstinência de opioide raramente mata; a overdose seguinte (tolerância reduzida) sim.
-- Buprenorfina só quando já em abstinência (senão precipita).`,
+## 🏥 Quando internar
 
-abst_benzo: `# Abstinência de Benzodiazepínicos
+A maior parte dos casos se maneja fora do hospital. Interne quando há desidratação grave, vômitos incoercíveis, gestação com repercussão, comorbidade clínica ou psiquiátrica descompensada, risco suicida, abstinência simultânea de álcool ou benzodiazepínico (essas sim com risco de vida), ou ausência total de suporte com falhas repetidas de manejo ambulatorial.
 
-> Após parada de uso crônico. **Pode ser grave** (convulsões, delirium) — semelhante à abstinência alcoólica.
+Internação por si só não trata dependência; ela só faz sentido acoplada a um plano de manutenção e vinculação. A **Lei 10.216/2001** também se aplica aqui: internação é exceção, preferencialmente voluntária, com o cuidado ancorado na rede aberta.
+
+## 💡 Pérolas e erros comuns
+
+Abstinência de opioide raramente mata; a overdose seguinte (tolerância reduzida) sim.
+
+Buprenorfina só quando já em abstinência (senão precipita).
+
+Midríase e lucidez = abstinência; miose e rebaixamento = intoxicação, use naloxona.
+
+Erro comum: desintoxicar e dar alta sem manutenção com agonista nem vinculação — a mortalidade sobe.
+
+Erro comum: tratar só com clonidina quando havia agonista disponível.
+
+Erro comum: iniciar buprenorfina com COWS baixo e precipitar abstinência grave, o que faz o paciente perder a confiança no tratamento.
+
+Erro comum: atribuir febre, dor abdominal ou confusão à abstinência e perder endocardite, abscesso ou sepse.
+
+Erro comum: esquecer beta-hCG; na gestante, o agonista é indicado e a desintoxicação isolada não.
+
+Erro comum: tratar o paciente com hostilidade — o estigma é o principal motivo de abandono.`,
+
+abst_benzo: `## 🧬 Fisiopatologia
+
+Os benzodiazepínicos são moduladores positivos do receptor GABA-A: aumentam a frequência de abertura do canal de cloreto e amplificam a inibição. No uso prolongado, o receptor se adapta — muda de subunidades, dessensibiliza e reduz o efeito, o que produz tolerância.
+
+Retirado o fármaco, sobra um sistema inibitório enfraquecido diante de uma transmissão glutamatérgica intacta ou aumentada. O resultado é hiperexcitabilidade do sistema nervoso central, com o mesmo mecanismo geral da abstinência alcoólica — e, portanto, o mesmo potencial de **convulsão e delirium**.
+
+Essa é a razão de a abstinência de benzodiazepínico ser uma das poucas síndromes de retirada com risco de vida, ao lado da alcoólica (e diferentemente da de opioide).
+
+A meia-vida define o tempo de início: com fármacos curtos (alprazolam, lorazepam, midazolam) os sintomas surgem em 1 a 2 dias e são mais abruptos; com os longos (diazepam, clonazepam) começam em 2 a 7 dias e se arrastam. Alprazolam tem fama de retirada especialmente difícil.
 
 ## 🩺 Quadro clínico
-- Ansiedade, insônia, tremor, sudorese, taquicardia, hipersensibilidade sensorial; grave: **convulsões e delirium**. Início mais tardio com benzodiazepínicos de meia-vida longa.
+
+Ansiedade, insônia, tremor, sudorese, taquicardia, hipersensibilidade sensorial; grave: **convulsões e delirium**. Início mais tardio com benzodiazepínicos de meia-vida longa.
+
+Sintomas frequentes: ansiedade em rebote, insônia, irritabilidade, inquietação, tremor, sudorese, palpitação, náusea, anorexia, cefaleia, mialgia, hipersensibilidade a luz, som e toque, parestesias, gosto metálico, despersonalização e desrealização.
+
+Graves: crise tônico-clônica generalizada, delirium com alucinações, hipertermia, instabilidade autonômica, catatonia e psicose.
+
+É útil separar três fenômenos. **Rebote**: retorno intensificado e transitório do sintoma original (ansiedade, insônia). **Abstinência propriamente dita**: sintomas novos, com curso definido de dias a semanas. **Recaída**: retorno do transtorno de base, que persiste.
+
+Uma parcela dos pacientes desenvolve sintomas prolongados por meses após a retirada — ansiedade flutuante, insônia, parestesias, zumbido. Reconhecer isso evita reintroduzir o fármaco desnecessariamente e evita dizer ao paciente que "é da cabeça dele".
+
+## ✅ Avaliação
+
+Determine com precisão: qual benzodiazepínico (ou fármaco Z, como zolpidem, que tem o mesmo problema), dose diária real, há quanto tempo, quantas fontes de prescrição, tentativas prévias de retirada e como foram, uso concomitante de álcool, opioide e outros depressores, e o transtorno que originou a prescrição.
+
+Uso por mais de 4 semanas já produz dependência física em parte dos pacientes; após meses ou anos, ela é a regra. Doses altas, fármacos de meia-vida curta e potência alta, e uso associado a álcool aumentam a gravidade da retirada.
+
+Avalie risco de convulsão: dose alta, retirada abrupta, história prévia de convulsão na retirada, uso concomitante de álcool, epilepsia, uso de bupropiona ou tramadol.
+
+## 🔀 Diagnóstico diferencial
+
+Antes de rotular, descarte causas clínicas: **hipoglicemia**, hiponatremia, hipocalcemia, hipomagnesemia, hipertireoidismo, sepse, hipóxia, TCE, encefalite, delirium por outra causa, feocromocitoma.
+
+Descarte também outras retiradas e intoxicações: **abstinência alcoólica** (frequentemente coexiste), abstinência de opioide, intoxicação por estimulante, síndrome serotoninérgica, síndrome anticolinérgica, abstinência de barbitúrico.
+
+Diferenciais psiquiátricos: transtorno de ansiedade generalizada, transtorno de pânico, insônia primária, transtorno de estresse pós-traumático, quadros somatoformes — todos podendo ser exatamente o transtorno de base cujo tratamento foi mascarado pelo benzodiazepínico.
+
+Marca prática: abstinência de benzodiazepínico tem curso temporal ligado à retirada, hipersensibilidade sensorial marcante e risco convulsivo; transtorno de ansiedade tem curso contínuo e independente de doses.
 
 ## 💊 Tratamento (com doses)
-- **Reintroduzir e desmamar lentamente** o benzodiazepínico (preferir um de **longa duração**, ex.: diazepam), com redução gradual (semanas a meses).
-- Tratar sintomas; ambiente seguro; **não suspender abruptamente** uso crônico.
-- Abordar a dependência; psicoterapia.
+
+**Reintroduzir e desmamar lentamente** o benzodiazepínico (preferir um de **longa duração**, ex.: diazepam), com redução gradual (semanas a meses).
+
+Tratar sintomas; ambiente seguro; **não suspender abruptamente** uso crônico.
+
+Abordar a dependência; psicoterapia.
+
+Na prática, dois caminhos. No paciente já em abstinência aguda e sintomática, **reintroduza** o benzodiazepínico em dose suficiente para controlar os sintomas e só então planeje a redução. No paciente estável que quer parar, **converta** para um equivalente de meia-vida longa (diazepam é o mais usado) e reduza de forma programada.
+
+O ritmo consagrado é de **reduções pequenas e espaçadas** — algo em torno de 5% a 25% da dose por etapa, com intervalos de uma a várias semanas entre as reduções, ajustando conforme os sintomas. Quanto mais longo o uso e mais alta a dose, mais lento deve ser o desmame; a fase final (as últimas frações da dose) costuma ser a mais difícil e pede passos ainda menores.
+
+Regra de ouro do desmame: **nunca voltar para trás por medo, mas pausar quando necessário**. Estabilizar por mais tempo em uma dose é aceitável; reacelerar não é.
+
+Convulsão na abstinência é tratada com benzodiazepínico e reintrodução da dose, com investigação de causas associadas. Delirium exige ambiente monitorizado, benzodiazepínico em doses adequadas e, quando refratário, fenobarbital em ambiente com suporte ventilatório.
+
+Adjuvantes não substituem o desmame, mas ajudam sintomas: anticonvulsivantes (carbamazepina, pregabalina, gabapentina) têm alguma evidência; antidepressivo é indicado quando há transtorno de ansiedade ou depressão de base, e deve ser iniciado antes de aprofundar a retirada; propranolol ajuda sintomas autonômicos. **Evite antipsicótico apenas para sedar** e cuidado com fármacos que reduzem limiar convulsivo, como bupropiona e tramadol.
+
+O componente não farmacológico é decisivo: psicoeducação (explicar que os sintomas são esperados e temporários), TCC para insônia e ansiedade, contrato de retirada com calendário escrito, receita única por um prescritor, e retornos frequentes. Intervenções simples, como uma carta estruturada do médico da atenção primária propondo a redução, já reduzem consumo em uma parcela dos pacientes.
+
+\`\`\`mermaid
+flowchart TD
+    A["Uso cronico de benzodiazepinico"] --> B["Nunca suspender de forma abrupta"]
+    B --> C["Ja em abstinencia sintomatica?"]
+    C -->|Sim| D["Reintroduzir dose suficiente<br/>para controlar sintomas"]
+    C -->|Nao| E["Converter para meia-vida longa<br/>ex.: diazepam"]
+    D --> E
+    E --> F["Reducao gradual programada<br/>semanas a meses"]
+    F --> G["Convulsao ou delirium?"]
+    G -->|Sim| H["Ambiente monitorizado<br/>BZD; fenobarbital se refratario"]
+    G -->|Nao| I["Manter calendario<br/>pausar se preciso, nao acelerar"]
+    I --> J["Tratar transtorno de base<br/>TCC e psicoeducacao"]
+    class G critical;
+    class B critical;
+    class J action;
+\`\`\`
 
 ## 🧪 Exames complementares
+
 | Exame | Objetivo |
 | --- | --- |
 | Glicemia, eletrólitos | Excluir outras causas |
 | Toxicológico | Coingestões |
+| Função hepática e renal | Ajuste e metabolização |
+| TSH | Hipertireoidismo imita o quadro |
+| ECG | Comorbidade e outras drogas |
 
-## 💡 Pérolas
-- Nunca suspender benzodiazepínico crônico de forma abrupta (risco de convulsão).
-- Desmame lento com agente de meia-vida longa.`,
+## 🏥 Quando internar
 
-snm: `# Síndrome Neuroléptica Maligna (SNM)
+Interne quando houver convulsão, delirium, dose muito alta com necessidade de retirada rápida, uso concomitante pesado de álcool ou outros depressores, comorbidade clínica ou psiquiátrica descompensada, risco suicida, ou falhas repetidas de desmame ambulatorial sem suporte.
 
-> Reação grave a **antipsicóticos** (ou retirada de dopaminérgico): **rigidez + hipertermia + disautonomia + alteração mental**. Emergência.
+Na maioria dos casos, porém, o desmame é ambulatorial e lento, conduzido na atenção primária ou no CAPS, com vínculo e retornos regulares. Internar para "tirar de uma vez" é justamente o que provoca a complicação que se quer evitar.
+
+## 💡 Pérolas e erros comuns
+
+Nunca suspender benzodiazepínico crônico de forma abrupta (risco de convulsão).
+
+Desmame lento com agente de meia-vida longa.
+
+A retirada de benzodiazepínico é, junto com a alcoólica, uma das que podem matar.
+
+Erro comum: paciente internado por outro motivo tem o benzodiazepínico de uso domiciliar "esquecido" na prescrição e convulsiona no terceiro dia — reconcilie a medicação na admissão.
+
+Erro comum: confundir rebote com recaída e concluir que "ele precisa do remédio para sempre".
+
+Erro comum: desmame em etapas grandes e rápidas na fase final, que é a mais sensível.
+
+Erro comum: prescrever benzodiazepínico continuamente para transtorno de ansiedade sem iniciar ISRS e psicoterapia — a dependência é iatrogênica.
+
+Erro comum: ignorar os fármacos Z (zolpidem), que provocam a mesma dependência e a mesma retirada.
+
+Erro comum: retomar o desmame do zero após uma recaída, em vez de estabilizar e seguir.`,
+
+snm: `## 🧬 Fisiopatologia
+
+A hipótese central é o **bloqueio dopaminérgico abrupto e intenso**. Nos núcleos da base, a queda de dopamina produz rigidez muscular extrema; no hipotálamo, compromete a termorregulação e gera hipertermia; na medula e no sistema autonômico, produz instabilidade de pressão, taquicardia e sudorese profusa.
+
+A rigidez sustentada consome ATP e destrói fibras musculares, o que explica a **elevação marcante de CK**, a mioglobinúria, a rabdomiólise e a lesão renal aguda. Parte da hipertermia vem da própria contração muscular contínua, não só do hipotálamo.
+
+Por isso a síndrome também ocorre na **retirada abrupta de agente dopaminérgico** (levodopa, agonistas, amantadina) no parkinsoniano — a chamada síndrome de hiperpirexia-parkinsonismo, clinicamente idêntica.
+
+Fatores de risco: início ou aumento rápido de dose, uso parenteral, antipsicótico de alta potência (haloperidol), agitação e contenção física, desidratação, exaustão, hiponatremia, deficiência de ferro, calor ambiental, episódio prévio de SNM, catatonia preexistente.
 
 ## 🩺 Quadro clínico
-- Após início/aumento de antipsicótico (dias): **rigidez "em cano de chumbo"**, **hipertermia**, rebaixamento, instabilidade autonômica (PA lábil, taquicardia, sudorese); **CK muito alta**, leucocitose, risco de rabdomiólise/IRA.
 
-## 🔀 Diferencial
-- **Síndrome serotoninérgica** (clonus/hiperreflexia, início mais rápido, serotoninérgicos), hipertermia maligna, catatonia, infecção do SNC.
+Após início/aumento de antipsicótico (dias): **rigidez "em cano de chumbo"**, **hipertermia**, rebaixamento, instabilidade autonômica (PA lábil, taquicardia, sudorese); **CK muito alta**, leucocitose, risco de rabdomiólise/IRA.
+
+A instalação é tipicamente **subaguda, ao longo de 1 a 3 dias**, e a maioria dos casos ocorre nas primeiras duas semanas após início ou aumento do antipsicótico — mas pode acontecer com fármaco usado há anos.
+
+A rigidez é generalizada, "em cano de chumbo" (resistência uniforme em toda a amplitude do movimento, sem roda denteada e sem clônus). Podem ocorrer tremor, disfagia, sialorreia, mutismo, distonia e sinais catatônicos.
+
+A alteração de consciência varia de confusão a estupor e coma. A hipertermia costuma ser alta e é critério essencial; disautonomia se manifesta com pressão lábil, taquicardia, taquipneia e sudorese abundante.
+
+Complicações que definem o prognóstico: rabdomiólise com insuficiência renal aguda, insuficiência respiratória por rigidez torácica, aspiração, arritmias, coagulação intravascular disseminada, tromboembolismo e convulsões.
+
+## ✅ Diagnóstico
+
+É diagnóstico **clínico**, apoiado por exposição recente a antagonista dopaminérgico (ou retirada de dopaminérgico), rigidez, hipertermia, disautonomia e alteração mental, com CK elevada.
+
+Laboratório típico: **CK muito elevada** (frequentemente em milhares), leucocitose com desvio, transaminases elevadas, hipocalcemia e hiperpotassemia na rabdomiólise, mioglobinúria, acidose metabólica, ferro sérico baixo. Nada disso é específico — servem para confirmar gravidade e complicações.
+
+Punção lombar, neuroimagem e EEG são normais ou inespecíficos na SNM, mas devem ser feitos para excluir infecção do sistema nervoso central e outras causas quando o quadro não for típico.
+
+Lembre: qualquer antagonista dopaminérgico serve de gatilho, inclusive **antieméticos** (metoclopramida, bromoprida, prometazina em alguns relatos) e antipsicóticos atípicos — nesses últimos o quadro tende a ser mais brando e com menos rigidez, o que aumenta a chance de passar despercebido.
+
+## 🔀 Diagnóstico diferencial
+
+**Síndrome serotoninérgica**: início em **horas** após serotoninérgico, com **clônus e hiperreflexia** predominando em membros inferiores, midríase, agitação, diarreia e hiperperistaltismo. A SNM tem início em **dias**, rigidez em cano de chumbo, bradirreflexia e hipoatividade intestinal.
+
+**Catatonia maligna**: quadro clinicamente quase idêntico (rigidez, febre, disautonomia, CK alta), mas precedido por sinais catatônicos — mutismo, negativismo, posturas, flexibilidade cérea, estupor ou excitação. A SNM é considerada por muitos autores uma catatonia induzida por fármaco; a distinção prática importa porque a catatonia responde a benzodiazepínico e ECT, e piora com antipsicótico.
+
+**Hipertermia maligna**: desencadeada por anestésico halogenado ou succinilcolina, no intraoperatório, com hipercapnia precoce e rigidez masseterina; tratada com dantroleno.
+
+**Infecção do sistema nervoso central** (meningite, encefalite), sepse, **golpe de calor** (pele seca, ambiente quente, sem exposição a fármaco), **tireotoxicose**, intoxicação por anticolinérgico (pele seca, midríase, sem rigidez), intoxicação por estimulante ou cocaína, **tétano**, estado de mal não convulsivo, encefalite autoimune, abstinência alcoólica grave.
+
+Sempre descartar causa clínica antes de fechar o diagnóstico: hemoculturas, exame de urina, radiografia de tórax, líquor quando houver dúvida.
 
 ## 💊 Tratamento (com doses)
-- **Suspender o antipsicótico** (ou reintroduzir o dopaminérgico retirado).
-- **Suporte agressivo:** resfriamento, hidratação vigorosa (proteção renal/rabdomiólise), correção de eletrólitos, UTI.
-- **Casos graves:** **dantroleno**, **bromocriptina** (agonista dopaminérgico); benzodiazepínico.
+
+**Suspender o antipsicótico** (ou reintroduzir o dopaminérgico retirado).
+
+**Suporte agressivo:** resfriamento, hidratação vigorosa (proteção renal/rabdomiólise), correção de eletrólitos, UTI.
+
+**Casos graves:** **dantroleno**, **bromocriptina** (agonista dopaminérgico); benzodiazepínico.
+
+A ordem prática é: retirar o agente, garantir suporte, e só então considerar farmacoterapia específica — o suporte é o que mais muda desfecho. Suspenda também lítio, anticolinérgicos e outros serotoninérgicos e antieméticos dopaminérgicos.
+
+Suporte inclui: monitorização em UTI, hidratação venosa vigorosa com alvo de débito urinário generoso para prevenir necrose tubular por mioglobina, resfriamento externo ativo, correção de distúrbios eletrolíticos e da acidose, profilaxia de tromboembolismo (paciente imóvel e rígido tem risco alto), proteção de via aérea e ventilação quando a rigidez compromete a mecânica respiratória, e diálise quando houver lesão renal com indicação.
+
+**Benzodiazepínico** (lorazepam ou diazepam) é razoável em todos os casos: reduz agitação, relaxa a musculatura, trata sobreposição catatônica e pode ser suficiente nos quadros leves.
+
+Nos casos moderados a graves, **dantroleno** (relaxante muscular de ação direta no retículo sarcoplasmático) é usado por via venosa em doses da ordem de 1 a 2,5 mg/kg, repetidas conforme resposta; vigie hepatotoxicidade e não associe a bloqueador de canal de cálcio. **Bromocriptina**, agonista dopaminérgico, é usada por via oral ou sonda, geralmente a partir de 2,5 mg a cada 8 horas, com titulação; **amantadina** é alternativa. A retirada desses fármacos deve ser gradual, pelo risco de rebote.
+
+A evidência para dantroleno e bromocriptina vem de séries e relatos, não de ensaios randomizados — por isso são adjuvantes, e nunca substituem suspensão do agente e suporte.
+
+**ECT** é a opção para casos refratários ou quando não se consegue separar SNM de catatonia maligna.
+
+Reintrodução de antipsicótico: só depois de resolução completa e, idealmente, com pelo menos duas semanas de intervalo, preferindo um antipsicótico de **baixa potência ou atípico**, em dose baixa, com titulação lenta e monitorização de temperatura e CK. Risco de recorrência é real e deve ser registrado no prontuário e informado ao paciente e à família.
+
+\`\`\`mermaid
+flowchart TD
+    A["Rigidez + febre em uso<br/>de antipsicotico"] --> B["Suspender o antipsicotico<br/>ou reintroduzir dopaminergico"]
+    B --> C["CK, funcao renal, eletrolitos<br/>excluir infeccao e sepse"]
+    C --> D["Suporte: UTI, hidratacao vigorosa<br/>resfriamento, profilaxia de TEV"]
+    D --> E["Ha clonus e hiperreflexia<br/>com inicio em horas?"]
+    E -->|Sim| F["Pensar em sindrome<br/>serotoninergica"]
+    E -->|Nao| G["Benzodiazepinico<br/>lorazepam ou diazepam"]
+    G --> H["Grave ou sem melhora?"]
+    H -->|Sim| I["Dantroleno 1-2,5 mg/kg IV<br/>e/ou bromocriptina 2,5 mg 8/8h"]
+    H -->|Nao| J["Manter suporte<br/>monitorar CK e temperatura"]
+    I --> K["Refratario: considerar ECT"]
+    class A critical;
+    class E critical;
+    class I action;
+    class J action;
+\`\`\`
 
 ## 🧪 Exames complementares
+
 | Exame | Objetivo |
 | --- | --- |
 | CK | Rabdomiólise (muito alta) |
 | Função renal, eletrólitos | IRA/distúrbios |
 | Hemograma | Leucocitose |
+| Gasometria, lactato | Acidose e gravidade |
+| Culturas, urina, RX de tórax | Excluir infecção |
+| Líquor / TC ou RM | Excluir causa neurológica |
+| ECG | Arritmia e distúrbio eletrolítico |
 
-## 💡 Pérolas
-- Rigidez + febre + antipsicótico + CK alta = SNM.
-- Diferencie da serotoninérgica (clonus/hiperreflexia × rigidez).`,
+## 🏥 Quando internar
 
-serotoninerg: `# Síndrome Serotoninérgica
+Sempre. SNM é indicação de internação e, na maioria dos casos, de **UTI** — pela necessidade de monitorização contínua, hidratação agressiva, controle térmico e risco de insuficiência renal e respiratória.
 
-> Excesso de atividade serotoninérgica por drogas: **alteração mental + hiperatividade autonômica + hiperatividade neuromuscular (clonus)**. Início rápido (horas).
+O leito deve ser clínico ou de terapia intensiva, não psiquiátrico. O paciente psiquiátrico com SNM é, naquele momento, um paciente clínico grave.
+
+Registre o evento como reação adversa grave, informe formalmente o paciente e a família, e deixe claro no prontuário e no resumo de alta qual fármaco foi implicado.
+
+## 💡 Pérolas e erros comuns
+
+Rigidez + febre + antipsicótico + CK alta = SNM.
+
+Diferencie da serotoninérgica (clonus/hiperreflexia × rigidez).
+
+Antiemético dopaminérgico (metoclopramida, bromoprida) também causa SNM.
+
+Retirada abrupta de levodopa no parkinsoniano produz quadro idêntico — reintroduza o dopaminérgico.
+
+Erro comum: tratar a febre como infecção e manter o antipsicótico. Suspender o agente é a primeira medida.
+
+Erro comum: dar mais antipsicótico porque o paciente "está agitado e rígido" — piora e pode matar.
+
+Erro comum: hidratação tímida; a lesão renal por mioglobina é evitável.
+
+Erro comum: esquecer profilaxia de tromboembolismo em paciente rígido e imóvel.
+
+Erro comum: reintroduzir o mesmo antipsicótico logo após a melhora.`,
+
+serotoninerg: `## 🧬 Fisiopatologia
+
+A síndrome serotoninérgica (mais precisamente, **toxicidade serotoninérgica**) resulta de excesso de serotonina nas sinapses centrais e periféricas, sobretudo por estimulação de receptores 5-HT2A e, em menor grau, 5-HT1A.
+
+O excesso pode vir de qualquer ponto da via: aumento de síntese ou de precursor, aumento de liberação, redução de recaptação (ISRS, IRSN, tramadol, cocaína, MDMA), redução de metabolização (IMAO, linezolida, azul de metileno), agonismo direto (triptanos, buspirona, lítio) ou inibição do metabolismo hepático de um serotoninérgico por outro fármaco.
+
+Diferentemente da SNM, que depende de bloqueio dopaminérgico progressivo, aqui o mecanismo é **farmacológico e dose-dependente**: por isso o quadro se instala em **horas** e cede rapidamente quando o agente é retirado — em geral em 24 horas, mais lentamente com fármacos de meia-vida longa como a fluoxetina ou com IMAO.
+
+A hiperatividade neuromuscular (clônus, hiperreflexia, tremor, rigidez nos casos graves) e a hipertermia por atividade muscular contínua são o que mata: rabdomiólise, lesão renal, coagulopatia e acidose.
 
 ## 🧬 Gatilhos
-- ISRS/IRSN, IMAO, tramadol, linezolida, triptanos, ondansetrona, lítio, drogas de abuso; risco maior em **associações** (ex.: ISRS + tramadol/IMAO).
+
+ISRS/IRSN, IMAO, tramadol, linezolida, triptanos, ondansetrona, lítio, drogas de abuso; risco maior em **associações** (ex.: ISRS + tramadol/IMAO).
+
+Amplie a lista: clomipramina e outros tricíclicos, bupropiona (menos), mirtazapina, fentanil, meperidina, metadona, dextrometorfano, azul de metileno, valproato, buspirona, erva-de-são-joão, MDMA, cocaína, anfetaminas, LSD, e inibidores enzimáticos que elevam o nível do serotoninérgico (fluconazol, ritonavir, eritromicina).
+
+Combinações de altíssimo risco: **IMAO com qualquer serotoninérgico**, ISRS com tramadol, ISRS com linezolida, ISRS com azul de metileno em cirurgia. Trocas de antidepressivo sem período de *washout* adequado são causa iatrogênica clássica.
+
+Atenção também ao paciente que já usa ISRS e recebe tramadol na emergência ou ondansetrona no pós-operatório — cenário comum e frequentemente esquecido.
+
+## 🩺 Quadro clínico
+
+A tríade é **alteração do estado mental + hiperatividade autonômica + hiperatividade neuromuscular**, instalada em horas (a maioria dentro de 6 a 24 horas após a mudança de dose ou introdução do fármaco).
+
+Alteração mental: ansiedade, agitação, inquietação, confusão, delirium nos casos graves.
+
+Autonômico: taquicardia, hipertensão (às vezes lábil), hipertermia, sudorese, **midríase**, **hiperperistaltismo e diarreia**, náusea, vômito.
+
+Neuromuscular: **clônus** espontâneo, induzível ou ocular, **hiperreflexia**, tremor, mioclonia, rigidez nos casos graves. O achado é caracteristicamente mais intenso em **membros inferiores**.
+
+Gravidade: casos leves com tremor, taquicardia e diarreia; moderados com clônus, agitação e hipertermia moderada; graves com hipertermia importante, rigidez, rebaixamento, rabdomiólise, coagulação intravascular disseminada e falência de múltiplos órgãos.
 
 ## ✅ Diagnóstico (critérios de Hunter)
-- Uso de serotoninérgico + um: **clonus** (espontâneo/induzível/ocular), agitação/diaforese, tremor + hiperreflexia, hipertonia + temperatura > 38°C com clonus. Predomínio nos **membros inferiores**.
 
-## 🔀 Diferencial
-- **SNM** (rigidez "em cano de chumbo", início em dias, antipsicótico) × serotoninérgica (clonus/hiperreflexia, horas, serotoninérgicos).
+Uso de serotoninérgico + um: **clonus** (espontâneo/induzível/ocular), agitação/diaforese, tremor + hiperreflexia, hipertonia + temperatura > 38°C com clonus. Predomínio nos **membros inferiores**.
+
+Os critérios de Hunter são mais sensíveis e específicos que os antigos critérios de Sternbach e devem ser aplicados à beira do leito, com exame neurológico dirigido: teste clônus de tornozelo, procure clônus ocular, avalie reflexos e tônus comparando membros superiores e inferiores.
+
+Não há exame laboratorial que confirme o diagnóstico. Nível sérico de serotonina não se correlaciona com o quadro. Solicite exames para avaliar gravidade e complicações: CK, função renal, eletrólitos, transaminases, gasometria, coagulograma, ECG.
+
+## 🔀 Diagnóstico diferencial
+
+**SNM** (rigidez "em cano de chumbo", início em dias, antipsicótico) × serotoninérgica (clonus/hiperreflexia, horas, serotoninérgicos).
+
+Resumindo o essencial: SNM é **lenta, rígida, bradirreflexa e hipoativa no intestino**; serotoninérgica é **rápida, clônica, hiperreflexa, midriática e hiperativa no intestino**.
+
+**Síndrome anticolinérgica**: pele **seca** e quente, rubor, retenção urinária, midríase, delirium — mas **reflexos normais, sem clônus e sem hiperperistaltismo**. Na serotoninérgica o paciente está encharcado de suor.
+
+**Hipertermia maligna**: gatilho anestésico, rigidez com hipercapnia precoce.
+
+**Intoxicação por simpaticomimético** (cocaína, anfetamina): midríase, taquicardia e hipertermia, sem hiperreflexia e clônus tão marcados.
+
+**Abstinência alcoólica ou de benzodiazepínico**, **golpe de calor**, **tireotoxicose**, **meningoencefalite**, **sepse**, **tétano**, **estado de mal não convulsivo** e **encefalite autoimune** completam o diferencial. Sempre descartar causa infecciosa e metabólica antes de rotular.
 
 ## 💊 Tratamento (com doses)
-- **Suspender o agente** serotoninérgico.
-- **Suporte:** **benzodiazepínico** (agitação/clonus), resfriamento, hidratação, controle autonômico; UTI nos graves.
-- **Casos graves: ciproeptadina** (anti-serotoninérgico).
 
-## 💡 Pérolas
-- Clonus e hiperreflexia (pernas) são a marca — diferencia da SNM.
-- Cuidado com associações (ISRS + tramadol/IMAO/linezolida).`,
+**Suspender o agente** serotoninérgico.
 
-catatonia: `# Catatonia
+**Suporte:** **benzodiazepínico** (agitação/clonus), resfriamento, hidratação, controle autonômico; UTI nos graves.
 
-> Síndrome psicomotora (mutismo, imobilidade, negativismo ou agitação) associada a transtornos psiquiátricos ou doenças clínicas. Subdiagnosticada.
+**Casos graves: ciproeptadina** (anti-serotoninérgico).
+
+A retirada do agente resolve a maioria dos casos leves e moderados em 24 a 72 horas, com observação e sintomáticos. Suspenda **todos** os serotoninérgicos, inclusive os "inocentes" (ondansetrona, tramadol, dextrometorfano).
+
+**Benzodiazepínico** é a base sintomática: controla agitação, reduz clônus e atividade muscular, e com isso reduz a produção de calor. Titule pela resposta.
+
+**Resfriamento**: medidas físicas externas agressivas nos hipertérmicos. **Antitérmicos não funcionam** — a hipertermia é muscular, não hipotalâmica. Nos casos com hipertermia extrema e rigidez, o correto é **sedação profunda, bloqueio neuromuscular não despolarizante e intubação**; nunca succinilcolina, pelo risco de hiperpotassemia na rabdomiólise.
+
+**Ciproeptadina**, antagonista 5-HT2A por via oral ou sonda, é o antídoto relativo nos casos moderados a graves: esquema descrito é dose de ataque de **12 mg**, seguida de **2 mg a cada 2 horas** enquanto persistirem sintomas, com manutenção de **8 mg a cada 6 horas**. A evidência é de relatos e séries, com qualidade baixa — é adjuvante, e não substitui retirada do agente, benzodiazepínico e resfriamento. Efeitos: sedação e anticolinérgicos.
+
+Controle autonômico com fármacos de ação curta e titulável (por exemplo, esmolol ou nitroprussiato) na hipertensão grave; evite betabloqueador de ação longa, pela labilidade pressórica. Evite bromocriptina e dantroleno (podem piorar), e evite antipsicóticos com atividade serotoninérgica.
+
+Reintrodução do serotoninérgico só após resolução completa, com esclarecimento sobre a interação que causou o evento e com respeito ao período de *washout* nas trocas — especialmente ao envolver IMAO ou fluoxetina.
+
+\`\`\`mermaid
+flowchart TD
+    A["Alteracao mental + autonomia<br/>+ clonus em horas"] --> B["Suspender TODOS os<br/>agentes serotoninergicos"]
+    B --> C["Aplicar criterios de Hunter<br/>clonus, hiperreflexia, MMII"]
+    C --> D["Excluir infeccao, sepse<br/>e causa metabolica"]
+    D --> E["Benzodiazepinico<br/>resfriamento e hidratacao"]
+    E --> F["Hipertermia grave<br/>ou rigidez importante?"]
+    F -->|Sim| G["UTI: sedacao, bloqueio neuromuscular<br/>e intubacao; sem succinilcolina"]
+    F -->|Nao| H["Ciproeptadina 12 mg ataque<br/>2 mg 2/2h; manutencao 8 mg 6/6h"]
+    G --> H
+    H --> I["Observar 24-72h<br/>orientar interacao ao paciente"]
+    class A critical;
+    class F critical;
+    class I action;
+    class E action;
+\`\`\`
+
+## 🏥 Quando internar
+
+Casos leves podem ser observados por algumas horas na emergência, com retirada do agente e benzodiazepínico, e liberados com orientação clara sobre qual combinação causou o quadro.
+
+Interne quando houver hipertermia, clônus intenso, rigidez, rebaixamento, CK elevada, instabilidade autonômica ou ingestão intencional. **UTI** para hipertermia importante, necessidade de bloqueio neuromuscular, rabdomiólise ou disfunção orgânica.
+
+Se houve ingestão intencional, o caso é também comportamento suicida: avaliação de risco, plano de segurança e **notificação compulsória de violência autoprovocada em até 24 horas** (Lei 13.819/2019, ficha do SINAN).
+
+## 💡 Pérolas e erros comuns
+
+Clonus e hiperreflexia (pernas) são a marca — diferencia da SNM.
+
+Cuidado com associações (ISRS + tramadol/IMAO/linezolida).
+
+Pele encharcada de suor e intestino hiperativo apontam para serotoninérgica; pele seca aponta para anticolinérgico.
+
+Erro comum: antitérmico na hipertermia — não funciona, porque o calor é gerado no músculo.
+
+Erro comum: usar succinilcolina no paciente com rabdomiólise.
+
+Erro comum: não examinar clônus de tornozelo e clônus ocular, e fechar diagnóstico errado.
+
+Erro comum: prescrever tramadol ou ondansetrona a um paciente que já usa ISRS, sem se dar conta da interação.
+
+Erro comum: trocar antidepressivo sem respeitar o *washout*, sobretudo envolvendo IMAO ou fluoxetina.
+
+Erro comum: tratar como SNM e usar bromocriptina ou dantroleno, que não ajudam e podem piorar.`,
+
+catatonia: `## 🧬 Fisiopatologia
+
+A catatonia é uma síndrome psicomotora, não um subtipo de esquizofrenia — e essa mudança conceitual é a razão de ela ser hoje reconhecida em transtornos do humor, em doenças clínicas e neurológicas, e não apenas na psicose.
+
+O modelo mais aceito envolve **hipoatividade gabaérgica** no córtex órbito-frontal e em circuitos frontoparietais, com desregulação de conexões entre córtex pré-motor, córtex parietal posterior e núcleos da base. A hipofunção GABA-A explica a resposta dramática ao benzodiazepínico.
+
+Há também **hipodopaminergia** relativa, o que explica a piora com antipsicóticos (bloqueadores D2) e a proximidade fenomenológica com a síndrome neuroléptica maligna — muitos autores consideram a SNM uma catatonia induzida por fármaco. Alterações glutamatérgicas participam, e são o elo com a encefalite anti-NMDA.
+
+Consequência prática: catatonia é potencialmente reversível e tem tratamento eficaz. O que a torna perigosa é o subdiagnóstico e a imobilidade prolongada.
 
 ## 🩺 Quadro clínico
-- **Estupor/mutismo, imobilidade, negativismo, posturas mantidas, flexibilidade cérea, ecolalia/ecopraxia**; forma maligna com febre e disautonomia (grave). Avaliada pela escala de Bush-Francis.
 
-## 🧬 Causas
-- Transtornos do humor/psicóticos; clínicas (encefalite/autoimune, metabólico, infeccioso); pode coexistir/confundir com SNM.
+**Estupor/mutismo, imobilidade, negativismo, posturas mantidas, flexibilidade cérea, ecolalia/ecopraxia**; forma maligna com febre e disautonomia (grave). Avaliada pela escala de Bush-Francis.
+
+Sinais adicionais frequentes: catalepsia, obediência automática, *mitgehen* (o membro acompanha uma pressão mínima como se fosse uma alavanca), *gegenhalten* (resistência proporcional à força aplicada), estereotipias, maneirismos, careteamento, verbigeração, impulsividade, retraimento com recusa alimentar e hídrica.
+
+Há duas formas motoras: a **retraída** (a clássica, com estupor, mutismo e imobilidade) e a **excitada** (agitação sem propósito, desorganizada, que costuma ser confundida com mania ou psicose agitada). As duas podem alternar no mesmo paciente.
+
+Complicações da imobilidade definem boa parte da morbidade: desidratação, desnutrição, broncoaspiração, pneumonia, úlceras de pressão, contraturas, retenção urinária, **tromboembolismo venoso** e rabdomiólise.
+
+A **catatonia maligna** acrescenta febre, disautonomia (pressão lábil, taquicardia, sudorese), rigidez e elevação de CK — é emergência com mortalidade alta se não tratada.
 
 ## ✅ Diagnóstico
-- Clínico + **teste com lorazepam** (melhora rápida apoia o diagnóstico). Investigar causa orgânica (metabólico, neuroimagem, líquor/encefalite se indicado).
+
+Clínico + **teste com lorazepam** (melhora rápida apoia o diagnóstico). Investigar causa orgânica (metabólico, neuroimagem, líquor/encefalite se indicado).
+
+O diagnóstico exige ao menos três sinais catatônicos, e a **Bush-Francis Catatonia Rating Scale** é o instrumento padrão: uma triagem de 14 itens e uma escala completa de 23, útil também para medir resposta ao tratamento de forma objetiva.
+
+O **teste do lorazepam** (challenge) usa dose de **1 a 2 mg por via IV ou IM, ou 2 mg por via oral**, com reavaliação dos sinais catatônicos após cerca de **5 minutos (IV), 15 minutos (IM) ou 30 minutos (VO)**. Considera-se resposta positiva uma **redução de 50%** na pontuação da escala. Um teste negativo não exclui catatonia — parte dos pacientes responde apenas a doses maiores ou de forma mais lenta.
+
+Investigação mínima: hemograma, eletrólitos, cálcio, glicemia, função renal e hepática, TSH, CK, PCR, urina, toxicológico, HIV e sífilis. Neuroimagem, **EEG** (para excluir estado de mal não convulsivo, que imita catatonia) e **líquor** com pesquisa de anticorpos antineuronais quando há febre, sinal focal, crise convulsiva, discinesias ou primeiro episódio atípico.
+
+## 🔀 Diagnóstico diferencial
+
+Sempre descartar causa clínica antes de rotular como catatonia psiquiátrica: **encefalite anti-NMDA** (mulher jovem, psicose de instalação rápida, discinesias orofaciais, crises, disautonomia — pode ter teratoma de ovário associado), outras encefalites autoimunes e infecciosas, **estado de mal não convulsivo**, AVC de tronco e **síndrome do encarceramento**, hidrocefalia, tumor frontal, mutismo acinético, doença de Parkinson avançada, distúrbios metabólicos (hiponatremia, hipercalcemia, uremia, encefalopatia hepática), hipotireoidismo grave, deficiência de B12, lúpus neuropsiquiátrico, intoxicação e abstinência.
+
+**Síndrome neuroléptica maligna**: praticamente indistinguível da catatonia maligna, mas com exposição recente a antagonista dopaminérgico e rigidez em cano de chumbo. Na dúvida, a conduta segura é a mesma: suspender antipsicótico, dar benzodiazepínico, suporte, e considerar ECT.
+
+**Síndrome serotoninérgica**: clônus e hiperreflexia em horas, com exposição a serotoninérgico.
+
+Diferenciais psiquiátricos: **depressão grave com lentificação extrema**, **mania com estupor**, esquizofrenia, transtorno conversivo, transtorno factício, mutismo seletivo.
 
 ## 💊 Tratamento (com doses)
-- **Benzodiazepínico (lorazepam)** é a 1ª linha — frequentemente resolutivo.
-- **ECT** se refratária ou catatonia maligna.
-- Tratar a doença de base; suporte (hidratação, profilaxia de TEV, nutrição).
-- **Cautela com antipsicótico** (pode piorar/precipitar SNM).
 
-## 💡 Pérolas
-- Teste do lorazepam: diagnóstico e tratamento ao mesmo tempo.
-- Evitar antipsicótico na catatonia (risco de SNM); ECT na forma maligna.`,
+**Benzodiazepínico (lorazepam)** é a 1ª linha — frequentemente resolutivo.
 
-intox_etanol_ag: `# Intoxicação Alcoólica Aguda
+**ECT** se refratária ou catatonia maligna.
 
-> Efeito agudo do etanol. Maior risco: **rebaixamento com broncoaspiração**, trauma e hipoglicemia.
+Tratar a doença de base; suporte (hidratação, profilaxia de TEV, nutrição).
+
+**Cautela com antipsicótico** (pode piorar/precipitar SNM).
+
+Na prática, o mesmo lorazepam do teste vira o tratamento: após resposta positiva, mantém-se em doses divididas ao longo do dia, com **titulação progressiva** conforme a resposta e a tolerância. Doses diárias necessárias são frequentemente muito superiores às usadas em ansiedade, e pacientes catatônicos toleram doses altas com pouca sedação — o limitante é o nível de consciência e a mecânica respiratória, não a dose no papel. No Brasil, onde lorazepam parenteral é pouco disponível, diazepam e clonazepam são usados como alternativas.
+
+**ECT** é o tratamento de segunda linha e o de escolha imediata na **catatonia maligna**, na catatonia com risco de vida (recusa alimentar, desidratação grave) e na refratária ao benzodiazepínico. As taxas de resposta são altas, inclusive em quem não respondeu ao lorazepam. O gargalo no Brasil é o acesso: poucos serviços oferecem ECT, o que exige transferência precoce e articulação com o serviço de referência — não espere uma semana de falha para começar a buscar a vaga.
+
+Suporte é parte do tratamento, não detalhe: hidratação, nutrição (sonda quando necessário), **profilaxia de tromboembolismo venoso**, mudança de decúbito, prevenção de aspiração, higiene, controle de retenção urinária e de constipação, e monitorização de CK e função renal.
+
+**Suspenda antipsicóticos** sempre que possível — eles podem precipitar catatonia maligna e SNM. Se a psicose de base exigir antipsicótico, aguarde a resolução da catatonia e prefira um agente de baixa potência, em dose baixa, sob monitorização.
+
+Adjuvantes descritos em refratários: amantadina e memantina (glutamatérgicos), e tratamento específico da causa (imunoterapia na encefalite autoimune, correção metabólica, tratamento do episódio de humor).
+
+\`\`\`mermaid
+flowchart TD
+    A["Estupor, mutismo, imobilidade<br/>ou posturas mantidas"] --> B["Aplicar Bush-Francis<br/>e buscar causa clinica"]
+    B --> C["Febre, disautonomia<br/>rigidez e CK alta?"]
+    C -->|Sim| D["Catatonia maligna ou SNM<br/>UTI e ECT precoce"]
+    C -->|Nao| E["Teste do lorazepam<br/>1-2 mg IV/IM ou 2 mg VO"]
+    E --> F["Reduziu 50% da escala?"]
+    F -->|Sim| G["Manter lorazepam em doses<br/>divididas e titular"]
+    F -->|Nao| H["Nao exclui catatonia<br/>titular dose e reavaliar"]
+    H --> I["Refrataria: encaminhar para ECT"]
+    G --> J["Suporte: hidratacao, nutricao<br/>profilaxia de TEV; evitar antipsicotico"]
+    I --> J
+    class C critical;
+    class D action;
+    class J action;
+\`\`\`
+
+## 🏥 Quando internar
+
+Interne praticamente todos: a catatonia implica risco de desidratação, aspiração, trombose e complicações da imobilidade, além de exigir investigação etiológica.
+
+Leito clínico ou UTI para catatonia maligna, instabilidade autonômica, CK elevada, rebaixamento ou necessidade de suporte nutricional e ventilatório. Leito de saúde mental em hospital geral, ou CAPS III em quadros leves e já estabilizados.
+
+Como o paciente catatônico com frequência não consegue consentir, a **Lei 10.216/2001** se aplica: internação involuntária mediante laudo médico circunstanciado e **comunicação ao Ministério Público em até 72 horas**. Documente a incapacidade de expressar vontade e o risco.
+
+## 💡 Pérolas e erros comuns
+
+Teste do lorazepam: diagnóstico e tratamento ao mesmo tempo.
+
+Evitar antipsicótico na catatonia (risco de SNM); ECT na forma maligna.
+
+Catatonia não é exclusiva da esquizofrenia — a causa mais comum é transtorno do humor, e as causas clínicas são frequentes.
+
+Erro comum: interpretar o paciente mudo e imóvel como "não colaborativo" ou "manipulador" e não examinar sinais catatônicos.
+
+Erro comum: prescrever antipsicótico para o paciente "psicótico e imóvel" e desencadear catatonia maligna.
+
+Erro comum: parar o lorazepam por causa de dose "alta demais" no papel, sem avaliar o paciente.
+
+Erro comum: interpretar teste negativo como exclusão do diagnóstico.
+
+Erro comum: esquecer profilaxia de TEV e nutrição, que são causas evitáveis de morte.
+
+Erro comum: não pedir EEG e não considerar encefalite anti-NMDA em jovem com quadro atípico.`,
+
+intox_etanol_ag: `## 🧬 Fisiopatologia
+
+O etanol atravessa livremente as membranas e age em todo o sistema nervoso central: potencia o GABA-A (efeito sedativo e ansiolítico) e inibe receptores NMDA (efeito amnéstico e de descoordenação). Daí vêm, em sequência, a desinibição, a ataxia, a amnésia e o rebaixamento.
+
+A metabolização é predominantemente hepática, pela álcool-desidrogenase, e segue **cinética de ordem zero**: elimina-se uma quantidade fixa por hora, independentemente do quanto foi ingerido. Isso significa que não existe forma de "acelerar" a eliminação — e explica por que o tempo de observação é longo e previsível.
+
+O metabolismo gera excesso de NADH, que desvia o piruvato para lactato e reduz a gliconeogênese. Em quem está com glicogênio esgotado (etilista crônico, desnutrido, jejum, criança), o resultado é **hipoglicemia** e **cetoacidose alcoólica** com ânion gap elevado.
+
+O etilista crônico é ainda deficiente em **tiamina**, cofator essencial do metabolismo da glicose. Ofertar glicose sem tiamina consome o pouco que resta e pode precipitar **encefalopatia de Wernicke** — a razão da regra clássica de dar tiamina antes.
 
 ## 🩺 Quadro clínico
-- Desinibição, fala arrastada, ataxia, nistagmo → sonolência, rebaixamento, depressão respiratória, hipotermia; vômitos (risco de aspiração).
+
+Desinibição, fala arrastada, ataxia, nistagmo → sonolência, rebaixamento, depressão respiratória, hipotermia; vômitos (risco de aspiração).
+
+A progressão acompanha grosseiramente a alcoolemia, mas a **tolerância muda tudo**: o etilista crônico pode caminhar e conversar com níveis que deixariam um bebedor eventual em coma. Por isso a clínica guia, e não o número.
+
+Em crianças e adolescentes, doses relativamente pequenas causam hipoglicemia grave e rebaixamento — a apresentação é mais perigosa e a hipoglicemia é regra, não exceção.
+
+Sinais de gravidade: Glasgow reduzido, ausência de reflexo de proteção de via aérea, dessaturação, bradipneia, hipotensão, hipotermia, hipoglicemia, convulsão, pupilas assimétricas, sinal focal, ou rebaixamento que não melhora com o tempo.
 
 ## ✅ Avaliação
-- **Glicemia capilar** (hipoglicemia é comum), sinais vitais, Glasgow, procurar **trauma associado (TCE)**; considerar coingestões. Alcoolemia auxilia, mas a clínica guia.
+
+**Glicemia capilar** (hipoglicemia é comum), sinais vitais, Glasgow, procurar **trauma associado (TCE)**; considerar coingestões. Alcoolemia auxilia, mas a clínica guia.
+
+Faça exame físico completo, com o paciente despido: hematomas, ferimento de couro cabeludo, otorragia, sinais de fratura, marcas de agulha, hipotermia. Boa parte dos "bêbados" que morrem na emergência morre de trauma craniano, hipoglicemia ou infecção que ninguém procurou.
+
+Reavalie de forma seriada. O sinal mais importante da intoxicação alcoólica simples é que o paciente **melhora com o tempo**. Se em 1 a 2 horas ele não está melhor, ou piora, o diagnóstico está errado até prova em contrário.
+
+## 🔀 Diagnóstico diferencial
+
+Sempre descartar causa clínica antes de atribuir tudo ao álcool: **TCE com hematoma subdural ou epidural** (o etilista cai, e o subdural crônico é traiçoeiro), **hipoglicemia**, hiponatremia, hipercapnia, hipóxia, sepse e meningite, encefalopatia hepática, encefalopatia de Wernicke, cetoacidose alcoólica ou diabética, AVC, estado pós-ictal e estado de mal não convulsivo, hipotermia.
+
+Coingestões e outros álcoois: benzodiazepínico, opioide (miose e bradipneia — considere naloxona diagnóstica), antipsicótico, antidepressivo, cocaína e estimulantes; **metanol e etilenoglicol** (acidose com ânion gap e *gap* osmolar elevados, alterações visuais no metanol, cristalúria de oxalato no etilenoglicol) exigem tratamento específico e urgente.
+
+Pistas que apontam para fora do álcool: pupilas anormais, sinal focal, febre, rigidez de nuca, convulsão, acidose importante, *gap* osmolar elevado, ausência de hálito etílico, ou incoerência entre a alcoolemia e o nível de consciência.
 
 ## 💊 Tratamento
-- **Suporte:** vias aéreas/posição de segurança, O₂, monitorização, hidratação; corrigir **hipoglicemia**.
-- **Tiamina 100 mg parenteral antes da glicose** (prevenir Wernicke) no etilista.
-- Observação até clarear; não há antídoto. Depressão respiratória → suporte ventilatório/UTI.
-- Avaliar **abstinência** nas horas seguintes (dependentes) e risco de suicídio.
+
+**Suporte:** vias aéreas/posição de segurança, O₂, monitorização, hidratação; corrigir **hipoglicemia**.
+
+**Tiamina 100 mg parenteral antes da glicose** (prevenir Wernicke) no etilista.
+
+Observação até clarear; não há antídoto. Depressão respiratória → suporte ventilatório/UTI.
+
+Avaliar **abstinência** nas horas seguintes (dependentes) e risco de suicídio.
+
+Detalhando o suporte: decúbito lateral esquerdo em quem vomita e ainda protege a via aérea; aspiração disponível; oximetria e capnografia quando houver; intubação quando não há proteção de via aérea, quando há insuficiência respiratória ou quando a agitação e o rebaixamento impedem cuidados essenciais. Aquecimento passivo na hipotermia.
+
+Hidratação venosa conforme perdas e estado volêmico — soro "de rotina" para todo mundo não acelera a eliminação do etanol e não faz o paciente acordar mais cedo. Corrija distúrbios eletrolíticos e reponha **magnésio**, potássio e fósforo no etilista crônico, atento à síndrome de realimentação.
+
+Não há antídoto e não há papel para "estimulantes" ou flumazenil de rotina — flumazenil em quem usa benzodiazepínico cronicamente ou em coingestão com tricíclico pode precipitar convulsão. Hemodiálise é reservada a situações extremas ou a intoxicação por metanol e etilenoglicol.
+
+Agitação no intoxicado é problema à parte: prefira desescalada verbal e ambiente calmo; se for necessário medicar, lembre que **benzodiazepínico soma depressão respiratória com o etanol** e que antipsicótico isolado tem seus próprios riscos. Use a menor dose eficaz, com monitorização, e busque sempre a causa (hipoglicemia, TCE, dor, hipóxia, abstinência).
+
+Antes da alta: reavalie a marcha e a orientação, garanta acompanhante, oriente sobre risco de abstinência nas próximas horas em dependentes, faça a **triagem do uso de álcool** (AUDIT ou AUDIT-C), ofereça intervenção breve — que tem evidência de redução de consumo justamente nesse cenário — e encaminhe ao CAPS-AD ou à atenção primária. Avalie risco de suicídio: o álcool é fator de risco agudo e boa parte das tentativas ocorre sob efeito.
+
+\`\`\`mermaid
+flowchart TD
+    A["Rebaixamento com<br/>halito etilico"] --> B["ABCDE, protecao de via aerea<br/>glicemia capilar imediata"]
+    B --> C["Tiamina 100 mg parenteral<br/>ANTES da glicose"]
+    C --> D["Corrigir hipoglicemia<br/>monitorizar e aquecer"]
+    D --> E["Trauma, sinal focal, febre<br/>ou pupila anormal?"]
+    E -->|Sim| F["TC de cranio e investigacao<br/>de causa alternativa"]
+    E -->|Nao| G["Observacao seriada"]
+    G --> H["Melhorou em 1-2 horas?"]
+    H -->|Nao| F
+    H -->|Sim| I["Alta com acompanhante<br/>orientar risco de abstinencia"]
+    I --> J["Triagem AUDIT, intervencao breve<br/>encaminhar ao CAPS-AD"]
+    class E critical;
+    class H critical;
+    class J action;
+    class C action;
+\`\`\`
 
 ## 🧪 Exames complementares
+
 | Exame | Objetivo |
 | --- | --- |
 | Glicemia | Hipoglicemia |
 | TC de crânio | Se TCE/rebaixamento desproporcional |
 | Eletrólitos, gasometria | Casos graves |
+| Ânion gap e gap osmolar | Metanol, etilenoglicol, cetoacidose |
+| Função hepática, amilase | Hepatopatia, pancreatite |
+| Toxicológico | Coingestões |
 
-## 💡 Pérolas
-- Rebaixamento "alcoólico" desproporcional ou com trauma = pensar TCE (pedir TC).
-- Tiamina antes da glicose no etilista.`,
+## 🏥 Quando internar
+
+Interne quem tem rebaixamento persistente, necessidade de proteção de via aérea, depressão respiratória, hipoglicemia refratária, hipotermia, TCE, convulsão, suspeita de intoxicação por metanol ou etilenoglicol, coingestão significativa, cetoacidose alcoólica, ou comorbidade clínica descompensada. UTI para quem precisa de ventilação ou vasopressor.
+
+A maioria, porém, é observada até clarear e liberada com acompanhante. Não libere sozinho quem ainda está atáxico ou desorientado, e não libere sem plano quem chegou por ingestão intencional.
+
+Se a ingestão foi tentativa de suicídio, aplica-se o manejo do comportamento suicida, incluindo avaliação de risco, plano de segurança e **notificação compulsória de violência autoprovocada em até 24 horas** (Lei 13.819/2019, ficha do SINAN). Em criança ou adolescente, comunique também o Conselho Tutelar.
+
+## 💡 Pérolas e erros comuns
+
+Rebaixamento "alcoólico" desproporcional ou com trauma = pensar TCE (pedir TC).
+
+Tiamina antes da glicose no etilista.
+
+Intoxicação alcoólica simples melhora com o tempo; quem não melhora tem outro diagnóstico.
+
+Erro comum: atribuir tudo ao álcool e perder subdural, hipoglicemia, sepse ou meningite.
+
+Erro comum: não medir glicemia capilar na porta.
+
+Erro comum: usar flumazenil "para acordar" o paciente — pode precipitar convulsão.
+
+Erro comum: hidratar em volume alto achando que acelera a eliminação; a cinética é de ordem zero.
+
+Erro comum: sedar o agitado intoxicado com benzodiazepínico sem monitorização e somar depressão respiratória.
+
+Erro comum: dar alta sem triagem do uso de álcool, sem intervenção breve e sem avaliar risco de suicídio.
+
+Erro comum: esquecer que a abstinência começa 6 a 24 horas depois — o paciente pode voltar pior.`,
 
 pre_eclampsia: `# Pré-eclâmpsia
 
