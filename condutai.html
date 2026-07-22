@@ -1649,9 +1649,9 @@ const PROTOCOLS = [
   { id: 'fa_cronica', icon: '〰️', name: 'FA crônica — anticoagulação e ritmo', tags: 'CHA2DS2-VA · HAS-BLED · DOAC · Ablação', specialty: 'cardio', guideline: 'ESC 2024' },
   { id: 'flutter', icon: '〰️', name: 'Flutter atrial', tags: 'Cardioversão · Ablação · Anticoagulação', specialty: 'cardio', guideline: 'ESC 2024' },
   { id: 'tpsv', icon: '⚡', name: 'Taquicardia supraventricular (TPSV)', tags: 'Manobra vagal · Adenosina · Verapamil · Cardioversão', specialty: 'cardio', guideline: 'ESC 2019' },
-  { id: 'tv_sustent', icon: '⚡', name: 'TV sustentada (com pulso)', tags: 'Amiodarona · Procainamida · Cardioversão sincronizada', specialty: 'cardio', guideline: 'AHA 2017' },
+  { id: 'tv_sustent', icon: '⚡', name: 'TV sustentada (com pulso)', tags: 'Amiodarona · Procainamida · Cardioversão sincronizada', specialty: 'cardio', guideline: 'ESC 2022' },
   { id: 'bradiarritmia', icon: '🐢', name: 'Bradiarritmias e BAV', tags: 'Atropina · Dopamina · MP transcutâneo · Transvenoso', specialty: 'cardio', guideline: 'ESC 2021' },
-  { id: 'crise_ht', icon: '🩸', name: 'Crise hipertensiva — emergência vs urgência', tags: 'SBC · Nitroprussiato · Esmolol · Lesão órgão-alvo', specialty: 'cardio', guideline: 'SBC 2020' },
+  { id: 'crise_ht', icon: '🩸', name: 'Crise hipertensiva — emergência vs urgência', tags: 'SBC · Nitroprussiato · Esmolol · Lesão órgão-alvo', specialty: 'cardio', guideline: 'SBC 2025' },
   { id: 'hipertensao_resist', icon: '🩺', name: 'Hipertensão arterial resistente', tags: 'MAPA · Espironolactona · Causas secundárias', specialty: 'cardio', guideline: 'AHA 2018' },
   { id: 'eap', icon: '💨', name: 'Edema agudo de pulmão cardiogênico', tags: 'VNI · Furosemida · Nitroglicerina · Morfina', specialty: 'cardio', guideline: 'ESC 2023' },
   { id: 'choque_cardio', icon: '⚠️', name: 'Choque cardiogênico', tags: 'SCAI · Noradrenalina · Dobutamina · BIA/Impella', specialty: 'cardio', guideline: 'AHA 2024' },
@@ -9572,119 +9572,451 @@ bradiarritmia: `# Bradiarritmias e Bloqueios AV
 
 > FC < 50 bpm. O que decide a conduta é a presença de **instabilidade** (hipotensão, rebaixamento, dor isquêmica, IC aguda) e o **nível do bloqueio**.
 
+## 🔬 Fisiopatologia e mecanismo
+
+Bradicardia é sempre um problema de **geração** ou de **condução** do impulso. Na disfunção do nó sinusal, o marca-passo natural falha — por fibrose degenerativa relacionada à idade, isquemia, tônus vagal exagerado ou drogas —, produzindo bradicardia sinusal, pausas, parada sinusal e bloqueio sinoatrial. Na síndrome bradi-taqui, o mesmo átrio doente alterna fibrilação atrial rápida com pausas longas ao término da arritmia.
+
+Nos bloqueios atrioventriculares, o que mais importa clinicamente é **onde** está a lesão. O bloqueio **suprahissiano (nodal)** é modulado por tônus autonômico, tende a ser benigno e responde a atropina; o escape, quando necessário, nasce da junção, é estreito e tem frequência razoável (40-60 bpm). Já o bloqueio **infrahissiano** (feixe de His ou ramos) é estrutural, não responde a atropina e depende de um escape ventricular lento (20-40 bpm), de QRS largo e instável — é ele que causa síncope de Stokes-Adams e morte súbita.
+
+Essa diferença explica a regra de ouro do plantão: bloqueio com **QRS estreito e escape rápido** é provavelmente nodal e costuma ser reversível ou bem tolerado; bloqueio com **QRS largo e escape lento** é infranodal, não se resolve com droga e pede marca-passo.
+
+A localização anatômica do infarto também prediz o comportamento. O **IAM inferior** — com oclusão da coronária direita, que irriga o nó AV na maioria das pessoas — gera bloqueios nodais, frequentemente com bradicardia sinusal e hipotensão por reflexo de Bezold-Jarisch; costumam ser transitórios e responsivos a atropina. O **IAM anterior extenso** com BAV avançado significa necrose do septo e do sistema His-Purkinje: prognóstico ruim, escape instável e indicação precoce de estimulação.
+
+Por fim, lembre-se de que a bradicardia mata por **débito cardíaco insuficiente** (DC = FC × volume sistólico): quando a frequência cai e o ventrículo não consegue mais compensar aumentando o volume ejetado, sobrevêm hipotensão, hipoperfusão cerebral e isquemia miocárdica.
+
 ## 🔬 Etiologia
+
 - **Intrínseca:** degeneração do sistema de condução (idade), isquemia/IAM (sobretudo inferior), doença de Chagas, infiltrativa, pós-cirúrgica.
 - **Reversível:** drogas (BB, BCC, digoxina, amiodarona), **hipercalemia**, hipotireoidismo, hipertonia vagal, hipóxia, hipotermia.
+- Some ainda: endocardite com abscesso de anel aórtico, doença de Lyme, sarcoidose e amiloidose cardíacas, apneia do sono, hipertensão intracraniana (reflexo de Cushing) e período pós-TAVI ou pós-cirurgia valvar.
 
 ## ✅ Tipos (ECG)
+
 - **Bradicardia sinusal / disfunção do nó sinusal.**
 - **BAV 1º grau:** PR > 200 ms (benigno).
 - **BAV 2º Mobitz I (Wenckebach):** PR alarga até bloquear — nodal, geralmente benigno.
 - **BAV 2º Mobitz II:** bloqueio súbito sem alargar PR — infranodal, risco de progressão.
 - **BAVT (3º grau):** dissociação AV completa.
 
+Para não errar a leitura, marque as ondas P com compasso ou papel: em toda bradiarritmia, a pergunta central é **"as P estão regulares e cada uma conduz?"**. Se as P são regulares e algumas não conduzem, é bloqueio AV; se as próprias P estão ausentes ou irregulares, o problema é sinusal.
+
+Duas armadilhas frequentes. A primeira é o **BAV 2:1**, em que não dá para observar o alargamento progressivo do PR — não se classifica como Mobitz I ou II apenas pelo traçado: use pistas indiretas (QRS estreito e PR basal longo favorecem nodal; QRS largo favorece infranodal) e observe o comportamento com esforço/atropina, que melhora o bloqueio nodal e piora o infranodal. A segunda é o **BAV avançado ou de alto grau** (duas ou mais P consecutivas bloqueadas), que se comporta como doença infranodal e merece a mesma seriedade do BAVT.
+
+No BAVT, procure a assinatura: ondas P e QRS **completamente independentes**, com frequência atrial maior que a ventricular e intervalos PP e RR cada um regular por si. E não esqueça de olhar a onda T e o QRS em busca de **hipercalemia** — T apiculada, P achatada, QRS alargado, ritmo lento e bizarro: é a bradiarritmia que se trata com gluconato de cálcio, não com marca-passo.
+
 ## 🩺 Quadro clínico
+
 - Tontura, síncope, fadiga, dispneia, dor torácica, confusão — ou assintomático.
 
+Na anamnese, ancore os sintomas ao ritmo: fadiga que piorou nas últimas semanas, intolerância progressiva ao esforço (incompetência cronotrópica), tontura ao levantar, quedas sem pródromo e **síncope súbita sem aviso** — a síncope de Stokes-Adams, típica do bloqueio infranodal, ocorre sem pródromo e com recuperação rápida, diferente do desmaio vasovagal.
+
+Revise **toda a prescrição**, incluindo colírios de betabloqueador para glaucoma, e pergunte sobre mudança recente de dose. Investigue insuficiência renal e uso de espironolactona/IECA (hipercalemia), sintomas de hipotireoidismo, febre e sopro novo (endocardite), viagem a área endêmica de Chagas e história familiar de marca-passo precoce.
+
+No exame: frequência e regularidade do pulso, pressão arterial, nível de consciência, perfusão periférica, sinais de congestão. Procure **ondas A em canhão** no pulso jugular e **variação de intensidade da primeira bulha** — sinais de dissociação AV, ou seja, de BAVT.
+
 ## 🧪 Exames complementares
+
 | Exame | Objetivo |
 | --- | --- |
 | ECG 12 derivações | Tipo e nível do bloqueio |
 | K, TSH, nível de digoxina | Causa reversível |
 | Troponina | Isquemia |
 | Holter | Sintomas intermitentes |
+| Ecocardiograma | Cardiopatia estrutural, função ventricular, doença infiltrativa |
+| Gasometria, função renal, Mg, Ca | Hipóxia, acidose, distúrbios eletrolíticos |
+| Monitor de eventos / looper implantável | Síncope rara e não documentada |
 
 ## 💊 Tratamento (com doses)
+
 **Instável:**
 - **Atropina 1 mg IV** a cada 3–5 min (máx 3 mg) — pouco eficaz em bloqueio infranodal/BAVT.
 - Refratário: **marca-passo transcutâneo** (com analgesia/sedação) e/ou **dopamina 5–20 mcg/kg/min** ou **adrenalina 2–10 mcg/min** em BIC.
 - **Marca-passo transvenoso** + avaliar definitivo.
 
 **Estável:** monitorizar, suspender drogas culpadas, corrigir distúrbios.
+
 **Marca-passo definitivo:** BAVT, Mobitz II, disfunção sintomática do nó sinusal sem causa reversível.
 
+Alguns pontos de execução fazem diferença. Ao instalar o **marca-passo transcutâneo**, confirme **captura elétrica** (espícula seguida de QRS alargado) **e mecânica** (pulso palpável ou curva de pressão) — a captura falsa é erro comum e deixa o paciente sem débito enquanto o monitor "parece" bom. O procedimento dói: analgesia e sedação não são luxo.
+
+Enquanto prepara a estimulação, mantenha em paralelo a caçada à causa reversível. Em intoxicação por **betabloqueador**, glucagon e insulina em altas doses com glicose têm papel; em **bloqueador de canal de cálcio**, gluconato/cloreto de cálcio e a mesma estratégia de insulina-glicose; em **hipercalemia**, gluconato de cálcio imediato para estabilizar a membrana; em **digoxina**, anticorpo antidigoxina quando disponível. Nenhuma dessas situações se resolve implantando marca-passo definitivo.
+
+\`\`\`mermaid
+flowchart TD
+    A["Bradicardia FC menor que 50<br/>com sintomas"] --> B["Instabilidade?<br/>hipotensao, rebaixamento, isquemia, IC"]
+    B -->|Nao| C["Monitorizar<br/>suspender drogas culpadas<br/>corrigir disturbios"]
+    B -->|Sim| D["Atropina 1 mg IV<br/>a cada 3-5 min, max 3 mg"]
+    D -->|Sem resposta| E["Marca-passo transcutaneo<br/>com analgesia e sedacao"]
+    D -->|Sem resposta| F["Dopamina 5-20 mcg/kg/min<br/>ou adrenalina 2-10 mcg/min"]
+    E --> G["Marca-passo transvenoso<br/>e avaliar definitivo"]
+    F --> G
+    C --> H["Causa reversivel?<br/>drogas, potassio, isquemia"]
+    H -->|Nao, e Mobitz II ou BAVT| G
+    class B critical;
+    class D,E,F,G,C action;
+\`\`\`
+
+## 🏥 Quando internar / UTI
+
+Internação com monitorização contínua para: **BAVT, BAV avançado e Mobitz II** (independentemente de sintomas), bradicardia sintomática de qualquer tipo, síncope atribuída à bradiarritmia, pausas longas documentadas, escape de QRS largo, bradiarritmia no contexto de síndrome coronariana aguda, intoxicação medicamentosa significativa e hipercalemia com alteração eletrocardiográfica.
+
+Reserve **UTI/unidade coronariana** para o paciente que precisou de atropina, drogas vasoativas, marca-passo transcutâneo ou transvenoso, para o BAVT com escape instável, para o IAM anterior com bloqueio avançado e para as intoxicações graves que exigem antídoto.
+
+Podem ser conduzidos ambulatorialmente, com investigação programada, os assintomáticos com **BAV de 1º grau** ou **Mobitz I** e QRS estreito, sem cardiopatia estrutural, desde que orientados quanto a sinais de alarme e com retorno agendado. Sintoma intermitente sem documentação é indicação de Holter ou monitor prolongado, não de alta sem plano.
+
 ## 💡 Pérolas
+
 - Mobitz II e BAVT NÃO respondem bem à atropina — preparar marca-passo.
-- Sempre excluir causa reversível (drogas, K⁺, isquemia) antes do definitivo.`,
+- Sempre excluir causa reversível (drogas, K⁺, isquemia) antes do definitivo.
+- **Atropina pode piorar** o bloqueio infranodal: ao acelerar o átrio sem melhorar a condução distal, aumenta o grau de bloqueio. Não retarde a estimulação insistindo em doses repetidas.
+- Bradicardia **assintomática** em atleta ou durante o sono costuma ser fisiológica — trate o paciente, não o número no monitor.
+- BAVT congênito tende a ter escape juncional estreito e razoavelmente estável; BAVT adquirido do idoso costuma ter escape ventricular largo e perigoso.
+- Bradicardia + hipotensão em IAM inferior: pense em **infarto de ventrículo direito**, faça derivações direitas (V3R-V4R) e lembre que o tratamento é volume, não diurético ou nitrato.
+- Bradicardia extrema com QRS bizarro e T apiculada é **hipercalemia** até prova em contrário — gluconato de cálcio antes de qualquer coisa.
+- Deixe as pás do marca-passo transcutâneo posicionadas no paciente de risco antes que ele descompense; improvisar durante a assistolia custa minutos preciosos.`,
 
 tpsv: `# Taquicardia Supraventricular Paroxística (TPSV)
 
 > Taquicardia regular de QRS estreito, com início e término súbitos. Mecanismos: reentrada nodal (mais comum) ou via acessória (WPW).
 
+## 🔬 Fisiopatologia e mecanismo
+
+A TPSV é, quase sempre, uma **reentrada** — um circuito elétrico fechado que precisa de duas vias com propriedades de condução e refratariedade diferentes. Isso explica o comportamento clínico tão característico: começa de repente (uma extrassístole "entra" no circuito), mantém frequência rigorosamente regular e termina de repente (algo bloqueia o circuito).
+
+Na **taquicardia por reentrada nodal (TRN)** — cerca de dois terços dos casos, mais comum em mulheres jovens sem cardiopatia — o circuito está dentro e ao redor do próprio nó AV, que possui uma via lenta (alfa) e uma via rápida (beta). Na forma típica (*slow-fast*), o impulso desce pela via lenta e sobe pela rápida, ativando átrios e ventrículos quase ao mesmo tempo. Daí a onda P retrógrada escondida dentro do QRS ou aparecendo como pseudo-r' em V1 e pseudo-S em D2/D3/aVF.
+
+Na **taquicardia por reentrada AV (TRAV)**, o circuito é maior: desce pelo nó AV e sobe por uma **via acessória** (feixe de Kent) — ou o contrário, na forma antidrômica. Quando a via acessória também conduz anterogradamente em ritmo sinusal, o ECG basal mostra PR curto e onda delta: é a **síndrome de Wolff-Parkinson-White**. Aqui a onda P retrógrada aparece depois do QRS, no segmento ST.
+
+O terceiro mecanismo é a **taquicardia atrial focal**, por automatismo ou atividade deflagrada em um foco atrial fora do nó sinusal — tende a ter aquecimento (*warm-up*) e não termina com adenosina em uma parcela dos casos.
+
+Do ponto de vista hemodinâmico, a queda de débito vem do encurtamento da diástole e da perda da contribuição atrial — o átrio contrai contra valva AV fechada, gerando as ondas A em canhão e a sensação de "batida no pescoço" que muitos pacientes descrevem.
+
 ## 🩺 Quadro clínico
+
 - Palpitações súbitas ("disparo"), tontura, dispneia, dor torácica; raramente síncope.
 
+Um detalhe de anamnese vale ouro: o paciente costuma descrever o início como um **interruptor** ("liga e desliga"), diferente do aumento gradual da taquicardia sinusal. Muitos relatam poliúria ao fim da crise (liberação de peptídeo natriurético atrial) e já descobriram sozinhos que prender a respiração, tossir ou lavar o rosto com água fria interrompe o episódio — história praticamente patognomônica de arritmia reentrante.
+
+Pergunte sempre: idade do primeiro episódio (início na infância/adolescência sugere via acessória), frequência e duração das crises, gatilhos (café, álcool, estresse, exercício), sintomas de tireotoxicose e presença de síncope. **Síncope, dor anginosa e dispneia importante durante a crise** são sinais de repercussão relevante e mudam a urgência da abordagem.
+
+No exame físico da crise: taquicardia regular, pulso de amplitude constante, pressão frequentemente preservada em jovens, ondas A em canhão **regulares** no pulso jugular (diferente das irregulares da TV). Fora da crise, o exame costuma ser normal — o que ajuda a explicar por que tantos pacientes recebem rótulo de ansiedade antes do diagnóstico.
+
 ## ✅ Diagnóstico (ECG)
+
 - QRS estreito (< 120 ms), regular, FC 150–250; onda P retrógrada ou ausente. Diferenciar de flutter (ondas F) e taquicardia sinusal.
 
+Sistematize a leitura em quatro passos. **Primeiro, o QRS é estreito ou largo?** Estreito e regular abre o leque da TPSV; largo obriga a tratar como TV até prova em contrário.
+
+**Segundo, é regular ou irregular?** Irregularidade sem padrão aponta fibrilação atrial; irregularidade com padrão sugere flutter com condução variável ou taquicardia atrial multifocal.
+
+**Terceiro, onde está a onda P?** P retrógrada invisível ou pseudo-r' em V1 → reentrada nodal típica. P logo após o QRS, no ST → reentrada por via acessória. P antes do QRS com morfologia diferente da sinusal → taquicardia atrial. Nenhuma P, mas linha de base serrilhada a ~300/min → flutter.
+
+**Quarto, a frequência ajuda?** Frequência ventricular travada perto de 150 bpm deve sempre levantar a suspeita de **flutter atrial com condução 2:1** — é o diagnóstico mais frequentemente perdido nesse cenário.
+
+Sempre que possível, registre um ECG de 12 derivações **durante** a taquicardia e outro **após** a reversão: a comparação revela ondas P antes ocultas e pode desmascarar a onda delta do WPW, que muda todo o manejo crônico.
+
+## 🔀 Diagnósticos diferenciais
+
+- Flutter atrial 2:1, taquicardia atrial, FA, TV (se QRS largo).
+- Taquicardia sinusal apropriada (febre, dor, anemia, hipovolemia, sepse, tireotoxicose, embolia pulmonar, abstinência, drogas adrenérgicas) — nesta, a conduta é tratar a causa, jamais frear o coração.
+
 ## 💊 Tratamento (com doses)
+
 **Instável → cardioversão elétrica sincronizada** (50–100 J).
+
 **Estável:**
 1. **Manobras vagais** (Valsalva modificada, massagem do seio carotídeo).
 2. **Adenosina 6 mg IV em bolus rápido** + flush; sem resposta → **12 mg**, repetir 12 mg (avisar o paciente do mal-estar transitório).
 3. Alternativas: diltiazem/verapamil IV ou betabloqueador.
+
 **Definitivo/profilaxia:** BB ou BCC; **ablação por cateter** (curativa) nos recorrentes.
 
+Duas notas práticas sobre a técnica. A **Valsalva modificada** (estudo REVERT) é claramente superior à clássica e deve ser o padrão: paciente semi-sentado sopra contra resistência por 15 segundos e, imediatamente ao final, é deitado com elevação passiva das pernas a 45° por 15 segundos — a taxa de reversão sobe de cerca de 17% para 43%. A **massagem do seio carotídeo** só depois de auscultar as carótidas: sopro carotídeo, AVC/AIT prévio ou estenose conhecida contraindicam.
+
+Quanto à adenosina: meia-vida de segundos, então **bolus verdadeiramente rápido em veia proximal (antecubital ou central), seguido de flush vigoroso de soro** e elevação do braço. Avise o paciente sobre rubor, opressão torácica e sensação de morte iminente por alguns segundos — aviso que evita pânico e recusa da segunda dose. Use com cautela em asma grave/broncoespasmo ativo e em transplantados cardíacos (resposta exagerada). Doses menores em acesso central. Mantenha o traçado rodando durante a injeção: mesmo quando não reverte, a pausa induzida "abre" a linha de base e frequentemente revela as ondas F do flutter — a adenosina é, aqui, também um instrumento diagnóstico.
+
+\`\`\`mermaid
+flowchart TD
+    A["Taquicardia regular<br/>QRS estreito"] --> B["Instabilidade hemodinamica?"]
+    B -->|Sim| C["Cardioversao eletrica<br/>sincronizada 50-100 J"]
+    B -->|Nao| D["Manobra vagal<br/>Valsalva modificada"]
+    D -->|Reverteu| E["Observar e investigar<br/>ECG pos-reversao"]
+    D -->|Nao reverteu| F["Adenosina 6 mg IV bolus<br/>rapido + flush"]
+    F -->|Nao reverteu| G["Adenosina 12 mg<br/>repetir 12 mg"]
+    G -->|Nao reverteu| H["Diltiazem ou verapamil IV<br/>ou betabloqueador"]
+    E --> I["Recorrentes: ablacao<br/>por cateter curativa"]
+    class B critical;
+    class C,F,G,H,I action;
+\`\`\`
+
 ## ⚠️ Cuidado
+
 - QRS largo/irregular (FA pré-excitada/WPW): NÃO usar adenosina, BCC, BB ou digoxina — usar procainamida ou cardioversão.
 
-## 🔀 Diagnósticos diferenciais
-- Flutter atrial 2:1, taquicardia atrial, FA, TV (se QRS largo).`,
+O motivo é fisiopatológico: essas drogas bloqueiam o nó AV e, na presença de via acessória com condução anterógrada, o impulso atrial caótico passa preferencialmente pelo feixe de Kent, sem freio — a resposta ventricular dispara e pode degenerar em fibrilação ventricular. O quadro no ECG é inconfundível quando procurado: taquicardia **irregular, de QRS largo e bizarro, com variação de morfologia e frequências muito altas**.
+
+## 🏥 Quando internar
+
+A maior parte dos pacientes é revertida e recebe alta da emergência, com orientação de manobra vagal domiciliar e encaminhamento ambulatorial.
+
+Justificam internação ou observação prolongada: episódio com **instabilidade** ou que exigiu cardioversão elétrica; síncope durante a crise; TPSV sobre cardiopatia estrutural, insuficiência cardíaca ou síndrome coronariana; **pré-excitação com FA** (risco de morte súbita, exige avaliação eletrofisiológica); recorrência precoce apesar do tratamento; e comorbidade descompensada que precipitou a arritmia.
+
+Na alta, garanta três coisas: ECG de repouso pós-reversão anexado ao prontuário, orientação escrita sobre a manobra de Valsalva modificada e **encaminhamento à eletrofisiologia** — a ablação por cateter tem altíssima taxa de cura e baixo risco, e é a opção preferida em pacientes sintomáticos recorrentes, em vez de anos de antiarrítmico.
+
+## 💡 Pérolas
+
+- Frequência ventricular ancorada em ~150 bpm: pense em **flutter 2:1** antes de fechar TPSV.
+- Não trate taquicardia sinusal como TPSV: frear um coração que está taquicárdico por hipovolemia ou sepse piora o paciente.
+- Adenosina que não reverte não exclui arritmia supraventricular — pode ser taquicardia atrial ou flutter; a resposta ao fármaco é dado diagnóstico, não veredito.
+- Reversão com manobra vagal ou adenosina sugere fortemente circuito dependente do nó AV (TRN ou TRAV) — informação valiosa para o eletrofisiologista.
+- Procure onda delta no ECG basal de todo paciente com TPSV: encontrar WPW muda o prognóstico e a prioridade de ablação.
+- Colha eletrólitos e TSH nos casos recorrentes; hipertireoidismo é gatilho subdiagnosticado.`,
 
 tv_sustent: `# Taquicardia Ventricular Sustentada (com pulso)
 
 > QRS largo (≥ 120 ms), > 30 s ou com instabilidade. **Toda taquicardia de QRS largo é TV até prova em contrário**, sobretudo com cardiopatia.
 
-## 🔬 Etiologia
-- Cardiopatia isquêmica (cicatriz pós-IAM — mais comum), miocardiopatias, canalopatias (QT longo, Brugada), distúrbios eletrolíticos, drogas.
+## 🔬 Fisiopatologia e mecanismo
 
-## ✅ Diagnóstico (ECG)
-- QRS largo regular; dissociação AV, batimentos de captura/fusão e concordância precordial favorecem TV.
+A grande maioria das TVs sustentadas monomórficas do adulto nasce de **reentrada em torno de uma cicatriz miocárdica**. A cicatriz — tipicamente pós-infarto — não é um bloco homogêneo: ela contém fibras de miocárdio sobrevivente entremeadas por fibrose, formando istmos de condução lenta. Quando uma extrassístole encontra esse istmo no momento certo, o impulso circula em torno da área inexcitável e reentra no miocárdio sadio, gerando uma taquicardia rápida e regular. Isso explica por que a TV pós-IAM é **monomórfica** (mesmo circuito, mesma sequência de ativação, mesma morfologia batimento a batimento) e por que a ablação por cateter do istmo funciona.
+
+Outros dois mecanismos importam. A **atividade deflagrada (triggered activity)** por pós-despolarizações precoces é o motor do *torsades de pointes*: em QT longo, a repolarização prolongada permite reativação de canais de cálcio, gerando um batimento que dispara TV polimórfica autolimitada ou degenerando em FV. Já o **automatismo anormal** predomina na TV da isquemia aguda, das catecolaminas altas e dos distúrbios eletrolíticos.
+
+A repercussão hemodinâmica depende de três variáveis: a frequência da TV, a função ventricular de base e a perda da contribuição atrial. Um coração com fração de ejeção preservada pode tolerar 160 bpm por horas; um ventrículo pós-infarto com FE 25% entra em choque na mesma frequência.
+
+## 🩺 Apresentação clínica
+
+O espectro vai de palpitações rápidas e regulares até a parada cardiorrespiratória. Palpitação de início e término súbitos, tontura, dispneia, dor torácica, sudorese, pré-síncope e síncope são as queixas típicas. **Síncope durante taquicardia de QRS largo é sinal de alarme** — significa débito insuficiente para perfundir o cérebro.
+
+Três dados de anamnese mudam a probabilidade pré-teste mais do que qualquer critério eletrocardiográfico: **infarto prévio, insuficiência cardíaca e cardiopatia estrutural conhecida**. Diante de QRS largo em paciente com IAM prévio, a probabilidade de TV passa de 95%. Pergunte também sobre morte súbita na família (canalopatias), síncope aos esforços, uso de drogas que alargam o QT, diarreia/vômitos (hipocalemia) e doença de Chagas — no Brasil, cardiopatia chagásica é causa frequente de TV com aneurisma apical.
+
+No exame físico, procure os sinais de **dissociação AV**, que são praticamente diagnósticos: ondas A em canhão irregulares no pulso venoso jugular, variação da intensidade da primeira bulha e variação da pressão arterial sistólica batimento a batimento. Avalie perfusão, nível de consciência, congestão pulmonar e pressão arterial — é isso que define a via terapêutica.
+
+## ✅ Leitura do ECG e diagnóstico diferencial
+
+Toda taquicardia regular de QRS largo tem três explicações possíveis: **TV** (80% dos casos gerais, > 95% se cardiopatia), **TSV com aberrância de condução** (bloqueio de ramo pré-existente ou frequência-dependente) e **TSV com pré-excitação** (condução anterógrada por via acessória).
+
+Achados que praticamente selam o diagnóstico de TV:
+
+- **Dissociação AV** — ondas P dissociadas, mais lentas que o QRS, "andando" pelo traçado.
+- **Batimentos de captura** (um QRS estreito no meio da taquicardia, quando o estímulo sinusal consegue despolarizar o ventrículo) e **batimentos de fusão** (QRS intermediário).
+- **Concordância precordial** — todos os QRS de V1 a V6 positivos ou todos negativos.
+- **QRS muito largo**: > 140 ms com padrão de BRD ou > 160 ms com padrão de BRE.
+- **Eixo noroeste** (entre −90° e ±180°).
+
+O **algoritmo de Brugada** formaliza isso em quatro perguntas sequenciais; uma resposta "sim" a qualquer uma encerra em TV: (1) ausência de complexo RS em todas as derivações precordiais; (2) intervalo do início do R ao nadir do S > 100 ms em alguma precordial; (3) dissociação AV; (4) critérios morfológicos de TV em V1-V2 e V6. Um sucessor útil à beira do leito é o **critério de aVR (Vereckei)**: presença de onda R inicial em aVR aponta para TV.
+
+Na prática, a regra que salva vidas é a mais simples: **na dúvida, é TV**. Tratar TSV como TV custa pouco (o paciente recebe procainamida ou uma cardioversão); tratar TV como TSV com verapamil pode causar colapso hemodinâmico e óbito.
+
+## 🚨 Classificação e gravidade
+
+**Quanto à morfologia:** monomórfica (QRS uniforme — cicatriz) ou polimórfica (QRS variável — isquemia aguda, canalopatia; se com QT longo, é *torsades de pointes*).
+
+**Quanto à duração:** não sustentada (≥ 3 batimentos, < 30 s, sem instabilidade) ou sustentada (> 30 s ou com instabilidade — que é a desta conduta).
+
+**Quanto à estabilidade — o que decide a conduta:** considere **instável** o paciente com hipotensão/choque, rebaixamento do nível de consciência, dor torácica isquêmica ou insuficiência cardíaca aguda/congestão. Qualquer um desses sinais move o paciente direto para a cardioversão elétrica, sem tentativa de droga.
+
+Uma variante que merece nome próprio é a **tempestade elétrica**: três ou mais episódios de TV/FV sustentada (ou choques apropriados do CDI) em 24 horas. É emergência — exige sedação, betabloqueio agressivo, correção de isquemia e discussão precoce com eletrofisiologia.
+
+## 🔬 Etiologia
+
+- Cardiopatia isquêmica (cicatriz pós-IAM — mais comum), miocardiopatias, canalopatias (QT longo, Brugada), distúrbios eletrolíticos, drogas.
+- No Brasil, acrescente sempre **cardiopatia chagásica** ao diferencial, especialmente com TV de morfologia de bloqueio de ramo direito e eixo superior.
 
 ## 💊 Tratamento (com doses)
+
 **Instável (hipotensão, IC, isquemia, rebaixamento) → cardioversão elétrica sincronizada** (100 J, escalar). Sem pulso → desfibrilação (protocolo ACLS).
+
+Sedar sempre que o paciente estiver consciente e houver tempo — mas nunca postergar o choque no paciente em choque circulatório. Confira se o aparelho está mesmo no modo **sincronizado**; em TV polimórfica a sincronização costuma falhar, e a conduta correta passa a ser choque **não sincronizado** em alta energia.
+
 **Estável, monomórfica:**
 - **Amiodarona 150 mg IV em 10 min**, repetir se necessário; manutenção 1 mg/min por 6h.
 - Alternativas: procainamida; lidocaína (contexto isquêmico).
+
+Vale registrar a inversão de preferência trazida pelo estudo PROCAMIO e incorporada pela diretriz europeia de arritmias ventriculares: na taquicardia regular de QRS largo com cardiopatia estrutural conhecida ou suspeita, a **procainamida** passou a ser o antiarrítmico preferencial, com mais terminações precoces e menos eventos adversos que a amiodarona — que segue sendo alternativa aceitável e é a droga mais disponível na maioria dos serviços brasileiros. Independentemente da escolha, **droga única**: empilhar antiarrítmicos multiplica pró-arritmia e hipotensão. Se a primeira droga falhar, o próximo passo é cardioversão elétrica, não um segundo antiarrítmico.
+
 **Torsades (polimórfica + QT longo):** **Sulfato de magnésio 1–2 g IV**, corrigir K/Mg, suspender drogas que alargam o QT, overdrive/marca-passo.
+
+Note a assimetria: no *torsades*, a amiodarona é **contraindicada** (alarga ainda mais o QT). Já a TV polimórfica **com QT normal** deve ser lida como isquemia aguda até prova em contrário — a conduta é reperfusão/cateterismo, não antiarrítmico.
+
 **Sempre:** corrigir isquemia e eletrólitos; avaliar **CDI** (prevenção secundária).
 
+\`\`\`mermaid
+flowchart TD
+    A["Taquicardia QRS largo<br/>com pulso"] --> B["Instabilidade?<br/>hipotensao, IC, isquemia, rebaixamento"]
+    B -->|Sim| C["Cardioversao eletrica<br/>sincronizada 100 J, escalar"]
+    B -->|Nao| D["Monomorfica ou polimorfica?"]
+    D -->|Monomorfica| E["Amiodarona 150 mg IV em 10 min<br/>ou procainamida"]
+    D -->|Polimorfica com QT longo| F["Sulfato de magnesio 1-2 g IV<br/>corrigir K e Mg"]
+    E --> G["Sem resposta:<br/>cardioversao eletrica"]
+    A --> H["Sem pulso:<br/>desfibrilar - ACLS"]
+    C --> I["Corrigir isquemia e eletrolitos<br/>avaliar CDI"]
+    E --> I
+    F --> I
+    class B,H critical;
+    class C,E,F,I action;
+\`\`\`
+
+## 🏥 Quando internar / UTI
+
+**Todo paciente com TV sustentada interna, monitorizado.** Vaga de terapia intensiva ou unidade coronariana para: qualquer episódio que exigiu cardioversão, instabilidade hemodinâmica, TV no contexto de síndrome coronariana aguda, TV polimórfica ou *torsades*, tempestade elétrica, necessidade de infusão contínua de antiarrítmico e portador de CDI com choques de repetição.
+
+Antes de qualquer alta, três perguntas precisam de resposta: **havia causa reversível?** (isquemia aguda, hipocalemia, droga QT-prolongadora), **qual a função ventricular?** (ecocardiograma obrigatório) e **este paciente tem indicação de CDI em prevenção secundária?** TV sustentada sem causa totalmente reversível, em cardiopata com expectativa de sobrevida razoável, é indicação clássica de cardiodesfibrilador. A avaliação com eletrofisiologia — para CDI, ablação de substrato ou ambos — deve ser feita ainda na internação.
+
 ## 💡 Pérolas
+
 - Na dúvida sobre QRS largo, trate como TV (NÃO dar verapamil).
-- Procurar e corrigir K⁺ e Mg²⁺.`,
+- Procurar e corrigir K⁺ e Mg²⁺.
+- **"Está estável, então é TSV"** é a armadilha mais clássica da emergência: pacientes jovens toleram TV por horas com pressão normal. Estabilidade hemodinâmica **não** é critério diagnóstico.
+- Peça um **ECG de 12 derivações durante a taquicardia** sempre que houver tempo e um após a reversão — comparar o QRS basal com o da taquicardia resolve boa parte dos casos duvidosos e é o documento que orientará o eletrofisiologista.
+- Compare também o padrão do QRS com um ECG antigo: se a morfologia larga da taquicardia é **idêntica** ao bloqueio de ramo prévio em ritmo sinusal, aumenta a chance de TSV com aberrância.
+- Adenosina não é teste diagnóstico seguro em QRS largo: pode acelerar a resposta ventricular na FA pré-excitada e desestabilizar o paciente.
+- Marca-passo/CDI no paciente: interrogue o dispositivo — TV incessante pode ser subestimulada ou o próprio CDI pode estar em falha de terapia.
+- Depois de reverter, **não considere o caso encerrado**: TV sustentada é marcador de risco de morte súbita, e o desfecho depende do que é feito nas 48 horas seguintes.`,
 
 flutter: `# Flutter Atrial
 
 > Macrorreentrada atrial (em geral no istmo cavotricuspídeo). FC atrial ~300 e ventricular frequentemente ~150 (condução 2:1).
 
-## ✅ Diagnóstico (ECG)
-- Ondas **F em "dente de serra"** (melhor em D2, D3, aVF), regulares; condução 2:1, 3:1 ou 4:1.
+## 🔬 Fisiopatologia e mecanismo
+
+O flutter atrial típico é uma **macrorreentrada organizada no átrio direito**, girando em torno do anel tricúspide e passando obrigatoriamente por um corredor estreito de tecido entre a valva tricúspide e a veia cava inferior: o **istmo cavotricuspídeo**. Esse istmo é a zona de condução lenta que sustenta o circuito — e é justamente por isso que uma linha de ablação ali interrompe a arritmia de forma definitiva, com taxas de sucesso muito altas.
+
+Quando o circuito gira no sentido **anti-horário** (a forma mais comum), a ativação sobe pelo septo interatrial e desce pela parede lateral, produzindo as clássicas ondas F negativas em D2, D3 e aVF e positivas em V1. No sentido **horário** (flutter reverso), o padrão se inverte: ondas F positivas na parede inferior. Já o **flutter atípico** não depende do istmo — costuma girar em torno de cicatrizes de cirurgia cardíaca prévia, de ablação de fibrilação atrial ou de áreas de fibrose atrial esquerda, e tem morfologia variável e ablação mais complexa.
+
+O nó AV funciona como um filtro que protege o ventrículo: com frequência atrial em torno de 300/min, a condução 2:1 entrega ~150 bpm, a 3:1 entrega ~100 e a 4:1, ~75. Por isso o flutter tende a ser **regular** — diferente da irregularidade caótica da FA — e por isso frequência ventricular travada em 150 bpm deve sempre levantar a suspeita.
+
+Do ponto de vista do risco, os átrios fibrilando a 300/min não têm contração mecânica eficaz. Há estase, sobretudo no apêndice atrial esquerdo, e formação de trombo — motivo pelo qual o risco tromboembólico do flutter é considerado **equivalente ao da fibrilação atrial**, ainda que a arritmia pareça "mais organizada" no traçado. Flutter e FA convivem no mesmo paciente com enorme frequência: quem tem um tende a desenvolver o outro, e isso tem implicação direta na decisão de manter anticoagulação após a ablação.
 
 ## 🩺 Quadro / risco
+
 - Palpitações, dispneia, fadiga. Risco tromboembólico **semelhante ao da FA** → aplicar CHA₂DS₂-VA.
 
+Alguns pacientes chegam com palpitação regular e rápida de início definido; outros, apenas com cansaço, redução da capacidade de esforço, tontura ou descompensação de insuficiência cardíaca. Não é raro o diagnóstico surgir na investigação de **taquicardiomiopatia** — cardiomiopatia induzida por frequência alta e persistente, com queda da fração de ejeção que costuma reverter depois do controle do ritmo.
+
+Na anamnese, busque os substratos e gatilhos: hipertensão, valvopatia (sobretudo mitral), insuficiência cardíaca, DPOC e cor pulmonale, apneia obstrutiva do sono, hipertireoidismo, obesidade, álcool, cirurgia cardíaca ou torácica prévia, embolia pulmonar e uso de antiarrítmicos da classe IC (que podem organizar uma FA em flutter de condução 1:1 — situação perigosa). Pergunte também sobre AVC/AIT prévio, sangramentos e função renal, porque isso definirá a anticoagulação.
+
+No exame físico, a frequência costuma ser regular, e as **ondas A em canhão regulares e rápidas** no pulso venoso jugular ("pescoço tremendo" a ~300/min) são um achado elegante. Procure sinais de congestão, sopros, bócio e sinais de doença pulmonar.
+
+## ✅ Diagnóstico (ECG)
+
+- Ondas **F em "dente de serra"** (melhor em D2, D3, aVF), regulares; condução 2:1, 3:1 ou 4:1.
+
+A leitura sistemática pede três olhares. Primeiro, **a linha de base entre os QRS**: no flutter típico não há linha isoelétrica nas derivações inferiores — as ondas F se encadeiam continuamente, em serrote. Segundo, **V1**, onde as ondas F costumam aparecer mais discretas e positivas, ajudando a definir o sentido do circuito. Terceiro, **a relação P:QRS**, que define a condução (2:1, 3:1, variável).
+
+O erro clássico é o **flutter 2:1 mascarado**: com FC ventricular ~150 bpm, uma das ondas F cai dentro do QRS e a outra dentro da onda T, e o traçado é lido como TPSV. Três truques desmascaram: procurar deformidade sistemática da onda T comparando com um ECG antigo; medir se a frequência atrial dobrada dá ~300/min; e, sobretudo, **frear temporariamente o nó AV** — manobra vagal ou adenosina em bolus produz bloqueio AV transitório que "abre" a linha de base e expõe as ondas F. A adenosina, aqui, não reverte o flutter: ela o revela.
+
+## 🔀 Diagnósticos diferenciais
+
+- FA, TPSV, taquicardia atrial.
+- Taquicardia sinusal com P sobreposta à T (a frequência raramente é fixa em 150 e há variação com repouso/esforço) e flutter atípico/taquicardia atrial macrorreentrante pós-ablação.
+
 ## 💊 Tratamento (com doses)
+
 **Instável → cardioversão elétrica sincronizada** (baixa energia, ~50 J).
+
 **Estável:**
 - **Controle de FC:** diltiazem/verapamil ou betabloqueador (costuma ser mais difícil que na FA).
 - **Reversão:** cardioversão elétrica ou ibutilida.
 - **Anticoagulação:** mesmas regras da FA (CHA₂DS₂-VA, DOAC; cardioversão sem anticoagulação prévia só se < 24h — ESC 2024/SBC 2025).
 - **Ablação do istmo cavotricuspídeo:** alta taxa de cura — tratamento definitivo.
 
-## 🔀 Diagnósticos diferenciais
-- FA, TPSV, taquicardia atrial.`,
+Três comentários práticos. O flutter é **eletricamente muito sensível**: reverte com energias baixas, bem menores que as necessárias na FA — o que torna a cardioversão elétrica sincronizada uma estratégia atraente e frequentemente preferida à tentativa farmacológica. Em contrapartida, o **controle de frequência é notoriamente difícil**: a condução do flutter tende a "saltar" de 4:1 para 2:1 com qualquer estímulo adrenérgico, e não é incomum precisar de doses altas ou de combinação de drogas sem sucesso satisfatório — mais um argumento a favor da estratégia de controle de ritmo.
 
-choque_cardio: `# Choque Cardiogênico
+Sobre a **anticoagulação**, a regra é a mesma da FA e não admite atalho: fora da janela segura (arritmia de duração indeterminada ou ≥ 24-48 h), cardioverter exige ou anticoagulação plena por pelo menos três semanas antes, ou ecocardiograma transesofágico excluindo trombo — e, em qualquer cenário, anticoagulação por no mínimo quatro semanas após a cardioversão, com continuidade indefinida se o escore de risco indicar. Cardioverter um flutter "porque parecia organizado" e sem cobertura é uma das causas evitáveis de AVC em emergência.
 
-> Hipoperfusão tecidual por falência de bomba apesar de volemia adequada: PAS < 90 (ou queda > 30 mmHg) + sinais de baixo débito (oligúria, confusão, extremidades frias, **lactato elevado**). Mortalidade alta.
+Por fim, a **ablação do istmo cavotricuspídeo** merece ser oferecida cedo no flutter típico recorrente ou sintomático: é procedimento de risco baixo e cura elevada. Isso não dispensa manter a vigilância para fibrilação atrial depois — muitos pacientes desenvolvem FA no seguimento, e a decisão de suspender ou não o anticoagulante depende do risco tromboembólico, não do sucesso técnico da ablação.
+
+\`\`\`mermaid
+flowchart TD
+    A["Taquicardia regular<br/>ondas F em dente de serra"] --> B["Instabilidade hemodinamica?"]
+    B -->|Sim| C["Cardioversao eletrica<br/>sincronizada baixa energia ~50 J"]
+    B -->|Nao| D["Avaliar duracao e<br/>risco tromboembolico CHA2DS2-VA"]
+    D --> E["Controle de FC:<br/>diltiazem, verapamil ou betabloqueador"]
+    D --> F["Reversao: cardioversao eletrica<br/>ou ibutilida"]
+    F --> G["Sem anticoagulacao previa<br/>so se menos de 24h"]
+    E --> H["Anticoagulacao pelas<br/>mesmas regras da FA"]
+    F --> H
+    H --> I["Ablacao do istmo cavotricuspideo<br/>tratamento definitivo"]
+    class B,G critical;
+    class C,E,F,H,I action;
+\`\`\`
+
+## 🏥 Quando internar
+
+Interna, com monitorização: flutter com **instabilidade hemodinâmica**, resposta ventricular muito alta e refratária ao controle inicial, condução **1:1** (frequência próxima de 300 bpm — emergência, frequentemente associada a antiarrítmico IC ou a vias de condução rápidas), insuficiência cardíaca descompensada, isquemia miocárdica associada, evento tromboembólico e necessidade de cardioversão em paciente que exige preparo com ecocardiograma transesofágico.
+
+Podem ser manejados de forma ambulatorial ou em unidade de observação os casos com frequência controlada, sem sintomas graves e sem cardiopatia descompensada — desde que a **anticoagulação seja iniciada corretamente antes da alta**, que a causa precipitante seja investigada e que o encaminhamento a cardiologia/eletrofisiologia esteja garantido.
+
+Investigação mínima antes de fechar o caso: ECG, eletrólitos, função renal e hepática (dosagem do DOAC), TSH, hemograma e **ecocardiograma transtorácico** — para avaliar átrio esquerdo, função ventricular e valvopatia.
+
+## 💡 Pérolas
+
+- Frequência ventricular fixa em ~150 bpm é flutter 2:1 até prova em contrário; use manobra vagal ou adenosina para expor as ondas F.
+- Flutter reverte com **energia baixa** — não escale desnecessariamente a carga.
+- Nunca use classe IC (propafenona, flecainida) isolada: pode lentificar o flutter e permitir condução **1:1**, disparando a frequência ventricular. Sempre associada a droga bloqueadora do nó AV.
+- Risco de AVC igual ao da FA: a organização do traçado não protege ninguém.
+- Ablação bem-sucedida do istmo **não** autoriza suspender anticoagulante por conta própria — a decisão segue o escore de risco e a chance de FA coexistente.
+- Procure e trate o gatilho: tireotoxicose, apneia do sono, álcool, DPOC descompensada e pós-operatório de cirurgia cardíaca respondem por boa parte dos casos.
+- Frequência ventricular persistentemente alta com queda de fração de ejeção sugere taquicardiomiopatia — potencialmente reversível com controle do ritmo.`,
+
+choque_cardio: `> Hipoperfusão tecidual por falência de bomba apesar de volemia adequada: PAS < 90 (ou queda > 30 mmHg) + sinais de baixo débito (oligúria, confusão, extremidades frias, **lactato elevado**). Mortalidade alta.
+
+## 🧬 Fisiopatologia — a espiral do baixo débito
+
+O evento inicial é a queda do volume sistólico por falência de bomba. O débito cardíaco cai, a perfusão coronariana cai junto (o próprio coração isquêmico é o primeiro órgão a sofrer), e a isquemia piora ainda mais a contratilidade: é a espiral clássica do choque cardiogênico.
+
+A resposta compensatória — vasoconstrição adrenérgica e taquicardia — sustenta a pressão por algum tempo, mas às custas de aumento da pós-carga e do consumo miocárdico de oxigênio, agravando a lesão. Em paralelo, o ventrículo esquerdo insuficiente eleva as pressões de enchimento, gerando congestão pulmonar: por isso o paciente típico é **"frio e úmido"**.
+
+Existe ainda um componente inflamatório sistêmico bem descrito: liberação de citocinas e óxido nítrico produz vasoplegia paradoxal em parte dos pacientes, o que explica os casos com resistência vascular sistêmica baixa e a resposta insuficiente apenas a inotrópico. A hipoperfusão sustentada leva a acidose lática, lesão renal aguda, hepatite isquêmica, isquemia mesentérica e coagulopatia — a falência de múltiplos órgãos que determina o desfecho.
+
+Nem todo choque cardiogênico é de ventrículo esquerdo. O **choque de ventrículo direito** (infarto de VD, TEP, hipertensão pulmonar descompensada) tem lógica própria: VD dilatado, pressão venosa alta, pulmões limpos, dependência de pré-carga e altíssima sensibilidade a vasodilatadores e a ventilação com pressão positiva.
 
 ## 🔬 Etiologia
+
 - **IAM com disfunção de VE** (mais comum) ou complicação mecânica (CIV, ruptura de músculo papilar, ruptura de parede livre); miocardite, IC terminal, valvopatia aguda. (Excluir causas obstrutivas: TEP maciço, tamponamento.)
 
-## 🩺 Monitorização
+Vale acrescentar as causas menos lembradas e potencialmente reversíveis: **arritmias** (taquiarritmia com alta resposta ou bradiarritmia grave), **miocardiopatia de Takotsubo**, **miocardite fulminante**, **intoxicação por cardiodepressores** (betabloqueador, bloqueador de canal de cálcio, digital, antidepressivo tricíclico), **contusão miocárdica**, disfunção aguda de prótese valvar e pós-cardiotomia.
+
+## 🩺 Apresentação clínica
+
+O quadro é o de hipoperfusão: extremidades frias e mosqueadas, enchimento capilar lento, pressão de pulso estreita, taquicardia, oligúria, sonolência ou agitação, náuseas. À congestão associam-se dispneia, ortopneia, estertores, turgência jugular e B3.
+
+A hipotensão pode ser tardia — existe o **choque normotenso**, em que o paciente mantém pressão à custa de vasoconstrição intensa e já apresenta lactato elevado e oligúria. Não espere a PAS cair para agir.
+
+Na anamnese, procure dor torácica e seu tempo de evolução, síncope, palpitação, quadro viral recente (miocardite), medicações e possível intoxicação, história de IC ou valvopatia. No exame, o **sopro novo** é o achado que muda o plano cirúrgico, e a assimetria entre pulmões limpos e jugular muito distendida aponta para VD, tamponamento ou TEP.
+
+## 🔀 Diagnóstico diferencial
+
+O erro mais caro é rotular como cardiogênico um choque de outro tipo — ou o contrário. Diferencie:
+
+- **Choque séptico/distributivo** — extremidades quentes, pressão de pulso alargada, foco infeccioso; responde a volume e vasopressor. Cuidado: sepse pode causar disfunção miocárdica e os dois coexistem.
+- **Choque hipovolêmico/hemorrágico** — jugulares colabadas, veia cava inferior fina e colapsável, resposta a volume.
+- **Choque obstrutivo** — tamponamento (abafamento de bulhas, jugular alta, derrame ao eco), pneumotórax hipertensivo, TEP maciço (VD dilatado, hipoxemia).
+- **Choque por causa mecânica intracardíaca** — regurgitação mitral aguda, comunicação interventricular pós-infarto, disfunção de prótese; sopro novo e eco definem.
+
+O **ecocardiograma à beira-leito é o desempate** e deve ser feito precocemente em todo choque indiferenciado: avalia contratilidade, tamanho e função do VD, pericárdio, valvas e a veia cava.
+
+## 📊 Classificação SCAI (estágios A–E)
+
+A classificação SCAI SHOCK organiza a gravidade e é usada para comunicação, triagem e decisão de suporte:
+
+- **A — At risk (em risco):** sem sinais de choque, mas com condição que predispõe (infarto extenso, IC agudizada).
+- **B — Beginning (pré-choque):** hipotensão relativa e/ou taquicardia **sem** hipoperfusão; lactato normal.
+- **C — Classic (clássico):** hipoperfusão manifesta exigindo intervenção (vasopressor, inotrópico, suporte mecânico), lactato elevado.
+- **D — Deteriorating (deteriorando):** não responde à estratégia inicial, precisa de escalonamento.
+- **E — Extremis (extremo):** colapso circulatório, parada refratária ou suporte máximo em curso.
+
+A mortalidade cresce de forma marcada de A para E, e a **parada cardíaca** é registrada como modificador do estágio, por ter peso prognóstico próprio. Reclassificar o paciente ao longo das horas (e não apenas na admissão) é mais informativo que o estágio de entrada isolado.
+
+## 🩻 Monitorização
+
 - PA invasiva, diurese, lactato seriado, ecocardiograma à beira-leito.
 
+Acrescente clareamento de lactato seriado como marcador de resposta, saturação venosa central quando disponível e avaliação repetida da perfusão periférica. Em casos complexos ou refratários, o cateter de artéria pulmonar ajuda a definir fenótipo hemodinâmico (débito, resistência, pressões de enchimento direita e esquerda) e a guiar o escalonamento — especialmente quando se cogita suporte mecânico ou transplante.
+
 ## 🧪 Exames complementares
+
 | Exame | Objetivo |
 | --- | --- |
 | ECG + troponina | IAM (causa) |
@@ -9693,6 +10025,7 @@ choque_cardio: `# Choque Cardiogênico
 | Função renal e hepática | Disfunção orgânica |
 
 ## 💊 Tratamento (com doses)
+
 1. **Revascularização imediata** se IAM (angioplastia) — o que mais muda o desfecho.
 2. **Noradrenalina** (vasopressor de escolha) titulada para PAM ≥ 65.
 3. **Inotrópico: dobutamina 2–20 mcg/kg/min** (ou milrinona) para o débito.
@@ -9700,9 +10033,53 @@ choque_cardio: `# Choque Cardiogênico
 5. **Suporte circulatório mecânico** (BIA seletivo, Impella/ECMO) nos refratários; UTI.
 6. Corrigir complicação mecânica (cirurgia).
 
-## 💡 Pérolas
+Alguns pontos práticos que fazem diferença à beira do leito.
+
+**Tempo é miocárdio.** No choque por infarto, a revascularização da artéria culpada é a única medida com impacto consistente em mortalidade; o transporte para hemodinâmica não deve esperar "estabilização".
+
+**Vasopressor antes de inotrópico** quando a pressão está muito baixa: sem pressão de perfusão coronariana, o inotrópico apenas aumenta consumo de oxigênio e arritmias. Uma vez restaurada a pressão arterial média, some o inotrópico para melhorar o débito e desmame o vasopressor conforme a perfusão melhora.
+
+**Corrija o que sabota a bomba**: arritmia (cardioversão elétrica se instável, controle de frequência ou marca-passo conforme o caso), hipoxemia, acidose grave, hipocalcemia, distúrbio eletrolítico e intoxicação por cardiodepressor (com antídoto específico).
+
+**Ventilação**: a intubação com pressão positiva reduz a pós-carga do VE e o trabalho respiratório, mas derruba o retorno venoso — perigosa no choque de VD e em quem já está no limite. Prepare vasopressor e escolha indutor hemodinamicamente estável.
+
+**Suporte circulatório mecânico** deve ser considerado precocemente nos refratários, em centro com experiência e sempre com uma "estratégia de saída" definida (ponte para recuperação, para revascularização/cirurgia, para transplante ou dispositivo de longa permanência). Em choque cardiogênico por infarto, o balão intra-aórtico tem uso hoje seletivo, e a bomba microaxial de fluxo contínuo mostrou benefício de sobrevida em população selecionada de infarto com supradesnivelamento, ao custo de mais complicações vasculares, hemolíticas e renais — ou seja, seleção de paciente é parte do tratamento. ECMO venoarterial é a opção quando há também falência respiratória ou colapso completo, exigindo atenção à sobrecarga do VE.
+
+\`\`\`mermaid
+flowchart TD
+    A["Hipotensao + hipoperfusao<br/>lactato elevado"] --> B["Ecocardiograma<br/>a beira-leito"]
+    B --> C["Confirmar falencia de bomba<br/>excluir tamponamento e TEP"]
+    C --> D["Sopro novo?"]
+    D -->|Sim| E["Complicacao mecanica<br/>avaliacao cirurgica"]
+    D -->|Nao| F["Noradrenalina<br/>PAM >= 65"]
+    F --> G["Debito ainda baixo?"]
+    G -->|Sim| H["Dobutamina<br/>2-20 mcg/kg/min"]
+    G -->|Nao| I["Reavaliar lactato<br/>e perfusao"]
+    C --> J["IAM como causa?"]
+    J -->|Sim| K["Revascularizacao imediata<br/>angioplastia"]
+    H --> L["Refratario?"]
+    L -->|Sim| M["Suporte circulatorio mecanico<br/>UTI e centro de referencia"]
+    L -->|Nao| I
+    class A,D,L critical;
+    class E,F,H,K,M action;
+\`\`\`
+
+## 🏥 Quando internar / UTI
+
+Todo choque cardiogênico é caso de **UTI ou unidade coronariana**, com acesso rápido a hemodinâmica, ecocardiografia e cirurgia cardíaca. Transferência precoce para centro de referência com suporte mecânico e programa de transplante é indicada quando há refratariedade, complicação mecânica, miocardite fulminante ou paciente jovem com etiologia potencialmente reversível.
+
+A literatura favorece o modelo de **equipe dedicada de choque** — cardiologia intensiva, hemodinâmica, cirurgia e intensivismo decidindo juntos e rápido, com protocolo definido de escalonamento e reavaliação em janelas curtas.
+
+## 💡 Pérolas e erros comuns
+
 - Perfil "frio e úmido" — não dar diurético isolado antes de corrigir o débito.
-- Sopro novo = procurar complicação mecânica (cirúrgica).`,
+- Sopro novo = procurar complicação mecânica (cirúrgica).
+- **Lactato e perfusão valem mais que o número da pressão**: existe choque com PAS "aceitável".
+- Não encha de volume por reflexo. Fora da hipovolemia e do choque de VD, volume piora a congestão e a função ventricular.
+- **Choque de VD** é a exceção às regras: precisa de pré-carga adequada, ritmo sinusal, evitar vasodilatador e ter cuidado extremo com pressão positiva.
+- Betabloqueador e outros cardiodepressores devem ser suspensos enquanto há choque.
+- Inotrópico não é inofensivo: taquicardia, arritmia e aumento do consumo de oxigênio; use a menor dose e pelo menor tempo possível.
+- Escalonar tarde é o erro mais comum. Defina antes qual é o critério de falha da estratégia atual e o que será feito quando ele ocorrer.`,
 
 endocardite: `# Endocardite Infecciosa
 
@@ -9828,27 +10205,52 @@ chagas: `# Cardiopatia Chagásica Crônica
 - Sempre pedir sorologia de Chagas na investigação de IC/arritmia no Brasil.
 - BRD + HBAE em paciente de área endêmica = pensar Chagas.`,
 
-ic_descomp: `# Insuficiência Cardíaca Aguda Descompensada
+ic_descomp: `> Piora rápida de sinais/sintomas de IC com necessidade de terapia urgente. Definir o **perfil hemodinâmico** (congestão × perfusão) é o que guia o tratamento.
 
-> Piora rápida de sinais/sintomas de IC com necessidade de terapia urgente. Definir o **perfil hemodinâmico** (congestão × perfusão) é o que guia o tratamento.
+## 🧬 Fisiopatologia — o que realmente descompensa
+
+A IC aguda quase nunca é "excesso de água" simples. Dois mecanismos coexistem em proporções variáveis: **acúmulo de volume** (retenção hidrossalina progressiva ao longo de dias/semanas, típica do paciente que ganha peso e incha) e **redistribuição de volume** (vasoconstrição adrenérgica aguda que desloca sangue do leito esplâncnico para o território pulmonar em horas, típica do EAP hipertensivo com peso praticamente inalterado).
+
+O gatilho comum é o aumento da pressão de enchimento do ventrículo esquerdo, transmitida retrogradamente ao capilar pulmonar. Quando essa pressão supera a capacidade de drenagem linfática, surge edema intersticial e depois alveolar — daí a dispneia, a ortopneia e a hipoxemia.
+
+Em paralelo, ativa-se o eixo neuro-hormonal (simpático, sistema renina-angiotensina-aldosterona, vasopressina), que aumenta pós-carga e retenção de sódio, fechando um círculo vicioso. Nos casos com baixo débito, entra a **congestão venosa sistêmica**, que eleva a pressão venosa renal e hepática e explica boa parte da lesão renal e hepática aguda que aparece nesses pacientes — muitas vezes atribuída erroneamente só ao diurético.
 
 ## 📊 Perfis clínicos (Stevenson)
+
 - **Quente-úmido** (congesto, bem perfundido) — o mais comum.
 - **Frio-úmido** (congesto + baixo débito) — pior prognóstico.
 - **Frio-seco** (baixo débito sem congestão).
 - **Quente-seco** (compensado).
 - Apresentações: IC congestiva, EAP, choque cardiogênico, IC direita isolada.
 
+Na prática, "úmido" se define por congestão (jugular, estertores, edema, B3, hepatomegalia, refluxo hepatojugular) e "frio" por hipoperfusão (extremidades frias, pressão de pulso estreita, oligúria, sonolência/confusão, lactato elevado). Hipotensão isolada **não** define frio; muito paciente com IC crônica vive com PAS de 90 e perfusão adequada.
+
 ## 🧬 Fatores precipitantes (sempre procurar)
+
 - Síndrome coronariana, crise hipertensiva, **arritmia (FA)**, disfunção valvar/mecânica, TEP, infecção, tamponamento; má aderência, transgressão de sal/água, AINEs, anemia, disfunção tireoidiana.
 
+Um mnemônico útil à beira do leito é **CHAMPIT**: Coronariopatia aguda, Hipertensão (emergência), Arritmia, causa Mecânica aguda, TEP (Pulmonary embolism), Infecção e Tamponamento — todos exigem tratamento específico e imediato, além do tratamento da IC.
+
+Tratar a congestão sem tratar o precipitante é a receita da reinternação em 30 dias.
+
 ## 🩺 Quadro clínico
+
 - Dispneia/ortopneia, congestão (estertores, turgência jugular, edema) ± má perfusão (hipotensão, oligúria, confusão, extremidades frias).
 
+Na anamnese, pergunte objetivamente: em quantos travesseiros dorme (e mudou recentemente?), acorda à noite com falta de ar (dispneia paroxística noturna), quanto ganhou de peso na última semana, parou algum remédio ou faltou receita, comeu sal/salgadinho/embutido, teve palpitação, dor torácica, febre, tosse, ou começou anti-inflamatório.
+
+No exame físico, os achados de maior valor são **turgência jugular**, **B3** e **refluxo hepatojugular** — bem mais específicos que estertores, que faltam em boa parte dos casos crônicos (drenagem linfática adaptada). Avalie temperatura e enchimento capilar das extremidades, pressão de pulso, nível de consciência e diurese: é assim que você classifica frio versus quente sem cateter.
+
 ## ✅ Diagnóstico
+
 - Clínica + **BNP/NT-proBNP** (> 100 / > 300 sugerem) + **ECG** + **RX de tórax** (congestão) + eco à beira-leito (POCUS). Buscar o precipitante (troponina, eletrólitos, função renal, gasometria).
 
+Os peptídeos natriuréticos têm ótimo valor **preditivo negativo**: valores baixos em paciente dispneico praticamente afastam IC aguda. Já valores elevados devem ser lidos com contexto: sobem também em FA, TEP, sepse, insuficiência renal e idade avançada, e são falsamente baixos na obesidade e no EAP muito precoce (flash).
+
+O POCUS acelera tudo: linhas B bilaterais difusas (congestão pulmonar), veia cava inferior dilatada e pouco colapsável (pressão venosa central alta), derrame pleural, avaliação grosseira da fração de ejeção, do ventrículo direito e do pericárdio.
+
 ## 🧪 Exames complementares
+
 | Exame | Objetivo |
 | --- | --- |
 | ECG | Isquemia, arritmia |
@@ -9860,9 +10262,15 @@ ic_descomp: `# Insuficiência Cardíaca Aguda Descompensada
 | Gasometria + lactato | Perfusão e gravidade |
 
 ## 🔀 Diagnósticos diferenciais
+
 - Pneumonia, DPOC/asma exacerbada, TEP, SDRA, sobrecarga volêmica por DRC.
 
+Vale detalhar as armadilhas mais custosas. **DPOC exacerbado** e IC coexistem com frequência e ambos sibilam ("asma cardíaca"); o histórico de tabagismo, o padrão do RX e o BNP ajudam, mas às vezes é preciso tratar os dois. **TEP** entra sempre que a hipoxemia é desproporcional ao RX ou há disfunção de VD sem causa esquerda evidente.
+
+**Pneumonia** pode ser o precipitante, não o diferencial — febre, leucocitose e consolidação localizada não excluem congestão associada. **Sobrecarga volêmica na doença renal crônica** produz quadro idêntico, e nela a resposta ao diurético pode ser nula: o tratamento é diálise. Considere ainda anemia grave, tireotoxicose, sepse e pericardite/tamponamento como causas de dispneia com jugular alta.
+
 ## 💊 Tratamento (com doses) — por perfil
+
 **Quente-úmido (congesto, PA preservada):**
 - **Diurético de alça IV:** Furosemida em bolus = **1–2,5× a dose oral diária** (virgem de diurético: 20–40 mg IV); reavaliar diurese em 2–6h; resposta ruim → dobrar a dose ou infusão contínua.
 - **Vasodilatador** (PAS > 110, EAP hipertensivo): Nitroglicerina IV 10–20 mcg/min, titular; ou nitroprussiato.
@@ -9876,13 +10284,47 @@ ic_descomp: `# Insuficiência Cardíaca Aguda Descompensada
 
 **Sempre:** manter betabloqueador se tolerado (reduzir se baixo débito; suspender só no choque); reintroduzir/otimizar os 4 pilares antes da alta; restrição de sódio; **tratar o precipitante**.
 
+O diurético IV deve ser dado **precocemente** e sua eficácia avaliada de forma objetiva, não pela impressão. Reavalie diurese e sintomas em poucas horas; se a resposta for insuficiente, a conduta é **aumentar a dose do diurético de alça** antes de considerar combinações. A associação de um segundo diurético com sítio de ação diferente (tiazídico ou acetazolamida) melhora a descongestão em resistência ao diurético, mas exige vigilância de sódio, potássio e função renal.
+
+Uma alta de qualidade importa tanto quanto a estabilização: paciente congesto que recebe alta "melhorado, mas ainda úmido" reinterna. Antes de liberar, confira ausência de congestão em repouso, transição para diurético oral com pelo menos 24 h de estabilidade, otimização dos quatro pilares do tratamento da IC com fração de ejeção reduzida (inibidor do sistema renina-angiotensina/sacubitril-valsartana, betabloqueador, antagonista mineralocorticoide e inibidor de SGLT2), orientação de peso diário e consulta precoce.
+
+\`\`\`mermaid
+flowchart TD
+    A["Dispneia + suspeita<br/>de IC aguda"] --> B["Definir perfil<br/>congestao x perfusao"]
+    B -->|"Quente-umido"| C["Furosemida IV<br/>1-2,5x a dose oral"]
+    C --> D["PAS > 110?"]
+    D -->|Sim| E["Nitroglicerina IV<br/>10-20 mcg/min"]
+    D -->|Nao| F["Reavaliar diurese<br/>em 2-6 h"]
+    B -->|"Frio-umido"| G["Dobutamina<br/>2-20 mcg/kg/min"]
+    G --> H["Choque cardiogenico?"]
+    H -->|Sim| I["Noradrenalina<br/>PAM >= 65 + UTI"]
+    H -->|Nao| J["Diuretico apos<br/>melhorar perfusao"]
+    B -->|"Frio-seco"| K["Prova de volume<br/>cautelosa"]
+    E --> L["Tratar o precipitante<br/>CHAMPIT"]
+    F --> L
+    I --> L
+    J --> L
+    K --> L
+    class B,H critical;
+    class C,E,G,I action;
+\`\`\`
+
 ## 💡 Pérolas / erros comuns
+
 - Não usar diurético isolado no perfil frio (piora a perfusão) — corrija o débito primeiro.
 - Morfina caiu em desuso (associada a pior desfecho).
 - Reavaliar congestão e função renal diariamente; balanço guiado por peso/diurese.
+- **Não suspender o betabloqueador por reflexo.** Só suspenda no choque ou baixo débito franco; suspensão desnecessária piora o prognóstico.
+- **Creatinina que sobe durante uma descongestão eficaz** costuma refletir alívio da congestão venosa renal, não lesão — não pare o diurético automaticamente se o paciente está melhorando clinicamente e diurese boa.
+- Inotrópico **não é tratamento de congestão**: use apenas com hipoperfusão, pelo menor tempo possível, pelo risco de arritmia e mortalidade.
+- Vasodilatador em estenose aórtica grave ou hipotensão é armadilha: pode derrubar o débito.
+- Sódio sérico baixo e ureia alta na admissão são marcadores de gravidade e de risco de reinternação — sinalizam paciente que precisa de acompanhamento apertado.
 
 ## 🏥 UTI / encaminhar
-- Choque, EAP refratário, necessidade de inotrópico/vasopressor, SCA, arritmia instável.`,
+
+- Choque, EAP refratário, necessidade de inotrópico/vasopressor, SCA, arritmia instável.
+
+Some-se a isso: necessidade de VNI mantida ou intubação, hipoxemia refratária, lactato persistentemente elevado, oligúria com piora renal rápida ou indicação de diálise urgente, complicação mecânica valvar aguda e paciente candidato a suporte circulatório/transplante — este último deve ser discutido precocemente com centro de referência, não depois da falência de múltiplos órgãos.`,
 
 nstemi: `## 🔬 Fisiopatologia
 
@@ -10054,26 +10496,55 @@ sincope: `# Síncope
 - Síncope ao esforço = estenose aórtica / CMH / arritmia até prova em contrário.
 - Ausência de pródromo + cardiopatia = alto risco.`,
 
-dissecao_aorta: `# Dissecção Aguda de Aorta
+dissecao_aorta: `> Emergência: rotura da íntima → falso lúmen na parede aórtica. Na tipo A não tratada, a mortalidade é de **~1–2% por hora**. A alta suspeição salva vidas.
 
-> Emergência: rotura da íntima → falso lúmen na parede aórtica. Na tipo A não tratada, a mortalidade é de **~1–2% por hora**. A alta suspeição salva vidas.
+## 🧬 Fisiopatologia
+
+Tudo começa com uma lesão da íntima. O sangue, sob pressão sistêmica e com alta velocidade de ascensão da onda de pulso (dP/dt), penetra a camada média enfraquecida e a descola longitudinalmente, criando um **falso lúmen** que corre paralelo ao lúmen verdadeiro.
+
+A partir daí, todas as complicações derivam de duas mecânicas simples. A primeira é a **propagação**: o falso lúmen avança anterógrada ou retrogradamente, e é o que ele encontra pelo caminho que define o quadro — óstios coronários (infarto, tipicamente parede inferior por acometimento da coronária direita), raiz aórtica (regurgitação aórtica aguda), pericárdio (hemopericárdio e tamponamento), troncos supra-aórticos (AVC), artérias intercostais (isquemia medular), tronco celíaco/mesentéricas (isquemia mesentérica), renais (IRA) e ilíacas (isquemia de membro).
+
+A segunda é a **má-perfusão**: o falso lúmen comprime o verdadeiro (mecanismo dinâmico) ou a dissecção se estende para dentro do ramo (mecanismo estático), gerando isquemia de órgão a jusante. Isso explica por que o paciente pode chegar "com dor abdominal", "com hemiparesia" ou "com perna fria" — e não com a dor torácica clássica.
+
+Consequência terapêutica direta: o alvo do tratamento clínico não é só a pressão, é a **força de cisalhamento na parede (dP/dt)**, que depende da frequência cardíaca, da contratilidade e da pressão. Por isso a frequência vem antes da pressão.
 
 ## 📊 Classificação (Stanford)
+
 - **Tipo A:** acomete a aorta ascendente → **cirúrgica de urgência**.
 - **Tipo B:** apenas descendente (após a subclávia esquerda) → manejo clínico (endovascular/cirurgia se complicada).
 
+Na classificação de **DeBakey**, o tipo I nasce na ascendente e se estende à descendente, o tipo II fica restrito à ascendente (ambos correspondem ao Stanford A) e o tipo III começa após a subclávia esquerda (Stanford B). Na prática, Stanford é o que decide a conduta: **ascendente acometida = mesa de cirurgia**.
+
+Também importa o tempo: convencionou-se chamar de **aguda** a dissecção com até 14 dias de evolução, subaguda entre 15 e 90 dias e crônica acima disso — o risco de rotura e mortalidade é máximo nas primeiras 48 horas.
+
+Uma tipo B é dita **complicada** quando há rotura/hemotórax, má-perfusão de órgão ou membro, dor refratária, hipertensão refratária ou expansão rápida do diâmetro — e aí deixa de ser manejo apenas clínico.
+
 ## 🧬 Fatores de risco
+
 - HAS (principal), aneurisma, valva aórtica bicúspide, Marfan/Ehlers-Danlos, gravidez, cocaína, trauma, vasculites.
 
+História familiar de doença aórtica, coarctação, síndrome de Turner, Loeys-Dietz e manipulação recente (cateterismo, cirurgia cardíaca, balão intra-aórtico) também entram na conta. Em paciente jovem sem hipertensão, pense em doença do tecido conjuntivo ou cocaína.
+
 ## 🩺 Quadro clínico
+
 - **Dor torácica/dorsal súbita, intensa, "rasgando"**, migratória; ± síncope, déficit neurológico, isquemia de membro, IC (regurgitação aórtica aguda), tamponamento.
 - **Assimetria de pulsos/PA entre os membros**, sopro diastólico de regurgitação aórtica.
 
+A característica que mais distingue é o **modo de início**: a dor da dissecção é máxima desde o primeiro segundo, ao contrário da dor coronariana, que costuma crescer em minutos. Descrições de "rasgando", "cortando" ou "faca nas costas" têm alta especificidade, mas baixa sensibilidade — a maioria dos pacientes descreve apenas dor intensa.
+
+Cuidado com as apresentações que enganam: síncope isolada (sugere tamponamento ou acometimento de tronco supra-aórtico), AVC com dor torácica, dor abdominal com lactato alto, paraplegia súbita, insuficiência cardíaca aguda por regurgitação aórtica. Até cerca de 1 em cada 10 pacientes chega **sem dor**, sobretudo idosos e diabéticos.
+
+Na avaliação de risco, ajuda pensar em três blocos: **condição predisponente** (Marfan, história familiar, valva bicúspide, manipulação aórtica), **características da dor** (súbita, intensa, rasgante) e **achados de exame** (déficit de pulso, diferencial de PA, sopro de regurgitação aórtica novo, hipotensão/choque). Quanto mais blocos presentes, maior a probabilidade e mais direto deve ser o caminho para a imagem.
+
 ## ✅ Diagnóstico
+
 - **Angio-TC de aorta** (exame de escolha); ecocardiograma transesofágico se instável. D-dímero negativo torna improvável (apoio, não exclui isoladamente).
 - ECG (excluir STEMI; a dissecção pode acometer óstio coronário).
 
+O ecocardiograma transtorácico à beira do leito é útil e rápido: pode mostrar flap na raiz, regurgitação aórtica nova, derrame pericárdico e tamponamento — mas **um transtorácico normal não exclui dissecção**. A radiografia de tórax pode mostrar alargamento de mediastino ou derrame pleural à esquerda, e também não serve para excluir.
+
 ## 🧪 Exames complementares
+
 | Exame | Objetivo |
 | --- | --- |
 | Angio-TC de tórax/aorta | Confirma e classifica |
@@ -10083,18 +10554,61 @@ dissecao_aorta: `# Dissecção Aguda de Aorta
 | Troponina, função renal, lactato | Complicações/isquemia |
 
 ## 🔀 Diagnósticos diferenciais
+
 - SCA/STEMI, TEP, pericardite, pneumotórax, abdome agudo (na dissecção abdominal).
 
+Complete a lista com: hematoma intramural e úlcera aterosclerótica penetrante (as outras faces da **síndrome aórtica aguda**, com manejo semelhante), ruptura de esôfago (síndrome de Boerhaave), espasmo esofágico, cólica renal, pancreatite aguda e mediastinite. Em quadro neurológico, lembre que a dissecção é o grande simulador do AVC isquêmico — e a diferença entre trombolisar ou não pode ser fatal.
+
 ## 💊 Tratamento (com doses) — iniciar antes da definição completa
+
 1. **Controle anti-impulso (FC e PA):** **betabloqueador IV primeiro** — esmolol em BIC ou metoprolol 5 mg IV; **meta de FC < 60**.
 2. Depois, se PAS ainda elevada: **nitroprussiato IV** — **meta de PAS 100–120 mmHg** (BB antes do vasodilatador, para não causar taquicardia reflexa).
 3. Analgesia (morfina).
 4. **Tipo A → cirurgia cardíaca de emergência.** Tipo B não complicada → clínico; complicada → endovascular (TEVAR).
 
+A diretriz americana de doenças da aorta de 2022 formula o alvo como **PAS < 120 mmHg** (ou a menor pressão que mantenha perfusão de órgãos-alvo) e frequência cardíaca em torno de **60–80 bpm**; na prática beira-leito, buscar FC < 60 permanece uma meta segura e amplamente adotada.
+
+Pontos operacionais que fazem diferença: analgesia adequada é parte do controle pressórico (dor mantém taquicardia e hipertensão); se houver contraindicação ao betabloqueador (broncoespasmo grave), o **diltiazem/verapamil IV** é a alternativa para controle de frequência; **nunca inicie vasodilatador isolado**. Em paciente hipotenso ou chocado, pense em tamponamento, rotura ou regurgitação aórtica aguda — não em "dissecção controlada" — e acione a cirurgia imediatamente. Pericardiocentese no tamponamento por dissecção tipo A pode precipitar rotura e deve ser evitada fora de contexto de resgate extremo.
+
+Simultaneamente ao tratamento clínico: dois acessos calibrosos, monitorização contínua, **PA invasiva** (no braço com maior pressão), tipagem e reserva de hemocomponentes, e contato **imediato** com cirurgia cardíaca/vascular — a decisão cirúrgica não deve esperar o exame perfeito.
+
+\`\`\`mermaid
+flowchart TD
+    A["Dor toracica ou dorsal subita<br/>rasgando ou migratoria"] --> B["Assimetria de pulsos ou PA<br/>sopro diastolico novo<br/>deficit neurologico"]
+    B --> C["Estavel para tomografia?"]
+    C -->|Sim| D["Angio-TC de aorta"]
+    C -->|Nao| E["Eco transesofagico<br/>a beira do leito"]
+    D --> F["Iniciar controle anti-impulso<br/>betabloqueador IV primeiro<br/>FC menor que 60"]
+    E --> F
+    F --> G["PAS ainda elevada?"]
+    G -->|Sim| H["Nitroprussiato IV<br/>PAS 100 a 120 mmHg"]
+    G -->|Nao| I["Manter e classificar"]
+    H --> I
+    I --> J["Acomete aorta ascendente?"]
+    J -->|Tipo A| K["Cirurgia cardiaca<br/>de emergencia"]
+    J -->|Tipo B complicada| L["TEVAR ou cirurgia"]
+    J -->|Tipo B nao complicada| M["Manejo clinico em UTI"]
+    class B,J critical;
+    class K,L,M action;
+\`\`\`
+
+## 🏥 Quando internar / UTI
+
+- **Toda dissecção aguda é internação em UTI**, mesmo a tipo B não complicada — o risco de complicação nas primeiras 48 horas é alto e exige PA invasiva, drogas IV tituláveis e reavaliação seriada.
+- **Tipo A**: transferência imediata para serviço com cirurgia cardíaca; não retenha o paciente para "estabilizar melhor".
+- **Tipo B**: vigilância de sinais de complicação — dor recorrente, hipertensão refratária, elevação de lactato, oligúria, déficit motor de membros inferiores, queda de hemoglobina.
+- Alta hospitalar exige betabloqueador oral, controle rigoroso de PA (alvo habitualmente < 130/80 mmHg), programa de imagem seriada da aorta e rastreamento familiar quando há suspeita de doença do tecido conjuntivo.
+
 ## 💡 Pérolas / erros comuns
+
 - Diferença de PA > 20 mmHg entre os braços + dor "rasgando" = pensar em dissecção.
 - **NÃO** anticoagular nem trombolisar (erro fatal se confundir com SCA).
-- Controlar a FC **antes** da PA.`,
+- Controlar a FC **antes** da PA.
+- Dissecção tipo A pode se apresentar como **STEMI inferior** — supra em parede inferior com dor rasgante e assimetria de pulsos exige, antes da sala de hemodinâmica, uma imagem da aorta.
+- **D-dímero não é ferramenta de exclusão isolada** quando a probabilidade é alta: um resultado negativo em paciente de alto risco não autoriza mandar embora.
+- Meça a PA nos dois braços e palpe todos os pulsos em toda dor torácica grave — leva 30 segundos e muda o diagnóstico.
+- Síncope isolada em paciente com dor torácica é sinal de alarme (tamponamento).
+- Não retarde o tratamento anti-impulso esperando a confirmação por imagem; iniciar betabloqueador é seguro e reduz a propagação.`,
 
 ic_cronica: `# Insuficiência Cardíaca Crônica
 
@@ -10269,25 +10783,50 @@ dm2_amb: `# Diabetes Mellitus tipo 2 — Manejo ambulatorial
 ## 📌 Encaminhar
 - Suspeita de DM1, gestação, complicações avançadas, controle difícil.`,
 
-fa_cronica: `# Fibrilação Atrial — Manejo crônico
-
-> Arritmia sustentada mais comum. Pilares: **anticoagulação (CHA₂DS₂-VA)**, **controle de frequência vs ritmo** e tratamento da causa.
+fa_cronica: `> Arritmia sustentada mais comum. Pilares: **anticoagulação (CHA₂DS₂-VA)**, **controle de frequência vs ritmo** e tratamento da causa.
 
 ## 🔬 Fisiopatologia
+
 - Múltiplos circuitos de reentrada atrial / focos ectópicos (veias pulmonares) → contração atrial inefetiva → estase (risco de trombo no apêndice atrial) e resposta ventricular irregular.
 
+O que sustenta a arritmia ao longo do tempo é o **remodelamento**: cada período em FA encurta o período refratário atrial e favorece novos episódios ("FA gera FA"); em paralelo, hipertensão, obesidade, apneia do sono, álcool e valvopatia promovem fibrose e dilatação atrial, criando o substrato anatômico definitivo. É por isso que a diretriz europeia de 2024 organiza o cuidado em torno do esquema **AF-CARE**, que coloca o tratamento das comorbidades como primeiro pilar, antes mesmo da anticoagulação e do controle de sintomas.
+
+Na prática, isso significa que controlar peso, pressão, diabetes, apneia do sono e consumo de álcool não é "medida geral": é tratamento antiarrítmico com evidência de redução de recorrência.
+
+O risco tromboembólico vem da tríade de Virchow dentro do átrio: estase no apêndice atrial esquerdo, disfunção endotelial e estado pró-trombótico. O trombo formado ali embolisa preferencialmente para o cérebro — e o AVC cardioembólico é caracteristicamente mais extenso e mais incapacitante que o aterotrombótico.
+
+## 🩺 Apresentação clínica
+
+O espectro vai do totalmente assintomático (FA descoberta em ECG de rotina ou por *wearable*) ao paciente muito limitado. Sintomas típicos: palpitação, fadiga desproporcional, dispneia aos esforços, tontura, redução da capacidade funcional e, menos comum, síncope.
+
+Classifique o **padrão temporal**, porque ele orienta o tratamento: paroxística (reverte espontaneamente, em geral em até 7 dias), persistente (dura mais de 7 dias ou exige cardioversão), persistente de longa duração e permanente (quando paciente e médico decidem não perseguir mais o ritmo sinusal). Registre também a **carga de sintomas** — muitos pacientes só percebem o quanto estavam limitados depois de voltar ao sinusal.
+
+No exame: pulso irregularmente irregular, déficit de pulso, e busca ativa de sinais de insuficiência cardíaca, valvopatia (sopro de estenose mitral), tireotoxicose e sequelas neurológicas de embolia prévia.
+
 ## ✅ Diagnóstico
+
 - ECG: intervalo RR irregular e ausência de onda P. Holter se paroxística.
 
-## 🩺 Avaliação
+Para diagnóstico formal, é necessário um registro eletrocardiográfico do episódio — no ECG de 12 derivações ou em traçado de monitorização de duração suficiente. Alertas de dispositivos vestíveis não fecham diagnóstico e precisam ser confirmados. Em AVC criptogênico, vale prolongar a monitorização (Holter de 24 h a 7 dias, *looper* implantável em casos selecionados), pois a FA paroxística é frequentemente subdiagnosticada.
+
+## 📊 Avaliação
+
 - **CHA₂DS₂-VA** (risco de AVC — pontos): IC/disfunção de VE (1) · HAS (1) · **idade ≥ 75 (2)** · Diabetes (1) · **AVC/AIT/embolia prévios (2)** · doença Vascular (1) · idade 65–74 (1). *(sexo removido — ESC 2024)*
 - **HAS-BLED** (risco de sangramento — 1 ponto cada): HAS não controlada · função renal anormal · função hepática anormal · AVC prévio · sangramento prévio/predisposição · INR lábil · idade > 65 · drogas (AINE/antiagregante) ou álcool. **≥ 3 = alto risco** (não contraindica anticoagular — corrige fatores e intensifica vigilância).
 - Completar: TSH, eletrólitos, ecocardiograma, função renal/hepática.
 
+A mudança do CHA₂DS₂-VASc para o **CHA₂DS₂-VA** é uma das novidades mais relevantes de 2024: o sexo feminino deixou de pontuar como fator de risco independente, passando a ser entendido como modificador do risco. Na prática, isso significa que a mulher não recebe mais o ponto automático — a indicação de anticoagulação passa a depender apenas dos demais fatores, tornando a decisão idêntica para ambos os sexos.
+
+Avalie também o **padrão de comorbidades do AF-CARE**: pressão arterial, IMC, apneia obstrutiva do sono (rastrear ativamente), diabetes, consumo de álcool, tabagismo e atividade física. Cada um deles é alvo terapêutico com impacto na recorrência.
+
 ## 🔀 Diagnósticos diferenciais
+
 - Flutter atrial, taquicardia atrial multifocal, TPSV, extrassístoles frequentes.
 
+Vale também descartar causas secundárias que mudam o manejo: **hipertireoidismo** (dosar TSH em todo paciente novo), estenose mitral, comunicação interatrial, apneia do sono grave, abuso de álcool ("holiday heart") e cardiomiopatias infiltrativas — a FA pode ser a primeira manifestação de amiloidose cardíaca no idoso com hipertrofia ventricular.
+
 ## 🧪 Exames complementares
+
 | Exame | Objetivo |
 | --- | --- |
 | ECG / Holter | Confirmar e caracterizar |
@@ -10296,17 +10835,57 @@ fa_cronica: `# Fibrilação Atrial — Manejo crônico
 | Função renal/hepática | Escolha do anticoagulante |
 
 ## 💊 Tratamento (com doses)
+
 **Anticoagulação** — **CHA₂DS₂-VA** (escore sexo-neutro, ESC 2024; o "Sc"/sexo foi removido): **≥ 2 → anticoagular**; **= 1 → considerar**; 0 → não anticoagular:
+
 - **DOAC preferencial:** Rivaroxabana 20 mg/dia (15 se ClCr 15–49); Apixabana 5 mg 12/12h (2,5 se ≥ 2: idade ≥ 80, peso ≤ 60 kg, Cr ≥ 1,5); Dabigatrana 150 mg 12/12h.
 - **Varfarina** (INR 2–3) se estenose mitral moderada-grave ou prótese mecânica.
 
+Regras que evitam erro grave: **antiagregante não substitui anticoagulante** para prevenção de AVC na FA — AAS não tem lugar nessa indicação. A rivaroxabana deve ser tomada **com alimento** para absorção adequada. Reavalie periodicamente a função renal, porque a dose dos DOACs depende dela e o clearance cai com a idade. Em quem tem indicação de anticoagulação mas contraindicação absoluta e permanente, discuta **oclusão do apêndice atrial esquerdo** com o especialista.
+
 **Controle de frequência** (meta FC < 110 em repouso):
+
 - Betabloqueador (metoprolol, bisoprolol) ou diltiazem/verapamil (evitar em ICFEr); digoxina como adjuvante.
 
 **Controle de ritmo** (sintomático, jovem, IC): amiodarona; propafenona (sem cardiopatia estrutural); ou ablação por cateter.
 
-## 📌 Encaminhar
-- Candidatos a cardioversão/ablação, FA + IC, controle de ritmo.`,
+A escolha entre frequência e ritmo deixou de ser uma disputa: a evidência mais recente favorece **controle de ritmo precoce** (dentro do primeiro ano do diagnóstico) em pacientes selecionados, enquanto o controle de frequência permanece adequado para o idoso oligossintomático com átrio muito dilatado e FA de longa data. Nos dois cenários, a anticoagulação segue a mesma regra — **estratégia de ritmo bem-sucedida não autoriza suspender o anticoagulante**.
+
+Sobre os antiarrítmicos: a amiodarona é a mais eficaz e a mais tóxica no longo prazo (tireoide, pulmão, fígado, pele, córnea), exigindo monitorização periódica; por isso, no paciente **sem cardiopatia estrutural**, propafenona é preferível. A ablação por cateter com isolamento de veias pulmonares é hoje **primeira linha** em pacientes selecionados com FA paroxística sintomática, e tem benefício consistente em FA associada a insuficiência cardíaca com fração de ejeção reduzida.
+
+\`\`\`mermaid
+flowchart TD
+    A["FA confirmada<br/>manejo cronico"] --> B["Tratar comorbidades<br/>HAS, obesidade, apneia,<br/>diabetes, alcool"]
+    B --> C["Calcular CHA2DS2-VA<br/>escore sexo-neutro"]
+    C -->|Maior ou igual a 2| D["Anticoagular<br/>DOAC preferencial"]
+    C -->|Igual a 1| E["Considerar anticoagulacao<br/>decisao compartilhada"]
+    C -->|Zero| F["Nao anticoagular<br/>reavaliar periodicamente"]
+    D --> G["Estenose mitral mod-grave<br/>ou protese mecanica?"]
+    G -->|Sim| H["Varfarina com INR 2 a 3"]
+    G -->|Nao| I["Rivaroxabana, apixabana<br/>ou dabigatrana"]
+    B --> J["Paciente sintomatico?"]
+    J -->|Sim| K["Controle de ritmo<br/>antiarritmico ou ablacao"]
+    J -->|Nao| L["Controle de frequencia<br/>alvo FC menor que 110"]
+    class C critical;
+    class H,I,K,L action;
+\`\`\`
+
+## 🏥 Quando internar / encaminhar
+
+- **Internação** na descompensação: insuficiência cardíaca aguda, isquemia miocárdica, síncope, resposta ventricular não controlada apesar do tratamento oral, sangramento maior em uso de anticoagulante ou suspeita de taquicardiomiopatia.
+- **Cardiologia/arritmologia**: candidatos a cardioversão ou ablação, FA associada a insuficiência cardíaca, falha ou intolerância a antiarrítmico, FA em jovem, suspeita de pré-excitação, valvopatia significativa e candidatos a oclusão do apêndice atrial.
+- **Manejo ambulatorial** é adequado na FA assintomática ou pouco sintomática com frequência controlada, desde que a anticoagulação esteja definida e haja reavaliação periódica de sintomas, função renal e comorbidades.
+
+## 💡 Pérolas e erros comuns
+
+- O escore mudou: **CHA₂DS₂-VA, sem ponto por sexo feminino**. Usar o escore antigo pode levar a anticoagular mulheres sem outra indicação.
+- **AAS não previne AVC na FA.** Antiagregante isolado é erro comum e perigoso, por somar risco de sangramento sem proteção.
+- FA "paroxística" não protege ninguém: a indicação de anticoagulação independe do padrão temporal e da carga de arritmia.
+- Ajuste a dose do DOAC pelos critérios corretos e reveja com a função renal — subdosar por medo de sangramento reduz a proteção sem eliminar o risco hemorrágico.
+- HAS-BLED alto **não contraindica** anticoagular: serve para corrigir fatores modificáveis (pressão, álcool, AINE, INR lábil) e intensificar o acompanhamento.
+- Rastreie **apneia do sono** e trate obesidade e álcool — sem isso, a recorrência após ablação é alta.
+- Considere **amiloidose cardíaca** no idoso com FA, hipertrofia ventricular e baixa voltagem no ECG.
+- Frequência persistentemente alta com queda de fração de ejeção sugere **taquicardiomiopatia**, potencialmente reversível.`,
 
 dengue: `# Dengue — Classificação e manejo
 
@@ -10452,24 +11031,112 @@ flowchart TD
 - **Hesitar em aplicar adrenalina IM por medo de arritmia/efeito cardiovascular** — na dose e via corretas o risco de não tratar a anafilaxia é muito maior que o risco do fármaco.
 - **Excluir o diagnóstico por ausência de urticária** — até 1 em 5 casos não tem manifestação cutânea.
 - **Tratar angioedema hereditário como anafilaxia comum** — não responde a adrenalina/anti-H1/corticoide; exige C1-inibidor concentrado ou icatibanto e reconhecimento pela história familiar/ausência de urticária.`,
-acls: `## Ritmo chocável (FV / TV sem pulso)
+acls: `## 🫀 Fisiopatologia — por que a compressão é o remédio
+
+Na parada cardiorrespiratória (PCR) o débito cardíaco cai a zero e, com ele, a pressão de perfusão coronariana (PPC) e cerebral. É a PPC — diferença entre a pressão diastólica aórtica e a pressão do átrio direito — que determina se o miocárdio vai receber sangue suficiente para voltar a bater.
+
+A compressão torácica de alta qualidade é o único mecanismo capaz de gerar essa pressão, e ela **leva vários ciclos para subir e cai imediatamente quando você para**. É por isso que cada segundo de interrupção (para intubar, checar pulso, discutir o caso) tem custo hemodinâmico direto: a PPC despenca e precisa ser reconstruída do zero.
+
+A fibrilação ventricular consome ATP em atividade elétrica caótica e evolui, com o tempo, de uma fase elétrica (choque resolve) para uma fase circulatória (precisa de compressão antes do choque) e depois metabólica (acidose, isquemia, prognóstico ruim). A assistolia e a atividade elétrica sem pulso (AESP) normalmente já são o estágio final de uma causa que vinha se instalando — hipóxia, hipovolemia, obstrução — e por isso o tratamento delas é **encontrar a causa**, não apertar o desfibrilador.
+
+## 🩺 Reconhecimento e os primeiros 60 segundos
+
+Paciente irresponsivo, sem respiração ou com respiração agônica (gasping), sem pulso central em até 10 segundos → é PCR. Gasping é o erro clássico: é sinal de PCR, não de respiração preservada.
+
+Chame ajuda e o carrinho/desfibrilador, inicie compressões imediatamente e coloque as pás/pads assim que chegarem. Não atrase a compressão para pegar acesso, monitorizar ou intubar.
+
+Compressão sem via aérea avançada: **30:2**. Com via aérea avançada: compressões contínuas e ventilação assíncrona a cada 6 segundos (10/min), evitando hiperventilação — ventilar demais aumenta a pressão intratorácica e reduz o retorno venoso.
+
+## ⚡ Ritmo chocável (FV / TV sem pulso)
+
 1. **RCP de alta qualidade** (100–120/min, 5–6 cm, retorno total do tórax, interrupções <10 s).
 2. **Desfibrilar** (bifásico 200 J) e reassumir RCP por 2 min imediatamente.
 3. **Adrenalina 1 mg IV/IO** após o 2º choque e a cada 3–5 min.
 4. **Amiodarona** 300 mg IV (2ª dose 150 mg) após o 3º choque — ou lidocaína 1–1,5 mg/kg.
 5. Via aérea avançada + capnografia (ETCO₂) quando possível.
 
-## Ritmo NÃO chocável (AESP / assistolia)
+Não espere o ritmo "melhorar" depois do choque: carregue, choque, e volte a comprimir sem checar pulso — a checagem fica para o fim dos 2 minutos.
+
+Prefira o **acesso venoso periférico** como primeira tentativa; se falhar rapidamente, vá para o **intraósseo**. Toda droga em bolus deve ser seguida de flush de soro e elevação do membro.
+
+FV refratária (persistente após 3 choques com energia máxima, adrenalina e antiarrítmico) exige revisar posição dos eletrodos, qualidade da compressão e causas reversíveis antes de assumir irreversibilidade.
+
+## 🚫 Ritmo NÃO chocável (AESP / assistolia)
+
 - RCP contínua; **adrenalina 1 mg IV/IO assim que possível** e a cada 3–5 min. Não desfibrila.
 
-## A cada 2 min
-Checar ritmo/pulso e trocar quem comprime.
+Aqui a droga não é o tratamento — é ponte. O tratamento é a causa. Assistolia deve ser confirmada (checar cabos, ganho do monitor, segunda derivação) antes de aceitá-la, para não deixar passar uma FV fina.
 
-## Causas reversíveis (5H/5T)
+Na AESP, o ultrassom à beira-leito durante a checagem de ritmo (janela subxifoide, ≤10 s) muda conduta: coração parado de verdade (AESP verdadeira) versus contração presente sem pulso palpável (pseudo-AESP, que se comporta como choque profundo e responde a vasopressor e à correção da causa), além de identificar tamponamento, VD dilatado (TEP) e hipovolemia.
+
+## 🔍 Causas reversíveis (5H/5T)
+
 Hipóxia, Hipovolemia, H⁺ (acidose), Hipo/Hipercalemia, Hipotermia · Pneumotórax hiperTensivo, Tamponamento, Toxinas, Trombose (coronária/pulmonar).
 
-## Pós-PCR (RCE)
-PAM ≥65, SpO₂ 92–98%, normocapnia, ECG 12 derivações (CAT se STEMI), controle de temperatura (32–37,5 °C), tratar a causa.`,
+Pistas rápidas: QRS alargado com onda T apiculada → hipercalemia (cálcio + insulina/glicose + bicarbonato); assimetria de murmúrio e desvio de traqueia → pneumotórax hipertensivo (toracocentese de alívio imediata); VD dilatado com colapso hemodinâmico súbito e hipoxemia → TEP (considerar trombolítico, com RCP prolongada depois); hipotermia grave → aquecimento ativo e regra de que "ninguém está morto até estar aquecido e morto".
+
+Intoxicações merecem antídoto dirigido (bicarbonato em tricíclicos com QRS largo, emulsão lipídica em anestésico local, glucagon/cálcio em betabloqueador e bloqueador de canal de cálcio, naloxona em opioide).
+
+## 🔀 Diagnóstico diferencial
+
+Nem tudo que parece PCR é PCR: bradiarritmia extrema com pulso filiforme, choque profundo com pulso impalpável, síncope convulsiva e coma com respiração superficial já geraram compressões desnecessárias. Ainda assim, na dúvida com pulso não palpável em 10 segundos, **inicie a RCP** — o dano de comprimir quem tem pulso é muito menor que o de não comprimir quem não tem.
+
+Do outro lado, a PCR pode ser a apresentação de um evento não cardíaco: trauma com sangramento oculto, anafilaxia, obstrução de via aérea por corpo estranho, hemorragia intracraniana, sepse terminal. Isso muda a conduta imediata (adrenalina IM e volume na anafilaxia, hemostasia e sangue no trauma).
+
+\`\`\`mermaid
+flowchart TD
+    A["Irresponsivo<br/>sem pulso em 10 s"] --> B["Iniciar RCP<br/>100-120/min, 5-6 cm"]
+    B --> C["Monitor / pas<br/>checar ritmo"]
+    C -->|"FV / TV sem pulso"| D["Desfibrilar 200 J<br/>bifasico"]
+    C -->|"AESP / assistolia"| E["Adrenalina 1 mg IV/IO<br/>assim que possivel"]
+    D --> F["RCP 2 min<br/>adrenalina 1 mg apos 2o choque"]
+    F --> G["FV persiste apos 3o choque?"]
+    G -->|Sim| H["Amiodarona 300 mg IV<br/>2a dose 150 mg"]
+    G -->|Nao| I["Seguir ciclos de 2 min"]
+    E --> J["Procurar causa<br/>5H / 5T + POCUS"]
+    H --> K["Reavaliar ritmo<br/>a cada 2 min"]
+    J --> K
+    I --> K
+    K --> L["Retorno da circulacao<br/>espontanea"]
+    L --> M["Cuidados pos-PCR<br/>PAM >= 65, SpO2 92-98%"]
+    class A,G critical;
+    class D,E,H,M action;
+\`\`\`
+
+## ⏱️ A cada 2 min
+
+Checar ritmo/pulso e trocar quem comprime.
+
+A troca de compressor a cada 2 minutos não é formalidade: a qualidade da compressão cai mensuravelmente antes disso, mesmo com o socorrista se sentindo bem. Aproveite a pausa (curta) para checar ritmo, planejar o próximo passo em voz alta e conferir se a próxima dose de adrenalina está preparada.
+
+A **capnografia (ETCO₂)** é o melhor monitor de qualidade disponível: valores persistentemente baixos sugerem compressão ineficaz ou débito muito ruim, e uma elevação abrupta e sustentada durante as compressões é sinal precoce de retorno da circulação espontânea — antes mesmo da checagem de pulso.
+
+## 🧠 Pós-PCR (RCE)
+
+PAM ≥65, SpO₂ 92–98%, normocapnia, ECG 12 derivações (CAT se STEMI), controle de temperatura (32–37,5 °C), tratar a causa.
+
+Evite tanto a hipóxia quanto a hiperóxia: reduza a FiO₂ assim que a oximetria permitir. Evite hiperventilar — hipocapnia causa vasoconstrição cerebral. Trate ativamente a febre em todo comatoso pós-PCR, porque hipertermia piora a lesão neurológica.
+
+Hipotensão pós-RCE é comum (atordoamento miocárdico + vasoplegia) e deve ser tratada com volume criterioso e vasopressor/inotrópico, não tolerada. Faça glicemia, eletrólitos, gasometria com lactato e ecocardiograma.
+
+**Não prognostique cedo.** A avaliação neurológica confiável exige afastar sedação, bloqueador neuromuscular e hipotermia, e combina exame, imagem, EEG e biomarcadores após pelo menos 72 h de normotermia.
+
+## 🏥 Quando internar / UTI
+
+Todo paciente com RCE vai para UTI, sem exceção. Encaminhamento imediato para hemodinâmica se STEMI ou forte suspeita de causa coronariana; considerar centro com ECMO/suporte mecânico em PCR refratária de causa potencialmente reversível e em população selecionada (testemunhada, RCP precoce, ritmo chocável, pouco tempo de baixo fluxo).
+
+A decisão de encerrar a reanimação é clínica e multifatorial — tempo de parada, ritmo, ETCO₂, causa, comorbidades, presença de causa reversível ainda tratável — e deve ser tomada em voz alta com a equipe, nunca por um único critério isolado.
+
+## 💡 Pérolas e erros comuns
+
+- **Interrupção é o inimigo.** Não pare a compressão para intubar, puncionar ou discutir. Carregue o desfibrilador com o tórax sendo comprimido.
+- **Comprimir raso e devagar** é o erro mais frequente. Use metrônomo/feedback quando disponível.
+- **Não apoiar o tórax** entre as compressões (leaning) impede o retorno venoso e sabota tudo.
+- **Hiperventilação** é quase universal em ressuscitação real e reduz o débito gerado pelas compressões.
+- **Assistolia não se choca** — nem "para ver se ajuda".
+- Bicarbonato e cálcio **não são de rotina**: só com indicação (hipercalemia, intoxicação específica, acidose grave documentada).
+- Gasping é PCR. Convulsão no início da parada também pode ser PCR.
+- Chegou o RCE, o trabalho não acabou: pressão, oxigenação, temperatura e cateterismo definem o desfecho neurológico tanto quanto a RCP.`,
 sepse: `## 🦠 Fisiopatologia — por que o choque mata
 
 Sepse não é apenas "infecção grave": é a **resposta do hospedeiro à infecção se tornando desregulada** e lesando órgãos próprios. Há liberação simultânea de mediadores pró-inflamatórios (TNF-α, IL-1, IL-6) e uma resposta anti-inflamatória compensatória — o excesso da segunda gera **imunoparalisia** e predispõe a infecção secundária/nosocomial em quem sobrevive à fase aguda.
@@ -10846,18 +11513,100 @@ Fique atento a complicações mecânicas tardias (2-7 dias): **ruptura de parede
 - Na fibrinólise, usar **meia-dose de tenecteplase em ≥75 anos** (reduz risco de sangramento intracraniano) e **não associar fondaparinux** quando o plano é ICP subsequente.
 - Reavaliar clinicamente 60-90 min após fibrinólise: queda de supra <50%, resolução da dor e pico precoce de enzimas sugerem sucesso; ausência desses sinais indica **ICP de resgate imediata**, não esperar até completar a "janela" fármaco-invasiva.
 - Não deixar de ativar o código infarto por dúvida diagnóstica em paciente instável — ecocardiograma point-of-care resolve a maioria das dúvidas rapidamente sem atrasar a decisão.`,
-eap: `## Reconhecimento
+eap: `## 💧 Fisiopatologia — congestão em minutos, não em dias
+
+O edema agudo de pulmão (EAP) cardiogênico é a forma mais dramática da insuficiência cardíaca aguda: a pressão de enchimento do ventrículo esquerdo sobe abruptamente, é transmitida ao átrio esquerdo e ao capilar pulmonar, e quando ultrapassa a capacidade de drenagem linfática o líquido invade o interstício e depois o alvéolo.
+
+O detalhe que muda a conduta é que, na maioria dos casos, **isso não é excesso de volume corporal, e sim redistribuição**. Uma descarga adrenérgica com pico hipertensivo aumenta a pós-carga, desloca sangue do leito esplâncnico para o território central e sobrecarrega um ventrículo esquerdo com pouca reserva (frequentemente com fração de ejeção preservada e disfunção diastólica). O paciente pode estar com o mesmo peso de ontem e ainda assim afogando.
+
+Instala-se então um círculo vicioso: hipoxemia e ansiedade aumentam o tônus simpático, que aumenta a pressão arterial e a pós-carga, que piora a congestão. A alteração de relação ventilação-perfusão e o aumento do trabalho respiratório levam à fadiga muscular e à hipercapnia. Quebrar esse ciclo — com pressão positiva e vasodilatação — é o que resolve o quadro, e por isso o vasodilatador tende a agir mais rápido que o diurético no EAP hipertensivo.
+
+## 🩺 Reconhecimento
+
 Dispneia súbita, ortopneia, estertores difusos, hipoxemia — geralmente **hipertenso**. Congestão pulmonar aguda.
 
-## Conduta
+O paciente típico chega sentado, agitado, sudoreico, taquipneico, falando em frases curtas, usando musculatura acessória, às vezes com expectoração rósea espumosa. À ausculta, estertores que sobem das bases para os ápices e não raro sibilos difusos ("asma cardíaca") — que já levaram muito EAP a receber broncodilatador e corticoide por engano.
+
+Procure ativamente na anamnese o gatilho e a doença de base: dor torácica, palpitação, uso irregular de anti-hipertensivo ou diurético, ingestão de sal, início recente de anti-inflamatório, história de valvopatia, IC prévia, doença renal crônica com sessão de diálise perdida.
+
+No exame, além dos pulmões, avalie **turgência jugular**, sopros novos (regurgitação mitral aguda, estenose aórtica), B3, edema periférico, temperatura das extremidades e nível de consciência. Extremidades frias, pressão de pulso estreita e confusão apontam para baixo débito associado — outro cenário terapêutico.
+
+## 🔀 Diagnóstico diferencial
+
+Nem toda insuficiência respiratória com estertores é EAP cardiogênico. Considere:
+
+- **Exacerbação de DPOC/asma** — sibilância predominante, expiração prolongada, história tabágica; diferenciação difícil e às vezes simultânea.
+- **Pneumonia grave** — febre, expectoração purulenta, consolidação localizada; pode ser o próprio precipitante do EAP.
+- **SDRA** — infiltrado bilateral com fator de risco (sepse, aspiração, pancreatite), sem hipertensão nem jugular alta.
+- **TEP** — hipoxemia desproporcional ao exame pulmonar e ao RX, disfunção de ventrículo direito.
+- **Sobrecarga volêmica na doença renal crônica** — quadro idêntico, resposta ruim ao diurético, tratamento é diálise.
+- **EAP não cardiogênico** — neurogênico, por altitude, por pressão negativa (pós-extubação/obstrução alta), por drogas.
+
+Ferramentas rápidas para desempatar: **POCUS** (linhas B bilaterais difusas, veia cava dilatada e pouco colapsável, avaliação da função ventricular e do pericárdio), ECG (isquemia, FA aguda), RX de tórax e peptídeos natriuréticos — lembrando que o BNP pode ainda estar baixo no EAP hiperagudo.
+
+## 🚦 Fenótipos e gravidade
+
+Classificar em três cenários orienta a droga a escolher:
+
+- **EAP hipertensivo (PAS alta, muitas vezes >160)** — o mais comum; o problema é pós-carga e redistribuição. Vasodilatador é a peça central; diurético em dose modesta.
+- **EAP normotenso** — congestão mais volumétrica, geralmente com IC crônica agudizada; diurético ganha peso relativo.
+- **EAP hipotenso (PAS <90 ou sinais de hipoperfusão)** — não é "só" congestão; é falência de bomba. Vasodilatador e diurético agressivos aqui pioram tudo.
+
+Sinais de gravidade que antecipam a intubação: exaustão respiratória, incapacidade de falar, rebaixamento do nível de consciência, hipoxemia refratária à VNI, hipercapnia com acidose progressiva, instabilidade hemodinâmica e isquemia em curso.
+
+## 💊 Conduta
+
 - **Sentar** o paciente; **O₂ / VNI (CPAP ou BiPAP)** precoce se desconforto/hipoxemia (reduz intubação).
 - **Vasodilatador**: **nitroglicerina** IV (ou nitroprussiato) se PAS ≥110 — alívio rápido da pré e pós-carga.
 - **Diurético de alça**: **furosemida** IV (≈ dose VO habitual, ou 40 mg se virgem de diurético).
 - **Morfina**: evitar (associada a pior desfecho).
 - Tratar o gatilho: isquemia, crise hipertensiva, FA aguda, má adesão.
 
-## Cuidado
-EAP **com hipotensão** não é só congestão → pensar em **choque cardiogênico** (inotrópico/vasopressor, suporte).`,
+A **ventilação não invasiva** deve ser instalada em minutos, não depois de "tentar máscara com reservatório por meia hora". A pressão positiva recruta alvéolos, melhora a oxigenação, reduz o trabalho respiratório, diminui o retorno venoso (pré-carga) e a pós-carga do ventrículo esquerdo. Comece com CPAP em pressão baixa (tipicamente em torno de 5–10 cmH₂O) e titule pelo conforto, pela saturação e pela frequência respiratória; use BiPAP quando houver hipercapnia ou fadiga muscular importante. Contraindicações: rebaixamento com risco de aspiração, vômitos, instabilidade hemodinâmica grave, necessidade de intubação imediata.
+
+A **nitroglicerina IV** costuma ser titulada a partir de doses baixas (10–20 mcg/min) com incrementos rápidos conforme a pressão e os sintomas — o objetivo é aliviar a congestão, não normalizar a pressão a qualquer custo. Evite em hipotensão, estenose aórtica grave, infarto de ventrículo direito e uso recente de inibidor de fosfodiesterase-5 (sildenafila e similares).
+
+A **furosemida** tem papel real, mas menor do que a tradição sugere no EAP hipertensivo: em quem já usa diurético, a dose IV deve ser pelo menos equivalente à dose oral habitual; em quem é virgem de diurético, dose menor já basta. Reavalie diurese e congestão em poucas horas e ajuste — dobrar a dose ou passar a infusão contínua diante de resposta insuficiente.
+
+\`\`\`mermaid
+flowchart TD
+    A["Dispneia subita + ortopneia<br/>estertores + hipoxemia"] --> B["Sentar o paciente<br/>monitorizar, O2"]
+    B --> C["Desconforto ou hipoxemia?"]
+    C -->|Sim| D["VNI precoce<br/>CPAP ou BiPAP"]
+    C -->|Nao| E["O2 suplementar<br/>e reavaliar"]
+    D --> F["PAS >= 110?"]
+    E --> F
+    F -->|Sim| G["Nitroglicerina IV<br/>titular"]
+    F -->|"Nao - hipotenso"| H["Pensar choque cardiogenico<br/>inotropico / vasopressor"]
+    G --> I["Furosemida IV<br/>40 mg se virgem de diuretico"]
+    I --> J["Tratar o gatilho<br/>isquemia, FA, crise hipertensiva"]
+    H --> J
+    class A,C,H critical;
+    class D,G,I action;
+\`\`\`
+
+## ⚠️ Cuidado
+
+EAP **com hipotensão** não é só congestão → pensar em **choque cardiogênico** (inotrópico/vasopressor, suporte).
+
+Nesse cenário, vasodilatador e diurético em dose cheia podem precipitar colapso. A sequência correta é sustentar a perfusão (vasopressor para pressão arterial média adequada, inotrópico para o débito), procurar a causa (infarto, complicação mecânica valvar, miocardite, arritmia) e só descongestionar depois que o paciente estiver perfundindo.
+
+## 🏥 Quando internar / UTI
+
+Praticamente todo EAP cardiogênico se interna. Vão para **UTI ou unidade coronariana**: necessidade de VNI mantida ou de intubação, hipoxemia refratária, hipotensão ou sinais de hipoperfusão, síndrome coronariana aguda associada, arritmia instável, complicação mecânica valvar, lactato elevado, rebaixamento de consciência e resposta ruim ao tratamento inicial.
+
+Podem ir para enfermaria os casos que respondem rápido ao vasodilatador e ao diurético, com gatilho identificado e corrigido, oxigenação estável em ar ambiente ou baixo fluxo e sem lesão miocárdica ou renal significativa — sempre com monitorização de diurese, peso diário e reavaliação frequente.
+
+Antes da alta hospitalar, o objetivo é o mesmo da IC descompensada: paciente sem congestão em repouso, em diurético oral estável, com os pilares do tratamento da IC otimizados, gatilho tratado (inclusive pressão arterial), e consulta de reavaliação marcada em prazo curto.
+
+## 💡 Pérolas e erros comuns
+
+- **Diurético em excesso no EAP hipertensivo** é erro clássico: o paciente não está com volume total alto, está com volume mal distribuído. O que salva é pressão positiva + vasodilatador.
+- **Atrasar a VNI** para "ver se melhora no oxigênio" custa intubações evitáveis.
+- Sibilo não exclui EAP; tratar como asma retarda o diagnóstico.
+- Meça a pressão antes de correr com nitrato — e reavalie a cada titulação.
+- Sopro novo com EAP = pensar em regurgitação mitral aguda ou outra complicação mecânica; é caso cirúrgico e o eco precisa ser feito rápido.
+- Toda descompensação merece a pergunta "por que hoje?": isquemia silenciosa, fibrilação atrial de alta resposta e falta de medicação respondem pela maioria.`,
 pac: `## Gravidade — CURB-65
 Confusão · Ureia >43 mg/dL · FR ≥30 · PA <90/60 · ≥65 anos. **0–1** ambulatorial · **2** enfermaria · **≥3** considerar UTI.
 
@@ -11011,27 +11760,174 @@ Febre, dor lombar / Giordano +, sintomas urinários. "Complicada" = homem, gesta
 - **ESBL** (ITU recorrente, ATB recente, internação): carbapenem, fluoroquinolona ou SMX-TMP (não pip-tazo); reservar carbapenem ao guiado por cultura/gravidade.
 - **Pielonefrite + obstrução** (cálculo) = urgência urológica → drenar (duplo-J / nefrostomia).
 > Fonte: IDSA 2010 + atualização cUTI 2025; IDSA AMR 2024.`,
-fa_rvr: `## Avaliação
+fa_rvr: `## 🧬 Fisiopatologia
+
+Na fibrilação atrial, focos ectópicos (tipicamente nas veias pulmonares) e múltiplos circuitos de reentrada substituem a despolarização organizada do átrio por uma atividade elétrica caótica de 400–600 impulsos por minuto. O nó atrioventricular funciona como filtro: quanto menor o seu período refratário, mais impulsos passam — daí a **resposta ventricular rápida (RVR)**.
+
+Tudo que reduz o tônus vagal ou aumenta o tônus adrenérgico "abre" esse filtro: sepse, dor, hipovolemia, febre, hipóxia, tromboembolismo pulmonar, tireotoxicose, anemia, abstinência alcoólica, drogas simpatomiméticas. Por isso, **a RVR muitas vezes é o sintoma de outra doença**, não a doença.
+
+As consequências hemodinâmicas vêm de três fatores: perda da contribuição atrial ao enchimento ventricular (até ~20–30% do débito, e muito mais no ventrículo pouco complacente), encurtamento da diástole com queda do enchimento e da perfusão coronariana, e irregularidade do ciclo, que gera batimentos de baixo volume ejetado. Se a taquicardia se mantém por semanas, surge **taquicardiomiopatia** — disfunção ventricular potencialmente reversível com o controle da frequência.
+
+## 🩺 Apresentação clínica
+
+Palpitação irregular, dispneia, fadiga, tontura, desconforto torácico e redução da tolerância ao esforço são os sintomas típicos. Pergunte objetivamente **quando começou** — o horário de início é a informação que decide a estratégia de cardioversão — e se há episódios prévios, uso de anticoagulante, cardiopatia conhecida e possíveis gatilhos.
+
+No exame, o pulso é **irregularmente irregular**, com déficit de pulso (frequência central maior que a periférica). Procure ativamente sinais de instabilidade e de causa secundária: hipotensão, má perfusão, estertores, turgência jugular, bócio/tremor/exoftalmia, febre, sinais de TEP.
+
+O ECG de 12 derivações confirma: intervalos RR irregulares, ausência de onda P e linha de base fibrilatória. Complete com hemograma, eletrólitos (K, Mg), função renal, TSH, troponina quando houver dor torácica, e radiografia de tórax. O ecocardiograma é necessário, mas não deve atrasar o tratamento agudo.
+
+## 🔀 Diagnóstico diferencial
+
+- **Flutter atrial** com condução variável — pode parecer irregular; procure as ondas F em "dente de serra" em D2/D3/aVF.
+- **Taquicardia atrial multifocal** — ondas P presentes, com ≥ 3 morfologias diferentes; típica do DPOC descompensado.
+- **TPSV** e **taquicardia sinusal** — regulares; a taquicardia sinusal apropriada é a grande armadilha na sepse.
+- **Extrassistolia supraventricular frequente** — irregular, mas com P sinusais entremeadas.
+- **FA pré-excitada (WPW)** — irregular, rápida (frequentemente > 200 bpm) e com **QRS largo e bizarro de morfologia variável**; reconhecer é vital porque muda toda a conduta.
+- **TV polimórfica** — QRS largo, mas instabilidade e contexto diferentes.
+
+## ⚠️ Avaliação
+
 Confirmar FA com resposta ventricular rápida. **Instável** (hipotensão, isquemia, IC, choque) → **cardioversão elétrica sincronizada** imediata.
 
-## Estável — controle de FC
+Antes de rotular como instável, faça a pergunta certa: **a taquicardia é a causa do choque ou a consequência dele?** Em um paciente séptico com FA a 130 bpm e hipotensão, cardioverter raramente resolve — e reduzir a frequência à força pode piorar o débito. A instabilidade atribuível à FA costuma ocorrer em frequências mais altas (em geral acima de 150 bpm) e com correlação temporal clara entre a arritmia e a deterioração.
+
+## 💊 Estável — controle de FC
+
 - **Betabloqueador** (metoprolol) **ou** BCC não-diidropiridínico (diltiazem/verapamil). Alvo FC <110 (controle leniente).
 - **ICFEr** → preferir betabloqueador; **evitar** diltiazem/verapamil. Amiodarona/digoxina se IC/hipotensão.
 
-## Ritmo e anticoagulação
+Na prática, o betabloqueador IV é a escolha mais frequente no pronto-socorro quando não há congestão descompensada, e o metoprolol 5 mg IV em bolus lento, repetível conforme a resposta da frequência, é o esquema mais usado no Brasil. O diltiazem tende a controlar a frequência de forma mais previsível em quem tem função ventricular preservada, mas é proscrito na ICFEr por inotropismo negativo.
+
+Não esqueça das medidas de base: **corrigir hipocalemia e hipomagnesemia**, tratar dor, febre, hipovolemia e hipóxia. Muitos pacientes desaceleram apenas com isso. Em hipotensão limítrofe, a amiodarona e a digoxina são as opções com menor impacto inotrópico negativo, lembrando que a digoxina tem início lento e é pouco eficaz para controlar frequência no esforço ou em estados adrenérgicos.
+
+## 🔄 Ritmo e anticoagulação
+
 - Cardioversão sem anticoagulação prévia só se início **< 24 h** (regra mudou de 48→24 h — ESC 2024/SBC 2025); ≥ 24 h → 3 semanas de anticoagulação **ou** ECO-TE antes.
 - **Anticoagulação** conforme **CHA₂DS₂-VA** (≥ 2 → anticoagular; sexo-neutro). DOAC preferível, exceto estenose mitral mod-grave / prótese mecânica → varfarina.
 - ⚠️ **FA pré-excitada (WPW)**: NÃO usar bloqueadores do nó AV (BB, diltiazem/verapamil, digoxina, adenosina, amiodarona IV) — risco de FV. Instável → cardioversão; estável → procainamida/ibutilida.
-> Fonte: ESC **2024** (AF-CARE); SBC 2025.`,
-crise_ht: `## Emergência × urgência
+
+Duas observações práticas. Primeiro, a diretriz europeia de 2024 valoriza uma abordagem de **"esperar para ver"**: em FA recente e paciente estável, boa parte reverte espontaneamente nas primeiras horas com controle de frequência e tratamento do gatilho, poupando o procedimento. Segundo, **após qualquer cardioversão** — elétrica ou química — mantém-se anticoagulação por pelo menos 4 semanas, e indefinidamente se o escore de risco indicar, porque o atordoamento atrial persiste mesmo com ritmo sinusal restabelecido.
+
+Na cardioversão elétrica sincronizada, use sedação/analgesia adequada, choque **sincronizado** com o QRS (bifásico, energia alta desde o primeiro choque) e verifique posicionamento das pás anteroposterior quando houver falha.
+
+\`\`\`mermaid
+flowchart TD
+    A["FA com resposta<br/>ventricular rapida"] --> B["Instavel?<br/>hipotensao, isquemia,<br/>IC, choque"]
+    B -->|Sim| C["Cardioversao eletrica<br/>sincronizada imediata"]
+    B -->|Nao| D["QRS largo e irregular<br/>suspeita de WPW?"]
+    D -->|Sim| E["Nao usar bloqueadores do no AV<br/>estavel: procainamida ou ibutilida"]
+    D -->|Nao| F["Controle de frequencia<br/>alvo FC menor que 110"]
+    F --> G["Funcao ventricular<br/>reduzida?"]
+    G -->|Sim| H["Betabloqueador<br/>evitar diltiazem e verapamil<br/>amiodarona ou digoxina se hipotenso"]
+    G -->|Nao| I["Betabloqueador ou<br/>diltiazem e verapamil"]
+    H --> J["Inicio ha menos de 24 h?"]
+    I --> J
+    J -->|Sim| K["Pode cardioverter<br/>sem anticoagulacao previa"]
+    J -->|Nao| L["3 semanas de anticoagulacao<br/>ou eco transesofagico antes"]
+    class B,E critical;
+    class C,K,L action;
+\`\`\`
+
+## 🏥 Quando internar / UTI
+
+- **Instabilidade hemodinâmica**, FA pré-excitada, isquemia miocárdica associada, insuficiência cardíaca aguda ou frequência refratária ao tratamento inicial → internação, com **UTI** nos casos que exigem droga vasoativa, antiarrítmico IV contínuo ou cardioversão com risco.
+- Internar também quando a FA é manifestação de doença aguda grave (sepse, TEP, tireotoxicose descompensada) — o foco passa a ser a doença de base.
+- **Alta do pronto-socorro** é razoável em paciente estável, com frequência controlada, sem sinais de insuficiência cardíaca, com anticoagulação definida (quando indicada), medicação oral prescrita e retorno precoce garantido.
+
+## 💡 Pérolas e erros comuns
+
+- **O relógio importa mais que o ECG**: registre o horário exato do início dos sintomas — é ele que libera ou não a cardioversão precoce.
+- Em FA com QRS largo, rápida e irregular, pense **WPW antes de qualquer droga**. Adenosina, verapamil, diltiazem, digoxina e amiodarona IV podem precipitar fibrilação ventricular.
+- Nem toda taquicardia com hipotensão é indicação de choque elétrico — no paciente séptico, a FA costuma ser marcador de gravidade, não o problema principal.
+- Controle **leniente** (< 110 bpm) é suficiente na maioria; perseguir frequências muito baixas gera efeito adverso sem benefício.
+- Corrija potássio e magnésio antes de escalar antiarrítmicos.
+- A decisão de anticoagular **não depende** de o paciente sair em ritmo sinusal nem de o episódio ser paroxístico: depende do escore de risco.
+- Digoxina isolada controla mal a frequência no paciente agitado, febril ou em esforço.
+- Documente sempre um ECG de 12 derivações antes e depois da intervenção — o traçado é a base de toda decisão futura.`,
+crise_ht: `## 🧬 Fisiopatologia
+
+A crise hipertensiva não é definida por um número isolado de pressão arterial, e sim pelo descompasso entre a pressão de perfusão e a capacidade de autorregulação dos leitos vasculares. Cérebro, rim e retina mantêm fluxo constante dentro de uma faixa de pressão arterial média (PAM); acima do limite superior dessa faixa, a autorregulação "quebra".
+
+Quando isso acontece, ocorre hiperperfusão, disfunção endotelial, extravasamento de plasma e necrose fibrinoide arteriolar — o substrato da encefalopatia hipertensiva, da retinopatia grau III/IV e da nefroesclerose maligna. Em paralelo, o estresse de cisalhamento ativa o sistema renina-angiotensina-aldosterona, gerando um ciclo vicioso de vasoconstrição e natriurese pressórica com hipovolemia relativa.
+
+O ponto clínico decisivo é que o **hipertenso crônico desloca sua curva de autorregulação para a direita**. Ele tolera pressões altíssimas sem lesão, mas sofre isquemia com quedas que seriam normais para um normotenso. É exatamente por isso que reduzir a PA rápido demais pode causar AVC isquêmico, infarto ou necrose tubular aguda iatrogênicos — a queda abrupta é tão perigosa quanto a pressão alta.
+
+## 🩺 Apresentação clínica
+
+Na anamnese, o alvo não é a pressão: é a **lesão de órgão-alvo**. Pergunte objetivamente por cefaleia intensa de início recente, alteração do nível de consciência ou confusão, déficit focal, convulsão, borramento visual, dor torácica, dispneia/ortopneia, dor dorsal "rasgando", oligúria e náuseas/vômitos.
+
+Investigue sempre os gatilhos: má adesão ou suspensão abrupta de anti-hipertensivo (especialmente clonidina e betabloqueador), dor não controlada, retenção urinária, ansiedade, uso de cocaína/anfetaminas/simpatomiméticos, AINEs, corticoide, descongestionantes nasais e gestação.
+
+No exame físico, meça a PA nos **dois braços** com manguito adequado, após repouso e com o paciente calmo — uma medida isolada em ambiente de dor ou ansiedade não define crise. Ausculte pulmões (estertores = edema agudo), coração (B3, sopro diastólico novo), palpe pulsos periféricos, faça exame neurológico completo e, sempre que possível, **fundoscopia** (hemorragias, exsudatos e papiledema fecham o diagnóstico de emergência hipertensiva mesmo sem outra pista).
+
+## 🔀 Diagnóstico diferencial
+
+A armadilha mais comum é tratar como crise hipertensiva o que é apenas **hipertensão reativa** a outro problema. Nesses casos, a PA cai ao tratar a causa — e baixá-la com droga IV pode ser deletério.
+
+- **Pseudocrise / pico pressórico reativo**: dor aguda, retenção urinária, ansiedade/pânico, abstinência alcoólica, hipoglicemia, hipóxia. Trata-se a causa, não a pressão.
+- **Hipertensão intracraniana / AVC hemorrágico**: PA alta + bradicardia + rebaixamento (reflexo de Cushing) — a hipertensão é compensatória.
+- **Dissecção de aorta**: dor migratória, assimetria de pulsos — muda completamente a meta e a droga.
+- **Síndrome coronariana aguda e edema agudo de pulmão**: podem ser causa ou consequência da elevação pressórica.
+- **Feocromocitoma, hipertireoidismo, síndrome serotoninérgica, intoxicação por simpatomiméticos**: crises paroxísticas com sudorese, tremor e taquicardia.
+- **Pré-eclâmpsia/eclâmpsia**: gestante ou puérpera até 6 semanas — protocolo próprio.
+
+## 📊 Emergência × urgência
+
 - **Emergência hipertensiva** = PA muito alta **+ lesão aguda de órgão-alvo** (EAP, SCA, dissecção, AVC, encefalopatia, eclâmpsia, IRA).
 - **Urgência** = PA alta **sem** lesão aguda.
 
-## Conduta
+A diretriz brasileira mais recente prefere descrever a segunda situação como *elevação importante da PA sem lesão de órgão-alvo*, justamente para desestimular o reflexo de "baixar a pressão rápido" em quem não tem lesão aguda.
+
+Exames que ajudam a separar os dois grupos: ECG, troponina, creatinina/ureia, eletrólitos, hemograma (esquistócitos sugerem microangiopatia), EAS (hematúria/proteinúria), radiografia de tórax, fundoscopia e, conforme a suspeita, TC de crânio ou angio-TC de aorta.
+
+## 💊 Conduta
+
 - **Emergência** → droga **IV titulável**; reduzir **PAM ~10–20% na 1ª hora** (depois 5–15% nas 23 h). Opções: nitroprussiato, nicardipina, labetalol, nitroglicerina (isquemia/EAP).
   - **Dissecção de aorta**: alvo PAS **<120** e FC **<60** — **betabloqueador primeiro** (esmolol), depois vasodilatador.
   - **AVC**: metas específicas (ver protocolo de AVC).
-- **Urgência** → VO em horas/dias, sem queda abrupta; reiniciar/ajustar anti-hipertensivos e dar seguimento.`,
+- **Urgência** → VO em horas/dias, sem queda abrupta; reiniciar/ajustar anti-hipertensivos e dar seguimento.
+
+Doses das drogas IV habitualmente disponíveis no Brasil:
+
+- **Nitroprussiato de sódio**: iniciar 0,25–0,3 mcg/kg/min em BIC, titulando a cada poucos minutos. Início e término de ação em segundos a minutos. Proteger da luz; atenção à toxicidade por cianeto/tiocianato em infusões prolongadas ou em disfunção renal/hepática.
+- **Nitroglicerina IV**: 5–100 mcg/min. Preferida quando há **isquemia miocárdica ou edema agudo de pulmão** (venodilatação reduz a pré-carga). Contraindicada com uso recente de inibidor de fosfodiesterase-5.
+- **Esmolol**: betabloqueador de meia-vida ultracurta, ideal quando se quer controlar frequência cardíaca junto com a pressão (dissecção, pós-operatório) e quando se teme intolerância ao betabloqueio.
+- **Metoprolol IV**: 5 mg em bolus, repetível até 3 vezes conforme a frequência cardíaca alvo.
+- **Hidralazina IV**: droga de escolha na **pré-eclâmpsia grave/eclâmpsia** por segurança fetal, associada ao sulfato de magnésio para profilaxia/tratamento da convulsão. Evitar na dissecção de aorta (taquicardia reflexa aumenta o estresse de parede).
+
+Em elevações sem lesão de órgão-alvo, prefira reintroduzir/otimizar a medicação oral do próprio paciente. Se precisar de algo de ação mais rápida, use anti-hipertensivo oral em ambiente observado — **nunca nifedipino sublingual**, que produz queda imprevisível e já foi associado a AVC e infarto.
+
+\`\`\`mermaid
+flowchart TD
+    A["PA muito elevada<br/>no pronto-socorro"] --> B["Lesao aguda de<br/>orgao-alvo?"]
+    B -->|Nao| C["Elevacao sem lesao<br/>de orgao-alvo"]
+    C --> D["Anti-hipertensivo VO<br/>reduzir em horas ou dias<br/>seguimento ambulatorial"]
+    B -->|Sim| E["Emergencia hipertensiva<br/>droga IV titulavel + UTI"]
+    E --> F["Qual orgao acometido?"]
+    F -->|Dissecao de aorta| G["Betabloqueador primeiro<br/>PAS menor 120 e FC menor 60"]
+    F -->|Isquemia ou EAP| H["Nitroglicerina IV<br/>5 a 100 mcg/min"]
+    F -->|AVC| I["Metas do protocolo<br/>especifico de AVC"]
+    F -->|Encefalopatia, IRA, outros| J["Reduzir PAM 10 a 20%<br/>na primeira hora"]
+    class B,E critical;
+    class D,G,H,J action;
+\`\`\`
+
+## 🏥 Quando internar / UTI
+
+- **Toda emergência hipertensiva** → internação, monitorização contínua e, na maioria dos casos, **UTI** com acesso venoso confiável e, idealmente, PA invasiva quando se usa nitroprussiato em altas doses.
+- Considere internação também em: creatinina em ascensão, hipocalemia com suspeita de hiperaldosteronismo, anemia hemolítica microangiopática, gestante com PA ≥ 160/110, impossibilidade de seguimento próximo ou ausência de suporte social/medicação.
+- **Alta do pronto-socorro** é adequada na elevação sem lesão de órgão-alvo, desde que o paciente saia com esquema oral definido, orientação escrita e **retorno em 24–72 h**.
+
+## 💡 Pérolas e erros comuns
+
+- **Trate o paciente, não o número.** PA 220/120 assintomática e sem lesão aguda não é emergência; PA 170/100 com edema agudo de pulmão é.
+- Repita a medida após repouso e analgesia antes de decidir. Boa parte das "crises" some com 15 minutos de repouso e controle da dor.
+- **Nifedipino sublingual está proscrito.** Também evite captopril "de resgate" repetido sem plano de seguimento.
+- Queda excessiva na primeira hora é iatrogenia: monitore por sintomas isquêmicos (dor torácica, déficit neurológico, oligúria) e não apenas pelo monitor.
+- Sempre pergunte pela **suspensão de clonidina ou betabloqueador** — o efeito rebote responde à reintrodução da própria droga.
+- **Fundoscopia** é o exame mais subutilizado: papiledema muda a classificação e a conduta.
+- Pense em cocaína/simpatomiméticos no jovem: nesses casos evite betabloqueador isolado; prefira benzodiazepínico e vasodilatador.
+- Em toda gestante ou puérpera recente com PA elevada, **pré-eclâmpsia até prova em contrário**.`,
 pancreatite: `## Diagnóstico (2 de 3)
 Dor abdominal típica + **lipase/amilase ≥3×** o limite + imagem compatível. Definir etiologia (biliar, álcool, hipertrigliceridemia, drogas).
 
