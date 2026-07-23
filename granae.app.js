@@ -19,9 +19,60 @@ const defaultState = () => ({
     { id: cid(), name: 'Outras receitas', type: 'income', icon: '💰', color: '#06b6d4' },
   ],
   fixedItems: [],
+  tombstones: [],       // exclusoes de transacoes {id, at} — impedem que o merge ressuscite
+  fixedTombstones: [],  // exclusoes de itens fixos
 });
 
 function cid() { return Math.random().toString(36).slice(2, 10); }
+
+// Reconciliacao entre aparelhos: une duas listas por id (vence o maior updatedAt),
+// depois aplica os tombstones. Sem isto, um aparelho com estado antigo
+// sobrescrevia o documento inteiro e apagava o que outro lancou.
+function mergeById(localArr, remoteArr, localTomb, remoteTomb) {
+  const tomb = new Map();
+  for (const t of [...(remoteTomb || []), ...(localTomb || [])]) {
+    if (!t || !t.id) continue;
+    const prev = tomb.get(t.id);
+    if (!prev || (t.at || 0) > (prev.at || 0)) tomb.set(t.id, t);
+  }
+  const byId = new Map();
+  for (const it of [...(remoteArr || []), ...(localArr || [])]) {
+    if (!it || !it.id) continue;
+    const prev = byId.get(it.id);
+    if (!prev || (it.updatedAt || 0) >= (prev.updatedAt || 0)) byId.set(it.id, it);
+  }
+  const items = [];
+  for (const [id, it] of byId) {
+    const tb = tomb.get(id);
+    if (tb && (tb.at || 0) >= (it.updatedAt || 0)) continue;
+    items.push(it);
+  }
+  const cutoff = Date.now() - 60 * 24 * 3600 * 1000;
+  const tombstones = [...tomb.values()].filter(t => (t.at || 0) >= cutoff);
+  return { items, tombstones };
+}
+function stampTx(obj) { obj.updatedAt = Date.now(); return obj; }
+function tombstone(list, id) {
+  if (!Array.isArray(state[list])) state[list] = [];
+  state[list] = state[list].filter(t => t.id !== id);
+  state[list].push({ id, at: Date.now() });
+}
+// Merge especifico deste app, registrado no helper central MT dentro do waitMT
+// (users/{uid}/apps/granae). Definido como funcao porque este script roda antes
+// do modulo _mtauth.js — window.MT ainda nao existe aqui.
+function granaeMergeFn(remote, local) {
+  remote = remote || {};
+  const tx = mergeById(local.transactions, remote.transactions, local.tombstones, remote.tombstones);
+  const fx = mergeById(local.fixedItems, remote.fixedItems, local.fixedTombstones, remote.fixedTombstones);
+  return {
+    profile: local.profile || remote.profile || {},
+    transactions: tx.items,
+    tombstones: tx.tombstones,
+    fixedItems: fx.items,
+    fixedTombstones: fx.tombstones,
+    categories: (local.categories && local.categories.length) ? local.categories : (remote.categories || []),
+  };
+}
 
 let state = defaultState();
 // Filtro ativo de categoria + mês na tela de Transações (setado ao clicar num bar do dashboard)
@@ -47,6 +98,8 @@ function applyData(d) {
       transactions: Array.isArray(d.transactions) ? d.transactions : [],
       categories: (d.categories && d.categories.length) ? d.categories : defaultState().categories,
       fixedItems: Array.isArray(d.fixedItems) ? d.fixedItems : [],
+      tombstones: Array.isArray(d.tombstones) ? d.tombstones : [],
+      fixedTombstones: Array.isArray(d.fixedTombstones) ? d.fixedTombstones : [],
     };
   } else {
     state = defaultState();
@@ -674,6 +727,7 @@ txForm.addEventListener('submit', e => {
   // Data futura → agendado (não conta nos totais até a data chegar)
   if (obj.date > todayISO()) obj.pending = true;
   const idx = state.transactions.findIndex(t => t.id === obj.id);
+  stampTx(obj);
   if (idx >= 0) state.transactions[idx] = obj;
   else state.transactions.push(obj);
   saveState();
@@ -687,6 +741,7 @@ txDelete.addEventListener('click', () => {
   if (!id) return;
   if (!confirm('Excluir esta transação?')) return;
   state.transactions = state.transactions.filter(t => t.id !== id);
+  tombstone('tombstones', id);
   saveState();
   txDialog.close();
   refreshAll();
@@ -885,6 +940,7 @@ fixedForm.addEventListener('submit', e => {
   }
   if (!obj.name || !obj.amount) return;
   const idx = state.fixedItems.findIndex(f => f.id === obj.id);
+  stampTx(obj);
   if (idx >= 0) state.fixedItems[idx] = obj;
   else state.fixedItems.push(obj);
   saveState();
@@ -898,6 +954,7 @@ fixedDelete.addEventListener('click', () => {
   if (!id) return;
   if (!confirm('Excluir este item fixo?')) return;
   state.fixedItems = state.fixedItems.filter(f => f.id !== id);
+  tombstone('fixedTombstones', id);
   saveState();
   fixedDialog.close();
   refreshAll();
@@ -918,6 +975,7 @@ document.getElementById('fixedSheet').addEventListener('change', async e => {
       state.fixedItems.push({
         id: cid(), type: it.type, name: it.name,
         amount: Number(it.amount) || 0, category: it.category,
+        updatedAt: Date.now(),
       });
     }
     saveState();
@@ -1045,6 +1103,7 @@ document.getElementById('invoiceFile').addEventListener('change', async e => {
           description: it.description,
           category: it.category,
           date: it.date,
+          updatedAt: Date.now(),
         });
       }
       saveState();
@@ -1169,6 +1228,7 @@ async function onRecordingDone() {
       </div>
     `;
     document.getElementById('audConfirm').onclick = () => {
+      stampTx(tx);
       state.transactions.push(tx);
       saveState();
       audioDialog.close();
@@ -1285,6 +1345,7 @@ ensureNewTxButton();
 refreshAll();
 (function waitMT() {
   if (window.MT && window.MT.onData) {
+    window.MT.mergeFn = granaeMergeFn;
     window.MT.onData((d) => {
       const u = window.MT.user;
       currentUid = u ? u.uid : null;
