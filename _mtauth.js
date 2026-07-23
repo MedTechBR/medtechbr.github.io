@@ -262,6 +262,25 @@ else {
       MT.localSet(d); MT._emit(d);
       if (MT.user) {
         const ref = F.doc(db, 'users', MT.user.uid, 'apps', APP.id);
+        // Se o app registrou MT.mergeFn, reconcilia com o remoto numa transacao
+        // antes de gravar, para nao apagar o que outro aparelho lancou.
+        // Sem hook, mantem o comportamento antigo (last-write-wins).
+        if (typeof MT.mergeFn === 'function') {
+          try {
+            let merged = null;
+            await F.runTransaction(db, async (tx) => {
+              const snap = await tx.get(ref);
+              let remote = null;
+              if (snap.exists()) { const raw = snap.data(); try { remote = raw.json ? JSON.parse(raw.json) : null; } catch (e) { remote = null; } }
+              merged = MT.mergeFn(remote, d) || d;
+              tx.set(ref, { json: JSON.stringify(merged), updatedAt: F.serverTimestamp() }, { merge: true });
+            });
+            if (merged) { MT.localSet(merged); MT._emit(merged); }
+            return;
+          } catch (e) {
+            console.warn('MT.save merge falhou, gravando sem merge:', e && e.message);
+          }
+        }
         await F.setDoc(ref, { json: JSON.stringify(d), updatedAt: F.serverTimestamp() }, { merge: true });
       }
     };
