@@ -19,7 +19,7 @@
 <meta name="apple-mobile-web-app-title" content="ConsultAI">
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"agendaai",name:"ConsultAI"};</script>
-<script type="module" src="_mtauth.js?v=10"></script>
+<script type="module" src="_mtauth.js?v=11"></script>
 <style>
 :root{--petrol:#4C8DFF;--petrol-dark:#2f6ae0;--ink:#E7EEF7;--mint:#4C8DFF;--mint-dark:#2f6ae0;--bg:#0A0E14;--soft:rgba(76,141,255,.12);--line:rgba(88,166,255,.12);--muted:#8A98AC;--green:#3FB950;--green-bg:rgba(63,185,80,.12);--amber:#E3B341;--amber-bg:rgba(227,179,65,.12);--red:#F85149;--red-bg:rgba(248,81,73,.12);--blue:#4C8DFF;--blue-bg:rgba(76,141,255,.12);--violet:#a78bfa;--violet-bg:rgba(167,139,250,.14);--wa:#25D366;--surface:#111823;--card:#111823;--panel2:#0E141D;--line-strong:rgba(140,160,185,.16);--dim:#5A6B80;--teal:#38E1C6;--glow:rgba(76,141,255,.42);--disp:'Space Grotesk',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
 /* ===== Início (dashboard) ===== */
@@ -488,7 +488,21 @@ whenMT(()=>{MT.onData(d=>{
   renderUser();render();
   migrateEvoluai();
 });renderUser();});
-function persist(){MT.save(state);}
+function mtToast(msg){
+  let t=document.getElementById('mt-toast');
+  if(!t){t=document.createElement('div');t.id='mt-toast';
+    t.style.cssText='position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:9999;background:#2a1414;color:#ffb4ac;border:1px solid #F85149;padding:10px 16px;border-radius:10px;font-size:14px;max-width:90vw;box-shadow:0 10px 30px rgba(0,0,0,.5);transition:opacity .3s';
+    document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';clearTimeout(t._h);t._h=setTimeout(()=>{t.style.opacity='0';},5000);
+}
+// Antes era fire-and-forget: a UI dizia "salvo" mesmo quando a nuvem falhava
+// (doc > 1 MiB, offline, regra) e o registro clinico ficava so no aparelho.
+function persist(){
+  return Promise.resolve(MT.save(state)).catch(e=>{
+    mtToast('Falha ao salvar na nuvem. Os dados estão salvos neste aparelho, mas ainda não subiram — verifique a conexão.');
+    console.warn('persist falhou:',e&&e.message);
+  });
+}
 
 /* migra histórico do EvoluAI (app aposentado) uma única vez */
 async function migrateEvoluai(){
@@ -1361,9 +1375,25 @@ function saveCfg(){
 }
 function loadLogo(input){
   const f=input.files&&input.files[0];if(!f)return;
-  if(f.size>800000){alert('Imagem muito grande (máx ~800 KB). Use uma logomarca menor.');input.value='';return;}
+  if(f.size>5000000){alert('Arquivo muito grande. Escolha uma imagem menor.');input.value='';return;}
   const r=new FileReader();
-  r.onload=()=>{const h=document.getElementById('c_logo');if(h)h.value=r.result;const p=document.getElementById('logoPrev');if(p)p.innerHTML='<img src="'+r.result+'" style="max-height:56px;max-width:170px;border:1px solid var(--line);border-radius:8px;padding:4px;background:#fff"> <button class="btn btn-g btn-sm" onclick="clearLogo()">Remover</button>';};
+  r.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      // Reduz o logo para caber com folga no doc de 1 MiB do Firestore.
+      // Antes, um logo de ~800 KB virava ~1,07 MB em base64 e travava TODA a
+      // sincronizacao (pacientes/evolucoes paravam de subir, sem erro visivel).
+      const MAXW=240,MAXH=90;let w=img.width,h=img.height;
+      const sc=Math.min(1,MAXW/w,MAXH/h);w=Math.round(w*sc)||1;h=Math.round(h*sc)||1;
+      const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+      cv.getContext('2d').drawImage(img,0,0,w,h);
+      let out;try{out=cv.toDataURL('image/png');if(out.length>90000)out=cv.toDataURL('image/jpeg',0.85);}catch(e){out=r.result;}
+      const h2=document.getElementById('c_logo');if(h2)h2.value=out;
+      const p=document.getElementById('logoPrev');if(p)p.innerHTML='<img src="'+out+'" style="max-height:56px;max-width:170px;border:1px solid var(--line);border-radius:8px;padding:4px;background:#fff"> <button class="btn btn-g btn-sm" onclick="clearLogo()">Remover</button>';
+    };
+    img.onerror=()=>{alert('Não consegui ler essa imagem. Tente PNG ou JPG.');input.value='';};
+    img.src=r.result;
+  };
   r.readAsDataURL(f);
 }
 function clearLogo(){const h=document.getElementById('c_logo');if(h)h.value='';const p=document.getElementById('logoPrev');if(p)p.innerHTML='';const f=document.getElementById('c_logofile');if(f)f.value='';}

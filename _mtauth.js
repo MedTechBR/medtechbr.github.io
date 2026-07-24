@@ -8,17 +8,24 @@
 const CFG = window.MEDTECH_FB || {};
 const PLACEHOLDER = !CFG.apiKey || CFG.apiKey === "COLE_AQUI";
 const APP = window.MT_APP || { id: "app", name: "App" };
-const lsKey = "mt_" + APP.id;
+const lsBase = "mt_" + APP.id;
+// Cache local POR USUARIO. A chave antiga (sem uid) era compartilhada entre
+// contas no mesmo navegador -> num PC de plantao o Dr. B via/gravava os dados
+// do Dr. A. Nuke a legada e passa a namespacear por uid; a nuvem e a fonte
+// de verdade, entao nada de dado logado se perde.
+try { localStorage.removeItem(lsBase); } catch (e) {}
+const lsKeyFor = (uid) => lsBase + "_" + (uid || "anon");
 const listeners = [];
 const MT = {
   mode: PLACEHOLDER ? "demo" : "cloud",
   user: null,
+  _uid: null,
   ready: null,
   _data: undefined,
   onData(cb) { listeners.push(cb); if (MT._data !== undefined) cb(MT._data); },
   _emit(d) { MT._data = d; listeners.forEach(f => { try { f(d); } catch (e) { console.error(e); } }); },
-  localGet() { try { return JSON.parse(localStorage.getItem(lsKey)); } catch (e) { return null; } },
-  localSet(d) { try { localStorage.setItem(lsKey, JSON.stringify(d)); } catch (e) {} },
+  localGet() { try { return JSON.parse(localStorage.getItem(lsKeyFor(MT._uid))); } catch (e) { return null; } },
+  localSet(d) { try { localStorage.setItem(lsKeyFor(MT._uid), JSON.stringify(d)); } catch (e) {} },
 
   /* ---------- Assinatura do ecossistema (Kiwify central) ----------
      SUBS_ENFORCE=false → NADA muda para os usuários (retorna active provisional).
@@ -236,6 +243,7 @@ else {
     let unsub = null;
     A.onAuthStateChanged(auth, (u) => {
       MT.user = u;
+      MT._uid = u ? u.uid : null;
       if (u) {
         const el = document.getElementById('mt-auth'); if (el) el.remove();
         injectHomeButton();
@@ -252,6 +260,7 @@ else {
         setTimeout(removeSplash, 3500);   // rede de segurança (offline / lento)
       } else {
         if (unsub) { unsub(); unsub = null; }
+        MT._data = undefined;   // nao vaza dado do usuario anterior para a proxima conta
         removeHomeButton();
         removeSplash();
         if (!document.getElementById('mt-auth')) mountAuth();
