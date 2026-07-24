@@ -206,11 +206,14 @@ const SEC=[
 const main=document.getElementById('main');
 function home(q){
   const list = q ? SEC.filter(s=>(s.t+' '+s.s+' '+s.html).toLowerCase().includes(q.toLowerCase())) : SEC;
+  const _iaq=(document.getElementById('iaq')||{}).value, _iaOut=(document.getElementById('iaOut')||{}).innerHTML;
   main.innerHTML=`
    <div class="hero"><span class="ic"><i class="ti ti-book-2"></i></span><div><b>Seu manual de bolso do internato</b><p>Como admitir, evoluir, prescrever com segurança, virar o plantão e interpretar o básico — e um mentor por IA para tirar dúvidas. Para condutas e doses atualizadas, o guia aponta para o CondutAI/ATBguia.</p></div></div>
    <div class="sec-title">Temas</div>
    <div class="grid">${list.map(s=>`<button class="card" onclick="open_('${s.id}')"><span class="ic"><i class="ti ${s.ic}"></i></span><span><span class="ttl">${s.t}</span><span class="sub">${s.s}</span></span></button>`).join('')||'<p style="color:var(--muted)">Nada encontrado.</p>'}</div>
    ${iaHTML()}`;
+  if(_iaq!==undefined){const _t=document.getElementById('iaq');if(_t)_t.value=_iaq;}
+  if(_iaOut){const _o=document.getElementById('iaOut');if(_o)_o.innerHTML=_iaOut;}
   bindIA();
 }
 function open_(id){
