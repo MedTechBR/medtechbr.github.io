@@ -260,10 +260,10 @@ function sampleSeed(){return {pacientes:[
   {id:uid(),leito:'12A',setor:'Enfermaria',nome:'Maria Souza',idade:'74 anos',sexo:'F',clinica:'Clínica Médica',diagnosticos:'Pneumonia adquirida na comunidade',comorbidades:'HAS, DM2',alergias:'',muc:'Losartana 50 mg/dia',hda:'Quadro de tosse produtiva e febre há 4 dias, com piora da dispneia, admitida em 18/06.',laboratorio:'PCR 180 · leucograma 15.000 com desvio',culturas:'Hemocultura (18/06): em andamento',imagem:'RX tórax: consolidação em base direita',exameFisico:EF_TEMPLATE,evolucao:'',parametros:'',conduta:'Ceftriaxona + azitromicina (D2)',pendencias:[{id:uid(),t:'Colher hemocultura',done:false},{id:uid(),t:'Controle de PCR em 48h',done:false}],obs:'',status:'ativo',criadoEm:nowISO()},
   {id:uid(),leito:'UTI 3',setor:'UTI',nome:'João Lima',idade:'61 anos',sexo:'M',clinica:'Clínica Médica',diagnosticos:'IAM sem supra (NSTEMI)\nIC descompensada',comorbidades:'HAS, tabagismo',alergias:'',muc:'AAS, sinvastatina',hda:'Dor torácica em aperto iniciada há 1 dia, com dispneia progressiva.',laboratorio:'Troponina em curva ascendente',culturas:'',imagem:'ECG: infra de ST em V4-V6 · Eco: FE 35%',exameFisico:EF_TEMPLATE,evolucao:'',parametros:'',conduta:'AAS + clopidogrel + enoxaparina',pendencias:[{id:uid(),t:'CAT amanhã',done:false},{id:uid(),t:'Ajustar diurético',done:false}],obs:'Aguardando vaga em hemodinâmica.',status:'ativo',criadoEm:nowISO()}
 ]};}
-function normalize(d){d=d&&typeof d==='object'?d:{};return {pacientes:Array.isArray(d.pacientes)?d.pacientes:[]};}
+function normalize(d){d=d&&typeof d==='object'?d:{};return {pacientes:Array.isArray(d.pacientes)?d.pacientes:[],_tomb:(d._tomb&&typeof d._tomb==='object')?d._tomb:{}};}
 
 function whenMT(cb){if(window.MT){cb();}else{setTimeout(()=>whenMT(cb),30);}}
-whenMT(()=>{MT.onData(d=>{
+whenMT(()=>{MT.mergeFn=(r,l)=>MT.mergeState(r,l,['pacientes']);MT.onData(d=>{
   if(d&&typeof d==='object'&&d.pacientes){state=normalize(d);}
   else{state=(MT.mode==='demo')?sampleSeed():normalize(null);if(MT.mode==='demo')MT.save(state);}
   renderUser();render();
@@ -322,7 +322,7 @@ function editCampo(pid,campo){
   const t=document.getElementById('ec_txt');if(t){t.focus();t.setSelectionRange(t.value.length,t.value.length);}
 }
 function saveCampo(pid,campo){
-  const p=state.pacientes.find(x=>x.id===pid);if(!p)return;
+  const p=state.pacientes.find(x=>x.id===pid);if(!p)return;p.updatedAt=Date.now();
   const v=getVal('ec_txt');
   if(campo==='dx')p.diagnosticos=bullets(v);
   else if(campo==='pendencias'){const oldP=p.pendencias||[];p.pendencias=v.split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>up(o.t)===up(t));return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});}
@@ -336,7 +336,7 @@ function editPrevAlta(pid){
    <div class="row actions"><button class="btn btn-p" onclick="savePrevAlta('${pid}')">Salvar</button>${p.previsaoAlta?`<button class="btn btn-g" onclick="savePrevAlta('${pid}',true)">Remover</button>`:''}<button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
 }
 function savePrevAlta(pid,clear){
-  const p=state.pacientes.find(x=>x.id===pid);if(!p)return;
+  const p=state.pacientes.find(x=>x.id===pid);if(!p)return;p.updatedAt=Date.now();
   p.previsaoAlta=clear?'':getVal('pa_date');persist();closeModal();render();
 }
 
@@ -468,14 +468,14 @@ function saveForm(id){
   const pend=getVal('f_pend').split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>up(o.t)===up(t));return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});
   const o={leito:getVal('f_leito'),setor:getVal('f_setor'),nome:getVal('f_nome'),idade:getVal('f_idade'),sexo:getVal('f_sexo'),diagnosticos:bullets(getVal('f_dx')),comorbidades:getVal('f_comorb'),alergias:getVal('f_alergias'),muc:getVal('f_muc'),hda:getVal('f_hda'),laboratorio:bullets(getVal('f_lab')),culturas:bullets(getVal('f_culturas')),imagem:bullets(getVal('f_imagem')),exameFisico:getVal('f_ef'),conduta:bullets(getVal('f_conduta')),pendencias:pend,previsaoAlta:getVal('f_prevAlta'),obs:getVal('f_obs')};
   if(!o.leito&&!o.nome){alert('Informe ao menos o leito ou o nome do paciente.');return;}
-  if(id){const cur=state.pacientes.find(x=>x.id===id);delete cur.exames;Object.assign(cur,o);}
-  else{state.pacientes.push({id:uid(),status:'ativo',criadoEm:nowISO(),...o});}
+  if(id){const cur=state.pacientes.find(x=>x.id===id);if(!cur){state.pacientes.push({id,status:'ativo',criadoEm:nowISO(),...o,updatedAt:Date.now()});}else{delete cur.exames;Object.assign(cur,o,{updatedAt:Date.now()});}}
+  else{state.pacientes.push({id:uid(),status:'ativo',criadoEm:nowISO(),...o,updatedAt:Date.now()});}
   persist();clearDraft();closeModal();render();
 }
 function delPac(id){const p=state.pacientes.find(x=>x.id===id);if(!p)return;
-  if(confirm(`Excluir definitivamente ${p.nome||'este paciente'} (leito ${p.leito||'—'})?`)){state.pacientes=state.pacientes.filter(x=>x.id!==id);persist();render();}}
-function reabrir(id){const p=state.pacientes.find(x=>x.id===id);if(!p)return;p.status='ativo';delete p.saida;persist();render();}
-function togglePend(pid,itemId){const p=state.pacientes.find(x=>x.id===pid);if(!p)return;const it=(p.pendencias||[]).find(x=>x.id===itemId);if(!it)return;it.done=!it.done;persist();renderAtivos();}
+  if(confirm(`Excluir definitivamente ${p.nome||'este paciente'} (leito ${p.leito||'—'})?`)){MT.markDeleted(state,id);state.pacientes=state.pacientes.filter(x=>x.id!==id);persist();render();}}
+function reabrir(id){const p=state.pacientes.find(x=>x.id===id);if(!p)return;p.updatedAt=Date.now();p.status='ativo';delete p.saida;persist();render();}
+function togglePend(pid,itemId){const p=state.pacientes.find(x=>x.id===pid);if(!p)return;const it=(p.pendencias||[]).find(x=>x.id===itemId);if(!it)return;it.done=!it.done;p.updatedAt=Date.now();persist();renderAtivos();}
 function oneLine(s){return String(s||'').replace(/\s*\n\s*/g,'; ').trim();}
 function bullets(s){return String(s||'').split('\n').map(x=>x.trim()).filter(Boolean).map(x=>/^[-•*>]/.test(x)?('- '+x.replace(/^[-•*>]\s*/,'')):('- '+x)).join('\n');}
 function gtbul(s){return String(s||'').split('\n').map(x=>x.trim()).filter(Boolean).map(x=>'> '+x.replace(/^[-•*>]\s*/,'')).join('\n');}
@@ -547,7 +547,7 @@ function renderSugestoes(id,txt,alvo){
   alvo.innerHTML='<div class="sug-out">'+html+'</div>';
 }
 function ackSug(id,i,btn){
-  const p=state.pacientes.find(x=>x.id===id);if(!p)return;
+  const p=state.pacientes.find(x=>x.id===id);if(!p)return;p.updatedAt=Date.now();
   const item=_sugAtual[i];if(!item)return;
   if(isDinamica(item)){ // PA/glicemia/febre: OK vale só para HOJE — reaparece amanhã se o parâmetro do dia ainda estiver alterado
     const hoje=ymd();
@@ -560,7 +560,7 @@ function ackSug(id,i,btn){
   const row=btn&&btn.closest('.sug-item');if(row)row.remove();
 }
 function limparAck(id){
-  const p=state.pacientes.find(x=>x.id===id);if(!p)return;
+  const p=state.pacientes.find(x=>x.id===id);if(!p)return;p.updatedAt=Date.now();
   p.sugAck=[];p.sugAckDia=null;persist();
   if(_sugCtx&&_sugCtx.id===id)renderSugestoes(id,_sugCtx.txt,_sugCtx.alvo);
 }
@@ -606,7 +606,7 @@ function openVisita(id){
   draftKey='visita:'+id+':'+ymd();draftReopen=()=>openVisita(id);restoreDraft();
 }
 function saveVisita(id,gerar){
-  const p=state.pacientes.find(x=>x.id===id);if(!p)return;
+  const p=state.pacientes.find(x=>x.id===id);if(!p)return;p.updatedAt=Date.now();
   p.evolucao=getVal('v_evol').toUpperCase();
   p.parametros=getVal('v_param').toUpperCase();
   p.exameFisico=buildEF().toUpperCase();
@@ -808,7 +808,7 @@ function openSaida(id){
 }
 function saidaToggle(){const t=document.getElementById('s_tipo').value;const w=document.getElementById('s_destWrap');if(w)w.style.display=(t==='transferencia')?'':'none';}
 function saveSaida(id){
-  const p=state.pacientes.find(x=>x.id===id);if(!p)return;
+  const p=state.pacientes.find(x=>x.id===id);if(!p)return;p.updatedAt=Date.now();
   p.status='saida';
   p.saida={tipo:document.getElementById('s_tipo').value,data:document.getElementById('s_data').value||ymd(),destino:getVal('s_dest'),obs:getVal('s_obs'),em:nowISO()};
   persist();closeModal();render();
