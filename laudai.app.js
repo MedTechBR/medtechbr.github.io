@@ -372,7 +372,7 @@ async function saveLaudoToFirestore(text, ctx) {
     text,
   });
   state.laudos = list;
-  if (window.MT && window.MT.save) await window.MT.save({ laudos: list.slice(0, 100) });
+  if (window.MT && window.MT.save) await window.MT.save({ laudos: list });
 }
 
 // ===== File handling =====
@@ -609,17 +609,12 @@ async function generate() {
   const model = Gemini.getModel();
 
   try {
-    // Upload videos — só funciona em BYOK no v1
-    const videos = state.media.filter(m => m.kind === 'video' && !m.fileUri);
-    if (videos.length && !Gemini.isByokMode()) {
-      throw Object.assign(new Error('VIDEO_BYOK_REQUIRED'), { code: 'video-byok-required' });
-    }
-    for (let i = 0; i < videos.length; i++) {
-      const v = videos[i];
-      const prefix = videos.length > 1 ? `Vídeo ${i + 1}/${videos.length}: ` : '';
-      const uploaded = await Gemini.uploadVideo(v.file, (msg, pct) => setLoader(prefix + msg, pct));
-      v.fileUri = uploaded.uri;
-      v.mimeType = uploaded.mimeType;
+    // Analise de video ainda nao esta disponivel (removida junto do BYOK).
+    // Em vez de falhar pedindo uma chave que nao existe mais, descarta o video
+    // com aviso honesto e segue com as imagens.
+    if (state.media.some(m => m.kind === 'video')) {
+      toast('Análise de vídeo ainda não está disponível. Enviei só as imagens.', 'error');
+      state.media = state.media.filter(m => m.kind !== 'video');
     }
 
     setLoader('Analisando achados…', 90);
