@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0A0E14">
 <title>CondutAI — Abordagem clínica baseada em diretrizes</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%95%EF%B8%8F%3C/text%3E%3C/svg%3E">
-<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"condutai",name:"CondutAI"};</script>
 <script type="module" src="_mtauth.js?v=12"></script>
@@ -1541,7 +1541,12 @@ main, #main { display: block !important; height: auto !important; overflow: visi
 <script>
 // ============ Mermaid setup ============
 let mermaidCounter = 0;
-mermaid.initialize({
+let _mermaidReady = false;
+// mermaid carrega com defer (nao bloqueia o parse do HTML gigante); inicializa
+// lazy, so na 1a vez que um fluxograma vai renderizar.
+function initMermaid(){
+  if (_mermaidReady || typeof mermaid === 'undefined') return _mermaidReady;
+  mermaid.initialize({
   startOnLoad: false,
   theme: 'base',
   securityLevel: 'loose',
@@ -1578,6 +1583,9 @@ mermaid.initialize({
     diagramPadding: 14
   }
 });
+  _mermaidReady = true;
+  return true;
+}
 
 // ============ Estado ============
 const LS_KEY = 'condutai_key';
@@ -59921,6 +59929,10 @@ function sanitizeMermaid(code) {
 
 async function renderMermaidIn(container) {
   const blocks = container.querySelectorAll('.mermaid');
+  if (!blocks.length) return;
+  // mermaid carrega com defer; espera ate estar disponivel e inicializa lazy
+  for (let i = 0; i < 60 && typeof mermaid === 'undefined'; i++) await new Promise(r => setTimeout(r, 40));
+  if (!initMermaid()) return;
   for (const el of blocks) {
     const raw = el.getAttribute('data-source').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,'&');
     const code = sanitizeMermaid(raw);
