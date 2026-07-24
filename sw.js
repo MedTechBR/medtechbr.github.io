@@ -1,7 +1,7 @@
 /* MedTech Portal — service worker (PWA instalável).
    Network-first no shell do portal; cache só como fallback offline.
    NÃO intercepta apps externos (.web.app) nem APIs (origem diferente). */
-const CACHE = 'medtech-portal-v4';
+const CACHE = 'medtech-v717';
 const SHELL = [
   './app.html',
   './enfermaria.html',
@@ -50,6 +50,6 @@ self.addEventListener('fetch', e => {
         }
         return res;
       })
-      .catch(() => caches.match(req).then(c => c || caches.match('./enfermaria.html') || caches.match('./app.html')))
+      .catch(() => caches.match(req).then(c => c || caches.match('./app.html')))
   );
 });
