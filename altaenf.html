@@ -678,8 +678,17 @@ document.addEventListener('change', ()=>{saveDraft();render();});
 document.getElementById('btnPrint').addEventListener('click', ()=>window.print());
 
 document.getElementById('btnCopy').addEventListener('click', async ()=>{
-  try{ await navigator.clipboard.writeText(plainText()); toast('Texto copiado para a área de transferência'); }
-  catch(e){ toast('Não foi possível copiar automaticamente'); }
+  const txt=plainText();
+  try{ await navigator.clipboard.writeText(txt); toast('Texto copiado para a área de transferência'); return; }
+  catch(e){}
+  // fallback p/ webview / contexto sem a API de clipboard
+  try{
+    const ta=document.createElement('textarea'); ta.value=txt;
+    ta.style.cssText='position:fixed;left:-9999px;top:0'; document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    const ok=document.execCommand('copy'); ta.remove();
+    toast(ok?'Texto copiado para a área de transferência':'Não consegui copiar — selecione o texto e copie manualmente');
+  }catch(e){ toast('Não consegui copiar — selecione o texto e copie manualmente'); }
 });
 
 document.getElementById('btnClear').addEventListener('click', ()=>{

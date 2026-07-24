@@ -618,7 +618,7 @@ function galeriaHtml(e){
 function md(t){
   const blocks=String(t||'').split('\n');let html='',inUl=false;
   const closeUl=()=>{if(inUl){html+='</ul>';inUl=false;}};
-  const inl=s=>esc(s).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\b(≥|≤|>|<)\s/g,'$1 ');
+  const inl=s=>esc(s).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\*([^*\n]+)\*/g,'<i>$1</i>').replace(/\b(≥|≤|>|<)\s/g,'$1 ');
   for(let raw of blocks){
     const l=raw.trim();
     if(!l){closeUl();continue;}
