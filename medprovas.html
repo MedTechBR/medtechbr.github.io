@@ -4809,10 +4809,12 @@ function renderResumoCorrecao() {
 function exportarNotasCSV() {
   const p = getProvaAtual();
   if (!p || p.alunos.length === 0) return;
-  let csv = `Prova,${p.titulo}\nDisciplina,${p.disciplina}\n\nNome,Nota,Acertos,Total,Percentual\n`;
+  // escapa campo CSV + neutraliza injeção de fórmula no Excel (= + - @)
+  const csvField = v => { let s = String(v == null ? '' : v); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  let csv = `Prova,${csvField(p.titulo)}\nDisciplina,${csvField(p.disciplina)}\n\nNome,Nota,Acertos,Total,Percentual\n`;
   for (const a of p.alunos) {
     const c = calcularNota(a, p);
-    csv += `"${a.nome || 'Sem nome'}",${c.nota.toFixed(2)},${c.acertos},${c.total},${(c.nota * 10).toFixed(1)}%\n`;
+    csv += `${csvField(a.nome || 'Sem nome')},${c.nota.toFixed(2)},${c.acertos},${c.total},${(c.nota * 10).toFixed(1)}%\n`;
   }
   const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);

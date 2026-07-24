@@ -1,4 +1,4 @@
-// RadioLaudo IA — app principal
+// LaudAI IA — app principal
 // State + UI + Auth + Firestore sync
 
 const state = {
@@ -13,8 +13,8 @@ const state = {
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 
-const LS_LANG = 'radiolaudo_lang';
-const LS_STYLE = 'radiolaudo_style';
+const LS_LANG = 'laudai_lang';
+const LS_STYLE = 'laudai_style';
 
 // URL do produto no Kiwify (preencha depois de criar o produto no painel)
 // Exemplo: https://pay.kiwify.com.br/seu-id-aqui
@@ -59,7 +59,7 @@ function validateCPF(raw) {
   return r === parseInt(cpf[10]);
 }
 function cpfToEmail(cpfRaw) {
-  return `${String(cpfRaw).replace(/\D/g, '')}@cpf.radiolaudo.app`;
+  return `${String(cpfRaw).replace(/\D/g, '')}@cpf.laudai.app`;
 }
 // Firebase exige senha mínima de 6 chars. Se o usuário usar a senha padrão
 // de 3 dígitos (3 primeiros do CPF), repetimos para atingir 6 chars internamente.
@@ -388,11 +388,11 @@ async function handleFiles(fileList) {
         const inside = await Dicom.extractZipAll(f);
         if (!inside.length) { toast(`ZIP "${f.name}" está vazio.`, 'error'); continue; }
         // Se houver _DEBUG.txt do bookmarklet, mostra como toast informativo
-        const dbg = inside.find(x => /^_?radiolaudo[_-]?log|_DEBUG/i.test(x.name));
+        const dbg = inside.find(x => /^_?laudai[_-]?log|_DEBUG/i.test(x.name));
         if (dbg) {
           try { console.log('[Bookmarklet log]', await dbg.text()); } catch {}
         }
-        const useful = inside.filter(x => !/^_?radiolaudo[_-]?log|_DEBUG|readme|\.txt$/i.test(x.name));
+        const useful = inside.filter(x => !/^_?laudai[_-]?log|_DEBUG|readme|\.txt$/i.test(x.name));
         expanded.push(...useful);
         toast(`${useful.length} arquivo(s) extraído(s) de ${f.name}.`);
       } catch (e) {
@@ -905,7 +905,7 @@ async function parseOhifJson(text) {
 function buildBookmarkletCode() {
   // Bookmarklet: roda na página do PACS (Clinux, OHIF, qualquer viewer com ?json=manifest).
   // Lê o manifesto OHIF, baixa TODOS os DICOMs da série (não apenas a slice na tela)
-  // e empacota em ZIP que o usuário arrasta para o RadioLaudo.
+  // e empacota em ZIP que o usuário arrasta para o LaudAI.
   // Fallback: se não houver manifesto, captura múltiplos canvases visíveis.
   const code = `(async()=>{
 var log=[],push=function(m){log.push('['+(new Date).toISOString()+'] '+m);try{console.log('[RL]',m);}catch(e){}};
@@ -914,11 +914,11 @@ try{
 if(!window.JSZip)await new Promise((R,E)=>{var s=document.createElement('script');s.src='https://unpkg.com/jszip@3.10.1/dist/jszip.min.js';s.onload=R;s.onerror=()=>E(new Error('JSZip falhou'));document.head.appendChild(s);});
 push('JSZip loaded');
 var box=document.createElement('div');box.style.cssText='position:fixed;top:20px;right:20px;background:#0a0e1a;color:#e2e8f0;padding:16px 20px;border-radius:12px;border:2px solid #06b6d4;font-family:system-ui;font-size:13px;z-index:2147483647;box-shadow:0 12px 32px rgba(0,0,0,.5);min-width:300px;max-width:400px;line-height:1.5';
-box.innerHTML='<div id="rl-h" style="font-weight:700;margin-bottom:6px">RadioLaudo — exportando</div><div id="rl-s">Procurando manifesto OHIF…</div><div id="rl-err" style="margin-top:8px;font-size:11px;color:#f59e0b;max-height:120px;overflow-y:auto;display:none"></div>';
+box.innerHTML='<div id="rl-h" style="font-weight:700;margin-bottom:6px">LaudAI — exportando</div><div id="rl-s">Procurando manifesto OHIF…</div><div id="rl-err" style="margin-top:8px;font-size:11px;color:#f59e0b;max-height:120px;overflow-y:auto;display:none"></div>';
 document.body.appendChild(box);
 var st=box.querySelector('#rl-s'),hd=box.querySelector('#rl-h'),errEl=box.querySelector('#rl-err');
 function showErr(m){errEl.style.display='block';errEl.innerHTML+='⚠ '+m+'<br>';}
-function finalize(zip,total,label,ok){zip.file('_RADIOLAUDO_LOG.txt',log.join('\\n'));return zip.generateAsync({type:'blob'}).then(b=>{var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='radiolaudo-'+label+'-'+Date.now()+'.zip';a.click();if(ok){hd.textContent='✓ '+total+' arquivo(s) prontos';hd.style.color='#10b981';st.innerHTML='<span style=color:#94a3b8>Arraste o ZIP no RadioLaudo</span>';}else{hd.textContent='⚠ Exportação parcial / log baixado';hd.style.color='#f59e0b';}setTimeout(()=>box.remove(),30000);});}
+function finalize(zip,total,label,ok){zip.file('_LAUDAI_LOG.txt',log.join('\\n'));return zip.generateAsync({type:'blob'}).then(b=>{var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='laudai-'+label+'-'+Date.now()+'.zip';a.click();if(ok){hd.textContent='✓ '+total+' arquivo(s) prontos';hd.style.color='#10b981';st.innerHTML='<span style=color:#94a3b8>Arraste o ZIP no LaudAI</span>';}else{hd.textContent='⚠ Exportação parcial / log baixado';hd.style.color='#f59e0b';}setTimeout(()=>box.remove(),30000);});}
 var u=new URL(location.href),jsonUrl=u.searchParams.get('json')||u.searchParams.get('url')||u.searchParams.get('manifest'),urls=[];
 push('jsonUrl='+jsonUrl);
 if(jsonUrl){
@@ -961,7 +961,7 @@ for(var i=0;i<cnt;i++){var blob=await new Promise(r=>cs[i].toBlob(r,'image/png')
 push('Canvas capturados: '+cnt);
 showErr('Modo fallback: '+cnt+' canvas PNG (não DICOM raw)');
 await finalize(zip2,cnt,'canvas',true);
-}catch(e){push('FATAL: '+e.message);try{var zipE=new JSZip();zipE.file('_RADIOLAUDO_LOG.txt',log.join('\\n'));var bE=await zipE.generateAsync({type:'blob'});var aE=document.createElement('a');aE.href=URL.createObjectURL(bE);aE.download='radiolaudo-log-'+Date.now()+'.zip';aE.click();}catch(_){}alert('RadioLaudo — erro: '+e.message+'\\nLog baixado em ZIP.');}
+}catch(e){push('FATAL: '+e.message);try{var zipE=new JSZip();zipE.file('_LAUDAI_LOG.txt',log.join('\\n'));var bE=await zipE.generateAsync({type:'blob'});var aE=document.createElement('a');aE.href=URL.createObjectURL(bE);aE.download='laudai-log-'+Date.now()+'.zip';aE.click();}catch(_){}alert('LaudAI — erro: '+e.message+'\\nLog baixado em ZIP.');}
 })();`;
   return 'javascript:' + encodeURIComponent(code);
 }
