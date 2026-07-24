@@ -343,7 +343,7 @@ function savePrevAlta(pid,clear){
 function renderAtivos(){
   const list=ativos().slice().sort(leitoSort).filter(matchBusca);
   const tot=ativos().length;
-  const uti=ativos().filter(p=>/uti/i.test(p.setor||'')||/uti/i.test(p.leito||'')).length;
+  const uti=ativos().filter(p=>/\buti\b/i.test(p.setor||'')||/\buti\b/i.test(p.leito||'')).length;
   const comPend=ativos().filter(p=>(p.pendencias||[]).some(x=>!x.done)).length;
   let html=`<div class="cards">
     <div class="kpi"><div class="l">Internados</div><div class="v">${tot}</div></div>

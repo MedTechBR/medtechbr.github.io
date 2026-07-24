@@ -262,10 +262,10 @@ function renderComp(){
 }
 function moveComp(n){const r=compRange(cur);cur=new Date(r.s);cur.setMonth(cur.getMonth()+n);render();}
 function setCompDay(v){state.compDay=Math.min(28,Math.max(1,parseInt(v)||1));persist();render();}
-function toggleStatus(id){const s=state.shifts.find(x=>x.id===id);s.status=s.status==='pago'?'agendado':'pago';persist();render();}
+function toggleStatus(id){const s=state.shifts.find(x=>x.id===id);if(!s)return;s.status=s.status==='pago'?'agendado':'pago';persist();render();}
 function del(id){if(confirm('Excluir este plantão?')){state.shifts=state.shifts.filter(x=>x.id!==id);persist();render();}}
 function delFromForm(id){if(confirm('Excluir este plantão?')){state.shifts=state.shifts.filter(x=>x.id!==id);persist();closeModal();render();}}
-function dup(id){const s=state.shifts.find(x=>x.id===id);const d=new Date(s.date+'T00:00:00');d.setDate(d.getDate()+7);
+function dup(id){const s=state.shifts.find(x=>x.id===id);if(!s)return;const d=new Date(s.date+'T00:00:00');d.setDate(d.getDate()+7);
   state.shifts.push({...s,id:uid(),date:d.toISOString().slice(0,10),status:'agendado'});persist();cur=new Date(d);calCur=new Date(d.getFullYear(),d.getMonth(),1);render();}
 
 /* ---------- CALENDÁRIO (com copiar/colar dia) ---------- */
