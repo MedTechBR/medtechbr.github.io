@@ -1,0 +1,41 @@
+/* ============================================================
+   _mttokens.css — fonte unica de verdade do ecossistema MedTech
+   (tema Console dark). Importe ANTES do CSS do app:
+     <link rel="stylesheet" href="_mttokens.css?v=1">
+   Os tokens --mt-* sao o contrato canonico. Migre os :root locais
+   para consumir estes por app (Onda 2/3); nada quebra enquanto
+   coexistirem, porque os nomes --mt-* nao colidem com os legados.
+   Cores de texto verificadas em WCAG AA sobre --mt-bg.
+   ============================================================ */
+:root{
+  /* Superficies */
+  --mt-bg:#0A0E14; --mt-surface:#111823; --mt-surface-2:#0E141D;
+  --mt-overlay:rgba(0,0,0,.60);
+  /* Texto (AA verificado sobre --mt-bg) */
+  --mt-text:#E7EEF7;         /* ~15:1  */
+  --mt-text-dim:#8A98AC;     /* ~6.6:1 */
+  --mt-text-faint:#7E8EA6;   /* ~5.8:1 — substitui o #5A6B80 (3.55:1, reprovava) */
+  /* Marca + acento */
+  --mt-brand:#4C8DFF; --mt-brand-strong:#2F6AE0; --mt-accent:#38E1C6;
+  --mt-brand-grad:linear-gradient(145deg,#4C8DFF,#2F6AE0);
+  /* Semanticos */
+  --mt-ok:#3FB950; --mt-warn:#E3B341; --mt-danger:#F85149;
+  /* Linhas / brilho / elevacao */
+  --mt-line:rgba(88,166,255,.12); --mt-line-strong:rgba(140,160,185,.16);
+  --mt-glow:rgba(76,141,255,.42);
+  --mt-shadow:0 1px 2px rgba(0,0,0,.30),0 12px 32px -12px rgba(0,0,0,.45);
+  --mt-ring:0 0 0 3px rgba(76,141,255,.28);
+  /* Trilhas (categoria) — unica multi-cor permitida, so em chip/eyebrow */
+  --mt-trilha-clinica:#4C8DFF; --mt-trilha-doc:#38E1C6;
+  --mt-trilha-formacao:#A78BFA; --mt-trilha-gestao:#F5A15C;
+  /* Raios */
+  --mt-r-sm:8px; --mt-r-md:12px; --mt-r-lg:18px; --mt-r-pill:999px;
+  /* Tipografia */
+  --mt-font-display:'Space Grotesk',system-ui,sans-serif;
+  --mt-font-text:'Inter',system-ui,sans-serif;
+  --mt-font-mono:'JetBrains Mono',ui-monospace,monospace;
+}
+/* Foco visivel para navegacao por teclado (WCAG 2.4.7) — nenhum app tinha */
+:where(a,button,[role=button],input,select,textarea,summary,[tabindex]):focus-visible{
+  outline:none; box-shadow:var(--mt-ring); border-radius:var(--mt-r-sm);
+}
