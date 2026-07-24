@@ -325,7 +325,7 @@ function saveCampo(pid,campo){
   const p=state.pacientes.find(x=>x.id===pid);if(!p)return;
   const v=getVal('ec_txt');
   if(campo==='dx')p.diagnosticos=bullets(v);
-  else if(campo==='pendencias'){const oldP=p.pendencias||[];p.pendencias=v.split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>o.t===t);return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});}
+  else if(campo==='pendencias'){const oldP=p.pendencias||[];p.pendencias=v.split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>up(o.t)===up(t));return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});}
   persist();closeModal();render();
 }
 function editPrevAlta(pid){
@@ -465,7 +465,7 @@ function openForm(id){
 }
 function saveForm(id){
   const oldP=id?((state.pacientes.find(x=>x.id===id)||{}).pendencias||[]):[];
-  const pend=getVal('f_pend').split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>o.t===t);return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});
+  const pend=getVal('f_pend').split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>up(o.t)===up(t));return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});
   const o={leito:getVal('f_leito'),setor:getVal('f_setor'),nome:getVal('f_nome'),idade:getVal('f_idade'),sexo:getVal('f_sexo'),diagnosticos:bullets(getVal('f_dx')),comorbidades:getVal('f_comorb'),alergias:getVal('f_alergias'),muc:getVal('f_muc'),hda:getVal('f_hda'),laboratorio:bullets(getVal('f_lab')),culturas:bullets(getVal('f_culturas')),imagem:bullets(getVal('f_imagem')),exameFisico:getVal('f_ef'),conduta:bullets(getVal('f_conduta')),pendencias:pend,previsaoAlta:getVal('f_prevAlta'),obs:getVal('f_obs')};
   if(!o.leito&&!o.nome){alert('Informe ao menos o leito ou o nome do paciente.');return;}
   if(id){const cur=state.pacientes.find(x=>x.id===id);delete cur.exames;Object.assign(cur,o);}
@@ -612,7 +612,7 @@ function saveVisita(id,gerar){
   p.exameFisico=buildEF().toUpperCase();
   p.conduta=getVal('v_conduta').toUpperCase();
   const oldP=p.pendencias||[];
-  p.pendencias=getVal('v_pend').toUpperCase().split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>o.t===t);return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});
+  p.pendencias=getVal('v_pend').toUpperCase().split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>up(o.t)===up(t));return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});
   p.previsaoAlta=getVal('v_prevAlta');
   p.visitaEm=ymd();
   persist();clearDraft();
