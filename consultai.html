@@ -1375,16 +1375,16 @@ function renderConfig(){const c=state.cfg;const ag=c.agenda||{ini:'07:00',fim:'1
     <div class="field"><label>Fim do atendimento</label><input id="ag_fim" type="time" value="${esc(ag.fim)}"></div>
     <div class="field"><label>Duração padrão (min)</label><input id="ag_slot" type="number" min="10" step="5" value="${ag.slot}"></div></div>
    <div class="field"><label>Dias de atendimento</label><div class="dias-pick" id="ag_dias">${[1,2,3,4,5,6,0].map(n=>`<button type="button" data-d="${n}" class="${(ag.dias||[]).includes(n)?'on':''}" onclick="this.classList.toggle('on')">${WDS[n]}</button>`).join('')}</div></div>
-   <div class="row"><button class="btn btn-p" onclick="saveCfg()">Salvar dados</button></div></div>
+   <div class="row"><button class="btn btn-p" onclick="saveCfg(this)">Salvar dados</button></div></div>
    ${modHtml}${docsHtml}`;
 }
-function saveCfg(){
+function saveCfg(btn){
   const gi=id=>document.getElementById(id);
   const ag=Object.assign({ini:'07:00',fim:'19:00',slot:30,dias:[1,2,3,4,5,6]},state.cfg.agenda||{});
   if(gi('ag_ini')){ag.ini=gi('ag_ini').value||'07:00';ag.fim=gi('ag_fim').value||'19:00';ag.slot=Math.max(10,parseInt(gi('ag_slot').value)||30);
     const ds=[...document.querySelectorAll('#ag_dias button.on')].map(b=>+b.dataset.d).sort((a,b)=>a-b);ag.dias=ds.length?ds:[1,2,3,4,5,6];}
   state.cfg={medico:gi('c_med').value.trim(),crm:gi('c_crm').value.trim(),rqe:gi('c_rqe').value.trim(),esp:gi('c_esp').value.trim(),clinica:gi('c_cli').value.trim(),endereco:gi('c_end').value.trim(),telefone:gi('c_tel').value.trim(),logo:gi('c_logo')?gi('c_logo').value:(state.cfg.logo||''),rodape:gi('c_rodape')?gi('c_rodape').value.trim():(state.cfg.rodape||''),agenda:ag};
-  persist();const b=event.target;const o=b.textContent;b.textContent='✓ Salvo';setTimeout(()=>b.textContent=o,1500);
+  persist();const b=btn||(typeof event!=='undefined'&&event.target);if(b){const o=b.textContent;b.textContent='✓ Salvo';setTimeout(()=>b.textContent=o,1500);}
 }
 function loadLogo(input){
   const f=input.files&&input.files[0];if(!f)return;

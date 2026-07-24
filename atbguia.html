@@ -852,7 +852,7 @@ function renderItem(e){
 }
 
 /* ===================== BULÁRIO (drug) ===================== */
-function bandFor(d,clcr){return (d.renal||[]).find(b=>clcr>=(b.min||0)&&clcr<=(b.max==null?999:b.max));}
+function bandFor(d,clcr){return (d.renal||[]).find(b=>clcr>=(b.min||0)&&clcr<((b.max==null?9999:b.max)+1));}
 function doseAjustada(d,peso,clcr){
   const parts=[];
   if(d.kg&&peso>0){const lo=Math.round(d.kg.lo*peso),hi=Math.round(d.kg.hi*peso);

@@ -234,6 +234,7 @@ function activateDuePending() {
   for (const t of state.transactions) {
     if (t.pending && t.date <= today) {
       delete t.pending;
+      t.updatedAt = Date.now(); // senão o merge entre aparelhos pode reverter a ativação
       changed = true;
     }
   }
@@ -467,7 +468,7 @@ function renderScheduled() {
   if (!wrap || !list) return;
   // Total signed (despesas - receitas)
   const net = monthPending.reduce((s, t) => s + (t.type === 'expense' ? -t.amount : t.amount), 0);
-  if (!monthPending.length || net === 0) { wrap.hidden = true; return; }
+  if (!monthPending.length) { wrap.hidden = true; return; }
   wrap.hidden = false;
   countEl.textContent = `${monthPending.length} pendente${monthPending.length === 1 ? '' : 's'}`;
   const sign = net < 0 ? '−' : (net > 0 ? '+' : '');
@@ -1282,16 +1283,11 @@ document.getElementById('wipeData').addEventListener('click', () => {
 const _dashLancar = document.getElementById('dashLancar');
 if (_dashLancar) _dashLancar.addEventListener('click', () => openTxDialog(null));
 
-// FAB de "+ transação" através da nav inferior (botão Lançar)
-document.querySelector('.bottom-nav button[data-nav="transacoes"]').addEventListener('dblclick', () => openTxDialog(null));
-// Garantir que clicar em "Lançar" também abre o diálogo ao já estar na view
-let lastNavClickTs = 0;
+// Botão "Lançar" da nav inferior: o rótulo promete lançar, então o clique simples
+// navega para a lista (handler genérico de data-nav) E já abre o formulário.
+// (antes só o duplo-clique abria — clique simples parecia "não fazer nada".)
 document.querySelector('.bottom-nav button[data-nav="transacoes"]').addEventListener('click', () => {
-  const now = Date.now();
-  if (now - lastNavClickTs < 350 || !document.querySelector('[data-view=transacoes]').classList.contains('hidden') === true) {
-    // já estávamos na view
-  }
-  lastNavClickTs = now;
+  setTimeout(() => openTxDialog(null), 0);
 });
 
 // Fechar diálogos via [data-close]
