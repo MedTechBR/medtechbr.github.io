@@ -787,7 +787,7 @@ function saveForm(id){
   const p=state.patients.find(x=>x.nome.trim().toLowerCase()===nome.toLowerCase());
   const o={date:document.getElementById('f_date').value,time:document.getElementById('f_time').value||'08:00',dur:parseInt(document.getElementById('f_dur').value)||30,pacId:p?p.id:null,pac:p?'':nome,fone:document.getElementById('f_fone').value.trim(),type:document.getElementById('f_type').value,status:document.getElementById('f_status').value,obs:document.getElementById('f_obs').value.trim()};
   if(!o.date){alert('Informe a data.');return;}
-  if(id){Object.assign(state.appts.find(x=>x.id===id),o);}else{state.appts.push({id:uid(),...o});}
+  if(id){const _a=state.appts.find(x=>x.id===id);if(_a){Object.assign(_a,o);}else{state.appts.push({id,...o});}}else{state.appts.push({id:uid(),...o});}
   persist();closeModal();
   if(view==='agenda'&&aTab==='dia')cur=new Date(o.date+'T00:00:00');
   render();
@@ -844,7 +844,7 @@ function savePac(id){
   const nome=document.getElementById('p_nome').value.trim();
   if(!nome){alert('Informe o nome do paciente.');return;}
   const o={nome,nasc:document.getElementById('p_nasc').value,sexo:document.getElementById('p_sexo').value,cpf:document.getElementById('p_cpf').value.trim(),fone:document.getElementById('p_fone').value.trim(),email:document.getElementById('p_email').value.trim(),convenio:document.getElementById('p_conv').value.trim(),endereco:document.getElementById('p_end').value.trim(),alergias:document.getElementById('p_alg').value.trim(),problemas:document.getElementById('p_prob').value.trim(),meds:document.getElementById('p_meds').value.trim(),obs:document.getElementById('p_obs').value.trim()};
-  if(id){Object.assign(patientById(id),o);}else{const np={id:uid(),criadoEm:nowISO(),...o};state.patients.push(np);id=np.id;}
+  if(id){const _pt=patientById(id);if(_pt){Object.assign(_pt,o);}else{state.patients.push({id,criadoEm:nowISO(),...o});}}else{const np={id:uid(),criadoEm:nowISO(),...o};state.patients.push(np);id=np.id;}
   persist();closeModal();
   if(view==='paciente'){renderPaciente();}else{openPac(id);}
 }
@@ -974,11 +974,11 @@ function labChartSVG(series){
   const line=series.map((s,i)=>X(i).toFixed(1)+','+Y(s.valor).toFixed(1)).join(' ');
   const step=Math.max(1,Math.ceil(n/6));let marks='';
   series.forEach((s,i)=>{const x=X(i).toFixed(1),y=Y(s.valor);
-    marks+='<circle cx="'+x+'" cy="'+y.toFixed(1)+'" r="3.5" fill="#2563eb"/>';
-    marks+='<text x="'+x+'" y="'+(y-7).toFixed(1)+'" font-size="10" text-anchor="middle" fill="#0f172a">'+esc(fmtNum(s.valor))+'</text>';
-    if(i%step===0||i===n-1)marks+='<text x="'+x+'" y="'+(H-8)+'" font-size="9" text-anchor="middle" fill="#5B7882">'+esc(dm(s.date))+'</text>';
+    marks+='<circle cx="'+x+'" cy="'+y.toFixed(1)+'" r="3.5" fill="#4C8DFF"/>';
+    marks+='<text x="'+x+'" y="'+(y-7).toFixed(1)+'" font-size="10" text-anchor="middle" fill="#E7EEF7">'+esc(fmtNum(s.valor))+'</text>';
+    if(i%step===0||i===n-1)marks+='<text x="'+x+'" y="'+(H-8)+'" font-size="9" text-anchor="middle" fill="#7E8EA6">'+esc(dm(s.date))+'</text>';
   });
-  return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="max-width:100%;height:auto;display:block" preserveAspectRatio="xMidYMid meet"><polyline points="'+line+'" fill="none" stroke="#1e40af" stroke-width="2"/>'+marks+'</svg>';
+  return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="max-width:100%;height:auto;display:block" preserveAspectRatio="xMidYMid meet"><polyline points="'+line+'" fill="none" stroke="#4C8DFF" stroke-width="2"/>'+marks+'</svg>';
 }
 function addLab(){
   const nome=(document.getElementById('lab_nome').value||'').trim();
@@ -1049,7 +1049,7 @@ function saveEvol(id){
   const tipoAtend=(document.getElementById('e_atend')||{}).value||'';
   let titulo=document.getElementById('e_titulo').value.trim();
   if(!titulo){titulo=(texto.split('\n').map(s=>s.trim()).find(s=>s)||'Evolução').replace(/^[#*•\-\s]+/,'').slice(0,60);}
-  if(id){Object.assign(state.records.find(x=>x.id===id),{tipo,tipoAtend,titulo,texto});}
+  if(id){const _r=state.records.find(x=>x.id===id);if(_r){Object.assign(_r,{tipo,tipoAtend,titulo,texto});}else{const rec={id,pacId:curPac,date:nowISO(),tipo,tipoAtend,titulo,texto};if(attendApptId)rec.apptId=attendApptId;state.records.push(rec);}}
   else{const rec={id:uid(),pacId:curPac,date:nowISO(),tipo,tipoAtend,titulo,texto};if(attendApptId)rec.apptId=attendApptId;state.records.push(rec);}
   if(attendApptId){const ap=state.appts.find(x=>x.id===attendApptId);if(ap)ap.status='atendido';attendApptId=null;}
   persist();closeModalMic();renderPBody();
@@ -1106,18 +1106,26 @@ function rxDel(i){rxItens.splice(i,1);renderRxItens();}
 function renderRxItens(){
   const box=document.getElementById('r_itens');if(!box)return;
   if(!rxItens.length){box.innerHTML='<div class="empty" style="padding:18px">Nenhum medicamento adicionado.<br>Busque acima e selecione — a posologia vem pronta.</div>';return;}
-  box.innerHTML=rxItens.map((it,i)=>`<div class="rx-item">
+  const _pac=(typeof curPac!=='undefined'&&curPac)?patientById(curPac):null;
+  const _alg=(_pac&&_pac.alergias?_pac.alergias:'').split(/[,;\/\n]+/).map(s=>s.trim().toLowerCase()).filter(s=>s.length>=3);
+  box.innerHTML=rxItens.map((it,i)=>{
+   const _h=_alg.find(a=>(it.nome||'').toLowerCase().includes(a));
+   return `<div class="rx-item">
      <div class="rx-item-h"><span class="rx-num">${i+1}</span><input class="rx-nome" value="${esc(it.nome)}" placeholder="Medicamento e concentração" oninput="rxItens[${i}].nome=this.value"><button class="rx-x" title="Remover" onclick="rxDel(${i})">×</button></div>
      <textarea class="rx-pos" placeholder="Posologia (via, dose, frequência, duração)" oninput="rxItens[${i}].pos=this.value">${esc(it.pos)}</textarea>
-   </div>`).join('');
+     ${_h?`<div style="margin-top:6px;color:#FF7A7A;font-size:12px;font-weight:700">⚠ Paciente tem alergia registrada a "${esc(_h)}"</div>`:''}
+   </div>`;}).join('');
 }
 function saveRx2(andPrint){
   const itens=rxItens.map(it=>({nome:(it.nome||'').trim(),pos:(it.pos||'').trim()})).filter(it=>it.nome);
   if(!itens.length){alert('Adicione ao menos um medicamento.');return;}
+  const _pac=(typeof curPac!=='undefined'&&curPac)?patientById(curPac):null;
+  const _alg=(_pac&&_pac.alergias?_pac.alergias:'').split(/[,;\/\n]+/).map(s=>s.trim().toLowerCase()).filter(s=>s.length>=3);
+  if(_alg.length){const _hit=itens.filter(it=>_alg.some(a=>(it.nome||'').toLowerCase().includes(a))).map(it=>it.nome);if(_hit.length&&!confirm('⚠ ATENÇÃO — alergia registrada\n\nO paciente tem alergia a: '+_pac.alergias+'\n\nMedicamento(s) prescrito(s) com correspondência: '+_hit.join(', ')+'\n\nDeseja prescrever mesmo assim?'))return;}
   const tipo=document.getElementById('r_tipo').value;const obs=document.getElementById('r_obs').value.trim();
   const texto=itens.map(it=>it.pos?(it.nome+' — '+it.pos):it.nome).join('\n');
   let rid=rxEditId;
-  if(rxEditId){Object.assign(state.prescriptions.find(x=>x.id===rxEditId),{tipo,itens,texto,obs});}
+  if(rxEditId){const _p=state.prescriptions.find(x=>x.id===rxEditId);if(_p){Object.assign(_p,{tipo,itens,texto,obs});}else{state.prescriptions.push({id:rxEditId,pacId:curPac,date:nowISO(),tipo,itens,texto,obs});}}
   else{rid=uid();state.prescriptions.push({id:rid,pacId:curPac,date:nowISO(),tipo,itens,texto,obs});}
   persist();closeModalMic();renderPBody();
   if(andPrint)printRx(rid);
@@ -1236,7 +1244,7 @@ function saveAtestado(id,andPrint){
   const o=atColetar(id);
   if(!o.texto){alert('Gere ou escreva o texto do atestado.');return;}
   let rid=id;
-  if(id){Object.assign(state.documentos.find(x=>x.id===id),o);}else{rid=uid();state.documentos.push({id:rid,...o});}
+  if(id){const _d=state.documentos.find(x=>x.id===id);if(_d){Object.assign(_d,o);}else{state.documentos.push({id,...o});}}else{rid=uid();state.documentos.push({id:rid,...o});}
   persist();closeModalMic();renderPBody();
   if(andPrint)printDocu(state.documentos.find(x=>x.id===rid));
 }
@@ -1260,7 +1268,7 @@ function saveExames(id,andPrint){
   const o=exColetar(id);
   if(!o.exames){alert('Liste ao menos um exame.');return;}
   let rid=id;
-  if(id){Object.assign(state.documentos.find(x=>x.id===id),o);}else{rid=uid();state.documentos.push({id:rid,...o});}
+  if(id){const _d=state.documentos.find(x=>x.id===id);if(_d){Object.assign(_d,o);}else{state.documentos.push({id,...o});}}else{rid=uid();state.documentos.push({id:rid,...o});}
   persist();closeModalMic();renderPBody();
   if(andPrint)printDocu(state.documentos.find(x=>x.id===rid));
 }
