@@ -135,6 +135,7 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 .disc{font-size:11.5px;color:var(--muted);margin-top:14px;line-height:1.5;border-top:1px solid var(--line);padding-top:12px}
 @media(max-width:680px){.grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
 </style>
+<style>/* mt-a11y-16px */@media(max-width:680px){input,select,textarea{font-size:16px}}</style>
 </head>
 <body>
 <header>
@@ -911,7 +912,7 @@ async function aprofundarDrug(id){
 
 /* ===================== EMPÍRICO ===================== */
 const PREV_ATBS=['Amoxicilina','Amox-clavulanato','Ampicilina','Oxacilina','Cefalexina','Cefazolina','Ceftriaxona','Cefepime','Ceftazidima','Piperacilina-tazobactam','Meropenem','Ertapenem','Ciprofloxacino','Levofloxacino','Azitromicina','Clindamicina','Metronidazol','Sulfametoxazol-trimetoprim','Vancomicina','Linezolida','Daptomicina','Gentamicina','Amicacina','Nitrofurantoína','Polimixina B'];
-let empForm={foco:'pac',ctx:'comunitario',grav:'enfermaria',alergia:'nao',usados:[],detalhe:'',extra:'',peso:'',clcr:''};
+let empForm={foco:'pac',ctx:'comunitario',grav:'enfermaria',alergia:'nao',usados:[],detalhe:'',extra:'',peso:'',clcr:'',riscos:{atb:false,intern:false,disp:false,col:false,imuno:false}};
 function toggleUsado(i){const a=PREV_ATBS[i];const k=empForm.usados.indexOf(a);if(k>=0)empForm.usados.splice(k,1);else empForm.usados.push(a);const w=document.getElementById('usadosChips');if(w&&w.children[i])w.children[i].classList.toggle('on');}
 function abrirEmpirico(){curView='emp';renderEmpirico();scroll0();}
 function renderEmpirico(){
@@ -929,11 +930,11 @@ function renderEmpirico(){
      <div class="field"><label>Peso e clearance (para já ajustar as doses)</label><div style="display:flex;gap:8px"><input type="number" id="empPeso" value="${esc(empForm.peso)}" oninput="empForm.peso=this.value" inputmode="decimal" placeholder="Peso (kg)" style="flex:1"><input type="number" id="empClcr" value="${esc(empForm.clcr)}" oninput="empForm.clcr=this.value" inputmode="numeric" placeholder="ClCr (mL/min)" style="flex:1"></div></div>
      <div class="field"><label>Fatores de risco para multirresistência</label>
        <div class="checks">
-         <label><input type="checkbox" id="r_atb"> Uso de ATB nos últimos 90 dias</label>
-         <label><input type="checkbox" id="r_intern"> Internação/UTI recente ou atual prolongada</label>
-         <label><input type="checkbox" id="r_disp"> Dispositivo invasivo (cateter, sonda, VM)</label>
-         <label><input type="checkbox" id="r_col"> Colonização/infecção prévia por MDR (ESBL/KPC/MRSA/Pseudomonas)</label>
-         <label><input type="checkbox" id="r_imuno"> Imunossupressão / neutropenia</label>
+         <label><input type="checkbox" id="r_atb" ${empForm.riscos.atb?'checked':''} onchange="empForm.riscos.atb=this.checked"> Uso de ATB nos últimos 90 dias</label>
+         <label><input type="checkbox" id="r_intern" ${empForm.riscos.intern?'checked':''} onchange="empForm.riscos.intern=this.checked"> Internação/UTI recente ou atual prolongada</label>
+         <label><input type="checkbox" id="r_disp" ${empForm.riscos.disp?'checked':''} onchange="empForm.riscos.disp=this.checked"> Dispositivo invasivo (cateter, sonda, VM)</label>
+         <label><input type="checkbox" id="r_col" ${empForm.riscos.col?'checked':''} onchange="empForm.riscos.col=this.checked"> Colonização/infecção prévia por MDR (ESBL/KPC/MRSA/Pseudomonas)</label>
+         <label><input type="checkbox" id="r_imuno" ${empForm.riscos.imuno?'checked':''} onchange="empForm.riscos.imuno=this.checked"> Imunossupressão / neutropenia</label>
        </div></div>
      <div class="field"><label>Antibióticos já em uso (toque para adicionar — para escalonar/trocar)</label>
        <div class="suggs" id="usadosChips">${PREV_ATBS.map((a,i)=>`<button type="button" class="sugg ${empForm.usados.includes(a)?'on':''}" onclick="toggleUsado(${i})">${esc(a)}</button>`).join('')}</div>
@@ -951,11 +952,13 @@ function setEmp(k,v){empForm[k]=v;renderEmpirico();}
 async function sugerirEmpirico(){
   const foco=FOCOS.find(f=>f.id===empForm.foco)||FOCOS[0];
   const riscos=[];
-  if(document.getElementById('r_atb').checked)riscos.push('ATB nos últimos 90 dias');
-  if(document.getElementById('r_intern').checked)riscos.push('internação/UTI recente');
-  if(document.getElementById('r_disp').checked)riscos.push('dispositivo invasivo');
-  if(document.getElementById('r_col').checked)riscos.push('colonização/infecção prévia por MDR');
-  if(document.getElementById('r_imuno').checked)riscos.push('imunossupressão/neutropenia');
+  // le do estado (empForm.riscos), nao do DOM — os checkboxes resetavam a cada
+  // re-render e a IA podia subcobrir ESBL/KPC/MRSA/Pseudomonas
+  if(empForm.riscos.atb)riscos.push('ATB nos últimos 90 dias');
+  if(empForm.riscos.intern)riscos.push('internação/UTI recente');
+  if(empForm.riscos.disp)riscos.push('dispositivo invasivo');
+  if(empForm.riscos.col)riscos.push('colonização/infecção prévia por MDR');
+  if(empForm.riscos.imuno)riscos.push('imunossupressão/neutropenia');
   const txtDet=(document.getElementById('empUsadosTxt').value||'').trim();
   const usadosSel=empForm.usados.slice();
   const usados=(usadosSel.length?usadosSel.join(', '):'')+(txtDet?(usadosSel.length?'; ':'')+txtDet:'');
