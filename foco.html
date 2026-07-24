@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0A0E14">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
@@ -457,7 +457,7 @@ let tasks=[], events=[], notes=[];
 let curView='hoje', taskFilter='todas';
 
 const fmtDate=d=>new Date(d+'T00:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
-const todayStr=()=>{const d=new Date();return d.toISOString().slice(0,10)};
+const todayStr=()=>{const d=new Date();return new Date(d-d.getTimezoneOffset()*60000).toISOString().slice(0,10)};
 const PRIO={alta:{l:'Alta',c:'alta',o:0},media:{l:'Média',c:'media',o:1},baixa:{l:'Baixa',c:'baixa',o:2}};
 
 /* ---------- SYNC: tudo via login central MedTech (window.MT) ---------- */
