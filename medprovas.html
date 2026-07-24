@@ -2710,7 +2710,7 @@ function renderProva() {
     card.className = 'questao-gerada';
     card.innerHTML = `
       <h4>Questão ${idx + 1} ${p.anuladas[idx] ? '<span style="color:#92400e; font-size:0.85em;">(ANULADA)</span>' : ''}</h4>
-      <textarea class="enunciado-edit" style="width:100%; min-height:0; padding:12px; line-height:1.55; font-size:0.97em; overflow:hidden; resize:vertical;">${q.enunciado}</textarea>
+      <textarea class="enunciado-edit" style="width:100%; min-height:0; padding:12px; line-height:1.55; font-size:0.97em; overflow:hidden; resize:vertical;">${escapeHtml(q.enunciado || '')}</textarea>
       <div class="alternativas" style="margin-top:10px;">
         ${['A','B','C','D'].map(letra => `
           <div class="questao-alt ${q.gabarito === letra ? 'gabarito' : ''}" data-letra="${letra}" onclick="alterarGabarito('${p.id}', ${idx}, '${letra}')" style="align-items:flex-start;">
