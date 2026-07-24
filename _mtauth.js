@@ -27,6 +27,40 @@ const MT = {
   localGet() { try { return JSON.parse(localStorage.getItem(lsKeyFor(MT._uid))); } catch (e) { return null; } },
   localSet(d) { try { localStorage.setItem(lsKeyFor(MT._uid), JSON.stringify(d)); } catch (e) {} },
 
+  /* ---------- Merge por-entidade entre aparelhos (anti last-write-wins) ----------
+     O app registra MT.mergeFn e passa as coleções (arrays de {id, updatedAt}).
+     - Adições nunca se perdem (união por id).
+     - Edição concorrente do MESMO id: vence o updatedAt maior (last-edit-wins por entidade).
+     - Deleção via tombstone: state._tomb = {id: tsMs}. Um item é removido se
+       _tomb[id] >= item.updatedAt, e o _tomb propaga a deleção p/ os outros aparelhos.
+     Requisitos no app: carimbar item.updatedAt = Date.now() ao criar/editar; ao apagar,
+     registrar (state._tomb = state._tomb||{})[id] = Date.now(). Escalares seguem o
+     aparelho que está salvando. Ver [[reference-granae-perda-dados-merge]]. */
+  markDeleted(state, id) { if (!state) return state; (state._tomb = state._tomb || {})[id] = Date.now(); return state; },
+  mergeState(remote, local, collections) {
+    if (!remote || typeof remote !== 'object') return local;
+    if (!local || typeof local !== 'object') return remote;
+    const out = Object.assign({}, local);
+    const tomb = Object.assign({}, remote._tomb || {});
+    const lt = local._tomb || {};
+    for (const id in lt) { if (!(id in tomb) || lt[id] > tomb[id]) tomb[id] = lt[id]; }
+    (collections || []).forEach(key => {
+      const R = Array.isArray(remote[key]) ? remote[key] : [];
+      const L = Array.isArray(local[key]) ? local[key] : [];
+      const byId = new Map();
+      const consider = it => {
+        if (!it || it.id == null) return;
+        const prev = byId.get(it.id);
+        if (!prev) { byId.set(it.id, it); return; }
+        if ((+it.updatedAt || 0) >= (+prev.updatedAt || 0)) byId.set(it.id, it);
+      };
+      R.forEach(consider); L.forEach(consider);
+      out[key] = [...byId.values()].filter(x => !(x.id in tomb && tomb[x.id] >= (+x.updatedAt || 0)));
+    });
+    out._tomb = tomb;
+    return out;
+  },
+
   /* ---------- Assinatura do ecossistema (Kiwify central) ----------
      SUBS_ENFORCE=false → NADA muda para os usuários (retorna active provisional).
      Quando o produto Kiwify existir: trocar KIWIFY_CHECKOUT_URL, SUBS_ENFORCE=true

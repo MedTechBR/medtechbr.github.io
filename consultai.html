@@ -19,7 +19,7 @@
 <meta name="apple-mobile-web-app-title" content="ConsultAI">
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"agendaai",name:"ConsultAI"};</script>
-<script type="module" src="_mtauth.js?v=12"></script>
+<script type="module" src="_mtauth.js?v=13"></script>
 <style>
 :root{--petrol:#4C8DFF;--petrol-dark:#2f6ae0;--ink:#E7EEF7;--mint:#4C8DFF;--mint-dark:#2f6ae0;--bg:#0A0E14;--soft:rgba(76,141,255,.12);--line:rgba(88,166,255,.12);--muted:#8A98AC;--green:#3FB950;--green-bg:rgba(63,185,80,.12);--amber:#E3B341;--amber-bg:rgba(227,179,65,.12);--red:#F85149;--red-bg:rgba(248,81,73,.12);--blue:#4C8DFF;--blue-bg:rgba(76,141,255,.12);--violet:#a78bfa;--violet-bg:rgba(167,139,250,.14);--wa:#25D366;--surface:#111823;--card:#111823;--panel2:#0E141D;--line-strong:rgba(140,160,185,.16);--dim:#7E8EA6;--teal:#38E1C6;--glow:rgba(76,141,255,.42);--disp:'Space Grotesk',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
 /* ===== Início (dashboard) ===== */
@@ -479,10 +479,10 @@ function normalize(d){d=d&&typeof d==='object'?d:{};
  cfg.agenda=Object.assign({ini:'07:00',fim:'19:00',slot:30,dias:[1,2,3,4,5,6]},cfg.agenda||{});
  if(!Array.isArray(cfg.agenda.dias)||!cfg.agenda.dias.length)cfg.agenda.dias=[1,2,3,4,5,6];
  return {patients:d.patients||[],appts:d.appts||[],records:d.records||[],prescriptions:d.prescriptions||[],documentos:d.documentos||[],docs:d.docs||[],labs:d.labs||[],modelos:d.modelos||[],
-   cfg,migratedEvoluai:!!d.migratedEvoluai};}
+   cfg,migratedEvoluai:!!d.migratedEvoluai,_tomb:(d._tomb&&typeof d._tomb==='object')?d._tomb:{}};}
 
 function whenMT(cb){if(window.MT){cb();}else{setTimeout(()=>whenMT(cb),30);}}
-whenMT(()=>{MT.onData(d=>{
+whenMT(()=>{MT.mergeFn=(r,l)=>MT.mergeState(r,l,['patients','records','prescriptions','documentos','appts','labs','modelos']);MT.onData(d=>{
   if(d&&typeof d==='object'&&(d.patients||d.appts||d.records||d.cfg)){state=normalize(d);}
   else{state=normalize((MT.mode==='demo')?sampleSeed():null);if(MT.mode==='demo')MT.save(state);}
   renderUser();render();
@@ -758,7 +758,7 @@ function renderSearchList(){
   box.innerHTML=html;
 }
 function cycleStatus(id){const a=state.appts.find(x=>x.id===id);const i=SORDER.indexOf(a.status);a.status=SORDER[(i+1)%SORDER.length];persist();render();}
-function del(id){if(confirm('Excluir esta consulta?')){state.appts=state.appts.filter(x=>x.id!==id);persist();render();}}
+function del(id){if(confirm('Excluir esta consulta?')){MT.markDeleted(state,id);state.appts=state.appts.filter(x=>x.id!==id);persist();render();}}
 
 /* form de consulta (com vínculo a paciente) */
 function openForm(id,prefillPacId,prefill){
@@ -787,6 +787,7 @@ function saveForm(id){
   const p=state.patients.find(x=>x.nome.trim().toLowerCase()===nome.toLowerCase());
   const o={date:document.getElementById('f_date').value,time:document.getElementById('f_time').value||'08:00',dur:parseInt(document.getElementById('f_dur').value)||30,pacId:p?p.id:null,pac:p?'':nome,fone:document.getElementById('f_fone').value.trim(),type:document.getElementById('f_type').value,status:document.getElementById('f_status').value,obs:document.getElementById('f_obs').value.trim()};
   if(!o.date){alert('Informe a data.');return;}
+  o.updatedAt=Date.now();
   if(id){const _a=state.appts.find(x=>x.id===id);if(_a){Object.assign(_a,o);}else{state.appts.push({id,...o});}}else{state.appts.push({id:uid(),...o});}
   persist();closeModal();
   if(view==='agenda'&&aTab==='dia')cur=new Date(o.date+'T00:00:00');
@@ -844,6 +845,7 @@ function savePac(id){
   const nome=document.getElementById('p_nome').value.trim();
   if(!nome){alert('Informe o nome do paciente.');return;}
   const o={nome,nasc:document.getElementById('p_nasc').value,sexo:document.getElementById('p_sexo').value,cpf:document.getElementById('p_cpf').value.trim(),fone:document.getElementById('p_fone').value.trim(),email:document.getElementById('p_email').value.trim(),convenio:document.getElementById('p_conv').value.trim(),endereco:document.getElementById('p_end').value.trim(),alergias:document.getElementById('p_alg').value.trim(),problemas:document.getElementById('p_prob').value.trim(),meds:document.getElementById('p_meds').value.trim(),obs:document.getElementById('p_obs').value.trim()};
+  o.updatedAt=Date.now();
   if(id){const _pt=patientById(id);if(_pt){Object.assign(_pt,o);}else{state.patients.push({id,criadoEm:nowISO(),...o});}}else{const np={id:uid(),criadoEm:nowISO(),...o};state.patients.push(np);id=np.id;}
   persist();closeModal();
   if(view==='paciente'){renderPaciente();}else{openPac(id);}
@@ -851,6 +853,8 @@ function savePac(id){
 function delPac(id){const p=patientById(id);if(!p)return;
   const nev=state.records.filter(r=>r.pacId===id).length,nrx=state.prescriptions.filter(r=>r.pacId===id).length;
   if(!confirm(`Excluir ${p.nome} e seus ${nev} prontuário(s) e ${nrx} receituário(s)? As consultas ficam na agenda sem vínculo.`))return;
+  const _rid=state.records.filter(r=>r.pacId===id).map(r=>r.id),_pid=state.prescriptions.filter(r=>r.pacId===id).map(r=>r.id);
+  MT.markDeleted(state,id);_rid.forEach(x=>MT.markDeleted(state,x));_pid.forEach(x=>MT.markDeleted(state,x));
   state.patients=state.patients.filter(x=>x.id!==id);
   state.records=state.records.filter(r=>r.pacId!==id);
   state.prescriptions=state.prescriptions.filter(r=>r.pacId!==id);
@@ -958,8 +962,8 @@ function renderPBody(){
   }
 }
 function copyRec(id){const r=state.records.find(x=>x.id===id);if(r&&navigator.clipboard)navigator.clipboard.writeText(r.texto);}
-function delRec(id){if(confirm('Excluir esta evolução do prontuário?')){state.records=state.records.filter(x=>x.id!==id);persist();renderPBody();}}
-function delRx(id){if(confirm('Excluir este receituário?')){state.prescriptions=state.prescriptions.filter(x=>x.id!==id);persist();renderPBody();}}
+function delRec(id){if(confirm('Excluir esta evolução do prontuário?')){MT.markDeleted(state,id);state.records=state.records.filter(x=>x.id!==id);persist();renderPBody();}}
+function delRx(id){if(confirm('Excluir este receituário?')){MT.markDeleted(state,id);state.prescriptions=state.prescriptions.filter(x=>x.id!==id);persist();renderPBody();}}
 
 /* ===== EXAMES (curva/gráfico) ===== */
 function dm(s){const d=new Date((s&&String(s).length<=10?s+'T00:00:00':s));if(isNaN(d))return esc(String(s||''));return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');}
@@ -987,10 +991,10 @@ function addLab(){
   if(isNaN(val)){alert('Informe um valor numérico.');return;}
   const unidade=(document.getElementById('lab_un').value||'').trim();
   const date=document.getElementById('lab_data').value||ymd(new Date());
-  state.labs.push({id:uid(),pacId:curPac,date,nome,valor:val,unidade});
+  state.labs.push({id:uid(),pacId:curPac,date,nome,valor:val,unidade,updatedAt:Date.now()});
   persist();renderPBody();
 }
-function delLab(id){if(confirm('Excluir este valor?')){state.labs=state.labs.filter(x=>x.id!==id);persist();renderPBody();}}
+function delLab(id){if(confirm('Excluir este valor?')){MT.markDeleted(state,id);state.labs=state.labs.filter(x=>x.id!==id);persist();renderPBody();}}
 
 /* ===== EVOLUÇÃO (editor + IA + voz) ===== */
 function openEvol(id){
@@ -1049,8 +1053,8 @@ function saveEvol(id){
   const tipoAtend=(document.getElementById('e_atend')||{}).value||'';
   let titulo=document.getElementById('e_titulo').value.trim();
   if(!titulo){titulo=(texto.split('\n').map(s=>s.trim()).find(s=>s)||'Evolução').replace(/^[#*•\-\s]+/,'').slice(0,60);}
-  if(id){const _r=state.records.find(x=>x.id===id);if(_r){Object.assign(_r,{tipo,tipoAtend,titulo,texto});}else{const rec={id,pacId:curPac,date:nowISO(),tipo,tipoAtend,titulo,texto};if(attendApptId)rec.apptId=attendApptId;state.records.push(rec);}}
-  else{const rec={id:uid(),pacId:curPac,date:nowISO(),tipo,tipoAtend,titulo,texto};if(attendApptId)rec.apptId=attendApptId;state.records.push(rec);}
+  if(id){const _r=state.records.find(x=>x.id===id);if(_r){Object.assign(_r,{tipo,tipoAtend,titulo,texto,updatedAt:Date.now()});}else{const rec={id,pacId:curPac,date:nowISO(),tipo,tipoAtend,titulo,texto,updatedAt:Date.now()};if(attendApptId)rec.apptId=attendApptId;state.records.push(rec);}}
+  else{const rec={id:uid(),pacId:curPac,date:nowISO(),tipo,tipoAtend,titulo,texto,updatedAt:Date.now()};if(attendApptId)rec.apptId=attendApptId;state.records.push(rec);}
   if(attendApptId){const ap=state.appts.find(x=>x.id===attendApptId);if(ap)ap.status='atendido';attendApptId=null;}
   persist();closeModalMic();renderPBody();
 }
@@ -1125,8 +1129,8 @@ function saveRx2(andPrint){
   const tipo=document.getElementById('r_tipo').value;const obs=document.getElementById('r_obs').value.trim();
   const texto=itens.map(it=>it.pos?(it.nome+' — '+it.pos):it.nome).join('\n');
   let rid=rxEditId;
-  if(rxEditId){const _p=state.prescriptions.find(x=>x.id===rxEditId);if(_p){Object.assign(_p,{tipo,itens,texto,obs});}else{state.prescriptions.push({id:rxEditId,pacId:curPac,date:nowISO(),tipo,itens,texto,obs});}}
-  else{rid=uid();state.prescriptions.push({id:rid,pacId:curPac,date:nowISO(),tipo,itens,texto,obs});}
+  if(rxEditId){const _p=state.prescriptions.find(x=>x.id===rxEditId);if(_p){Object.assign(_p,{tipo,itens,texto,obs,updatedAt:Date.now()});}else{state.prescriptions.push({id:rxEditId,pacId:curPac,date:nowISO(),tipo,itens,texto,obs,updatedAt:Date.now()});}}
+  else{rid=uid();state.prescriptions.push({id:rid,pacId:curPac,date:nowISO(),tipo,itens,texto,obs,updatedAt:Date.now()});}
   persist();closeModalMic();renderPBody();
   if(andPrint)printRx(rid);
 }
@@ -1135,7 +1139,7 @@ function salvarModeloRx(){
   const itens=rxItens.map(it=>({nome:(it.nome||'').trim(),pos:(it.pos||'').trim()})).filter(it=>it.nome);
   if(!itens.length){alert('Monte o receituário antes de salvar como modelo.');return;}
   const nome=prompt('Nome do modelo (ex.: Receita HAS):');if(!nome||!nome.trim())return;
-  state.modelos.push({id:uid(),tipo:'rx',nome:nome.trim(),rxTipo:document.getElementById('r_tipo').value,itens,obs:document.getElementById('r_obs').value.trim()});
+  state.modelos.push({id:uid(),tipo:'rx',updatedAt:Date.now(),nome:nome.trim(),rxTipo:document.getElementById('r_tipo').value,itens,obs:document.getElementById('r_obs').value.trim()});
   persist();alert('Modelo salvo! Aparece em "Modelos salvos" ao abrir um novo receituário.');
 }
 function aplicarModeloRx(){
@@ -1149,7 +1153,7 @@ function aplicarModeloRx(){
 function salvarModeloAtestado(){
   const texto=document.getElementById('at_texto').value.trim();if(!texto){alert('Gere ou escreva o atestado antes de salvar como modelo.');return;}
   const nome=prompt('Nome do modelo (ex.: Atestado 1 dia):');if(!nome||!nome.trim())return;
-  state.modelos.push({id:uid(),tipo:'atestado',nome:nome.trim(),subtipo:document.getElementById('at_sub').value,dias:parseInt(document.getElementById('at_dias').value)||null,cid:document.getElementById('at_cid').value.trim(),texto});
+  state.modelos.push({id:uid(),tipo:'atestado',updatedAt:Date.now(),nome:nome.trim(),subtipo:document.getElementById('at_sub').value,dias:parseInt(document.getElementById('at_dias').value)||null,cid:document.getElementById('at_cid').value.trim(),texto});
   persist();alert('Modelo salvo! Aparece em "Modelos salvos" ao abrir um novo atestado.');
 }
 function aplicarModeloAtestado(){
@@ -1161,7 +1165,7 @@ function aplicarModeloAtestado(){
   const tx=document.getElementById('at_texto');if(tx)tx.value=m.texto||'';
   atToggle();
 }
-function delModelo(id){if(confirm('Excluir este modelo?')){state.modelos=state.modelos.filter(x=>x.id!==id);persist();renderConfig();}}
+function delModelo(id){if(confirm('Excluir este modelo?')){MT.markDeleted(state,id);state.modelos=state.modelos.filter(x=>x.id!==id);persist();renderConfig();}}
 
 /* ===== impressão (A4) ===== */
 function printHTML(title,bodyHTML){
@@ -1208,7 +1212,7 @@ function printDocu(d){const p=patientById(d.pacId);
   printHTML(ttl+' — '+(p?p.nome:''),body);
 }
 function printDocu2(id){const d=state.documentos.find(x=>x.id===id);if(d)printDocu(d);}
-function delDocu(id){if(confirm('Excluir este documento?')){state.documentos=state.documentos.filter(x=>x.id!==id);persist();renderPBody();}}
+function delDocu(id){if(confirm('Excluir este documento?')){MT.markDeleted(state,id);state.documentos=state.documentos.filter(x=>x.id!==id);persist();renderPBody();}}
 /* Atestado */
 function openAtestado(id){
   const d=id?state.documentos.find(x=>x.id===id):null;
@@ -1241,7 +1245,7 @@ function atTextoFromFields(){const p=patientById(curPac)||{};const sub=document.
 function atGerar(){const ta=document.getElementById('at_texto');if(ta)ta.value=atTextoFromFields();}
 function atColetar(id){return {pacId:curPac,date:nowISO(),tipo:'atestado',subtipo:document.getElementById('at_sub').value,dias:parseInt(document.getElementById('at_dias').value)||null,dataInicio:document.getElementById('at_data').value,cid:document.getElementById('at_cid').value.trim(),texto:document.getElementById('at_texto').value.trim(),titulo:(document.getElementById('at_sub').value==='afastamento'?'Atestado de afastamento':'Atestado de comparecimento')};}
 function saveAtestado(id,andPrint){
-  const o=atColetar(id);
+  const o=atColetar(id);o.updatedAt=Date.now();
   if(!o.texto){alert('Gere ou escreva o texto do atestado.');return;}
   let rid=id;
   if(id){const _d=state.documentos.find(x=>x.id===id);if(_d){Object.assign(_d,o);}else{state.documentos.push({id,...o});}}else{rid=uid();state.documentos.push({id:rid,...o});}
@@ -1265,7 +1269,7 @@ function exColetar(id){const exames=document.getElementById('ex_lista').value.tr
   const texto=exames.split('\n').map(s=>s.trim()).filter(Boolean).map(s=>'• '+s).join('\n');
   return {pacId:curPac,date:nowISO(),tipo:'exames',exames,ind,texto,obs:ind?('Indicação clínica / hipótese diagnóstica: '+ind):'',titulo:'Solicitação de exames'};}
 function saveExames(id,andPrint){
-  const o=exColetar(id);
+  const o=exColetar(id);o.updatedAt=Date.now();
   if(!o.exames){alert('Liste ao menos um exame.');return;}
   let rid=id;
   if(id){const _d=state.documentos.find(x=>x.id===id);if(_d){Object.assign(_d,o);}else{state.documentos.push({id,...o});}}else{rid=uid();state.documentos.push({id:rid,...o});}
