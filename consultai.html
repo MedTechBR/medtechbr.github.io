@@ -677,9 +677,9 @@ function apptCard(a){const ty=TYPES[a.type]||TYPES.con;const st=STATUS[a.status]
       ${a.obs?`<div class="obs">${esc(a.obs)}</div>`:''}
     </div>
     <div class="acts">
-      <button class="btn btn-p btn-sm" onclick="atender('${a.id}')" title="Atender: gravar a consulta e gerar a evolução por IA">🎙️ Atender</button>
+      <button class="btn btn-p btn-sm" onclick="atender('${a.id}')" title="Atender: gravar a consulta e gerar a evolução por IA"><i class="ti ti-microphone"></i> Atender</button>
       <button class="btn btn-wa btn-sm" onclick="waMenu('${a.id}')">WhatsApp</button>
-      <div class="ic">${a.pacId?`<button title="Prontuário" onclick="openPac('${a.pacId}')">📋</button>`:''}<button onclick="openForm('${a.id}')">✏️</button><button onclick="del('${a.id}')">🗑️</button></div>
+      <div class="ic">${a.pacId?`<button title="Prontuário" onclick="openPac('${a.pacId}')"><i class="ti ti-clipboard"></i></button>`:''}<button onclick="openForm('${a.id}')"><i class="ti ti-pencil"></i></button><button onclick="del('${a.id}')"><i class="ti ti-trash"></i></button></div>
     </div>
   </div>`;}
 
@@ -872,11 +872,11 @@ function renderPaciente(){
       <div class="sub">${p.fone?('📱 '+esc(p.fone)+'  '):''}${p.convenio?('🏥 '+esc(p.convenio)):''}${p.cpf?('  · CPF '+esc(p.cpf)):''}</div>
     </div>
     <div class="pacts">
-      <button class="btn btn-g btn-sm" onclick="openPacForm('${p.id}')">✏️ Editar ficha</button>
-      <button class="btn btn-g btn-sm" onclick="openForm(null,'${p.id}')">📅 Agendar</button>
-      <button class="btn btn-g btn-sm" onclick="resumoPac('${p.id}')">✨ Resumo (IA)</button>
+      <button class="btn btn-g btn-sm" onclick="openPacForm('${p.id}')"><i class="ti ti-pencil"></i> Editar ficha</button>
+      <button class="btn btn-g btn-sm" onclick="openForm(null,'${p.id}')"><i class="ti ti-calendar"></i> Agendar</button>
+      <button class="btn btn-g btn-sm" onclick="resumoPac('${p.id}')"><i class="ti ti-sparkles"></i> Resumo (IA)</button>
       <button class="btn btn-wa btn-sm" onclick="waPac('${p.id}')">📱 WhatsApp</button>
-      <button class="btn btn-dn btn-sm" onclick="delPac('${p.id}')">🗑️ Excluir</button>
+      <button class="btn btn-dn btn-sm" onclick="delPac('${p.id}')"><i class="ti ti-trash"></i> Excluir</button>
     </div></div>
     <div class="pinfo">
       ${p.alergias?`<div class="ib alerta"><div class="il">⚠ Alergias</div>${esc(p.alergias)}</div>`:`<div class="ib"><div class="il">Alergias</div>Nenhuma registrada</div>`}
@@ -886,11 +886,11 @@ function renderPaciente(){
     </div>
   </div>
   <div class="subtabs">
-    <button class="${pTab==='evol'?'on':''}" onclick="setPTab('evol')">📋 Evoluções</button>
+    <button class="${pTab==='evol'?'on':''}" onclick="setPTab('evol')"><i class="ti ti-clipboard"></i> Evoluções</button>
     <button class="${pTab==='rx'?'on':''}" onclick="setPTab('rx')">💊 Receituários</button>
-    <button class="${pTab==='docs'?'on':''}" onclick="setPTab('docs')">📄 Documentos</button>
+    <button class="${pTab==='docs'?'on':''}" onclick="setPTab('docs')"><i class="ti ti-file-text"></i> Documentos</button>
     <button class="${pTab==='labs'?'on':''}" onclick="setPTab('labs')">📈 Exames</button>
-    <button class="${pTab==='cons'?'on':''}" onclick="setPTab('cons')">📅 Consultas</button>
+    <button class="${pTab==='cons'?'on':''}" onclick="setPTab('cons')"><i class="ti ti-calendar"></i> Consultas</button>
   </div><div id="pbody"></div>`;
   document.getElementById('view').innerHTML=head;
   renderPBody();
@@ -905,7 +905,7 @@ function renderPBody(){
     h+=recs.length?recs.map(r=>{const f=REC_FMT[r.tipo]||REC_FMT.evolucao;
       return `<div class="rec"><div class="rh"><div class="rt">${r.tipoAtend&&ATEND_TIPOS[r.tipoAtend]?`<span class="chip">${ATEND_TIPOS[r.tipoAtend]}</span> `:''}<span class="chip">${f.l}</span> ${esc(r.titulo||'Evolução')}</div><div class="rd">${fmtDT(r.date)}</div></div>
         <div class="rbody">${esc(r.texto)}</div>
-        <div class="racts"><button onclick="openEvol('${r.id}')">✏️ Editar</button><button onclick="printEvol('${r.id}')">🖨️ Imprimir</button><button onclick="copyRec('${r.id}')">📋 Copiar</button><button onclick="delRec('${r.id}')">🗑️ Excluir</button></div></div>`;
+        <div class="racts"><button onclick="openEvol('${r.id}')"><i class="ti ti-pencil"></i> Editar</button><button onclick="printEvol('${r.id}')"><i class="ti ti-printer"></i> Imprimir</button><button onclick="copyRec('${r.id}')"><i class="ti ti-clipboard"></i> Copiar</button><button onclick="delRec('${r.id}')"><i class="ti ti-trash"></i> Excluir</button></div></div>`;
     }).join(''):'<div class="empty">Nenhuma evolução registrada.<br>Toque em <b>+ Nova evolução</b> (pode ditar por voz e a IA estrutura em SOAP).</div>';
     box.innerHTML=h;
   } else if(pTab==='rx'){
@@ -913,7 +913,7 @@ function renderPBody(){
     let h=`<div class="bar"><div></div><div class="right"><button class="btn btn-p btn-sm" onclick="openRx()">+ Novo receituário</button></div></div>`;
     h+=rxs.length?rxs.map(r=>`<div class="rec"><div class="rh"><div class="rt"><span class="chip">${r.tipo==='especial'?'Controle especial':'Receituário'}</span></div><div class="rd">${fmtDT(r.date)}</div></div>
         <div class="rbody">${esc(r.texto)}</div>${r.obs?`<div class="rbody" style="color:var(--muted);font-size:13px">Obs.: ${esc(r.obs)}</div>`:''}
-        <div class="racts"><button onclick="printRx('${r.id}')">🖨️ Imprimir</button><button onclick="waRx('${r.id}')">📱 WhatsApp</button><button onclick="openRx('${r.id}')">✏️ Editar</button><button onclick="delRx('${r.id}')">🗑️ Excluir</button></div></div>`).join('')
+        <div class="racts"><button onclick="printRx('${r.id}')"><i class="ti ti-printer"></i> Imprimir</button><button onclick="waRx('${r.id}')">📱 WhatsApp</button><button onclick="openRx('${r.id}')"><i class="ti ti-pencil"></i> Editar</button><button onclick="delRx('${r.id}')"><i class="ti ti-trash"></i> Excluir</button></div></div>`).join('')
       :'<div class="empty">Nenhum receituário emitido.<br>Toque em <b>+ Novo receituário</b> (busque o medicamento e a posologia vem pronta; depois imprima).</div>';
     box.innerHTML=h;
   } else if(pTab==='docs'){
@@ -921,7 +921,7 @@ function renderPBody(){
     let h=`<div class="bar"><div></div><div class="right"><button class="btn btn-p btn-sm" onclick="openAtestado()">+ Atestado</button><button class="btn btn-p btn-sm" onclick="openExames()">+ Solicitação de exames</button></div></div>`;
     h+=docs.length?docs.map(r=>`<div class="rec"><div class="rh"><div class="rt"><span class="chip">${r.tipo==='atestado'?'Atestado':'Exames'}</span> ${esc(r.titulo||'')}</div><div class="rd">${fmtDT(r.date)}</div></div>
         <div class="rbody">${esc(r.texto)}${r.obs?('\n\n'+esc(r.obs)):''}</div>
-        <div class="racts"><button onclick="printDocu2('${r.id}')">🖨️ Imprimir</button><button onclick="waDocu('${r.id}')">📱 WhatsApp</button><button onclick="${r.tipo==='atestado'?`openAtestado('${r.id}')`:`openExames('${r.id}')`}">✏️ Editar</button><button onclick="delDocu('${r.id}')">🗑️ Excluir</button></div></div>`).join('')
+        <div class="racts"><button onclick="printDocu2('${r.id}')"><i class="ti ti-printer"></i> Imprimir</button><button onclick="waDocu('${r.id}')">📱 WhatsApp</button><button onclick="${r.tipo==='atestado'?`openAtestado('${r.id}')`:`openExames('${r.id}')`}"><i class="ti ti-pencil"></i> Editar</button><button onclick="delDocu('${r.id}')"><i class="ti ti-trash"></i> Excluir</button></div></div>`).join('')
       :'<div class="empty">Nenhum atestado ou solicitação de exames.<br>Use <b>+ Atestado</b> ou <b>+ Solicitação de exames</b> acima.</div>';
     box.innerHTML=h;
   } else if(pTab==='labs'){
@@ -1005,15 +1005,15 @@ function openEvol(id){
     <div class="field"><label>Título (opcional)</label><input id="e_titulo" value="${esc(r.titulo||'')}" placeholder="Ex.: Retorno cardiologia"></div></div>
    <div class="hint" style="margin:-4px 0 8px"><b>Primeira</b>: anamnese completa · <b>Retorno</b>: usa a evolução anterior + foco no intervalo · <b>Nova</b>: aproveita comorbidades/medicações já cadastradas.</div>
    <div class="field"><label>Gravação / ditado</label>
-     <div class="toolbar"><button class="btn btn-mic btn-sm" id="recBtn" onclick="toggleConsulta()">🔴 Gravar consulta</button><button class="btn btn-mic btn-sm" id="micBtn" onclick="toggleMic('e_raw')">🎤 Ditar</button><span id="liveTag"></span>
+     <div class="toolbar"><button class="btn btn-mic btn-sm" id="recBtn" onclick="toggleConsulta()">🔴 Gravar consulta</button><button class="btn btn-mic btn-sm" id="micBtn" onclick="toggleMic('e_raw')"><i class="ti ti-microphone"></i> Ditar</button><span id="liveTag"></span>
        <button class="btn btn-g btn-sm" onclick="if(confirm('Limpar o rascunho?'))document.getElementById('e_raw').value='';">Limpar</button>
-       <button class="btn btn-p btn-sm" id="aiBtn" onclick="genEvol()">✨ Estruturar com IA</button></div>
+       <button class="btn btn-p btn-sm" id="aiBtn" onclick="genEvol()"><i class="ti ti-sparkles"></i> Estruturar com IA</button></div>
      <textarea id="e_raw" placeholder="🔴 Gravar consulta: grave o atendimento inteiro — ao parar, a IA gera a evolução automaticamente. Ou 🎤 Ditar / digitar o caso."></textarea>
      <div class="hint"><b>Gravar consulta</b> grava o áudio do atendimento inteiro; ao parar, a IA transcreve e gera a evolução (leva alguns segundos). Precisa de conta MedTech e microfone — grave com o consentimento do paciente. <b>Ditar</b> faz transcrição rápida ao vivo no navegador.</div>
    </div>
    <div class="field"><label>Texto da evolução (revise antes de salvar)</label><textarea id="e_out" style="min-height:160px" placeholder="O texto estruturado aparece aqui. Você pode editar livremente.">${esc(r.texto||'')}</textarea></div>
    <div class="hint">⚠️ A IA é apoio e não inventa dados. Revise sempre antes de salvar/assinar.${MT.mode==='demo'?' <b>Entre na conta MedTech para usar a IA.</b>':''}</div>
-   <div class="row"><button class="btn btn-p" onclick="saveEvol('${id||''}')">💾 Salvar no prontuário</button><button class="btn btn-g" onclick="emitirDoc('rx','${id||''}')">💊 Receituário</button><button class="btn btn-g" onclick="emitirDoc('atestado','${id||''}')">📄 Atestado</button><button class="btn btn-g" onclick="closeModalMic()">Cancelar</button></div></div>`);
+   <div class="row"><button class="btn btn-p" onclick="saveEvol('${id||''}')"><i class="ti ti-device-floppy"></i> Salvar no prontuário</button><button class="btn btn-g" onclick="emitirDoc('rx','${id||''}')">💊 Receituário</button><button class="btn btn-g" onclick="emitirDoc('atestado','${id||''}')"><i class="ti ti-file-text"></i> Atestado</button><button class="btn btn-g" onclick="closeModalMic()">Cancelar</button></div></div>`);
 }
 function encounterCtx(tipo){
   const p=patientById(curPac)||{};
@@ -1082,7 +1082,7 @@ function openRx(id){
    </div>
    <div id="r_itens"></div>
    <div class="field" style="margin-top:10px"><label>Orientações / observações (opcional)</label><textarea id="r_obs" placeholder="Ex.: retorno em 7 dias, repouso...">${esc(obs)}</textarea></div>
-   <div class="row"><button class="btn btn-p" onclick="saveRx2(false)">💾 Salvar</button><button class="btn btn-p" onclick="saveRx2(true)">💾 Salvar e imprimir</button><button class="btn btn-g" onclick="printRxDraft()">🖨️ Imprimir</button><button class="btn btn-g" onclick="salvarModeloRx()">⭐ Salvar modelo</button><button class="btn btn-g" onclick="closeModalMic()">Cancelar</button></div></div>`);
+   <div class="row"><button class="btn btn-p" onclick="saveRx2(false)"><i class="ti ti-device-floppy"></i> Salvar</button><button class="btn btn-p" onclick="saveRx2(true)"><i class="ti ti-device-floppy"></i> Salvar e imprimir</button><button class="btn btn-g" onclick="printRxDraft()"><i class="ti ti-printer"></i> Imprimir</button><button class="btn btn-g" onclick="salvarModeloRx()">⭐ Salvar modelo</button><button class="btn btn-g" onclick="closeModalMic()">Cancelar</button></div></div>`);
   renderRxItens();
 }
 function rxSug(q){
@@ -1215,10 +1215,10 @@ function openAtestado(id){
      <div class="field" id="at_diasWrap"><label>Dias de afastamento</label><input id="at_dias" type="number" min="1" value="${dias}" onchange="atGerar()"></div></div>
    <div class="two"><div class="field"><label>Data de início</label><input id="at_data" type="date" value="${dataI}" onchange="atGerar()"></div>
      <div class="field"><label>CID-10 (opcional)</label><input id="at_cid" value="${esc(cid)}" placeholder="Ex.: J11" onchange="atGerar()"></div></div>
-   <div class="field"><label>Texto do atestado <button class="btn btn-g btn-sm" style="float:right;margin-top:-3px" onclick="atGerar()">↻ Gerar a partir dos campos</button></label>
+   <div class="field"><label>Texto do atestado <button class="btn btn-g btn-sm" style="float:right;margin-top:-3px" onclick="atGerar()"><i class="ti ti-refresh"></i> Gerar a partir dos campos</button></label>
      <textarea id="at_texto" style="min-height:120px" placeholder="O texto é gerado a partir dos campos — edite livremente.">${esc(texto)}</textarea>
      <div class="hint">O CID-10 é opcional e só deve constar com autorização do paciente.</div></div>
-   <div class="row"><button class="btn btn-p" onclick="saveAtestado('${id||''}',false)">💾 Salvar</button><button class="btn btn-p" onclick="saveAtestado('${id||''}',true)">💾 Salvar e imprimir</button><button class="btn btn-g" onclick="atImprimir()">🖨️ Imprimir</button><button class="btn btn-g" onclick="salvarModeloAtestado()">⭐ Salvar modelo</button><button class="btn btn-g" onclick="closeModalMic()">Cancelar</button></div></div>`);
+   <div class="row"><button class="btn btn-p" onclick="saveAtestado('${id||''}',false)"><i class="ti ti-device-floppy"></i> Salvar</button><button class="btn btn-p" onclick="saveAtestado('${id||''}',true)"><i class="ti ti-device-floppy"></i> Salvar e imprimir</button><button class="btn btn-g" onclick="atImprimir()"><i class="ti ti-printer"></i> Imprimir</button><button class="btn btn-g" onclick="salvarModeloAtestado()">⭐ Salvar modelo</button><button class="btn btn-g" onclick="closeModalMic()">Cancelar</button></div></div>`);
   atToggle(); if(!texto)atGerar();
 }
 function atToggle(){const s=document.getElementById('at_sub');const w=document.getElementById('at_diasWrap');if(s&&w)w.style.display=(s.value==='afastamento')?'':'none';}
@@ -1250,7 +1250,7 @@ function openExames(id){
    <div class="field"><label>Exames mais pedidos</label><div class="wa-tpls">${EXAMES_COMUNS.map(e=>`<button onclick="exAdd('${e.replace(/'/g,'')}')">+ ${e}</button>`).join('')}</div></div>
    <div class="field"><label>Exames solicitados (um por linha)</label><textarea id="ex_lista" style="min-height:140px" placeholder="Ex.: Hemograma completo&#10;Glicemia de jejum&#10;TSH, T4 livre">${esc(exames)}</textarea></div>
    <div class="field"><label>Indicação clínica / hipótese diagnóstica (opcional)</label><textarea id="ex_ind" placeholder="Ex.: investigação de fadiga; HAS em acompanhamento">${esc(ind)}</textarea></div>
-   <div class="row"><button class="btn btn-p" onclick="saveExames('${id||''}',false)">💾 Salvar</button><button class="btn btn-p" onclick="saveExames('${id||''}',true)">💾 Salvar e imprimir</button><button class="btn btn-g" onclick="exImprimir()">🖨️ Imprimir</button><button class="btn btn-g" onclick="closeModalMic()">Cancelar</button></div></div>`);
+   <div class="row"><button class="btn btn-p" onclick="saveExames('${id||''}',false)"><i class="ti ti-device-floppy"></i> Salvar</button><button class="btn btn-p" onclick="saveExames('${id||''}',true)"><i class="ti ti-device-floppy"></i> Salvar e imprimir</button><button class="btn btn-g" onclick="exImprimir()"><i class="ti ti-printer"></i> Imprimir</button><button class="btn btn-g" onclick="closeModalMic()">Cancelar</button></div></div>`);
 }
 function exAdd(e){const ta=document.getElementById('ex_lista');if(!ta)return;const c=ta.value.trim();ta.value=(c?c+'\n':'')+e;ta.focus();}
 function exColetar(id){const exames=document.getElementById('ex_lista').value.trim();const ind=document.getElementById('ex_ind').value.trim();
@@ -1336,11 +1336,11 @@ function renderConfig(){const c=state.cfg;const ag=c.agenda||{ini:'07:00',fim:'1
   if(state.docs&&state.docs.length){
     docsHtml=`<div class="phead" style="margin-top:14px"><h2 style="font-size:16px;margin-bottom:4px">Documentos importados do EvoluAI (${state.docs.length})</h2>
     <div class="sub" style="color:var(--muted);font-size:13px;margin-bottom:10px">Histórico migrado do app anterior. Abra para copiar e, se quiser, cole no prontuário do paciente.</div>`+
-    state.docs.map((d,i)=>`<div class="rec"><div class="rh"><div class="rt">${esc(d.title||'Documento')}</div><div class="rd">${d.date?fmtDT(d.date):''}</div></div><div class="rbody">${esc(d.out||'')}</div><div class="racts"><button onclick="copyDoc(${i})">📋 Copiar</button><button onclick="delDoc(${i})">🗑️ Excluir</button></div></div>`).join('')+`</div>`;
+    state.docs.map((d,i)=>`<div class="rec"><div class="rh"><div class="rt">${esc(d.title||'Documento')}</div><div class="rd">${d.date?fmtDT(d.date):''}</div></div><div class="rbody">${esc(d.out||'')}</div><div class="racts"><button onclick="copyDoc(${i})"><i class="ti ti-clipboard"></i> Copiar</button><button onclick="delDoc(${i})"><i class="ti ti-trash"></i> Excluir</button></div></div>`).join('')+`</div>`;
   }
   let modHtml='';
   if(state.modelos&&state.modelos.length){
-    modHtml=`<div class="phead" style="margin-top:14px"><h2 style="font-size:16px;margin-bottom:4px">⭐ Modelos salvos (${state.modelos.length})</h2><div class="sub" style="color:var(--muted);font-size:13px;margin-bottom:10px">Receitas e atestados reutilizáveis — aplique ao criar um receituário/atestado.</div>`+state.modelos.map(m=>`<div class="rec"><div class="rh"><div class="rt"><span class="chip">${m.tipo==='rx'?'Receita':'Atestado'}</span> ${esc(m.nome)}</div><div class="racts"><button onclick="delModelo('${m.id}')">🗑️ Excluir</button></div></div></div>`).join('')+`</div>`;
+    modHtml=`<div class="phead" style="margin-top:14px"><h2 style="font-size:16px;margin-bottom:4px">⭐ Modelos salvos (${state.modelos.length})</h2><div class="sub" style="color:var(--muted);font-size:13px;margin-bottom:10px">Receitas e atestados reutilizáveis — aplique ao criar um receituário/atestado.</div>`+state.modelos.map(m=>`<div class="rec"><div class="rh"><div class="rt"><span class="chip">${m.tipo==='rx'?'Receita':'Atestado'}</span> ${esc(m.nome)}</div><div class="racts"><button onclick="delModelo('${m.id}')"><i class="ti ti-trash"></i> Excluir</button></div></div></div>`).join('')+`</div>`;
   }
   document.getElementById('view').innerHTML=`
    <div class="phead"><h2 style="font-size:17px;margin-bottom:4px">Dados do profissional / clínica</h2>
@@ -1353,11 +1353,11 @@ function renderConfig(){const c=state.cfg;const ag=c.agenda||{ini:'07:00',fim:'1
    <div class="two"><div class="field"><label>Endereço</label><input id="c_end" value="${esc(c.endereco)}" placeholder="Rua, nº — cidade"></div>
     <div class="field"><label>Telefone</label><input id="c_tel" value="${esc(c.telefone)}" placeholder="(11) 3333-3333"></div></div>
    <div class="hint">Nome, CRM, RQE e especialidade saem em <b>todos</b> os documentos. Endereço e telefone saem no <b>receituário de controle especial</b>.</div></div>
-   <div class="phead" style="margin-top:14px"><h2 style="font-size:17px;margin-bottom:4px">🖼️ Personalização dos documentos</h2>
+   <div class="phead" style="margin-top:14px"><h2 style="font-size:17px;margin-bottom:4px"><i class="ti ti-photo"></i> Personalização dos documentos</h2>
    <div class="sub" style="color:var(--muted);font-size:13px;margin-bottom:14px">Logomarca no cabeçalho e rodapé personalizado dos receituários, atestados e demais impressos.</div>
    <div class="two"><div class="field"><label>Logomarca (PNG/JPG)</label><input type="file" id="c_logofile" accept="image/*" onchange="loadLogo(this)"><input type="hidden" id="c_logo" value="${esc(c.logo||'')}"><div id="logoPrev" style="margin-top:8px">${c.logo?`<img src="${c.logo}" style="max-height:56px;max-width:170px;border:1px solid var(--line);border-radius:8px;padding:4px;background:#fff"> <button class="btn btn-g btn-sm" onclick="clearLogo()">Remover</button>`:''}</div></div>
     <div class="field"><label>Rodapé personalizado</label><input id="c_rodape" value="${esc(c.rodape||'')}" placeholder="Ex.: Clínica Vida · Rua X, 123 · (11) 3333-3333"><div class="hint">Substitui o rodapé padrão nos documentos impressos.</div></div></div></div>
-   <div class="phead" style="margin-top:14px"><h2 style="font-size:17px;margin-bottom:4px">📅 Modelo de agenda</h2>
+   <div class="phead" style="margin-top:14px"><h2 style="font-size:17px;margin-bottom:4px"><i class="ti ti-calendar"></i> Modelo de agenda</h2>
    <div class="sub" style="color:var(--muted);font-size:13px;margin-bottom:14px">Define a faixa de horários e a grade da visão <b>Semana</b>, além da duração padrão das novas consultas.</div>
    <div class="three"><div class="field"><label>Início do atendimento</label><input id="ag_ini" type="time" value="${esc(ag.ini)}"></div>
     <div class="field"><label>Fim do atendimento</label><input id="ag_fim" type="time" value="${esc(ag.fim)}"></div>
