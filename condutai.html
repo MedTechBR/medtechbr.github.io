@@ -1302,7 +1302,7 @@ main, #main { display: block !important; height: auto !important; overflow: visi
       <div id="vm_calc_res" class="alert alert-info" style="margin:12px 0"><span>🧮</span><div>Peso predito: — · VC alvo: — · P/F: —</div></div>
       <p style="font-size:12px;color:var(--text-soft);margin:-4px 0 14px">Peso predito (ARDSNet): H=50+0,91×(alt−152,4); M=45,5+0,91×(alt−152,4). VC protetor = 6 mL/kg. P/F (Berlim, PEEP≥5): ≤300 leve · ≤200 moderada · ≤100 grave.</p>
 
-      <details class="wb-acc" open><summary>⚙ Modos e parâmetros iniciais</summary><div class="wb-acc-body">
+      <details class="wb-acc" open><summary><i class="ti ti-settings"></i> Modos e parâmetros iniciais</summary><div class="wb-acc-body">
         <div class="tbl-scroll"><table>
           <thead><tr><th>Modo</th><th>Controla</th><th>Uso</th></tr></thead>
           <tbody>
@@ -1387,7 +1387,7 @@ main, #main { display: block !important; height: auto !important; overflow: visi
     <div class="pres-full"><label>Diagnóstico / contexto clínico <span style="color:#dc2626">*</span><textarea id="p_dx" placeholder="Ex: pneumonia comunitária grave; DPOC exacerbada; ITU complicada; CAD…"></textarea></label></div>
     <div class="pres-full"><label>Cenário<select id="p_cenario"><option value="emergencia">Emergência</option><option value="enfermaria">Enfermaria</option><option value="uti">UTI</option><option value="ambulatorio">Ambulatório</option></select></label></div>
     <div class="pres-full"><label>Observações adicionais<textarea id="p_obs" placeholder="Comorbidades, gestação, função hepática, medicações em uso…"></textarea></label></div>
-    <button id="presGo" class="gaso-btn">✨ Gerar sugestão de prescrição</button>
+    <button id="presGo" class="gaso-btn"><i class="ti ti-sparkles"></i> Gerar sugestão de prescrição</button>
     <div id="presResult" style="margin-top:16px"></div>
   </section>
 
@@ -60134,7 +60134,7 @@ Para cada pergunta, em itálico abaixo: *resposta esperada: [breve, 1 linha]* e 
 Tabela ou lista com 3 colunas/categorias claras:
 - **Adequado:** condutas atuais que estão certas (1 linha cada, com diretriz/ano)
 - 🔧 **Ajustar:** condutas que precisam ser corrigidas (dose errada, via, frequência, droga inadequada). Para cada: dose/via/frequência CORRETA + justificativa em diretriz
-- ➕ **Faltando:** condutas/exames/monitorização que deveriam ter sido feitos e não foram
+- <i class="ti ti-plus"></i> **Faltando:** condutas/exames/monitorização que deveriam ter sido feitos e não foram
 
 ## Pearls específicos deste paciente
 3-5 pontos de ouro que SÓ ESSE CASO permite ensinar bem. Evite pearls genéricos da doença — quero pearls que esse paciente em particular destaca (achado peculiar, combinação incomum, evolução atípica, decisão difícil).
@@ -60325,7 +60325,7 @@ function buildFriendlyError(status, raw, usedModel) {
     return `Requisição inválida (HTTP 400).${safetyHint}\nDetalhe técnico: ${raw.slice(0, 250)}`;
   }
   if (status === 404) {
-    return `Modelo "${usedModel}" não encontrado (HTTP 404). Talvez tenha sido descontinuado — troque nas configurações (⚙).`;
+    return `Modelo "${usedModel}" não encontrado (HTTP 404). Talvez tenha sido descontinuado — troque nas configurações (<i class="ti ti-settings"></i>).`;
   }
   if (!status) return `Falha de conexão: ${raw.slice(0, 200)}`;
   return `Erro Gemini (HTTP ${status}): ${raw.slice(0, 250)}`;
@@ -60733,7 +60733,7 @@ async function renderSocratic(item) {
     <div class="chat-container" id="chatContainer"></div>
     ${isFinished ? '' : `
     <div class="followup-box" id="followupBox">
-      <div class="followup-label">🎤 Sua resposta como residente</div>
+      <div class="followup-label"><i class="ti ti-microphone"></i> Sua resposta como residente</div>
       <div class="followup-wrap">
         <textarea class="followup-input" id="followupInput" rows="2" placeholder="Digite sua resposta..."></textarea>
         <div class="followup-actions">
@@ -63156,8 +63156,8 @@ function interpretarGaso() {
       prim = 'Acidose metabólica';
       const e = 1.5 * hco3 + 8;
       exp = `Compensação esperada (fórmula de Winter): pCO₂ ≈ **${r(e - 2)}–${r(e + 2)}** mmHg.`;
-      misto = pco2 > e + 2 ? '➕ pCO₂ acima do esperado → **acidose respiratória associada** (distúrbio misto).'
-        : pco2 < e - 2 ? '➕ pCO₂ abaixo do esperado → **alcalose respiratória associada** (distúrbio misto).'
+      misto = pco2 > e + 2 ? '<i class="ti ti-plus"></i> pCO₂ acima do esperado → **acidose respiratória associada** (distúrbio misto).'
+        : pco2 < e - 2 ? '<i class="ti ti-plus"></i> pCO₂ abaixo do esperado → **alcalose respiratória associada** (distúrbio misto).'
         : '✅ Compensação respiratória adequada.';
     } else if (pco2 > 45) {
       prim = 'Acidose respiratória';
@@ -63168,8 +63168,8 @@ function interpretarGaso() {
       prim = 'Alcalose metabólica';
       const e = 0.7 * hco3 + 21;
       exp = `Compensação esperada: pCO₂ ≈ **${r(e - 2)}–${r(e + 2)}** mmHg.`;
-      misto = pco2 < e - 2 ? '➕ pCO₂ abaixo do esperado → alcalose respiratória associada.'
-        : pco2 > e + 2 ? '➕ pCO₂ acima do esperado → acidose respiratória associada.'
+      misto = pco2 < e - 2 ? '<i class="ti ti-plus"></i> pCO₂ abaixo do esperado → alcalose respiratória associada.'
+        : pco2 > e + 2 ? '<i class="ti ti-plus"></i> pCO₂ acima do esperado → acidose respiratória associada.'
         : '✅ Compensação respiratória adequada.';
     } else if (pco2 < 35) {
       prim = 'Alcalose respiratória';

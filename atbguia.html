@@ -845,7 +845,7 @@ function renderItem(e){
    <div class="exam-head"><div class="ei">${e.icon}</div><div><h1>${esc(e.nome)}</h1><div class="tags">${esc(e.cat||'Foco de infecção')} · ${esc(e.tags||'')}</div></div></div>
    <div class="content">${md(e.md)}</div>
    <div class="panel" style="margin-top:18px"><h4>Aprofundar com IA</h4>
-     <button class="btn btn-ai" id="aprBtn" onclick="aprofundar('${e.id}')">✨ Casos, doses e detalhes com a IA</button>
+     <button class="btn btn-ai" id="aprBtn" onclick="aprofundar('${e.id}')"><i class="ti ti-sparkles"></i> Casos, doses e detalhes com a IA</button>
      <div id="aprOut"></div>
    </div>
    <div class="disc">Doses para adulto com função renal normal — confira ajuste renal, alergias, gestação e o antibiograma/protocolo local.</div>`;
@@ -887,7 +887,7 @@ function renderDrug(d){
      <h2>Interações importantes</h2>${md(d.interacoes)}
    </div>
    <div class="panel" style="margin-top:14px"><h4>Aprofundar com IA</h4>
-     <button class="btn btn-ai" id="aprBtn" onclick="aprofundarDrug('${d.id}')">✨ Mais detalhes / dúvidas com a IA</button>
+     <button class="btn btn-ai" id="aprBtn" onclick="aprofundarDrug('${d.id}')"><i class="ti ti-sparkles"></i> Mais detalhes / dúvidas com a IA</button>
      <div id="aprOut"></div>
    </div>
    <div class="disc">Doses para adulto — confirme na bula/protocolo local; atenção a obesidade, gestação, diálise e infecções de SNC. A calculadora é estimativa de apoio.</div>`;
@@ -908,7 +908,7 @@ async function aprofundarDrug(id){
     const prompt=SYS_ATB+`\n\nO médico está vendo o antibiótico "${d.nome}" (${d.classe}). Traga: principais indicações/espectro na prática, ajustes especiais (obesidade, diálise, gestação, SNC), erros comuns e 1–2 interações/cuidados que costumam passar batido. Doses de adulto. Conciso, markdown.`;
     const txt=await callIA(prompt);out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
   }catch(err){out.innerHTML='<div class="ai-out" style="background:rgba(248,81,73,.12);border-color:rgba(248,81,73,.3);color:#F85149">⚠️ '+esc(err.message||'Falha na IA')+'</div>';}
-  b.disabled=false;b.innerHTML='✨ Mais detalhes / dúvidas com a IA';
+  b.disabled=false;b.innerHTML='<i class="ti ti-sparkles"></i> Mais detalhes / dúvidas com a IA';
 }
 
 /* ===================== EMPÍRICO ===================== */
@@ -942,7 +942,7 @@ function renderEmpirico(){
        <input type="text" id="empUsadosTxt" value="${esc(empForm.detalhe)}" oninput="empForm.detalhe=this.value" placeholder="outros / detalhes: ex. há 3 dias, sem melhora" style="margin-top:8px"></div>
      <div class="field"><label>Dados extras (opcional)</label>
        <input type="text" id="empExtra" value="${esc(empForm.extra)}" oninput="empForm.extra=this.value" placeholder="ex.: ClCr 35, gestante, peso 90 kg, cultura: E. coli ESBL"></div>
-     <button class="btn btn-ai" id="empBtn" onclick="sugerirEmpirico()">✨ Sugerir conduta</button>
+     <button class="btn btn-ai" id="empBtn" onclick="sugerirEmpirico()"><i class="ti ti-sparkles"></i> Sugerir conduta</button>
      <div id="empOut"></div>
    </div>
    <div class="sec-title">Guia curado — ${esc(foco.nome)}</div>
@@ -982,7 +982,7 @@ async function sugerirEmpirico(){
     const txt=await callIA(prompt);
     out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
   }catch(err){out.innerHTML='<div class="ai-out" style="background:rgba(248,81,73,.12);border-color:rgba(248,81,73,.3);color:#F85149">⚠️ '+esc(err.message||'Falha na IA')+'</div>';}
-  b.disabled=false;b.innerHTML='✨ Sugerir conduta';
+  b.disabled=false;b.innerHTML='<i class="ti ti-sparkles"></i> Sugerir conduta';
 }
 
 /* ===================== COBERTURA ===================== */
@@ -1008,7 +1008,7 @@ function renderDirigida(){
    <div class="formcard">
      <div class="field"><label>Germe isolado</label><select id="dirSel" onchange="renderDirAlvo()">${opts}</select></div>
      <div id="dirAlvo"></div>
-     <button class="btn btn-ai" id="dirBtn" onclick="sugerirDirigida()" style="margin-top:6px">✨ Refinar com a IA (dose, duração, alergia)</button>
+     <button class="btn btn-ai" id="dirBtn" onclick="sugerirDirigida()" style="margin-top:6px"><i class="ti ti-sparkles"></i> Refinar com a IA (dose, duração, alergia)</button>
      <div id="dirOut"></div>
    </div>
    <div class="disc">Princípio de stewardship: ao sair a cultura, <b>descalone</b> para o menor espectro eficaz contra o germe isolado.</div>`;
@@ -1026,7 +1026,7 @@ async function sugerirDirigida(){
     const prompt=SYS_ATB+`\n\nGerme isolado: ${d.g}. Dê a terapia DIRIGIDA preferencial (menor espectro eficaz) com DOSE e via, alternativas (inclusive para alergia a penicilina), e duração típica por foco. Mencione quando associar 2ª droga (ex.: endocardite). Conciso, markdown.`;
     const txt=await callIA(prompt);out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
   }catch(err){out.innerHTML='<div class="ai-out" style="background:rgba(248,81,73,.12);border-color:rgba(248,81,73,.3);color:#F85149">⚠️ '+esc(err.message||'Falha na IA')+'</div>';}
-  b.disabled=false;b.innerHTML='✨ Refinar com a IA (dose, duração, alergia)';
+  b.disabled=false;b.innerHTML='<i class="ti ti-sparkles"></i> Refinar com a IA (dose, duração, alergia)';
 }
 
 /* ===================== CALCULADORA DE DOSE (ATB + peso + ClCr) ===================== */
@@ -1124,7 +1124,7 @@ async function aprofundar(id){
     const txt=await callIA(prompt);
     out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
   }catch(err){out.innerHTML='<div class="ai-out" style="background:rgba(248,81,73,.12);border-color:rgba(248,81,73,.3);color:#F85149">⚠️ '+esc(err.message||'Falha na IA')+'</div>';}
-  b.disabled=false;b.innerHTML='✨ Casos, doses e detalhes com a IA';
+  b.disabled=false;b.innerHTML='<i class="ti ti-sparkles"></i> Casos, doses e detalhes com a IA';
 }
 
 let chat=[];
@@ -1132,7 +1132,7 @@ function abrirAssistente(){curView='ai';chat=[];renderAssistente();scroll0();}
 function renderAssistente(){
   const suggs=['Esquema empírico para PAC internado','Como age a resistência ESBL vs KPC?','Mecanismo de ação dos β-lactâmicos','Explique o esquema RIPE da tuberculose','Qual a 1ª linha para candidemia?','Por que o MRSA resiste aos β-lactâmicos?','Alérgico grave a penicilina com pneumonia, o que uso?'];
   let html=`<button class="back" onclick="routeHome()">← Voltar</button>
-   <div class="exam-head"><div class="ei">✨</div><div><h1>Assistente de antibióticos</h1><div class="tags">Condutas, doses, espectro, resistência, microbiologia, antifúngicos, TB — pergunte tudo</div></div></div>`;
+   <div class="exam-head"><div class="ei"><i class="ti ti-sparkles"></i></div><div><h1>Assistente de antibióticos</h1><div class="tags">Condutas, doses, espectro, resistência, microbiologia, antifúngicos, TB — pergunte tudo</div></div></div>`;
   if(!chat.length){html+=`<div class="suggs">`+suggs.map(s=>`<button class="sugg" onclick="enviarSug(this)">${esc(s)}</button>`).join('')+`</div>`;}
   html+=`<div class="chat" id="chat">`+chat.map(m=>`<div class="msg ${m.role==='user'?'u':'a'}"><div class="av">${m.role==='user'?'🧑‍⚕️':'💊'}</div><div class="bub">${m.role==='user'?'<p>'+esc(m.text).replace(/\n/g,'<br>')+'</p>':md(m.text)}</div></div>`).join('')+`</div>
    <div class="ask"><textarea id="ask" rows="1" placeholder="Ex.: paciente com colangite e alergia a penicilina, qual esquema?" oninput="growAsk(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviar();}"></textarea><button onclick="enviar()" aria-label="Enviar">➤</button></div>
