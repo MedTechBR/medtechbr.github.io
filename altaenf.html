@@ -662,8 +662,18 @@ function plainText(){
 /* ============================================================
    EVENTOS
 ============================================================ */
-document.addEventListener('input', render);
-document.addEventListener('change', render);
+/* Rascunho automático (localStorage) — o formulário é longo e preenchido à beira-leito;
+   sem isto, recarregar a aba ou o Safari reciclar a página apagava tudo. */
+const DRAFT_KEY='altaenf_draft_v1';
+function collectDraft(){const d={fields:{},checks:[]};document.querySelectorAll('[id]').forEach(el=>{if(!el.matches('input, textarea, select'))return;if(el.type==='checkbox'||el.type==='radio'){if(el.checked)d.checks.push(el.id);}else if(el.id)d.fields[el.id]=el.value;});return d;}
+function saveDraft(){try{localStorage.setItem(DRAFT_KEY,JSON.stringify(collectDraft()));}catch(e){}}
+function loadDraft(){let d;try{d=JSON.parse(localStorage.getItem(DRAFT_KEY));}catch(e){}if(!d)return;if(d.fields)for(const k in d.fields){const el=document.getElementById(k);if(el)el.value=d.fields[k];}if(Array.isArray(d.checks))d.checks.forEach(id=>{const c=document.getElementById(id);if(c)c.checked=true;});}
+/* re-render por tecla reconstrói o #doc inteiro (com os 2 PNG do cabeçalho/rodapé) —
+   debounce evita o travamento no celular ao digitar nas orientações. */
+let _renderTimer=null;
+function scheduleRender(){if(_renderTimer)clearTimeout(_renderTimer);_renderTimer=setTimeout(()=>{_renderTimer=null;render();},150);}
+document.addEventListener('input', ()=>{saveDraft();scheduleRender();});
+document.addEventListener('change', ()=>{saveDraft();render();});
 
 document.getElementById('btnPrint').addEventListener('click', ()=>window.print());
 
@@ -676,6 +686,7 @@ document.getElementById('btnClear').addEventListener('click', ()=>{
   if(!confirm('Limpar todos os campos e marcações?')) return;
   document.querySelectorAll('input[type=checkbox]').forEach(c=>c.checked=false);
   document.querySelectorAll('input[type=text], textarea').forEach(i=>i.value='');
+  try{localStorage.removeItem(DRAFT_KEY);}catch(e){}
   render();
   toast('Formulário limpo');
 });
@@ -688,6 +699,7 @@ function toast(msg){
   toastTimer=setTimeout(()=>el.classList.remove('show'),2200);
 }
 
+loadDraft();
 render();
 </script>
 </body>
