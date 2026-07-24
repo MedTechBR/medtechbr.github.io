@@ -1467,7 +1467,7 @@
           PDF ou Word com o cabeçalho/instruções/formatação que servirão de modelo. As questões serão geradas no estilo desse modelo.
         </p>
         <label for="esqueletoInput" class="file-drop">
-          <p style="font-size:1.5em;">📋</p>
+          <p style="font-size:1.5em;"><i class="ti ti-clipboard"></i></p>
           <p><strong>Clique ou arraste o esqueleto</strong> (PDF ou .docx)</p>
         </label>
         <input type="file" id="esqueletoInput" accept=".pdf,.docx" style="display:none" onchange="adicionarEsqueleto(event)">
@@ -1486,7 +1486,7 @@
     <div id="pageProvas" class="page hidden">
       <div class="breadcrumb"><a onclick="navegar('menu')">← Menu</a></div>
       <div class="card">
-        <h2>📋 Minhas Provas</h2>
+        <h2><i class="ti ti-clipboard"></i> Minhas Provas</h2>
         <div id="listaProvas"></div>
       </div>
     </div>
@@ -1514,7 +1514,7 @@
         <div style="margin-top: 16px; padding: 16px; border: 2px dashed var(--border-strong); border-radius: var(--radius); background: var(--bg); display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:center;">
           <strong style="color:var(--text-muted); margin-right:6px;">Adicionar nova questão:</strong>
           <button class="success small" id="btnAddIA" onclick="adicionarQuestaoIA()"><i class="ti ti-sparkles"></i> Gerar com IA</button>
-          <button class="secondary small" onclick="adicionarQuestaoManual()">✏️ Em branco</button>
+          <button class="secondary small" onclick="adicionarQuestaoManual()"><i class="ti ti-pencil"></i> Em branco</button>
         </div>
         <div id="addQuestaoStatus" style="margin-top:10px;"></div>
       </div>
@@ -1533,7 +1533,7 @@
         <p id="corrigirGabarito" style="color:#6b7280; margin-bottom:16px;"></p>
 
         <div class="form-row">
-          <button class="success large" onclick="adicionarAlunoCorrecao()">➕ Adicionar Aluno</button>
+          <button class="success large" onclick="adicionarAlunoCorrecao()"><i class="ti ti-plus"></i> Adicionar Aluno</button>
           <span style="color:#6b7280; font-size:0.9em;" id="contadorAlunosCorrecao"></span>
         </div>
 
@@ -1546,7 +1546,7 @@
     <div id="pageConfig" class="page hidden">
       <div class="breadcrumb"><a onclick="navegar('menu')">← Menu</a></div>
       <div class="card">
-        <h2>⚙️ Configurações</h2>
+        <h2><i class="ti ti-settings"></i> Configurações</h2>
 
         <h3 style="margin-top:8px;">Meus dados</h3>
         <div class="form-row">
@@ -2217,7 +2217,7 @@ function renderEsqueleto() {
   const e = elaboracao.esqueleto;
   div.innerHTML = `
     <div class="file-item">
-      <span>📋 ${e.nome}</span>
+      <span><i class="ti ti-clipboard"></i> ${e.nome}</span>
       <button class="danger small" onclick="removerEsqueleto()">✕</button>
     </div>
   `;
@@ -2663,7 +2663,7 @@ function renderListaProvas() {
       </div>
       <div class="acoes">
         <button class="secondary small" onclick="abrirProva('${p.id}')">📖 Ver</button>
-        <button class="success small" onclick="abrirProva('${p.id}'); setTimeout(()=>navegar('corrigir'), 100)">✏️ Corrigir</button>
+        <button class="success small" onclick="abrirProva('${p.id}'); setTimeout(()=>navegar('corrigir'), 100)"><i class="ti ti-pencil"></i> Corrigir</button>
       </div>
     `;
     div.appendChild(item);
@@ -2726,9 +2726,9 @@ function renderProva() {
           Anular questão
         </label>
         <span style="font-size:0.85em; color:#6b7280;">Gabarito: ${q.gabarito}</span>
-        <button class="secondary small" onclick="abrirBuscaImagem(${idx})">🖼️ ${q.imagem ? 'Trocar imagem' : 'Adicionar imagem'}</button>
+        <button class="secondary small" onclick="abrirBuscaImagem(${idx})"><i class="ti ti-photo"></i> ${q.imagem ? 'Trocar imagem' : 'Adicionar imagem'}</button>
         <button class="secondary small" onclick="regenerarQuestao(${idx})" style="margin-left:auto;">🔄 Regenerar com IA</button>
-        <button class="danger small" onclick="removerQuestao(${idx})" title="Remover esta questão">🗑️</button>
+        <button class="danger small" onclick="removerQuestao(${idx})" title="Remover esta questão"><i class="ti ti-trash"></i></button>
       </div>
       ${q.explicacao ? `<details style="margin-top:8px; font-size:0.9em;"><summary style="cursor:pointer; color:#6b7280;">📘 Comentário</summary><p style="margin-top:6px; color:#4b5563; white-space:pre-wrap;">${escapeHtml(q.explicacao)}</p></details>` : ''}
       ${q.referencias ? `<details style="margin-top:4px; font-size:0.9em;"><summary style="cursor:pointer; color:#6b7280;">📚 Referências</summary><p style="margin-top:6px; color:#4b5563; white-space:pre-wrap;">${escapeHtml(q.referencias)}</p></details>` : ''}
@@ -2807,7 +2807,7 @@ function renderImagemQuestao(q, idx) {
   if (q.imagemSugerida) {
     return `
       <div class="questao-sem-imagem">
-        🖼️ A IA sugeriu uma imagem ilustrativa para esta questão: <em>"${escapeHtml(q.imagemSugerida)}"</em>.
+        <i class="ti ti-photo"></i> A IA sugeriu uma imagem ilustrativa para esta questão: <em>"${escapeHtml(q.imagemSugerida)}"</em>.
         Clique em "Adicionar imagem" abaixo para buscar e anexar.
       </div>`;
   }
@@ -2819,7 +2819,7 @@ function abrirBuscaImagem(idx) {
   if (!p) return;
   _idxImagemAtiva = idx;
   const q = p.questoes[idx];
-  document.getElementById('imgModalTitle').textContent = `🖼️ Imagem para Questão ${idx + 1}`;
+  document.getElementById('imgModalTitle').innerHTML = `<i class="ti ti-photo"></i> Imagem para Questão ${idx + 1}`;
   const input = document.getElementById('imgSearchInput');
   input.value = q.imagemSugerida || '';
   document.getElementById('imgResults').innerHTML = '';
