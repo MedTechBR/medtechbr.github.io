@@ -21,6 +21,7 @@ const defaultState = () => ({
   fixedItems: [],
   tombstones: [],       // exclusoes de transacoes {id, at} — impedem que o merge ressuscite
   fixedTombstones: [],  // exclusoes de itens fixos
+  categoryTombstones: [], // exclusoes de categorias {id, at}
 });
 
 function cid() { return Math.random().toString(36).slice(2, 10); }
@@ -64,13 +65,15 @@ function granaeMergeFn(remote, local) {
   remote = remote || {};
   const tx = mergeById(local.transactions, remote.transactions, local.tombstones, remote.tombstones);
   const fx = mergeById(local.fixedItems, remote.fixedItems, local.fixedTombstones, remote.fixedTombstones);
+  const cat = mergeById(local.categories, remote.categories, local.categoryTombstones, remote.categoryTombstones);
   return {
     profile: local.profile || remote.profile || {},
     transactions: tx.items,
     tombstones: tx.tombstones,
     fixedItems: fx.items,
     fixedTombstones: fx.tombstones,
-    categories: (local.categories && local.categories.length) ? local.categories : (remote.categories || []),
+    categories: cat.items,
+    categoryTombstones: cat.tombstones,
   };
 }
 
@@ -100,6 +103,7 @@ function applyData(d) {
       fixedItems: Array.isArray(d.fixedItems) ? d.fixedItems : [],
       tombstones: Array.isArray(d.tombstones) ? d.tombstones : [],
       fixedTombstones: Array.isArray(d.fixedTombstones) ? d.fixedTombstones : [],
+      categoryTombstones: Array.isArray(d.categoryTombstones) ? d.categoryTombstones : [],
     };
   } else {
     state = defaultState();
@@ -797,6 +801,7 @@ catForm.addEventListener('submit', e => {
     name: data.get('name').trim(),
     icon: data.get('icon') || '🏷️',
     color: data.get('color') || '#6366f1',
+    updatedAt: Date.now(),
   };
   if (!obj.name) return;
   const idx = state.categories.findIndex(c => c.id === obj.id);
@@ -827,6 +832,7 @@ catDelete.addEventListener('click', () => {
     state.transactions.forEach(t => { if (t.category === cat.name) t.category = 'Outros'; });
     state.fixedItems.forEach(f => { if (f.category === cat.name) f.category = 'Outros'; });
   }
+  (state.categoryTombstones = state.categoryTombstones || []).push({ id, at: Date.now() });
   state.categories = state.categories.filter(c => c.id !== id);
   saveState();
   catDialog.close();
@@ -991,7 +997,7 @@ function ensureCategory(name, type) {
   if (!name) return;
   const existing = categoryByName(name, type);
   if (existing) return existing;
-  const c = { id: cid(), name, type: type || 'expense', icon: '🏷️', color: '#6366f1' };
+  const c = { id: cid(), name, type: type || 'expense', icon: '🏷️', color: '#6366f1', updatedAt: Date.now() };
   state.categories.push(c);
   return c;
 }
