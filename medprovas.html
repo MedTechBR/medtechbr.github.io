@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MedProvas · Elaboração e correção de provas com IA</title>
-<meta name="theme-color" content="#0A0E14">
+<meta name="theme-color" content="#FAFAF8">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.7.0/mammoth.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
@@ -21,33 +21,33 @@
 <style>
   :root {
     /* Paleta MedProvas — teal médico + navy */
-    --primary: #4C8DFF;
-    --primary-hover: #2f6ae0;
-    --primary-dark: #2f6ae0;
+    --primary: #C07C0A;
+    --primary-hover: #996208;
+    --primary-dark: #996208;
     --primary-soft: #15294d;
     --primary-soft-2: #1b3358;
-    --primary-border: rgba(76,141,255,.3);
-    --accent: #38E1C6;
+    --primary-border: rgba(192,124,10,.3);
+    --accent: #0E8A63;
     --accent-soft: #0f2b28;
-    --bg: #0A0E14;
-    --bg-2: #0E141D;
+    --bg: #FAFAF8;
+    --bg-2: #F1F1EC;
     --bg-3: #18222f;
-    --surface: #111823;
-    --border: rgba(140,160,185,.16);
+    --surface: #FFFFFF;
+    --border: #DDDDD5;
     --border-strong: rgba(140,160,185,.24);
-    --text: #E7EEF7;
-    --text-muted: #8A98AC;
-    --text-soft: #7E8EA6;
-    --success: #3FB950;
+    --text: #23272E;
+    --text-muted: #5E646B;
+    --text-soft: #767C84;
+    --success: #1D7A46;
     --success-soft: #10281a;
-    --danger: #F85149;
+    --danger: #C6453D;
     --danger-soft: #2a1113;
-    --warning: #E3B341;
+    --warning: #A3730A;
     --warning-soft: #2a1e08;
     --info-soft: #14243f;
-    --glow: rgba(76,141,255,.42);
-    --line: rgba(88,166,255,.12);
-    --teal: #38E1C6;
+    --glow: rgba(192,124,10,.42);
+    --line: #E8E8E2;
+    --teal: #0E8A63;
     --radius-sm: 8px;
     --radius: 12px;
     --radius-lg: 18px;
@@ -63,9 +63,9 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background-color: #0A0E14;
-    background-image: radial-gradient(1100px 460px at 84% -10%,rgba(76,141,255,.12),transparent 60%),radial-gradient(840px 460px at 4% 110%,rgba(56,225,198,.06),transparent 55%),linear-gradient(rgba(140,160,185,.032) 1px,transparent 1px),linear-gradient(90deg,rgba(140,160,185,.032) 1px,transparent 1px);
+    font-family: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: #FAFAF8;
+    background-image: radial-gradient(1100px 460px at 84% -10%,rgba(192,124,10,.12),transparent 60%),radial-gradient(840px 460px at 4% 110%,rgba(14,138,99,.06),transparent 55%),linear-gradient(rgba(140,160,185,.032) 1px,transparent 1px),linear-gradient(90deg,rgba(140,160,185,.032) 1px,transparent 1px);
     background-size: auto,auto,34px 34px,34px 34px;
     background-attachment: fixed;
     color: var(--text);
@@ -76,7 +76,7 @@
     line-height: 1.5;
   }
   h1, h2, h3, h4 {
-    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-family: 'Figtree', 'Figtree', sans-serif;
     color: var(--text);
     letter-spacing: -0.01em;
   }
@@ -84,7 +84,7 @@
   h3 { margin-bottom: 12px; font-size: 1.05em; font-weight: 600; color: var(--text); }
   p { line-height: 1.55; }
   a { color: var(--primary); cursor: pointer; }
-  ::selection { background: rgba(76,141,255,.3); color: #E7EEF7; }
+  ::selection { background: rgba(192,124,10,.3); color: #23272E; }
 
   /* ─────────── LAYOUT (sidebar + topbar) ─────────── */
   #appWrapper {
@@ -155,12 +155,12 @@
     color: white;
     font-weight: 800;
     font-size: 1.1em;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Figtree', sans-serif;
     box-shadow: 0 6px 14px rgba(13,148,136,0.25);
     flex-shrink: 0;
   }
   .sidebar-brand .brand-name {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Figtree', sans-serif;
     font-weight: 800;
     font-size: 1.15em;
     color: var(--text);
@@ -211,7 +211,7 @@
   /* ─────────── TOPBAR ─────────── */
   .topbar {
     grid-area: topbar;
-    background: rgba(10,14,20,0.72);
+    background: rgba(255,255,255,.85);
     backdrop-filter: saturate(160%) blur(14px);
     -webkit-backdrop-filter: saturate(180%) blur(14px);
     border-bottom: 1px solid var(--border);
@@ -224,7 +224,7 @@
     z-index: 50;
   }
   .topbar .page-title {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Figtree', sans-serif;
     font-weight: 700;
     font-size: 1.1em;
     color: var(--text);
@@ -255,14 +255,14 @@
     box-shadow: 0 4px 10px rgba(245,158,11,0.30);
   }
   .pro-badge.trial {
-    background: rgba(76,141,255,.14);
+    background: rgba(192,124,10,.14);
     color: #7FB0FF;
-    border: 1px solid rgba(76,141,255,.35);
+    border: 1px solid rgba(192,124,10,.35);
   }
   .pro-badge.expired {
     background: var(--danger-soft);
     color: #fca5a5;
-    border: 1px solid rgba(248,81,73,.4);
+    border: 1px solid rgba(198,69,61,.4);
   }
   .pro-badge.hidden { display: none; }
 
@@ -305,7 +305,7 @@
     margin-bottom: 10px;
   }
   .paywall-card .price {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Figtree', sans-serif;
     font-size: 2.6em;
     font-weight: 800;
     color: var(--primary);
@@ -358,7 +358,7 @@
     justify-content: center;
     font-weight: 700;
     font-size: 0.82em;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Figtree', sans-serif;
     box-shadow: 0 4px 10px rgba(13,148,136,0.25);
   }
 
@@ -475,7 +475,7 @@
   .dash-stat-icon svg { width: 22px; height: 22px; }
   .dash-stat-info { display: flex; flex-direction: column; }
   .dash-stat-num {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Figtree', sans-serif;
     font-size: 1.7em;
     font-weight: 800;
     color: var(--text);
@@ -536,10 +536,10 @@
   input:focus, select:focus, textarea:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(76,141,255,0.28);
+    box-shadow: 0 0 0 4px rgba(192,124,10,0.28);
   }
   input::placeholder, textarea::placeholder { color: var(--text-soft); }
-  input:-webkit-autofill, input:-webkit-autofill:focus, textarea:-webkit-autofill, select:-webkit-autofill { -webkit-box-shadow: 0 0 0 100px #0E141D inset; -webkit-text-fill-color: #E7EEF7; caret-color: #E7EEF7; transition: background-color 99999s; }
+  input:-webkit-autofill, input:-webkit-autofill:focus, textarea:-webkit-autofill, select:-webkit-autofill { -webkit-box-shadow: 0 0 0 100px #FFFFFF inset; -webkit-text-fill-color: #23272E; caret-color: #23272E; transition: background-color 99999s; }
   .dash-stat-num, .pro-badge, .status { font-family: 'JetBrains Mono', ui-monospace, monospace; }
 
   /* ─────────── BUTTONS ─────────── */
@@ -561,7 +561,7 @@
     gap: 6px;
     line-height: 1.2;
   }
-  button:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 10px rgba(76,141,255,0.25); }
+  button:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 10px rgba(192,124,10,0.25); }
   button:active { transform: translateY(0); }
   button:disabled { background: var(--border-strong); color: var(--text-muted); cursor: not-allowed; transform: none; box-shadow: none; }
   button.secondary { background: var(--surface); color: var(--text); border-color: var(--border-strong); }
@@ -626,11 +626,11 @@
     color: white;
     font-weight: 800;
     font-size: 1.2em;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Figtree', sans-serif;
     border: 1px solid rgba(255,255,255,0.25);
   }
   .auth-side .brand-name {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Figtree', sans-serif;
     font-weight: 800;
     font-size: 1.3em;
     letter-spacing: -0.01em;
@@ -720,7 +720,7 @@
       color: white;
       font-weight: 800;
       font-size: 1.8em;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Figtree', sans-serif;
       box-shadow: 0 12px 30px rgba(13,148,136,0.35);
     }
   }
@@ -807,7 +807,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, transparent, rgba(76,141,255,0.04));
+    background: linear-gradient(135deg, transparent, rgba(192,124,10,0.04));
     opacity: 0;
     transition: opacity 0.2s;
   }
@@ -829,7 +829,7 @@
     transition: transform 0.2s;
   }
   .menu-item:hover .icon { transform: scale(1.05); }
-  .menu-item .title { font-weight: 700; color: var(--text); margin-bottom: 4px; font-size: 1.05em; font-family: 'Space Grotesk', sans-serif; }
+  .menu-item .title { font-weight: 700; color: var(--text); margin-bottom: 4px; font-size: 1.05em; font-family: 'Figtree', sans-serif; }
   .menu-item .desc { color: var(--text-muted); font-size: 0.88em; line-height: 1.5; }
 
   /* ─────────── LISTAS ─────────── */
@@ -1032,7 +1032,7 @@
     font-size: 2.2em;
     font-weight: 800;
     line-height: 1;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Figtree', sans-serif;
   }
   .aluno-nota.aprovado { color: var(--success); }
   .aluno-nota.reprovado { color: var(--danger); }
@@ -1051,7 +1051,7 @@
     padding: 16px;
     text-align: center;
   }
-  .stat-num { font-size: 2em; font-weight: 800; color: var(--text); font-family: 'Space Grotesk', sans-serif; }
+  .stat-num { font-size: 2em; font-weight: 800; color: var(--text); font-family: 'Figtree', sans-serif; }
   .stat-label { font-size: 0.82em; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
 
   /* ─────────── BREADCRUMB ─────────── */
@@ -1125,7 +1125,7 @@
   .questao-imagem .img-titulo { font-weight: 600; color: var(--text); }
   .questao-sem-imagem {
     background: var(--accent-soft);
-    border: 1px dashed rgba(56,225,198,.4);
+    border: 1px dashed rgba(14,138,99,.4);
     border-radius: 8px;
     padding: 8px 12px;
     margin: 8px 0;
@@ -2234,94 +2234,6 @@ function base64ToBlob(base64, mime) {
   return new Blob([bytes], { type: mime });
 }
 
-async function uploadParaFilesAPI(blob, displayName, apiKey) {
-  // Step 1: inicia upload resumable
-  const startResp = await fetch(
-    `https://generativelanguage.googleapis.com/upload/v1beta/files?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: {
-        'X-Goog-Upload-Protocol': 'resumable',
-        'X-Goog-Upload-Command': 'start',
-        'X-Goog-Upload-Header-Content-Length': blob.size.toString(),
-        'X-Goog-Upload-Header-Content-Type': blob.type || 'application/pdf',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ file: { display_name: displayName || 'arquivo.pdf' } })
-    }
-  );
-  if (!startResp.ok) {
-    const txt = await startResp.text();
-    throw new Error('Falha ao iniciar upload (' + startResp.status + '): ' + txt.slice(0, 200));
-  }
-  const uploadUrl = startResp.headers.get('X-Goog-Upload-URL');
-  if (!uploadUrl) throw new Error('Sem URL de upload retornada pela API');
-
-  // Step 2: envia bytes do arquivo
-  const upResp = await fetch(uploadUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Length': blob.size.toString(),
-      'X-Goog-Upload-Offset': '0',
-      'X-Goog-Upload-Command': 'upload, finalize'
-    },
-    body: blob
-  });
-  if (!upResp.ok) {
-    const txt = await upResp.text();
-    throw new Error('Falha no upload (' + upResp.status + '): ' + txt.slice(0, 200));
-  }
-  const result = await upResp.json();
-  return result.file; // { name, uri, mimeType, state, ... }
-}
-
-async function aguardarArquivoAtivo(fileName, apiKey, maxTentativas = 30) {
-  for (let i = 0; i < maxTentativas; i++) {
-    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/${fileName}?key=${apiKey}`);
-    if (!resp.ok) throw new Error('Erro ao verificar arquivo: ' + resp.status);
-    const data = await resp.json();
-    if (data.state === 'ACTIVE') return data;
-    if (data.state === 'FAILED') throw new Error('Processamento do arquivo falhou no Gemini');
-    await new Promise(r => setTimeout(r, 1500));
-  }
-  throw new Error('Tempo esgotado esperando processamento do arquivo no Gemini');
-}
-
-// Recebe lista de { nome, base64, mime } e devolve array de parts para
-// usar em generateContent. Usa inline_data se o total for pequeno, ou
-// Files API quando ultrapassar o limite seguro.
-// Sobe um Blob para o Firebase Storage no prefixo do usuário e devolve o URI gs://
-async function uploadParaStorage(blob, nomeArquivo, onProgress) {
-  if (!window.fb || !window.fb.storage) throw new Error('Firebase Storage não pronto.');
-  if (!proState.fbUser) {
-    await garantirLoginFirebase();
-    if (!proState.fbUser) throw new Error('Login do Firebase não pronto para upload.');
-  }
-  const uid = proState.fbUser.uid;
-  // Caminho único por upload pra não colidir entre provas
-  const safe = (nomeArquivo || 'material.pdf').replace(/[^a-zA-Z0-9._-]/g, '_').slice(-80);
-  const path = `users/${uid}/uploads/${Date.now()}_${Math.random().toString(36).slice(2, 8)}_${safe}`;
-  const r = window.fb.storageRef(window.fb.storage, path);
-  const task = window.fb.uploadBytesResumable(r, blob, { contentType: blob.type || 'application/pdf' });
-  return await new Promise((resolve, reject) => {
-    task.on('state_changed',
-      (snap) => {
-        if (onProgress) {
-          const pct = snap.totalBytes ? Math.floor((snap.bytesTransferred / snap.totalBytes) * 100) : 0;
-          onProgress(`Enviando "${nomeArquivo}" ${pct}%`);
-        }
-      },
-      (err) => reject(new Error('Falha no upload para Storage: ' + (err.message || err.code || 'desconhecido'))),
-      () => {
-        const bucket = task.snapshot.metadata.bucket;
-        const fullPath = task.snapshot.metadata.fullPath;
-        resolve({ gsUri: `gs://${bucket}/${fullPath}`, path: fullPath, bucket });
-      }
-    );
-  });
-}
-
-// Tamanho real do arquivo, seja em blob ou em base64
 function tamanhoMaterial(a) {
   if (a.tamanho) return Number(a.tamanho);
   if (a.blob) return a.blob.size;
@@ -4597,7 +4509,7 @@ function exportarGabaritoPDF() {
         ${linhaAlt('C')}
         ${linhaAlt('D')}
         ${q.explicacao ? `<div style="margin-top:10px; padding:8px 10px; background:#eff6ff; border-left:3px solid #3b82f6; border-radius:3px;"><strong>📘 Comentário:</strong><br>${escapeHtml(q.explicacao).replace(/\n/g, '<br>')}</div>` : ''}
-        ${q.referencias ? `<div style="margin-top:8px; padding:8px 10px; background:rgba(227,179,65,.13); border-left:3px solid #E3B341; border-radius:3px; font-size:0.92em; color:#D9E2EE;"><strong>📚 Referências:</strong><br>${escapeHtml(q.referencias).replace(/\n/g, '<br>')}</div>` : ''}
+        ${q.referencias ? `<div style="margin-top:8px; padding:8px 10px; background:rgba(163,115,10,.13); border-left:3px solid #A3730A; border-radius:3px; font-size:0.92em; color:#D9E2EE;"><strong>📚 Referências:</strong><br>${escapeHtml(q.referencias).replace(/\n/g, '<br>')}</div>` : ''}
       </div>`;
   });
 

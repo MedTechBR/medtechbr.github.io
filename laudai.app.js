@@ -338,17 +338,6 @@ function initMainApp() {
   });
 
   refreshSettingsUI();
-  showFirebaseWarningIfNeeded();
-}
-
-function showFirebaseWarningIfNeeded() {
-  const isPlaceholder = (window.firebaseConfig?.projectId || '').includes('REPLACE_ME');
-  if (isPlaceholder) {
-    const warn = document.createElement('div');
-    warn.className = 'fb-warn';
-    warn.innerHTML = '<strong>Firebase não configurado.</strong> Edite <code>firebase-config.js</code> com os valores do seu projeto. Veja <code>SETUP.md</code> para instruções.';
-    $('.container').prepend(warn);
-  }
 }
 
 function refreshSettingsUI() {
