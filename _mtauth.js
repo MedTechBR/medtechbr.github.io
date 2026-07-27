@@ -95,12 +95,12 @@ const MT = {
     if (!document.getElementById('mt-paywall')) {
       const d = document.createElement('div');
       d.id = 'mt-paywall';
-      d.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:99990;display:flex;align-items:center;justify-content:center;padding:20px';
-      d.innerHTML = '<div style="background:linear-gradient(160deg,#131B26,#0E141D);border:1px solid rgba(88,166,255,.14);border-radius:16px;max-width:400px;width:100%;padding:26px;font-family:Inter,system-ui,sans-serif;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.45)">' +
-        '<div style="font-size:19px;font-weight:800;color:#E7EEF7;margin-bottom:8px;font-family:\'Space Grotesk\',system-ui,sans-serif">Assine o MedTech</div>' +
-        '<div style="font-size:14px;color:#8A98AC;line-height:1.5;margin-bottom:16px">Acesso a todos os apps do ecossistema, com IA incluída.<br>1 app R$ 19,90 · 2 apps R$ 34,90 · tudo R$ 59,90/mês.</div>' +
-        '<a href="' + url + '" target="_blank" rel="noopener" style="display:block;background:linear-gradient(145deg,#4C8DFF,#2f6ae0);color:#fff;border-radius:10px;padding:13px;font-weight:700;text-decoration:none;box-shadow:0 8px 22px rgba(76,141,255,.38)">Assinar agora</a>' +
-        '<button onclick="document.getElementById(\'mt-paywall\').remove()" style="margin-top:10px;background:none;border:none;color:#8A98AC;font-size:13px;cursor:pointer">Agora não</button></div>';
+      d.style.cssText = 'position:fixed;inset:0;background:rgba(28,32,38,.45);z-index:99990;display:flex;align-items:center;justify-content:center;padding:20px';
+      d.innerHTML = '<div style="background:#FFFFFF;border:1px solid #E5E5DF;border-radius:16px;max-width:400px;width:100%;padding:26px;font-family:system-ui,sans-serif;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.45)">' +
+        '<div style="font-size:19px;font-weight:800;color:#23272E;margin-bottom:8px;font-family:system-ui,sans-serif">Assine o MedTech</div>' +
+        '<div style="font-size:14px;color:#5E646B;line-height:1.5;margin-bottom:16px">Acesso a todos os apps do ecossistema, com IA incluída.<br>1 app R$ 19,90 · 2 apps R$ 34,90 · tudo R$ 59,90/mês.</div>' +
+        '<a href="' + url + '" target="_blank" rel="noopener" style="display:block;background:#2B5CE6;color:#fff;border-radius:10px;padding:13px;font-weight:700;text-decoration:none;box-shadow:0 8px 22px rgba(43,92,230,.25)">Assinar agora</a>' +
+        '<button onclick="document.getElementById(\'mt-paywall\').remove()" style="margin-top:10px;background:none;border:none;color:#5E646B;font-size:13px;cursor:pointer">Agora não</button></div>';
       document.body.appendChild(d);
     }
     return false;
@@ -113,26 +113,26 @@ function injectCSS() {
   if (document.getElementById('mt-style')) return;
   const s = document.createElement('style'); s.id = 'mt-style';
   s.textContent = `
-  .mt-auth{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(700px 360px at 80% -12%,rgba(76,141,255,.16),transparent 60%),radial-gradient(560px 320px at 8% 112%,rgba(56,225,198,.09),transparent 55%),#0A0E14}
-  .mt-card{background:linear-gradient(160deg,#131B26,#0E141D);border:1px solid rgba(88,166,255,.14);border-radius:20px;padding:30px 26px;max-width:380px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.25)}
-  .mt-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px;letter-spacing:-.01em;color:#E7EEF7;font-family:'Space Grotesk',system-ui,sans-serif}
-  .mt-brand .mk{width:38px;height:38px;border-radius:11px;background:linear-gradient(145deg,#4C8DFF,#2f6ae0);display:grid;place-items:center}
+  .mt-auth{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;background:#FAFAF8}
+  .mt-card{background:#FFFFFF;border:1px solid #E5E5DF;border-radius:20px;padding:30px 26px;max-width:380px;width:100%;box-shadow:0 14px 40px -14px rgba(20,24,30,.18)}
+  .mt-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px;letter-spacing:-.01em;color:#23272E;font-family:system-ui,sans-serif}
+  .mt-brand .mk{width:38px;height:38px;border-radius:11px;background:#2B5CE6;display:grid;place-items:center}
   .mt-brand .mk svg{width:24px;height:24px}
-  .mt-brand b{color:#4C8DFF}
-  .mt-sub{color:#8A98AC;font-size:13px;margin:4px 0 20px}
-  .mt-auth h2{font-size:18px;color:#E7EEF7;font-family:'Space Grotesk',system-ui,sans-serif;margin-bottom:14px}
-  .mt-auth input{width:100%;padding:12px 13px;border:1px solid rgba(140,160,185,.18);background:#0E141D;color:#E7EEF7;border-radius:11px;font-size:15px;font-family:inherit;margin-bottom:11px}
-  .mt-auth input:focus{outline:none;border-color:#4C8DFF;box-shadow:0 0 0 3px rgba(76,141,255,.15)}
-  .mt-auth input:-webkit-autofill,.mt-auth input:-webkit-autofill:hover,.mt-auth input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 100px #0E141D inset;-webkit-text-fill-color:#E7EEF7;caret-color:#E7EEF7;transition:background-color 99999s ease-in-out 0s}
-  .mt-auth .mt-btn{width:100%;padding:13px;border:none;border-radius:11px;background:linear-gradient(145deg,#4C8DFF,#2f6ae0);color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;box-shadow:0 8px 22px rgba(76,141,255,.38)}
+  .mt-brand b{color:#2B5CE6}
+  .mt-sub{color:#5E646B;font-size:13px;margin:4px 0 20px}
+  .mt-auth h2{font-size:18px;color:#23272E;font-family:system-ui,sans-serif;margin-bottom:14px}
+  .mt-auth input{width:100%;padding:12px 13px;border:1px solid rgba(140,160,185,.18);background:#F4F4F0;color:#23272E;border-radius:11px;font-size:15px;font-family:inherit;margin-bottom:11px}
+  .mt-auth input:focus{outline:none;border-color:#2B5CE6;box-shadow:0 0 0 3px rgba(43,92,230,.15)}
+  .mt-auth input:-webkit-autofill,.mt-auth input:-webkit-autofill:hover,.mt-auth input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 100px #F4F4F0 inset;-webkit-text-fill-color:#23272E;caret-color:#23272E;transition:background-color 99999s ease-in-out 0s}
+  .mt-auth .mt-btn{width:100%;padding:13px;border:none;border-radius:11px;background:#2B5CE6;color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;box-shadow:0 8px 22px rgba(43,92,230,.25)}
   .mt-auth .mt-btn:hover{filter:brightness(1.08)}
-  .mt-auth .mt-link{background:none;border:none;color:#4C8DFF;font-weight:700;font-size:13.5px;cursor:pointer;margin-top:12px;font-family:inherit;display:block;width:100%}
+  .mt-auth .mt-link{background:none;border:none;color:#2B5CE6;font-weight:700;font-size:13.5px;cursor:pointer;margin-top:12px;font-family:inherit;display:block;width:100%}
   .mt-err{color:#F85149;font-size:13px;margin:2px 0 8px;min-height:16px}
-  .mt-consent{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:#8A98AC;text-align:left;margin:2px 0 12px}
-  .mt-consent a{color:#4C8DFF;font-weight:700}
-  .mt-demobar{position:fixed;left:0;right:0;bottom:0;z-index:9000;background:#0E141D;color:#8A98AC;font-size:13px;text-align:center;padding:9px 14px;border-top:1px solid rgba(140,160,185,.16)}
-  .mt-demobar b{color:#4C8DFF}
-  .mt-demobar button{margin-left:8px;background:linear-gradient(145deg,#4C8DFF,#2f6ae0);color:#fff;border:none;border-radius:7px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer}
+  .mt-consent{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:#5E646B;text-align:left;margin:2px 0 12px}
+  .mt-consent a{color:#2B5CE6;font-weight:700}
+  .mt-demobar{position:fixed;left:0;right:0;bottom:0;z-index:9000;background:#F4F4F0;color:#5E646B;font-size:13px;text-align:center;padding:9px 14px;border-top:1px solid #DDDDD5}
+  .mt-demobar b{color:#2B5CE6}
+  .mt-demobar button{margin-left:8px;background:#2B5CE6;color:#fff;border:none;border-radius:7px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer}
   .mt-home{position:fixed;z-index:9500;top:calc(env(safe-area-inset-top) + 9px);left:calc(env(safe-area-inset-left) + 9px);display:inline-flex;align-items:center;gap:5px;background:rgba(15,23,42,.84);color:#fff;text-decoration:none;font:700 12px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;padding:6px 11px 6px 8px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.3);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);opacity:.6;transition:opacity .15s,transform .12s}
   .mt-home:hover{opacity:1}
   .mt-home:active{transform:scale(.94)}
@@ -148,10 +148,10 @@ function injectCSS() {
   .mt-sw-a .n{font:500 10.5px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;text-align:center;line-height:1.2}
   .mt-sw-a.cur .k{outline:3px solid #23272E;outline-offset:2px}
   .mt-sw-a.cur .n{font-weight:700}
-  .mt-splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(700px 360px at 80% -12%,rgba(76,141,255,.16),transparent 60%),radial-gradient(560px 320px at 8% 112%,rgba(56,225,198,.09),transparent 55%),#0A0E14}
-  .mt-splash .mk{width:62px;height:62px;border-radius:18px;background:linear-gradient(145deg,#4C8DFF,#2f6ae0);display:grid;place-items:center}
+  .mt-splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#FAFAF8;}
+  .mt-splash .mk{width:62px;height:62px;border-radius:18px;background:#2B5CE6;display:grid;place-items:center}
   .mt-splash .mk svg{width:38px;height:38px}
-  .mt-splash .sp{width:26px;height:26px;border:3px solid rgba(140,160,185,.2);border-top-color:#4C8DFF;border-radius:50%;animation:mtspin .8s linear infinite}
+  .mt-splash .sp{width:26px;height:26px;border:3px solid rgba(140,160,185,.2);border-top-color:#2B5CE6;border-radius:50%;animation:mtspin .8s linear infinite}
   @keyframes mtspin{to{transform:rotate(360deg)}}
   `;
   document.head.appendChild(s);
