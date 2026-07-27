@@ -20,6 +20,7 @@
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"agendaai",name:"ConsultAI"};</script>
 <script type="module" src="_mtauth.js?v=13"></script>
+<script type="module" src="_mttele.js?v=1"></script>
 <style>
 :root{--petrol:#4C8DFF;--petrol-dark:#2f6ae0;--ink:#E7EEF7;--mint:#4C8DFF;--mint-dark:#2f6ae0;--bg:#0A0E14;--soft:rgba(76,141,255,.12);--line:rgba(88,166,255,.12);--muted:#8A98AC;--green:#3FB950;--green-bg:rgba(63,185,80,.12);--amber:#E3B341;--amber-bg:rgba(227,179,65,.12);--red:#F85149;--red-bg:rgba(248,81,73,.12);--blue:#4C8DFF;--blue-bg:rgba(76,141,255,.12);--violet:#a78bfa;--violet-bg:rgba(167,139,250,.14);--wa:#25D366;--surface:#111823;--card:#111823;--panel2:#0E141D;--line-strong:rgba(140,160,185,.16);--dim:#7E8EA6;--teal:#38E1C6;--glow:rgba(76,141,255,.42);--disp:'Space Grotesk',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
 /* ===== Início (dashboard) ===== */
@@ -677,7 +678,7 @@ function apptCard(a){const ty=TYPES[a.type]||TYPES.con;const st=STATUS[a.status]
       ${a.obs?`<div class="obs">${esc(a.obs)}</div>`:''}
     </div>
     <div class="acts">
-      <button class="btn btn-p btn-sm" onclick="atender('${a.id}')" title="Atender: gravar a consulta e gerar a evolução por IA"><i class="ti ti-microphone"></i> Atender</button>
+      ${a.type==='tel'?`<button class="btn btn-p btn-sm" onclick="openTele('${a.id}')" title="Abrir a sala de vídeo da teleconsulta"><i class="ti ti-video"></i> Sala</button>`:''}<button class="btn btn-p btn-sm" onclick="atender('${a.id}')" title="Atender: gravar a consulta e gerar a evolução por IA"><i class="ti ti-microphone"></i> Atender</button>
       <button class="btn btn-wa btn-sm" onclick="waMenu('${a.id}')">WhatsApp</button>
       <div class="ic">${a.pacId?`<button title="Prontuário" onclick="openPac('${a.pacId}')"><i class="ti ti-clipboard"></i></button>`:''}<button onclick="openForm('${a.id}')"><i class="ti ti-pencil"></i></button><button onclick="del('${a.id}')"><i class="ti ti-trash"></i></button></div>
     </div>
@@ -1417,6 +1418,46 @@ function delDoc(i){if(confirm('Excluir este documento importado?')){state.docs.s
 function onlyDigits(s){return String(s||'').replace(/\D/g,'');}
 function waNumber(fone){let d=onlyDigits(fone);if(!d)return '';if(d.length<=11&&!d.startsWith('55'))d='55'+d;return d;}
 function dataLonga(iso){const d=new Date(iso+'T00:00:00');return d.getDate()+' de '+MES[d.getMonth()]+' ('+WDL[d.getDay()]+')';}
+/* ===== Teleconsulta — sala de vídeo do médico (WebRTC P2P via _mttele.js) ===== */
+let teleCall=null;
+function teleLink(a){
+  if(!a.teleRoom){const r=new Uint8Array(24);crypto.getRandomValues(r);a.teleRoom='t'+Array.from(r,x=>(x%36).toString(36)).join('');a.updatedAt=Date.now();persist();}
+  return new URL('tele.html?r='+a.teleRoom,location.href).href;
+}
+function teleCopy(link,btn){
+  const done=()=>{const o=btn.innerHTML;btn.innerHTML='<i class="ti ti-check"></i> Copiado';setTimeout(()=>btn.innerHTML=o,1600);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(link).then(done).catch(()=>{teleCopyFallback(link);done();});}
+  else{teleCopyFallback(link);done();}
+}
+function teleCopyFallback(t){const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;left:-9999px';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}ta.remove();}
+function openTele(id){
+  const a=state.appts.find(x=>x.id===id);if(!a)return;
+  if(!window.MTTele){alert('O módulo de vídeo ainda está carregando — tente de novo em 2 segundos.');return;}
+  if(document.getElementById('teleWrap'))closeTele();
+  const link=teleLink(a);
+  if(!document.getElementById('teleCss')){
+    const st=document.createElement('style');st.id='teleCss';st.textContent='#teleWrap{position:fixed;inset:0;z-index:9998;background:#05080d;display:flex;flex-direction:column}#teleWrap .tstage{flex:1;position:relative;overflow:hidden}#teleWrap .trv{width:100%;height:100%;object-fit:cover;background:#000}#teleWrap .tlv{position:absolute;right:14px;bottom:14px;width:22%;max-width:180px;aspect-ratio:3/4;object-fit:cover;border-radius:12px;border:2px solid rgba(255,255,255,.18);background:#000;transform:scaleX(-1);box-shadow:0 10px 26px rgba(0,0,0,.6)}#teleWrap .tst{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(10,14,20,.8);border:1px solid rgba(120,150,190,.2);color:#E7EEF7;border-radius:999px;padding:8px 16px;font-size:13.5px;display:flex;align-items:center;gap:8px;max-width:92%;backdrop-filter:blur(8px)}#teleWrap .tdot{width:8px;height:8px;border-radius:50%;background:#E3B341;animation:tpl 1.2s infinite;flex:0 0 auto}#teleWrap .tst.ok .tdot{background:#3FB950;animation:none}@keyframes tpl{50%{opacity:.35}}#teleWrap .tbar{display:flex;justify-content:center;align-items:center;gap:12px;padding:14px;background:rgba(10,14,20,.92);border-top:1px solid rgba(120,150,190,.16);flex-wrap:wrap}#teleWrap .trb{width:52px;height:52px;border-radius:50%;border:1px solid rgba(120,150,190,.25);background:#111823;color:#E7EEF7;font-size:20px;cursor:pointer;display:grid;place-items:center}#teleWrap .trb.off{background:rgba(248,81,73,.18);color:#ff9a92;border-color:rgba(248,81,73,.4)}#teleWrap .trb.end{background:#F85149;color:#fff;border:none;width:68px;border-radius:999px}#teleWrap .tlink{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(120,150,190,.25);background:#111823;color:#E7EEF7;border-radius:10px;padding:11px 14px;font:600 13px Inter,sans-serif;cursor:pointer}';
+    document.head.appendChild(st);
+  }
+  const w=document.createElement('div');w.id='teleWrap';
+  w.innerHTML='<div class="tstage"><video class="trv" id="teleRv" autoplay playsinline></video><video class="tlv" id="teleLv" autoplay playsinline muted></video><div class="tst" id="teleSt"><span class="tdot"></span><span id="teleStTxt">Abrindo a sala…</span></div></div><div class="tbar"><button class="tlink" id="teleCopyBtn" title="Copiar o link do paciente"><i class="ti ti-link"></i> Copiar link do paciente</button><button class="trb" id="teleMic" title="Silenciar / ativar microfone"><i class="ti ti-microphone"></i></button><button class="trb" id="teleCam" title="Ligar / desligar câmera"><i class="ti ti-video"></i></button><button class="trb end" id="teleEnd" title="Encerrar a teleconsulta"><i class="ti ti-phone-off"></i></button></div>';
+  document.body.appendChild(w);
+  const stTxt=document.getElementById('teleStTxt'),stBox=document.getElementById('teleSt');
+  const MSG={waiting:'Aguardando o paciente entrar — envie o link',connecting:'Conectando…',connected:'Conectado',reconnecting:'Reconectando…',dropped:'Conexão perdida — feche e abra a sala de novo',ended:'Encerrada'};
+  let pacNomeTele='';
+  const setSt=k=>{stTxt.textContent=(k==='connected'&&pacNomeTele)?('Conectado — '+pacNomeTele):(MSG[k]||k);stBox.classList.toggle('ok',k==='connected');if(k==='ended')closeTele();};
+  document.getElementById('teleCopyBtn').onclick=e=>teleCopy(link,e.currentTarget);
+  document.getElementById('teleMic').onclick=e=>{if(!teleCall)return;const on=teleCall.toggleMic();e.currentTarget.classList.toggle('off',!on);e.currentTarget.innerHTML=on?'<i class="ti ti-microphone"></i>':'<i class="ti ti-microphone-off"></i>';};
+  document.getElementById('teleCam').onclick=e=>{if(!teleCall)return;const on=teleCall.toggleCam();e.currentTarget.classList.toggle('off',!on);e.currentTarget.innerHTML=on?'<i class="ti ti-video"></i>':'<i class="ti ti-video-off"></i>';};
+  document.getElementById('teleEnd').onclick=()=>closeTele();
+  window.MTTele.start({roomId:a.teleRoom,role:'caller',name:state.cfg.medico||'Dr',localVideo:document.getElementById('teleLv'),remoteVideo:document.getElementById('teleRv'),onState:setSt,onPeerName:n=>{pacNomeTele=n;if(stBox.classList.contains('ok'))stTxt.textContent='Conectado — '+n;}})
+    .then(c=>{teleCall=c;})
+    .catch(e=>{setSt('dropped');console.error('tele:',e);mtToast('Não consegui abrir a sala: '+(e.message||e));});
+}
+function closeTele(){
+  if(teleCall){try{teleCall.hangup();}catch(e){}teleCall=null;}
+  const w=document.getElementById('teleWrap');if(w)w.remove();
+}
 function waText(a,kind){
   const nome=(pacNome(a)||'').split(' ')[0];
   const onde=state.cfg.clinica?(' na '+state.cfg.clinica):'';
@@ -1424,8 +1465,9 @@ function waText(a,kind){
   const ass=state.cfg.medico?('\n\n— '+(state.cfg.clinica||quem)):'';
   const dia=dataLonga(a.date);
   if(kind==='confirm')return `Olá, ${nome}! 👋\n\nConfirmando ${quem?('seu atendimento com '+quem):'sua consulta'}${onde}:\n\n📅 ${dia}\n🕒 ${a.time}h\n\nPodemos confirmar sua presença? Responda SIM para confirmar ou avise se precisar remarcar. 🙂${ass}`;
-  if(kind==='lembrete')return `Olá, ${nome}! 😊\n\nLembrete da sua ${a.type==='tel'?'teleconsulta':'consulta'}${onde}:\n\n📅 ${dia}\n🕒 ${a.time}h\n\n${a.type==='tel'?'O link de acesso será enviado próximo ao horário. ':'Chegue com alguns minutos de antecedência. '}Até lá! 👋${ass}`;
+  if(kind==='lembrete')return `Olá, ${nome}! 😊\n\nLembrete da sua ${a.type==='tel'?'teleconsulta':'consulta'}${onde}:\n\n📅 ${dia}\n🕒 ${a.time}h\n\n${a.type==='tel'?('Acesse no horário pelo link:\n'+teleLink(a)+'\n\n'):'Chegue com alguns minutos de antecedência. '}Até lá! 👋${ass}`;
   if(kind==='remarcar')return `Olá, ${nome}!\n\nPreciso remarcar sua consulta que estava prevista para ${dia} às ${a.time}h. Quais dias e horários ficam melhores para você nesta semana?\n\nDesde já, obrigado pela compreensão. 🙏${ass}`;
+  if(kind==='telelink')return `Olá, ${nome}! 😊\n\nAqui está o link da sua teleconsulta${onde}:\n\n${teleLink(a)}\n\n📅 ${dia}\n🕒 ${a.time}h\n\nNo horário, é só abrir o link, permitir câmera e microfone e me aguardar na sala. Até lá! 👋${ass}`;
   if(kind==='resultado')return `Olá, ${nome}! 😊\n\nSeus exames/resultados já estão disponíveis${onde?(' '+onde):''}. Gostaria de agendar um horário para revisarmos juntos?${ass}`;
   return `Olá, ${nome}!`;
 }
@@ -1438,7 +1480,7 @@ function waMenu(id){
     <label style="font-weight:600;font-size:14px">Modelo de mensagem</label>
     <div class="wa-tpls" id="wa_tpls">
       <button data-k="confirm" class="on" onclick="setKind('${id}','confirm')">Confirmar</button>
-      <button data-k="lembrete" onclick="setKind('${id}','lembrete')">Lembrete</button>
+      <button data-k="lembrete" onclick="setKind('${id}','lembrete')">Lembrete</button>${a.type==='tel'?`<button data-k="telelink" onclick="setKind('${id}','telelink')">Link da teleconsulta</button>`:''}
       <button data-k="remarcar" onclick="setKind('${id}','remarcar')">Remarcar</button>
       <button data-k="resultado" onclick="setKind('${id}','resultado')">Resultado</button>
     </div>
