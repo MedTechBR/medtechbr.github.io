@@ -2943,6 +2943,7 @@ async function renderResultDireto(item) {
           ${isCaso ? '<button class="action-btn" id="viewEvolBtn"><i class="ti ti-file-text"></i> Ver evolução</button>' : ''}
           <button class="action-btn" id="aiPanelBtn"><i class="ti ti-message-circle"></i> Perguntar</button>
           <button class="action-btn" id="copyBtn"><i class="ti ti-copy"></i> Copiar</button>
+          <button class="action-btn" id="evolBtn" title="Copiar só o plano (tratamento/conduta) formatado para colar na evolução do paciente"><i class="ti ti-clipboard-plus"></i> P/ evolução</button>
           <button class="action-btn" id="printBtn"><i class="ti ti-printer"></i> PDF</button>
           <button class="action-btn" id="refreshBtn"><i class="ti ti-refresh"></i> Refazer</button>
         </div>
@@ -2965,6 +2966,13 @@ async function renderResultDireto(item) {
     navigator.clipboard.writeText(text);
     const b = document.getElementById('copyBtn');
     b.innerHTML = '<i class="ti ti-check"></i> Copiado'; setTimeout(() => b.innerHTML = '<i class="ti ti-copy"></i> Copiar', 1500);
+  };
+  const evolBtn = document.getElementById('evolBtn');
+  if (evolBtn) evolBtn.onclick = () => {
+    const titulo = (protocolMeta && protocolMeta.name) || query || 'Conduta';
+    navigator.clipboard.writeText(planoParaEvolucao(text, titulo)).then(() => {
+      evolBtn.innerHTML = '<i class="ti ti-check"></i> Plano copiado'; setTimeout(() => evolBtn.innerHTML = '<i class="ti ti-clipboard-plus"></i> P/ evolução', 1800);
+    }).catch(() => alert('Não consegui copiar — use o botão Copiar.'));
   };
   document.getElementById('printBtn').onclick = () => window.print();
   document.getElementById('refreshBtn').onclick = () => run(query);
@@ -5446,6 +5454,20 @@ function renderCidQuick() {
   el.innerHTML = '<span style="font-size:12px;color:var(--text-mute);width:100%;margin-bottom:2px">Comuns:</span>' + CID_COMUNS.map(d => `<button data-q="${escapeHtml(d)}">${escapeHtml(d)}</button>`).join('');
   el.querySelectorAll('button').forEach(b => b.onclick = () => { document.getElementById('cidSearch').value = b.dataset.q; runCid(b.dataset.q); });
   el.dataset.done = '1';
+}
+/* Onda 6 — "copiar para evolução": extrai as seções de plano (tratamento/conduta/
+   manejo) do texto da conduta, limpa markdown/fluxogramas e formata p/ prontuário. */
+function planoParaEvolucao(mdText, titulo) {
+  const secoes = String(mdText || '').split(/\n(?=## )/)
+    .filter(s => /^##\s+[^\n]*(tratamento|conduta|manejo|terap|prescri|antibi)/i.test(s));
+  let corpo = (secoes.length ? secoes.join('\n') : String(mdText || ''))
+    .replace(/```[a-z]*\n[\s\S]*?```/g, '')
+    .replace(/^#+\s*/gm, '')
+    .replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\*([^*\n]+)\*/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+    .replace(/\n{3,}/g, '\n\n').trim();
+  if (corpo.length > 4000) corpo = corpo.slice(0, 4000) + '\n[…]';
+  return 'PLANO — ' + titulo + ' (ref.: CondutAI · MedTech):\n\n' + corpo;
 }
 function cidCopy(c) { const x = CID10.find(i => i.c === c); if (x && navigator.clipboard) navigator.clipboard.writeText(x.c + ' - ' + x.d); }
 function runCid(q) {
