@@ -175,7 +175,8 @@ const MT_FUNCS = [
   { id:'guiainterno',nm:'Guia do Interno', ic:'ti-school',    c:'#A8730F', url:'/guiainterno.html' },
   { id:'foco',       nm:'Foco',       ic:'ti-target-arrow',   c:'#0E8A63', url:'/foco.html' },
   { id:'plantaohub', nm:'PlantãoHub', ic:'ti-clock',          c:'#15966F', url:'/plantaohub.html' },
-  { id:'granae',     nm:'Granaê',     ic:'ti-wallet',         c:'#6D46D8', url:'/granae.html' }
+  { id:'granae',     nm:'Granaê',     ic:'ti-wallet',         c:'#6D46D8', url:'/granae.html' },
+  { id:'logbook',    nm:'Logbook',    ic:'ti-notebook',       c:'#B0532F', url:'/logbook.html' }
 ];
 MT.FUNCS = MT_FUNCS;
 MT.openSwitcher = () => openSwitcher();
