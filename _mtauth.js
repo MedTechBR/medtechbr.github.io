@@ -138,6 +138,16 @@ function injectCSS() {
   .mt-home:active{transform:scale(.94)}
   .mt-home svg{width:13px;height:13px;flex:0 0 auto}
   body.mt-shell{padding-top:calc(env(safe-area-inset-top) + 42px) !important}
+  .mt-sw{position:fixed;inset:0;z-index:9600;background:rgba(20,24,30,.45);display:flex;align-items:flex-start;justify-content:center;padding:60px 16px 16px}
+  .mt-sw-box{background:#FAFAF8;border-radius:18px;box-shadow:0 24px 60px -18px rgba(0,0,0,.45);padding:18px 16px 14px;max-width:420px;width:100%;max-height:82vh;overflow:auto}
+  .mt-sw-h{font:600 12px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#9AA0A6;margin:0 0 12px 4px}
+  .mt-sw-g{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 6px}
+  .mt-sw-a{display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;color:#23272E}
+  .mt-sw-a .k{width:48px;height:48px;border-radius:13px;display:grid;place-items:center;font-size:23px;color:#fff;box-shadow:0 2px 5px rgba(35,39,46,.16);transition:transform .12s}
+  .mt-sw-a:hover .k{transform:scale(1.08)}
+  .mt-sw-a .n{font:500 10.5px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;text-align:center;line-height:1.2}
+  .mt-sw-a.cur .k{outline:3px solid #23272E;outline-offset:2px}
+  .mt-sw-a.cur .n{font-weight:700}
   .mt-splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(700px 360px at 80% -12%,rgba(76,141,255,.16),transparent 60%),radial-gradient(560px 320px at 8% 112%,rgba(56,225,198,.09),transparent 55%),#0A0E14}
   .mt-splash .mk{width:62px;height:62px;border-radius:18px;background:linear-gradient(145deg,#4C8DFF,#2f6ae0);display:grid;place-items:center}
   .mt-splash .mk svg{width:38px;height:38px}
@@ -149,13 +159,53 @@ function injectCSS() {
 
 /* Botão flutuante "voltar ao MedTech" — aparece nos apps (não no próprio portal),
    só quando logado. Todos os apps carregam este módulo, então fica num lugar só. */
+/* ===== Trocador de funções (shell do super-app) =====
+   As "funções" do MedTech: um toque no selo abre a grade e salta de app em app. */
+const MT_FUNCS = [
+  { id:'agendaai',   nm:'ConsultAI',  ic:'ti-calendar-event', c:'#2B5CE6', url:'/consultai.html' },
+  { id:'condutai',   nm:'CondutAI',   ic:'ti-stethoscope',    c:'#1D6FD0', url:'/condutai.html' },
+  { id:'atbguia',    nm:'ATBguia',    ic:'ti-pill',           c:'#0E8A9C', url:'/atbguia.html' },
+  { id:'enfermaria', nm:'EnfermarIA', ic:'ti-bed',            c:'#3B7BE0', url:'/enfermaria.html' },
+  { id:'pocusai',    nm:'PocusAI',    ic:'ti-scan',           c:'#2456B8', url:'/pocusai.html' },
+  { id:'laudai',     nm:'LaudAI',     ic:'ti-report-medical', c:'#4166D6', url:'/laudai.html' },
+  { id:'paliai',     nm:'PaliAI',     ic:'ti-heart-handshake',c:'#B84A86', url:'/paliai.html' },
+  { id:'calcmed',    nm:'CalcMed',    ic:'ti-calculator',     c:'#4C7A99', url:'/calcmed.html' },
+  { id:'medprovas',  nm:'MedProvas',  ic:'ti-clipboard-text', c:'#C07C0A', url:'/medprovas.html' },
+  { id:'flashmed',   nm:'FlashMed',   ic:'ti-cards',          c:'#D0902A', url:'/flashmed.html' },
+  { id:'guiainterno',nm:'Guia do Interno', ic:'ti-school',    c:'#A8730F', url:'/guiainterno.html' },
+  { id:'foco',       nm:'Foco',       ic:'ti-target-arrow',   c:'#0E8A63', url:'/foco.html' },
+  { id:'plantaohub', nm:'PlantãoHub', ic:'ti-clock',          c:'#15966F', url:'/plantaohub.html' },
+  { id:'granae',     nm:'Granaê',     ic:'ti-wallet',         c:'#6D46D8', url:'/granae.html' }
+];
+MT.FUNCS = MT_FUNCS;
+MT.openSwitcher = () => openSwitcher();
+function ensureTabler() {
+  if (document.querySelector('link[href*="tabler-icons"]')) return;
+  const l = document.createElement('link'); l.rel = 'stylesheet';
+  l.href = 'https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css';
+  document.head.appendChild(l);
+}
+function openSwitcher() {
+  if (document.getElementById('mt-sw')) return;
+  ensureTabler();
+  const ov = document.createElement('div'); ov.id = 'mt-sw'; ov.className = 'mt-sw';
+  const item = f => '<a class="mt-sw-a' + (f.id === APP.id ? ' cur' : '') + '" href="' + f.url + '">' +
+    '<span class="k" style="background:' + f.c + '"><i class="ti ' + f.ic + '"></i></span><span class="n">' + f.nm + '</span></a>';
+  ov.innerHTML = '<div class="mt-sw-box"><p class="mt-sw-h">Funções do MedTech</p><div class="mt-sw-g">' +
+    '<a class="mt-sw-a" href="/app.html"><span class="k" style="background:#23272E"><i class="ti ti-home"></i></span><span class="n">Início</span></a>' +
+    MT_FUNCS.map(item).join('') + '</div></div>';
+  ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+  document.addEventListener('keydown', function esc(e){ if (e.key === 'Escape') { ov.remove(); document.removeEventListener('keydown', esc); } });
+  document.body.appendChild(ov);
+}
 function injectHomeButton() {
   if (APP.id === 'portal') return;
   if (document.getElementById('mt-home')) return;
   document.body.classList.add('mt-shell');   // reserva uma faixa no topo p/ o botão não cobrir conteúdo
   const a = document.createElement('a');
-  a.id = 'mt-home'; a.className = 'mt-home'; a.href = '/app.html'; a.title = 'Voltar ao MedTech';
-  a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>MedTech';
+  a.id = 'mt-home'; a.className = 'mt-home'; a.href = '/app.html'; a.title = 'Trocar de função · MedTech';
+  a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/></svg>MedTech';
+  a.addEventListener('click', e => { e.preventDefault(); openSwitcher(); });
   document.body.appendChild(a);
 }
 function removeHomeButton() { const h = document.getElementById('mt-home'); if (h) h.remove(); document.body.classList.remove('mt-shell'); }
