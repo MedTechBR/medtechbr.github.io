@@ -3,771 +3,152 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MedTech — O ecossistema de IA para quem veste o jaleco</title>
-<meta name="description" content="MedTech: 15 aplicativos de inteligência artificial para médicos e estudantes de medicina — condutas, escores, laudos, provas, plantões e mais. Uma conta, tudo na nuvem.">
+<title>MedTech — 15 apps médicos com IA, uma conta só</title>
+<meta name="description" content="MedTech: condutas, antibióticos, prontuário com teleconsulta, laudos, provas, plantões, finanças e mais — 15 aplicativos com IA integrada, na nuvem, com um único login.">
 <meta name="theme-color" content="#FAFAF8">
-<link rel="icon" type="image/png" href="favicon.png">
-<meta property="og:title" content="MedTech — IA para profissionais de saúde">
-<meta property="og:description" content="15 apps de IA para a medicina. Uma conta, tudo na nuvem, IA já integrada.">
-<meta property="og:type" content="website">
-<meta property="og:image" content="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
+<link rel="icon" type="image/png" href="favicon.png">
 <style>
-:root{
-  --bg:#FAFAF8; --bg-soft:#F1F1EC; --surface:#FFFFFF; --panel:#F1F1EC;
-  --ink:#23272E; --ink-2:#B9C6D6; --muted:#5E646B; --dim:#767C84;
-  --line:#E8E8E2; --line-2:rgba(140,160,185,.12);
-  --brand:#2B5CE6; --brand-600:#3f7ff0; --brand-700:#2249B8;
-  --accent:#0E8A63; --violet:#8b7cf6; --mint:#1D7A46; --amber:#A3730A;
-  --ring:rgba(43,92,230,.30); --glow:rgba(43,92,230,.42);
-  --shadow-sm:0 1px 2px rgba(0,0,0,.4);
-  --shadow:0 14px 40px -18px rgba(0,0,0,.7);
-  --shadow-lg:0 40px 90px -40px rgba(0,0,0,.85);
-  --disp:'Figtree',sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
-  --r:16px; --r-lg:24px;
-}
+:root{--ink:#23272E;--muted:#5E646B;--dim:#9AA0A6;--paper:#FAFAF8;--panel:#F1F1EC;--line:#ECECE7;--line-strong:#D8D8D0;--accent:#2B5CE6;--ok:#0E8A63}
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{font-family:'Figtree',system-ui,-apple-system,sans-serif;color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;
-  background-color:#FAFAF8;
-  background-image:
-    radial-gradient(1100px 500px at 84% -8%,rgba(43,92,230,.12),transparent 60%),
-    radial-gradient(900px 520px at 2% 108%,rgba(14,138,99,.06),transparent 55%),
-    linear-gradient(rgba(140,160,185,.032) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(140,160,185,.032) 1px,transparent 1px);
-  background-size:auto,auto,34px 34px,34px 34px;
-  background-attachment:fixed}
-h1,h2,h3,h4,.display{font-family:var(--disp);line-height:1.1;letter-spacing:-.02em;font-weight:700}
-a{text-decoration:none;color:inherit}
-img,svg{display:block;max-width:100%}
-.wrap{max-width:1160px;margin:0 auto;padding:0 24px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:15px;padding:12px 22px;border-radius:999px;border:1px solid transparent;cursor:pointer;transition:.18s ease;white-space:nowrap}
-.btn-primary{background:linear-gradient(160deg,var(--brand),var(--brand-700));color:#fff;box-shadow:0 10px 26px -10px var(--glow)}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 16px 34px -12px var(--glow)}
-.btn-ghost{background:#F5F5F0;color:var(--ink);border-color:var(--line-2)}
-.btn-ghost:hover{border-color:rgba(43,92,230,.4);background:rgba(43,92,230,.08)}
-.btn-lg{padding:15px 28px;font-size:16px}
-.eyebrow{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:12.5px;color:#9dc0ff;background:rgba(43,92,230,.10);border:1px solid rgba(43,92,230,.22);padding:6px 13px;border-radius:999px;letter-spacing:.02em;font-family:var(--mono)}
-.eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 4px rgba(43,92,230,.18)}
-.muted{color:var(--muted)}
-
-/* NAV */
-header{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.85);backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid var(--line)}
-nav{display:flex;align-items:center;justify-content:space-between;height:70px}
-.brand{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-weight:700;font-size:20px}
-.brand .mk{width:34px;height:34px;border-radius:10px;background:linear-gradient(150deg,var(--brand),#6aa0ff);display:grid;place-items:center;box-shadow:0 8px 20px -8px var(--glow)}
-.brand .mk svg{width:20px;height:20px}
-.brand b{color:var(--brand)}
-.nav-links{display:flex;align-items:center;gap:6px}
-.nav-links a{font-weight:500;font-size:14.5px;color:var(--ink-2);padding:8px 12px;border-radius:9px;transition:.15s}
-.nav-links a:hover{color:var(--ink);background:rgba(140,160,185,.08)}
-.nav-cta{display:flex;align-items:center;gap:10px}
-.burger{display:none;width:42px;height:42px;border:1px solid var(--line-2);border-radius:11px;background:#F5F5F0;cursor:pointer;align-items:center;justify-content:center}
-.burger span{position:relative;width:18px;height:2px;background:var(--ink);border-radius:2px;transition:.2s}
-.burger span::before,.burger span::after{content:"";position:absolute;left:0;width:18px;height:2px;background:var(--ink);border-radius:2px;transition:.2s}
-.burger span::before{top:-6px}.burger span::after{top:6px}
-.mobile-menu{display:none;flex-direction:column;gap:4px;padding:12px 24px 20px;border-bottom:1px solid var(--line);background:rgba(14,20,29,.96)}
-.mobile-menu a{padding:12px 10px;border-radius:10px;font-weight:500;color:var(--ink-2)}
-.mobile-menu a:hover{background:rgba(140,160,185,.08)}
-.mobile-menu .btn{margin-top:8px}
-body.menu-open .mobile-menu{display:flex}
-body.menu-open .burger span{background:transparent}
-body.menu-open .burger span::before{top:0;transform:rotate(45deg)}
-body.menu-open .burger span::after{top:0;transform:rotate(-45deg)}
-
-/* HERO */
-.hero{position:relative;overflow:hidden}
-.hero::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
-  background:
-    linear-gradient(180deg,rgba(10,14,20,.62),rgba(10,14,20,.86) 62%,#FAFAF8 100%),
-    url(hero-ecg.webp) center top/cover no-repeat;
-  opacity:.92}
-.hero::after{content:"";position:absolute;inset:0 0 auto 0;height:1px;background:linear-gradient(90deg,transparent,rgba(43,92,230,.4),transparent);z-index:1}
-.hero .wrap{position:relative;z-index:2;padding:76px 24px 34px}
-.hero-grid{display:grid;grid-template-columns:1.02fr 1fr;gap:54px;align-items:center}
-.hero-grid>*{min-width:0}
-.dash-body>*,.dash-cards>*{min-width:0}
-.hero h1{font-size:clamp(36px,5.2vw,58px);letter-spacing:-.03em;margin-top:18px;color:#F4F6F9}
-.hero h1 .grad{background:linear-gradient(100deg,#7EA4FF,#4FD8B8);-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero p.sub{margin:22px 0 30px;font-size:clamp(17px,2vw,20px);color:rgba(238,242,247,.88);max-width:540px}
-.hero-cta{display:flex;gap:12px;flex-wrap:wrap}
-.hero-meta{display:flex;gap:26px;margin-top:34px;flex-wrap:wrap}
-.hero-meta div b{font-family:var(--disp);font-size:24px;display:block;color:var(--ink)}
-.hero-meta div span{font-size:13px;color:var(--muted)}
-.trust-row{display:flex;align-items:center;gap:10px;margin-top:34px;color:var(--muted);font-size:13.5px;flex-wrap:wrap}
-.trust-row .av{display:flex}
-.trust-row .av span{width:30px;height:30px;border-radius:50%;border:2px solid #F1F1EC;margin-left:-8px;background:linear-gradient(135deg,var(--brand),var(--accent));display:grid;place-items:center;color:#06202b;font-size:12px;font-weight:700}
-.trust-row .av span:first-child{margin-left:0}
-
-/* DASHBOARD MOCKUP */
-.dash{position:relative;border-radius:var(--r-lg);background:linear-gradient(160deg,#131b26,#F1F1EC);border:1px solid var(--line);box-shadow:var(--shadow-lg);overflow:hidden}
-.dash-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);background:rgba(140,160,185,.04)}
-.dash-bar .dots{display:flex;gap:6px}
-.dash-bar .dots i{width:10px;height:10px;border-radius:50%;display:block}
-.dash-bar .dots i:nth-child(1){background:#ff6058}.dash-bar .dots i:nth-child(2){background:#ffbd2e}.dash-bar .dots i:nth-child(3){background:#28c840}
-.dash-url{margin-left:8px;flex:1;font-size:11.5px;color:var(--muted);background:rgba(255,255,255,.7);border:1px solid var(--line-2);border-radius:8px;padding:5px 10px;font-family:var(--mono)}
-.dash-body{display:grid;grid-template-columns:74px 1fr;min-height:380px}
-.dash-side{border-right:1px solid var(--line);padding:16px 0;display:flex;flex-direction:column;align-items:center;gap:14px;background:rgba(255,255,255,.5)}
-.dash-side .ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;color:var(--muted);background:#F5F5F0;border:1px solid var(--line-2);font-weight:700;font-size:14px;font-family:var(--mono)}
-.dash-side .ic.on{background:linear-gradient(160deg,var(--brand),var(--brand-700));color:#fff;border-color:transparent;box-shadow:0 8px 18px -8px var(--glow)}
-.dash-main{padding:18px 20px}
-.dash-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.dash-head h4{font-size:16px}
-.dash-head .search{font-size:12px;color:var(--muted);border:1px solid var(--line-2);border-radius:9px;padding:7px 12px;min-width:150px;background:rgba(255,255,255,.6)}
-.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
-.kpi{border:1px solid var(--line-2);border-radius:14px;padding:13px 14px;background:rgba(140,160,185,.04)}
-.kpi .lbl{font-size:11.5px;color:var(--muted);font-weight:500}
-.kpi .val{font-family:var(--disp);font-size:22px;font-weight:700;margin-top:2px}
-.kpi .chg{font-size:11px;font-weight:600;color:var(--mint);margin-top:2px;font-family:var(--mono)}
-.dash-cards{display:grid;grid-template-columns:1.4fr 1fr;gap:12px}
-.panel{border:1px solid var(--line-2);border-radius:14px;padding:14px;background:#FAFAF8}
-.panel .pt{font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
-.panel .pt span{font-size:11px;color:var(--muted);font-weight:500}
-.tasklist{display:flex;flex-direction:column;gap:9px}
-.tk{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--ink-2)}
-.tk .ck{width:18px;height:18px;border-radius:6px;border:1.6px solid var(--dim);flex:0 0 auto}
-.tk.done .ck{background:var(--brand);border-color:var(--brand);position:relative}
-.tk.done .ck::after{content:"";position:absolute;left:5px;top:2px;width:5px;height:9px;border:2px solid #fff;border-top:0;border-left:0;transform:rotate(45deg)}
-.tk.done{color:var(--muted);text-decoration:line-through}
-.float{position:absolute;background:linear-gradient(160deg,#141d29,#F1F1EC);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:11px 14px;display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600}
-.float .fi{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;color:#fff;flex:0 0 auto}
-.float.f1{bottom:-16px;left:-22px}
-.float.f2{top:-16px;right:-18px}
-
-/* SECTIONS */
-section{padding:88px 0}
-.sec-head{text-align:center;max-width:680px;margin:0 auto 48px}
-.sec-head h2{font-size:clamp(28px,4vw,42px);margin:14px 0 12px}
-.sec-head p{color:var(--muted);font-size:18px}
-.logos{padding:30px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(14,20,29,.5)}
-.logos .wrap{display:flex;align-items:center;justify-content:center;gap:34px;flex-wrap:wrap;color:var(--muted);font-weight:500;font-size:14px;font-family:var(--mono)}
-.logos b{color:var(--ink-2);font-weight:600}
-
-/* SHOWCASE (galeria curada) */
-.showcase{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.sc{border:1px solid var(--line);border-radius:var(--r-lg);background:linear-gradient(160deg,#121a25,#F1F1EC);overflow:hidden;transition:.2s ease;display:flex;flex-direction:column}
-.sc:hover{transform:translateY(-4px);border-color:rgba(43,92,230,.34);box-shadow:0 30px 60px -34px var(--glow)}
-.sc-bar{display:flex;align-items:center;gap:7px;padding:10px 13px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.5)}
-.sc-bar i{width:8px;height:8px;border-radius:50%;background:var(--dim);display:block}
-.sc-bar i:nth-child(1){background:#ff6058}.sc-bar i:nth-child(2){background:#ffbd2e}.sc-bar i:nth-child(3){background:#28c840}
-.sc-bar .u{margin-left:6px;font-size:10.5px;color:var(--dim);font-family:var(--mono)}
-.sc-view{padding:15px 15px 8px;min-height:196px;display:flex;flex-direction:column;gap:9px;flex:1}
-.sc-app{display:flex;align-items:center;gap:9px;margin-bottom:3px}
-.sc-app .i{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:0 0 auto}
-.sc-app .i svg{width:17px;height:17px}
-.sc-app b{font-family:var(--disp);font-size:14.5px}
-.sc-app .i.blue{background:rgba(43,92,230,.14);color:#7fb0ff}
-.sc-app .i.teal{background:rgba(14,138,99,.14);color:#57e6cf}
-.sc-app .i.mint{background:rgba(29,122,70,.16);color:#57d06a}
-.sc-app .i.violet{background:rgba(139,124,246,.16);color:#a99bf8}
-.sc-app .i.pink{background:rgba(244,114,182,.15);color:#f48fc4}
-.sc-app .i.amber{background:rgba(163,115,10,.16);color:#e7c260}
-.mrow{background:#F7F7F3;border:1px solid var(--line-2);border-radius:9px;padding:8px 10px;font-size:11.5px;color:var(--ink-2);display:flex;align-items:center;gap:8px}
-.mrow .rc{width:20px;height:20px;border-radius:6px;flex:0 0 auto;display:grid;place-items:center;font-size:11px}
-.mrow .rc svg{width:12px;height:12px}
-.mrow small{color:var(--dim);font-size:10px;display:block;margin-top:1px}
-.mbar{height:6px;border-radius:99px;background:#E1E1DA;overflow:hidden}
-.mbar span{display:block;height:100%;border-radius:99px}
-.mchips{display:flex;gap:6px;flex-wrap:wrap}
-.mchip{font-size:10.5px;font-weight:600;padding:5px 9px;border-radius:8px;background:rgba(43,92,230,.10);color:#8fb6ff;border:1px solid rgba(43,92,230,.18);font-family:var(--mono)}
-.msearch{font-size:11px;color:var(--dim);border:1px solid var(--line-2);border-radius:8px;padding:7px 10px;background:rgba(255,255,255,.6);display:flex;align-items:center;gap:7px}
-.mkpi{display:flex;align-items:baseline;gap:8px}
-.mkpi b{font-family:var(--disp);font-size:26px;color:var(--ink)}
-.mkpi span{font-size:11px;color:var(--muted);font-family:var(--mono)}
-.sc-foot{padding:12px 15px 15px;border-top:1px solid var(--line-2);margin-top:auto}
-.sc-foot p{font-size:12.5px;color:var(--muted);line-height:1.5}
-.sc-foot .go{display:inline-flex;align-items:center;gap:6px;margin-top:9px;font-size:13px;font-weight:600;color:#7fb0ff}
-.sc-foot .go svg{transition:.2s}
-.sc:hover .sc-foot .go svg{transform:translateX(3px)}
-.soap{display:grid;gap:5px}
-.soap div{font-size:11px;color:var(--ink-2);display:flex;gap:7px}
-.soap .k{font-family:var(--mono);font-weight:600;color:#7fb0ff;width:14px;flex:0 0 auto}
-
-/* APPS GRID */
-.apps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.app-card{position:relative;border:1px solid var(--line);border-radius:var(--r);padding:22px;background:linear-gradient(160deg,#121a25,#F1F1EC);transition:.2s ease;overflow:hidden}
-.app-card:hover{border-color:rgba(43,92,230,.34);transform:translateY(-3px);box-shadow:var(--shadow)}
-.app-card .ac-ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-weight:700;font-size:16px;margin-bottom:14px;font-family:var(--mono)}
-.app-card h3{font-size:18px;margin-bottom:6px}
-.app-card p{font-size:14px;color:var(--muted);margin-bottom:16px}
-.app-card .go{font-size:13.5px;font-weight:600;color:#7fb0ff;display:inline-flex;align-items:center;gap:6px}
-.app-card .go svg{transition:.2s}
-.app-card:hover .go svg{transform:translateX(3px)}
-
-/* FEATURE SPLIT */
-.split{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
-.feat-list{list-style:none;display:grid;gap:16px;margin-top:22px}
-.feat-list li{display:flex;gap:12px;font-size:15.5px;color:var(--ink-2)}
-.feat-list li .fc{width:26px;height:26px;border-radius:8px;background:rgba(43,92,230,.12);color:var(--brand);display:grid;place-items:center;flex:0 0 auto;font-weight:700}
-
-/* PLANS */
-.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:1000px;margin:0 auto}
-.plan{border:1px solid var(--line);border-radius:var(--r-lg);padding:30px 26px;background:linear-gradient(160deg,#121a25,#F1F1EC);display:flex;flex-direction:column}
-.plan.pop{border-color:rgba(43,92,230,.5);box-shadow:0 30px 70px -34px var(--glow);position:relative}
-.plan.pop .badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(160deg,var(--brand),var(--brand-700));color:#fff;font-size:11.5px;font-weight:700;padding:5px 14px;border-radius:999px;font-family:var(--mono);box-shadow:0 8px 18px -8px var(--glow)}
-.plan h3{font-size:18px}
-.plan .price{margin:14px 0 4px;font-family:var(--disp)}
-.plan .price b{font-size:38px;font-weight:700}
-.plan .price span{color:var(--muted);font-size:15px}
-.plan ul{list-style:none;display:grid;gap:10px;margin:20px 0 24px;font-size:14.5px;color:var(--ink-2)}
-.plan ul li{display:flex;gap:9px}
-.plan ul li::before{content:"✓";color:var(--brand);font-weight:800}
-
-/* HOSPITAL */
-.hosp{background:linear-gradient(150deg,#0d1826,#10233f);border:1px solid var(--line);border-radius:var(--r-lg);padding:44px;color:#fff;display:grid;grid-template-columns:1.3fr .7fr;gap:36px;align-items:center;overflow:hidden;position:relative}
-.hosp::after{content:"";position:absolute;right:-80px;top:-80px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(43,92,230,.4),transparent 70%)}
-.hosp h2{color:#fff;font-size:clamp(24px,3vw,34px);margin-bottom:12px;position:relative}
-.hosp p{color:#c3d0e6;position:relative}
-.hosp ul{list-style:none;display:grid;gap:9px;margin:18px 0 0;position:relative;color:#dbe4f4;font-size:14.5px}
-.hosp ul li::before{content:"✓ ";color:var(--accent);font-weight:800}
-.hosp .box{background:rgba(255,255,255,.5);border:1px solid #DDDDD5;border-radius:18px;padding:24px;text-align:center;position:relative}
-.hosp .box .t{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#9db4dd;font-weight:700;font-family:var(--mono)}
-.hosp .box .v{font-family:var(--disp);font-size:26px;font-weight:700;margin:6px 0 14px}
-
-/* CTA */
-.cta-final{background:linear-gradient(120deg,#123156,#1a4a86 55%,#0f5f6b);border:1px solid rgba(43,92,230,.3);border-radius:var(--r-lg);padding:56px 30px;text-align:center;color:#fff;position:relative;overflow:hidden}
-.cta-final::after{content:"";position:absolute;inset:0;background:radial-gradient(600px 200px at 50% -30%,rgba(43,92,230,.35),transparent 70%);pointer-events:none}
-.cta-final h2{font-size:clamp(26px,3.6vw,38px);color:#fff;margin-bottom:12px;position:relative}
-.cta-final p{color:#dbe7ff;font-size:18px;max-width:520px;margin:0 auto 26px;position:relative}
-.cta-final>*{position:relative}
-.cta-final .btn-ghost{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.3)}
-.cta-final .btn-ghost:hover{background:rgba(255,255,255,.2)}
-.cta-final .btn-primary{background:#fff;color:var(--brand-700)}
-
-/* FOOTER */
-footer{border-top:1px solid var(--line);padding:52px 0 30px;color:var(--muted);font-size:14px}
-.foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:30px;margin-bottom:34px}
-.foot-grid h5{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink);margin-bottom:12px;font-family:var(--mono)}
-.foot-grid a{display:block;padding:5px 0;color:var(--muted)}
-.foot-grid a:hover{color:#7fb0ff}
-.foot-bot{border-top:1px solid var(--line);padding-top:20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
-
-/* CHIPS / FILTRO */
-.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:-24px 0 34px}
-.chip{border:1px solid var(--line-2);background:#F7F7F3;color:var(--ink-2);font-weight:600;font-size:13.5px;padding:8px 15px;border-radius:999px;cursor:pointer;transition:.15s;font-family:var(--mono)}
-.chip:hover{border-color:rgba(43,92,230,.34);background:rgba(43,92,230,.08)}
-.chip.on{background:linear-gradient(160deg,var(--brand),var(--brand-700));color:#fff;border-color:transparent;box-shadow:0 8px 18px -10px var(--glow)}
-.app-card[hidden]{display:none}
-
-/* TOGGLE PLANOS */
-.billing{display:flex;align-items:center;justify-content:center;gap:12px;margin:-20px 0 30px;font-size:14.5px;color:var(--ink-2)}
-.billing .sw{width:52px;height:30px;border-radius:999px;background:rgba(140,160,185,.2);position:relative;cursor:pointer;transition:.2s;border:none;flex:0 0 auto}
-.billing .sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.4);transition:.2s}
-.billing.annual .sw{background:var(--brand)}
-.billing.annual .sw::after{left:25px}
-.billing b{color:var(--ink)}
-.billing .save{font-size:12px;font-weight:700;color:var(--mint);background:rgba(29,122,70,.14);padding:3px 9px;border-radius:999px;font-family:var(--mono)}
-.plan .price .yr{display:block;font-family:'Inter';font-size:12.5px;font-weight:500;color:var(--muted);margin-top:2px}
-
-/* FAQ */
-.faq{max-width:760px;margin:0 auto;display:grid;gap:12px}
-.faq details{border:1px solid var(--line);border-radius:14px;background:linear-gradient(160deg,#121a25,#F1F1EC);overflow:hidden}
-.faq summary{list-style:none;cursor:pointer;padding:18px 20px;font-weight:600;font-size:16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
-.faq summary::-webkit-details-marker{display:none}
-.faq summary::after{content:"+";font-size:22px;color:var(--brand);font-weight:400;transition:.2s;flex:0 0 auto}
-.faq details[open] summary::after{transform:rotate(45deg)}
-.faq .ans{padding:0 20px 18px;color:var(--ink-2);font-size:15px}
-
-/* STICKY CTA MOBILE */
-.mcta{display:none;position:fixed;left:0;right:0;bottom:0;z-index:70;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:10px 16px;gap:10px;align-items:center}
-.mcta .t{flex:1;font-size:13px;color:var(--ink-2);font-weight:600;line-height:1.2}
-.mcta .btn{padding:11px 18px}
-
-@media(max-width:920px){
-  .hero-grid,.split,.hosp{grid-template-columns:1fr;gap:40px}
-  .hero .wrap{padding-top:48px}
-  .hero-visual{order:2}
-  .kpis{grid-template-columns:repeat(3,1fr)}
-  .showcase{grid-template-columns:repeat(2,1fr)}
-  .apps-grid{grid-template-columns:repeat(2,1fr)}
-  .plans{grid-template-columns:1fr;max-width:440px}
-  .foot-grid{grid-template-columns:1fr 1fr}
-}
-@media(max-width:680px){
-  .nav-links,.nav-cta .btn-ghost{display:none}
-  .burger{display:flex}
-  .showcase{grid-template-columns:1fr}
-  .apps-grid{grid-template-columns:1fr}
-  .float{display:none}
-  .foot-grid{grid-template-columns:1fr 1fr}
-  .mcta{display:flex}
-  body{padding-bottom:66px}
-  .chips{margin-top:-8px}
-}
+body{font-family:'Figtree',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--ink);background:var(--paper);line-height:1.55;-webkit-font-smoothing:antialiased}
+:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(43,92,230,.3);border-radius:8px}
+.wrap{max-width:980px;margin:0 auto;padding:0 22px}
+header{position:sticky;top:0;z-index:30;background:rgba(250,250,248,.92);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+.wm{font-weight:700;font-size:18px}
+.wm b{color:var(--accent)}
+.nav{display:flex;gap:8px;align-items:center}
+.ghost{background:transparent;border:1px solid var(--line-strong);color:var(--ink);border-radius:9px;padding:8px 14px;font:500 13.5px 'Figtree',sans-serif;cursor:pointer;text-decoration:none}
+.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.cta{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 16px;font:600 13.5px 'Figtree',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.cta:hover{filter:brightness(.92)}
+/* hero */
+.hero{text-align:center;padding:64px 0 44px}
+.hero h1{font-size:clamp(30px,5vw,46px);font-weight:800;letter-spacing:-.025em;line-height:1.12;max-width:640px;margin:0 auto}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero p{font-size:clamp(15.5px,2vw,18px);color:var(--muted);max-width:520px;margin:16px auto 26px}
+.hero .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.hero .cta{padding:13px 22px;font-size:15px;border-radius:11px}
+.hero .ghost{padding:12px 20px;font-size:15px;border-radius:11px}
+/* parede de ícones */
+.wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:22px 10px;max-width:760px;margin:52px auto 0;justify-items:center}
+.wall a{display:flex;flex-direction:column;align-items:center;gap:7px;text-decoration:none;color:inherit}
+.wall .k{width:58px;height:58px;border-radius:15px;display:grid;place-items:center;font-size:28px;color:#fff;box-shadow:0 2px 6px rgba(35,39,46,.14);transition:transform .13s}
+.wall a:hover .k{transform:translateY(-4px) scale(1.06)}
+.wall .n{font-size:11.5px;font-weight:500;color:var(--muted);text-align:center;line-height:1.2}
+/* seções */
+section{padding:52px 0}
+.sec-h{text-align:center;margin-bottom:30px}
+.sec-h h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-.02em}
+.sec-h p{color:var(--muted);font-size:15px;margin-top:6px}
+/* funções */
+.funcs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.func{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:13px;padding:14px;text-decoration:none;color:inherit;transition:border-color .13s}
+.func:hover{border-color:var(--line-strong)}
+.func .k{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;font-size:20px;color:#fff;flex:0 0 auto}
+.func b{font-size:14px;display:block}
+.func span{font-size:12.5px;color:var(--muted);line-height:1.4;display:block;margin-top:2px}
+/* como funciona */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.step{background:var(--panel);border-radius:13px;padding:20px;text-align:center}
+.step .ic{font-size:26px;color:var(--accent);margin-bottom:8px}
+.step b{display:block;font-size:15px;margin-bottom:4px}
+.step p{font-size:13px;color:var(--muted)}
+/* planos */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:820px;margin:0 auto}
+.plan{background:#fff;border:1px solid var(--line);border-radius:15px;padding:22px;text-align:center}
+.plan.dest{border:2px solid var(--accent)}
+.plan .nm{font-weight:600;font-size:14px;color:var(--muted)}
+.plan .pr{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:8px 0 2px}
+.plan .pr small{font-size:13px;font-weight:500;color:var(--dim)}
+.plan p{font-size:12.5px;color:var(--muted);margin:8px 0 14px}
+.plan .cta{width:100%;justify-content:center}
+.plans-note{text-align:center;font-size:12.5px;color:var(--dim);margin-top:14px}
+/* hospitalar */
+.hosp{background:var(--panel);border-radius:17px;padding:30px;text-align:center;max-width:720px;margin:0 auto}
+.hosp h2{font-size:20px;font-weight:700}
+.hosp p{color:var(--muted);font-size:14px;max-width:480px;margin:8px auto 16px}
+footer{text-align:center;color:var(--dim);font-size:12px;padding:26px 22px 34px;border-top:1px solid var(--line);margin-top:24px}
+footer a{color:var(--muted);text-decoration:none}
+footer a:hover{color:var(--accent)}
+@media(max-width:760px){.funcs{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.plans{grid-template-columns:1fr}.hero{padding:44px 0 30px}.wall{gap:16px 6px}.wall .k{width:52px;height:52px;border-radius:13px;font-size:25px}}
 </style>
-<link rel="stylesheet" href="_mttokens.css?v=1">
 </head>
 <body>
+<header><div class="wrap top">
+  <span class="wm">Med<b>Tech</b></span>
+  <nav class="nav"><a class="ghost" href="app.html">Entrar</a><a class="cta" href="app.html">Começar grátis</a></nav>
+</div></header>
 
-<header>
+<main>
   <div class="wrap">
-    <nav>
-      <a href="#" class="brand" aria-label="MedTech">
-        <span class="mk"><svg viewBox="0 0 24 24" fill="none"><path d="M4 13h3l2-6 3 11 2-7 1.5 2H20" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        Med<b>Tech</b>
-      </a>
-      <div class="nav-links">
-        <a href="#produtos">Produtos</a>
-        <a href="#plataforma">Plataforma</a>
-        <a href="#planos">Planos</a>
-        <a href="#hospitalar">Hospitalar</a>
+    <div class="hero">
+      <h1>Seus apps médicos, <em>com IA</em>, numa conta só</h1>
+      <p>Condutas, antibióticos, prontuário com teleconsulta, laudos, provas, plantões e finanças — na nuvem, em qualquer aparelho.</p>
+      <div class="row"><a class="cta" href="app.html"><i class="ti ti-arrow-right"></i> Começar grátis</a><a class="ghost" href="#funcoes">Ver os 15 apps</a></div>
+      <div class="wall" id="wall"></div>
+    </div>
+
+    <section id="funcoes">
+      <div class="sec-h"><h2>O que tem dentro</h2><p>Cada app resolve uma dor real do dia a dia — e todos conversam entre si.</p></div>
+      <div class="funcs" id="funcs"></div>
+    </section>
+
+    <section>
+      <div class="sec-h"><h2>Como funciona</h2></div>
+      <div class="steps">
+        <div class="step"><div class="ic"><i class="ti ti-key"></i></div><b>Uma conta, tudo aberto</b><p>Entre uma vez e todos os apps abrem já autenticados, na mesma janela.</p></div>
+        <div class="step"><div class="ic"><i class="ti ti-cloud"></i></div><b>Na nuvem, em qualquer aparelho</b><p>Celular no plantão, computador no consultório — seus dados sincronizam sozinhos.</p></div>
+        <div class="step"><div class="ic"><i class="ti ti-sparkles"></i></div><b>IA já integrada</b><p>Evolução por voz, condutas sob medida, laudos e provas — sem configurar nada.</p></div>
       </div>
-      <div class="nav-cta">
-        <a href="app.html" class="btn btn-ghost">Entrar</a>
-        <a href="#planos" class="btn btn-primary">Começar grátis</a>
-        <button class="burger" aria-label="Menu" onclick="document.body.classList.toggle('menu-open')"><span></span></button>
+    </section>
+
+    <section id="planos">
+      <div class="sec-h"><h2>Planos simples</h2><p>Comece grátis; assine quando fizer sentido.</p></div>
+      <div class="plans">
+        <div class="plan"><div class="nm">1 app</div><div class="pr">R$ 19,90<small>/mês</small></div><p>Escolha o app que resolve a sua maior dor.</p><a class="cta ghost" style="color:var(--ink)" href="app.html">Começar</a></div>
+        <div class="plan dest"><div class="nm">Tudo</div><div class="pr">R$ 59,90<small>/mês</small></div><p>Os 15 apps + IA ilimitada. O ecossistema completo.</p><a class="cta" href="app.html">Começar grátis</a></div>
+        <div class="plan"><div class="nm">2 apps</div><div class="pr">R$ 34,90<small>/mês</small></div><p>A dupla que você usa todo dia.</p><a class="cta ghost" style="color:var(--ink)" href="app.html">Começar</a></div>
       </div>
-    </nav>
+      <div class="plans-note">Sem fidelidade · cancele quando quiser · IA incluída em todos os planos</div>
+    </section>
+
+    <section>
+      <div class="hosp">
+        <h2>Para serviços e hospitais</h2>
+        <p>Quer o MedTech para a sua equipe, residência ou instituição — com gestão centralizada? Fale com a gente.</p>
+        <a class="cta" href="mailto:medtechbr1@gmail.com?subject=MedTech%20Hospitalar"><i class="ti ti-mail"></i> medtechbr1@gmail.com</a>
+      </div>
+    </section>
   </div>
-  <div class="mobile-menu">
-    <a href="#produtos">Produtos</a>
-    <a href="#plataforma">Plataforma</a>
-    <a href="#planos">Planos</a>
-    <a href="#hospitalar">Hospitalar</a>
-    <a href="app.html" class="btn btn-ghost">Entrar</a>
-    <a href="#planos" class="btn btn-primary">Começar grátis</a>
-  </div>
-</header>
+</main>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="wrap">
-    <div class="hero-grid">
-      <div class="hero-copy">
-        <span class="eyebrow"><span class="dot"></span> 15 apps de IA · uma conta MedTech</span>
-        <h1>A inteligência artificial que <span class="grad">devolve seu tempo</span> na medicina</h1>
-        <p class="sub">Condutas, escores, laudos, provas, plantões e prontuário — reunidos num ecossistema com IA já integrada. Você entra uma vez e usa tudo, na nuvem, em qualquer dispositivo.</p>
-        <div class="hero-cta">
-          <a href="#planos" class="btn btn-primary btn-lg">Começar grátis →</a>
-          <a href="#plataforma" class="btn btn-ghost btn-lg">Ver a plataforma</a>
-        </div>
-        <div class="hero-meta">
-          <div><b>14</b><span>aplicativos no ecossistema</span></div>
-          <div><b>1 conta</b><span>login único, dados na nuvem</span></div>
-          <div><b>IA nativa</b><span>sem precisar de chave</span></div>
-        </div>
-        <div class="trust-row">
-          <div class="av"><span>M</span><span>R</span><span>A</span><span>+</span></div>
-          Feito por médico, para médicos, residentes e estudantes.
-        </div>
-      </div>
-
-      <div class="hero-visual">
-        <div class="dash">
-          <div class="dash-bar">
-            <div class="dots"><i></i><i></i><i></i></div>
-            <div class="dash-url">app.medtech · meus aplicativos</div>
-          </div>
-          <div class="dash-body">
-            <div class="dash-side">
-              <div class="ic on">M</div>
-              <div class="ic">Cd</div>
-              <div class="ic">Cl</div>
-              <div class="ic">Ld</div>
-              <div class="ic">Pv</div>
-              <div class="ic">Fc</div>
-            </div>
-            <div class="dash-main">
-              <div class="dash-head">
-                <h4>Bom dia, Dr. Matheus 👋</h4>
-                <div class="search">🔎 Buscar app, conduta, escore…</div>
-              </div>
-              <div class="kpis">
-                <div class="kpi"><div class="lbl">Apps ativos</div><div class="val">14</div><div class="chg">tudo liberado</div></div>
-                <div class="kpi"><div class="lbl">Tempo economizado</div><div class="val">6h</div><div class="chg">▲ nesta semana</div></div>
-                <div class="kpi"><div class="lbl">Consultas IA</div><div class="val">128</div><div class="chg">▲ 24%</div></div>
-              </div>
-              <div class="dash-cards">
-                <div class="panel">
-                  <div class="pt">Uso do ecossistema <span>últimos 7 dias</span></div>
-                  <svg viewBox="0 0 320 120" width="100%" height="120" preserveAspectRatio="none">
-                    <defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0" stop-color="#2B5CE6" stop-opacity="0.32"/>
-                      <stop offset="1" stop-color="#2B5CE6" stop-opacity="0"/></linearGradient></defs>
-                    <path d="M0 92 L46 78 L92 84 L138 54 L184 62 L230 34 L276 44 L320 20 L320 120 L0 120 Z" fill="url(#ga)"/>
-                    <path d="M0 92 L46 78 L92 84 L138 54 L184 62 L230 34 L276 44 L320 20" fill="none" stroke="#2B5CE6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-                    <circle cx="320" cy="20" r="4" fill="#2B5CE6"/><circle cx="320" cy="20" r="8" fill="#2B5CE6" opacity="0.2"/>
-                  </svg>
-                </div>
-                <div class="panel">
-                  <div class="pt">Prioridades de hoje <span>IA</span></div>
-                  <div class="tasklist">
-                    <div class="tk done"><span class="ck"></span>Evoluir enfermaria</div>
-                    <div class="tk"><span class="ck"></span>Laudo · US abdome</div>
-                    <div class="tk"><span class="ck"></span>Revisar Cardiologia</div>
-                    <div class="tk"><span class="ck"></span>Plantão sáb 19h</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="float f1"><span class="fi" style="background:var(--mint)">✓</span> Sincronizado na nuvem</div>
-        <div class="float f2"><span class="fi" style="background:var(--brand)">✦</span> IA respondeu em 1,2s</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- LOGOS / TRUST -->
-<div class="logos">
-  <div class="wrap">
-    <span>Pensado para <b>estudantes</b></span>
-    <span>· <b>residentes</b></span>
-    <span>· <b>médicos</b> na rotina clínica</span>
-    <span>· <b>plantonistas</b></span>
-    <span>· <b>clínicas &amp; hospitais</b></span>
-  </div>
-</div>
-
-<!-- PLATAFORMA (feature split com dashboard) -->
-<section id="plataforma">
-  <div class="wrap">
-    <div class="split">
-      <div>
-        <span class="eyebrow"><span class="dot"></span> Uma plataforma, tudo conectado</span>
-        <h2 style="font-size:clamp(26px,3.6vw,38px);margin:16px 0 10px">Seu ecossistema clínico, num só lugar</h2>
-        <p class="muted" style="font-size:17px">Uma conta MedTech dá acesso a todos os apps, com seus dados sincronizados na nuvem. Você entra uma vez e a IA já vem instalada — sem configurar chave, sem fricção.</p>
-        <ul class="feat-list">
-          <li><span class="fc">✓</span> Login único (SSO) entre os aplicativos do ecossistema</li>
-          <li><span class="fc">✓</span> IA integrada de fábrica — funciona out-of-the-box</li>
-          <li><span class="fc">✓</span> Dados na nuvem, disponíveis no celular e no computador</li>
-          <li><span class="fc">✓</span> Instale como app (PWA), use até offline</li>
-        </ul>
-        <a href="app.html" class="btn btn-primary btn-lg" style="margin-top:26px">Entrar nos meus apps →</a>
-      </div>
-      <div class="hero-visual">
-        <div class="dash">
-          <div class="dash-bar">
-            <div class="dots"><i></i><i></i><i></i></div>
-            <div class="dash-url">medtech · painel do ecossistema</div>
-          </div>
-          <div class="dash-body" style="grid-template-columns:1fr;min-height:300px">
-            <div class="dash-main">
-              <div class="dash-head"><h4>Meus aplicativos</h4><div class="search">Todos ativos</div></div>
-              <div class="apps-mini" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
-                <!-- mini tiles -->
-                <div class="kpi" style="text-align:center;padding:12px 6px"><div style="width:34px;height:34px;border-radius:10px;background:rgba(43,92,230,.14);color:#7fb0ff;display:grid;place-items:center;margin:0 auto 6px;font-weight:700;font-family:var(--mono)">Cd</div><div style="font-size:11.5px;font-weight:600">CondutAI</div></div>
-                <div class="kpi" style="text-align:center;padding:12px 6px"><div style="width:34px;height:34px;border-radius:10px;background:rgba(29,122,70,.16);color:#57d06a;display:grid;place-items:center;margin:0 auto 6px;font-weight:700;font-family:var(--mono)">Cm</div><div style="font-size:11.5px;font-weight:600">CalcMed</div></div>
-                <div class="kpi" style="text-align:center;padding:12px 6px"><div style="width:34px;height:34px;border-radius:10px;background:rgba(139,124,246,.16);color:#a99bf8;display:grid;place-items:center;margin:0 auto 6px;font-weight:700;font-family:var(--mono)">At</div><div style="font-size:11.5px;font-weight:600">ATBguia</div></div>
-                <div class="kpi" style="text-align:center;padding:12px 6px"><div style="width:34px;height:34px;border-radius:10px;background:rgba(43,92,230,.14);color:#7fb0ff;display:grid;place-items:center;margin:0 auto 6px;font-weight:700;font-family:var(--mono)">Pc</div><div style="font-size:11.5px;font-weight:600">PocusAI</div></div>
-                <div class="kpi" style="text-align:center;padding:12px 6px"><div style="width:34px;height:34px;border-radius:10px;background:rgba(29,122,70,.16);color:#57d06a;display:grid;place-items:center;margin:0 auto 6px;font-weight:700;font-family:var(--mono)">Co</div><div style="font-size:11.5px;font-weight:600">ConsultAI</div></div>
-                <div class="kpi" style="text-align:center;padding:12px 6px"><div style="width:34px;height:34px;border-radius:10px;background:rgba(14,138,99,.16);color:#57e6cf;display:grid;place-items:center;margin:0 auto 6px;font-weight:700;font-family:var(--mono)">En</div><div style="font-size:11.5px;font-weight:600">EnfermarIA</div></div>
-                <div class="kpi" style="text-align:center;padding:12px 6px"><div style="width:34px;height:34px;border-radius:10px;background:rgba(43,92,230,.14);color:#7fb0ff;display:grid;place-items:center;margin:0 auto 6px;font-weight:700;font-family:var(--mono)">Ld</div><div style="font-size:11.5px;font-weight:600">LaudAI</div></div>
-                <div class="kpi" style="text-align:center;padding:12px 6px"><div style="width:34px;height:34px;border-radius:10px;background:rgba(14,138,99,.16);color:#57e6cf;display:grid;place-items:center;margin:0 auto 6px;font-weight:700;font-family:var(--mono)">Pv</div><div style="font-size:11.5px;font-weight:600">MedProvas</div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- VITRINE (galeria curada dos apps mais visuais) -->
-<section id="vitrine" style="padding-top:24px">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow"><span class="dot"></span> Em destaque</span>
-      <h2>Veja a IA trabalhando por dentro</h2>
-      <p>Uma amostra dos apps mais usados na beira do leito — condutas, ultrassom, antibióticos e mais.</p>
-    </div>
-    <div class="showcase">
-
-      <!-- CondutAI -->
-      <div class="sc">
-        <div class="sc-bar"><i></i><i></i><i></i><span class="u">condutai.html</span></div>
-        <div class="sc-view">
-          <div class="sc-app"><span class="i blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6M9 16h6M9 8h6M5 4h14v16H5z" stroke-linecap="round"/></svg></span><b>CondutAI</b></div>
-          <div class="mrow"><span class="rc" style="background:rgba(43,92,230,.16);color:#7fb0ff">1</span><div>Abordagem inicial <small>MOV, acesso, monitorização</small></div></div>
-          <div class="mrow"><span class="rc" style="background:rgba(14,138,99,.16);color:#57e6cf">2</span><div>Investigação <small>ECG, troponina, RX tórax</small></div></div>
-          <div class="mrow"><span class="rc" style="background:rgba(29,122,70,.16);color:#57d06a">3</span><div>Conduta + doses <small>AAS 300mg, dupla antiagregação</small></div></div>
-        </div>
-        <div class="sc-foot"><p>Descreva o caso → conduta por diretriz, fluxograma e doses, à beira-leito.</p><a class="go" href="https://medtechbr.github.io/condutai.html" target="_blank" rel="noopener">Abrir CondutAI <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
-      </div>
-
-      <!-- PaliAI -->
-      <div class="sc">
-        <div class="sc-bar"><i></i><i></i><i></i><span class="u">paliai.html · Conteúdo</span></div>
-        <div class="sc-view">
-          <div class="sc-app"><span class="i pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 8.6a5 5 0 0 0-8.8-3 5 5 0 0 0-8.8 3c0 4 4.5 7 8.8 10 4.3-3 8.8-6 8.8-10z" stroke-linejoin="round"/></svg></span><b>PaliAI</b></div>
-          <div class="msearch">🔎 dor, dispneia, sedação, SPIKES…</div>
-          <div class="mrow"><span class="rc" style="background:rgba(43,92,230,.16);color:#7fb0ff">✦</span><div>Avaliação da dor <small>escalas, dor irruptiva</small></div></div>
-          <div class="mrow"><span class="rc" style="background:rgba(14,138,99,.16);color:#57e6cf">✦</span><div>Opioides: início e titulação</div></div>
-          <div class="mrow"><span class="rc" style="background:rgba(139,124,246,.16);color:#a99bf8">✦</span><div>Sedação paliativa</div></div>
-        </div>
-        <div class="sc-foot"><p>Triagem em 2 min + biblioteca de 43 temas de cuidados paliativos.</p><a class="go" href="https://medtechbr.github.io/paliai.html" target="_blank" rel="noopener">Abrir PaliAI <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
-      </div>
-
-      <!-- ATBguia -->
-      <div class="sc">
-        <div class="sc-bar"><i></i><i></i><i></i><span class="u">atbguia.html</span></div>
-        <div class="sc-view">
-          <div class="sc-app"><span class="i violet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.5 20.5a4.95 4.95 0 0 1-7-7l7-7a4.95 4.95 0 0 1 7 7z" stroke-linejoin="round"/><path d="M8 8l8 8" stroke-linecap="round"/></svg></span><b>ATBguia</b></div>
-          <div class="mchips"><span class="mchip">Cobertura</span><span class="mchip">Terapia dirigida</span><span class="mchip">Calc. dose</span><span class="mchip">IV → VO</span></div>
-          <div class="mrow"><span class="rc" style="background:rgba(43,92,230,.16);color:#7fb0ff">🫁</span><div>Pneumonia (PAC) <small>amox-clav + azitro · 7 dias</small></div></div>
-          <div class="mrow"><span class="rc" style="background:rgba(163,115,10,.16);color:#e7c260">⚠</span><div>Ajuste renal · TFG 42 <small>reduzir dose 50%</small></div></div>
-        </div>
-        <div class="sc-foot"><p>Esquema empírico por foco, espectro, resistência e ajuste renal.</p><a class="go" href="https://medtechbr.github.io/atbguia.html" target="_blank" rel="noopener">Abrir ATBguia <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
-      </div>
-
-      <!-- PocusAI -->
-      <div class="sc">
-        <div class="sc-bar"><i></i><i></i><i></i><span class="u">pocusai.html</span></div>
-        <div class="sc-view">
-          <div class="sc-app"><span class="i blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2" stroke-linecap="round"/><circle cx="12" cy="12" r="2.5"/></svg></span><b>PocusAI</b></div>
-          <div class="mchips"><span class="mchip">Pulmão</span><span class="mchip">FoCUS</span><span class="mchip">VCI</span><span class="mchip">FAST</span></div>
-          <div class="mrow"><span class="rc" style="background:rgba(43,92,230,.16);color:#7fb0ff">📈</span><div>Pulmão · linhas B <small>sonda, corte, achados</small></div></div>
-          <div class="mrow"><span class="rc" style="background:rgba(14,138,99,.16);color:#57e6cf">🫀</span><div>VCI / volemia <small>colapsabilidade &gt; 50%</small></div></div>
-        </div>
-        <div class="sc-foot"><p>Ultrassom point-of-care região a região: sonda, cortes e técnica.</p><a class="go" href="https://medtechbr.github.io/pocusai.html" target="_blank" rel="noopener">Abrir PocusAI <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
-      </div>
-
-      <!-- CalcMed -->
-      <div class="sc">
-        <div class="sc-bar"><i></i><i></i><i></i><span class="u">calcmed.html</span></div>
-        <div class="sc-view">
-          <div class="sc-app"><span class="i mint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h2M16 11h0M8 15h2M12 15h2" stroke-linecap="round"/></svg></span><b>CalcMed</b></div>
-          <div class="mrow" style="flex-direction:column;align-items:flex-start;gap:7px">
-            <div class="mkpi"><b>72</b><span>mL/min/1,73m²</span></div>
-            <div style="font-size:10.5px;color:var(--muted);font-family:var(--mono)">CKD-EPI 2021 · TFG estimada</div>
-            <div class="mbar" style="width:100%"><span style="width:62%;background:linear-gradient(90deg,#1D7A46,#0E8A63)"></span></div>
-            <div style="font-size:11px;color:#57d06a">DRC estágio G2 — leve ↓</div>
-          </div>
-        </div>
-        <div class="sc-foot"><p>60+ calculadoras e escores com interpretação automática do resultado.</p><a class="go" href="https://medtechbr.github.io/calcmed.html" target="_blank" rel="noopener">Abrir CalcMed <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
-      </div>
-
-      <!-- ConsultAI -->
-      <div class="sc">
-        <div class="sc-bar"><i></i><i></i><i></i><span class="u">consultai.html · evolução</span></div>
-        <div class="sc-view">
-          <div class="sc-app"><span class="i mint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v3" stroke-linecap="round"/></svg></span><b>ConsultAI</b></div>
-          <div class="mrow" style="align-items:flex-start"><span class="rc" style="background:rgba(43,92,230,.16);color:#7fb0ff">🎙</span><div>Evolução por voz → SOAP <small>ditou, a IA estruturou</small></div></div>
-          <div class="soap">
-            <div><span class="k">S</span> Refere melhora da dor torácica…</div>
-            <div><span class="k">O</span> PA 128×82 · FC 74 · afebril</div>
-            <div><span class="k">A</span> Dor torácica atípica, baixo risco</div>
-            <div><span class="k">P</span> Alta com AAS, retorno em 7d</div>
-          </div>
-        </div>
-        <div class="sc-foot"><p>Prontuário, evolução por voz (SOAP), receituário e agenda com WhatsApp.</p><a class="go" href="https://medtechbr.github.io/consultai.html" target="_blank" rel="noopener">Abrir ConsultAI <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- PRODUTOS (15 apps) -->
-<section id="produtos" style="background:rgba(14,20,29,.5)">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow"><span class="dot"></span> O ecossistema</span>
-      <h2>15 aplicativos, uma missão: seu tempo de volta</h2>
-      <p>Cada app resolve uma dor concreta da rotina clínica com IA de verdade.</p>
-    </div>
-    <div class="chips" id="chips"></div>
-    <div class="apps-grid" id="appsGrid"></div>
-  </div>
-</section>
-
-<!-- PLANOS -->
-<section id="planos">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow"><span class="dot"></span> Planos &amp; assinatura</span>
-      <h2>Escolha quantos apps quiser</h2>
-      <p>Uma conta, tudo na nuvem, em qualquer dispositivo. Cancele quando quiser.</p>
-    </div>
-    <div class="billing" id="billing">
-      <span>Mensal</span>
-      <button class="sw" id="billSw" aria-label="Alternar cobrança mensal/anual" onclick="toggleBilling()"></button>
-      <span><b>Anual</b></span>
-      <span class="save">2 meses grátis</span>
-    </div>
-    <div class="plans">
-      <div class="plan">
-        <h3>1 aplicativo</h3>
-        <div class="price"><b data-m="R$ 19,90" data-a="R$ 16,58">R$ 19,90</b><span>/mês</span><span class="yr" data-yr="Cobrado R$ 199/ano"></span></div>
-        <p class="muted" style="font-size:14px">Escolha 1 app do ecossistema.</p>
-        <ul><li>1 app à sua escolha</li><li>Dados na nuvem</li><li>Atualizações incluídas</li></ul>
-        <a href="#contato" class="btn btn-ghost" style="margin-top:auto">Assinar</a>
-      </div>
-      <div class="plan pop">
-        <span class="badge">MAIS POPULAR</span>
-        <h3>Ecossistema completo</h3>
-        <div class="price"><b data-m="R$ 59,90" data-a="R$ 49,90">R$ 59,90</b><span>/mês</span><span class="yr" data-yr="Cobrado R$ 599/ano"></span></div>
-        <p class="muted" style="font-size:14px">Todos os aplicativos MedTech.</p>
-        <ul><li><b>Todos</b> os 15 apps, sem limite</li><li>Novos apps já inclusos</li><li>Suporte prioritário</li></ul>
-        <a href="#contato" class="btn btn-primary" style="margin-top:auto">Assinar tudo</a>
-      </div>
-      <div class="plan">
-        <h3>2 aplicativos</h3>
-        <div class="price"><b data-m="R$ 34,90" data-a="R$ 29,08">R$ 34,90</b><span>/mês</span><span class="yr" data-yr="Cobrado R$ 349/ano"></span></div>
-        <p class="muted" style="font-size:14px">Escolha 2 apps do ecossistema.</p>
-        <ul><li>2 apps à sua escolha</li><li>Dados na nuvem</li><li>Atualizações incluídas</li></ul>
-        <a href="#contato" class="btn btn-ghost" style="margin-top:auto">Assinar</a>
-      </div>
-    </div>
-    <p class="muted" style="text-align:center;font-size:13.5px;margin-top:22px">💡 No plano anual você paga 10 meses e leva 12. Estudante de medicina tem condição especial — fale com a gente.</p>
-  </div>
-</section>
-
-<!-- HOSPITALAR -->
-<section id="hospitalar">
-  <div class="wrap">
-    <div class="hosp">
-      <div>
-        <span class="eyebrow" style="background:rgba(14,138,99,.12);border-color:rgba(14,138,99,.3);color:#7fe9cd">🏥 Solução institucional</span>
-        <h2 style="margin-top:14px">Sistema Hospitalar MedTech</h2>
-        <p>Prontuário, prescrição, exames, fluxos de internação e gestão clínica para clínicas e hospitais. Vendido separadamente, com implantação e orçamento sob medida.</p>
-        <ul>
-          <li>Prontuário eletrônico, prescrição e catálogo de medicações/exames</li>
-          <li>Fluxos de internação e gestão do paciente</li>
-          <li>Implantação, treinamento e suporte dedicado</li>
-        </ul>
-      </div>
-      <div class="box">
-        <div class="t">Investimento</div>
-        <div class="v">Sob orçamento</div>
-        <a href="#contato" class="btn btn-primary" style="width:100%;background:#fff;color:var(--brand-700);margin-bottom:10px">Solicitar demonstração</a>
-        <a href="https://wa.me/5500000000000" target="_blank" rel="noopener" class="btn btn-ghost" style="width:100%;background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.3)">Falar no WhatsApp</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FAQ -->
-<section id="faq" style="background:rgba(14,20,29,.5)">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow"><span class="dot"></span> Perguntas frequentes</span>
-      <h2>Tudo que você precisa saber</h2>
-    </div>
-    <div class="faq">
-      <details open><summary>Preciso configurar alguma chave de IA?</summary><div class="ans">Não. A inteligência artificial já vem integrada e funcionando — você não precisa criar conta em nenhum provedor nem colar chave. É só entrar e usar.</div></details>
-      <details><summary>Meus dados ficam seguros e em conformidade com a LGPD?</summary><div class="ans">Sim. Seus dados ficam sincronizados na sua conta MedTech, na nuvem, e tratamos privacidade com seriedade. Você pode consultar nossos <a href="termos.html" style="color:#7fb0ff;font-weight:600">Termos</a> e a <a href="privacidade.html" style="color:#7fb0ff;font-weight:600">Política de Privacidade</a>.</div></details>
-      <details><summary>Posso assinar só o app que eu uso?</summary><div class="ans">Pode. Temos planos de 1 app (R$ 19,90/mês), 2 apps (R$ 34,90/mês) ou o ecossistema completo com os 15 apps (R$ 59,90/mês). Você escolhe.</div></details>
-      <details><summary>Funciona no celular e offline?</summary><div class="ans">Sim. Os apps instalam como aplicativo no seu celular (PWA) e funcionam até offline nas partes que não dependem de IA. Seus dados sincronizam quando você volta a ficar online.</div></details>
-      <details><summary>Posso cancelar quando quiser?</summary><div class="ans">Sim, sem multa nem fidelidade. A assinatura é mensal (ou anual, com desconto) e você cancela a qualquer momento — mantém o acesso até o fim do período pago.</div></details>
-    </div>
-  </div>
-</section>
-
-<!-- CTA FINAL -->
-<section id="contato">
-  <div class="wrap">
-    <div class="cta-final">
-      <h2>Comece hoje a ganhar tempo</h2>
-      <p>Crie sua conta MedTech e experimente o ecossistema. A IA já vem integrada — sem chave, sem complicação.</p>
-      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-        <a href="app.html" class="btn btn-primary btn-lg">Começar grátis →</a>
-        <a href="https://wa.me/5500000000000" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">Falar com a gente</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <div class="wrap">
-    <div class="foot-grid">
-      <div>
-        <a href="#" class="brand" style="margin-bottom:12px"><span class="mk"><svg viewBox="0 0 24 24" fill="none"><path d="M4 13h3l2-6 3 11 2-7 1.5 2H20" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Med<b>Tech</b></a>
-        <p class="muted" style="max-width:280px">O ecossistema de IA para quem veste o jaleco. Feito no Brasil, para a medicina.</p>
-      </div>
-      <div>
-        <h5>Produto</h5>
-        <a href="#produtos">Aplicativos</a>
-        <a href="#plataforma">Plataforma</a>
-        <a href="#planos">Planos</a>
-        <a href="app.html">Entrar</a>
-      </div>
-      <div>
-        <h5>Institucional</h5>
-        <a href="#hospitalar">Sistema Hospitalar</a>
-        <a href="termos.html">Termos de uso</a>
-        <a href="privacidade.html">Privacidade</a>
-      </div>
-      <div>
-        <h5>Contato</h5>
-        <a href="https://instagram.com/medtechbr" target="_blank" rel="noopener">@medtechbr</a>
-        <a href="#contato">Fale conosco</a>
-      </div>
-    </div>
-    <div class="foot-bot">
-      <span>© 2026 MedTech. Todos os direitos reservados.</span>
-      <span>Ferramenta de apoio — não substitui o julgamento clínico.</span>
-    </div>
-  </div>
-</footer>
-
-<!-- CTA fixo mobile -->
-<div class="mcta">
-  <div class="t">15 apps de IA · a partir de R$ 19,90/mês</div>
-  <a href="#planos" class="btn btn-primary">Começar grátis</a>
-</div>
+<footer>© 2026 MedTech · <a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a></footer>
 
 <script>
-// Toggle de cobrança mensal/anual
-function toggleBilling(){
-  const b=document.getElementById('billing'); const on=b.classList.toggle('annual');
-  document.querySelectorAll('.plan .price b').forEach(el=>{ el.textContent = on ? el.dataset.a : el.dataset.m; });
-  document.querySelectorAll('.plan .price .yr').forEach(el=>{ el.textContent = on ? el.dataset.yr : ''; });
-}
-
-// 15 apps reais (cores de ícone em tons claros p/ tema dark)
-const APPS = [
-  {n:"CondutAI", d:"Descreva o caso e receba a conduta completa por diretrizes — abordagem, fluxograma e doses, à beira-leito.", u:"https://medtechbr.github.io/condutai.html", ini:"Cd", fg:"#7fb0ff"},
-  {n:"CalcMed", d:"60+ calculadoras e escores clínicos (IMC, CKD-EPI, escores de risco…) com interpretação automática do resultado.", u:"https://medtechbr.github.io/calcmed.html", ini:"Cm", fg:"#57d06a"},
-  {n:"ATBguia", d:"Antibioticoterapia guiada: esquema empírico por foco, espectro e cobertura, resistência, ajuste renal e troca IV→VO.", u:"https://medtechbr.github.io/atbguia.html", ini:"At", fg:"#a99bf8"},
-  {n:"PocusAI", d:"Ultrassom point-of-care região a região: sonda, posição, cortes, técnica e achados normais vs. patológicos.", u:"https://medtechbr.github.io/pocusai.html", ini:"Pc", fg:"#7fb0ff"},
-  {n:"PaliAI", d:"Triagem de cuidados paliativos em menos de 2 min (Surprise Question, PPS/ECOG) e apoio à reunião familiar.", u:"https://medtechbr.github.io/paliai.html", ini:"Pa", fg:"#f48fc4"},
-  {n:"LaudAI", d:"Laudos médicos estruturados e revisados por IA em minutos, no seu padrão de terminologia e assinatura.", u:"https://medtechbr.github.io/laudai.html", ini:"Ld", fg:"#7fb0ff"},
-  {n:"ConsultAI", d:"Ambulatório completo: cadastro, prontuário, evolução por voz (SOAP), receituário e agenda com confirmação no WhatsApp.", u:"https://medtechbr.github.io/consultai.html", ini:"Co", fg:"#57d06a"},
-  {n:"EnfermarIA", d:"Enfermaria por leito: diagnósticos, exames e pendências de cada paciente; cole a evolução e a IA extrai os dados.", u:"https://medtechbr.github.io/enfermaria.html", ini:"En", fg:"#57e6cf"},
-  {n:"Guia do Interno", d:"Handbook para internos e R1: admissão, evolução SOAP, prescrição segura, passagem SBAR e procedimentos — com mentor por IA.", u:"https://medtechbr.github.io/guiainterno.html", ini:"Gi", fg:"#57e6cf"},
-  {n:"MedProvas", d:"Crie e corrija provas estilo ENARE/ENAMED com IA a partir dos seus PDFs, com gabarito comentado e referências.", u:"https://medtechbr.github.io/medprovas.html", ini:"Pv", fg:"#7fb0ff"},
-  {n:"FlashMed", d:"Flashcards prontos e gerados por IA, com repetição espaçada (SM-2) para fixar o conteúdo de vez.", u:"https://medtechbr.github.io/flashmed.html", ini:"Fm", fg:"#e7c260"},
-  {n:"PlantãoHub", d:"Escala de plantões, horas e ganhos sob controle — somados por mês e por local.", u:"https://medtechbr.github.io/plantaohub.html", ini:"Ph", fg:"#a99bf8"},
-  {n:"Foco", d:"Demandas, prazos e agenda do dia num só lugar; a IA diz o que priorizar agora e por quê.", u:"https://medtechbr.github.io/foco.html", ini:"Fc", fg:"#e7c260"},
-  {n:"Granaê", d:"Finanças pessoais sem planilha: lance gastos por voz e deixe a IA ler suas faturas e categorizar.", u:"https://medtechbr.github.io/granae.html", ini:"Gr", fg:"#a99bf8"}
+const APPS=[
+ {nm:'ConsultAI', ic:'ti-calendar-event', c:'#2B5CE6', d:'Consultório completo: agenda, prontuário, evolução por voz, receituário e teleconsulta por vídeo.'},
+ {nm:'CondutAI', ic:'ti-stethoscope', c:'#1D6FD0', d:'274 condutas nível Whitebook + IA com busca em diretrizes atuais.'},
+ {nm:'ATBguia', ic:'ti-pill', c:'#0E8A9C', d:'Antibioticoterapia empírica e dirigida, ajuste renal e bulário.'},
+ {nm:'EnfermarIA', ic:'ti-bed', c:'#3B7BE0', d:'Pacientes internados: leitos, pendências e evolução extraída por IA.'},
+ {nm:'PocusAI', ic:'ti-scan', c:'#2456B8', d:'Guia prático de ultrassom à beira-leito, região por região.'},
+ {nm:'LaudAI', ic:'ti-report-medical', c:'#4166D6', d:'Laudos assistidos por IA como segunda opinião do radiologista.'},
+ {nm:'PaliAI', ic:'ti-heart-handshake', c:'#B84A86', d:'Triagem de cuidados paliativos e roteiro de reunião familiar.'},
+ {nm:'CalcMed', ic:'ti-calculator', c:'#4C7A99', d:'64 calculadoras e escores clínicos validados.'},
+ {nm:'MedProvas', ic:'ti-clipboard-text', c:'#C07C0A', d:'Provas médicas geradas por IA a partir do seu material.'},
+ {nm:'FlashMed', ic:'ti-cards', c:'#D0902A', d:'Questões comentadas, simulados de residência e flashcards.'},
+ {nm:'Guia do Interno', ic:'ti-school', c:'#A8730F', d:'Handbook do internato: admissão, evolução, plantão e SBAR.'},
+ {nm:'Logbook', ic:'ti-notebook', c:'#B0532F', d:'Registro de procedimentos e casos com contadores e CSV.'},
+ {nm:'Foco', ic:'ti-target-arrow', c:'#0E8A63', d:'Demandas e agenda do médico, com priorização por IA.'},
+ {nm:'PlantãoHub', ic:'ti-clock', c:'#15966F', d:'Plantões, horas e quanto você tem a receber, mês a mês.'},
+ {nm:'Granaê', ic:'ti-wallet', c:'#6D46D8', d:'Finanças por voz e foto da fatura, com leitura por IA.'}
 ];
-// Trilhas (categorias) por app
-const CAT = {
-  "CondutAI":"clinica","CalcMed":"clinica","ATBguia":"clinica","PocusAI":"clinica","PaliAI":"clinica",
-  "LaudAI":"doc","ConsultAI":"doc","EnfermarIA":"doc",
-  "Guia do Interno":"estudo","MedProvas":"estudo","FlashMed":"estudo",
-  "PlantãoHub":"gestao","Foco":"gestao","Granaê":"gestao"
-};
-const TRILHAS = [
-  {k:"todos", l:"Todos"},
-  {k:"clinica", l:"Decisão clínica"},
-  {k:"doc", l:"Documentação"},
-  {k:"estudo", l:"Formação"},
-  {k:"gestao", l:"Gestão & pessoal"}
-];
-const arrow='<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-
-document.getElementById('appsGrid').innerHTML = APPS.map(a=>`
-  <a class="app-card" data-cat="${CAT[a.n]||'todos'}" href="${a.u}" target="_blank" rel="noopener">
-    <div class="ac-ic" style="background:${a.fg}1f;color:${a.fg};border:1px solid ${a.fg}33">${a.ini}</div>
-    <h3>${a.n}</h3>
-    <p>${a.d}</p>
-    <span class="go">Abrir ${a.n} ${arrow}</span>
-  </a>`).join('');
-
-document.getElementById('chips').innerHTML = TRILHAS.map((t,i)=>
-  `<button class="chip${i===0?' on':''}" data-k="${t.k}" onclick="filtrar('${t.k}',this)">${t.l}</button>`).join('');
-
-function filtrar(k, el){
-  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on');
-  document.querySelectorAll('.app-card').forEach(card=>{
-    card.hidden = !(k==='todos' || card.dataset.cat===k);
-  });
-}
+document.getElementById('wall').innerHTML=APPS.map(a=>`<a href="app.html" title="${a.nm}"><span class="k" style="background:${a.c}"><i class="ti ${a.ic}"></i></span><span class="n">${a.nm}</span></a>`).join('');
+document.getElementById('funcs').innerHTML=APPS.map(a=>`<a class="func" href="app.html"><span class="k" style="background:${a.c}"><i class="ti ${a.ic}"></i></span><span><b>${a.nm}</b><span>${a.d}</span></span></a>`).join('');
 </script>
 </body>
 </html>
