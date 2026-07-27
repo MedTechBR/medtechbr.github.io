@@ -871,7 +871,8 @@ function renderDrug(d){
    <div class="content"><h2>Dose habitual (adulto, função renal normal)</h2>${md(d.doseNormal)}
    ${d.kg?`<div class="perla">⚖️ <b>Dose por peso:</b> ${d.kg.lo}${d.kg.hi!==d.kg.lo?'–'+d.kg.hi:''} mg/kg ${inlMd(d.kg.intervalo)}${d.kg.nota?'. '+inlMd(d.kg.nota):''}</div>`:''}
    ${PED[d.id]?`<h2>Dose pediátrica</h2>${md(PED[d.id])}<div style="font-size:11.5px;color:var(--muted)">Dose pediátrica geral — confirme por peso/idade e protocolo; neonatos têm regras próprias.</div>`:''}
-   ${RX[d.id]?`<h2>Prescrição sugerida</h2>${md(RX[d.id])}`:''}</div>
+   ${RX[d.id]?`<h2>Prescrição sugerida</h2>${md(RX[d.id])}`:''}
+   <div style="margin-top:14px"><a class="btn btn-p" href="consultai.html?rx=${encodeURIComponent(JSON.stringify({nome:d.nome,pos:(d.doseNormal||'').replace(/\*\*/g,'')}))}" title="Abre o ConsultAI com este medicamento pronto para entrar no receituário do paciente"><i class="ti ti-prescription"></i> Prescrever no ConsultAI</a></div></div>
    <div class="formcard">
      <h4 style="font-size:13px;font-weight:800;color:var(--petrol-dark);margin-bottom:10px">🧮 Calculadora de dose — peso + clearance</h4>
      <div class="field"><label>Peso (kg)${d.kg?'':' — não usado neste antibiótico'}</label><input type="number" id="dPeso" inputmode="decimal" placeholder="ex.: 70" ${d.kg?'':'disabled style="opacity:.5"'}></div>
