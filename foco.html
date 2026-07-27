@@ -666,7 +666,9 @@ function toggleTask(id){
   t.done=!t.done; t.doneAt=t.done?new Date().toISOString():null; t.updatedAt=Date.now();
   if(concluindo){
     const els=document.querySelectorAll('.item[data-id="'+id+'"]');
-    if(els.length){ els.forEach(el=>el.classList.add('completing')); setTimeout(()=>{save();renderAll();},380); return; }
+    // salva JÁ (um snapshot da nuvem na janela da animação não reverte mais o
+    // toggle); só o re-render espera a animação terminar.
+    if(els.length){ els.forEach(el=>el.classList.add('completing')); save(); setTimeout(()=>renderAll(),380); return; }
   }
   save();renderAll();
 }
@@ -1049,9 +1051,11 @@ function applyData(d){
     // Primeiro acesso numa conta MedTech vazia: 2 demandas de boas-vindas.
     if(!tasks.length && !events.length && !notes.length && !localStorage.getItem('foco_seed_mt')){
       localStorage.setItem('foco_seed_mt','1');
+      // ids DETERMINÍSTICOS: se 2 aparelhos semearem antes de sincronizar, o merge
+      // une por id e as boas-vindas não duplicam.
       tasks=[
-        {id:uid(),title:'Explorar o app Foco 👀',note:'Toque no círculo para concluir uma demanda — ela vai para o Histórico.',prio:'media',due:todayStr(),done:false,doneAt:null,createdAt:new Date().toISOString()},
-        {id:uid(),title:'Adicionar minha primeira demanda real',prio:'alta',due:null,done:false,doneAt:null,createdAt:new Date().toISOString()}
+        {id:'seed-explorar',title:'Explorar o app Foco 👀',note:'Toque no círculo para concluir uma demanda — ela vai para o Histórico.',prio:'media',due:todayStr(),done:false,doneAt:null,createdAt:new Date().toISOString(),updatedAt:Date.now()},
+        {id:'seed-primeira',title:'Adicionar minha primeira demanda real',prio:'alta',due:null,done:false,doneAt:null,createdAt:new Date().toISOString(),updatedAt:Date.now()}
       ];
       save();
     }
