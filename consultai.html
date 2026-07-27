@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="_mttokens.css?v=1">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="manifest" href="consultai.webmanifest">
 <link rel="apple-touch-icon" href="icone-192.png">
@@ -483,6 +484,9 @@ function normalize(d){d=d&&typeof d==='object'?d:{};
    cfg,migratedEvoluai:!!d.migratedEvoluai,_tomb:(d._tomb&&typeof d._tomb==='object')?d._tomb:{}};}
 
 function whenMT(cb){if(window.MT){cb();}else{setTimeout(()=>whenMT(cb),30);}}
+// Onda 6 — prescrição compartilhada: ATBguia manda ?rx={nome,pos}; guarda e
+// pré-preenche o PRÓXIMO receituário novo aberto.
+try{const _rxq=new URLSearchParams(location.search).get('rx');if(_rxq){localStorage.setItem('mt_rx_pendente',_rxq);history.replaceState(null,'',location.pathname);}}catch(e){}
 whenMT(()=>{MT.mergeFn=(r,l)=>MT.mergeState(r,l,['patients','records','prescriptions','documentos','appts','labs','modelos']);MT.onData(d=>{
   if(d&&typeof d==='object'&&(d.patients||d.appts||d.records||d.cfg)){state=normalize(d);}
   else{state=normalize((MT.mode==='demo')?sampleSeed():null);if(MT.mode==='demo')MT.save(state);}
@@ -1073,6 +1077,7 @@ function openRx(id){
   rxEditId=id||null;
   const r=id?state.prescriptions.find(x=>x.id===id):null;
   let tipo='simples',obs='';rxItens=[];
+  if(!id){try{const _p=localStorage.getItem('mt_rx_pendente');if(_p){const it=JSON.parse(_p);if(it&&it.nome){rxItens.push({nome:String(it.nome).slice(0,120),pos:String(it.pos||'').slice(0,400)});}localStorage.removeItem('mt_rx_pendente');}}catch(e){}}
   if(r){tipo=r.tipo||'simples';obs=r.obs||'';
     if(Array.isArray(r.itens)&&r.itens.length){rxItens=r.itens.map(it=>({nome:it.nome||'',pos:it.pos||''}));}
     else if(r.texto){rxItens=r.texto.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{const i=l.indexOf(' — ');return i>=0?{nome:l.slice(0,i),pos:l.slice(i+3)}:{nome:l,pos:''};});}
@@ -1172,8 +1177,7 @@ function delModelo(id){if(confirm('Excluir este modelo?')){MT.markDeleted(state,
 function printHTML(title,bodyHTML){
   const w=window.open('','_blank');
   if(!w){alert('Permita pop-ups para imprimir/salvar em PDF.');return;}
-  w.document.write('<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>'+esc(title)+'</title><style>@page{size:A4;margin:18mm}body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#111;font-size:14px;line-height:1.55}.hd{display:flex;align-items:center;gap:14px;border-bottom:2px solid #2563eb;padding-bottom:10px;margin-bottom:6px}.hd-logo{max-height:64px;max-width:170px;object-fit:contain}.hd-txt{flex:1}.hd .cli{font-size:18px;font-weight:800;color:#2563eb}.hd .med{font-size:12.5px;color:#333;margin-top:2px}.ttl{font-size:15px;font-weight:800;text-align:center;margin:18px 0 12px;text-transform:uppercase;letter-spacing:.06em}.pac{margin:8px 0 14px;font-size:14px;border-bottom:1px dashed #ccc;padding-bottom:8px}.body{white-space:pre-wrap;min-height:120px}.sig{margin-top:64px;text-align:center}.sig .line{width:300px;border-top:1px solid #333;margin:0 auto 5px}.ft{margin-top:26px;font-size:11px;color:#888;text-align:center;border-top:1px solid #eee;padding-top:8px}</style><link rel="stylesheet" href="_mttokens.css?v=1">
-</head><body>'+bodyHTML+'<scr'+'ipt>window.onload=function(){setTimeout(function(){window.print();},250);}<\/scr'+'ipt></body></html>');
+  w.document.write('<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>'+esc(title)+'</title><style>@page{size:A4;margin:18mm}body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#111;font-size:14px;line-height:1.55}.hd{display:flex;align-items:center;gap:14px;border-bottom:2px solid #2563eb;padding-bottom:10px;margin-bottom:6px}.hd-logo{max-height:64px;max-width:170px;object-fit:contain}.hd-txt{flex:1}.hd .cli{font-size:18px;font-weight:800;color:#2563eb}.hd .med{font-size:12.5px;color:#333;margin-top:2px}.ttl{font-size:15px;font-weight:800;text-align:center;margin:18px 0 12px;text-transform:uppercase;letter-spacing:.06em}.pac{margin:8px 0 14px;font-size:14px;border-bottom:1px dashed #ccc;padding-bottom:8px}.body{white-space:pre-wrap;min-height:120px}.sig{margin-top:64px;text-align:center}.sig .line{width:300px;border-top:1px solid #333;margin:0 auto 5px}.ft{margin-top:26px;font-size:11px;color:#888;text-align:center;border-top:1px solid #eee;padding-top:8px}</style></head><body>'+bodyHTML+'<scr'+'ipt>window.onload=function(){setTimeout(function(){window.print();},250);}<\/scr'+'ipt></body></html>');
   w.document.close();
 }
 function cabecalho(full){const c=state.cfg;
