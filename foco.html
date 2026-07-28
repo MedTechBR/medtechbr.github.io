@@ -276,6 +276,49 @@
   .fab-mic{transition:transform .18s cubic-bezier(.2,.8,.2,1),box-shadow .2s}
   .fab-mic:active{transform:scale(.9)}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ===== Calendário mensal ===== */
+.cal-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.cal-head .mo{font-weight:700;font-size:16px;text-transform:capitalize}
+.cal-head .arr{background:var(--surface);border:1px solid var(--border);border-radius:9px;width:34px;height:34px;cursor:pointer;color:var(--accent);font-size:16px}
+.cal-head .hoje-btn{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:7px 11px;font:600 12px inherit;cursor:pointer;color:var(--muted)}
+.cal-head .bell{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:7px 10px;font:600 11.5px inherit;cursor:pointer;color:var(--accent)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:8px}
+.cal-grid .wd{text-align:center;font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--muted);padding:4px 0;text-transform:uppercase}
+.cal-cell{position:relative;aspect-ratio:1/1.05;border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:5px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--txt)}
+.cal-cell:hover{background:var(--bg)}
+.cal-cell.out{color:var(--border);pointer-events:auto;opacity:.55}
+.cal-cell.today{box-shadow:inset 0 0 0 1.6px var(--accent)}
+.cal-cell.sel{background:var(--accent);color:#fff}
+.cal-cell .dots{display:flex;gap:2.5px;margin-top:3px;flex-wrap:wrap;justify-content:center;max-width:90%}
+.cal-cell .d{width:5.5px;height:5.5px;border-radius:50%;background:var(--accent)}
+.cal-cell .d.dd{background:#B9C4BD}
+.cal-cell.sel .d{background:#fff}.cal-cell.sel .d.dd{background:rgba(255,255,255,.45)}
+.day-head{display:flex;align-items:center;justify-content:space-between;margin:16px 2px 8px}
+.day-head b{font-size:14.5px;text-transform:capitalize}
+.day-head .addday{background:none;border:1px dashed var(--border);border-radius:9px;padding:6px 10px;font:600 12px inherit;color:var(--accent);cursor:pointer}
+.ev .evcheck{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);flex:0 0 auto;cursor:pointer;margin-right:2px;display:grid;place-items:center;color:transparent;align-self:center}
+.ev .evcheck.done{background:#B9C4BD;border-color:#B9C4BD;color:#fff}
+.ev.evdone .info .t{text-decoration:line-through;color:var(--muted)}
+.ev.evdone{opacity:.75}
+.tag.rec{background:var(--bg);color:var(--muted);border:1px solid var(--border)}
+/* busca + quick add + checklist */
+.search-in{width:100%;padding:10px 13px;border:1px solid var(--border);border-radius:11px;font:inherit;font-size:16px;background:var(--surface);color:var(--txt);margin-bottom:10px}
+.search-in:focus{outline:none;border-color:var(--accent)}
+.qa-row{display:flex;gap:7px;margin-bottom:10px}
+.qa-row input{flex:1;padding:10px 13px;border:1px solid var(--border);border-radius:11px;font:inherit;font-size:16px;background:var(--surface);color:var(--txt)}
+.qa-row input:focus{outline:none;border-color:var(--accent)}
+.qa-row button{background:var(--accent);color:#fff;border:none;border-radius:11px;padding:0 15px;font:600 13px inherit;cursor:pointer;white-space:nowrap}
+.qa-row button:disabled{opacity:.6}
+.sub-ed{margin-top:6px}
+.sub-ed .sitem{display:flex;align-items:center;gap:8px;padding:6px 2px;font-size:13.5px}
+.sub-ed .sitem .sc{width:18px;height:18px;border-radius:6px;border:2px solid var(--border);cursor:pointer;flex:0 0 auto}
+.sub-ed .sitem .sc.on{background:var(--accent);border-color:var(--accent)}
+.sub-ed .sitem .st{flex:1}.sub-ed .sitem .st.on{text-decoration:line-through;color:var(--muted)}
+.sub-ed .sitem .sx{background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px}
+.sub-add{display:flex;gap:6px;margin-top:4px}
+.sub-add input{flex:1;padding:8px 11px;border:1px solid var(--border);border-radius:9px;font:inherit;font-size:14px;background:var(--surface)}
+.sub-add button{background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:0 12px;cursor:pointer;font-weight:700;color:var(--accent)}
 </style>
 <link rel="stylesheet" href="_mttokens.css?v=1">
 </head>
@@ -318,6 +361,8 @@
 
   <!-- DEMANDAS -->
   <section class="view" id="view-demandas">
+    <div class="qa-row"><input id="qaText" placeholder="Criar com IA: &quot;reunião sexta 14h no CC&quot;…" maxlength="200"><button id="qaBtn">Criar</button></div>
+    <input class="search-in" id="taskSearch" placeholder="Buscar demanda…" oninput="renderDemandas()">
     <div class="seg" id="taskFilter">
       <button class="active" data-f="todas">Todas</button>
       <button data-f="alta">Alta</button>
@@ -329,11 +374,20 @@
 
   <!-- AGENDA -->
   <section class="view" id="view-agenda">
-    <div id="agendaList"></div>
+    <div class="cal-head">
+      <button class="arr" onclick="moveCalFoco(-1)">‹</button>
+      <span class="mo" id="calMo"></span>
+      <button class="arr" onclick="moveCalFoco(1)">›</button>
+      <button class="hoje-btn" onclick="calHojeFoco()">Hoje</button>
+      <span id="calBell"></span>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div id="dayList"></div>
   </section>
 
   <!-- NOTAS -->
   <section class="view" id="view-notas">
+    <input class="search-in" id="noteSearch" placeholder="Buscar anotação…" oninput="renderNotes()">
     <div id="notesList"></div>
   </section>
 
@@ -369,8 +423,16 @@
         <button data-p="media" class="sel media">Média</button>
         <button data-p="baixa">Baixa</button>
       </div></div>
-    <div class="field"><label>Prazo (opcional)</label>
-      <input type="date" id="t-due"></div>
+    <div class="row">
+      <div class="field"><label>Prazo (opcional)</label>
+        <input type="date" id="t-due"></div>
+      <div class="field"><label>Repetir</label>
+        <select id="t-rec"><option value="none">Não repete</option><option value="daily">Todo dia</option><option value="weekly">Toda semana</option><option value="monthly">Todo mês</option></select></div>
+    </div>
+    <div class="field"><label>Checklist (opcional)</label>
+      <div class="sub-ed" id="t-subs"></div>
+      <div class="sub-add"><input id="t-subadd" placeholder="Adicionar passo…" maxlength="80"><button type="button" onclick="addSub()">+</button></div>
+    </div>
     <div class="actions">
       <button class="btn ghost" id="t-cancel">Cancelar</button>
       <button class="btn primary" id="t-save">Salvar</button>
@@ -390,6 +452,12 @@
     </div>
     <div class="field"><label>Local / detalhes (opcional)</label>
       <input id="e-loc" placeholder="Ex: Sala 3 / Google Meet"></div>
+    <div class="row">
+      <div class="field"><label>Duração</label>
+        <select id="e-dur"><option value="">—</option><option value="15">15 min</option><option value="30">30 min</option><option value="45">45 min</option><option value="60">1h</option><option value="90">1h30</option><option value="120">2h</option><option value="240">4h</option><option value="720">12h (plantão)</option></select></div>
+      <div class="field"><label>Repetir</label>
+        <select id="e-rec"><option value="none">Não repete</option><option value="weekly">Toda semana</option><option value="monthly">Todo mês</option></select></div>
+    </div>
     <div class="actions">
       <button class="btn ghost" id="e-cancel">Cancelar</button>
       <button class="btn primary" id="e-save">Salvar</button>
@@ -522,10 +590,13 @@ function taskHTML(t){
       <div class="meta">
         <span class="tag ${t.prio}">${PRIO[t.prio].l}</span>
         ${prazoTag}
+        ${(t.rec&&t.rec!=='none')?`<span class="tag rec">${({daily:'diária',weekly:'semanal',monthly:'mensal'})[t.rec]}</span>`:''}
+        ${(t.subs&&t.subs.length)?`<span class="tag rec">${ic('check',11)}${t.subs.filter(x=>x.done).length}/${t.subs.length}</span>`:''}
       </div>
       ${t.note?`<div class="note">${esc(t.note)}</div>`:''}
     </div>
     <div class="acts">
+      ${t.done?'':`<button class="iconbtn" onclick="postponeTask('${t.id}')" title="Adiar para amanhã">${ic('tomorrow')}</button>`}
       <button class="iconbtn" onclick="editTask('${t.id}')" title="Editar">${ic('pencil')}</button>
       <button class="iconbtn del" onclick="delTask('${t.id}')" title="Excluir">${ic('x')}</button>
     </div>
@@ -551,9 +622,9 @@ function renderHoje(){
   $('#st-pend').textContent=pend.length;
   $('#st-done').textContent=doneToday;
 
-  // eventos de hoje
-  const tev=events.filter(e=>e.date===todayStr()).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
-  $('#todayEvents').innerHTML = tev.length? tev.map(evHTML).join('')
+  // eventos de hoje (inclui recorrentes)
+  const tev=eventsOn(todayStr());
+  $('#todayEvents').innerHTML = tev.length? tev.map(e=>evHTML(e,todayStr())).join('')
     : `<div class="empty" style="padding:18px"><div class="ico">${ic('calendar',40)}</div><p>Nenhum compromisso hoje.<br>Aproveite o dia!</p></div>`;
 
   // tarefas prioritárias: atrasadas + vencendo hoje/amanhã + alta prioridade
@@ -568,6 +639,8 @@ function renderHoje(){
 function renderDemandas(){
   let arr=tasks.filter(t=>!t.done);
   if(taskFilter!=='todas') arr=arr.filter(t=>t.prio===taskFilter);
+  const q=($('#taskSearch')&&$('#taskSearch').value.trim().toLowerCase())||'';
+  if(q) arr=arr.filter(t=>(t.title+' '+(t.note||'')).toLowerCase().includes(q));
   arr=sortTasks(arr);
   $('#taskList').innerHTML = arr.length? arr.map(taskHTML).join('')
     : `<div class="empty"><div class="ico">${ic('list',44)}</div><p>Nenhuma demanda aqui.<br>Toque em + para adicionar.</p></div>`;
@@ -580,6 +653,7 @@ const IC={
   archive:'<path d="M4 8h16M6 8v11a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8M5.4 4.8A1 1 0 0 1 6.3 4h11.4a1 1 0 0 1 .9.8L20 8H4z"/><path d="M10 12h4"/>',
   pencil:'<path d="M4 20h4L18.5 9.5a2 2 0 0 0-3-3L5 17z"/><path d="M13.5 6.5l3 3"/>',
   x:'<path d="M6 6l12 12M18 6 6 18"/>',
+  tomorrow:'<path d="M5 12h13M13 6l6 6-6 6"/>',
   pin:'<path d="M12 21s-6-5-6-10a6 6 0 0 1 12 0c0 5-6 10-6 10z"/><circle cx="12" cy="11" r="2"/>',
   clock:'<circle cx="12" cy="12" r="8"/><path d="M12 8.5V12l2.5 1.8"/>',
   check:'<circle cx="12" cy="12" r="8"/><path d="M8.5 12.2l2.4 2.4 4.6-5"/>',
@@ -588,43 +662,82 @@ const IC={
 };
 function ic(n,sz){return `<svg class="ic-svg" viewBox="0 0 24 24" width="${sz||18}" height="${sz||18}" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${IC[n]||''}</svg>`;}
 
-function evHTML(e){
+function evHTML(e,dstr){
+  dstr=dstr||e.date||todayStr();
+  const done=evDone(e,dstr);
   const hasTime = !!(e.time && e.time!=='--:--' && e.time.trim());
   const [h,m]=(e.time||'').split(':');
   const timeHTML = hasTime
     ? `<div class="h">${h}<span class="mm">:${m||'00'}</span></div>`
     : `<div class="allday">${ic('clock',16)}</div>`;
-  return `<div class="ev${hasTime?'':' no-time'}" data-id="${e.id}">
+  const extra=[e.loc?`${ic('pin',13)}${esc(e.loc)}`:'', e.dur?`${e.dur>=60?(e.dur/60)+'h':e.dur+'min'}`:'', (e.rec&&e.rec!=='none')?`<span class="tag rec">${e.rec==='weekly'?'semanal':'mensal'}</span>`:''].filter(Boolean).join(' · ');
+  return `<div class="ev${hasTime?'':' no-time'}${done?' evdone':''}" data-id="${e.id}">
+    <div class="evcheck${done?' done':''}" onclick="toggleEvDone('${e.id}','${dstr}')" title="${done?'Desmarcar':'Concluído'}">${ic('check',13)}</div>
     <div class="time">${timeHTML}</div>
     <div class="vline"></div>
     <div class="info" onclick="editEvent('${e.id}')">
       <div class="t">${esc(e.title)}</div>
-      ${e.loc?`<div class="s">${ic('pin',13)}${esc(e.loc)}</div>`:''}
+      ${extra?`<div class="s">${extra}</div>`:''}
     </div>
     <div class="acts">
-      <button class="iconbtn" onclick="editEvent('${e.id}')" title="Editar">${ic('pencil')}</button>
+      <button class="iconbtn" onclick="editEvent('${e.id}')" title="Editar (série inteira)">${ic('pencil')}</button>
       <button class="iconbtn del" onclick="delEvent('${e.id}')" title="Excluir">${ic('x')}</button>
     </div>
   </div>`;
 }
 
-function renderAgenda(){
-  if(!events.length){
-    $('#agendaList').innerHTML=`<div class="empty"><div class="ico">${ic('calendar',44)}</div><p>Nenhum compromisso agendado.<br>Toque em + para programar.</p></div>`;
-    return;
-  }
-  const byDate={};
-  events.forEach(e=>{(byDate[e.date]=byDate[e.date]||[]).push(e)});
-  const dates=Object.keys(byDate).sort();
-  let html='';
-  dates.forEach(d=>{
-    const isToday=d===todayStr();
-    const lbl=new Date(d+'T00:00:00').toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
-    html+=`<div class="day-h"><span class="dow">${lbl}</span>${isToday?'<span class="today-pill">Hoje</span>':''}</div>`;
-    html+=byDate[d].sort((a,b)=>(a.time||'').localeCompare(b.time||'')).map(evHTML).join('');
-  });
-  $('#agendaList').innerHTML=html;
+/* ---------- ocorrências (recorrência) ---------- */
+function occursOn(e,dstr){
+  if(!e.date) return false;
+  if(!e.rec||e.rec==='none') return e.date===dstr;
+  if(dstr<e.date) return false;
+  const base=new Date(e.date+'T00:00:00'), d=new Date(dstr+'T00:00:00');
+  if(e.rec==='weekly') return base.getDay()===d.getDay();
+  if(e.rec==='monthly') return base.getDate()===d.getDate();
+  return false;
 }
+function eventsOn(dstr){ return events.filter(e=>occursOn(e,dstr)).sort((a,b)=>(a.time||'').localeCompare(b.time||'')); }
+function evDone(e,dstr){ return Array.isArray(e.doneDates)&&e.doneDates.includes(dstr); }
+function toggleEvDone(id,dstr){
+  const e=events.find(x=>x.id===id); if(!e) return;
+  e.doneDates=Array.isArray(e.doneDates)?e.doneDates:[];
+  const i=e.doneDates.indexOf(dstr);
+  if(i>-1) e.doneDates.splice(i,1); else e.doneDates.push(dstr);
+  e.updatedAt=Date.now(); save(); renderAll();
+}
+/* ---------- calendário mensal ---------- */
+let calCur=new Date(); calCur.setDate(1);
+let selDay=todayStr();
+function moveCalFoco(n){ calCur.setMonth(calCur.getMonth()+n); renderAgenda(); }
+function calHojeFoco(){ calCur=new Date(); calCur.setDate(1); selDay=todayStr(); renderAgenda(); }
+function selectDayCal(d){ selDay=d; renderAgenda(); }
+function ymdOf(dt){ return new Date(dt-dt.getTimezoneOffset()*60000).toISOString().slice(0,10); }
+function renderAgenda(){
+  const mo=$('#calMo'); if(!mo) return;
+  mo.textContent=calCur.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  const bell=$('#calBell');
+  if(bell) bell.innerHTML=('Notification' in window && Notification.permission==='default')
+    ? `<button class="bell" onclick="pedirLembretes()">${ic('clock',13)} Lembretes</button>` : '';
+  const first=new Date(calCur), start=new Date(first); start.setDate(1-first.getDay());
+  const hoje=todayStr();
+  let cells='<div class="wd">D</div><div class="wd">S</div><div class="wd">T</div><div class="wd">Q</div><div class="wd">Q</div><div class="wd">S</div><div class="wd">S</div>';
+  for(let i=0;i<42;i++){
+    const dt=new Date(start); dt.setDate(start.getDate()+i);
+    const ds=ymdOf(dt);
+    const evs=eventsOn(ds);
+    const dots=evs.slice(0,4).map(e=>`<span class="d${evDone(e,ds)?' dd':''}"></span>`).join('');
+    const cls=['cal-cell', dt.getMonth()!==calCur.getMonth()?'out':'', ds===hoje?'today':'', ds===selDay?'sel':''].filter(Boolean).join(' ');
+    cells+=`<div class="${cls}" onclick="selectDayCal('${ds}')">${dt.getDate()}${evs.length?`<span class="dots">${dots}</span>`:''}</div>`;
+  }
+  $('#calGrid').innerHTML=cells;
+  const lbl=new Date(selDay+'T00:00:00').toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+  const devs=eventsOn(selDay);
+  $('#dayList').innerHTML=`<div class="day-head"><b>${lbl}${selDay===hoje?' · hoje':''}</b><button class="addday" onclick="openEvModalDia('${selDay}')">+ compromisso</button></div>`
+    + (devs.length? devs.map(e=>evHTML(e,selDay)).join('')
+       : `<div class="empty" style="padding:16px"><p>Nada neste dia.</p></div>`);
+}
+function openEvModalDia(d){ openEvModal(); $('#e-date').value=d; }
+function pedirLembretes(){ Notification.requestPermission().then(()=>renderAgenda()); }
 
 function renderHist(){
   const done=tasks.filter(t=>t.done).sort((a,b)=>(b.doneAt||'').localeCompare(a.doneAt||''));
@@ -644,7 +757,9 @@ function renderHist(){
 }
 
 function renderNotes(){
-  const arr=[...notes].sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  let arr=[...notes].sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  const q=($('#noteSearch')&&$('#noteSearch').value.trim().toLowerCase())||'';
+  if(q) arr=arr.filter(n=>((n.title||'')+' '+(n.text||'')).toLowerCase().includes(q));
   $('#notesList').innerHTML = arr.length? arr.map(n=>{
     const when=n.updatedAt?new Date(n.updatedAt).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';
     const preview=(n.text||'').trim() || '(vazia)';
@@ -655,7 +770,7 @@ function renderNotes(){
     </div>`;
   }).join('') : `<div class="empty"><div class="ico">${ic('note',44)}</div><p>Nenhuma anotação ainda.<br>Toque em + para escrever livremente.</p></div>`;
 }
-function renderAll(){renderHoje();renderDemandas();renderAgenda();renderNotes();renderHist();clearAiFocus()}
+function renderAll(){renderHoje();renderDemandas();renderAgenda();renderNotes();renderHist();clearAiFocus();updateBadge();checkReminders()}
 // Limpa o resultado do "Foco da IA" quando as demandas/agenda mudam, p/ não mostrar algo já resolvido.
 function clearAiFocus(){ const o=document.querySelector('#aiOut'); if(o){ o.className='ai-out'; o.innerHTML=''; } }
 
@@ -664,6 +779,17 @@ function toggleTask(id){
   const t=tasks.find(x=>x.id===id); if(!t)return;
   const concluindo=!t.done;
   t.done=!t.done; t.doneAt=t.done?new Date().toISOString():null; t.updatedAt=Date.now();
+  // demanda recorrente: ao concluir, a próxima ocorrência nasce sozinha
+  if(concluindo && t.rec && t.rec!=='none'){
+    const base=new Date((t.due||todayStr())+'T00:00:00');
+    if(t.rec==='daily') base.setDate(base.getDate()+1);
+    else if(t.rec==='weekly') base.setDate(base.getDate()+7);
+    else base.setMonth(base.getMonth()+1);
+    tasks.push({id:uid(),title:t.title,note:t.note,prio:t.prio,rec:t.rec,
+      subs:(t.subs||[]).map(x=>({id:x.id,t:x.t,done:false})),
+      due:ymdOf(base),done:false,doneAt:null,createdAt:new Date().toISOString(),updatedAt:Date.now()});
+    t.rec='none'; // a concluída vira registro simples; a nova carrega a recorrência
+  }
   if(concluindo){
     const els=document.querySelectorAll('.item[data-id="'+id+'"]');
     // salva JÁ (um snapshot da nuvem na janela da animação não reverte mais o
@@ -672,6 +798,64 @@ function toggleTask(id){
   }
   save();renderAll();
 }
+function tomorrowStr(){ const d=new Date(); d.setDate(d.getDate()+1); return ymdOf(d); }
+function postponeTask(id){ const t=tasks.find(x=>x.id===id); if(!t)return; t.due=tomorrowStr(); t.updatedAt=Date.now(); save(); renderAll(); }
+/* ---------- checklist (editor no modal) ---------- */
+let editSubs=[];
+function renderSubsEd(){
+  const box=$('#t-subs'); if(!box) return;
+  box.innerHTML=editSubs.map((x,i)=>`<div class="sitem">
+    <span class="sc${x.done?' on':''}" onclick="editSubs[${i}].done=!editSubs[${i}].done;renderSubsEd()"></span>
+    <span class="st${x.done?' on':''}">${esc(x.t)}</span>
+    <button class="sx" onclick="editSubs.splice(${i},1);renderSubsEd()">×</button>
+  </div>`).join('');
+}
+function addSub(){
+  const inp=$('#t-subadd'); const v=inp.value.trim(); if(!v) return;
+  editSubs.push({id:uid(),t:v,done:false}); inp.value=''; inp.focus(); renderSubsEd();
+}
+/* ---------- quick-add por texto (mesmo parser da voz) ---------- */
+async function aiQuickText(){
+  const inp=$('#qaText'), btn=$('#qaBtn'); const txt=inp.value.trim(); if(!txt){inp.focus();return;}
+  if(!(window.MT&&MT.user)){ alert('Entre na sua conta MedTech para criar com IA.'); return; }
+  btn.disabled=true; btn.textContent='…';
+  try{
+    const idToken=await MT.user.getIdToken();
+    const today=todayStr();
+    const sys='Você converte um pedido em UMA demanda (tarefa) OU UM compromisso (evento) para um app de produtividade brasileiro. Datas YYYY-MM-DD; horário HH:MM (24h). Prioridade só para demanda: alta, media ou baixa (padrão media). Não invente dados não ditos.';
+    const schema={type:'object',properties:{tipo:{type:'string',enum:['demanda','evento']},titulo:{type:'string'},prioridade:{type:'string',enum:['alta','media','baixa']},prazo:{type:'string'},data:{type:'string'},hora:{type:'string'},local:{type:'string'},detalhes:{type:'string'}},required:['tipo','titulo']};
+    const res=await fetch('https://southamerica-east1-medtech-c658c.cloudfunctions.net/aigateway',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
+      body:JSON.stringify({contents:[{role:'user',parts:[{text:`Hoje é ${today}. Converta: "${txt}"`}]}],model:'gemini-2.5-flash',
+        generationConfig:{temperature:0.2,responseMimeType:'application/json',responseSchema:schema,thinkingConfig:{thinkingBudget:0}},systemInstruction:{parts:[{text:sys}]}})});
+    if(!res.ok) throw new Error('Erro da IA (HTTP '+res.status+')');
+    const text=(await res.json()).text||'';
+    let parsed; try{ parsed=JSON.parse(text); }catch(_){ const m=text.match(/\{[\s\S]*\}/); if(m) parsed=JSON.parse(m[0]); }
+    if(!parsed||!parsed.titulo) throw new Error('Não entendi. Tente reescrever.');
+    prefillFromVoice(parsed); inp.value='';
+  }catch(e){ alert(e.message||'Falhou. Tente de novo.'); }
+  btn.disabled=false; btn.textContent='Criar';
+}
+/* ---------- badge do PWA + lembretes locais ---------- */
+function updateBadge(){
+  if(!('setAppBadge' in navigator)) return;
+  const n=tasks.filter(t=>!t.done&&t.due&&dueInfo(t.due)&&dueInfo(t.due).diff<0).length;
+  try{ n?navigator.setAppBadge(n):navigator.clearAppBadge(); }catch(_){}
+}
+const _notified=new Set();
+function checkReminders(){
+  if(!('Notification' in window)||Notification.permission!=='granted') return;
+  const hoje=todayStr(), now=new Date(), mins=now.getHours()*60+now.getMinutes();
+  eventsOn(hoje).forEach(e=>{
+    if(!e.time||evDone(e,hoje)) return;
+    const [h,m]=e.time.split(':').map(Number);
+    const diff=(h*60+m)-mins, key=e.id+'@'+hoje;
+    if(diff>0&&diff<=30&&!_notified.has(key)){
+      _notified.add(key);
+      try{ new Notification('Em '+diff+' min: '+e.title,{body:(e.time||'')+(e.loc?' · '+e.loc:''),icon:'icone-192.png'}); }catch(_){}
+    }
+  });
+}
+setInterval(checkReminders,60000);
 function delTask(id){
   if(!confirm('Excluir esta demanda?'))return;
   tasks=tasks.filter(t=>t.id!==id);ttasks=tombFoco(ttasks,id);save();renderAll();
@@ -703,26 +887,26 @@ let selPrio='media', editingTaskId=null, editingEventId=null;
 function setPrioUI(p){selPrio=p;$$('#t-prio button').forEach(x=>{x.className='';if(x.dataset.p===p)x.classList.add('sel',p)})}
 $$('#t-prio button').forEach(b=>b.onclick=()=>setPrioUI(b.dataset.p));
 
-function openTaskModal(){
+function openTaskModal(){ editSubs=[]; setTimeout(renderSubsEd,0); const r=$('#t-rec'); if(r)r.value='none';
   editingTaskId=null;
   $('#taskModalTitle').textContent='Nova demanda';
   $('#t-title').value='';$('#t-note').value='';$('#t-due').value='';setPrioUI('media');
   $('#taskModal').classList.add('show');setTimeout(()=>$('#t-title').focus(),100);
 }
-function editTask(id){
+function editTask(id){ const _t0=tasks.find(t=>t.id===id); editSubs=((_t0&&_t0.subs)||[]).map(x=>({...x})); setTimeout(renderSubsEd,0); const r=$('#t-rec'); if(r)r.value=(_t0&&_t0.rec)||'none';
   const t=tasks.find(x=>x.id===id); if(!t)return;
   editingTaskId=id;
   $('#taskModalTitle').textContent='Editar demanda';
   $('#t-title').value=t.title;$('#t-note').value=t.note||'';$('#t-due').value=t.due||'';setPrioUI(t.prio);
   $('#taskModal').classList.add('show');
 }
-function openEvModal(){
+function openEvModal(){ const d=$('#e-dur'); if(d)d.value=''; const r=$('#e-rec'); if(r)r.value='none';
   editingEventId=null;
   $('#evModalTitle').textContent='Novo compromisso';
   $('#e-title').value='';$('#e-date').value=todayStr();$('#e-time').value='';$('#e-loc').value='';
   $('#evModal').classList.add('show');setTimeout(()=>$('#e-title').focus(),100);
 }
-function editEvent(id){
+function editEvent(id){ const _e0=events.find(e=>e.id===id); const d=$('#e-dur'); if(d)d.value=(_e0&&_e0.dur)||''; const r=$('#e-rec'); if(r)r.value=(_e0&&_e0.rec)||'none';
   const e=events.find(x=>x.id===id); if(!e)return;
   editingEventId=id;
   $('#evModalTitle').textContent='Editar compromisso';
@@ -885,8 +1069,8 @@ function prefillFromVoice(d){
 $('#t-save').onclick=()=>{
   const title=$('#t-title').value.trim();
   if(!title){$('#t-title').focus();return}
-  const data={title,note:$('#t-note').value.trim(),prio:selPrio,due:$('#t-due').value||null,updatedAt:Date.now()};
-  if(editingTaskId){ Object.assign(tasks.find(t=>t.id===editingTaskId),data); }
+  const data={title,note:$('#t-note').value.trim(),prio:selPrio,due:$('#t-due').value||null,rec:$('#t-rec').value||'none',subs:editSubs.map(x=>({...x})),updatedAt:Date.now()};
+  if(editingTaskId){ const _t=tasks.find(t=>t.id===editingTaskId); if(_t){Object.assign(_t,data);} else {tasks.push({id:editingTaskId,...data,done:false,doneAt:null,createdAt:new Date().toISOString()});} }
   else { tasks.push({id:uid(),...data,done:false,doneAt:null,createdAt:new Date().toISOString()}); }
   save();renderAll();$('#taskModal').classList.remove('show');
 };
@@ -894,12 +1078,14 @@ $('#e-save').onclick=()=>{
   const title=$('#e-title').value.trim(), date=$('#e-date').value;
   if(!title){$('#e-title').focus();return}
   if(!date){$('#e-date').focus();return}
-  const data={title,date,time:$('#e-time').value||'',loc:$('#e-loc').value.trim(),updatedAt:Date.now()};
-  if(editingEventId){ Object.assign(events.find(e=>e.id===editingEventId),data); }
-  else { events.push({id:uid(),...data}); }
+  const data={title,date,time:$('#e-time').value||'',loc:$('#e-loc').value.trim(),dur:parseInt($('#e-dur').value)||null,rec:$('#e-rec').value||'none',updatedAt:Date.now()};
+  if(editingEventId){ const _e=events.find(e=>e.id===editingEventId); if(_e){Object.assign(_e,data);} else {events.push({id:editingEventId,...data,doneDates:[]});} }
+  else { events.push({id:uid(),...data,doneDates:[]}); }
   save();renderAll();$('#evModal').classList.remove('show');
 };
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+$('#qaBtn').onclick=aiQuickText;
+$('#qaText').addEventListener('keydown',e=>{ if(e.key==='Enter') aiQuickText(); });
 
 /* ---------- IA (Gemini via gateway central MedTech, SEM chave) ---------- */
 let aiModel='gemini-2.5-flash';
@@ -936,8 +1122,8 @@ function buildFocusPrompt(pend){
       situacao_prazo: di?(di.diff<0?'ATRASADA':di.diff===0?'vence hoje':di.diff===1?'vence amanhã':'em '+di.diff+' dias'):'sem prazo',
       detalhes:t.note||''};
   });
-  const evHoje=events.filter(e=>e.date===hoje).sort((a,b)=>(a.time||'').localeCompare(b.time||''))
-    .map(e=>({hora:e.time||'sem hora', atividade:e.title, local:e.loc||''}));
+  const evHoje=eventsOn(hoje)
+    .map(e=>({hora:e.time||'sem hora', atividade:e.title, local:e.loc||'', duracao_min:e.dur||null, concluido:evDone(e,hoje)}));
   return `Você é um assistente de produtividade objetivo e prático. Hoje é ${now.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}, agora são ${hora}.
 
 Compromissos AGENDADOS para hoje:
