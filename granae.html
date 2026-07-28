@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
-  <link rel="stylesheet" href="granae.css?v=46" />
+  <link rel="stylesheet" href="granae.css?v=47" />
   <!-- garante inputs claros na tela de login central, mesmo com o tema escuro do Granaê -->
   <style>.mt-auth input{background:#F1F1EC;color:#23272E}.mt-auth input::placeholder{color:#5E646B}</style>
   <!-- Login único MedTech + sincronização na nuvem (mesmo módulo do portal) -->
@@ -47,6 +47,13 @@
         <h2 id="monthLabel">—</h2>
         <button id="nextMonth" class="round">›</button>
       </div>
+
+      <div class="dash-tabs" id="dashTabs">
+        <button class="on" data-dtab="resumo">Resumo</button>
+        <button data-dtab="graficos">Gráficos</button>
+      </div>
+
+      <div id="dashResumo">
 
       <section class="month-hero">
         <div class="hero-head">
@@ -99,17 +106,25 @@
         <ul id="scheduledList" class="tx-list" hidden></ul>
       </div>
 
+      <div class="section-title">
+        <h3 id="categoryBarsTitle">Gastos por categoria</h3>
+      </div>
+      <div id="categoryBars" class="bars"></div>
+
+      <div class="section-title between">
+        <h3>Últimas transações</h3>
+        <button class="link" data-nav="transacoes">ver tudo →</button>
+      </div>
+      <ul id="recentList" class="tx-list"></ul>
+      </div><!-- /dashResumo -->
+
+      <div id="dashGraficos" hidden>
       <div class="card alt chart-card">
         <div class="card-head row between">
           <span class="card-label">Onde foi este mês</span>
         </div>
         <div id="chartDonut"></div>
       </div>
-
-      <div class="section-title">
-        <h3 id="categoryBarsTitle">Gastos por categoria</h3>
-      </div>
-      <div id="categoryBars" class="bars"></div>
 
       <div class="card alt chart-card">
         <div class="card-head row between">
@@ -118,11 +133,8 @@
         <div id="chartTrend"></div>
       </div>
 
-      <div class="section-title between">
-        <h3>Últimas transações</h3>
-        <button class="link" data-nav="transacoes">ver tudo →</button>
+        <button id="aiMonthBtn" class="primary big" style="width:100%;margin-top:6px">✦ Análise IA deste mês</button>
       </div>
-      <ul id="recentList" class="tx-list"></ul>
     </section>
 
     <!-- TRANSACOES -->
@@ -144,6 +156,10 @@
         <div class="tms-cell"><span class="tms-label">Entradas</span><strong class="tms-val income" id="txSumIn">—</strong></div>
         <div class="tms-cell"><span class="tms-label">Saídas</span><strong class="tms-val" id="txSumOut">—</strong></div>
         <div class="tms-cell"><span class="tms-label">Saldo</span><strong class="tms-val" id="txSumBal">—</strong></div>
+      </div>
+      <div class="tx-tools">
+        <input id="txSearch" type="search" placeholder="Buscar por descrição ou valor…" />
+        <button id="txCsv" class="ghost" title="Exportar o mês em CSV">CSV</button>
       </div>
       <div id="txFilterChip" class="tx-filter-chip" hidden>
         <span class="chip-label"></span>
@@ -296,12 +312,24 @@
         <span>Data</span>
         <input name="date" type="date" required />
       </label>
+      <label class="field" id="parcelasField">
+        <span>Parcelas</span>
+        <select name="parcelas">
+          <option value="1">À vista (1×)</option>
+          <option value="2">2×</option><option value="3">3×</option><option value="4">4×</option>
+          <option value="5">5×</option><option value="6">6×</option><option value="7">7×</option>
+          <option value="8">8×</option><option value="9">9×</option><option value="10">10×</option>
+          <option value="11">11×</option><option value="12">12×</option><option value="18">18×</option><option value="24">24×</option>
+        </select>
+        <small class="muted" id="parcelasHint" style="display:block;margin-top:4px"></small>
+      </label>
       <p id="txScheduledHint" class="scheduled-hint" hidden>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         <span><strong>Agendado.</strong> Não vai contar nos totais até <span id="txScheduledDate"></span>.</span>
       </p>
       <footer class="modal-foot">
         <button type="button" id="txDelete" class="danger" hidden>Excluir</button>
+        <button type="button" id="txDup" class="ghost" hidden>Duplicar p/ hoje</button>
         <button type="submit" class="primary">Salvar</button>
       </footer>
     </form>
@@ -329,6 +357,10 @@
       <label class="field">
         <span>Cor</span>
         <input name="color" type="color" value="#2563eb" />
+      </label>
+      <label class="field">
+        <span>Meta mensal (R$ — opcional, só p/ despesas)</span>
+        <input name="goal" type="number" inputmode="decimal" step="0.01" min="0" placeholder="Ex.: 800" />
       </label>
       <footer class="modal-foot">
         <button type="button" id="catDelete" class="danger" hidden>Excluir</button>
@@ -431,6 +463,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="granae.gemini.js?v=7"></script>
-  <script src="granae.app.js?v=12"></script>
+  <script src="granae.app.js?v=13"></script>
 </body>
 </html>
