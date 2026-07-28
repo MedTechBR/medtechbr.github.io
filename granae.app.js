@@ -173,7 +173,15 @@ function safeMD(text) {
 }
 
 // ====== Navegação ======
+let _keepTxFilter = false;
 function navigate(view) {
+  // entrar em Transações "do zero" (pela nav) limpa filtro de categoria e busca —
+  // filtro grudado fazia a lista parecer vazia ("sumiu os lançamentos").
+  if (view === 'transacoes' && !_keepTxFilter) {
+    categoryFilter = null;
+    const _q = document.getElementById('txSearch'); if (_q) _q.value = '';
+  }
+  _keepTxFilter = false;
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('hidden', v.dataset.view !== view));
   document.querySelectorAll('.bottom-nav button').forEach(b => b.classList.toggle('active', b.dataset.nav === view));
   if (view === 'dashboard') renderDashboard();
@@ -193,6 +201,7 @@ document.getElementById('categoryBars').addEventListener('click', (e) => {
   const item = e.target.closest('.bar-item[data-cat]');
   if (!item) return;
   categoryFilter = { name: item.dataset.cat };
+  _keepTxFilter = true;
   navigate('transacoes');
 });
 document.getElementById('categoryBars').addEventListener('keydown', (e) => {
@@ -201,6 +210,7 @@ document.getElementById('categoryBars').addEventListener('keydown', (e) => {
   if (!item) return;
   e.preventDefault();
   categoryFilter = { name: item.dataset.cat };
+  _keepTxFilter = true;
   navigate('transacoes');
 });
 
@@ -616,8 +626,12 @@ function renderTransactions() {
 
   const ul = document.getElementById('txList');
   if (!list.length) {
-    const que = categoryFilter ? `Nenhum lançamento de ${escapeHTML(categoryFilter.name)}` : 'Nenhuma transação';
-    ul.innerHTML = `<li class="empty">${que} em ${monthLongFmt.format(currentMonth)}.</li>`;
+    if (monthTx.length > 0) {
+      // o mês TEM lançamentos — estão escondidos por filtro/busca. Diga isso e ofereça a saída.
+      ul.innerHTML = `<li class="empty">${monthTx.length} lançamento${monthTx.length===1?'':'s'} de ${monthLongFmt.format(currentMonth)} escondido${monthTx.length===1?'':'s'} pelos filtros.<br><button type="button" class="primary" style="margin-top:10px" onclick="limparFiltrosTx()">Limpar filtros e mostrar tudo</button></li>`;
+    } else {
+      ul.innerHTML = `<li class="empty">Nenhuma transação em ${monthLongFmt.format(currentMonth)}.</li>`;
+    }
     attachTxClicks('txList');
     return;
   }
@@ -1317,12 +1331,8 @@ document.getElementById('wipeData').addEventListener('click', () => {
 const _dashLancar = document.getElementById('dashLancar');
 if (_dashLancar) _dashLancar.addEventListener('click', () => openTxDialog(null));
 
-// Botão "Lançar" da nav inferior: o rótulo promete lançar, então o clique simples
-// navega para a lista (handler genérico de data-nav) E já abre o formulário.
-// (antes só o duplo-clique abria — clique simples parecia "não fazer nada".)
-document.querySelector('.bottom-nav button[data-nav="transacoes"]').addEventListener('click', () => {
-  setTimeout(() => openTxDialog(null), 0);
-});
+// Nav "Transações" apenas NAVEGA (criar = botão + Lançar flutuante/dashboard).
+// A versão que abria o modal a cada clique tornava impossível só OLHAR a lista.
 
 // Fechar diálogos via [data-close]
 document.querySelectorAll('[data-close]').forEach(b => {
@@ -1393,6 +1403,15 @@ refreshAll();
   }
 })();
 
+
+// ====== Limpar todos os filtros das Transações ======
+function limparFiltrosTx() {
+  categoryFilter = null;
+  const q = document.getElementById('txSearch'); if (q) q.value = '';
+  const ft = document.getElementById('filterType'); if (ft) ft.value = 'all';
+  renderTransactions();
+}
+window.limparFiltrosTx = limparFiltrosTx;
 
 // ====== Abas do dashboard (Resumo | Gráficos) ======
 document.querySelectorAll('#dashTabs button').forEach(b => {
