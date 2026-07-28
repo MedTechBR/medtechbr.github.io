@@ -269,6 +269,10 @@ function renderDashboard() {
   for (const f of activeFixed.filter(f => f.type === 'expense')) {
     budgetByCat.set(f.category, (budgetByCat.get(f.category) || 0) + f.amount);
   }
+  // meta manual da categoria tem precedência sobre a soma dos fixos
+  for (const c of state.categories) {
+    if (c.type === 'expense' && c.goal > 0) budgetByCat.set(c.name, c.goal);
+  }
   const allCatNames = new Set([...byCat.keys(), ...budgetByCat.keys()]);
   const rows = [...allCatNames].map(name => ({
     name,
@@ -601,6 +605,8 @@ function renderTransactions() {
   let list = monthTx.slice();
   if (filter !== 'all') list = list.filter(t => t.type === filter);
   if (categoryFilter) list = list.filter(t => t.category === categoryFilter.name);
+  const _q = (document.getElementById('txSearch')?.value || '').trim().toLowerCase();
+  if (_q) list = list.filter(t => t.description.toLowerCase().includes(_q) || String(t.amount).includes(_q.replace(',', '.')));
   list.sort((a, b) => b.date.localeCompare(a.date));
 
   const lbl = document.getElementById('txMonthLabel');
@@ -677,6 +683,9 @@ function fillCategorySelect(select, type) {
 }
 
 function openTxDialog(id) {
+  const _pf = document.getElementById('parcelasField');
+  if (_pf) { _pf.hidden = !!id; if (txForm.parcelas) txForm.parcelas.value = '1'; const _h=document.getElementById('parcelasHint'); if(_h)_h.textContent=''; }
+  const _dup = document.getElementById('txDup'); if (_dup) _dup.hidden = !id;
   txForm.reset();
   const editing = id ? state.transactions.find(t => t.id === id) : null;
   document.getElementById('txDialogTitle').textContent = editing ? 'Editar transação' : 'Nova transação';
@@ -729,6 +738,29 @@ txForm.addEventListener('submit', e => {
     date: data.get('date'),
   };
   if (!obj.amount || !obj.description || !obj.category || !obj.date) return;
+  const nPar = parseInt(data.get('parcelas')) || 1;
+  const editing = !!txForm.dataset.id && state.transactions.some(t => t.id === txForm.dataset.id);
+  if (!editing && nPar > 1) {
+    // parcelamento: o valor digitado é o valor DA PARCELA; gera N lançamentos mensais
+    const gid = cid();
+    const base = new Date(obj.date + 'T00:00:00');
+    const hoje = todayISO();
+    for (let k = 0; k < nPar; k++) {
+      const d = new Date(base); d.setMonth(base.getMonth() + k);
+      // clampa dia (31 → último dia do mês curto)
+      if (d.getDate() !== base.getDate()) d.setDate(0);
+      const ds = d.toISOString().slice(0, 10);
+      const p = stampTx({ id: cid(), type: obj.type, amount: obj.amount,
+        description: `${obj.description} (${k + 1}/${nPar})`, category: obj.category,
+        date: ds, groupId: gid });
+      if (ds > hoje) p.pending = true;
+      state.transactions.push(p);
+    }
+    saveState(); txDialog.close(); refreshAll();
+    const fim = new Date(base); fim.setMonth(base.getMonth() + nPar - 1);
+    toast(`${nPar} parcelas de ${fmt.format(obj.amount)} até ${monthLongFmt.format(fim)}`);
+    return;
+  }
   // Data futura → agendado (não conta nos totais até a data chegar)
   if (obj.date > todayISO()) obj.pending = true;
   const idx = state.transactions.findIndex(t => t.id === obj.id);
@@ -789,6 +821,7 @@ function openCatDialog(id) {
     catForm.name.value = editing.name;
     catForm.icon.value = editing.icon || '🏷️';
     catForm.color.value = editing.color || '#6366f1';
+    catForm.goal.value = editing.goal || '';
   }
   catDialog.showModal();
 }
@@ -802,6 +835,7 @@ catForm.addEventListener('submit', e => {
     name: data.get('name').trim(),
     icon: data.get('icon') || '🏷️',
     color: data.get('color') || '#6366f1',
+    goal: Math.max(0, parseFloat(data.get('goal')) || 0) || null,
     updatedAt: Date.now(),
   };
   if (!obj.name) return;
@@ -1358,3 +1392,64 @@ refreshAll();
     setTimeout(waitMT, 40);
   }
 })();
+
+
+// ====== Abas do dashboard (Resumo | Gráficos) ======
+document.querySelectorAll('#dashTabs button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('#dashTabs button').forEach(x => x.classList.toggle('on', x === b));
+    const g = b.dataset.dtab === 'graficos';
+    document.getElementById('dashResumo').hidden = g;
+    document.getElementById('dashGraficos').hidden = !g;
+  });
+});
+
+// ====== Busca ======
+document.getElementById('txSearch')?.addEventListener('input', () => renderTransactions());
+
+// ====== Preview do parcelamento ======
+(function () {
+  const upd = () => {
+    const h = document.getElementById('parcelasHint'); if (!h) return;
+    const n = parseInt(txForm.parcelas?.value) || 1;
+    const v = parseFloat(txForm.amount?.value) || 0;
+    h.textContent = (n > 1 && v > 0) ? `${n}× de ${fmt.format(v)} = ${fmt.format(n * v)} no total` : '';
+  };
+  txForm.parcelas?.addEventListener('change', upd);
+  txForm.amount?.addEventListener('input', upd);
+})();
+
+// ====== Duplicar p/ hoje ======
+document.getElementById('txDup')?.addEventListener('click', () => {
+  const data = new FormData(txForm);
+  const obj = stampTx({ id: cid(), type: data.get('type'), amount: parseFloat(data.get('amount')),
+    description: data.get('description').trim(), category: data.get('category'), date: todayISO() });
+  if (!obj.amount || !obj.description) return;
+  state.transactions.push(obj);
+  saveState(); txDialog.close(); refreshAll();
+  toast('Duplicado para hoje');
+});
+
+// ====== Export CSV do mês ======
+document.getElementById('txCsv')?.addEventListener('click', () => {
+  const csvField = v => { let x = String(v == null ? '' : v); if (/^[=+\-@\t\r]/.test(x)) x = "'" + x; return /[",\n\r]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; };
+  const rows = [['Data', 'Tipo', 'Descrição', 'Categoria', 'Valor', 'Status']]
+    .concat(state.transactions.filter(t => inMonth(t.date, currentMonth))
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .map(t => [t.date, t.type === 'income' ? 'Receita' : 'Despesa', t.description, t.category,
+        String(t.amount).replace('.', ','), t.pending ? 'Agendado' : 'Efetivado']));
+  const csv = rows.map(r => r.map(csvField).join(';')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }));
+  const ym = currentMonth.getFullYear() + '-' + String(currentMonth.getMonth() + 1).padStart(2, '0');
+  a.download = `granae-${ym}.csv`; a.click(); URL.revokeObjectURL(a.href);
+  toast('CSV do mês baixado');
+});
+
+// ====== Análise IA do mês (atalho) ======
+document.getElementById('aiMonthBtn')?.addEventListener('click', () => {
+  navigate('ia');
+  const q = document.getElementById('aiQuestion');
+  if (q) q.value = `Análise completa de ${monthLongFmt.format(currentMonth)}: receitas, despesas por categoria (com % do total), comparação com fixos e metas, gastos atípicos e 3 recomendações práticas.`;
+  setTimeout(() => document.getElementById('aiAsk')?.click(), 250);
+});
