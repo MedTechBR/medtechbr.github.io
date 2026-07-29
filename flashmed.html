@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>FlashMed · Questões e Simulados · Residência Médica</title>
-<meta name="description" content="App de estudo de questões — ENARE Farmácia/Multiprofissional. Progresso e taxa de acerto salvos no aparelho.">
+<meta name="description" content="Banco de questões comentadas de residência médica e Revalida: monte sessões por concurso, ano, área, tema e prova. Simulados de provas reais com gabarito oficial.">
 <meta name="theme-color" content="#FAFAF8">
 <link rel="icon" type="image/png" sizes="192x192" href="icone-192.png">
 <link rel="apple-touch-icon" href="icone-192.png">
@@ -28,13 +28,14 @@
     --paper:#FFFFFF;
     --panel2:#F1F1EC;
     --teal:#D0902A;
-    --teal-deep:#A67221;
+    --teal-deep:#8A5A12;   /* texto âmbar sobre claro — AA */
+    --teal-btn:#96671D;    /* fundo de botão com texto branco — AA */
     --teal-tint:rgba(208,144,42,.12);
     --line:#E8E8E2;
     --line-strong:#DDDDD5;
     --right:#1D7A46;
     --right-bg:rgba(29,122,70,.12);
-    --wrong:#C6453D;
+    --wrong:#B23A33;
     --wrong-bg:rgba(198,69,61,.12);
     --amber:#A3730A;
     --glow:rgba(208,144,42,.42);
@@ -135,8 +136,6 @@
   .opt.struck .key{text-decoration:line-through;color:var(--ink-soft)}
   .opt.struck.right,.opt.struck.wrong{opacity:1}
   .opts-hint{font-size:.76rem;color:var(--ink-soft);margin:2px 2px 10px;display:flex;align-items:center;gap:6px}
-  /* aba Exames — deck de flashcards embutido */
-  
   /* figura anexada à questão */
   .qfig{margin:0 0 16px;display:flex;justify-content:center}
   .qfig img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:12px;background:#fff;padding:10px}
@@ -160,15 +159,86 @@
   .feedback .body b{color:var(--teal-deep)}
 
   .nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px}
-  .btn{background:var(--teal);color:#fff;border:none;border-radius:11px;padding:12px 20px;
+  .btn{background:var(--teal-btn);color:#fff;border:none;border-radius:11px;padding:12px 20px;
     font-size:.95rem;font-weight:600;cursor:pointer}
   .btn:hover{background:var(--teal-deep)}
-  .btn:disabled{background:#1b2532;color:#767C84;cursor:not-allowed}
-  .btn.sec{background:none;color:var(--teal);border:1.5px solid var(--line)}
+  .btn:disabled{background:var(--panel2);color:var(--ink-soft);cursor:not-allowed}
+  .btn.sec{background:none;color:var(--teal-deep);border:1.5px solid var(--line)}
   .btn.sec:hover{border-color:var(--teal);background:var(--teal-tint)}
 
   .foot{text-align:center;margin-top:22px;font-size:.78rem;color:var(--ink-soft)}
   .foot a{color:var(--teal);cursor:pointer;text-decoration:underline}
+
+  /* ===== Montador de sessão (banco de questões) ===== */
+  .setup-card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow);margin-bottom:12px}
+  .setup-card h3{font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:11px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font:inherit;font-size:.84rem;font-weight:600;display:inline-flex;align-items:center;gap:7px;
+    border:1px solid var(--line-strong);background:var(--paper);color:var(--ink-soft);border-radius:999px;
+    padding:7px 13px;cursor:pointer;transition:border-color .12s,background .12s,color .12s}
+  .chip:hover{border-color:var(--teal);color:var(--teal-deep)}
+  .chip.on{border-color:var(--teal);background:var(--teal-tint);color:var(--teal-deep)}
+  .chip .dot{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--line-strong);flex:0 0 auto;
+    display:grid;place-items:center;font-size:10px;line-height:1;color:#fff}
+  .chip.on .dot{background:var(--right);border-color:var(--right)}
+  .chip.on .dot::after{content:"✓"}
+  .chip small{font-weight:500;opacity:.75;font-variant-numeric:tabular-nums}
+
+  .areas{display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:9px}
+  .area-row{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;
+    padding:10px 12px;background:var(--paper);cursor:pointer;font:inherit;text-align:left;width:100%}
+  .area-row .nm{flex:1;font-size:.9rem;font-weight:600;color:var(--ink)}
+  .area-row .ct{font-size:.75rem;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+  .sw{width:42px;height:24px;border-radius:999px;background:var(--line-strong);position:relative;flex:0 0 auto;transition:background .15s}
+  .sw::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;
+    transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.28)}
+  .area-row.on .sw{background:var(--right)}
+  .area-row.on .sw::after{transform:translateX(18px)}
+
+  .ac-wrap{position:relative}
+  .ac-in{width:100%;font:inherit;font-size:.9rem;padding:11px 13px;border:1px solid var(--line-strong);
+    border-radius:11px;background:var(--panel2);color:var(--ink)}
+  .ac-in::placeholder{color:var(--ink-soft)}
+  .ac-in:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(208,144,42,.15);background:var(--paper)}
+  .ac-list{position:absolute;z-index:40;left:0;right:0;top:calc(100% + 5px);background:var(--paper);
+    border:1px solid var(--line-strong);border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.16);
+    max-height:270px;overflow:auto;padding:5px}
+  .ac-list[hidden]{display:none}
+  .ac-item{padding:9px 11px;border-radius:8px;font-size:.88rem;color:var(--ink);cursor:pointer;
+    display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .ac-item:hover,.ac-item.cur{background:var(--teal-tint)}
+  .ac-item small{color:var(--ink-soft);font-variant-numeric:tabular-nums;flex:0 0 auto}
+  .ac-empty{padding:10px 11px;font-size:.85rem;color:var(--ink-soft)}
+  .picked{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+  .picked:empty{display:none}
+  .pc{display:inline-flex;align-items:center;gap:6px;font-size:.82rem;font-weight:600;color:var(--teal-deep);
+    background:var(--teal-tint);border:1px solid rgba(208,144,42,.35);border-radius:999px;padding:5px 8px 5px 12px}
+  .pc button{border:none;background:none;color:var(--teal-deep);cursor:pointer;font-size:15px;line-height:1;padding:0 3px}
+  .pc button:hover{color:var(--wrong)}
+  .hint-line{font-size:.78rem;color:var(--ink-soft);margin-top:9px}
+
+  .qty-row{display:flex;align-items:center;gap:14px}
+  .qty-row input[type=range]{flex:1;accent-color:var(--teal);height:24px;background:transparent}
+  .qty-val{font-family:'JetBrains Mono',ui-monospace,monospace;font-weight:800;font-size:1.05rem;color:#fff;
+    background:var(--teal-btn);border-radius:9px;padding:6px 12px;min-width:58px;text-align:center}
+  .avail{text-align:center;font-size:.85rem;color:var(--ink-soft);margin:14px 0 8px}
+  .avail b{color:var(--teal-deep);font-size:1.05rem;font-variant-numeric:tabular-nums}
+  .build{width:100%;font:inherit;font-weight:700;font-size:1rem;padding:15px;border:none;border-radius:13px;
+    background:linear-gradient(135deg,var(--teal-btn),var(--teal-deep));color:#fff;cursor:pointer;
+    box-shadow:0 8px 20px rgba(208,144,42,.26)}
+  .build:disabled{background:var(--line-strong);color:var(--ink-soft);cursor:not-allowed;box-shadow:none}
+  .setup-actions{display:flex;gap:9px;margin-top:10px;flex-wrap:wrap}
+  .setup-actions .ghost{flex:1;text-align:center}
+
+  /* procedência da questão */
+  .src-line{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:12px}
+  .src{font-size:.72rem;font-weight:700;letter-spacing:.02em;border-radius:7px;padding:3px 9px;white-space:nowrap}
+  .src.prova{background:var(--teal-tint);color:var(--teal-deep)}
+  .src.esp{background:var(--panel2);color:var(--ink-soft)}
+  .src.tema{background:rgba(29,122,70,.10);color:var(--right)}
+  .src.anul{background:rgba(163,115,10,.14);color:var(--amber)}
+  .ref-line{margin-top:12px;padding-top:11px;border-top:1px dashed var(--line-strong);font-size:.82rem;color:var(--ink-soft)}
+  .ref-line b{color:var(--ink);font-weight:600}
 
   /* Tabs */
   .tabs{display:flex;gap:8px;margin:0 0 16px;flex-wrap:wrap}
@@ -176,7 +246,7 @@
     border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;
     display:flex;align-items:center;justify-content:center;gap:7px;transition:background .12s,color .12s,border-color .12s}
   .tab:hover:not(.active){border-color:var(--teal);color:var(--teal)}
-  .tab.active{background:var(--teal);border-color:var(--teal);color:#fff;box-shadow:var(--shadow)}
+  .tab.active{background:var(--teal-btn);border-color:var(--teal-btn);color:#fff;box-shadow:var(--shadow)}
   .panel[hidden]{display:none}
 
   /* Estudos */
@@ -196,12 +266,12 @@
     font-size:.85rem;color:var(--ink-soft)}
   .restore-bar button{font:inherit;font-weight:700;font-size:.82rem;color:var(--teal);background:none;
     border:1px solid var(--teal);border-radius:8px;padding:5px 12px;cursor:pointer;white-space:nowrap}
-  .restore-bar button:hover{background:var(--teal);color:#fff}
+  .restore-bar button:hover{background:var(--teal-btn);color:#fff}
   .topic .n{font-size:.7rem;font-weight:700;letter-spacing:.04em;color:var(--teal-deep);
     background:var(--teal-tint);border-radius:7px;padding:2px 8px;align-self:flex-start}
   .topic h3{font-size:1rem;color:var(--ink);line-height:1.25;font-weight:700}
   .topic p{font-size:.82rem;color:var(--ink-soft);line-height:1.4}
-  .topic .kind{font-size:.68rem;font-weight:700;letter-spacing:.03em;color:var(--amber);text-transform:uppercase}
+  .topic .kind{font-size:.68rem;font-weight:700;letter-spacing:.03em;color:var(--teal-deep);text-transform:uppercase}
   .group-head{grid-column:1/-1;font-weight:700;color:var(--teal-deep);font-size:.95rem;
     margin:10px 0 -2px;padding-bottom:6px;border-bottom:1px solid var(--line);
     display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
@@ -221,7 +291,7 @@
   .sim-cell.ans{background:var(--teal-tint);border-color:var(--teal);color:var(--teal-deep)}
   .sim-cell.cur{outline:2px solid var(--amber);outline-offset:1px}
   .opt.sel{border-color:var(--teal);background:var(--teal-tint)}
-  .opt.sel .key{border-color:var(--teal);background:var(--teal);color:#fff}
+  .opt.sel .key{border-color:var(--teal-btn);background:var(--teal-btn);color:#fff}
   .sim-scewrap{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin:6px 0 14px}
   .sim-score{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:2.6rem;font-weight:800;color:var(--teal-deep);line-height:1}
   .sim-rev{display:flex;flex-direction:column;gap:7px;margin-top:12px}
@@ -243,7 +313,7 @@
   .penbar{position:fixed;z-index:9999;
     bottom:calc(16px + env(safe-area-inset-bottom));right:calc(16px + env(safe-area-inset-right));
     display:flex;flex-direction:column;align-items:flex-end;gap:10px}
-  .pen-fab{width:52px;height:52px;border-radius:50%;border:none;background:var(--teal);color:#fff;
+  .pen-fab{width:52px;height:52px;border-radius:50%;border:none;background:var(--teal-btn);color:#fff;
     font-size:22px;line-height:1;box-shadow:var(--shadow);cursor:pointer;display:flex;
     align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
   .pen-fab.on{background:var(--wrong)}
@@ -265,7 +335,7 @@
     .nav .btn,.nav .btn.sec{width:100%}
   }
   /* link cruzado p/ o CondutAI (revisar a conduta da questão) */
-  .cond-xlink{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:9px 15px;border:1px solid rgba(208,144,42,.30);border-radius:11px;font-weight:600;font-size:13px;color:#8fb6ff;background:rgba(208,144,42,.12);text-decoration:none;transition:.15s}
+  .cond-xlink{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:9px 15px;border:1px solid rgba(208,144,42,.30);border-radius:11px;font-weight:600;font-size:13px;color:var(--teal-deep);background:rgba(208,144,42,.12);text-decoration:none;transition:.15s}
   .cond-xlink:hover{background:rgba(208,144,42,.20);border-color:rgba(208,144,42,.5)}
 </style>
 <link rel="stylesheet" href="_mttokens.css?v=2">
@@ -288,43 +358,102 @@
   </div>
 
   <div id="panel-questoes" class="panel">
-  <div class="stats">
-    <svg class="ring" viewBox="0 0 36 36" aria-hidden="true">
-      <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--line)" stroke-width="3"></circle>
-      <circle id="ringFill" cx="18" cy="18" r="15.9" fill="none" stroke="var(--teal)" stroke-width="3"
-        stroke-linecap="round" stroke-dasharray="0 100" transform="rotate(-90 18 18)"></circle>
-      <text id="ringTxt" x="18" y="19.5" text-anchor="middle" font-size="9" font-weight="700" fill="var(--teal-deep)">0%</text>
-    </svg>
-    <div class="metrics">
-      <div class="metric"><div class="v" id="mAns">0</div><div class="l">Respondidas</div></div>
-      <div class="metric"><div class="v" id="mRight">0</div><div class="l">Acertos</div></div>
-      <div class="metric"><div class="v" id="mTotal">0</div><div class="l">No banco</div></div>
+
+  <!-- ===== Montador de sessão ===== -->
+  <div id="setup">
+    <p class="topics-intro">Monte a sessão do jeito que você quer estudar. São <b id="poolTotal">0</b> questões comentadas no banco — provas oficiais de residência e Revalida, além das autorais MedTech.</p>
+
+    <div class="setup-card">
+      <h3>Questões de concursos específicos</h3>
+      <div class="chips" id="cTipo"></div>
+    </div>
+
+    <div class="setup-card">
+      <h3>Questões de anos específicos</h3>
+      <div class="chips" id="cAno"></div>
+    </div>
+
+    <div class="setup-card">
+      <h3>Questões de áreas específicas</h3>
+      <div class="areas" id="cArea"></div>
+    </div>
+
+    <div class="setup-card">
+      <h3>Questões apenas de temas específicos</h3>
+      <div class="ac-wrap">
+        <input class="ac-in" id="acTema" placeholder="Buscar… (exemplo: asma, sepse, pré-natal…)" autocomplete="off" enterkeyhint="done">
+        <div class="ac-list" id="acTemaList" hidden></div>
+      </div>
+      <div class="picked" id="pkTema"></div>
+      <div class="hint-line" id="hintTema">Temas escolhidos: <b>todos</b></div>
+    </div>
+
+    <div class="setup-card">
+      <h3>Questões de provas específicas</h3>
+      <div class="ac-wrap">
+        <input class="ac-in" id="acProva" placeholder="Buscar… (exemplo: ENARE, Revalida, USP…)" autocomplete="off" enterkeyhint="done">
+        <div class="ac-list" id="acProvaList" hidden></div>
+      </div>
+      <div class="picked" id="pkProva"></div>
+      <div class="hint-line" id="hintProva">Provas escolhidas: <b>todas</b></div>
+    </div>
+
+    <div class="setup-card">
+      <h3>Outros</h3>
+      <div class="chips" id="cOutros"></div>
+    </div>
+
+    <div class="setup-card">
+      <h3>Quantidade de questões</h3>
+      <div class="qty-row">
+        <input type="range" id="qty" min="5" max="120" step="5" value="20" aria-label="Quantidade de questões">
+        <span class="qty-val" id="qtyVal">20</span>
+      </div>
+      <div class="hint-line">A sessão embaralha as questões que passaram nos filtros.</div>
+    </div>
+
+    <div class="avail" id="avail"></div>
+    <button class="build" id="build">Gerar questões</button>
+    <div class="setup-actions">
+      <button class="ghost" id="resumeBtn" hidden>↩︎ Continuar a última sessão</button>
+      <button class="ghost" id="clearFilters">Limpar filtros</button>
+      <button class="ghost" id="perfToggle">Meu desempenho</button>
+    </div>
+
+    <div class="perf-panel" id="perfPanel" hidden style="margin-top:12px">
+      <div class="perf-head">Desempenho por tema <span class="perf-sub">— toque num tema fraco pra montar uma sessão só dele</span></div>
+      <div class="perf-list" id="perfList"><!-- via JS --></div>
+      <button class="perf-focus" id="focusBtn" hidden>🎯 Montar sessão com meus pontos fracos</button>
     </div>
   </div>
 
-  <div class="controls">
-    <select id="filter" aria-label="Filtrar por tema"></select>
-    <button class="ghost" id="shuffle">Embaralhar</button>
-    <button class="ghost" id="perfToggle">📊 Desempenho</button>
-    <button class="ghost" id="reset">Zerar desempenho</button>
-  </div>
+  <!-- ===== Sessão em andamento ===== -->
+  <div id="run" hidden>
+    <div class="stats">
+      <svg class="ring" viewBox="0 0 36 36" aria-hidden="true">
+        <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--line)" stroke-width="3"></circle>
+        <circle id="ringFill" cx="18" cy="18" r="15.9" fill="none" stroke="var(--teal)" stroke-width="3"
+          stroke-linecap="round" stroke-dasharray="0 100" transform="rotate(-90 18 18)"></circle>
+        <text id="ringTxt" x="18" y="19.5" text-anchor="middle" font-size="9" font-weight="700" fill="var(--teal-deep)">0%</text>
+      </svg>
+      <div class="metrics">
+        <div class="metric"><div class="v" id="mAns">0</div><div class="l">Respondidas</div></div>
+        <div class="metric"><div class="v" id="mRight">0</div><div class="l">Acertos</div></div>
+        <div class="metric"><div class="v" id="mTotal">0</div><div class="l">Na sessão</div></div>
+      </div>
+    </div>
 
-  <div class="perf-panel" id="perfPanel" hidden>
-    <div class="perf-head">Desempenho por tema <span class="perf-sub">— toque num tema fraco pra praticar só ele</span></div>
-    <div class="perf-list" id="perfList"><!-- preenchido via JS --></div>
-    <button class="perf-focus" id="focusBtn" hidden>🎯 Focar nos pontos fracos</button>
-  </div>
+    <div class="controls">
+      <button class="ghost" id="backSetup">← Nova sessão</button>
+      <button class="ghost" id="shuffle">Embaralhar</button>
+      <button class="ghost" id="reset">Zerar desempenho</button>
+    </div>
 
-  <div class="focus-banner" id="focusBanner" hidden>
-    <span>🎯 Modo foco ativo — praticando só os temas fracos</span>
-    <button id="focusExit">Sair</button>
-  </div>
+    <div class="card" id="card"><!-- preenchido via JS --></div>
 
-  <div class="card" id="card"><!-- preenchido via JS --></div>
-
-  <div class="foot">
-    Leva atual: <b id="footCount">0</b> questões carregadas ·
-    <a id="more">banco autoral em expansão · a prova real completa está na aba Simulado</a>
+    <div class="foot">
+      Sessão atual: <b id="footCount">0</b> questões · filtros: <span id="footFilters">todos</span>
+    </div>
   </div>
   </div><!-- /panel-questoes -->
 
@@ -350,149 +479,373 @@
 
 </div>
 
-<script src="flashmed-provas.js?v=2"></script>
-<script src="flashmed-medbank.js?v=1"></script>
+<script src="flashmed-provas.js?v=3"></script>
+<script src="flashmed-medbank.js?v=2"></script>
 <script>
 /* ============================================================
-   BANCO DE QUESTÕES — Leva 1
-   Cada objeto: {tema, q (enunciado), ops[4], correct (índice 0-3), c (comentário)}
+   BANCO UNIFICADO DE QUESTÕES
+   Uma questão = {id, q, ops[], correct, c, area, esp, tema,
+                  inst, banca, ano, tipo, provaId, prova, anulada}
+   `id` é estável (prova:indice | autoral:indice) — o progresso do
+   usuário é indexado por ele, então inserir/remover questão no banco
+   nunca mais reatribui histórico para a questão errada.
    ============================================================ */
-const BANK = (window.MED_BANK||[]);
+const AREA_LABEL = {clinica:"Clínica Médica", cirurgia:"Cirurgia Geral", pediatria:"Pediatria", go:"Gineco e Obstetrícia", preventiva:"Medicina Preventiva"};
+const AREA_ORDER = ["clinica","cirurgia","pediatria","go","preventiva"];
+const ESP_LABEL = {emergencia:"Emergência", cardio:"Cardiologia", infecto:"Infectologia", pneumo:"Pneumologia",
+  endocrino:"Endocrinologia", neuro:"Neurologia", gastro:"Gastro/Hepato", nefro:"Nefrologia", hemato:"Hematologia",
+  reumato:"Reumatologia", gineco:"Gineco/Obstetrícia", psiq:"Psiquiatria", derm:"Dermatologia", uro:"Urologia",
+  olho_orl:"Oftalmo/ORL", geriatria:"Geriatria", onco_pal:"Onco/Paliativos", raras:"Doenças raras",
+  cirurgia:"Cirurgia", pediatria:"Pediatria", preventiva:"Preventiva", ortopedia:"Ortopedia", medfam:"Medicina de Família"};
+const TIPO_LABEL = {r1:"R1 · acesso direto", r3:"R3 · com pré-requisito", revalida:"REVALIDA", autoral:"Autoral MedTech"};
+const TIPO_ORDER = ["r1","r3","revalida","autoral"];
+
+const POOL = (function buildPool(){
+  const out = [];
+  (window.SIMULADOS||[]).forEach(p=>{
+    (p.questions||[]).forEach((q,i)=>{
+      out.push({ id: q.id || (p.id+":"+i), q:q.q, ops:q.ops||[], correct:q.correct, c:q.c||"",
+        area: q.area||"clinica", esp: q.esp||"", tema: q.tema||"",
+        inst: p.inst||"", banca: p.banca||"", ano: p.ano||0, tipo: p.tipo||"r1",
+        provaId: p.id, prova: p.title||"", anulada: q.correct === -1 });
+    });
+  });
+  (window.MED_BANK||[]).forEach((q,i)=>{
+    out.push({ id: q.id || ("autoral:"+i), q:q.q, ops:q.ops||[], correct:q.correct, c:q.c||"",
+      area: q.area||"clinica", esp: q.esp||"", tema: q.tema||"",
+      inst:"MedTech", banca:"Autoral MedTech", ano: q.ano||2026, tipo:"autoral",
+      provaId:"autoral", prova:"Questões autorais MedTech", anulada:false });
+  });
+  return out;
+})();
+const BY_ID = new Map(POOL.map(q=>[q.id,q]));
+const PROVAS = (function(){
+  const m = new Map();
+  POOL.forEach(q=>{
+    if(!m.has(q.provaId)) m.set(q.provaId, {id:q.provaId, label:q.prova, banca:q.banca, ano:q.ano, n:0});
+    m.get(q.provaId).n++;
+  });
+  return [...m.values()].sort((a,b)=> b.ano-a.ano || a.label.localeCompare(b.label,"pt-BR"));
+})();
+const TEMAS = (function(){
+  const m = new Map();
+  POOL.forEach(q=>{ if(!q.tema) return; m.set(q.tema, (m.get(q.tema)||0)+1); });
+  return [...m.entries()].map(([tema,n])=>({tema,n})).sort((a,b)=> b.n-a.n || a.tema.localeCompare(b.tema,"pt-BR"));
+})();
+const ANOS = [...new Set(POOL.map(q=>q.ano))].filter(Boolean).sort((a,b)=>b-a);
+const TIPOS = TIPO_ORDER.filter(t=> POOL.some(q=>q.tipo===t));
+
+const norm = s => String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+/* índice de busca do tema: nome + texto das questões daquele tema. Sem isso,
+   quem digita "sepse" não encontra o tema "Choque séptico e ressuscitação". */
+const TEMA_BLOB = (function(){
+  const m = new Map();
+  POOL.forEach(q=>{
+    if(!q.tema) return;
+    m.set(q.tema, (m.get(q.tema)||"") + " " + norm(q.q) + " " + norm(ESP_LABEL[q.esp]||"") + " " + norm(AREA_LABEL[q.area]||""));
+  });
+  return m;
+})();
+function escapeAttr(s){ return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
 /* ============================================================
-   MOTOR DO QUIZ
+   PROGRESSO (por id estável) + sincronização entre aparelhos
    ============================================================ */
-const STORE_KEY = "enareFarmaProgress_v1";
-const POS_KEY = "enareFarmaPos_v1";   // continua de onde parou
-let answers = loadAnswers();          // { idx: {sel, ok} }
-let order = BANK.map((_,i)=>i);       // ordem de exibição (índices do BANK)
-let pos = 0;
-let activeFilter = "Todos os temas";
+const STORE_KEY  = "fm_answers_v2";
+const STRIKE_KEY = "fm_strikes_v2";
+const SESS_KEY   = "fm_session_v1";
+const FILT_KEY   = "fm_filters_v1";
+let answers = loadAnswers();   // { qid: {sel, ok, t} }
+let strikes = loadStrikes();   // { qid: [j,...] }
 
 function loadAnswers(){
-  try{ const r = localStorage.getItem(STORE_KEY); return r?JSON.parse(r):{}; }
-  catch(e){ return {}; }
+  try{
+    const r = localStorage.getItem(STORE_KEY);
+    if(r) return JSON.parse(r) || {};
+  }catch(e){}
+  /* migração do formato antigo (chave = índice posicional no banco autoral).
+     As alternativas autorais foram reembaralhadas nesta versão, então o índice
+     escolhido não vale mais — preservamos só o acerto/erro (sel:-1). */
+  const out = {};
+  try{
+    const old = JSON.parse(localStorage.getItem("enareFarmaProgress_v1")||"{}");
+    Object.keys(old).forEach(k=>{
+      if(/^\d+$/.test(k)) out["autoral:"+k] = {sel:-1, ok:!!old[k].ok, t:Date.now()};
+    });
+    if(Object.keys(out).length) localStorage.setItem(STORE_KEY, JSON.stringify(out));
+  }catch(e){}
+  return out;
+}
+function loadStrikes(){
+  try{ return JSON.parse(localStorage.getItem(STRIKE_KEY)||"{}") || {}; }catch(e){ return {}; }
 }
 function saveAnswers(){
   try{ localStorage.setItem(STORE_KEY, JSON.stringify(answers)); }catch(e){}
+  cloudSave();
 }
+function saveStrikesAll(){ try{ localStorage.setItem(STRIKE_KEY, JSON.stringify(strikes)); }catch(e){} }
 
-/* ---- filtro de temas ---- */
-function buildFilter(){
-  const temas = ["Todos os temas", ...Array.from(new Set(BANK.map(q=>q.tema)))];
-  const sel = document.getElementById("filter");
-  sel.innerHTML = temas.map(t=>`<option>${t}</option>`).join("");
-  sel.onchange = ()=>{
-    if(focusMode){ focusMode=false; document.getElementById("focusBanner").hidden=true; }
-    activeFilter = sel.value; applyFilter();
-  };
+/* nuvem: cada resposta é uma entidade {id, sel, ok, updatedAt} — merge por id,
+   last-edit-wins (mesmo contrato do Foco/Granaê). */
+let _cloudBusy = false;
+function cloudSave(){
+  if(!window.MT || !MT.save || _cloudBusy) return;
+  const resp = Object.keys(answers).map(id=>({id, sel:answers[id].sel, ok:!!answers[id].ok, updatedAt: answers[id].t || Date.now()}));
+  try{ MT.save({resp}); }catch(e){}
 }
-function applyFilter(){
-  order = BANK.map((_,i)=>i).filter(i=> activeFilter==="Todos os temas" || BANK[i].tema===activeFilter);
-  pos = 0;
-  render();
-}
-
-/* ---- estatísticas ---- */
-function refreshStats(){
-  const ansKeys = Object.keys(answers);
-  const ans = ansKeys.length;
-  const right = ansKeys.filter(k=>answers[k].ok).length;
-  const rate = ans? Math.round((right/ans)*100):0;
-  document.getElementById("mAns").textContent = ans;
-  document.getElementById("mRight").textContent = right;
-  document.getElementById("mTotal").textContent = BANK.length;
-  document.getElementById("footCount").textContent = BANK.length;
-  document.getElementById("ringTxt").textContent = rate+"%";
-  document.getElementById("ringFill").setAttribute("stroke-dasharray", `${rate} ${100-rate}`);
-  document.getElementById("ringFill").setAttribute("stroke",
-    rate>=70?"var(--right)":rate>=50?"var(--teal)":"var(--amber)");
-  const pp = document.getElementById("perfPanel");
-  if(pp && !pp.hidden) renderPerfPanel();
-}
-
-/* ---- desempenho por tema (painel + provas personalizadas) ---- */
-let focusMode = false;
-function perfByTema(){
-  const temas = Array.from(new Set(BANK.map(q=>q.tema)));
-  return temas.map(tema=>{
-    const idxs = BANK.map((q,i)=>({q,i})).filter(x=>x.q.tema===tema).map(x=>x.i);
-    const answered = idxs.filter(i=>answers[i]);
-    const right = answered.filter(i=>answers[i].ok).length;
-    const rate = answered.length ? Math.round((right/answered.length)*100) : null;
-    return { tema, total: idxs.length, answered: answered.length, right, rate };
-  }).sort((a,b)=>{
-    const ra = a.rate===null ? -1 : a.rate;   // não respondido some pro topo, junto com os piores
-    const rb = b.rate===null ? -1 : b.rate;
-    return ra - rb;
+function applyCloud(d){
+  if(!d || !Array.isArray(d.resp)) return;
+  let changed = false;
+  d.resp.forEach(r=>{
+    if(!r || !r.id) return;
+    const cur = answers[r.id];
+    if(!cur || (r.updatedAt||0) > (cur.t||0)){ answers[r.id] = {sel:r.sel, ok:!!r.ok, t:r.updatedAt||Date.now()}; changed = true; }
   });
+  if(changed){
+    _cloudBusy = true;
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(answers)); }catch(e){}
+    _cloudBusy = false;
+    if(!document.getElementById("run").hidden) render(); else countAvailable();
+  }
 }
-function renderPerfPanel(){
-  const list = document.getElementById("perfList");
-  const perf = perfByTema();
-  list.innerHTML = perf.map(p=>{
-    const pct = p.rate===null ? "—" : p.rate+"%";
-    const barPct = p.rate===null ? 0 : p.rate;
-    const cls = p.rate===null ? "na" : p.rate>=70 ? "" : p.rate>=50 ? "amber" : "wrong";
-    const color = cls==="wrong" ? "var(--wrong)" : cls==="amber" ? "var(--amber)" : cls==="na" ? "var(--line-strong)" : "var(--right)";
-    return `<div class="perf-row" data-tema="${escapeAttr(p.tema)}">
-      <div class="perf-tema">${escapeAttr(p.tema)}</div>
-      <div class="perf-bar-wrap"><div class="perf-bar ${cls}" style="width:${barPct}%;background:${color}"></div></div>
-      <div class="perf-pct">${p.answered}/${p.total} · ${pct}</div>
-    </div>`;
+function fmMergeFn(remote, local){ return MT.mergeState(remote, local, ["resp"]); }
+(function waitMT(){
+  if(window.MT){ MT.mergeFn = fmMergeFn; MT.onData(applyCloud); }
+  else setTimeout(waitMT, 40);
+})();
+
+/* ============================================================
+   FILTROS DA SESSÃO
+   ============================================================ */
+const F = {
+  tipos: new Set(TIPOS),
+  anos:  new Set(ANOS.map(String)),
+  areas: new Set(AREA_ORDER),
+  temas: new Set(),        // vazio = todos
+  provas:new Set(),        // vazio = todas
+  modo: "todas",           // todas | novas | erradas
+  semAnuladas: true,
+  qty: 20
+};
+try{
+  const sv = JSON.parse(localStorage.getItem(FILT_KEY)||"null");
+  if(sv){
+    if(Array.isArray(sv.tipos) && sv.tipos.length) F.tipos = new Set(sv.tipos.filter(t=>TIPOS.includes(t)));
+    if(Array.isArray(sv.anos) && sv.anos.length)   F.anos  = new Set(sv.anos.filter(a=>ANOS.map(String).includes(a)));
+    if(Array.isArray(sv.areas) && sv.areas.length) F.areas = new Set(sv.areas.filter(a=>AREA_ORDER.includes(a)));
+    if(Array.isArray(sv.temas))  F.temas  = new Set(sv.temas.filter(t=>TEMAS.some(x=>x.tema===t)));
+    if(Array.isArray(sv.provas)) F.provas = new Set(sv.provas.filter(p=>PROVAS.some(x=>x.id===p)));
+    if(sv.modo) F.modo = sv.modo;
+    if(typeof sv.semAnuladas === "boolean") F.semAnuladas = sv.semAnuladas;
+    if(+sv.qty) F.qty = +sv.qty;
+  }
+}catch(e){}
+function saveFilters(){
+  try{ localStorage.setItem(FILT_KEY, JSON.stringify({
+    tipos:[...F.tipos], anos:[...F.anos], areas:[...F.areas], temas:[...F.temas],
+    provas:[...F.provas], modo:F.modo, semAnuladas:F.semAnuladas, qty:F.qty })); }catch(e){}
+}
+function matches(q){
+  if(F.semAnuladas && q.anulada) return false;
+  if(!F.tipos.has(q.tipo)) return false;
+  if(!F.anos.has(String(q.ano))) return false;
+  if(!F.areas.has(q.area)) return false;
+  if(F.temas.size && !F.temas.has(q.tema)) return false;
+  if(F.provas.size && !F.provas.has(q.provaId)) return false;
+  const a = answers[q.id];
+  if(F.modo === "novas"   && a) return false;
+  if(F.modo === "erradas" && !(a && !a.ok)) return false;
+  return true;
+}
+function pool(){ return POOL.filter(matches); }
+
+/* ============================================================
+   UI DO MONTADOR
+   ============================================================ */
+const $ = id => document.getElementById(id);
+
+function chipHTML(val, label, on, extra){
+  return `<button class="chip${on?" on":""}" data-v="${escapeAttr(val)}"><span class="dot"></span>${escapeAttr(label)}${extra?` <small>${extra}</small>`:""}</button>`;
+}
+function renderTipos(){
+  $("cTipo").innerHTML = TIPOS.map(t=>{
+    const n = POOL.filter(q=>q.tipo===t && !(F.semAnuladas && q.anulada)).length;
+    return chipHTML(t, TIPO_LABEL[t]||t, F.tipos.has(t), n);
   }).join("");
-  list.querySelectorAll(".perf-row").forEach(row=>{
-    row.onclick = ()=>{
-      exitFocusMode(false);
-      activeFilter = row.dataset.tema;
-      const sel = document.getElementById("filter"); if(sel) sel.value = activeFilter;
-      applyFilter();
-    };
+  $("cTipo").querySelectorAll(".chip").forEach(b=> b.onclick = ()=>{
+    const v = b.dataset.v; F.tipos.has(v) ? F.tipos.delete(v) : F.tipos.add(v);
+    renderTipos(); countAvailable();
   });
-  // "Focar nos pontos fracos": temas com <70% de acerto (já respondidos) OU nunca respondidos
-  const weak = perf.filter(p=> p.rate===null || p.rate<70).map(p=>p.tema);
-  const focusBtn = document.getElementById("focusBtn");
-  if(focusBtn) focusBtn.hidden = weak.length===0 || weak.length===perf.length; // nada a focar se já foi tudo bem, ou se é tudo fraco (=banco todo)
 }
-function activateFocusMode(){
-  const perf = perfByTema();
-  const weakTemas = new Set(perf.filter(p=> p.rate===null || p.rate<70).map(p=>p.tema));
-  focusMode = true;
-  order = BANK.map((_,i)=>i).filter(i=> weakTemas.has(BANK[i].tema));
-  for(let i=order.length-1;i>0;i--){ const r=Math.floor(Math.random()*(i+1)); [order[i],order[r]]=[order[r],order[i]]; }
-  pos = 0;
-  document.getElementById("focusBanner").hidden = false;
-  document.getElementById("perfPanel").hidden = true;
+function renderAnos(){
+  const todos = F.anos.size === ANOS.length;
+  $("cAno").innerHTML = chipHTML("__all", "Todos", todos, "") +
+    ANOS.map(a=> chipHTML(String(a), String(a), F.anos.has(String(a)), POOL.filter(q=>q.ano===a).length)).join("");
+  $("cAno").querySelectorAll(".chip").forEach(b=> b.onclick = ()=>{
+    const v = b.dataset.v;
+    if(v === "__all"){ if(F.anos.size===ANOS.length) F.anos.clear(); else F.anos = new Set(ANOS.map(String)); }
+    else { F.anos.has(v) ? F.anos.delete(v) : F.anos.add(v); }
+    renderAnos(); countAvailable();
+  });
+}
+function renderAreas(){
+  $("cArea").innerHTML = AREA_ORDER.map(a=>{
+    const n = POOL.filter(q=>q.area===a && !(F.semAnuladas && q.anulada)).length;
+    return `<button class="area-row${F.areas.has(a)?" on":""}" data-v="${a}">
+      <span class="nm">${AREA_LABEL[a]}</span><span class="ct">${n}</span><span class="sw"></span></button>`;
+  }).join("");
+  $("cArea").querySelectorAll(".area-row").forEach(b=> b.onclick = ()=>{
+    const v = b.dataset.v; F.areas.has(v) ? F.areas.delete(v) : F.areas.add(v);
+    renderAreas(); countAvailable();
+  });
+}
+function renderOutros(){
+  const opts = [["todas","Todas as questões"],["novas","Só as que ainda não respondi"],["erradas","Só as que eu errei"]];
+  $("cOutros").innerHTML = opts.map(([v,l])=> chipHTML("m:"+v, l, F.modo===v, "")).join("") +
+    chipHTML("anul", "Ocultar questões anuladas", F.semAnuladas, "");
+  $("cOutros").querySelectorAll(".chip").forEach(b=> b.onclick = ()=>{
+    const v = b.dataset.v;
+    if(v === "anul") F.semAnuladas = !F.semAnuladas;
+    else F.modo = v.slice(2);
+    renderOutros(); renderTipos(); renderAreas(); countAvailable();
+  });
+}
+
+/* --- autocomplete multi-seleção (temas e provas) --- */
+function setupAC(inputId, listId, pickedId, hintId, source, key, labelOf, countOf, plural){
+  const inp = $(inputId), list = $(listId), picked = $(pickedId), hint = $(hintId);
+  let cur = -1;
+  function drawPicked(){
+    const sel = [...F[key]];
+    picked.innerHTML = sel.map(v=>`<span class="pc">${escapeAttr(labelOf(v))}<button data-v="${escapeAttr(v)}" aria-label="Remover">×</button></span>`).join("");
+    picked.querySelectorAll("button").forEach(b=> b.onclick = ()=>{ F[key].delete(b.dataset.v); drawPicked(); countAvailable(); });
+    hint.innerHTML = sel.length ? `${plural} escolhid${plural==="Provas"?"a":"o"}s: <b>${sel.length}</b>` : `${plural} escolhid${plural==="Provas"?"a":"o"}s: <b>${plural==="Provas"?"todas":"todos"}</b>`;
+  }
+  function close(){ list.hidden = true; cur = -1; }
+  function draw(){
+    const term = norm(inp.value.trim());
+    let items = source();
+    if(term){
+      const noNome = [], noTexto = [];
+      items.forEach(x=>{
+        if(norm(labelOf(x.v)).includes(term)) noNome.push(x);
+        else if(x.blob && x.blob.includes(term)) noTexto.push(x);
+      });
+      items = noNome.concat(noTexto);            // quem casa no nome do tema vem primeiro
+    }
+    items = items.filter(x=> !F[key].has(x.v)).slice(0, 40);
+    if(!items.length){ list.innerHTML = `<div class="ac-empty">${term?"Nada encontrado para “"+escapeAttr(inp.value.trim())+"”":"Digite para buscar"}</div>`; list.hidden = false; return; }
+    list.innerHTML = items.map((x,i)=>`<div class="ac-item${i===cur?" cur":""}" data-v="${escapeAttr(x.v)}">${escapeAttr(labelOf(x.v))}<small>${countOf(x)}</small></div>`).join("");
+    list.querySelectorAll(".ac-item").forEach(el=> el.onmousedown = e=>{ e.preventDefault(); pick(el.dataset.v); });
+    list.hidden = false;
+  }
+  function pick(v){ F[key].add(v); inp.value = ""; drawPicked(); close(); countAvailable(); }
+  inp.addEventListener("input", ()=>{ cur = -1; draw(); });
+  inp.addEventListener("focus", draw);
+  inp.addEventListener("blur", ()=> setTimeout(close, 120));
+  inp.addEventListener("keydown", e=>{
+    const items = [...list.querySelectorAll(".ac-item")];
+    if(e.key === "ArrowDown"){ cur = Math.min(cur+1, items.length-1); e.preventDefault(); }
+    else if(e.key === "ArrowUp"){ cur = Math.max(cur-1, 0); e.preventDefault(); }
+    else if(e.key === "Enter"){ if(items[cur]){ e.preventDefault(); pick(items[cur].dataset.v); } return; }
+    else if(e.key === "Escape"){ close(); return; }
+    else return;
+    items.forEach((el,i)=> el.classList.toggle("cur", i===cur));
+    if(items[cur]) items[cur].scrollIntoView({block:"nearest"});
+  });
+  drawPicked();
+  return drawPicked;
+}
+const TEMA_COUNT = new Map(TEMAS.map(t=>[t.tema,t.n]));
+const PROVA_LABEL = new Map(PROVAS.map(p=>[p.id,p.label]));
+let drawTemasPicked, drawProvasPicked;
+
+/* --- disponibilidade + montagem --- */
+function filtersSummary(){
+  const p = [];
+  if(F.tipos.size && F.tipos.size < TIPOS.length) p.push([...F.tipos].map(t=>TIPO_LABEL[t]).join(", "));
+  if(F.anos.size && F.anos.size < ANOS.length) p.push([...F.anos].sort().reverse().join("/"));
+  if(F.areas.size && F.areas.size < AREA_ORDER.length) p.push([...F.areas].map(a=>AREA_LABEL[a]).join(", "));
+  if(F.temas.size) p.push(F.temas.size + (F.temas.size>1?" temas":" tema"));
+  if(F.provas.size) p.push(F.provas.size + (F.provas.size>1?" provas":" prova"));
+  if(F.modo === "novas") p.push("não respondidas");
+  if(F.modo === "erradas") p.push("que eu errei");
+  return p.length ? p.join(" · ") : "todas as questões do banco";
+}
+function countAvailable(){
+  const n = pool().length;
+  const av = $("avail"), btn = $("build");
+  const max = Math.max(5, Math.min(120, Math.ceil(n/5)*5));
+  const rng = $("qty");
+  rng.max = String(max);
+  if(+rng.value > max){ rng.value = String(max); F.qty = max; $("qtyVal").textContent = max; }
+  if(n === 0){
+    av.innerHTML = `Nenhuma questão passa nesses filtros. <br>Solte algum filtro acima — ou toque em <b>Limpar filtros</b>.`;
+    btn.disabled = true;
+  } else {
+    av.innerHTML = `<b>${n}</b> ${n===1?"questão disponível":"questões disponíveis"} · a sessão vai usar <b>${Math.min(F.qty,n)}</b>`;
+    btn.disabled = false;
+  }
+  saveFilters();
+}
+function buildSession(ids, label){
+  const list = ids || pool().map(q=>q.id);
+  for(let i=list.length-1;i>0;i--){ const r = Math.floor(Math.random()*(i+1)); [list[i],list[r]] = [list[r],list[i]]; }
+  session = { ids: list.slice(0, Math.min(F.qty, list.length)), pos:0, label: label || filtersSummary() };
+  saveSession();
+  showRun();
+}
+let session = {ids:[], pos:0, label:""};
+function saveSession(){ try{ localStorage.setItem(SESS_KEY, JSON.stringify(session)); }catch(e){} }
+function showSetup(){
+  $("setup").hidden = false; $("run").hidden = true;
+  $("resumeBtn").hidden = !(session.ids && session.ids.length);
+  countAvailable();
+  window.scrollTo({top:0, behavior:"instant"});
+}
+function showRun(){
+  $("setup").hidden = true; $("run").hidden = false;
+  $("footFilters").textContent = session.label || filtersSummary();
   render();
+  window.scrollTo({top:0, behavior:"instant"});
 }
-function exitFocusMode(rerender){
-  if(!focusMode) return;
-  focusMode = false;
-  document.getElementById("focusBanner").hidden = true;
-  activeFilter = "Todos os temas";
-  const sel = document.getElementById("filter"); if(sel) sel.value = activeFilter;
-  if(rerender!==false) applyFilter();
-}
-function escapeAttr(s){ return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;"); }
 
-/* ---- render da questão ---- */
+/* ============================================================
+   SESSÃO: render da questão
+   ============================================================ */
 const LETTERS = ["A","B","C","D","E"];
+function refreshStats(){
+  const ids = session.ids;
+  const ans = ids.filter(id=>answers[id]).length;
+  const right = ids.filter(id=>answers[id] && answers[id].ok).length;
+  const rate = ans ? Math.round((right/ans)*100) : 0;
+  $("mAns").textContent = ans; $("mRight").textContent = right; $("mTotal").textContent = ids.length;
+  $("footCount").textContent = ids.length;
+  $("ringTxt").textContent = rate + "%";
+  $("ringFill").setAttribute("stroke-dasharray", `${rate} ${100-rate}`);
+  $("ringFill").setAttribute("stroke", rate>=70?"var(--right)":rate>=50?"var(--teal)":"var(--amber)");
+}
 function render(){
+  const card = $("card");
+  if(!session.ids.length){ card.innerHTML = `<p class="enun">Sessão vazia. Toque em <b>Nova sessão</b> para montar outra.</p>`; refreshStats(); return; }
+  if(session.pos >= session.ids.length) session.pos = session.ids.length - 1;
   refreshStats();
-  const card = document.getElementById("card");
-  if(order.length===0){ card.innerHTML = `<p class="enun">Nenhuma questão neste tema.</p>`; return; }
-  const qi = order[pos];
-  const q = BANK[qi];
-  const prev = answers[qi]; // já respondida?
-  try{ localStorage.setItem(POS_KEY, JSON.stringify({filter:activeFilter, qi})); }catch(e){}
+  const qid = session.ids[session.pos];
+  const q = BY_ID.get(qid);
+  if(!q){ card.innerHTML = `<p class="enun">Questão indisponível.</p>`; return; }
+  const prev = answers[qid];
+  saveSession();
 
+  const fonte = q.tipo === "autoral" ? "Autoral MedTech" : `${q.inst} ${q.ano}`;
   card.innerHTML = `
-    <div class="qhead">
-      <span class="num">Questão ${pos+1} de ${order.length}</span>
-      <span class="badge">${q.tema}</span>
+    <div class="src-line">
+      <span class="num">Questão ${session.pos+1} de ${session.ids.length}</span>
+      <span class="src prova">${escapeAttr(fonte)}</span>
+      ${q.esp?`<span class="src esp">${escapeAttr(ESP_LABEL[q.esp]||q.esp)}</span>`:""}
+      ${q.tema?`<span class="src tema">${escapeAttr(q.tema)}</span>`:""}
+      ${q.anulada?`<span class="src anul">ANULADA</span>`:""}
     </div>
     <div class="enun">${q.q}</div>
-    ${q.img?`<figure class="qfig"><img src="${q.img}" alt="Figura da questão"></figure>`:""}
     <div class="opts-hint">↔ Arraste uma alternativa para o lado para riscá-la</div>
     <div class="opts" id="opts">
       ${q.ops.map((o,j)=>`
@@ -506,41 +859,30 @@ function render(){
       <div class="body" id="fbbody"></div>
     </div>
     <div class="nav">
-      <button class="btn sec" id="prev" ${pos===0?"disabled":""}>← Anterior</button>
-      <button class="btn" id="next" ${pos>=order.length-1?"disabled":""}>Próxima →</button>
+      <button class="btn sec" id="prev" ${session.pos===0?"disabled":""}>← Anterior</button>
+      <button class="btn" id="next" ${session.pos>=session.ids.length-1?"disabled":""}>Próxima →</button>
     </div>`;
 
-  const optEls = [...card.querySelectorAll(".opt")];
-  const struck = getStruck(qi);
-  optEls.forEach(btn=>{
+  const struck = new Set(strikes[qid] || []);
+  card.querySelectorAll(".opt").forEach(btn=>{
     const j = parseInt(btn.dataset.j);
     if(struck.has(j)) btn.classList.add("struck");
-    attachStrikeSwipe(btn, qi, j);
-    btn.addEventListener("click", ()=>{ if(btn._swiped){ btn._swiped=false; return; } choose(qi, j); });
+    attachStrikeSwipe(btn, qid, j);
+    btn.addEventListener("click", ()=>{ if(btn._swiped){ btn._swiped=false; return; } choose(qid, j); });
   });
-  document.getElementById("prev").onclick = ()=>{ if(pos>0){pos--;render();} };
-  document.getElementById("next").onclick = ()=>{ if(pos<order.length-1){pos++;render();} };
+  $("prev").onclick = ()=>{ if(session.pos>0){ session.pos--; render(); } };
+  $("next").onclick = ()=>{ if(session.pos<session.ids.length-1){ session.pos++; render(); } };
 
-  if(window.QuizInk && typeof window.QuizInk.switchTo==="function") window.QuizInk.switchTo("q"+qi);   // tinta da caneta fica só nesta questão
-  if(prev) revealState(qi, prev.sel);
+  if(window.QuizInk && typeof window.QuizInk.switchTo === "function") window.QuizInk.switchTo("q:"+qid);
+  if(prev) revealState(qid, prev.sel);
 }
 
 /* ---- riscar alternativa: arraste para o lado (eliminar) ---- */
-const STRIKE_KEY = "enareStrikes_v1";
-let strikes = {};
-try{ strikes = JSON.parse(localStorage.getItem(STRIKE_KEY)||"{}") || {}; }catch(e){ strikes={}; }
-function getStruck(qi){ return new Set(strikes[qi] || []); }
-function saveStruck(qi, set){
-  if(set.size) strikes[qi] = [...set]; else delete strikes[qi];
-  try{ localStorage.setItem(STRIKE_KEY, JSON.stringify(strikes)); }catch(e){}
+function saveStruck(qid, set){
+  if(set.size) strikes[qid] = [...set]; else delete strikes[qid];
+  saveStrikesAll();
 }
-function toggleStrike(qi, j, btn){
-  const set = getStruck(qi);
-  if(set.has(j)){ set.delete(j); btn.classList.remove("struck"); }
-  else { set.add(j); btn.classList.add("struck"); }
-  saveStruck(qi, set);
-}
-function attachStrikeSwipe(btn, qi, j){
+function attachStrikeSwipe(btn, qid, j){
   let sx=0, sy=0, dragging=false;
   btn.addEventListener("pointerdown", e=>{
     if(e.pointerType==="mouse" && e.button!==0) return;
@@ -562,76 +904,154 @@ function attachStrikeSwipe(btn, qi, j){
   function up(){
     if(!dragging) return; dragging=false;
     btn.style.transition="transform .18s ease"; btn.style.transform="";
-    if(btn._swiped) toggleStrike(qi, j, btn);
+    if(btn._swiped){
+      const set = new Set(strikes[qid]||[]);
+      if(set.has(j)){ set.delete(j); btn.classList.remove("struck"); } else { set.add(j); btn.classList.add("struck"); }
+      saveStruck(qid, set);
+    }
   }
   btn.addEventListener("pointerup", up);
   btn.addEventListener("pointercancel", up);
 }
 
-function choose(qi, j){
-  if(answers[qi]) return; // bloqueia re-resposta
-  const ok = (j === BANK[qi].correct);
-  answers[qi] = {sel:j, ok};
+function choose(qid, j){
+  if(answers[qid]) return;                       // resposta é definitiva
+  const q = BY_ID.get(qid);
+  const ok = q.anulada ? true : (j === q.correct);   // anulada pontua para todos
+  answers[qid] = {sel:j, ok, t:Date.now()};
   saveAnswers();
-  revealState(qi, j);
+  revealState(qid, j);
   refreshStats();
 }
-
-function revealState(qi, sel){
-  const q = BANK[qi];
-  const optEls = [...document.querySelectorAll(".opt")];
-  optEls.forEach((btn,j)=>{
+function revealState(qid, sel){
+  const q = BY_ID.get(qid);
+  [...document.querySelectorAll("#card .opt")].forEach((btn,j)=>{
     btn.disabled = true;
-    if(j===q.correct) btn.classList.add("right");
-    else if(j===sel) btn.classList.add("wrong");
+    if(!q.anulada && j===q.correct) btn.classList.add("right");
+    else if(j===sel && j!==q.correct) btn.classList.add("wrong");
     else btn.classList.add("dim");
   });
-  const ok = (sel===q.correct);
-  const fb = document.getElementById("fb");
-  fb.classList.add("show", ok?"ok":"no");
-  document.getElementById("verdict").innerHTML =
-    ok ? "✓ Resposta correta" : `✗ Resposta incorreta — gabarito: ${LETTERS[q.correct]}`;
-  document.getElementById("fbbody").innerHTML = q.c +
-    `<a class="cond-xlink" href="condutai.html?busca=${encodeURIComponent(q.conduta||q.tema||"")}" target="_blank" rel="noopener">📋 Revisar conduta no CondutAI →</a>`;
+  const ok = q.anulada ? true : (sel === q.correct);
+  const fb = $("fb");
+  fb.className = "feedback show " + (ok ? "ok" : "no");
+  $("verdict").innerHTML = q.anulada
+    ? "⚖︎ Questão anulada pela banca — pontua para todos"
+    : ok ? "✓ Resposta correta"
+         : `✗ Resposta incorreta — gabarito: ${LETTERS[q.correct]}`;
+  const fonte = q.tipo === "autoral"
+    ? `<b>Autoral MedTech</b> — escrita a partir da diretriz citada acima.`
+    : `<b>${escapeAttr(q.prova)}</b> · ${escapeAttr(q.banca)} · ${q.ano} — gabarito oficial.`;
+  $("fbbody").innerHTML = q.c +
+    `<div class="ref-line">Fonte: ${fonte}</div>` +
+    `<a class="cond-xlink" href="condutai.html?busca=${encodeURIComponent(q.tema||ESP_LABEL[q.esp]||"")}" target="_blank" rel="noopener">📋 Revisar a conduta no CondutAI →</a>`;
 }
 
-/* ---- controles globais ---- */
-document.getElementById("shuffle").onclick = ()=>{
-  for(let i=order.length-1;i>0;i--){ const r=Math.floor(Math.random()*(i+1)); [order[i],order[r]]=[order[r],order[i]]; }
-  pos=0; render();
-};
-document.getElementById("reset").onclick = ()=>{
-  if(confirm("Zerar seu desempenho (respostas e taxa de acerto)?")){
-    answers={}; saveAnswers(); render();
+/* ============================================================
+   DESEMPENHO POR ESPECIALIDADE
+   ============================================================ */
+function perfByEsp(){
+  const m = new Map();
+  POOL.forEach(q=>{
+    if(!q.esp) return;
+    if(!m.has(q.esp)) m.set(q.esp, {esp:q.esp, total:0, answered:0, right:0});
+    const e = m.get(q.esp); e.total++;
+    const a = answers[q.id];
+    if(a){ e.answered++; if(a.ok) e.right++; }
+  });
+  return [...m.values()].filter(e=>e.answered>0).map(e=>({
+    ...e, rate: Math.round((e.right/e.answered)*100)
+  })).sort((a,b)=> a.rate-b.rate);
+}
+function renderPerfPanel(){
+  const list = $("perfList"), perf = perfByEsp();
+  if(!perf.length){
+    list.innerHTML = `<div class="hint-line">Você ainda não respondeu nenhuma questão. Monte uma sessão e volte aqui — o painel mostra sua taxa de acerto por especialidade.</div>`;
+    $("focusBtn").hidden = true; return;
   }
+  list.innerHTML = perf.map(p=>{
+    const color = p.rate>=70 ? "var(--right)" : p.rate>=50 ? "var(--amber)" : "var(--wrong)";
+    return `<div class="perf-row" data-esp="${escapeAttr(p.esp)}">
+      <div class="perf-tema">${escapeAttr(ESP_LABEL[p.esp]||p.esp)}</div>
+      <div class="perf-bar-wrap"><div class="perf-bar" style="width:${p.rate}%;background:${color}"></div></div>
+      <div class="perf-pct">${p.answered}/${p.total} · ${p.rate}%</div>
+    </div>`;
+  }).join("");
+  list.querySelectorAll(".perf-row").forEach(row=> row.onclick = ()=>{
+    const esp = row.dataset.esp;
+    const ids = POOL.filter(q=> q.esp===esp && !(F.semAnuladas && q.anulada)).map(q=>q.id);
+    F.qty = Math.max(F.qty, Math.min(20, ids.length));
+    buildSession(ids, "especialidade: "+(ESP_LABEL[esp]||esp));
+  });
+  const weak = perf.filter(p=>p.rate<70);
+  $("focusBtn").hidden = weak.length === 0;
+  $("focusBtn").onclick = ()=>{
+    const set = new Set(weak.map(p=>p.esp));
+    const ids = POOL.filter(q=> set.has(q.esp) && !(F.semAnuladas && q.anulada)).map(q=>q.id);
+    buildSession(ids, "pontos fracos (menos de 70% de acerto)");
+  };
+}
+
+/* ============================================================
+   LIGAÇÕES DA UI
+   ============================================================ */
+$("qty").addEventListener("input", e=>{ F.qty = +e.target.value; $("qtyVal").textContent = F.qty; countAvailable(); });
+$("build").onclick = ()=> buildSession();
+$("backSetup").onclick = showSetup;
+$("resumeBtn").onclick = showRun;
+$("clearFilters").onclick = ()=>{
+  F.tipos = new Set(TIPOS); F.anos = new Set(ANOS.map(String)); F.areas = new Set(AREA_ORDER);
+  F.temas.clear(); F.provas.clear(); F.modo = "todas"; F.semAnuladas = true;
+  renderTipos(); renderAnos(); renderAreas(); renderOutros();
+  drawTemasPicked(); drawProvasPicked(); countAvailable();
 };
-document.getElementById("perfToggle").onclick = ()=>{
-  const pp = document.getElementById("perfPanel");
-  pp.hidden = !pp.hidden;
+$("perfToggle").onclick = ()=>{
+  const pp = $("perfPanel"); pp.hidden = !pp.hidden;
   if(!pp.hidden) renderPerfPanel();
 };
-document.getElementById("focusBtn").onclick = activateFocusMode;
-document.getElementById("focusExit").onclick = ()=>exitFocusMode();
-
-/* ---- init (continua de onde parou) ---- */
-buildFilter();
-(function initResume(){
-  let saved=null; try{ saved=JSON.parse(localStorage.getItem(POS_KEY)||"null"); }catch(e){}
-  if(saved && saved.filter){
-    const sel=document.getElementById("filter");
-    if([...sel.options].some(o=>o.value===saved.filter)){ activeFilter=saved.filter; sel.value=saved.filter; }
+$("shuffle").onclick = ()=>{
+  for(let i=session.ids.length-1;i>0;i--){ const r=Math.floor(Math.random()*(i+1)); [session.ids[i],session.ids[r]]=[session.ids[r],session.ids[i]]; }
+  session.pos = 0; render();
+};
+$("reset").onclick = ()=>{
+  if(confirm("Zerar seu desempenho (todas as respostas e a taxa de acerto)?")){
+    Object.keys(answers).forEach(id=>{ answers[id] = {sel:-1, ok:false, t:Date.now(), del:true}; });
+    answers = {}; saveAnswers(); render();
   }
-  // Deep-link vindo do CondutAI: ?tema=<especialidade> tem precedência
-  try{ const ut=new URLSearchParams(location.search).get("tema");
-    if(ut){ const sel=document.getElementById("filter"); const hit=[...sel.options].find(o=>o.value.toLowerCase()===ut.toLowerCase());
-      if(hit){ activeFilter=hit.value; sel.value=hit.value; } } }catch(e){}
-  order = BANK.map((_,i)=>i).filter(i=> activeFilter==="Todos os temas" || BANK[i].tema===activeFilter);
-  pos = 0;
-  if(saved && typeof saved.qi==="number"){ const p=order.indexOf(saved.qi); if(p>=0) pos=p; }
-  render();
+};
+
+/* ============================================================
+   INIT
+   ============================================================ */
+$("poolTotal").textContent = POOL.length;
+$("qty").value = F.qty; $("qtyVal").textContent = F.qty;
+renderTipos(); renderAnos(); renderAreas(); renderOutros();
+drawTemasPicked = setupAC("acTema","acTemaList","pkTema","hintTema",
+  ()=> TEMAS.map(t=>({v:t.tema, n:t.n, blob:TEMA_BLOB.get(t.tema)||""})), "temas", v=>v, x=>TEMA_COUNT.get(x.v)||0, "Temas");
+drawProvasPicked = setupAC("acProva","acProvaList","pkProva","hintProva",
+  ()=> PROVAS.map(p=>({v:p.id, n:p.n})), "provas", v=>PROVA_LABEL.get(v)||v,
+  x=>(PROVAS.find(p=>p.id===x.v)||{}).n||0, "Provas");
+
+try{ const sv = JSON.parse(localStorage.getItem(SESS_KEY)||"null");
+  if(sv && Array.isArray(sv.ids) && sv.ids.length){ session = {ids: sv.ids.filter(id=>BY_ID.has(id)), pos: +sv.pos||0, label: sv.label||""}; }
+}catch(e){}
+
+/* deep-link do CondutAI: ?tema=<tema ou especialidade> monta a sessão na hora */
+(function deepLink(){
+  let t = null;
+  try{ t = new URLSearchParams(location.search).get("tema"); }catch(e){}
+  if(!t) return;
+  const alvo = norm(t);
+  const tema = TEMAS.find(x=> norm(x.tema) === alvo) || TEMAS.find(x=> norm(x.tema).includes(alvo));
+  if(tema){ F.temas.clear(); F.temas.add(tema.tema); drawTemasPicked(); countAvailable(); buildSession(null, "tema: "+tema.tema); return; }
+  const esp = Object.keys(ESP_LABEL).find(k=> norm(ESP_LABEL[k]) === alvo || k === alvo);
+  if(esp){
+    const ids = POOL.filter(q=> q.esp===esp && !(F.semAnuladas && q.anulada)).map(q=>q.id);
+    if(ids.length) buildSession(ids, "especialidade: "+ESP_LABEL[esp]);
+  }
 })();
-/* salva a posição também ao sair/minimizar o app (reforço p/ iOS) */
-function savePosNow(){ try{ if(order[pos]!=null) localStorage.setItem(POS_KEY, JSON.stringify({filter:activeFilter, qi:order[pos]})); }catch(e){} }
+if($("run").hidden !== false && $("setup").hidden !== true) showSetup();
+
+function savePosNow(){ saveSession(); }
 window.addEventListener("pagehide", savePosNow);
 document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="hidden") savePosNow(); });
 
