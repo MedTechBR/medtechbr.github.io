@@ -96,45 +96,9 @@ const Gemini = (() => {
   }
 
   async function generateLaudo({ media, ctx, model }) {
-    const parts = buildParts(media, ctx);
-    if (isByokMode()) {
-      return await generateDirect(parts, model);
-    }
-    return await generateViaProxy(parts, model, media);
+    return await generateViaProxy(buildParts(media, ctx), model, media);
   }
 
-  async function generateDirect(parts, model) {
-    const key = getKey();
-    const body = {
-      contents: [{ role: 'user', parts }],
-      generationConfig: { temperature: 0.35, topP: 0.95, maxOutputTokens: 8192 },
-    };
-    const url = `${BASE}/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) {
-      const detail = await safeErr(res);
-      if (res.status === 400 && /API key/i.test(detail)) throw new Error('API Key inválida. Verifique nas configurações.');
-      if (res.status === 429) throw new Error('Cota / rate limit excedido. Aguarde alguns segundos ou troque para Flash.');
-      if (res.status === 403) throw new Error('Acesso negado: ' + detail);
-      throw new Error(detail);
-    }
-    const data = await res.json();
-    const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text).filter(Boolean).join('\n') || '';
-    if (!text) {
-      const blockReason = data?.promptFeedback?.blockReason;
-      if (blockReason) throw new Error(`Resposta bloqueada pela política de segurança do Gemini: ${blockReason}. Tente reformular a história clínica.`);
-      throw new Error('Resposta vazia da API.');
-    }
-    return { text, mode: 'byok' };
-  }
-
-  // A IA roda no MedTech central (callables gemini/geminiImage → Vertex, SEM chave).
-  // radioia-a61ec foi aposentado. Imagens vão pelo geminiImage (até 14 MB, até 6 imgs);
-  // laudos só-texto (ex.: valores laboratoriais digitados) vão pelo gemini.
   async function generateViaProxy(parts, model, media) {
     // Vídeo não suportado nesta versão (exigia BYOK, agora removido).
     if (media.some(m => m.kind === 'video')) {
