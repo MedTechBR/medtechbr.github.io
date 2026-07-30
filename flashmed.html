@@ -416,6 +416,7 @@
     <button class="build" id="build">Gerar questões</button>
     <div class="setup-actions">
       <button class="ghost" id="resumeBtn" hidden>↩︎ Continuar a última sessão</button>
+      <button class="ghost" id="iaGerar">Criar questões com IA</button>
       <button class="ghost" id="clearFilters">Limpar filtros</button>
       <button class="ghost" id="perfToggle">Meu desempenho</button>
     </div>
@@ -497,8 +498,8 @@ const ESP_LABEL = {emergencia:"Emergência", cardio:"Cardiologia", infecto:"Infe
   reumato:"Reumatologia", gineco:"Gineco/Obstetrícia", psiq:"Psiquiatria", derm:"Dermatologia", uro:"Urologia",
   olho_orl:"Oftalmo/ORL", geriatria:"Geriatria", onco_pal:"Onco/Paliativos", raras:"Doenças raras",
   cirurgia:"Cirurgia", pediatria:"Pediatria", preventiva:"Preventiva", ortopedia:"Ortopedia", medfam:"Medicina de Família"};
-const TIPO_LABEL = {r1:"R1 · acesso direto", r3:"R3 · com pré-requisito", revalida:"REVALIDA", autoral:"Autoral MedTech"};
-const TIPO_ORDER = ["r1","r3","revalida","autoral"];
+const TIPO_LABEL = {r1:"R1 · acesso direto", r3:"R3 · com pré-requisito", revalida:"REVALIDA", autoral:"Autoral MedTech", ia:"Geradas por IA"};
+const TIPO_ORDER = ["r1","r3","revalida","autoral","ia"];
 
 const POOL = (function buildPool(){
   const out = [];
@@ -516,37 +517,122 @@ const POOL = (function buildPool(){
       inst:"MedTech", banca:"Autoral MedTech", ano: q.ano||2026, tipo:"autoral",
       provaId:"autoral", prova:"Questões autorais MedTech", anulada:false });
   });
+  lerGeradas().forEach(q=> out.push(q));
   return out;
 })();
 const BY_ID = new Map(POOL.map(q=>[q.id,q]));
-const PROVAS = (function(){
-  const m = new Map();
-  POOL.forEach(q=>{
-    if(!m.has(q.provaId)) m.set(q.provaId, {id:q.provaId, label:q.prova, banca:q.banca, ano:q.ano, n:0});
-    m.get(q.provaId).n++;
-  });
-  return [...m.values()].sort((a,b)=> b.ano-a.ano || a.label.localeCompare(b.label,"pt-BR"));
-})();
-const TEMAS = (function(){
-  const m = new Map();
-  POOL.forEach(q=>{ if(!q.tema) return; m.set(q.tema, (m.get(q.tema)||0)+1); });
-  return [...m.entries()].map(([tema,n])=>({tema,n})).sort((a,b)=> b.n-a.n || a.tema.localeCompare(b.tema,"pt-BR"));
-})();
-const ANOS = [...new Set(POOL.map(q=>q.ano))].filter(Boolean).sort((a,b)=>b-a);
-const TIPOS = TIPO_ORDER.filter(t=> POOL.some(q=>q.tipo===t));
-
 const norm = s => String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
-/* índice de busca do tema: nome + texto das questões daquele tema. Sem isso,
-   quem digita "sepse" não encontra o tema "Choque séptico e ressuscitação". */
-const TEMA_BLOB = (function(){
-  const m = new Map();
+/* Os índices abaixo são DERIVADOS do POOL. A IA acrescenta questões em runtime,
+   então eles precisam ser recalculáveis — reindexar() é chamado depois de gerar. */
+let PROVAS = [], TEMAS = [], ANOS = [], TIPOS = [], TEMA_BLOB = new Map(), TEMA_COUNT = new Map(), PROVA_LABEL = new Map();
+function reindexar(){
+  const mp = new Map();
   POOL.forEach(q=>{
-    if(!q.tema) return;
-    m.set(q.tema, (m.get(q.tema)||"") + " " + norm(q.q) + " " + norm(ESP_LABEL[q.esp]||"") + " " + norm(AREA_LABEL[q.area]||""));
+    if(!mp.has(q.provaId)) mp.set(q.provaId, {id:q.provaId, label:q.prova, banca:q.banca, ano:q.ano, n:0});
+    mp.get(q.provaId).n++;
   });
-  return m;
-})();
+  PROVAS = [...mp.values()].sort((a,b)=> b.ano-a.ano || a.label.localeCompare(b.label,"pt-BR"));
+  const mt = new Map();
+  POOL.forEach(q=>{ if(!q.tema) return; mt.set(q.tema, (mt.get(q.tema)||0)+1); });
+  TEMAS = [...mt.entries()].map(([tema,n])=>({tema,n})).sort((a,b)=> b.n-a.n || a.tema.localeCompare(b.tema,"pt-BR"));
+  ANOS  = [...new Set(POOL.map(q=>q.ano))].filter(Boolean).sort((a,b)=>b-a);
+  TIPOS = TIPO_ORDER.filter(t=> POOL.some(q=>q.tipo===t));
+  const mb = new Map();
+  POOL.forEach(q=>{ if(!q.tema) return;
+    mb.set(q.tema, (mb.get(q.tema)||"") + " " + norm(q.q) + " " + norm(ESP_LABEL[q.esp]||"") + " " + norm(AREA_LABEL[q.area]||"")); });
+  TEMA_BLOB = mb;
+  TEMA_COUNT = new Map(TEMAS.map(t=>[t.tema,t.n]));
+  PROVA_LABEL = new Map(PROVAS.map(p=>[p.id,p.label]));
+}
+reindexar();
 function escapeAttr(s){ return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+/* ============================================================
+   QUESTÕES GERADAS POR IA
+   Entram no MESMO schema das outras (área/especialidade/tema/fonte), então
+   passam pelos mesmos filtros, pelo desempenho e pelo deep-link do CondutAI.
+   Todo texto que volta da IA é ESCAPADO antes de ir para o innerHTML — o banco
+   curado podia usar <b>/<i>, conteúdo gerado não pode.
+   ============================================================ */
+const IA_KEY = "fm_ia_v1";
+function lerGeradas(){
+  try{ const a = JSON.parse(localStorage.getItem(IA_KEY)||"[]"); return Array.isArray(a)?a:[]; }catch(e){ return []; }
+}
+function gravarGeradas(arr){
+  try{ localStorage.setItem(IA_KEY, JSON.stringify(arr)); }catch(e){}
+}
+function limparIA(t){                    // texto puro: sem tags, sem entidade quebrada
+  return String(t==null?"":t)
+    .replace(/<(script|style)[\s\S]*?<\/\1>/gi,"")   // fora o bloco inteiro, não só a tag
+    .replace(/<[^>]*>/g,"")
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").trim();
+}
+function extrairArray(txt){              // a IA às vezes embrulha em ```json ou em prosa
+  const t = String(txt||"").replace(/```(?:json)?/gi,"");
+  const i = t.indexOf("["), f = t.lastIndexOf("]");
+  if(i<0 || f<=i) return null;
+  try{ const a = JSON.parse(t.slice(i,f+1)); return Array.isArray(a)?a:null; }catch(e){ return null; }
+}
+function promptGerar(tema, esp, area, n){
+  return 'Você é um professor de residência médica escrevendo questões INÉDITAS de múltipla escolha para um banco de estudo brasileiro.\n'
+   + 'Tema: ' + tema + '. Especialidade: ' + (ESP_LABEL[esp]||esp||"—") + '. Grande área: ' + (AREA_LABEL[area]||area||"—") + '.\n'
+   + 'Escreva ' + n + ' questões no padrão das provas de residência (ENARE, Revalida, USP): vinheta clínica curta com dados objetivos, '
+   + 'comando claro e 4 alternativas plausíveis, só uma correta.\n'
+   + 'ANTES de escrever, confira qual é a diretriz VIGENTE do tema (sociedade e ano) e baseie a resposta nela. '
+   + 'Se houve mudança recente de conduta, a questão deve refletir a recomendação ATUAL.\n'
+   + 'Devolva um array em notação JSON, um elemento por questão, com as chaves: '
+   + '"q" (enunciado), "ops" (array de 4 alternativas, texto puro), "correct" (índice 0 a 3 da correta), '
+   + '"coment" (comentário explicando por que a correta está certa E por que cada uma das outras está errada), '
+   + '"ref" (diretriz que embasa: sociedade + ano), "tema" (o tema específico).\n'
+   + 'Texto puro, sem HTML e sem markdown dentro dos campos. Português do Brasil.';
+}
+async function gerarQuestoesIA(btn){
+  const tema = (F.temas.size ? [...F.temas][0] : "").trim();
+  if(!tema){ alert("Escolha um tema primeiro (campo “Questões apenas de temas específicos”) — a IA escreve questões novas daquele tema."); return; }
+  const base = POOL.find(q=>q.tema===tema) || {};
+  const n = 3;
+  const antes = btn.innerHTML;
+  btn.disabled = true; btn.innerHTML = "Escrevendo " + n + " questões de “" + tema + "”…";
+  try{
+    if(!window.MT || !MT.user) throw new Error("Entre na conta MedTech para usar a IA.");
+    const txt = await MT.ai(promptGerar(tema, base.esp, base.area, n), "gemini-2.5-pro");
+    const arr = extrairArray(txt);
+    if(!arr || !arr.length) throw new Error("A IA não devolveu questões em formato utilizável. Tente de novo.");
+    const geradas = lerGeradas();
+    let criadas = 0;
+    arr.forEach(item=>{
+      const ops = Array.isArray(item.ops) ? item.ops.map(limparIA).filter(Boolean) : [];
+      const cor = Number(item.correct);
+      if(!item.q || ops.length < 2 || !(cor>=0 && cor<ops.length)) return;   // descarta item malformado
+      const ref = limparIA(item.ref);
+      const q = {
+        id: "ia:" + Date.now().toString(36) + ":" + Math.random().toString(36).slice(2,7),
+        q: limparIA(item.q), ops, correct: cor,
+        c: limparIA(item.coment) + (ref ? "\n\nDiretriz citada pela IA: " + ref : ""),
+        area: base.area || "clinica", esp: base.esp || "", tema: limparIA(item.tema) || tema,
+        inst: "MedTech IA", banca: "Gerada por IA", ano: new Date().getFullYear(), tipo: "ia",
+        provaId: "ia", prova: "Questões geradas por IA", anulada: false,
+        updatedAt: Date.now()
+      };
+      geradas.push(q); POOL.push(q); BY_ID.set(q.id, q); criadas++;
+    });
+    if(!criadas) throw new Error("As questões vieram incompletas. Tente de novo.");
+    gravarGeradas(geradas); cloudSave();
+    /* o filtro ativo foi montado antes deste tipo/ano existirem — sem isto o
+       usuário gera as questões e não vê nada mudar na contagem. */
+    F.tipos.add("ia"); F.anos.add(String(new Date().getFullYear()));
+    if(base.area) F.areas.add(base.area);
+    reindexar(); renderTipos(); renderAnos(); renderAreas(); drawTemasPicked(); drawProvasPicked();
+    $("poolTotal").textContent = POOL.length;
+    countAvailable();
+    btn.innerHTML = "✓ " + criadas + " questão(ões) criada(s) — já entram nos filtros";
+    setTimeout(()=>{ btn.innerHTML = antes; btn.disabled = false; }, 2600);
+    return;
+  }catch(e){
+    alert("⚠️ " + (e.message || "Não consegui gerar agora."));
+  }
+  btn.innerHTML = antes; btn.disabled = false;
+}
 
 /* ============================================================
    PROGRESSO (por id estável) + sincronização entre aparelhos
@@ -591,10 +677,22 @@ let _cloudBusy = false;
 function cloudSave(){
   if(!window.MT || !MT.save || _cloudBusy) return;
   const resp = Object.keys(answers).map(id=>({id, sel:answers[id].sel, ok:!!answers[id].ok, updatedAt: answers[id].t || Date.now()}));
-  try{ MT.save({resp}); }catch(e){}
+  try{ MT.save({resp, geradas: lerGeradas()}); }catch(e){}
 }
 function applyCloud(d){
-  if(!d || !Array.isArray(d.resp)) return;
+  if(!d) return;
+  if(Array.isArray(d.geradas)){                      // questões criadas em outro aparelho
+    const tenho = new Set(lerGeradas().map(q=>q.id));
+    const novas = d.geradas.filter(q=> q && q.id && !tenho.has(q.id));
+    if(novas.length){
+      const todas = lerGeradas().concat(novas);
+      gravarGeradas(todas);
+      novas.forEach(q=>{ if(!BY_ID.has(q.id)){ POOL.push(q); BY_ID.set(q.id,q); } });
+      reindexar();
+      if($("setup") && !$("setup").hidden){ renderTipos(); renderAreas(); $("poolTotal").textContent = POOL.length; countAvailable(); }
+    }
+  }
+  if(!Array.isArray(d.resp)) return;
   let changed = false;
   d.resp.forEach(r=>{
     if(!r || !r.id) return;
@@ -608,7 +706,7 @@ function applyCloud(d){
     if(!document.getElementById("run").hidden) render(); else countAvailable();
   }
 }
-function fmMergeFn(remote, local){ return MT.mergeState(remote, local, ["resp"]); }
+function fmMergeFn(remote, local){ return MT.mergeState(remote, local, ["resp","geradas"]); }
 (function waitMT(){
   if(window.MT){ MT.mergeFn = fmMergeFn; MT.onData(applyCloud); }
   else setTimeout(waitMT, 40);
@@ -756,8 +854,6 @@ function setupAC(inputId, listId, pickedId, hintId, source, key, labelOf, countO
   drawPicked();
   return drawPicked;
 }
-const TEMA_COUNT = new Map(TEMAS.map(t=>[t.tema,t.n]));
-const PROVA_LABEL = new Map(PROVAS.map(p=>[p.id,p.label]));
 let drawTemasPicked, drawProvasPicked;
 
 /* --- disponibilidade + montagem --- */
@@ -998,6 +1094,7 @@ $("qty").addEventListener("input", e=>{ F.qty = +e.target.value; $("qtyVal").tex
 $("build").onclick = ()=> buildSession();
 $("backSetup").onclick = showSetup;
 $("resumeBtn").onclick = showRun;
+$("iaGerar").onclick = function(){ gerarQuestoesIA(this); };
 $("clearFilters").onclick = ()=>{
   F.tipos = new Set(TIPOS); F.anos = new Set(ANOS.map(String)); F.areas = new Set(AREA_ORDER);
   F.temas.clear(); F.provas.clear(); F.modo = "todas"; F.semAnuladas = true;
