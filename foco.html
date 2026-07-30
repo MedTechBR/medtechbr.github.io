@@ -153,6 +153,9 @@
            background:linear-gradient(135deg,var(--petrol),var(--mint-d));color:#fff;font-size:40px;
            display:flex;align-items:center;justify-content:center;transition:transform .15s}
   .rec-mic:active{transform:scale(.94)}
+  .rec-mic i{font-size:38px;line-height:1}
+  .spin{display:inline-block;animation:girar 1s linear infinite}
+  @keyframes girar{to{transform:rotate(360deg)}}
   .rec-mic.recording{background:linear-gradient(135deg,#ef4444,#f97316);animation:pulse 1.3s infinite}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.5)}70%{box-shadow:0 0 0 22px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
   .rec-timer{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;margin-bottom:4px}
@@ -505,7 +508,7 @@
 <!-- MODAL CONTA (login central MedTech) -->
 <div class="overlay" id="acctModal">
   <div class="sheet">
-    <h3>👤 Minha conta MedTech</h3>
+    <h3><i class="ti ti-user-circle"></i> Minha conta MedTech</h3>
     <div id="acct-in">
       <div style="display:flex;align-items:center;gap:12px;background:var(--surface2);border-radius:12px;padding:14px;margin-bottom:8px">
         <div id="acct-avatar" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--petrol),var(--mint-d));color:#fff;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:0 0 auto"></div>
@@ -966,7 +969,7 @@ recMic.onclick=()=>{ if(recState==='idle') startRec(); else if(recState==='recor
 function openRecModal(){
   if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){ alert('Seu navegador não permite gravar áudio aqui. Tente pelo Chrome no computador.'); return; }
   recState='idle'; recSecs=0; recChunks=[];
-  recMic.className='rec-mic'; recMic.textContent='🎤'; recMic.disabled=false;
+  recMic.className='rec-mic'; recMic.innerHTML='<i class="ti ti-microphone"></i>'; recMic.disabled=false;
   recTimer.style.display='none'; recTimer.textContent='0:00';
   recHint.style.display='block'; recHint.innerHTML='Toque no microfone e fale. Ex.: <i>"Reunião com a equipe sexta às 15h na sala 3"</i> ou <i>"Entregar relatório até sexta, prioridade alta"</i>.';
   recErr.style.display='none';
@@ -986,7 +989,7 @@ async function startRec(){
   mediaRec.onstop=onRecStopped;
   mediaRec.start();
   recState='recording'; recSecs=0;
-  recMic.className='rec-mic recording'; recMic.textContent='⏸';
+  recMic.className='rec-mic recording'; recMic.innerHTML='<i class="ti ti-player-pause"></i>';
   recTimer.style.display='block'; recTimer.textContent='0:00';
   recHint.innerHTML='Gravando… toque para parar.';
   recTick=setInterval(()=>{ recSecs++; recTimer.textContent=fmtSecs(recSecs); if(recSecs>=REC_MAX) stopRec(); },1000);
@@ -1000,8 +1003,8 @@ function abortRec(){ clearInterval(recTick); clearTimeout(recAutoStop); if(media
 async function onRecStopped(){
   stopStream();
   const blob=new Blob(recChunks,{type:(mediaRec&&mediaRec.mimeType)||'audio/webm'});
-  if(!blob.size || recSecs<1){ recErr.textContent='⚠ Áudio muito curto. Fale por alguns segundos.'; recErr.style.display='block'; recState='idle'; recMic.className='rec-mic'; recMic.textContent='🎤'; recTimer.style.display='none'; recHint.innerHTML='Toque no microfone e fale.'; return; }
-  recMic.className='rec-mic'; recMic.textContent='⏳'; recMic.disabled=true;
+  if(!blob.size || recSecs<1){ recErr.textContent='⚠ Áudio muito curto. Fale por alguns segundos.'; recErr.style.display='block'; recState='idle'; recMic.className='rec-mic'; recMic.innerHTML='<i class="ti ti-microphone"></i>'; recTimer.style.display='none'; recHint.innerHTML='Toque no microfone e fale.'; return; }
+  recMic.className='rec-mic'; recMic.innerHTML='<i class="ti ti-loader-2 spin"></i>'; recMic.disabled=true;
   recTimer.style.display='none';
   recHint.innerHTML='<span class="ai-spin"></span> Entendendo o que você disse…';
   try{
@@ -1009,7 +1012,7 @@ async function onRecStopped(){
     recModal.classList.remove('show'); recMic.disabled=false;
     prefillFromVoice(d);
   }catch(err){
-    recMic.disabled=false; recMic.textContent='🎤';
+    recMic.disabled=false; recMic.innerHTML='<i class="ti ti-microphone"></i>';
     recHint.innerHTML='Toque no microfone e fale de novo.';
     recErr.textContent='⚠ '+(err&&err.message||'Não consegui processar o áudio.'); recErr.style.display='block';
     recState='idle';
@@ -1197,7 +1200,7 @@ async function callGeminiFocus(pend){
 function renderAiFocus(r, pend){
   const byId=Object.fromEntries(pend.map(t=>[t.id,t]));
   let html='';
-  if(r.resumo) html+=`<div class="ai-resumo">🎯 ${esc(r.resumo)}</div>`;
+  if(r.resumo) html+=`<div class="ai-resumo"><i class="ti ti-target"></i> ${esc(r.resumo)}</div>`;
   r.ordem.forEach((o,i)=>{
     const t=byId[o.id]; if(!t) return;
     html+=`<div class="ai-rank ${i===0?'top':''}" onclick="editTask('${t.id}')">
