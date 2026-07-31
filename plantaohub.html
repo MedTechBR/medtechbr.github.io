@@ -196,9 +196,17 @@ function sampleSeed(){const t=new Date();const f=dd=>{const x=new Date(t);x.setD
 /* ---------- boot via MT (login + nuvem ou demo) ---------- */
 function whenMT(cb){if(window.MT){cb();}else{setTimeout(()=>whenMT(cb),30);}}
 whenMT(()=>{
+  /* Sem isto o app era last-write-wins: salvar no celular apagava o que tinha
+     sido lançado no computador. shifts tem id → une por entidade; locais é um
+     dicionário de padrões (une por chave); compDay é preferência do aparelho. */
+  MT.mergeFn=(r,l)=>{
+    const out=MT.mergeState(r,l,['shifts']);
+    out.locais=Object.assign({}, r&&r.locais, l&&l.locais);
+    return out;
+  };
   MT.onData(d=>{
-    if(d&&typeof d==='object'){state={shifts:d.shifts||[],locais:d.locais||{},compDay:d.compDay||1};}
-    else{state=(MT.mode==='demo')?sampleSeed():{shifts:[],locais:{},compDay:1};if(MT.mode==='demo')MT.save(state);}
+    if(d&&typeof d==='object'){state={shifts:d.shifts||[],locais:d.locais||{},compDay:d.compDay||1,_tomb:d._tomb||{}};}
+    else{state=(MT.mode==='demo')?sampleSeed():{shifts:[],locais:{},compDay:1,_tomb:{}};if(MT.mode==='demo')MT.save(state);}
     renderUser();render();
   });
   renderUser();
@@ -261,11 +269,11 @@ function renderComp(){
 }
 function moveComp(n){const r=compRange(cur);cur=new Date(r.s);cur.setMonth(cur.getMonth()+n);render();}
 function setCompDay(v){state.compDay=Math.min(28,Math.max(1,parseInt(v)||1));persist();render();}
-function toggleStatus(id){const s=state.shifts.find(x=>x.id===id);if(!s)return;s.status=s.status==='pago'?'agendado':'pago';persist();render();}
-function del(id){if(confirm('Excluir este plantão?')){state.shifts=state.shifts.filter(x=>x.id!==id);persist();render();}}
-function delFromForm(id){if(confirm('Excluir este plantão?')){state.shifts=state.shifts.filter(x=>x.id!==id);persist();closeModal();render();}}
+function toggleStatus(id){const s=state.shifts.find(x=>x.id===id);if(!s)return;s.status=s.status==='pago'?'agendado':'pago';s.updatedAt=Date.now();persist();render();}
+function del(id){if(confirm('Excluir este plantão?')){MT.markDeleted(state,id);state.shifts=state.shifts.filter(x=>x.id!==id);persist();render();}}
+function delFromForm(id){if(confirm('Excluir este plantão?')){MT.markDeleted(state,id);state.shifts=state.shifts.filter(x=>x.id!==id);persist();closeModal();render();}}
 function dup(id){const s=state.shifts.find(x=>x.id===id);if(!s)return;const d=new Date(s.date+'T00:00:00');d.setDate(d.getDate()+7);
-  state.shifts.push({...s,id:uid(),date:d.toISOString().slice(0,10),status:'agendado'});persist();cur=new Date(d);render();}
+  state.shifts.push({...s,id:uid(),date:d.toISOString().slice(0,10),status:'agendado',updatedAt:Date.now()});persist();cur=new Date(d);render();}
 
 /* ---------- CALENDÁRIO (com copiar/colar dia) ---------- */
 function fmtH(t){t=t||'';return /:00$/.test(t)?t.slice(0,2)+'h':t;}
@@ -318,7 +326,7 @@ function clearClip(){dayClip=null;render();}
 function cellClick(ds){
   if(dayClip){
     if(ds===dayClip.from)return;          // não recolar no dia de origem
-    dayClip.shifts.forEach(s=>state.shifts.push({id:uid(),date:ds,local:s.local,start:s.start,end:s.end,value:s.value,status:'agendado',note:s.note||''}));
+    dayClip.shifts.forEach(s=>state.shifts.push({id:uid(),date:ds,local:s.local,start:s.start,end:s.end,value:s.value,status:'agendado',note:s.note||'',updatedAt:Date.now()}));
     persist();render();return;           // mantém o clipboard p/ colar em vários dias
   }
   openForm(null,ds);
@@ -375,7 +383,12 @@ function fillLocal(){const v=document.getElementById('f_local').value;const m=(s
 function saveForm(id){
   const o={date:document.getElementById('f_date').value,local:document.getElementById('f_local').value.trim()||'Plantão',start:document.getElementById('f_start').value,end:document.getElementById('f_end').value,value:parseFloat(document.getElementById('f_value').value)||0,status:document.getElementById('f_status').value,note:document.getElementById('f_note').value.trim()};
   if(!o.date){alert('Informe a data.');return;}
-  if(id){Object.assign(state.shifts.find(x=>x.id===id),o);}else{state.shifts.push({id:uid(),...o});}
+  o.updatedAt=Date.now();
+  if(id){
+    const alvo=state.shifts.find(x=>x.id===id);
+    if(alvo){Object.assign(alvo,o);}          // um onSnapshot pode ter trocado o array no meio da edição:
+    else{state.shifts.push({id,...o});}       // reinsere com o MESMO id em vez de estourar
+  }else{state.shifts.push({id:uid(),...o});}
   if(!state.locais)state.locais={};state.locais[o.local]={start:o.start,end:o.end,value:o.value};
   persist();closeModal();const od=new Date(o.date+'T00:00:00');cur=new Date(od);if(tab==='ano')curY=od.getFullYear();render();
 }
