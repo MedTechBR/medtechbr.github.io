@@ -6,6 +6,7 @@ const state = {
   laudoText: '',
   generating: false,
   laudos: [],         // Firestore-backed
+  _tomb: {},          // lápides: id -> quando foi apagado (senão o merge ressuscita)
   unsubLaudos: null,
   ready: false,
 };
@@ -28,6 +29,9 @@ const SUBSCRIPTION_PRICE_LABEL = 'R$ 29,90/mês';
 let _mtEnteredUid = null;
 (function waitMT() {
   if (!window.MT) { setTimeout(waitMT, 50); return; }
+  /* Sem isto o app era last-write-wins: gerar um laudo no celular apagava os
+     que tinham sido salvos no computador. laudos tem id → une por entidade. */
+  window.MT.mergeFn = (r, l) => window.MT.mergeState(r, l, ['laudos']);
   window.MT.onData((d) => {
     const u = window.MT.user;
     if (u) {
@@ -35,6 +39,7 @@ let _mtEnteredUid = null;
       state.ready = true;
       if (_mtEnteredUid !== u.uid) { _mtEnteredUid = u.uid; enterApp(u); }
     }
+    state._tomb = (d && d._tomb) || {};
     state.laudos = (d && Array.isArray(d.laudos) ? d.laudos : []).slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   });
 })();
@@ -352,16 +357,20 @@ function subscribeLaudos() { /* laudos chegam via MT.onData (configurado no boot
 async function saveLaudoToFirestore(text, ctx) {
   const list = (state.laudos || []).slice();
   list.unshift({
-    id: Date.now(),
+    /* numérico (a lista lê com parseInt), mas com sufixo aleatório: dois
+       aparelhos salvando no mesmo milissegundo colidiriam e o merge
+       descartaria um dos laudos. */
+    id: Date.now() * 1000 + Math.floor(Math.random() * 1000),
     date: new Date().toISOString(),
     modality: ctx.modality,
     region: ctx.region,
     age: ctx.age || '',
     sex: ctx.sex || '',
     text,
+    updatedAt: Date.now(),
   });
   state.laudos = list;
-  if (window.MT && window.MT.save) await window.MT.save({ laudos: list });
+  if (window.MT && window.MT.save) await window.MT.save({ laudos: list, _tomb: state._tomb });
 }
 
 // ===== File handling =====
@@ -1031,8 +1040,11 @@ function closeHistory() { $('#modal-history').classList.add('hidden'); }
 
 async function clearHistoryAll() {
   if (!confirm('Apagar todos os laudos do seu histórico? Esta ação não pode ser desfeita.')) return;
+  /* Só esvaziar a lista não apaga nada: no próximo merge o remoto devolveria
+     todos. Cada laudo precisa da própria lápide. */
+  (state.laudos || []).forEach(l => { if (l && l.id != null) window.MT.markDeleted(state, l.id); });
   state.laudos = [];
-  if (window.MT && window.MT.save) await window.MT.save({ laudos: [] });
+  if (window.MT && window.MT.save) await window.MT.save({ laudos: [], _tomb: state._tomb });
   toast('Histórico apagado.', 'success');
   openHistory();
 }
