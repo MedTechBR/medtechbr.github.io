@@ -692,7 +692,8 @@ const txDelete = document.getElementById('txDelete');
 
 function fillCategorySelect(select, type) {
   const list = state.categories.filter(c => c.type === type);
-  select.innerHTML = list.map(c => `<option value="${c.name}">${c.icon} ${c.name}</option>`).join('')
+  /* escapa: o nome da categoria pode vir da IA lendo uma fatura, não só do usuário */
+  select.innerHTML = list.map(c => `<option value="${escapeHTML(c.name)}">${escapeHTML(c.icon)} ${escapeHTML(c.name)}</option>`).join('')
     || `<option value="">— sem categorias —</option>`;
 }
 
