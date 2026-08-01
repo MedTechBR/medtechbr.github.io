@@ -378,7 +378,31 @@ else {
         await F.setDoc(ref, { json: JSON.stringify(d), updatedAt: F.serverTimestamp() }, { merge: true });
       }
     };
-    MT.signOut = () => A.signOut(auth);
+    /* ---- Sair de verdade ----------------------------------------------
+       O dado do usuário anterior NÃO pode ficar na máquina: num computador
+       de plantão o próximo médico abre o F12 e lê o prontuário. E são DUAS
+       cópias — o cache do app (localStorage) e o cache do Firestore
+       (IndexedDB, ligado em persistentLocalCache logo acima). Limpar só a
+       primeira deixa o prontuário no aparelho.
+       As chaves firestore_* são de coordenação interna do SDK; quem cuida
+       delas é o clearIndexedDbPersistence, não nós. */
+    MT.signOut = async () => {
+      try {
+        Object.keys(localStorage)
+          .filter(k => k.indexOf('firestore_') !== 0)
+          .forEach(k => localStorage.removeItem(k));
+      } catch (e) {}
+      try { await A.signOut(auth); } catch (e) {}
+      try {
+        await F.terminate(db);
+        await F.clearIndexedDbPersistence(db);
+      } catch (e) {
+        // acontece se outra aba do MedTech estiver aberta segurando o banco
+        console.warn('Cache local do Firestore não pôde ser limpo:', e && e.message);
+      }
+      // o Firestore foi encerrado — a página precisa subir de novo, limpa
+      try { location.replace(location.pathname); } catch (e) { location.reload(); }
+    };
 
     function mountAuth() {
       if (document.getElementById('mt-auth')) return;
