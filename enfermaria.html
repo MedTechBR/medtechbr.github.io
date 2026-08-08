@@ -284,7 +284,9 @@ function leitoSort(a,b){return String(a.setor||'').localeCompare(String(b.setor|
 function render(){tab==='ativos'?renderAtivos():renderSaidas();}
 function examesFmt(p){return [p.laboratorio,p.culturas,p.imagem].filter(Boolean).join('\n')||p.exames||'';}
 let examOpen=new Set(); let examAllOpen=false;
+let obsOpen=new Set();   /* observações começam recolhidas: o texto da IA é longo */
 function toggleExames(id){const o=examOpen.has(id);o?examOpen.delete(id):examOpen.add(id);const b=document.getElementById('exb-'+id),c=document.getElementById('exc-'+id);if(b)b.style.display=o?'none':'';if(c)c.textContent=o?'▸':'▾';}
+function toggleObs(id){const o=obsOpen.has(id);o?obsOpen.delete(id):obsOpen.add(id);const b=document.getElementById('obb-'+id),c=document.getElementById('obc-'+id);if(b)b.style.display=o?'none':'';if(c)c.textContent=o?'▸':'▾';}
 function toggleAllExames(){examAllOpen=!examAllOpen;examOpen.clear();if(examAllOpen)ativos().forEach(p=>{if(examesFmt(p))examOpen.add(p.id);});render();}
 
 /* O Chrome trata qualquer campo de texto solto como login e injeta o e-mail da conta
@@ -306,7 +308,7 @@ function ptCard(p){
       <div class="pt-field"><b>Dx:</b> <button class="mini-ed" onclick="editCampo('${p.id}','dx')"><i class="ti ti-pencil"></i></button>${p.diagnosticos?('\n'+esc(bullets(p.diagnosticos))):' <span class="pt-muted">—</span>'}</div>
       <div class="pt-field pt-exwrap">${exFmt?`<div class="pt-exh" onclick="toggleExames('${p.id}')" style="cursor:pointer;display:flex;align-items:center;gap:6px"><b>Exames</b><span class="pt-muted" style="font-weight:400">(${exFmt.split('\n').filter(Boolean).length})</span><button class="mini-ed" onclick="event.stopPropagation();openForm('${p.id}')"><i class="ti ti-pencil"></i></button><span id="exc-${p.id}" style="margin-left:auto;color:var(--muted)">${examOpen.has(p.id)?'▾':'▸'}</span></div><div id="exb-${p.id}" style="${examOpen.has(p.id)?'':'display:none;'}white-space:pre-wrap;margin-top:2px">${esc(bullets(exFmt))}</div>`:`<b>Exames:</b> <button class="mini-ed" onclick="openForm('${p.id}')"><i class="ti ti-pencil"></i></button> <span class="pt-muted">—</span>`}</div>
       ${pendHtml}
-      ${p.obs?`<div class="pt-obs"><i class="ti ti-note"></i> ${esc(p.obs)}</div>`:''}
+      ${p.obs?`<div class="pt-field pt-obswrap"><div class="pt-exh" onclick="toggleObs('${p.id}')" style="cursor:pointer;display:flex;align-items:center;gap:6px"><i class="ti ti-note"></i><b>Observações</b><span class="pt-muted" style="font-weight:400">(${p.obs.split('\n').filter(l=>l.trim()).length})</span><button class="mini-ed" onclick="event.stopPropagation();openForm('${p.id}')"><i class="ti ti-pencil"></i></button><span id="obc-${p.id}" style="margin-left:auto;color:var(--muted)">${obsOpen.has(p.id)?'▾':'▸'}</span></div><div id="obb-${p.id}" class="pt-obs" style="${obsOpen.has(p.id)?'':'display:none;'}">${esc(p.obs)}</div></div>`:''}
     </div>
     <div class="pt-acts">
       <button class="visita" onclick="openVisita('${p.id}')"><i class="ti ti-stethoscope"></i> Visita</button>
