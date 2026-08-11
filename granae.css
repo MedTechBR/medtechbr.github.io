@@ -727,3 +727,120 @@ hr { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
 .fat-v{text-align:right;display:flex;flex-direction:column}
 .fat-v strong{font-variant-numeric:tabular-nums}
 .fat-v small{font-size:.7rem}
+
+/* ============================================================
+   DESKTOP — o app nasceu para o celular e no monitor virava uma
+   coluna estreita no meio do vazio, com o menu boiando por cima
+   do conteúdo. Aqui ele vira um app de verdade: menu lateral,
+   duas colunas e tabela no lugar de lista de cartões.
+   ============================================================ */
+.dcol { display: contents; }          /* no celular as colunas não existem */
+
+@media (min-width: 1024px) {
+  body { padding-bottom: 0; padding-left: 236px; }
+
+  /* topbar acompanha o recuo do menu lateral */
+  .topbar { padding-left: 24px; padding-right: 28px; }
+
+  /* a nav de baixo vira trilho lateral.
+     A regra de 720px transforma a nav numa pílula flutuante (sticky, centrada,
+     arredondada) — tudo isso precisa ser desfeito aqui, senão ela boia no meio
+     do conteúdo em vez de virar barra lateral. */
+  .bottom-nav {
+    position: fixed;
+    top: 0; bottom: 0; left: 0; right: auto; width: 236px;
+    margin: 0; border-radius: 0; max-width: none; background: var(--bg);
+    grid-template-columns: 1fr;
+    grid-auto-rows: max-content;
+    align-content: start;
+    gap: 3px;
+    border-top: none;
+    border-right: 1px solid var(--border);
+    padding: 86px 14px 18px;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .bottom-nav button {
+    grid-template-columns: 24px 1fr;
+    justify-items: start; align-items: center;
+    gap: 11px; padding: 11px 13px;
+    border-radius: 11px; text-align: left;
+  }
+  .bottom-nav button small { font-size: 13.5px; letter-spacing: 0; }
+  .bottom-nav button:hover { background: var(--panel-2, rgba(0,0,0,.04)); }
+  .bottom-nav button.active { background: var(--primary-soft, rgba(109,70,216,.12)); }
+  .bottom-nav button.active span { transform: none; }
+  .bottom-nav .nav-ico { width: 22px; height: 22px; }
+
+  main { max-width: 1240px; padding: 20px 28px 48px; margin: 0; }
+
+  /* mês fica sempre à vista ao rolar */
+  .month-switcher, .month-switcher.tx-month {
+    position: sticky; top: 0; z-index: 6;
+    background: var(--bg); padding: 10px 0 12px; margin-bottom: 4px;
+  }
+
+  /* dashboard em duas colunas */
+  #dashResumo { display: grid; grid-template-columns: minmax(0,1.25fr) minmax(0,.85fr); gap: 0 30px; align-items: start; }
+  .dcol { display: block; min-width: 0; }
+  .dcol-b { position: sticky; top: 64px; }
+
+  /* o saldo gigante não precisa de meia tela */
+  .hero-number { font-size: 2.6rem !important; }
+
+  /* mais respiro nas listas longas */
+  .tx-list { max-height: none; }
+
+  /* modais maiores, já que há espaço */
+  .modal { max-width: 560px; }
+  #txDetail { max-width: 620px; }
+
+  /* Botões flutuantes: a regra base estica o "+ Lançar" de ponta a ponta
+     (left:18px + right:28px). No desktop ele vira botão compacto ao lado do
+     microfone, e não uma barra atravessando a tela. */
+  .fab { right: 28px; bottom: 28px; }
+  .new-tx-fab {
+    left: auto; right: 100px; bottom: 28px;
+    width: auto; padding: 13px 22px; border-radius: 999px;
+  }
+  /* o filtro não precisa ocupar a linha inteira */
+  #filterType { flex: 0 0 auto; width: auto; min-width: 170px; }
+}
+
+@media (min-width: 1360px) {
+  main { max-width: 1340px; }
+  #dashResumo { grid-template-columns: minmax(0,1.3fr) minmax(0,.9fr); gap: 0 36px; }
+}
+
+/* ---- Transações como TABELA no desktop ---- */
+@media (min-width: 1024px) {
+  .tx-list.as-table { display: table; width: 100%; border-collapse: collapse; }
+  .tx-list.as-table .tx-item {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) 176px 140px 132px;
+    align-items: center; gap: 12px;
+    padding: 11px 12px; border-radius: 9px; border: none;
+    border-bottom: 1px solid var(--line, #eee);
+  }
+  .tx-list.as-table .tx-item:hover { background: var(--panel-2, rgba(0,0,0,.035)); }
+  .tx-list.as-table .tx-head {
+    font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--muted); font-weight: 700; cursor: default; background: none;
+  }
+  .tx-list.as-table .tx-head:hover { background: none; }
+  .txc-r { text-align: right; font-variant-numeric: tabular-nums; }
+  .txc-dim { color: var(--muted); font-size: .86rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+
+/* células que só existem na tabela do desktop */
+.txc-date, .txc-acc { display: none; }
+@media (min-width: 1024px) {
+  .tx-list.as-table .txc-acc { display: block; }
+  /* nada de coluna de data: a lista já é agrupada por dia, com o saldo do dia */
+  .tx-list.as-table .tx-day { grid-column: 1 / -1; }
+}
+/* resumo de parcelas no painel */
+.dashcmt-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 8px 0 10px; }
+.dashcmt-kpis strong { display: block; font-size: 1.02rem; font-variant-numeric: tabular-nums; }
+.dashcmt-row { display: flex; justify-content: space-between; gap: 10px; padding: 5px 0; font-size: .86rem; border-top: 1px solid var(--line, #eee); }
+.dashcmt-row span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
