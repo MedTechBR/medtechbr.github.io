@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
-  <link rel="stylesheet" href="granae.css?v=48" />
+  <link rel="stylesheet" href="granae.css?v=50" />
   <!-- garante inputs claros na tela de login central, mesmo com o tema escuro do Granaê -->
   <style>.mt-auth input{background:#F1F1EC;color:#23272E}.mt-auth input::placeholder{color:#5E646B}</style>
   <!-- Login único MedTech + sincronização na nuvem (mesmo módulo do portal) -->
@@ -182,6 +182,14 @@
         <h3 class="muted small uppercase">Receitas</h3>
         <ul id="catIncomeList" class="cat-list"></ul>
       </div>
+      <div class="cat-section" style="margin-top:22px">
+        <div class="section-title between">
+          <h3 class="muted small uppercase" style="margin:0">Contas e cartões</h3>
+          <button id="addAccount" class="ghost">+ Adicionar</button>
+        </div>
+        <p class="muted small" style="margin:2px 0 8px">Marque de onde saiu cada gasto para acompanhar a fatura de cada cartão.</p>
+        <ul id="accList" class="cat-list"></ul>
+      </div>
     </section>
 
     <!-- FIXOS -->
@@ -208,6 +216,23 @@
     </section>
 
     <!-- ANALISE IA -->
+    <!-- COMPROMISSOS -->
+    <section class="view hidden" data-view="compromissos">
+      <div class="section-title between">
+        <h2>Compromissos</h2>
+        <button id="addCommitment" class="primary">+ Financiamento</button>
+      </div>
+      <p class="muted small" style="margin:-4px 0 12px">Parcelamentos e financiamentos em aberto — quanto já foi e quanto falta.</p>
+      <div id="cmtResumo" class="cmt-resumo"></div>
+      <div id="faturas"></div>
+      <h3 class="muted small uppercase" style="margin:18px 0 8px">Em aberto</h3>
+      <ul id="cmtList" class="cmt-list"></ul>
+      <h3 class="muted small uppercase" style="margin:20px 0 8px">Já quitados</h3>
+      <ul id="cmtDone" class="cmt-list"></ul>
+      <h3 class="muted small uppercase" style="margin:22px 0 8px">Comprometido nos próximos meses</h3>
+      <div id="cmtProj" class="cmt-proj"></div>
+    </section>
+
     <section class="view hidden" data-view="ia">
       <div class="section-title">
         <h2>Análise IA</h2>
@@ -279,6 +304,10 @@
       <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14L17 2H7z"/></svg>
       <small>Fixos</small>
     </button>
+    <button data-nav="compromissos">
+      <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M7 15h4"/></svg>
+      <small>Parcelas</small>
+    </button>
     <button data-nav="ia">
       <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.94 14.34L6.34 18l-.96-2.65-2.65-.96 3.66-3.6 1.6 1.6 1.95 1.95z"/><path d="M14 2l2 4 4 2-4 2-2 4-2-4-4-2 4-2z"/><path d="M19 14l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"/></svg>
       <small>IA</small>
@@ -308,6 +337,15 @@
         <span>Categoria</span>
         <select name="category" required></select>
       </label>
+      <label class="field" id="txSubField">
+        <span>Subcategoria <small class="muted">— opcional</small></span>
+        <input name="sub" type="text" maxlength="40" list="subSugestoes" placeholder="Ex.: Remédios" />
+        <datalist id="subSugestoes"></datalist>
+      </label>
+      <label class="field" id="txAccField">
+        <span>Conta ou cartão</span>
+        <select name="accountId"></select>
+      </label>
       <label class="field">
         <span>Data</span>
         <input name="date" type="date" required />
@@ -330,6 +368,67 @@
       <footer class="modal-foot">
         <button type="button" id="txDelete" class="danger" hidden>Excluir</button>
         <button type="button" id="txDup" class="ghost" hidden>Duplicar p/ hoje</button>
+        <button type="submit" class="primary">Salvar</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- MODAL: DETALHE DO LANÇAMENTO (leitura) -->
+  <dialog id="txDetail" class="modal">
+    <header class="modal-head">
+      <h3>Detalhes</h3>
+      <button type="button" class="ghost" data-close-detail>✕</button>
+    </header>
+    <div id="txDetailBody"></div>
+    <footer class="modal-foot">
+      <button type="button" id="txDetailDel" class="danger">Excluir</button>
+      <button type="button" id="txDetailEdit" class="primary">Editar</button>
+    </footer>
+  </dialog>
+
+  <!-- MODAL: FINANCIAMENTO -->
+  <dialog id="cmtDialog" class="modal">
+    <form id="cmtForm" method="dialog">
+      <header class="modal-head">
+        <h3>Novo financiamento</h3>
+        <button type="button" class="ghost" data-close-cmt>✕</button>
+      </header>
+      <p class="muted small" style="margin:0 0 10px">Diferente do parcelamento: aqui há juros, então o total pago é maior que o valor financiado.</p>
+      <label class="field"><span>Do quê</span><input name="descricao" type="text" maxlength="80" required placeholder="Ex.: Carro, Apartamento" /></label>
+      <label class="field"><span>Valor financiado</span><input name="valorFinanciado" type="number" step="0.01" min="0" required /></label>
+      <label class="field"><span>Valor da parcela</span><input name="parcela" type="number" step="0.01" min="0" required /></label>
+      <label class="field"><span>Número de parcelas</span><input name="n" type="number" step="1" min="2" max="480" required /></label>
+      <label class="field"><span>Taxa de juros ao mês (%) <small class="muted">— opcional</small></span><input name="taxa" type="number" step="0.01" min="0" /></label>
+      <label class="field"><span>Categoria</span><select name="category" required></select></label>
+      <label class="field"><span>1ª parcela</span><input name="date" type="date" required /></label>
+      <label class="field" id="cmtAccField" hidden><span>Conta ou cartão</span><select name="accountId"></select></label>
+      <p class="muted small" id="cmtHint" style="margin:6px 0 0"></p>
+      <footer class="modal-foot">
+        <button type="submit" class="primary">Criar</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- MODAL: CONTA / CARTÃO -->
+  <dialog id="accDialog" class="modal">
+    <form id="accForm" method="dialog">
+      <header class="modal-head">
+        <h3 id="accDialogTitle">Nova conta</h3>
+        <button type="button" class="ghost" data-close-acc>✕</button>
+      </header>
+      <div class="seg">
+        <label><input type="radio" name="kind" value="conta" checked /><span>Conta</span></label>
+        <label><input type="radio" name="kind" value="cartao" /><span>Cartão de crédito</span></label>
+      </div>
+      <label class="field"><span>Nome</span><input name="name" type="text" maxlength="40" required placeholder="Ex.: Nubank, Santander" /></label>
+      <label class="field"><span>Cor</span><input name="color" type="color" value="#6366f1" /></label>
+      <div id="accCardFields" hidden>
+        <label class="field"><span>Dia do fechamento da fatura</span><input name="fechamento" type="number" min="1" max="28" placeholder="Ex.: 3" /></label>
+        <label class="field"><span>Dia do vencimento</span><input name="vencimento" type="number" min="1" max="28" placeholder="Ex.: 12" /></label>
+        <label class="field"><span>Limite <small class="muted">— opcional</small></span><input name="limite" type="number" step="0.01" min="0" /></label>
+      </div>
+      <footer class="modal-foot">
+        <button type="button" id="accDelete" class="danger" hidden>Excluir</button>
         <button type="submit" class="primary">Salvar</button>
       </footer>
     </form>
@@ -463,6 +562,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="granae.gemini.js?v=7"></script>
-  <script src="granae.app.js?v=15"></script>
+  <script src="granae.app.js?v=17"></script>
 </body>
 </html>
