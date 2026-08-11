@@ -310,7 +310,16 @@ function safeMD(text) {
 
 // ====== Navegação ======
 let _keepTxFilter = false;
-function navigate(view) {
+/* Rotas no endereço: o botão voltar do navegador passa a andar entre as telas
+   em vez de sair do app. Também deixa recarregar caindo na mesma tela. */
+const VIEWS = ['dashboard', 'transacoes', 'categorias', 'fixos', 'compromissos', 'ia'];
+function viewDoHash() {
+  const h = (location.hash || '').replace(/^#\/?/, '');
+  return VIEWS.includes(h) ? h : 'dashboard';
+}
+window.addEventListener('hashchange', () => navigate(viewDoHash(), true));
+
+function navigate(view, doHash) {
   // entrar em Transações "do zero" (pela nav) limpa filtro de categoria e busca —
   // filtro grudado fazia a lista parecer vazia ("sumiu os lançamentos").
   if (view === 'transacoes' && !_keepTxFilter) {
@@ -318,10 +327,12 @@ function navigate(view) {
     const _q = document.getElementById('txSearch'); if (_q) _q.value = '';
   }
   _keepTxFilter = false;
+  if (!VIEWS.includes(view)) view = 'dashboard';
+  if (!doHash && ('#/' + view) !== location.hash) location.hash = '#/' + view;
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('hidden', v.dataset.view !== view));
   document.querySelectorAll('.bottom-nav button').forEach(b => b.classList.toggle('active', b.dataset.nav === view));
   if (view === 'dashboard') renderDashboard();
-  if (view === 'transacoes') renderTransactions();
+  if (view === 'transacoes') { renderTransactions(); aplicarTabelaTx(); }
   if (view === 'categorias') renderCategories();
   if (view === 'fixos') renderFixed();
   if (view === 'compromissos') { renderCompromissos(); renderFaturas(); }
@@ -712,7 +723,9 @@ function txItemHTML(t, hideDate) {
   // Chip estilo Monerix: fundo tonal da cor da categoria + emoji + nome
   const chipBg = cat.color + '1F'; // ~12% alpha
   const chipFg = cat.color;
+  const conta = (state.accounts || []).find(a => a.id === t.accountId);
   return `<li class="tx-item${pendingCls}" data-id="${t.id}">
+    <span class="txc-date txc-dim">${new Date(t.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}</span>
     <div class="meta">
       <span class="desc">${escapeHTML(t.description)}${pendingBadge}</span>
       ${hideDate ? '' : `<span class="sub">${dayFmt.format(new Date(t.date + 'T00:00:00'))}</span>`}
@@ -720,7 +733,8 @@ function txItemHTML(t, hideDate) {
     <span class="tx-cat-chip" style="background:${chipBg};color:${chipFg}">
       <span class="ico">${cat.icon || '🏷️'}</span> ${escapeHTML(t.category)}
     </span>
-    <span class="val ${t.type}">${sign} ${fmt.format(t.amount)}</span>
+    <span class="txc-acc txc-dim">${conta ? escapeHTML(conta.name) : ''}</span>
+    <span class="val ${t.type} txc-r">${sign} ${fmt.format(t.amount)}</span>
   </li>`;
 }
 function escapeHTML(s) {
@@ -1685,9 +1699,64 @@ document.getElementById('btnInstall').addEventListener('click', async () => {
 });
 
 // ====== Refresh ======
+const ehDesktop = () => window.matchMedia('(min-width: 1024px)').matches;
+
+/* Cabeçalho da tabela — só no desktop, onde a lista vira tabela de verdade. */
+function aplicarTabelaTx() {
+  const ul = document.getElementById('txList');
+  if (!ul) return;
+  const desk = ehDesktop();
+  ul.classList.toggle('as-table', desk);
+  const antigo = ul.querySelector('.tx-head');
+  if (antigo) antigo.remove();
+  if (desk && ul.children.length) {
+    const th = document.createElement('li');
+    th.className = 'tx-item tx-head';
+    th.innerHTML = '<span>Descrição</span><span>Categoria</span><span>Conta</span><span class="txc-r">Valor</span>';
+    ul.prepend(th);
+  }
+}
+
+/* Coluna da direita do painel: o que estava só na aba Parcelas. */
+function renderDashLateral() {
+  const box = document.getElementById('dashCompromissos');
+  if (box) {
+    const abertos = compromissos().filter(c => !c.quitado);
+    if (!abertos.length) { box.hidden = true; }
+    else {
+      box.hidden = false;
+      const aPagar = abertos.reduce((s, c) => s + c.aPagar, 0);
+      const mes = abertos.reduce((s, c) => s + c.valorParcela, 0);
+      box.innerHTML = `<div class="card-head row between"><span class="card-label">Parcelas em aberto</span>
+          <button class="link" data-nav="compromissos">ver →</button></div>
+        <div class="dashcmt-kpis"><div><span class="muted small">Por mês</span><strong>${fmt.format(mes)}</strong></div>
+        <div><span class="muted small">Falta pagar</span><strong>${fmt.format(aPagar)}</strong></div></div>
+        ${abertos.slice(0, 3).map(c => `<div class="dashcmt-row"><span>${escapeHTML(c.descricao)}</span>
+          <span class="muted small">${c.pagas}/${c.n}</span></div>`).join('')}`;
+      box.querySelector('[data-nav]')?.addEventListener('click', () => navigate('compromissos'));
+    }
+  }
+  const fat = document.getElementById('dashFaturas');
+  if (fat) {
+    const cartoes = (state.accounts || []).filter(a => a.kind === 'cartao');
+    if (!cartoes.length) { fat.innerHTML = ''; }
+    else {
+      const ref = new Date();
+      fat.innerHTML = `<div class="section-title"><h3>Fatura aberta</h3></div><div class="fat-list">` +
+        cartoes.map(c => {
+          const tot = faturaDoCartao(c, ref).reduce((s, t) => s + (+t.amount || 0), 0);
+          return `<div class="fat-row"><span class="dot" style="background:${escapeHTML(c.color || '#6366f1')}"></span>
+            <div class="fat-id"><strong>${escapeHTML(c.name)}</strong></div>
+            <div class="fat-v"><strong>${fmt.format(tot)}</strong></div></div>`;
+        }).join('') + '</div>';
+    }
+  }
+}
+
 function refreshAll() {
   renderDashboard();
-  if (!document.querySelector('[data-view=transacoes]').classList.contains('hidden')) renderTransactions();
+  renderDashLateral();
+  if (!document.querySelector('[data-view=transacoes]').classList.contains('hidden')) { renderTransactions(); aplicarTabelaTx(); }
   if (!document.querySelector('[data-view=categorias]').classList.contains('hidden')) renderCategories();
   if (!document.querySelector('[data-view=fixos]').classList.contains('hidden')) renderFixed();
   if (!document.querySelector('[data-view=compromissos]').classList.contains('hidden')) { renderCompromissos(); renderFaturas(); }
@@ -1994,3 +2063,38 @@ function renderFaturas() {
   }).join('');
   el.innerHTML = `<h3 class="muted small uppercase" style="margin:16px 0 8px">Fatura aberta dos cartões</h3><div class="fat-list">${linhas}</div>`;
 }
+
+/* ====== Atalhos de teclado (desktop) ======
+   Quem usa no computador não quer caçar botão com o mouse. */
+document.addEventListener('keydown', (e) => {
+  const emCampo = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || '')
+    || document.activeElement?.isContentEditable;
+  const modalAberto = [...document.querySelectorAll('dialog')].some(d => d.open);
+
+  if (e.key === 'Escape' && modalAberto) return;            // o próprio dialog fecha
+  if (emCampo || modalAberto || e.metaKey || e.ctrlKey || e.altKey) return;
+
+  const k = e.key.toLowerCase();
+  if (k === 'n') { e.preventDefault(); openTxDialog(null); return; }
+  if (k === '/') { e.preventDefault(); navigate('transacoes');
+                   setTimeout(() => document.getElementById('txSearch')?.focus(), 60); return; }
+  if (k === 'arrowleft')  { e.preventDefault(); document.getElementById(
+      document.querySelector('[data-view=transacoes]').classList.contains('hidden') ? 'prevMonth' : 'txPrevMonth')?.click(); return; }
+  if (k === 'arrowright') { e.preventDefault(); document.getElementById(
+      document.querySelector('[data-view=transacoes]').classList.contains('hidden') ? 'nextMonth' : 'txNextMonth')?.click(); return; }
+  const atalhos = { '1':'dashboard', '2':'transacoes', '3':'categorias', '4':'fixos', '5':'compromissos', '6':'ia' };
+  if (atalhos[k]) { e.preventDefault(); navigate(atalhos[k]); }
+});
+
+/* A tabela só existe no desktop: ao mudar a largura, refaz o cabeçalho. */
+let _rzTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(_rzTimer);
+  _rzTimer = setTimeout(() => {
+    if (!document.querySelector('[data-view=transacoes]').classList.contains('hidden')) aplicarTabelaTx();
+  }, 180);
+});
+
+/* Entra pela rota do endereço (recarregar mantém a tela). Sem o segundo
+   argumento para que o endereço seja gravado já no primeiro carregamento. */
+navigate(viewDoHash());
