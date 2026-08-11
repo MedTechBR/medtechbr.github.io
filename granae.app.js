@@ -21,11 +21,13 @@ const defaultState = () => ({
   fixedItems: [],
   accounts: [],         // contas e cartões {id, name, kind:'conta'|'cartao', bank, color, fechamento, vencimento, limite}
   commitments: [],      // metadados do parcelamento/financiamento; id == groupId das parcelas
+  rules: [],            // regras automáticas {id, contem, category, sub, accountId}
   tombstones: [],       // exclusoes de transacoes {id, at} — impedem que o merge ressuscite
   fixedTombstones: [],  // exclusoes de itens fixos
   categoryTombstones: [], // exclusoes de categorias {id, at}
   accountTombstones: [],
   commitmentTombstones: [],
+  ruleTombstones: [],
 });
 
 function cid() { return Math.random().toString(36).slice(2, 10); }
@@ -77,7 +79,7 @@ function parcelaInfo(t) {
   const kRaw = m[3], nRaw = m[4];
   const k = +kRaw, n = +nRaw;
   /* coerência: "Consulta 14/08" é uma DATA, não a parcela 14 de 8 */
-  if (!(n >= 2 && n <= 120 && k >= 1 && k <= n)) return null;
+  if (!(n >= 2 && n <= 600 && k >= 1 && k <= n)) return null;   // 420 = 35 anos de financiamento
   /* sem parênteses, zero à esquerda denuncia data: "ALUGUEL 05/12" não é
      parcela 5 de 12. O app nunca gera zero à esquerda. */
   if (!temParenteses && (/^0\d/.test(kRaw) || /^0\d/.test(nRaw))) return null;
@@ -111,7 +113,9 @@ function compromissos() {
     const pi = parcelaInfo(txs[0]) || {};
     const meta = (state.commitments || []).find(c => c.id === id) || {};
     const n = meta.nParcelas || pi.n || txs.length;
-    const valorParcela = +txs[0].amount || 0;
+    /* A parcela de financiamento muda todo mês. Para projetar o que falta,
+       o valor mais RECENTE representa melhor do que o mais antigo. */
+    const valorParcela = +txs[txs.length - 1].amount || +txs[0].amount || 0;
     /* Quando o app cria o parcelamento, TODAS as N parcelas viram lançamento.
        No histórico digitado à mão só existe o que já aconteceu ("GRAMA CASA 3/6"
        sem as outras 3). Aí o número da parcela no texto é a única fonte de
@@ -194,6 +198,7 @@ function granaeMergeFn(remote, local) {
   const cat = mergeById(local.categories, remote.categories, local.categoryTombstones, remote.categoryTombstones);
   const acc = mergeById(local.accounts, remote.accounts, local.accountTombstones, remote.accountTombstones);
   const cmt = mergeById(local.commitments, remote.commitments, local.commitmentTombstones, remote.commitmentTombstones);
+  const rul = mergeById(local.rules, remote.rules, local.ruleTombstones, remote.ruleTombstones);
   return {
     profile: local.profile || remote.profile || {},
     transactions: tx.items,
@@ -206,6 +211,8 @@ function granaeMergeFn(remote, local) {
     accountTombstones: acc.tombstones,
     commitments: cmt.items,
     commitmentTombstones: cmt.tombstones,
+    rules: rul.items,
+    ruleTombstones: rul.tombstones,
   };
 }
 
@@ -240,6 +247,8 @@ function applyData(d) {
       commitments: Array.isArray(d.commitments) ? d.commitments : [],
       accountTombstones: Array.isArray(d.accountTombstones) ? d.accountTombstones : [],
       commitmentTombstones: Array.isArray(d.commitmentTombstones) ? d.commitmentTombstones : [],
+      rules: Array.isArray(d.rules) ? d.rules : [],
+      ruleTombstones: Array.isArray(d.ruleTombstones) ? d.ruleTombstones : [],
     };
   } else {
     state = defaultState();
@@ -381,8 +390,13 @@ document.getElementById('txNextMonth').addEventListener('click', () => {
   renderTransactions();
 });
 
+/* Transferir dinheiro entre suas contas não é ganhar nem gastar. Os dois
+   lançamentos do par ficam de fora de qualquer total, gráfico ou orçamento —
+   senão o mês mostraria receita e despesa que não existiram. */
+const ehTransfer = t => !!t.transferId;
+
 function txOfMonth() {
-  return state.transactions.filter(t => inMonth(t.date, currentMonth));
+  return state.transactions.filter(t => inMonth(t.date, currentMonth) && !ehTransfer(t));
 }
 
 // Ativa transações agendadas cuja data já chegou (ou já passou)
@@ -571,7 +585,7 @@ function renderTrend() {
     months.push(d);
   }
   const data = months.map(m => {
-    const tx = state.transactions.filter(t => !t.pending && inMonth(t.date, m));
+    const tx = state.transactions.filter(t => !t.pending && !ehTransfer(t) && inMonth(t.date, m));
     const income = tx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
     const expense = tx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
     return { month: m, income, expense };
@@ -762,7 +776,7 @@ function renderTxMonthSummary(monthTx) {
 function renderTransactions() {
   const filter = document.getElementById('filterType').value;
   // SEMPRE escopado ao mês vigente (navegável pelo seletor de mês acima da lista)
-  const monthTx = state.transactions.filter(t => inMonth(t.date, currentMonth));
+  const monthTx = state.transactions.filter(t => inMonth(t.date, currentMonth) && !ehTransfer(t));
   let list = monthTx.slice();
   if (filter !== 'all') list = list.filter(t => t.type === filter);
   if (categoryFilter) list = list.filter(t => t.category === categoryFilter.name);
@@ -995,6 +1009,7 @@ txForm.addEventListener('submit', e => {
     toast(`${nPar} parcelas de ${fmt.format(obj.amount)} até ${monthLongFmt.format(fim)}`);
     return;
   }
+  aplicarRegras(obj);      // "UBER vira Transporte" antes de salvar
   // Data futura → agendado (não conta nos totais até a data chegar)
   if (obj.date > todayISO()) obj.pending = true;
   const idx = state.transactions.findIndex(t => t.id === obj.id);
@@ -1756,6 +1771,7 @@ function renderDashLateral() {
 function refreshAll() {
   renderDashboard();
   renderDashLateral();
+  renderProjecao();
   if (!document.querySelector('[data-view=transacoes]').classList.contains('hidden')) { renderTransactions(); aplicarTabelaTx(); }
   if (!document.querySelector('[data-view=categorias]').classList.contains('hidden')) renderCategories();
   if (!document.querySelector('[data-view=fixos]').classList.contains('hidden')) renderFixed();
@@ -1993,6 +2009,7 @@ function openAccDialog(id) {
     accForm.fechamento.value = a.fechamento || '';
     accForm.vencimento.value = a.vencimento || '';
     accForm.limite.value = a.limite || '';
+    if (accForm.saldoInicial) accForm.saldoInicial.value = a.saldoInicial || '';
   }
   syncAccKindUI();
   accDialog.showModal();
@@ -2007,6 +2024,7 @@ accForm?.addEventListener('submit', () => {
   const obj = stampTx({
     id: id || cid(), kind: d.get('kind') || 'conta', name: nome,
     color: d.get('color') || '#6366f1',
+    saldoInicial: +d.get('saldoInicial') || 0,
     fechamento: +d.get('fechamento') || null,
     vencimento: +d.get('vencimento') || null,
     limite: +d.get('limite') || null,
@@ -2059,9 +2077,13 @@ function renderFaturas() {
         <small class="muted">${itens.length} lanç.${c.vencimento ? ' · vence dia ' + c.vencimento : ''}</small></div>
       <div class="fat-v"><strong>${fmt.format(total)}</strong>
         ${usoLimite !== null ? `<small class="muted">${usoLimite}% do limite</small>` : ''}</div>
+      <button type="button" class="fat-pg ${faturaPaga(c.id, ref) ? 'on' : ''}" data-fat="${escapeHTML(c.id)}">
+        ${faturaPaga(c.id, ref) ? '✓ paga' : 'marcar paga'}</button>
     </div>`;
   }).join('');
   el.innerHTML = `<h3 class="muted small uppercase" style="margin:16px 0 8px">Fatura aberta dos cartões</h3><div class="fat-list">${linhas}</div>`;
+  el.querySelectorAll('[data-fat]').forEach(b =>
+    b.addEventListener('click', () => alternarFaturaPaga(b.dataset.fat, new Date())));
 }
 
 /* ====== Atalhos de teclado (desktop) ======
@@ -2098,3 +2120,256 @@ window.addEventListener('resize', () => {
 /* Entra pela rota do endereço (recarregar mantém a tela). Sem o segundo
    argumento para que o endereço seja gravado já no primeiro carregamento. */
 navigate(viewDoHash());
+
+/* ============================================================
+   REGRAS AUTOMÁTICAS
+   "Todo lançamento com UBER vira Transporte". É o que separa
+   dez minutos de uma hora quando você importa uma fatura.
+   ============================================================ */
+function aplicarRegras(t) {
+  const desc = (t.description || '').toLowerCase();
+  for (const r of (state.rules || [])) {
+    if (!r.contem) continue;
+    if (desc.indexOf(String(r.contem).toLowerCase()) < 0) continue;
+    if (r.category) t.category = r.category;
+    if (r.sub) t.sub = r.sub;
+    if (r.accountId) t.accountId = r.accountId;
+    return r;
+  }
+  return null;
+}
+
+/* Roda as regras em tudo que já existe — útil ao criar uma regra nova. */
+function reaplicarRegras() {
+  let n = 0;
+  state.transactions.forEach(t => {
+    const antes = t.category + '|' + (t.sub || '');
+    if (aplicarRegras(t) && (t.category + '|' + (t.sub || '')) !== antes) { t.updatedAt = Date.now(); n++; }
+  });
+  return n;
+}
+
+/* ============================================================
+   REVISÃO EM LOTE
+   Fila do que está sem categoria de verdade (ou caiu em "Outros").
+   Teclado: 1-9 escolhe categoria, Enter pula, Esc sai.
+   ============================================================ */
+function paraRevisar() {
+  return state.transactions
+    .filter(t => !ehTransfer(t) && (!t.category || t.category === 'Outros'))
+    .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+}
+
+let _revIdx = 0, _revLista = [];
+function abrirRevisao() {
+  _revLista = paraRevisar();
+  _revIdx = 0;
+  if (!_revLista.length) { toast('Nada para revisar — tudo categorizado.'); return; }
+  document.getElementById('revDialog').showModal();
+  pintarRevisao();
+}
+function pintarRevisao() {
+  const t = _revLista[_revIdx];
+  const box = document.getElementById('revBody');
+  if (!t) {
+    box.innerHTML = `<p class="muted">Fim da fila. ${_revLista.length} revisado(s).</p>`;
+    document.getElementById('revProg').textContent = '';
+    return;
+  }
+  const cats = state.categories.filter(c => c.type === t.type).slice(0, 9);
+  document.getElementById('revProg').textContent = `${_revIdx + 1} de ${_revLista.length}`;
+  box.innerHTML = `
+    <div class="rev-tx">
+      <strong>${escapeHTML(t.description)}</strong>
+      <span class="${t.type === 'income' ? 'income' : ''}">${t.type === 'income' ? '+' : '−'} ${fmt.format(t.amount)}</span>
+    </div>
+    <div class="muted small" style="margin-bottom:12px">${new Date(t.date + 'T00:00:00').toLocaleDateString('pt-BR')} · categoria atual: ${escapeHTML(t.category || '—')}</div>
+    <div class="rev-cats">
+      ${cats.map((c, i) => `<button type="button" class="rev-cat" data-cat="${escapeHTML(c.name)}">
+        <kbd>${i + 1}</kbd> <span>${escapeHTML(c.icon || '')} ${escapeHTML(c.name)}</span></button>`).join('')}
+    </div>
+    <label class="field" style="margin-top:12px">
+      <span>Criar regra: sempre que a descrição contiver</span>
+      <input id="revRegra" type="text" placeholder="${escapeHTML((t.description || '').split(' ')[0] || '')}" />
+    </label>`;
+  box.querySelectorAll('.rev-cat').forEach(b =>
+    b.addEventListener('click', () => aplicarRevisao(b.dataset.cat)));
+}
+function aplicarRevisao(cat) {
+  const t = _revLista[_revIdx];
+  if (!t) return;
+  t.category = cat; t.updatedAt = Date.now();
+  const termo = (document.getElementById('revRegra')?.value || '').trim();
+  if (termo) {
+    state.rules = state.rules || [];
+    state.rules.push({ id: cid(), contem: termo, category: cat, updatedAt: Date.now() });
+    const n = reaplicarRegras();
+    toast(`Regra criada — ${n} lançamento(s) atualizados`);
+  }
+  _revIdx++;
+  saveState(); pintarRevisao(); refreshAll();
+}
+document.addEventListener('keydown', (e) => {
+  const dlg = document.getElementById('revDialog');
+  if (!dlg || !dlg.open) return;
+  if (/^[1-9]$/.test(e.key)) {
+    const b = document.querySelectorAll('#revBody .rev-cat')[+e.key - 1];
+    if (b) { e.preventDefault(); b.click(); }
+  } else if (e.key === 'Enter') { e.preventDefault(); _revIdx++; pintarRevisao(); }
+});
+
+/* ============================================================
+   SALDO POR CONTA — "quanto tem no Nubank"
+   ============================================================ */
+function saldoDaConta(acc) {
+  const base = +acc.saldoInicial || 0;
+  return state.transactions.reduce((s, t) => {
+    if (t.accountId !== acc.id || t.pending) return s;
+    return s + (t.type === 'income' ? +t.amount : -(+t.amount));
+  }, base);
+}
+
+/* ============================================================
+   PROJEÇÃO DE SALDO — o que o YNAB faz de mais útil:
+   avisar do aperto ANTES de ele acontecer.
+   ============================================================ */
+function projecaoSaldo(meses = 6) {
+  const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+  let acumulado = state.transactions
+    .filter(t => !t.pending && !ehTransfer(t) && t.date <= todayISO())
+    .reduce((s, t) => s + (t.type === 'income' ? +t.amount : -(+t.amount)), 0);
+  const fixos = (state.fixedItems || []);
+  const rendaFixa = fixos.filter(f => f.type === 'income').reduce((s, f) => s + (+f.amount || 0), 0);
+  const gastoFixo = fixos.filter(f => f.type === 'expense').reduce((s, f) => s + (+f.amount || 0), 0);
+  const out = [];
+  for (let i = 1; i <= meses; i++) {
+    const ref = new Date(hoje.getFullYear(), hoje.getMonth() + i, 1);
+    const parcelas = state.transactions
+      .filter(t => t.type === 'expense' && chaveGrupo(t) && inMonth(t.date, ref))
+      .reduce((s, t) => s + (+t.amount || 0), 0);
+    const compromissoEstimado = compromissos()
+      .filter(c => !c.quitado && c.estimado)
+      .reduce((s, c) => s + c.valorParcela, 0);
+    const saida = gastoFixo + Math.max(parcelas, compromissoEstimado);
+    acumulado += rendaFixa - saida;
+    out.push({ ref, entra: rendaFixa, sai: saida, saldo: acumulado });
+  }
+  return out;
+}
+
+/* ============================================================
+   TRANSFERÊNCIA ENTRE CONTAS
+   Dois lançamentos amarrados por transferId: saída na origem e
+   entrada no destino. Ambos ficam fora dos totais do mês.
+   ============================================================ */
+function criarTransferencia({ de, para, valor, data, descricao }) {
+  if (!de || !para || de === para || !(valor > 0)) return null;
+  const tid = cid();
+  const nomeDe = (state.accounts.find(a => a.id === de) || {}).name || 'conta';
+  const nomePara = (state.accounts.find(a => a.id === para) || {}).name || 'conta';
+  const txt = descricao || `Transferência ${nomeDe} → ${nomePara}`;
+  const base = { date: data, category: 'Transferência', transferId: tid, updatedAt: Date.now() };
+  state.transactions.push({ ...base, id: cid(), type: 'expense', amount: valor, accountId: de, description: txt });
+  state.transactions.push({ ...base, id: cid(), type: 'income', amount: valor, accountId: para, description: txt });
+  return tid;
+}
+
+/* ============================================================
+   FATURA FECHÁVEL — marcar o mês do cartão como pago
+   ============================================================ */
+function chaveFatura(accId, ref) {
+  return accId + ':' + ref.getFullYear() + '-' + String(ref.getMonth() + 1).padStart(2, '0');
+}
+function faturaPaga(accId, ref) {
+  const acc = (state.accounts || []).find(a => a.id === accId);
+  return !!(acc && acc.faturasPagas && acc.faturasPagas[chaveFatura(accId, ref)]);
+}
+function alternarFaturaPaga(accId, ref) {
+  const acc = (state.accounts || []).find(a => a.id === accId);
+  if (!acc) return;
+  acc.faturasPagas = acc.faturasPagas || {};
+  const k = chaveFatura(accId, ref);
+  if (acc.faturasPagas[k]) delete acc.faturasPagas[k];
+  else acc.faturasPagas[k] = Date.now();
+  acc.updatedAt = Date.now();
+  saveState(); refreshAll();
+}
+
+/* ====== Ligações das telas novas ====== */
+document.getElementById('txRevisar')?.addEventListener('click', abrirRevisao);
+
+document.getElementById('txTransferir')?.addEventListener('click', () => {
+  const f = document.getElementById('trfForm');
+  if (!(state.accounts || []).length) { toast('Cadastre uma conta primeiro (aba Categorias).'); return; }
+  fillAccountSelect(f.de); fillAccountSelect(f.para);
+  f.data.value = todayISO();
+  document.getElementById('trfDialog').showModal();
+});
+document.getElementById('trfForm')?.addEventListener('submit', () => {
+  const d = new FormData(document.getElementById('trfForm'));
+  const ok = criarTransferencia({
+    de: d.get('de'), para: d.get('para'), valor: +d.get('valor'),
+    data: d.get('data'), descricao: (d.get('descricao') || '').trim()
+  });
+  if (!ok) { toast('Escolha duas contas diferentes e um valor.'); return; }
+  saveState(); refreshAll(); toast('Transferência registrada');
+});
+
+function renderRegras() {
+  const ul = document.getElementById('rulesList');
+  if (!ul) return;
+  const rs = state.rules || [];
+  ul.innerHTML = rs.length ? rs.map(r => `<li class="cat-item" data-rule="${escapeHTML(r.id)}">
+      <span class="name">contém “${escapeHTML(r.contem)}” → <b>${escapeHTML(r.category || '')}</b></span>
+      <button type="button" class="ghost" data-del="${escapeHTML(r.id)}">remover</button></li>`).join('')
+    : '<li class="empty muted small">Nenhuma regra ainda.</li>';
+  ul.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
+    tombstone('ruleTombstones', b.dataset.del);
+    state.rules = (state.rules || []).filter(r => r.id !== b.dataset.del);
+    saveState(); renderRegras();
+  }));
+}
+document.getElementById('txRegras')?.addEventListener('click', () => {
+  fillCategorySelect(document.getElementById('ruleCat'), 'expense');
+  renderRegras();
+  document.getElementById('rulesDialog').showModal();
+});
+document.getElementById('ruleAdd')?.addEventListener('click', () => {
+  const termo = document.getElementById('ruleTermo').value.trim();
+  const cat = document.getElementById('ruleCat').value;
+  if (!termo || !cat) return;
+  state.rules = state.rules || [];
+  state.rules.push({ id: cid(), contem: termo, category: cat, updatedAt: Date.now() });
+  const n = reaplicarRegras();
+  saveState(); renderRegras(); refreshAll();
+  toast(`Regra criada — ${n} lançamento(s) recategorizados`);
+  document.getElementById('ruleTermo').value = '';
+});
+
+/* Projeção de saldo no painel — o aviso do aperto antes dele chegar. */
+function renderProjecao() {
+  const el = document.getElementById('dashProjecao');
+  if (!el) return;
+  const p = projecaoSaldo(6);
+  if (!p.length || !(state.fixedItems || []).length) { el.innerHTML = ''; return; }
+  const negativo = p.find(m => m.saldo < 0);
+  el.innerHTML = `<div class="section-title"><h3>Projeção de saldo</h3></div>
+    ${negativo ? `<div class="proj-alerta">No ritmo atual, o saldo fica negativo em <b>${negativo.ref.toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}</b>.</div>` : ''}
+    <div class="cmt-proj">${p.map(m => `<div class="proj-row">
+      <span class="proj-m">${m.ref.toLocaleDateString('pt-BR',{month:'short',year:'2-digit'})}</span>
+      <span class="proj-v ${m.saldo < 0 ? 'neg' : ''}">${fmt.format(m.saldo)}</span>
+    </div>`).join('')}</div>
+    <p class="muted small" style="margin-top:6px">Estimativa a partir dos fixos cadastrados e das parcelas em aberto.</p>`;
+}
+
+/* Saldo por conta na lista de contas. */
+accItemHTML = function (a) {
+  const usados = state.transactions.filter(t => t.accountId === a.id).length;
+  const saldo = saldoDaConta(a);
+  return `<li class="cat-item" data-acc="${escapeHTML(a.id)}">
+    <span class="dot" style="background:${escapeHTML(a.color || '#6366f1')}"></span>
+    <span class="name">${escapeHTML(a.name)}</span>
+    <span class="acc-saldo ${saldo < 0 ? 'neg' : ''}">${fmt.format(saldo)}</span>
+    <span class="muted small">${a.kind === 'cartao' ? 'cartão' : 'conta'} · ${usados}</span>
+  </li>`;
+};
