@@ -120,6 +120,22 @@ footer a{color:var(--petrol-dark);font-weight:600;text-decoration:none}
   footer{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
   .field input,.field select,.field textarea{font-size:16px}
 }
+
+/* Previsão de recebimento da competência */
+.prev-box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin:12px 0 16px}
+.prev-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.prev-h b{color:var(--petrol-dark);font-size:12px}
+.prev-cfg{display:inline-flex;align-items:center;gap:4px;cursor:pointer;color:var(--muted);font-size:11.5px;text-transform:none;letter-spacing:0}
+.prev-cfg:hover{color:var(--petrol-dark)}
+.prev-top{font-size:15px;margin-bottom:9px}
+.prev-row{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:9px;cursor:pointer;font-size:13.5px}
+.prev-row:hover{background:var(--panel2)}
+.prev-l{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prev-d{flex:0 0 auto;color:var(--muted);font-variant-numeric:tabular-nums}
+.prev-pad{opacity:.7;font-size:10.5px}
+.prev-v{flex:0 0 auto;font-weight:700;font-variant-numeric:tabular-nums;min-width:88px;text-align:right}
+.prev-nota{margin-top:8px;font-size:11.5px;color:var(--muted);line-height:1.45}
+.prev-vazio{font-size:13px;color:var(--muted)}
 </style>
 <link rel="stylesheet" href="_mttokens.css?v=3">
 </head>
@@ -151,7 +167,7 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const MES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const MESC=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 const WD=['dom','seg','ter','qua','qui','sex','sáb'];
-let state={shifts:[],locais:{},compDay:1};
+let state={shifts:[],locais:{},compDay:1,pgDia:10,pgMes:1};
 let cur=new Date();                       // referência da competência exibida
 let curY=new Date().getFullYear();
 let tab='mes';
@@ -184,6 +200,42 @@ function compRange(ref){
 }
 function inComp(sh,r){return sh.date>=ymd(r.s)&&sh.date<=ymd(r.e);}
 
+/* ---------- PREVISÃO DE PAGAMENTO DA COMPETÊNCIA ----------------------
+   Plantão trabalhado não é plantão recebido: cada lugar paga num dia e com
+   uma defasagem própria. Guardamos um padrão geral (state.pgDia/pgMes) e
+   deixamos cada local sobrescrever, porque na prática eles divergem.
+   A conta parte do FECHAMENTO da competência, não do dia do plantão. */
+function regraPg(local){
+  const m=(state.locais||{})[local]||{};
+  const dia = m.pgDia!=null ? m.pgDia : (state.pgDia!=null ? state.pgDia : 10);
+  const mes = m.pgMes!=null ? m.pgMes : (state.pgMes!=null ? state.pgMes : 1);
+  const proprio = m.pgDia!=null || m.pgMes!=null;
+  return { dia:Math.min(28,Math.max(1,+dia||10)), mes:Math.max(0,Math.min(6,+mes||0)), proprio };
+}
+/* Data prevista de crédito para a competência que fecha em `fim`. */
+function dataPg(local, fim){
+  const g=regraPg(local);
+  const d=new Date(fim.getFullYear(), fim.getMonth()+g.mes, g.dia);
+  return d;
+}
+function fmtDia(d){ return pad2(d.getDate())+'/'+pad2(d.getMonth()+1)+'/'+d.getFullYear(); }
+
+/* Agrupa a competência por local, com o valor e a data prevista de cada um. */
+function previsaoDaComp(shifts, r){
+  const porLocal=new Map();
+  shifts.forEach(sh=>{
+    const k=sh.local||'—';
+    if(!porLocal.has(k)) porLocal.set(k,{local:k,total:0,pago:0,n:0});
+    const o=porLocal.get(k);
+    o.total+=Number(sh.value||0); o.n++;
+    if(sh.status==='pago') o.pago+=Number(sh.value||0);
+  });
+  return [...porLocal.values()].map(o=>{
+    const d=dataPg(o.local, r.e);
+    return {...o, aReceber:o.total-o.pago, data:d, regra:regraPg(o.local)};
+  }).sort((a,b)=>a.data-b.data);
+}
+
 function sampleSeed(){const t=new Date();const f=dd=>{const x=new Date(t);x.setDate(dd);return x.toISOString().slice(0,10);};
   return {shifts:[
    {id:uid(),date:f(5),local:'UPA Central',start:'19:00',end:'07:00',value:1200,status:'pago',note:''},
@@ -205,8 +257,8 @@ whenMT(()=>{
     return out;
   };
   MT.onData(d=>{
-    if(d&&typeof d==='object'){state={shifts:d.shifts||[],locais:d.locais||{},compDay:d.compDay||1,_tomb:d._tomb||{}};}
-    else{state=(MT.mode==='demo')?sampleSeed():{shifts:[],locais:{},compDay:1,_tomb:{}};if(MT.mode==='demo')MT.save(state);}
+    if(d&&typeof d==='object'){state={shifts:d.shifts||[],locais:d.locais||{},compDay:d.compDay||1,pgDia:d.pgDia||10,pgMes:(d.pgMes==null?1:d.pgMes),_tomb:d._tomb||{}};}
+    else{state=(MT.mode==='demo')?sampleSeed():{shifts:[],locais:{},compDay:1,pgDia:10,pgMes:1,_tomb:{}};if(MT.mode==='demo')MT.save(state);}
     renderUser();render();
   });
   renderUser();
@@ -254,6 +306,7 @@ function renderComp(){
     <div class="kpi green"><div class="l">Recebido</div><div class="v" style="font-size:18px">${money0(receb)}</div></div>
     <div class="kpi red"><div class="l">A receber</div><div class="v" style="font-size:18px">${money0(areceber)}</div></div>
   </div>`;
+  html += previsaoHTML(ms, r);
   if(!ms.length){html+=`<div class="empty">Nenhum plantão ${fltLocal?'deste local ':''}nesta competência.<br>Toque em <b>+ Novo plantão</b> para começar.</div>`;}
   else{html+=ms.map(s=>{const dt=new Date(s.date+'T00:00:00');return `<div class="shift">
     <div class="day"><div class="d">${String(dt.getDate()).padStart(2,'0')}</div><div class="w">${WD[dt.getDay()]}</div></div>
@@ -268,6 +321,73 @@ function renderComp(){
   document.getElementById('view').innerHTML=html;
 }
 function moveComp(n){const r=compRange(cur);cur=new Date(r.s);cur.setMonth(cur.getMonth()+n);render();}
+/* Bloco "quando cai" — o dado que faltava para cruzar com as contas do mês. */
+function previsaoHTML(ms, r){
+  if(!ms.length) return '';
+  const linhas = previsaoDaComp(ms, r).filter(x=>x.aReceber>0);
+  if(!linhas.length) return `<div class="prev-box"><div class="prev-h"><b>Previsão de recebimento</b></div><div class="prev-vazio">Tudo desta competência já foi recebido.</div></div>`;
+  const total = linhas.reduce((s,x)=>s+x.aReceber,0);
+  const datas = [...new Set(linhas.map(x=>ymd(x.data)))];
+  const resumo = datas.length===1
+    ? `<b>${money0(total)}</b> previstos para <b>${fmtDia(linhas[0].data)}</b>`
+    : `<b>${money0(total)}</b> previstos em ${datas.length} datas`;
+  return `<div class="prev-box">
+    <div class="prev-h"><b>Previsão de recebimento</b><span class="prev-cfg" onclick="abrirRegraPg('')"><i class="ti ti-settings"></i> padrão</span></div>
+    <div class="prev-top">${resumo}</div>
+    ${linhas.map(x=>`<div class="prev-row" onclick="abrirRegraPg('${esc(x.local).replace(/'/g,"\\'")}')">
+      <span class="prev-l">${esc(x.local)}</span>
+      <span class="prev-d">${fmtDia(x.data)}${x.regra.proprio?'':' <small class="prev-pad">padrão</small>'}</span>
+      <span class="prev-v">${money0(x.aReceber)}</span>
+    </div>`).join('')}
+    <div class="prev-nota">Estimativa: a competência fecha e o pagamento é creditado conforme a regra de cada local. Toque numa linha para ajustar.</div>
+  </div>`;
+}
+
+/* Regra de pagamento: sem local = padrão geral; com local = só aquele. */
+function abrirRegraPg(local){
+  const g = local ? regraPg(local) : {dia:(state.pgDia||10), mes:(state.pgMes==null?1:state.pgMes), proprio:true};
+  const m = local ? ((state.locais||{})[local]||{}) : null;
+  const usaPadrao = local ? !g.proprio : false;
+  const opts = [0,1,2,3].map(n=>`<option value="${n}" ${g.mes===n?'selected':''}>${n===0?'no mesmo mês do fechamento':n===1?'no mês seguinte':'em '+n+' meses'}</option>`).join('');
+  modal(`<h3>${local?('Pagamento — '+esc(local)):'Pagamento — padrão geral'}</h3>
+   <div class="hint" style="margin-bottom:10px">${local?'Vale só para este local. Deixe em branco para usar o padrão geral.':'Vale para todos os locais que não tiverem regra própria.'}</div>
+   <div class="row">
+     <div class="field" style="flex:1"><label>Dia do crédito</label><input id="pg_dia" type="number" min="1" max="28" value="${usaPadrao?'':g.dia}" placeholder="${usaPadrao?String(g.dia)+' (padrão)':''}"></div>
+     <div class="field" style="flex:1.4"><label>Quando</label><select id="pg_mes">${opts}</select></div>
+   </div>
+   <div class="hint" id="pg_prev" style="margin-top:6px"></div>
+   <div class="row actions">
+     <button class="btn btn-p" onclick="salvarRegraPg('${local?esc(local).replace(/'/g,"\\'"):''}')">Salvar</button>
+     ${local?`<button class="btn btn-g" onclick="limparRegraPg('${esc(local).replace(/'/g,"\\'")}')">Usar padrão</button>`:''}
+     <button class="btn btn-g" onclick="closeModal()">Cancelar</button>
+   </div>`);
+  const atualiza=()=>{
+    const dia=+document.getElementById('pg_dia').value||g.dia;
+    const mes=+document.getElementById('pg_mes').value;
+    const r=compRange(cur);
+    const d=new Date(r.e.getFullYear(), r.e.getMonth()+mes, Math.min(28,Math.max(1,dia)));
+    document.getElementById('pg_prev').innerHTML=`Nesta competência, cairia em <b>${fmtDia(d)}</b>.`;
+  };
+  document.getElementById('pg_dia').addEventListener('input',atualiza);
+  document.getElementById('pg_mes').addEventListener('change',atualiza);
+  atualiza();
+}
+function salvarRegraPg(local){
+  const dia=Math.min(28,Math.max(1,parseInt(document.getElementById('pg_dia').value)||10));
+  const mes=Math.max(0,Math.min(6,parseInt(document.getElementById('pg_mes').value)||0));
+  if(local){
+    if(!state.locais)state.locais={};
+    if(!state.locais[local])state.locais[local]={};
+    state.locais[local].pgDia=dia; state.locais[local].pgMes=mes;
+  } else { state.pgDia=dia; state.pgMes=mes; }
+  persist(); closeModal(); render();
+}
+function limparRegraPg(local){
+  const m=(state.locais||{})[local];
+  if(m){ delete m.pgDia; delete m.pgMes; }
+  persist(); closeModal(); render();
+}
+
 function setCompDay(v){state.compDay=Math.min(28,Math.max(1,parseInt(v)||1));persist();render();}
 function toggleStatus(id){const s=state.shifts.find(x=>x.id===id);if(!s)return;s.status=s.status==='pago'?'agendado':'pago';s.updatedAt=Date.now();persist();render();}
 function del(id){if(confirm('Excluir este plantão?')){MT.markDeleted(state,id);state.shifts=state.shifts.filter(x=>x.id!==id);persist();render();}}
