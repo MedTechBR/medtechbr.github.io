@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
-  <link rel="stylesheet" href="granae.css?v=55" />
+  <link rel="stylesheet" href="granae.css?v=56" />
   <!-- garante inputs claros na tela de login central, mesmo com o tema escuro do Granaê -->
   <style>.mt-auth input{background:#F1F1EC;color:#23272E}.mt-auth input::placeholder{color:#5E646B}</style>
   <!-- Login único MedTech + sincronização na nuvem (mesmo módulo do portal) -->
@@ -116,6 +116,7 @@
       <div class="dcol dcol-b">
       <div id="dashCompromissos" class="card alt" hidden></div>
       <div id="dashFaturas"></div>
+      <div id="dashProjecao"></div>
       <div class="section-title between">
         <h3>Últimas transações</h3>
         <button class="link" data-nav="transacoes">ver tudo →</button>
@@ -165,6 +166,9 @@
       </div>
       <div class="tx-tools">
         <input id="txSearch" type="search" placeholder="Buscar por descrição ou valor…" />
+        <button id="txRevisar" class="ghost" title="Revisar em lote o que está sem categoria">Revisar</button>
+        <button id="txRegras" class="ghost" title="Regras automáticas de categoria">Regras</button>
+        <button id="txTransferir" class="ghost" title="Transferir entre contas">Transferir</button>
         <button id="txCsv" class="ghost" title="Exportar o mês em CSV">CSV</button>
       </div>
       <div id="txFilterChip" class="tx-filter-chip" hidden>
@@ -415,6 +419,51 @@
     </form>
   </dialog>
 
+  <!-- MODAL: REVISÃO EM LOTE -->
+  <dialog id="revDialog" class="modal">
+    <header class="modal-head">
+      <h3>Revisar categorias <span id="revProg" class="muted small" style="font-weight:400"></span></h3>
+      <button type="button" class="ghost" onclick="document.getElementById('revDialog').close()">✕</button>
+    </header>
+    <div id="revBody"></div>
+    <footer class="modal-foot">
+      <span class="muted small" style="flex:1">Teclas 1-9 escolhem · Enter pula · Esc sai</span>
+      <button type="button" class="ghost" onclick="_revIdx++;pintarRevisao()">Pular</button>
+    </footer>
+  </dialog>
+
+  <!-- MODAL: TRANSFERÊNCIA -->
+  <dialog id="trfDialog" class="modal">
+    <form id="trfForm" method="dialog">
+      <header class="modal-head">
+        <h3>Transferir entre contas</h3>
+        <button type="button" class="ghost" onclick="document.getElementById('trfDialog').close()">✕</button>
+      </header>
+      <p class="muted small" style="margin:0 0 10px">Mover dinheiro entre suas contas não é receita nem despesa — não entra nos totais do mês.</p>
+      <label class="field"><span>De</span><select name="de" required></select></label>
+      <label class="field"><span>Para</span><select name="para" required></select></label>
+      <label class="field"><span>Valor</span><input name="valor" type="number" step="0.01" min="0.01" required /></label>
+      <label class="field"><span>Data</span><input name="data" type="date" required /></label>
+      <label class="field"><span>Descrição <small class="muted">— opcional</small></span><input name="descricao" type="text" maxlength="80" /></label>
+      <footer class="modal-foot"><button type="submit" class="primary">Transferir</button></footer>
+    </form>
+  </dialog>
+
+  <!-- MODAL: REGRAS -->
+  <dialog id="rulesDialog" class="modal">
+    <header class="modal-head">
+      <h3>Regras automáticas</h3>
+      <button type="button" class="ghost" onclick="document.getElementById('rulesDialog').close()">✕</button>
+    </header>
+    <p class="muted small" style="margin:0 0 10px">Quando a descrição contiver o texto, a categoria é aplicada sozinha — em tudo que entrar daqui pra frente e no que já existe.</p>
+    <div class="row" style="gap:8px;align-items:flex-end">
+      <label class="field" style="flex:1.4"><span>Contendo</span><input id="ruleTermo" type="text" placeholder="Ex.: UBER" /></label>
+      <label class="field" style="flex:1.2"><span>Vira</span><select id="ruleCat"></select></label>
+      <button type="button" class="primary" id="ruleAdd">Criar</button>
+    </div>
+    <ul id="rulesList" class="cat-list" style="margin-top:12px"></ul>
+  </dialog>
+
   <!-- MODAL: CONTA / CARTÃO -->
   <dialog id="accDialog" class="modal">
     <form id="accForm" method="dialog">
@@ -428,6 +477,7 @@
       </div>
       <label class="field"><span>Nome</span><input name="name" type="text" maxlength="40" required placeholder="Ex.: Nubank, Santander" /></label>
       <label class="field"><span>Cor</span><input name="color" type="color" value="#6366f1" /></label>
+      <label class="field"><span>Saldo inicial <small class="muted">— o que já tinha nela</small></span><input name="saldoInicial" type="number" step="0.01" /></label>
       <div id="accCardFields" hidden>
         <label class="field"><span>Dia do fechamento da fatura</span><input name="fechamento" type="number" min="1" max="28" placeholder="Ex.: 3" /></label>
         <label class="field"><span>Dia do vencimento</span><input name="vencimento" type="number" min="1" max="28" placeholder="Ex.: 12" /></label>
@@ -568,6 +618,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="granae.gemini.js?v=7"></script>
-  <script src="granae.app.js?v=20"></script>
+  <script src="granae.app.js?v=22"></script>
 </body>
 </html>
