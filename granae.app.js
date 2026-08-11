@@ -19,9 +19,13 @@ const defaultState = () => ({
     { id: cid(), name: 'Outras receitas', type: 'income', icon: '💰', color: '#06b6d4' },
   ],
   fixedItems: [],
+  accounts: [],         // contas e cartões {id, name, kind:'conta'|'cartao', bank, color, fechamento, vencimento, limite}
+  commitments: [],      // metadados do parcelamento/financiamento; id == groupId das parcelas
   tombstones: [],       // exclusoes de transacoes {id, at} — impedem que o merge ressuscite
   fixedTombstones: [],  // exclusoes de itens fixos
   categoryTombstones: [], // exclusoes de categorias {id, at}
+  accountTombstones: [],
+  commitmentTombstones: [],
 });
 
 function cid() { return Math.random().toString(36).slice(2, 10); }
@@ -53,6 +57,128 @@ function mergeById(localArr, remoteArr, localTomb, remoteTomb) {
   return { items, tombstones };
 }
 function stampTx(obj) { obj.updatedAt = Date.now(); return obj; }
+
+/* ---------- COMPROMISSOS (parcelamentos e financiamentos) ----------------
+   O parcelamento sempre gravou um groupId nas parcelas, mas nada lia esse
+   campo — as parcelas ficavam soltas com "(1/3)" no texto e o usuário tinha
+   que contar na mão. Aqui elas voltam a ser UMA coisa só.
+   Precisa funcionar com o que já está no banco: parcelas antigas podem não
+   ter groupId, então caímos no padrão "(k/N)" da descrição. */
+/* Aceita os dois jeitos de escrever, porque o histórico real tem os dois:
+   o que o app gera — "Notebook (1/3)" — e o que foi digitado à mão ao longo
+   dos anos, sem parênteses: "CORTINAS 1/3", "GRAMA CASA 4/6". */
+const RE_PARCELA = /^(.*?)\s*(\()?\s*(\d{1,3})\s*\/\s*(\d{1,3})\s*(?:\))?\s*$/;
+
+function parcelaInfo(t) {
+  const desc = t.description || '';
+  const m = RE_PARCELA.exec(desc);
+  if (!m) return null;
+  const temParenteses = !!m[2];
+  const kRaw = m[3], nRaw = m[4];
+  const k = +kRaw, n = +nRaw;
+  /* coerência: "Consulta 14/08" é uma DATA, não a parcela 14 de 8 */
+  if (!(n >= 2 && n <= 120 && k >= 1 && k <= n)) return null;
+  /* sem parênteses, zero à esquerda denuncia data: "ALUGUEL 05/12" não é
+     parcela 5 de 12. O app nunca gera zero à esquerda. */
+  if (!temParenteses && (/^0\d/.test(kRaw) || /^0\d/.test(nRaw))) return null;
+  const base = m[1].trim();
+  if (!base) return null;                 // "1/3" sozinho não identifica nada
+  return { base, k, n };
+}
+
+/* Chave de agrupamento: groupId quando existe; senão, descrição-base + total
+   de parcelas + tipo (duas compras diferentes em 12x não se misturam porque
+   a descrição-base é diferente). */
+function chaveGrupo(t) {
+  if (t.groupId) return t.groupId;
+  const pi = parcelaInfo(t);
+  if (!pi) return null;
+  return 'legado:' + t.type + ':' + pi.base.toLowerCase() + ':' + pi.n;
+}
+
+function compromissos() {
+  const hoje = todayISO();
+  const grupos = new Map();
+  for (const t of state.transactions) {
+    const g = chaveGrupo(t);
+    if (!g) continue;
+    if (!grupos.has(g)) grupos.set(g, []);
+    grupos.get(g).push(t);
+  }
+  const out = [];
+  for (const [id, txs] of grupos) {
+    txs.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+    const pi = parcelaInfo(txs[0]) || {};
+    const meta = (state.commitments || []).find(c => c.id === id) || {};
+    const n = meta.nParcelas || pi.n || txs.length;
+    const valorParcela = +txs[0].amount || 0;
+    /* Quando o app cria o parcelamento, TODAS as N parcelas viram lançamento.
+       No histórico digitado à mão só existe o que já aconteceu ("GRAMA CASA 3/6"
+       sem as outras 3). Aí o número da parcela no texto é a única fonte de
+       verdade sobre quantas já foram, e o que falta é ESTIMADO pelo valor. */
+    const completo = txs.length >= n;
+    const jaVencidas = txs.filter(t => !t.pending && t.date <= hoje);
+    const maiorK = txs.reduce((mx, t) => {
+      const pj = parcelaInfo(t);
+      return pj && (!t.pending && t.date <= hoje) ? Math.max(mx, pj.k) : mx;
+    }, 0);
+    const pagas = Math.min(n, completo ? jaVencidas.length : Math.max(maiorK, jaVencidas.length));
+    const soma = completo ? txs.reduce((s, t) => s + (+t.amount || 0), 0) : valorParcela * n;
+    const pago = completo ? jaVencidas.reduce((s, t) => s + (+t.amount || 0), 0) : valorParcela * pagas;
+    out.push({
+      id,
+      kind: meta.kind || 'parcelamento',
+      descricao: meta.descricao || pi.base || txs[0].description,
+      categoria: txs[0].category,
+      type: txs[0].type,
+      accountId: meta.accountId || txs[0].accountId || null,
+      n, pagas,
+      restantes: Math.max(0, n - pagas),
+      valorParcela,
+      estimado: !completo,        /* as parcelas futuras não estão lançadas */
+      lancadas: txs.length,
+      /* financiamento tem juros: o total contratado NÃO é parcela × N */
+      total: meta.total != null ? +meta.total : soma,
+      totalParcelas: soma,
+      pago,
+      aPagar: Math.max(0, soma - pago),
+      taxaMensal: meta.taxaMensal != null ? +meta.taxaMensal : null,
+      valorFinanciado: meta.valorFinanciado != null ? +meta.valorFinanciado : null,
+      primeira: txs[0].date,
+      /* Com o histórico incompleto, a última parcela LANÇADA não é a última do
+         acordo — projetamos a partir da parcela mais recente e do que falta,
+         senão "faltam 57" apareceria com término no mês que vem. */
+      ultima: (function () {
+        const ultimoTx = txs[txs.length - 1];
+        if (completo) return ultimoTx.date;
+        const pj = parcelaInfo(ultimoTx);
+        const restam = pj ? (n - pj.k) : Math.max(0, n - txs.length);
+        const d = new Date(ultimoTx.date + 'T00:00:00');
+        d.setMonth(d.getMonth() + restam);
+        return d.toISOString().slice(0, 10);
+      })(),
+      ultimaProjetada: !completo,
+      quitado: pagas >= n,
+      txs,
+    });
+  }
+  /* em aberto primeiro, e dentro disso o que acaba mais cedo */
+  return out.sort((a, b) => (a.quitado - b.quitado) || (a.ultima || '').localeCompare(b.ultima || ''));
+}
+
+/* Quanto de cada mês futuro já está comprometido (parcelas ainda por vencer). */
+function comprometimentoPorMes(meses = 12) {
+  const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+  const out = [];
+  for (let i = 0; i < meses; i++) {
+    const ref = new Date(hoje.getFullYear(), hoje.getMonth() + i, 1);
+    const total = state.transactions
+      .filter(t => t.type === 'expense' && chaveGrupo(t) && inMonth(t.date, ref) && t.date >= todayISO())
+      .reduce((s, t) => s + (+t.amount || 0), 0);
+    out.push({ ref, total });
+  }
+  return out;
+}
 function tombstone(list, id) {
   if (!Array.isArray(state[list])) state[list] = [];
   state[list] = state[list].filter(t => t.id !== id);
@@ -66,6 +192,8 @@ function granaeMergeFn(remote, local) {
   const tx = mergeById(local.transactions, remote.transactions, local.tombstones, remote.tombstones);
   const fx = mergeById(local.fixedItems, remote.fixedItems, local.fixedTombstones, remote.fixedTombstones);
   const cat = mergeById(local.categories, remote.categories, local.categoryTombstones, remote.categoryTombstones);
+  const acc = mergeById(local.accounts, remote.accounts, local.accountTombstones, remote.accountTombstones);
+  const cmt = mergeById(local.commitments, remote.commitments, local.commitmentTombstones, remote.commitmentTombstones);
   return {
     profile: local.profile || remote.profile || {},
     transactions: tx.items,
@@ -74,6 +202,10 @@ function granaeMergeFn(remote, local) {
     fixedTombstones: fx.tombstones,
     categories: cat.items,
     categoryTombstones: cat.tombstones,
+    accounts: acc.items,
+    accountTombstones: acc.tombstones,
+    commitments: cmt.items,
+    commitmentTombstones: cmt.tombstones,
   };
 }
 
@@ -104,6 +236,10 @@ function applyData(d) {
       tombstones: Array.isArray(d.tombstones) ? d.tombstones : [],
       fixedTombstones: Array.isArray(d.fixedTombstones) ? d.fixedTombstones : [],
       categoryTombstones: Array.isArray(d.categoryTombstones) ? d.categoryTombstones : [],
+      accounts: Array.isArray(d.accounts) ? d.accounts : [],
+      commitments: Array.isArray(d.commitments) ? d.commitments : [],
+      accountTombstones: Array.isArray(d.accountTombstones) ? d.accountTombstones : [],
+      commitmentTombstones: Array.isArray(d.commitmentTombstones) ? d.commitmentTombstones : [],
     };
   } else {
     state = defaultState();
@@ -188,6 +324,7 @@ function navigate(view) {
   if (view === 'transacoes') renderTransactions();
   if (view === 'categorias') renderCategories();
   if (view === 'fixos') renderFixed();
+  if (view === 'compromissos') { renderCompromissos(); renderFaturas(); }
   if (view === 'ia') renderAI();
   window.scrollTo({ top: 0 });
 }
@@ -681,8 +818,62 @@ document.getElementById('clearTxFilter').addEventListener('click', () => {
 
 function attachTxClicks(listId) {
   document.getElementById(listId).querySelectorAll('.tx-item').forEach(el => {
-    el.addEventListener('click', () => openTxDialog(el.dataset.id));
+    el.addEventListener('click', () => openTxDetail(el.dataset.id));
   });
+}
+
+/* ---------- DETALHE DO LANÇAMENTO (leitura) ----------
+   Antes o clique caía direto no formulário de edição. Ver não é editar — e
+   quando o lançamento faz parte de um parcelamento, é aqui que aparece o
+   progresso do grupo inteiro. */
+let _detalheId = null;
+const txDetail = document.getElementById('txDetail');
+
+function openTxDetail(id) {
+  const t = state.transactions.find(x => x.id === id);
+  if (!t) return;
+  _detalheId = id;
+  const cat = categoryByName(t.category, t.type) || { color: '#888', icon: '🏷️' };
+  const g = chaveGrupo(t);
+  const grupo = g ? compromissos().find(c => c.id === g) : null;
+  const conta = (state.accounts || []).find(a => a.id === t.accountId);
+  const dataFmt = new Date(t.date + 'T00:00:00').toLocaleDateString('pt-BR');
+  const venc = t.dueDate && t.dueDate !== t.date
+    ? `<div><span class="muted small">Vencimento</span><b>${new Date(t.dueDate + 'T00:00:00').toLocaleDateString('pt-BR')}</b></div>` : '';
+
+  let blocoGrupo = '';
+  if (grupo) {
+    blocoGrupo = `
+      <h4 class="muted small uppercase" style="margin:16px 0 6px">${grupo.kind === 'financiamento' ? 'Financiamento' : 'Parcelamento'}</h4>
+      <div class="det-grid">
+        <div><span class="muted small">Parcelas</span><b>${grupo.pagas} de ${grupo.n}</b></div>
+        <div><span class="muted small">Faltam</span><b>${grupo.restantes}</b></div>
+        <div><span class="muted small">Já pago</span><b>${fmt.format(grupo.pago)}</b></div>
+        <div><span class="muted small">Falta pagar</span><b>${fmt.format(grupo.aPagar)}</b></div>
+      </div>
+      <div class="cmt-bar big"><div style="width:${pct(grupo.pagas, grupo.n)}%"></div></div>
+      <button type="button" class="link" id="verCompromisso" style="margin-top:8px">Ver todas as parcelas →</button>`;
+  }
+
+  document.getElementById('txDetailBody').innerHTML = `
+    <div class="det-hero">
+      <strong>${escapeHTML(t.description)}</strong>
+      <span class="${t.type === 'income' ? 'income' : ''}">${t.type === 'income' ? '+' : '−'} ${fmt.format(t.amount)}</span>
+    </div>
+    <div class="det-grid">
+      <div><span class="muted small">Situação</span><b>${t.pending ? 'Agendado' : 'Efetivado'}</b></div>
+      <div><span class="muted small">Data</span><b>${dataFmt}</b></div>
+      ${venc}
+      <div><span class="muted small">Categoria</span><b><span style="color:${cat.color}">${escapeHTML(cat.icon || '')}</span> ${escapeHTML(t.category || '—')}</b></div>
+      ${t.sub ? `<div><span class="muted small">Subcategoria</span><b>${escapeHTML(t.sub)}</b></div>` : ''}
+      ${conta ? `<div><span class="muted small">${conta.kind === 'cartao' ? 'Cartão' : 'Conta'}</span><b>${escapeHTML(conta.name)}</b></div>` : ''}
+    </div>
+    ${blocoGrupo}`;
+  document.getElementById('txDetailDel').hidden = false;
+  document.getElementById('txDetailEdit').hidden = false;
+  const vc = document.getElementById('verCompromisso');
+  if (vc) vc.addEventListener('click', () => { txDetail.close(); openCmtDetail(grupo.id); });
+  txDetail.showModal();
 }
 
 // Diálogo de transação
@@ -709,16 +900,28 @@ function openTxDialog(id) {
   const type = editing?.type || 'expense';
   txForm.querySelector(`input[name=type][value=${type}]`).checked = true;
   fillCategorySelect(txForm.category, type);
+  fillAccountSelect(txForm.accountId, editing?.accountId);
+  preencherSugestoesSub();
   if (editing) {
     txForm.amount.value = editing.amount;
     txForm.description.value = editing.description;
     txForm.category.value = editing.category;
     txForm.date.value = editing.date;
+    if (txForm.sub) txForm.sub.value = editing.sub || '';
   } else {
     txForm.date.value = todayISO();
   }
   updateTxScheduledHint();
   txDialog.showModal();
+}
+
+/* As subcategorias não são cadastradas: viram sugestão a partir do que já foi
+   digitado antes, para não criar mais uma tela de cadastro. */
+function preencherSugestoesSub() {
+  const dl = document.getElementById('subSugestoes');
+  if (!dl) return;
+  const usadas = [...new Set(state.transactions.map(t => t.sub).filter(Boolean))].sort();
+  dl.innerHTML = usadas.map(v => `<option value="${escapeHTML(v)}"></option>`).join('');
 }
 
 function updateTxScheduledHint() {
@@ -751,6 +954,8 @@ txForm.addEventListener('submit', e => {
     description: data.get('description').trim(),
     category: data.get('category'),
     date: data.get('date'),
+    sub: (data.get('sub') || '').trim() || null,
+    accountId: data.get('accountId') || null,
   };
   if (!obj.amount || !obj.description || !obj.category || !obj.date) return;
   const nPar = parseInt(data.get('parcelas')) || 1;
@@ -767,7 +972,7 @@ txForm.addEventListener('submit', e => {
       const ds = d.toISOString().slice(0, 10);
       const p = stampTx({ id: cid(), type: obj.type, amount: obj.amount,
         description: `${obj.description} (${k + 1}/${nPar})`, category: obj.category,
-        date: ds, groupId: gid });
+        date: ds, groupId: gid, sub: obj.sub, accountId: obj.accountId });
       if (ds > hoje) p.pending = true;
       state.transactions.push(p);
     }
@@ -807,7 +1012,117 @@ const catDelete = document.getElementById('catDelete');
 
 document.getElementById('addCategory').addEventListener('click', () => openCatDialog(null));
 
+/* ---------- TELA: COMPROMISSOS ---------- */
+function pct(a, b) { return b > 0 ? Math.min(100, Math.round(a / b * 100)) : 0; }
+
+function cmtItemHTML(c) {
+  const cat = categoryByName(c.categoria) || { color: '#888', icon: '🏷️' };
+  const p = pct(c.pagas, c.n);
+  const jaPago = c.kind === 'financiamento' && c.total ? '' :
+    `<span>${fmt.format(c.pago)} pagos</span>`;
+  const juros = (c.kind === 'financiamento' && c.valorFinanciado)
+    ? `<div class="cmt-juros">Financiado ${fmt.format(c.valorFinanciado)} · vai pagar ${fmt.format(c.totalParcelas)} <b>(+${fmt.format(c.totalParcelas - c.valorFinanciado)} de juros)</b>${c.taxaMensal ? ' · ' + c.taxaMensal + '% a.m.' : ''}</div>`
+    : '';
+  return `<li class="cmt-item${c.quitado ? ' quitado' : ''}" data-cmt="${escapeHTML(c.id)}">
+    <div class="cmt-top">
+      <span class="cmt-ico" style="background:${cat.color}22;color:${cat.color}">${escapeHTML(cat.icon || '🏷️')}</span>
+      <div class="cmt-id">
+        <strong>${escapeHTML(c.descricao)}</strong>
+        <small class="muted">${c.kind === 'financiamento' ? 'Financiamento' : 'Parcelamento'} · ${escapeHTML(c.categoria || '')}</small>
+      </div>
+      <div class="cmt-num">
+        <strong>${c.pagas}/${c.n}</strong>
+        <small class="muted">${c.quitado ? 'quitado' : 'faltam ' + c.restantes}</small>
+      </div>
+    </div>
+    <div class="cmt-bar"><div style="width:${p}%"></div></div>
+    <div class="cmt-foot">
+      ${jaPago}
+      ${c.quitado ? '' : `<span class="cmt-falta"><b>${fmt.format(c.aPagar)}</b> a pagar${c.estimado ? ' <small class="muted">(estimado)</small>' : ''}</span>`}
+      <span class="muted">${fmt.format(c.valorParcela)}/mês${c.quitado ? '' : (c.ultimaProjetada ? ' · termina por volta de ' : ' · última em ') + monthLongFmt.format(new Date(c.ultima + 'T00:00:00'))}</span>
+    </div>
+    ${juros}
+  </li>`;
+}
+
+function renderCompromissos() {
+  const todos = compromissos();
+  const abertos = todos.filter(c => !c.quitado);
+  const quitados = todos.filter(c => c.quitado);
+  const listaEl = document.getElementById('cmtList');
+  const doneEl = document.getElementById('cmtDone');
+  if (!listaEl) return;
+
+  listaEl.innerHTML = abertos.length ? abertos.map(cmtItemHTML).join('')
+    : '<li class="empty">Nenhum parcelamento em aberto. Ao lançar uma despesa em várias parcelas, ela aparece aqui.</li>';
+  doneEl.innerHTML = quitados.length ? quitados.map(cmtItemHTML).join('')
+    : '<li class="empty muted small">Nada quitado ainda.</li>';
+
+  /* resumo do topo: o número que interessa é o que ainda falta sair do bolso */
+  const aPagar = abertos.reduce((s, c) => s + c.aPagar, 0);
+  const porMes = abertos.reduce((s, c) => s + c.valorParcela, 0);
+  const resumo = document.getElementById('cmtResumo');
+  resumo.innerHTML = `
+    <div class="cmt-kpi"><span class="muted small">Ainda a pagar</span><strong>${fmt.format(aPagar)}</strong></div>
+    <div class="cmt-kpi"><span class="muted small">Por mês</span><strong>${fmt.format(porMes)}</strong></div>
+    <div class="cmt-kpi"><span class="muted small">Em aberto</span><strong>${abertos.length}</strong></div>`;
+
+  /* projeção: quanto de cada mês já está comprometido */
+  const proj = comprometimentoPorMes(12).filter(m => m.total > 0);
+  const projEl = document.getElementById('cmtProj');
+  if (!proj.length) { projEl.innerHTML = '<p class="muted small">Nenhuma parcela futura.</p>'; }
+  else {
+    const max = Math.max(...proj.map(m => m.total));
+    projEl.innerHTML = proj.map(m => `
+      <div class="proj-row">
+        <span class="proj-m">${m.ref.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' })}</span>
+        <div class="proj-bar"><div style="width:${pct(m.total, max)}%"></div></div>
+        <span class="proj-v">${fmt.format(m.total)}</span>
+      </div>`).join('');
+  }
+
+  listaEl.querySelectorAll('.cmt-item').forEach(el => el.addEventListener('click', () => openCmtDetail(el.dataset.cmt)));
+  doneEl.querySelectorAll('.cmt-item').forEach(el => el.addEventListener('click', () => openCmtDetail(el.dataset.cmt)));
+}
+
+/* Detalhe do compromisso: a lista de parcelas, marcando o que já passou */
+function openCmtDetail(id) {
+  const c = compromissos().find(x => x.id === id);
+  if (!c) return;
+  const hoje = todayISO();
+  const linhas = c.txs.map((t, i) => {
+    const paga = !t.pending && t.date <= hoje;
+    return `<div class="par-row${paga ? ' paga' : ''}">
+      <span class="par-k">${i + 1}/${c.n}</span>
+      <span class="par-d">${new Date(t.date + 'T00:00:00').toLocaleDateString('pt-BR')}</span>
+      <span class="par-v">${fmt.format(t.amount)}</span>
+      <span class="par-s">${paga ? '✓ paga' : 'pendente'}</span>
+    </div>`;
+  }).join('');
+  const body = document.getElementById('txDetailBody');
+  body.innerHTML = `
+    <div class="det-hero"><strong>${escapeHTML(c.descricao)}</strong><span>${fmt.format(c.valorParcela)}<small>/mês</small></span></div>
+    <div class="det-grid">
+      <div><span class="muted small">Tipo</span><b>${c.kind === 'financiamento' ? 'Financiamento' : 'Parcelamento'}</b></div>
+      <div><span class="muted small">Parcelas</span><b>${c.pagas} de ${c.n}</b></div>
+      <div><span class="muted small">Já pago</span><b>${fmt.format(c.pago)}</b></div>
+      <div><span class="muted small">Falta pagar</span><b>${fmt.format(c.aPagar)}</b></div>
+      ${c.valorFinanciado ? `<div><span class="muted small">Valor financiado</span><b>${fmt.format(c.valorFinanciado)}</b></div>
+      <div><span class="muted small">Juros no total</span><b>${fmt.format(c.totalParcelas - c.valorFinanciado)}</b></div>` : ''}
+      <div><span class="muted small">Categoria</span><b>${escapeHTML(c.categoria || '—')}</b></div>
+      <div><span class="muted small">Última parcela</span><b>${new Date(c.ultima + 'T00:00:00').toLocaleDateString('pt-BR')}</b></div>
+    </div>
+    <div class="cmt-bar big"><div style="width:${pct(c.pagas, c.n)}%"></div></div>
+    ${c.estimado ? `<p class="muted small" style="margin:8px 0 0">Só ${c.lancadas} das ${c.n} parcelas estão lançadas. O que falta é estimado pelo valor da parcela — lance as próximas para o número ficar exato.</p>` : ''}
+    <h4 class="muted small uppercase" style="margin:16px 0 6px">Parcelas lançadas</h4>
+    <div class="par-list">${linhas}</div>`;
+  document.getElementById('txDetailDel').hidden = true;
+  document.getElementById('txDetailEdit').hidden = true;
+  document.getElementById('txDetail').showModal();
+}
+
 function renderCategories() {
+  renderAccounts();
   const exp = state.categories.filter(c => c.type === 'expense');
   const inc = state.categories.filter(c => c.type === 'income');
   document.getElementById('catExpenseList').innerHTML = exp.map(catItemHTML).join('') || `<li class="empty">Sem categorias.</li>`;
@@ -1375,6 +1690,7 @@ function refreshAll() {
   if (!document.querySelector('[data-view=transacoes]').classList.contains('hidden')) renderTransactions();
   if (!document.querySelector('[data-view=categorias]').classList.contains('hidden')) renderCategories();
   if (!document.querySelector('[data-view=fixos]').classList.contains('hidden')) renderFixed();
+  if (!document.querySelector('[data-view=compromissos]').classList.contains('hidden')) { renderCompromissos(); renderFaturas(); }
 }
 
 // ====== Conta (login central MedTech via window.MT) ======
@@ -1473,3 +1789,208 @@ document.getElementById('aiMonthBtn')?.addEventListener('click', () => {
   if (q) q.value = `Análise completa de ${monthLongFmt.format(currentMonth)}: receitas, despesas por categoria (com % do total), comparação com fixos e metas, gastos atípicos e 3 recomendações práticas.`;
   setTimeout(() => document.getElementById('aiAsk')?.click(), 250);
 });
+
+// ====== Detalhe do lançamento: fechar / editar / excluir ======
+document.querySelector('[data-close-detail]')?.addEventListener('click', () => txDetail.close());
+document.getElementById('txDetailEdit')?.addEventListener('click', () => {
+  txDetail.close();
+  if (_detalheId) openTxDialog(_detalheId);
+});
+document.getElementById('txDetailDel')?.addEventListener('click', () => {
+  if (!_detalheId) return;
+  const t = state.transactions.find(x => x.id === _detalheId);
+  if (!t) return;
+  if (!confirm(`Excluir "${t.description}"?`)) return;
+  tombstone('tombstones', _detalheId);
+  saveState(); txDetail.close(); refreshAll();
+  toast('Excluído');
+});
+
+// ====== Financiamento ======
+// Parcelamento e financiamento geram as MESMAS parcelas mensais; o que muda é
+// o metadado (valor financiado, juros) guardado em state.commitments.
+const cmtDialog = document.getElementById('cmtDialog');
+const cmtForm = document.getElementById('cmtForm');
+
+document.querySelector('[data-close-cmt]')?.addEventListener('click', () => cmtDialog.close());
+document.getElementById('addCommitment')?.addEventListener('click', () => {
+  fillCategorySelect(cmtForm.category, 'expense');
+  fillAccountSelect(cmtForm.accountId);
+  cmtForm.reset();
+  fillCategorySelect(cmtForm.category, 'expense');
+  fillAccountSelect(cmtForm.accountId);
+  cmtForm.date.value = todayISO();
+  document.getElementById('cmtHint').textContent = '';
+  cmtDialog.showModal();
+});
+
+// prévia do custo total enquanto digita — o juro fica visível ANTES de criar
+['valorFinanciado', 'parcela', 'n'].forEach(campo => {
+  cmtForm?.[campo]?.addEventListener('input', () => {
+    const vf = +cmtForm.valorFinanciado.value || 0;
+    const p = +cmtForm.parcela.value || 0;
+    const n = +cmtForm.n.value || 0;
+    const el = document.getElementById('cmtHint');
+    if (!p || !n) { el.textContent = ''; return; }
+    const total = p * n;
+    const juros = total - vf;
+    el.innerHTML = vf
+      ? `Vai pagar <b>${fmt.format(total)}</b> por algo de ${fmt.format(vf)} — <b>${fmt.format(juros)}</b> de juros (${Math.round(juros / vf * 100)}%).`
+      : `Total de <b>${fmt.format(total)}</b> em ${n}×.`;
+  });
+});
+
+cmtForm?.addEventListener('submit', () => {
+  const d = new FormData(cmtForm);
+  const n = parseInt(d.get('n')) || 0;
+  const parcela = +d.get('parcela') || 0;
+  const desc = String(d.get('descricao') || '').trim();
+  if (!n || !parcela || !desc || !d.get('category') || !d.get('date')) return;
+  const gid = cid();
+  const base = new Date(d.get('date') + 'T00:00:00');
+  const hoje = todayISO();
+  for (let k = 0; k < n; k++) {
+    const dt = new Date(base); dt.setMonth(base.getMonth() + k);
+    if (dt.getDate() !== base.getDate()) dt.setDate(0);   // 31 → último dia do mês curto
+    const ds = dt.toISOString().slice(0, 10);
+    const t = stampTx({
+      id: cid(), type: 'expense', amount: parcela,
+      description: `${desc} (${k + 1}/${n})`,
+      category: d.get('category'), date: ds, groupId: gid,
+      accountId: d.get('accountId') || null,
+    });
+    if (ds > hoje) t.pending = true;
+    state.transactions.push(t);
+  }
+  state.commitments = state.commitments || [];
+  state.commitments.push(stampTx({
+    id: gid, kind: 'financiamento', descricao: desc, nParcelas: n,
+    valorFinanciado: +d.get('valorFinanciado') || null,
+    taxaMensal: +d.get('taxa') || null,
+    total: parcela * n,
+    accountId: d.get('accountId') || null,
+  }));
+  saveState(); cmtDialog.close(); refreshAll();
+  toast(`Financiamento criado: ${n}× de ${fmt.format(parcela)}`);
+});
+
+/* ================= CONTAS E CARTÕES =================
+   Sem isto não dá para responder "quanto vem na fatura do Santander". */
+function fillAccountSelect(select, selecionado) {
+  if (!select) return;
+  const list = state.accounts || [];
+  select.innerHTML = '<option value="">— não informado —</option>' +
+    list.map(a => `<option value="${escapeHTML(a.id)}"${a.id === selecionado ? ' selected' : ''}>${escapeHTML(a.name)}${a.kind === 'cartao' ? ' (cartão)' : ''}</option>`).join('');
+}
+
+function accItemHTML(a) {
+  const usados = state.transactions.filter(t => t.accountId === a.id).length;
+  return `<li class="cat-item" data-acc="${escapeHTML(a.id)}">
+    <span class="dot" style="background:${escapeHTML(a.color || '#6366f1')}"></span>
+    <span class="name">${escapeHTML(a.name)}</span>
+    <span class="muted small">${a.kind === 'cartao' ? 'cartão' : 'conta'} · ${usados} lanç.</span>
+  </li>`;
+}
+
+function renderAccounts() {
+  const el = document.getElementById('accList');
+  if (!el) return;
+  const list = state.accounts || [];
+  el.innerHTML = list.length ? list.map(accItemHTML).join('')
+    : '<li class="empty muted small">Nenhuma conta ou cartão. Toque em “+ Adicionar”.</li>';
+  el.querySelectorAll('.cat-item').forEach(li => li.addEventListener('click', () => openAccDialog(li.dataset.acc)));
+}
+
+const accDialog = document.getElementById('accDialog');
+const accForm = document.getElementById('accForm');
+
+function syncAccKindUI() {
+  const kind = accForm.querySelector('input[name=kind]:checked')?.value;
+  document.getElementById('accCardFields').hidden = kind !== 'cartao';
+}
+accForm?.querySelectorAll('input[name=kind]').forEach(r => r.addEventListener('change', syncAccKindUI));
+document.querySelector('[data-close-acc]')?.addEventListener('click', () => accDialog.close());
+
+function openAccDialog(id) {
+  const a = (state.accounts || []).find(x => x.id === id);
+  accForm.reset();
+  accForm.dataset.id = a ? a.id : '';
+  document.getElementById('accDialogTitle').textContent = a ? 'Editar' : 'Nova conta ou cartão';
+  document.getElementById('accDelete').hidden = !a;
+  if (a) {
+    accForm.querySelector(`input[name=kind][value="${a.kind || 'conta'}"]`).checked = true;
+    accForm.name.value = a.name || '';
+    accForm.color.value = a.color || '#6366f1';
+    accForm.fechamento.value = a.fechamento || '';
+    accForm.vencimento.value = a.vencimento || '';
+    accForm.limite.value = a.limite || '';
+  }
+  syncAccKindUI();
+  accDialog.showModal();
+}
+document.getElementById('addAccount')?.addEventListener('click', () => openAccDialog(null));
+
+accForm?.addEventListener('submit', () => {
+  const d = new FormData(accForm);
+  const nome = String(d.get('name') || '').trim();
+  if (!nome) return;
+  const id = accForm.dataset.id;
+  const obj = stampTx({
+    id: id || cid(), kind: d.get('kind') || 'conta', name: nome,
+    color: d.get('color') || '#6366f1',
+    fechamento: +d.get('fechamento') || null,
+    vencimento: +d.get('vencimento') || null,
+    limite: +d.get('limite') || null,
+  });
+  state.accounts = state.accounts || [];
+  const i = state.accounts.findIndex(x => x.id === obj.id);
+  if (i >= 0) state.accounts[i] = obj; else state.accounts.push(obj);
+  saveState(); accDialog.close(); refreshAll();
+  toast(id ? 'Atualizado' : 'Criado');
+});
+
+document.getElementById('accDelete')?.addEventListener('click', () => {
+  const id = accForm.dataset.id;
+  if (!id) return;
+  const usados = state.transactions.filter(t => t.accountId === id).length;
+  if (!confirm(usados ? `Excluir? ${usados} lançamento(s) ficam sem conta (nada é apagado).` : 'Excluir?')) return;
+  tombstone('accountTombstones', id);
+  state.accounts = (state.accounts || []).filter(a => a.id !== id);
+  saveState(); accDialog.close(); refreshAll();
+  toast('Excluído');
+});
+
+/* ---------- FATURA DO CARTÃO ----------
+   O ciclo fecha no dia configurado: gasto após o fechamento cai na fatura do
+   mês seguinte. Sem dia de fechamento, cai no mês do próprio gasto. */
+function faturaDoCartao(acc, ref) {
+  const fech = acc.fechamento || 0;
+  return state.transactions.filter(t => {
+    if (t.accountId !== acc.id || t.type !== 'expense') return false;
+    const d = new Date(t.date + 'T00:00:00');
+    let mes = d.getMonth(), ano = d.getFullYear();
+    if (fech && d.getDate() > fech) { mes += 1; if (mes > 11) { mes = 0; ano += 1; } }
+    return mes === ref.getMonth() && ano === ref.getFullYear();
+  });
+}
+
+function renderFaturas() {
+  const el = document.getElementById('faturas');
+  if (!el) return;
+  const cartoes = (state.accounts || []).filter(a => a.kind === 'cartao');
+  if (!cartoes.length) { el.innerHTML = ''; return; }
+  const ref = new Date();
+  const linhas = cartoes.map(c => {
+    const itens = faturaDoCartao(c, ref);
+    const total = itens.reduce((s, t) => s + (+t.amount || 0), 0);
+    const usoLimite = c.limite ? pct(total, c.limite) : null;
+    return `<div class="fat-row">
+      <span class="dot" style="background:${escapeHTML(c.color || '#6366f1')}"></span>
+      <div class="fat-id"><strong>${escapeHTML(c.name)}</strong>
+        <small class="muted">${itens.length} lanç.${c.vencimento ? ' · vence dia ' + c.vencimento : ''}</small></div>
+      <div class="fat-v"><strong>${fmt.format(total)}</strong>
+        ${usoLimite !== null ? `<small class="muted">${usoLimite}% do limite</small>` : ''}</div>
+    </div>`;
+  }).join('');
+  el.innerHTML = `<h3 class="muted small uppercase" style="margin:16px 0 8px">Fatura aberta dos cartões</h3><div class="fat-list">${linhas}</div>`;
+}
