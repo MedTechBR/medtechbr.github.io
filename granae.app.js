@@ -107,8 +107,39 @@ function compromissos() {
     if (!grupos.has(g)) grupos.set(g, []);
     grupos.get(g).push(t);
   }
+  /* Compromisso recém-criado ainda não tem lançamento nenhum. Sem isto ele
+     não apareceria na tela — some justo quando você acabou de cadastrar. */
+  (state.commitments || []).forEach(c => { if (!grupos.has(c.id)) grupos.set(c.id, []); });
+
   const out = [];
   for (const [id, txs] of grupos) {
+    const meta0 = (state.commitments || []).find(c => c.id === id) || {};
+
+    /* DÍVIDA: sem cronograma. Não tem parcela nem data — tem um total e o
+       tanto que já foi abatido. Cada pagamento é uma despesa normal do mês. */
+    if (meta0.kind === 'divida') {
+      const pagos = txs.filter(t => !t.pending);
+      const pago = pagos.reduce((s, t) => s + (+t.amount || 0), 0);
+      const total = +meta0.total || 0;
+      out.push({
+        id, kind: 'divida',
+        descricao: meta0.descricao || 'Dívida',
+        credor: meta0.credor || null,
+        categoria: (txs[0] && txs[0].category) || meta0.category || 'Dívidas',
+        type: 'expense', accountId: meta0.accountId || null,
+        n: null, pagas: pagos.length, restantes: null,
+        valorParcela: 0, total, totalParcelas: total,
+        pago, aPagar: Math.max(0, total - pago), aPagarOficial: true,
+        estimado: false, lancadas: txs.length,
+        primeira: txs.length ? txs[0].date : (meta0.desde || null),
+        ultima: txs.length ? txs[txs.length - 1].date : null,
+        ultimaProjetada: false,
+        quitado: total > 0 && pago >= total - 0.005,
+        txs: pagos,
+      });
+      continue;
+    }
+    if (!txs.length) continue;      // parcelamento/financiamento sem lançamento: nada a mostrar
     txs.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
     const pi = parcelaInfo(txs[0]) || {};
     const meta = (state.commitments || []).find(c => c.id === id) || {};
@@ -1057,6 +1088,7 @@ function pct(a, b) { return b > 0 ? Math.min(100, Math.round(a / b * 100)) : 0; 
 
 function cmtItemHTML(c) {
   const cat = categoryByName(c.categoria) || { color: '#888', icon: '🏷️' };
+  if (c.kind === 'divida') return dividaItemHTML(c, cat);
   const p = pct(c.pagas, c.n);
   const jaPago = c.kind === 'financiamento' && c.total ? '' :
     `<span>${fmt.format(c.pago)} pagos</span>`;
@@ -1086,6 +1118,31 @@ function cmtItemHTML(c) {
   </li>`;
 }
 
+/* Dívida sem cronograma: o que importa é quanto já foi abatido do total. */
+function dividaItemHTML(c, cat) {
+  const p = c.total ? pct(c.pago, c.total) : 0;
+  return `<li class="cmt-item${c.quitado ? ' quitado' : ''}" data-cmt="${escapeHTML(c.id)}">
+    <div class="cmt-top">
+      <span class="cmt-ico" style="background:${cat.color}22;color:${cat.color}">${escapeHTML(cat.icon || '🤝')}</span>
+      <div class="cmt-id">
+        <strong>${escapeHTML(c.descricao)}</strong>
+        <small class="muted">Dívida${c.credor ? ' · ' + escapeHTML(c.credor) : ''} · sem prazo fixo</small>
+      </div>
+      <div class="cmt-num">
+        <strong>${p}%</strong>
+        <small class="muted">${c.quitado ? 'quitada' : 'abatido'}</small>
+      </div>
+    </div>
+    <div class="cmt-bar"><div style="width:${p}%"></div></div>
+    <div class="cmt-foot">
+      <span>${fmt.format(c.pago)} pagos de ${fmt.format(c.total)}</span>
+      ${c.quitado ? '' : `<span class="cmt-falta"><b>${fmt.format(c.aPagar)}</b> em aberto</span>`}
+      <span class="muted">${c.pagas} pagamento${c.pagas === 1 ? '' : 's'}</span>
+    </div>
+    ${c.quitado ? '' : `<div class="cmt-acao"><button type="button" class="primary" data-pagar="${escapeHTML(c.id)}">Registrar pagamento</button></div>`}
+  </li>`;
+}
+
 function renderCompromissos() {
   const todos = compromissos();
   const abertos = todos.filter(c => !c.quitado);
@@ -1098,12 +1155,13 @@ function renderCompromissos() {
      parcela × N; financiamento tem parcela que muda todo mês (SAC + TR) e o
      que importa é o saldo devedor. Misturar os dois numa lista só confunde. */
   const fin = abertos.filter(c => c.kind === 'financiamento');
-  const par = abertos.filter(c => c.kind !== 'financiamento');
+  const div = abertos.filter(c => c.kind === 'divida');
+  const par = abertos.filter(c => c.kind !== 'financiamento' && c.kind !== 'divida');
   const bloco = (titulo, lista) => lista.length
     ? `<li class="cmt-grupo">${titulo}</li>` + lista.map(cmtItemHTML).join('') : '';
   listaEl.innerHTML = abertos.length
-    ? bloco('Financiamentos', fin) + bloco('Parcelamentos', par)
-    : '<li class="empty">Nenhum parcelamento em aberto. Ao lançar uma despesa em várias parcelas, ela aparece aqui.</li>';
+    ? bloco('Financiamentos', fin) + bloco('Dívidas sem prazo', div) + bloco('Parcelamentos', par)
+    : '<li class="empty">Nenhum compromisso em aberto. Ao lançar uma despesa parcelada — ou cadastrar uma dívida — ela aparece aqui.</li>';
   doneEl.innerHTML = quitados.length ? quitados.map(cmtItemHTML).join('')
     : '<li class="empty muted small">Nada quitado ainda.</li>';
 
@@ -1131,6 +1189,10 @@ function renderCompromissos() {
       </div>`).join('');
   }
 
+  /* o botão de pagar não pode abrir o detalhe junto */
+  listaEl.querySelectorAll('[data-pagar]').forEach(b => b.addEventListener('click', (e) => {
+    e.stopPropagation(); abrirPagamentoDivida(b.dataset.pagar);
+  }));
   listaEl.querySelectorAll('.cmt-item').forEach(el => el.addEventListener('click', () => openCmtDetail(el.dataset.cmt)));
   doneEl.querySelectorAll('.cmt-item').forEach(el => el.addEventListener('click', () => openCmtDetail(el.dataset.cmt)));
 }
@@ -2394,3 +2456,73 @@ accItemHTML = function (a) {
     <span class="muted small">${a.kind === 'cartao' ? 'cartão' : 'conta'} · ${usados}</span>
   </li>`;
 };
+
+/* ============================================================
+   DÍVIDA SEM PRAZO
+   Dinheiro que se deve sem cronograma — o empréstimo do pai, o
+   acerto com um amigo. Não tem parcela nem vencimento: tem um
+   total e o tanto que já foi abatido. Cada pagamento é uma
+   despesa NORMAL do mês (entra nos totais) e reduz o saldo.
+   ============================================================ */
+const divDialog = document.getElementById('divDialog');
+const divForm = document.getElementById('divForm');
+const pagDialog = document.getElementById('pagDialog');
+const pagForm = document.getElementById('pagForm');
+
+document.getElementById('addDivida')?.addEventListener('click', () => {
+  divForm.reset();
+  ensureCategory('Dívidas', 'expense');
+  fillCategorySelect(divForm.category, 'expense');
+  divForm.category.value = 'Dívidas';
+  divDialog.showModal();
+});
+
+divForm?.addEventListener('submit', () => {
+  const d = new FormData(divForm);
+  const desc = String(d.get('descricao') || '').trim();
+  const total = +d.get('total') || 0;
+  if (!desc || !total) return;
+  state.commitments = state.commitments || [];
+  state.commitments.push({
+    id: cid(), kind: 'divida', descricao: desc,
+    credor: (d.get('credor') || '').trim() || null,
+    total, category: d.get('category') || 'Dívidas',
+    desde: todayISO(), updatedAt: Date.now(),
+  });
+  saveState(); divDialog.close(); refreshAll();
+  toast(`Dívida de ${fmt.format(total)} cadastrada`);
+});
+
+let _dividaAlvo = null;
+function abrirPagamentoDivida(id) {
+  const c = compromissos().find(x => x.id === id);
+  if (!c) return;
+  _dividaAlvo = id;
+  pagForm.reset();
+  fillAccountSelect(pagForm.accountId);
+  pagForm.data.value = todayISO();
+  document.getElementById('pagTitulo').textContent = 'Pagamento — ' + c.descricao;
+  document.getElementById('pagResumo').innerHTML =
+    `Em aberto: <b>${fmt.format(c.aPagar)}</b> de ${fmt.format(c.total)}. O valor entra como despesa do mês.`;
+  pagDialog.showModal();
+}
+
+pagForm?.addEventListener('submit', () => {
+  const c = (state.commitments || []).find(x => x.id === _dividaAlvo);
+  if (!c) return;
+  const d = new FormData(pagForm);
+  const valor = +d.get('valor') || 0;
+  const data = d.get('data');
+  if (!valor || !data) return;
+  const t = stampTx({
+    id: cid(), type: 'expense', amount: valor,
+    description: `${c.descricao} — pagamento`,
+    category: c.category || 'Dívidas', date: data,
+    groupId: c.id, accountId: d.get('accountId') || null,
+  });
+  if (data > todayISO()) t.pending = true;
+  state.transactions.push(t);
+  saveState(); pagDialog.close(); refreshAll();
+  const dep = compromissos().find(x => x.id === c.id);
+  toast(dep && dep.quitado ? 'Dívida quitada! 🎉' : `Pago ${fmt.format(valor)} — faltam ${fmt.format(dep ? dep.aPagar : 0)}`);
+});
