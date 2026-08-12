@@ -139,15 +139,26 @@ function compromissos() {
       n, pagas,
       restantes: Math.max(0, n - pagas),
       valorParcela,
-      estimado: !completo,        /* as parcelas futuras não estão lançadas */
+      estimado: !completo && meta.saldoDevedor == null,
       lancadas: txs.length,
       /* financiamento tem juros: o total contratado NÃO é parcela × N */
       total: meta.total != null ? +meta.total : soma,
       totalParcelas: soma,
       pago,
-      aPagar: Math.max(0, soma - pago),
+      aPagar: meta.saldoDevedor != null ? +meta.saldoDevedor : Math.max(0, soma - pago),
+      aPagarOficial: meta.saldoDevedor != null,
       taxaMensal: meta.taxaMensal != null ? +meta.taxaMensal : null,
+      taxaAnual: meta.taxaAnual != null ? +meta.taxaAnual : null,
       valorFinanciado: meta.valorFinanciado != null ? +meta.valorFinanciado : null,
+      /* Em financiamento a parcela muda todo mês (SAC + TR), então multiplicar
+         parcela × restantes é chute. O saldo devedor do banco é o número real —
+         quando ele existe, manda. */
+      saldoDevedor: meta.saldoDevedor != null ? +meta.saldoDevedor : null,
+      dataSaldo: meta.dataSaldo || null,
+      banco: meta.banco || null,
+      contrato: meta.contrato || null,
+      diaDebito: meta.diaDebito != null ? +meta.diaDebito : null,
+      sistema: meta.sistema || null,
       primeira: txs[0].date,
       /* Com o histórico incompleto, a última parcela LANÇADA não é a última do
          acordo — projetamos a partir da parcela mais recente e do que falta,
@@ -1049,8 +1060,9 @@ function cmtItemHTML(c) {
   const p = pct(c.pagas, c.n);
   const jaPago = c.kind === 'financiamento' && c.total ? '' :
     `<span>${fmt.format(c.pago)} pagos</span>`;
-  const juros = (c.kind === 'financiamento' && c.valorFinanciado)
-    ? `<div class="cmt-juros">Financiado ${fmt.format(c.valorFinanciado)} · vai pagar ${fmt.format(c.totalParcelas)} <b>(+${fmt.format(c.totalParcelas - c.valorFinanciado)} de juros)</b>${c.taxaMensal ? ' · ' + c.taxaMensal + '% a.m.' : ''}</div>`
+  /* a linha do banco vale mesmo sem extrato oficial (só o nome já situa) */
+  const juros = (c.kind === 'financiamento' && (c.valorFinanciado || c.banco))
+    ? `<div class="cmt-juros">${c.banco ? '<b>' + escapeHTML(c.banco) + '</b> · ' : ''}${c.valorFinanciado ? 'financiado ' + fmt.format(c.valorFinanciado) : 'sem extrato oficial ainda'}${c.taxaAnual ? ' · ' + String(c.taxaAnual).replace('.', ',') + '% a.a' : ''}${c.sistema ? ' · ' + escapeHTML(c.sistema) : ''}${c.diaDebito ? ' · debita dia ' + c.diaDebito : ''}</div>`
     : '';
   return `<li class="cmt-item${c.quitado ? ' quitado' : ''}" data-cmt="${escapeHTML(c.id)}">
     <div class="cmt-top">
@@ -1067,7 +1079,7 @@ function cmtItemHTML(c) {
     <div class="cmt-bar"><div style="width:${p}%"></div></div>
     <div class="cmt-foot">
       ${jaPago}
-      ${c.quitado ? '' : `<span class="cmt-falta"><b>${fmt.format(c.aPagar)}</b> a pagar${c.estimado ? ' <small class="muted">(estimado)</small>' : ''}</span>`}
+      ${c.quitado ? '' : `<span class="cmt-falta"><b>${fmt.format(c.aPagar)}</b> ${c.aPagarOficial ? 'de saldo devedor' : 'a pagar'}${c.estimado ? ' <small class="muted">(estimado)</small>' : ''}${c.aPagarOficial && c.dataSaldo ? ` <small class="muted">em ${new Date(c.dataSaldo + 'T00:00:00').toLocaleDateString('pt-BR')}</small>` : ''}</span>`}
       <span class="muted">${fmt.format(c.valorParcela)}/mês${c.quitado ? '' : (c.ultimaProjetada ? ' · termina por volta de ' : ' · última em ') + monthLongFmt.format(new Date(c.ultima + 'T00:00:00'))}</span>
     </div>
     ${juros}
@@ -1082,7 +1094,15 @@ function renderCompromissos() {
   const doneEl = document.getElementById('cmtDone');
   if (!listaEl) return;
 
-  listaEl.innerHTML = abertos.length ? abertos.map(cmtItemHTML).join('')
+  /* São bichos diferentes: parcelamento tem parcela fixa e o total é
+     parcela × N; financiamento tem parcela que muda todo mês (SAC + TR) e o
+     que importa é o saldo devedor. Misturar os dois numa lista só confunde. */
+  const fin = abertos.filter(c => c.kind === 'financiamento');
+  const par = abertos.filter(c => c.kind !== 'financiamento');
+  const bloco = (titulo, lista) => lista.length
+    ? `<li class="cmt-grupo">${titulo}</li>` + lista.map(cmtItemHTML).join('') : '';
+  listaEl.innerHTML = abertos.length
+    ? bloco('Financiamentos', fin) + bloco('Parcelamentos', par)
     : '<li class="empty">Nenhum parcelamento em aberto. Ao lançar uma despesa em várias parcelas, ela aparece aqui.</li>';
   doneEl.innerHTML = quitados.length ? quitados.map(cmtItemHTML).join('')
     : '<li class="empty muted small">Nada quitado ainda.</li>';
@@ -1090,11 +1110,12 @@ function renderCompromissos() {
   /* resumo do topo: o número que interessa é o que ainda falta sair do bolso */
   const aPagar = abertos.reduce((s, c) => s + c.aPagar, 0);
   const porMes = abertos.reduce((s, c) => s + c.valorParcela, 0);
+  const dividaFin = fin.reduce((s, c) => s + c.aPagar, 0);
   const resumo = document.getElementById('cmtResumo');
   resumo.innerHTML = `
-    <div class="cmt-kpi"><span class="muted small">Ainda a pagar</span><strong>${fmt.format(aPagar)}</strong></div>
-    <div class="cmt-kpi"><span class="muted small">Por mês</span><strong>${fmt.format(porMes)}</strong></div>
-    <div class="cmt-kpi"><span class="muted small">Em aberto</span><strong>${abertos.length}</strong></div>`;
+    <div class="cmt-kpi"><span class="muted small">Dívida total</span><strong>${fmt.format(aPagar)}</strong></div>
+    <div class="cmt-kpi"><span class="muted small">Sai por mês</span><strong>${fmt.format(porMes)}</strong></div>
+    <div class="cmt-kpi"><span class="muted small">Só imóveis</span><strong>${fmt.format(dividaFin)}</strong></div>`;
 
   /* projeção: quanto de cada mês já está comprometido */
   const proj = comprometimentoPorMes(12).filter(m => m.total > 0);
