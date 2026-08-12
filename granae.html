@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
-  <link rel="stylesheet" href="granae.css?v=59" />
+  <link rel="stylesheet" href="granae.css?v=61" />
   <!-- garante inputs claros na tela de login central, mesmo com o tema escuro do Granaê -->
   <style>.mt-auth input{background:#F1F1EC;color:#23272E}.mt-auth input::placeholder{color:#5E646B}</style>
   <!-- Login único MedTech + sincronização na nuvem (mesmo módulo do portal) -->
@@ -171,6 +171,13 @@
         <button id="txTransferir" class="ghost" title="Transferir entre contas">Transferir</button>
         <button id="txCsv" class="ghost" title="Exportar o mês em CSV">CSV</button>
       </div>
+      <div class="tx-tools tx-tools-2">
+        <select id="filterAcc" title="Conta ou cartão"><option value="">Toda conta/cartão</option></select>
+        <select id="filterSub" title="Subcategoria"><option value="">Toda subcategoria</option></select>
+        <button id="txSalvarFiltro" class="ghost" title="Salvar esta combinação de filtros">☆ Salvar filtro</button>
+        <button id="txLimparFiltros" class="ghost" title="Limpar todos os filtros">Limpar</button>
+      </div>
+      <div id="savedFilters" class="saved-filters"></div>
       <div id="txFilterChip" class="tx-filter-chip" hidden>
         <span class="chip-label"></span>
         <button type="button" id="clearTxFilter" aria-label="Limpar filtro">×</button>
@@ -199,6 +206,14 @@
         </div>
         <p class="muted small" style="margin:2px 0 8px">Marque de onde saiu cada gasto para acompanhar a fatura de cada cartão.</p>
         <ul id="accList" class="cat-list"></ul>
+      </div>
+      <div class="cat-section" style="margin-top:22px">
+        <div class="section-title between">
+          <h3 class="muted small uppercase" style="margin:0">Orçamento por subcategoria</h3>
+          <button id="addSubBudget" class="ghost">+ Definir</button>
+        </div>
+        <p class="muted small" style="margin:2px 0 8px">Teto mensal mais fino que a categoria — ex.: Alimentação › iFood.</p>
+        <ul id="subBudgetList" class="cat-list"></ul>
       </div>
     </section>
 
@@ -510,6 +525,7 @@
       <label class="field"><span>Nome</span><input name="name" type="text" maxlength="40" required placeholder="Ex.: Nubank, Santander" /></label>
       <label class="field"><span>Cor</span><input name="color" type="color" value="#6366f1" /></label>
       <label class="field"><span>Saldo inicial <small class="muted">— o que já tinha nela</small></span><input name="saldoInicial" type="number" step="0.01" /></label>
+      <label class="field"><span>Orçamento mensal <small class="muted">— teto de gasto nesta conta/cartão, opcional</small></span><input name="orcamento" type="number" step="0.01" min="0" placeholder="Ex.: 2000" /></label>
       <div id="accCardFields" hidden>
         <label class="field"><span>Dia do fechamento da fatura</span><input name="fechamento" type="number" min="1" max="28" placeholder="Ex.: 3" /></label>
         <label class="field"><span>Dia do vencimento</span><input name="vencimento" type="number" min="1" max="28" placeholder="Ex.: 12" /></label>
@@ -517,6 +533,23 @@
       </div>
       <footer class="modal-foot">
         <button type="button" id="accDelete" class="danger" hidden>Excluir</button>
+        <button type="submit" class="primary">Salvar</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- MODAL: ORÇAMENTO POR SUBCATEGORIA -->
+  <dialog id="subBudgetDialog" class="modal">
+    <form id="subBudgetForm" method="dialog">
+      <header class="modal-head">
+        <h3 id="subBudgetTitle">Orçamento por subcategoria</h3>
+        <button type="button" class="ghost" data-close-sb>✕</button>
+      </header>
+      <label class="field"><span>Categoria</span><select name="cat" required></select></label>
+      <label class="field"><span>Subcategoria</span><input name="sub" type="text" maxlength="40" required list="subSugestoes" placeholder="Ex.: iFood" /></label>
+      <label class="field"><span>Teto por mês</span><input name="valor" type="number" step="0.01" min="0" required placeholder="Ex.: 400" /></label>
+      <footer class="modal-foot">
+        <button type="button" id="subBudgetDelete" class="danger" hidden>Excluir</button>
         <button type="submit" class="primary">Salvar</button>
       </footer>
     </form>
@@ -650,6 +683,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="granae.gemini.js?v=7"></script>
-  <script src="granae.app.js?v=26"></script>
+  <script src="granae.app.js?v=29"></script>
 </body>
 </html>

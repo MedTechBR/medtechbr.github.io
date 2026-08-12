@@ -22,12 +22,16 @@ const defaultState = () => ({
   accounts: [],         // contas e cartões {id, name, kind:'conta'|'cartao', bank, color, fechamento, vencimento, limite}
   commitments: [],      // metadados do parcelamento/financiamento; id == groupId das parcelas
   rules: [],            // regras automáticas {id, contem, category, sub, accountId}
+  budgets: [],          // tetos extras {id, tipo:'cartao'|'sub', ref, sub, valor} — ref = accountId ou nome da categoria
+  savedFilters: [],     // filtros salvos {id, nome, tipo, categoria, sub, contaId, busca}
   tombstones: [],       // exclusoes de transacoes {id, at} — impedem que o merge ressuscite
   fixedTombstones: [],  // exclusoes de itens fixos
   categoryTombstones: [], // exclusoes de categorias {id, at}
   accountTombstones: [],
   commitmentTombstones: [],
   ruleTombstones: [],
+  budgetTombstones: [],
+  savedFilterTombstones: [],
 });
 
 function cid() { return Math.random().toString(36).slice(2, 10); }
@@ -241,6 +245,8 @@ function granaeMergeFn(remote, local) {
   const acc = mergeById(local.accounts, remote.accounts, local.accountTombstones, remote.accountTombstones);
   const cmt = mergeById(local.commitments, remote.commitments, local.commitmentTombstones, remote.commitmentTombstones);
   const rul = mergeById(local.rules, remote.rules, local.ruleTombstones, remote.ruleTombstones);
+  const bud = mergeById(local.budgets, remote.budgets, local.budgetTombstones, remote.budgetTombstones);
+  const flt = mergeById(local.savedFilters, remote.savedFilters, local.savedFilterTombstones, remote.savedFilterTombstones);
   return {
     profile: local.profile || remote.profile || {},
     transactions: tx.items,
@@ -255,6 +261,10 @@ function granaeMergeFn(remote, local) {
     commitmentTombstones: cmt.tombstones,
     rules: rul.items,
     ruleTombstones: rul.tombstones,
+    budgets: bud.items,
+    budgetTombstones: bud.tombstones,
+    savedFilters: flt.items,
+    savedFilterTombstones: flt.tombstones,
   };
 }
 
@@ -291,6 +301,10 @@ function applyData(d) {
       commitmentTombstones: Array.isArray(d.commitmentTombstones) ? d.commitmentTombstones : [],
       rules: Array.isArray(d.rules) ? d.rules : [],
       ruleTombstones: Array.isArray(d.ruleTombstones) ? d.ruleTombstones : [],
+      budgets: Array.isArray(d.budgets) ? d.budgets : [],
+      budgetTombstones: Array.isArray(d.budgetTombstones) ? d.budgetTombstones : [],
+      savedFilters: Array.isArray(d.savedFilters) ? d.savedFilters : [],
+      savedFilterTombstones: Array.isArray(d.savedFilterTombstones) ? d.savedFilterTombstones : [],
     };
   } else {
     state = defaultState();
@@ -368,7 +382,16 @@ function viewDoHash() {
   const h = (location.hash || '').replace(/^#\/?/, '');
   return VIEWS.includes(h) ? h : 'dashboard';
 }
-window.addEventListener('hashchange', () => navigate(viewDoHash(), true));
+/* O próprio navigate() escreve no hash, e o hashchange que ele provoca chamava
+   navigate() DE NOVO — a segunda passada já não tinha o _keepTxFilter e apagava
+   o filtro de categoria recém-aplicado (era isso que fazia o clique na categoria
+   "não filtrar"). Se a tela já é a do hash, não há o que navegar. */
+window.addEventListener('hashchange', () => {
+  const alvo = viewDoHash();
+  const atual = [...document.querySelectorAll('.view')].find(v => !v.classList.contains('hidden'))?.dataset.view;
+  if (alvo === atual) return;
+  navigate(alvo, true);
+});
 
 function navigate(view, doHash) {
   // entrar em Transações "do zero" (pela nav) limpa filtro de categoria e busca —
@@ -402,6 +425,10 @@ document.getElementById('categoryBars').addEventListener('click', (e) => {
   categoryFilter = { name: item.dataset.cat };
   _keepTxFilter = true;
   navigate('transacoes');
+  // as barras são de GASTOS: o filtro de tipo tem que acompanhar, senão um
+  // 'income' que sobrou do clique anterior devolve a lista vazia
+  const _ft = document.getElementById('filterType');
+  if (_ft && _ft.value !== 'expense') { _ft.value = 'expense'; renderTransactions(); if (typeof aplicarTabelaTx === 'function') aplicarTabelaTx(); }
 });
 document.getElementById('categoryBars').addEventListener('keydown', (e) => {
   if (e.key !== 'Enter' && e.key !== ' ') return;
@@ -411,6 +438,10 @@ document.getElementById('categoryBars').addEventListener('keydown', (e) => {
   categoryFilter = { name: item.dataset.cat };
   _keepTxFilter = true;
   navigate('transacoes');
+  // as barras são de GASTOS: o filtro de tipo tem que acompanhar, senão um
+  // 'income' que sobrou do clique anterior devolve a lista vazia
+  const _ft = document.getElementById('filterType');
+  if (_ft && _ft.value !== 'expense') { _ft.value = 'expense'; renderTransactions(); if (typeof aplicarTabelaTx === 'function') aplicarTabelaTx(); }
 });
 
 // ====== Dashboard ======
@@ -816,12 +847,18 @@ function renderTxMonthSummary(monthTx) {
 }
 
 function renderTransactions() {
+  preencherSelectsDeFiltro();
+  renderFiltrosSalvos();
   const filter = document.getElementById('filterType').value;
   // SEMPRE escopado ao mês vigente (navegável pelo seletor de mês acima da lista)
   const monthTx = state.transactions.filter(t => inMonth(t.date, currentMonth) && !ehTransfer(t));
   let list = monthTx.slice();
   if (filter !== 'all') list = list.filter(t => t.type === filter);
   if (categoryFilter) list = list.filter(t => t.category === categoryFilter.name);
+  const _acc = document.getElementById('filterAcc')?.value || '';
+  if (_acc) list = list.filter(t => (t.accountId || '') === _acc);
+  const _sub = document.getElementById('filterSub')?.value || '';
+  if (_sub) list = list.filter(t => (t.sub || '') === _sub);
   const _q = (document.getElementById('txSearch')?.value || '').trim().toLowerCase();
   if (_q) list = list.filter(t => t.description.toLowerCase().includes(_q) || String(t.amount).includes(_q.replace(',', '.')));
   list.sort((a, b) => b.date.localeCompare(a.date));
@@ -1850,7 +1887,9 @@ function renderDashLateral() {
         <div class="dashcmt-kpis"><div><span class="muted small">Por mês</span><strong>${fmt.format(mes)}</strong></div>
         <div><span class="muted small">Falta pagar</span><strong>${fmt.format(aPagar)}</strong></div></div>
         ${abertos.slice(0, 3).map(c => `<div class="dashcmt-row"><span>${escapeHTML(c.descricao)}</span>
-          <span class="muted small">${c.pagas}/${c.n}</span></div>`).join('')}`;
+          <span class="muted small">${c.kind === 'divida'
+            ? (c.total ? pct(c.pago, c.total) + '% pago' : fmt.format(c.pago))
+            : c.pagas + '/' + c.n}</span></div>`).join('')}`;
       box.querySelector('[data-nav]')?.addEventListener('click', () => navigate('compromissos'));
     }
   }
@@ -2081,6 +2120,7 @@ function accItemHTML(a) {
 }
 
 function renderAccounts() {
+  renderSubBudgets();
   const el = document.getElementById('accList');
   if (!el) return;
   const list = state.accounts || [];
@@ -2112,6 +2152,7 @@ function openAccDialog(id) {
     accForm.fechamento.value = a.fechamento || '';
     accForm.vencimento.value = a.vencimento || '';
     accForm.limite.value = a.limite || '';
+    accForm.orcamento.value = a.orcamento || '';
     if (accForm.saldoInicial) accForm.saldoInicial.value = a.saldoInicial || '';
   }
   syncAccKindUI();
@@ -2131,6 +2172,7 @@ accForm?.addEventListener('submit', () => {
     fechamento: +d.get('fechamento') || null,
     vencimento: +d.get('vencimento') || null,
     limite: +d.get('limite') || null,
+    orcamento: +d.get('orcamento') || null,
   });
   state.accounts = state.accounts || [];
   const i = state.accounts.findIndex(x => x.id === obj.id);
@@ -2469,9 +2511,21 @@ function renderProjecao() {
 accItemHTML = function (a) {
   const usados = state.transactions.filter(t => t.accountId === a.id).length;
   const saldo = saldoDaConta(a);
+  // teto de gasto da conta/cartão no mês (opcional)
+  const orc = +a.orcamento || 0;
+  let barra = '';
+  if (orc > 0) {
+    const gasto = gastoNaContaNoMes(a.id, currentMonth);
+    const p = Math.round((gasto / orc) * 100);
+    const st = p > 100 ? 'over' : p >= 80 ? 'warn' : 'ok';
+    barra = `<div class="orc-mini ${st}">
+      <div class="orc-mini-bar"><i style="width:${Math.min(100, p)}%"></i></div>
+      <small class="muted">${fmt.format(gasto)} de ${fmt.format(orc)} · ${p}%</small>
+    </div>`;
+  }
   return `<li class="cat-item" data-acc="${escapeHTML(a.id)}">
     <span class="dot" style="background:${escapeHTML(a.color || '#6366f1')}"></span>
-    <span class="name">${escapeHTML(a.name)}</span>
+    <span class="name">${escapeHTML(a.name)}${barra}</span>
     <span class="acc-saldo ${saldo < 0 ? 'neg' : ''}">${fmt.format(saldo)}</span>
     <span class="muted small">${a.kind === 'cartao' ? 'cartão' : 'conta'} · ${usados}</span>
   </li>`;
@@ -2546,3 +2600,208 @@ pagForm?.addEventListener('submit', () => {
   const dep = compromissos().find(x => x.id === c.id);
   toast(dep && dep.quitado ? 'Dívida quitada! 🎉' : `Pago ${fmt.format(valor)} — faltam ${fmt.format(dep ? dep.aPagar : 0)}`);
 });
+
+/* ====== Clique no bloco de Receitas/Despesas abre a lista já filtrada ====== */
+(function ligarAtalhosDoFluxo() {
+  const linhas = [
+    { el: document.getElementById('sumIncome'),  tipo: 'income',  rotulo: 'receitas' },
+    { el: document.getElementById('sumExpense'), tipo: 'expense', rotulo: 'despesas' },
+  ];
+  linhas.forEach(({ el, tipo, rotulo }) => {
+    const linha = el && el.closest('.flow-row');
+    if (!linha) return;
+    linha.classList.add('clicavel');
+    linha.setAttribute('role', 'button');
+    linha.setAttribute('tabindex', '0');
+    linha.title = `Ver as ${rotulo} do mês`;
+    const ir = () => {
+      categoryFilter = null;                       // vindo daqui, sem categoria presa
+      _keepTxFilter = true;                        // navigate() não deve limpar o que acabei de definir
+      navigate('transacoes');
+      const ft = document.getElementById('filterType');
+      if (ft) { ft.value = tipo; }
+      renderTransactions();
+      if (typeof aplicarTabelaTx === 'function') aplicarTabelaTx();
+    };
+    linha.addEventListener('click', ir);
+    linha.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ir(); } });
+  });
+})();
+
+/* ================= ORÇAMENTO POR CARTÃO E POR SUBCATEGORIA =================
+   O teto por categoria já existia (meta da categoria + fixos). Faltavam dois
+   recortes que os apps concorrentes têm: um teto por conta/cartão e um teto
+   mais fino que a categoria (a subcategoria). Ambos moram na mesma coleção
+   `budgets`, distinguidos por `tipo`, pra ter um merge/tombstone só. */
+
+function gastoNaContaNoMes(accId, ref) {
+  return state.transactions
+    .filter(t => t.type === 'expense' && (t.accountId || '') === accId && inMonth(t.date, ref) && !ehTransfer(t))
+    .reduce((s, t) => s + t.amount, 0);
+}
+function gastoNaSubNoMes(cat, sub, ref) {
+  return state.transactions
+    .filter(t => t.type === 'expense' && t.category === cat && (t.sub || '') === sub && inMonth(t.date, ref) && !ehTransfer(t))
+    .reduce((s, t) => s + t.amount, 0);
+}
+const orcamentosSub = () => (state.budgets || []).filter(b => b.tipo === 'sub');
+
+function renderSubBudgets() {
+  const el = document.getElementById('subBudgetList');
+  if (!el) return;
+  const list = orcamentosSub().slice().sort((a, b) =>
+    (a.ref + a.sub).localeCompare(b.ref + b.sub, 'pt-BR'));
+  el.innerHTML = list.length ? list.map(b => {
+    const gasto = gastoNaSubNoMes(b.ref, b.sub, currentMonth);
+    const p = b.valor ? Math.round((gasto / b.valor) * 100) : 0;
+    const st = p > 100 ? 'over' : p >= 80 ? 'warn' : 'ok';
+    const falta = b.valor - gasto;
+    return `<li class="cat-item" data-sb="${escapeHTML(b.id)}">
+      <span class="dot" style="background:${escapeHTML(categoryByName(b.ref)?.color || '#94a3b8')}"></span>
+      <span class="name">${escapeHTML(b.ref)} › ${escapeHTML(b.sub)}
+        <div class="orc-mini ${st}">
+          <div class="orc-mini-bar"><i style="width:${Math.min(100, p)}%"></i></div>
+          <small class="muted">${fmt.format(gasto)} de ${fmt.format(b.valor)} · ${
+            falta >= 0 ? 'sobram ' + fmt.format(falta) : 'estourou ' + fmt.format(-falta)}</small>
+        </div>
+      </span>
+      <span class="muted small">${p}%</span>
+    </li>`;
+  }).join('') : '<li class="empty muted small">Nenhum teto por subcategoria ainda.</li>';
+  el.querySelectorAll('.cat-item').forEach(li =>
+    li.addEventListener('click', () => abrirSubBudget(li.dataset.sb)));
+}
+
+const sbDialog = document.getElementById('subBudgetDialog');
+const sbForm = document.getElementById('subBudgetForm');
+document.querySelector('[data-close-sb]')?.addEventListener('click', () => sbDialog.close());
+document.getElementById('addSubBudget')?.addEventListener('click', () => abrirSubBudget(null));
+
+function abrirSubBudget(id) {
+  const b = (state.budgets || []).find(x => x.id === id);
+  sbForm.reset();
+  sbForm.dataset.id = b ? b.id : '';
+  document.getElementById('subBudgetTitle').textContent = b ? 'Editar teto' : 'Novo teto por subcategoria';
+  document.getElementById('subBudgetDelete').hidden = !b;
+  sbForm.cat.innerHTML = state.categories.filter(c => c.type === 'expense')
+    .map(c => `<option value="${escapeHTML(c.name)}">${escapeHTML(c.name)}</option>`).join('');
+  preencherSugestoesSub();
+  if (b) { sbForm.cat.value = b.ref; sbForm.sub.value = b.sub; sbForm.valor.value = b.valor; }
+  sbDialog.showModal();
+}
+
+sbForm?.addEventListener('submit', () => {
+  const d = new FormData(sbForm);
+  const cat = String(d.get('cat') || '').trim();
+  const sub = String(d.get('sub') || '').trim();
+  const valor = +d.get('valor') || 0;
+  if (!cat || !sub || valor <= 0) return;
+  const id = sbForm.dataset.id;
+  // não deixa criar dois tetos pro mesmo par categoria+subcategoria
+  const jaExiste = orcamentosSub().find(b => b.ref === cat && b.sub === sub && b.id !== id);
+  if (jaExiste) { toast('Já existe um teto para essa subcategoria'); return; }
+  const obj = stampTx({ id: id || cid(), tipo: 'sub', ref: cat, sub, valor });
+  state.budgets = state.budgets || [];
+  const i = state.budgets.findIndex(x => x.id === obj.id);
+  if (i >= 0) state.budgets[i] = obj; else state.budgets.push(obj);
+  saveState(); sbDialog.close(); refreshAll();
+  toast(id ? 'Atualizado' : 'Teto criado');
+});
+
+document.getElementById('subBudgetDelete')?.addEventListener('click', () => {
+  const id = sbForm.dataset.id;
+  if (!id) return;
+  tombstone('budgetTombstones', id);
+  state.budgets = (state.budgets || []).filter(b => b.id !== id);
+  saveState(); sbDialog.close(); refreshAll();
+  toast('Excluído');
+});
+
+/* ====================== FILTROS SALVOS ======================
+   Guarda a combinação inteira (tipo + categoria + subcategoria + conta + busca)
+   com um nome, e devolve tudo num clique. */
+
+function preencherSelectsDeFiltro() {
+  const selA = document.getElementById('filterAcc');
+  if (selA) {
+    const atual = selA.value;
+    selA.innerHTML = '<option value="">Toda conta/cartão</option>' + (state.accounts || [])
+      .map(a => `<option value="${escapeHTML(a.id)}">${escapeHTML(a.name)}</option>`).join('');
+    selA.value = atual;
+  }
+  const selS = document.getElementById('filterSub');
+  if (selS) {
+    const atual = selS.value;
+    const subs = [...new Set(state.transactions.map(t => t.sub).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+    selS.innerHTML = '<option value="">Toda subcategoria</option>' + subs
+      .map(v => `<option value="${escapeHTML(v)}">${escapeHTML(v)}</option>`).join('');
+    selS.value = atual;
+  }
+}
+
+function filtroAtual() {
+  return {
+    tipo: document.getElementById('filterType')?.value || 'all',
+    categoria: categoryFilter ? categoryFilter.name : '',
+    sub: document.getElementById('filterSub')?.value || '',
+    contaId: document.getElementById('filterAcc')?.value || '',
+    busca: (document.getElementById('txSearch')?.value || '').trim(),
+  };
+}
+
+function aplicarFiltroSalvo(f) {
+  const ft = document.getElementById('filterType'); if (ft) ft.value = f.tipo || 'all';
+  categoryFilter = f.categoria ? { name: f.categoria } : null;
+  const fs = document.getElementById('filterSub'); if (fs) fs.value = f.sub || '';
+  const fa = document.getElementById('filterAcc'); if (fa) fa.value = f.contaId || '';
+  const bs = document.getElementById('txSearch'); if (bs) bs.value = f.busca || '';
+  renderTransactions(); aplicarTabelaTx();
+}
+
+function renderFiltrosSalvos() {
+  const el = document.getElementById('savedFilters');
+  if (!el) return;
+  const list = state.savedFilters || [];
+  el.innerHTML = list.map(f => `<span class="sf-chip" data-sf="${escapeHTML(f.id)}">
+      <button type="button" class="sf-apply">${escapeHTML(f.nome)}</button>
+      <button type="button" class="sf-del" aria-label="Remover filtro salvo">×</button>
+    </span>`).join('');
+  el.querySelectorAll('.sf-apply').forEach(b => b.addEventListener('click', () => {
+    const f = (state.savedFilters || []).find(x => x.id === b.closest('.sf-chip').dataset.sf);
+    if (f) aplicarFiltroSalvo(f);
+  }));
+  el.querySelectorAll('.sf-del').forEach(b => b.addEventListener('click', () => {
+    const id = b.closest('.sf-chip').dataset.sf;
+    const f = (state.savedFilters || []).find(x => x.id === id);
+    if (!f || !confirm(`Remover o filtro "${f.nome}"?`)) return;
+    tombstone('savedFilterTombstones', id);
+    state.savedFilters = (state.savedFilters || []).filter(x => x.id !== id);
+    saveState(); renderFiltrosSalvos();
+  }));
+}
+
+document.getElementById('txSalvarFiltro')?.addEventListener('click', () => {
+  const f = filtroAtual();
+  if (f.tipo === 'all' && !f.categoria && !f.sub && !f.contaId && !f.busca) {
+    toast('Escolha algum filtro antes de salvar'); return;
+  }
+  const sugestao = [f.categoria, f.sub, f.busca].filter(Boolean).join(' ')
+    || (f.contaId ? (state.accounts.find(a => a.id === f.contaId)?.name || '') : '')
+    || (f.tipo === 'income' ? 'Receitas' : f.tipo === 'expense' ? 'Despesas' : '');
+  const nome = (prompt('Nome do filtro:', sugestao) || '').trim();
+  if (!nome) return;
+  state.savedFilters = state.savedFilters || [];
+  const antigo = state.savedFilters.find(x => x.nome.toLowerCase() === nome.toLowerCase());
+  const obj = stampTx({ id: antigo ? antigo.id : cid(), nome, ...f });
+  const i = state.savedFilters.findIndex(x => x.id === obj.id);
+  if (i >= 0) state.savedFilters[i] = obj; else state.savedFilters.push(obj);
+  saveState(); renderFiltrosSalvos();
+  toast('Filtro salvo');
+});
+
+document.getElementById('txLimparFiltros')?.addEventListener('click', () => {
+  aplicarFiltroSalvo({ tipo: 'all', categoria: '', sub: '', contaId: '', busca: '' });
+});
+
+document.getElementById('filterAcc')?.addEventListener('change', () => { renderTransactions(); aplicarTabelaTx(); });
+document.getElementById('filterSub')?.addEventListener('change', () => { renderTransactions(); aplicarTabelaTx(); });
