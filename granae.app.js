@@ -938,7 +938,27 @@ function openTxDetail(id) {
       ${t.sub ? `<div><span class="muted small">Subcategoria</span><b>${escapeHTML(t.sub)}</b></div>` : ''}
       ${conta ? `<div><span class="muted small">${conta.kind === 'cartao' ? 'Cartão' : 'Conta'}</span><b>${escapeHTML(conta.name)}</b></div>` : ''}
     </div>
-    ${blocoGrupo}`;
+    ${blocoGrupo}
+    ${grupo ? '' : `<div class="det-vinc">
+      <label class="field"><span>Faz parte de um compromisso?</span>
+        <select id="vincSel">
+          <option value="">— não faz parte —</option>
+          ${compromissos().filter(c => !c.quitado).map(c =>
+            `<option value="${escapeHTML(c.id)}">${escapeHTML(c.descricao)}${c.kind === 'divida' ? ' (dívida)' : ''}</option>`).join('')}
+        </select>
+      </label>
+      <small class="muted">Use para lançamentos que você registrou ANTES de cadastrar a dívida — eles passam a abater o saldo.</small>
+    </div>`}`;
+  const vs = document.getElementById('vincSel');
+  if (vs) vs.addEventListener('change', () => {
+    const alvo = state.transactions.find(x => x.id === _detalheId);
+    if (!alvo) return;
+    if (vs.value) alvo.groupId = vs.value; else delete alvo.groupId;
+    alvo.updatedAt = Date.now();
+    saveState(); refreshAll();
+    toast(vs.value ? 'Vinculado — já abate o saldo' : 'Desvinculado');
+    txDetail.close();
+  });
   document.getElementById('txDetailDel').hidden = false;
   document.getElementById('txDetailEdit').hidden = false;
   const vc = document.getElementById('verCompromisso');
