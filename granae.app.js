@@ -1206,6 +1206,7 @@ function cmtItemHTML(c) {
       <span class="muted">${fmt.format(c.valorParcela)}/mês${c.quitado ? '' : (c.ultimaProjetada ? ' · termina por volta de ' : ' · última em ') + monthLongFmt.format(new Date(c.ultima + 'T00:00:00'))}</span>
     </div>
     ${juros}
+    ${c.quitado ? '' : `<div class="cmt-acao"><button type="button" class="primary" data-parcela="${escapeHTML(c.id)}">Registrar parcela ${c.pagas + 1}/${c.n}</button></div>`}
   </li>`;
 }
 
@@ -1283,6 +1284,9 @@ function renderCompromissos() {
   /* o botão de pagar não pode abrir o detalhe junto */
   listaEl.querySelectorAll('[data-pagar]').forEach(b => b.addEventListener('click', (e) => {
     e.stopPropagation(); abrirPagamentoDivida(b.dataset.pagar);
+  }));
+  listaEl.querySelectorAll('[data-parcela]').forEach(b => b.addEventListener('click', (e) => {
+    e.stopPropagation(); abrirParcela(b.dataset.parcela);
   }));
   listaEl.querySelectorAll('.cmt-item').forEach(el => el.addEventListener('click', () => openCmtDetail(el.dataset.cmt)));
   doneEl.querySelectorAll('.cmt-item').forEach(el => el.addEventListener('click', () => openCmtDetail(el.dataset.cmt)));
@@ -2602,7 +2606,47 @@ divForm?.addEventListener('submit', () => {
 });
 
 let _dividaAlvo = null;
+let _pagModo = 'divida';   // 'divida' | 'parcela'
+
+/* Lançar a próxima parcela de um parcelamento/financiamento sem digitar nada.
+   Antes só dava para criar a parcela na mão, em Transações, escrevendo o
+   "(k/n)" certo na descrição — se errasse o número, a parcela não entrava no
+   grupo. Aqui o app já sabe qual é a próxima, quanto é e em que conta cai. */
+function abrirParcela(id) {
+  const c = compromissos().find(x => x.id === id);
+  if (!c || c.kind === 'divida') return;
+  _dividaAlvo = id; _pagModo = 'parcela';
+  const doGrupo = state.transactions.filter(t => t.groupId === c.id).sort((a, b) => a.date.localeCompare(b.date));
+  const ultima = doGrupo[doGrupo.length - 1];
+  pagForm.reset();
+  fillAccountSelect(pagForm.accountId);
+  if (ultima && ultima.accountId) pagForm.accountId.value = ultima.accountId;
+  pagForm.valor.value = (c.valorParcela || 0).toFixed(2);
+  pagForm.data.value = proximaData(ultima && ultima.date);
+  const k = c.pagas + 1;
+  document.getElementById('pagTitulo').textContent = `Parcela ${k}/${c.n} — ${c.descricao}`;
+  document.getElementById('pagResumo').innerHTML =
+    `Vai lançar como <b>${escapeHTML(c.descricao)} (${k}/${c.n})</b> em ${escapeHTML(c.categoria || 'sem categoria')}.` +
+    ` Restam ${c.restantes} parcela${c.restantes === 1 ? '' : 's'} depois desta.`;
+  pagDialog.showModal();
+  setTimeout(() => { try { pagForm.valor.select(); } catch (e) {} }, 40);
+}
+
+/* mesmo dia do mês da última parcela, no mês seguinte; nunca antes de hoje */
+function proximaData(ultimaISO) {
+  const hoje = todayISO();
+  if (!ultimaISO) return hoje;
+  const d = new Date(ultimaISO + 'T00:00:00');
+  const dia = d.getDate();
+  const alvo = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+  const ultimoDiaDoMes = new Date(alvo.getFullYear(), alvo.getMonth() + 1, 0).getDate();
+  alvo.setDate(Math.min(dia, ultimoDiaDoMes));
+  const tz = alvo.getTimezoneOffset() * 60000;
+  return new Date(alvo - tz).toISOString().slice(0, 10);
+}
+
 function abrirPagamentoDivida(id) {
+  _pagModo = 'divida';
   const c = compromissos().find(x => x.id === id);
   if (!c) return;
   _dividaAlvo = id;
@@ -2616,23 +2660,35 @@ function abrirPagamentoDivida(id) {
 }
 
 pagForm?.addEventListener('submit', () => {
-  const c = (state.commitments || []).find(x => x.id === _dividaAlvo);
+  /* parcelamento nasce das próprias transações (não tem registro em
+     state.commitments), então a busca tem que ser na lista derivada — senão
+     o submit saía calado sem lançar nada. */
+  const c = (state.commitments || []).find(x => x.id === _dividaAlvo)
+        || compromissos().find(x => x.id === _dividaAlvo);
   if (!c) return;
   const d = new FormData(pagForm);
   const valor = +d.get('valor') || 0;
   const data = d.get('data');
   if (!valor || !data) return;
+  const atual = compromissos().find(x => x.id === c.id);
+  const ehParcela = _pagModo === 'parcela' && atual && atual.kind !== 'divida';
+  const k = atual ? atual.pagas + 1 : 1;
   const t = stampTx({
     id: cid(), type: 'expense', amount: valor,
-    description: `${c.descricao} — pagamento`,
-    category: c.category || 'Dívidas', date: data,
+    description: ehParcela ? `${c.descricao} (${k}/${atual.n})` : `${c.descricao} — pagamento`,
+    category: (ehParcela ? atual.categoria : c.category) || 'Dívidas', date: data,
     groupId: c.id, accountId: d.get('accountId') || null,
   });
   if (data > todayISO()) t.pending = true;
   state.transactions.push(t);
   saveState(); pagDialog.close(); refreshAll();
   const dep = compromissos().find(x => x.id === c.id);
-  toast(dep && dep.quitado ? 'Dívida quitada! 🎉' : `Pago ${fmt.format(valor)} — faltam ${fmt.format(dep ? dep.aPagar : 0)}`);
+  if (ehParcela) {
+    toast(dep && dep.quitado ? 'Parcelamento quitado! 🎉'
+      : `Parcela ${k}/${atual.n} lançada — faltam ${dep ? dep.restantes : 0}`);
+  } else {
+    toast(dep && dep.quitado ? 'Dívida quitada! 🎉' : `Pago ${fmt.format(valor)} — faltam ${fmt.format(dep ? dep.aPagar : 0)}`);
+  }
 });
 
 /* ====== Clique no bloco de Receitas/Despesas abre a lista já filtrada ====== */
