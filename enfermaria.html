@@ -269,6 +269,16 @@ footer a{color:var(--petrol-dark);font-weight:600;text-decoration:none}
 }
 .pr-l1{display:block}
 .pr-meta{margin-right:6px}
+/* Botão de recolher a ficha aberta. Sem ele, o toque abria e não fechava:
+   só dava para voltar pelo botão global de modo. */
+.pt-card.aberta{position:relative;padding-top:54px;border-color:var(--petrol)}
+.pt-fechar{position:absolute;top:6px;right:8px;display:inline-flex;align-items:center;gap:5px;
+  min-height:44px;padding:8px 14px;border:1px solid var(--line);border-radius:999px;
+  background:var(--panel2);color:var(--petrol-dark);font:700 12.5px inherit;cursor:pointer}
+.pt-fechar:hover{background:var(--soft);border-color:var(--petrol)}
+.pt-fechar:focus-visible{outline:2px solid var(--petrol);outline-offset:2px}
+@media (max-width:720px){ .pt-card.aberta{padding-top:56px} }
+
 </style>
 <link rel="stylesheet" href="_mttokens.css?v=3">
 </head>
@@ -412,7 +422,9 @@ function ptCard(p){
   const exFmt=examesFmt(p);
   const visitHoje=p.visitaEm===ymd();
   const pendHtml=`<div class="pt-pend"><div class="pt-pend-h"><span class="pt-pend-l"><b>Pendências</b><button class="mini-ed" onclick="editCampo('${p.id}','pendencias')"><i class="ti ti-pencil"></i></button></span><span class="pt-prev${p.previsaoAlta?'':' empty'}" onclick="editPrevAlta('${p.id}')" title="Previsão de alta — clique para editar"><i class="ti ti-calendar"></i> ${p.previsaoAlta?('Alta: '+esc(fmtData(p.previsaoAlta))):'+ previsão de alta'}</span></div>${pend.length?pend.map(it=>`<label class="pend-item${it.done?' done':''}"><input type="checkbox" ${it.done?'checked':''} onclick="togglePend('${p.id}','${it.id}')"><span>${esc(it.t)}</span></label>`).join(''):'<div class="pend-empty">Nenhuma pendência.</div>'}</div>`;
-  return `<div class="pt-card">
+  const barraFechar = (denso && abertos.has(p.id)) ? `<button type="button" class="pt-fechar" onclick="toggleCard('${p.id}')" aria-label="Recolher a ficha de ${esc(p.nome||'paciente')}"><i class="ti ti-chevron-up"></i> Recolher</button>` : '';
+  return `<div class="pt-card${denso && abertos.has(p.id) ? ' aberta' : ''}">
+    ${barraFechar}
     <div class="leito"><div class="ln">${esc(p.leito||'—')}</div>${p.setor?`<div class="ls">${esc(p.setor)}</div>`:''}</div>
     <div class="pt-main">
       <div class="pt-top"><span class="nome">${esc(p.nome||'Paciente')}</span>${meta?`<span class="meta">${esc(meta)}</span>`:''}${visitHoje?'<span class="chip-hoje"><i class="ti ti-check"></i> visto hoje</span>':'<span class="chip-wait"><i class="ti ti-clock"></i> aguarda visita</span>'}</div>
