@@ -493,7 +493,7 @@ function agrupaPorSetor(list){const g={};list.forEach(p=>{const k=(p.setor||'').
 function renderListOnly(){
   const box=document.getElementById('ptlist');if(!box)return;
   const list=ativos().filter(matchBusca);
-  if(!list.length){box.innerHTML=ativos().length?'<div class="empty">Nenhum paciente encontrado para a busca.</div>':'<div class="empty">Nenhum paciente internado.<br>Toque em <b>+ Novo paciente</b> — você pode colar a evolução e a IA preenche os campos.</div>';return;}
+  if(!list.length){box.innerHTML=ativos().length?'<div class="empty">Nenhum paciente encontrado para a busca.</div>':'<div class="empty">Nenhum paciente internado.<br>Toque em <b>+ Paciente</b> para começar.</div>';return;}
   const g=agrupaPorSetor(list);
   box.innerHTML=grupoKeys(g).map(k=>`<div class="setor-h"><i class="ti ti-building-hospital"></i> ${esc(k)} <span>${g[k].length}</span></div>`+g[k].map(ptCard).join('')).join('');
 }

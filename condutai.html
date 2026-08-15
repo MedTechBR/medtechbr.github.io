@@ -394,11 +394,12 @@ main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
   padding: 8px 10px; text-align: left; vertical-align: top;
 }
 .content th { background: var(--bg-soft); font-weight: 600; }
+/* era uma caixa bege com borda grossa; virou texto de abertura, como nas
+   referências clínicas de verdade */
 .content blockquote {
-  border-left: 4px solid var(--warn);
-  background: var(--warn-soft);
-  padding: 10px 14px; margin: 12px 0;
-  border-radius: 6px; color: var(--text);
+  border-left: 3px solid var(--border);
+  padding: 2px 0 2px 14px; margin: 10px 0 16px;
+  color: var(--text-soft); font-size: 15px; line-height: 1.65;
 }
 .content hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
 .content a { color: var(--primary); text-decoration: none; }
@@ -969,10 +970,9 @@ main, #main { display: block !important; height: auto !important; overflow: visi
 /* tabela, diagrama e bloco de código continuam usando a largura toda */
 .content table, .content pre, .content .mermaid { max-width: none; }
 
-/* sumário acompanha a rolagem: documento de 3.000px sem isso obriga voltar ao topo */
-@media (min-width: 1024px){
-  .protocol-card{ position: sticky; top: 14px; z-index: 5; }
-}
+/* (removido) uma regra anterior grudava .protocol-card no topo achando que era
+   o sumário — "proTOColcard" casou com o seletor [class*=toc]. O sumário agora
+   são as próprias seções recolhidas, que não precisam ficar fixas. */
 
 /* input abaixo de 16px faz o iOS dar zoom ao focar */
 #globalSearch, #aiPanelInput, .ai-panel-input textarea { font-size: 16px; }
@@ -984,6 +984,13 @@ main, #main { display: block !important; height: auto !important; overflow: visi
 @media (max-width: 720px){
   .action-btn{ min-height: 44px; padding-left: 14px; padding-right: 14px; }
 }
+
+/* Cabeçalho: o título disputava a linha com 6 botões e quebrava em 2-3 linhas
+   num filete estreito. Título ocupa a linha inteira; ações vão abaixo. */
+.result-header{ flex-direction: column; align-items: stretch; }
+.result-header > div:first-child{ min-width: 0; }
+.result-actions{ margin-left: 0; }
+.result-meta{ font-family: inherit; }
 
 </style>
 <style>/* mt-a11y-16px */@media(max-width:680px){input,select,textarea{font-size:16px}}</style>
@@ -2769,16 +2776,19 @@ function renderSourcesHtml(sources) {
 // Converte as seções "## ..." (já renderizadas como <h2>) em blocos recolhíveis (estilo acordeão).
 // O conteúdo antes do 1º <h2> (título + resumo) fica sempre visível; a 1ª seção abre por padrão.
 // Cada seção ganha um id (acc-sec-N) para o sumário (TOC) poder abrir/rolar até ela.
+/* Todas as seções nascem RECOLHIDAS: a lista de títulos passa a ser o próprio
+   índice, e some o bloco de chips que duplicava essa mesma lista. */
+function tituloCurto(t) {
+  // "Fisiopatologia — o que realmente descompensa" -> "Fisiopatologia"
+  return String(t).split(/\s+[—–]\s+/)[0].trim() || t;
+}
 function accordionize(html) {
   const parts = html.split(/(?=<h2)/);
   if (parts.length <= 1) return html;
-  let firstReal = -1;
   return parts.map((p, i) => {
     const m = p.match(/^<h2[^>]*>([\s\S]*?)<\/h2>([\s\S]*)$/);
     if (!m) return p;
-    if (firstReal < 0) firstReal = i;   // abre a PRIMEIRA secao real; o banco comeca em '## ' sem intro, entao 'i===1' abria a segunda
-    const open = (i === firstReal) ? ' open' : '';
-    return `<details class="wb-acc" id="acc-sec-${i}"${open}><summary>${m[1]}</summary><div class="wb-acc-body">${m[2]}</div></details>`;
+    return `<details class="wb-acc" id="acc-sec-${i}"><summary>${tituloCurto(m[1])}</summary><div class="wb-acc-body">${m[2]}</div></details>`;
   }).join('');
 }
 
@@ -2797,10 +2807,9 @@ function buildToc(html) {
     const m = p.match(/^<h2[^>]*>([\s\S]*?)<\/h2>/);
     if (m) secs.push({ idx: i, label: m[1].replace(/<[^>]+>/g, '').trim() });
   });
-  if (secs.length < 3) return ''; // conduta curta não precisa de sumário
-  return `<nav class="wb-toc"><div class="wb-toc-title"><i class="ti ti-list"></i> Nesta conduta (${secs.length} seções)</div><div class="wb-toc-list">` +
-    secs.map(s => `<button type="button" class="toc-item" data-idx="${s.idx}">${escapeHtml(s.label)}</button>`).join('') +
-    `</div></nav>`;
+  /* O índice em chips repetia, palavra por palavra, os títulos que já aparecem
+     logo abaixo nas seções recolhidas. Duas listas iguais na mesma tela. */
+  return '';
 }
 function bindToc(container) {
   container.querySelectorAll('.toc-item').forEach(btn => {
@@ -2943,10 +2952,10 @@ async function renderResultDireto(item) {
   const alertCls = isCaso ? 'alert-caso' : 'alert-info';
   const alertIcon = isCaso ? '<i class="ti ti-file-text"></i>' : isProto ? '<i class="ti ti-book-2"></i>' : '<i class="ti ti-info-circle"></i>';
   const alertText = isCaso
-    ? 'Análise gerada por IA a partir da evolução colada. Sempre <strong>cruze com seu exame físico e contexto do paciente</strong>. A IA não vê o paciente — não substitui sua avaliação clínica.'
+    ? 'Gerado por IA — a IA não vê o paciente. Cruze com seu exame físico.'
     : isProto
-      ? `Protocolo gerado em tempo real com base na diretriz mais recente${protocolMeta ? ` (<strong>${escapeHtml(protocolMeta.guideline)}</strong>)` : ''}. Doses e condutas são referência — sempre adapte ao seu paciente.`
-      : 'Conteúdo gerado por IA com base em busca em tempo real. Sempre <strong>valide criticamente</strong> com a fonte primária e o contexto do paciente. Não substitui julgamento clínico.';
+      ? `Gerado por IA${protocolMeta ? ` · <strong>${escapeHtml(protocolMeta.guideline)}</strong>` : ''} — confira doses e adapte ao paciente.`
+      : 'Gerado por IA — valide na fonte primária.';
   const titleDisplay = isCaso
     ? (query.length > 80 ? escapeHtml(query.slice(0, 80)) + '…' : escapeHtml(query))
     : escapeHtml(query);
@@ -2963,7 +2972,9 @@ async function renderResultDireto(item) {
       <div class="result-header">
         <div style="flex:1;min-width:0;">
           <div class="result-title">${isCaso ? 'Caso clínico' : titleDisplay} <span class="badge ${badgeCls}">${item.offline ? '<i class="ti ti-book-2"></i> Banco MedTech' : badgeText}</span></div>
-          <div class="result-meta">${ctxLabel} • ${cenarioLabel} • ${formatDate(date)}${isCaso ? ` • <span title="${escapeHtml(query)}">${query.length} caracteres na evolução</span>` : ` • ${readMin} min de leitura`}${isProto && protocolMeta ? ` • <strong style="color:var(--success)">${escapeHtml(protocolMeta.guideline)}</strong>` : ''}${wasSeenBefore ? ' • <span style="color:var(--text-mute)">já visto</span>' : ''}</div>
+          <!-- o selo acima já diz a origem (BANCO MEDTECH / IA); aqui fica só o
+               que o selo não diz: diretriz, tempo de leitura e se já foi lido -->
+          <div class="result-meta">${isProto && protocolMeta ? `<strong style="color:var(--success)">${escapeHtml(protocolMeta.guideline)}</strong> · ` : ''}${isCaso ? `${query.length} caracteres na evolução` : `${readMin} min de leitura`}${wasSeenBefore ? ' · já visto' : ''}</div>
         </div>
         <div class="result-actions">
           ${protocolMeta ? `<button class="action-btn${savedNow ? ' saved' : ''}" id="saveBtn">${savedNow ? '<i class="ti ti-bookmark-filled"></i> Salvo' : '<i class="ti ti-bookmark"></i> Salvar'}</button>` : ''}
@@ -2975,10 +2986,7 @@ async function renderResultDireto(item) {
           <button class="action-btn" id="refreshBtn"><i class="ti ti-refresh"></i> Refazer</button>
         </div>
       </div>
-      <div class="alert ${alertCls}">
-        <span>${item.offline ? '<i class="ti ti-book-2"></i>' : alertIcon}</span>
-        <div>${item.offline ? 'Conteúdo do <strong>banco MedTech</strong> (offline, sem IA) — referência rápida. Confira doses e adapte ao paciente. Toque em <strong>Refazer</strong> para a versão detalhada com IA.' : alertText}</div>
-      </div>
+      ${item.offline ? '' : `<div class="alert ${alertCls}"><span>${alertIcon}</span><div>${alertText}</div></div>`}
       ${tocHtml}
       <div class="content">${accordionize(mdHtml)}</div>
       ${renderSourcesHtml(sources)}
