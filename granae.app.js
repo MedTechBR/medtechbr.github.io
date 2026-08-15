@@ -802,14 +802,48 @@ function applyFlowRow(kind, real, budget, hasFixed) {
 }
 
 // ====== Transações ======
+/* ---------- Contraste de cor vinda do dado do usuário ----------
+   A categoria tem cor livre; usada crua como texto sobre o próprio tom ela
+   reprova AA. Estas funções escurecem só o necessário, preservando o matiz. */
+function _hexRgb(h) {
+  h = String(h || '#000000').replace('#', '');
+  if (h.length === 3) h = h.split('').map(c => c + c).join('');
+  return { r: parseInt(h.slice(0, 2), 16) || 0, g: parseInt(h.slice(2, 4), 16) || 0, b: parseInt(h.slice(4, 6), 16) || 0 };
+}
+const _hex2 = v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0');
+const _rgbHex = c => '#' + _hex2(c.r) + _hex2(c.g) + _hex2(c.b);
+function _lum(c) {
+  const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+  return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b);
+}
+function _razao(a, b) {
+  const L1 = _lum(a), L2 = _lum(b);
+  return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+}
+/** Mistura duas cores hex (t = quanto de `a` entra). */
+function misturar(a, b, t) {
+  const x = _hexRgb(a), y = _hexRgb(b);
+  return _rgbHex({ r: x.r * t + y.r * (1 - t), g: x.g * t + y.g * (1 - t), b: x.b * t + y.b * (1 - t) });
+}
+/** Escurece `cor` até alcançar 4,5:1 contra `fundo`. Devolve hex. */
+function corLegivel(cor, fundo, alvo) {
+  alvo = alvo || 4.5;
+  const bg = _hexRgb(fundo);
+  let c = _hexRgb(cor);
+  for (let i = 0; i < 24 && _razao(c, bg) < alvo; i++) c = { r: c.r * 0.88, g: c.g * 0.88, b: c.b * 0.88 };
+  return _rgbHex(c);
+}
+
 function txItemHTML(t, hideDate) {
   const cat = categoryByName(t.category) || { color: '#999', icon: '🏷️' };
   const sign = t.type === 'income' ? '+' : '−';
   const pendingCls = t.pending ? ' pending' : '';
   const pendingBadge = t.pending ? ' <span class="badge-pending">agendado</span>' : '';
-  // Chip estilo Monerix: fundo tonal da cor da categoria + emoji + nome
+  // Chip: fundo tonal da cor da categoria + emoji + nome.
+  // O texto NÃO pode ser a cor crua — âmbar puro sobre âmbar 12% dava 1,96:1
+  // (AA exige 4,5). corLegivel escurece a mesma cor até passar.
   const chipBg = cat.color + '1F'; // ~12% alpha
-  const chipFg = cat.color;
+  const chipFg = corLegivel(cat.color, misturar(cat.color, '#FFFFFF', 0.12));
   const conta = (state.accounts || []).find(a => a.id === t.accountId);
   return `<li class="tx-item${pendingCls}" data-id="${t.id}">
     <span class="txc-date txc-dim">${new Date(t.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}</span>

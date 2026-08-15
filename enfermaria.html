@@ -215,6 +215,60 @@ footer a{color:var(--petrol-dark);font-weight:600;text-decoration:none}
   #ec_txt{min-height:220px}
   .ai-box textarea{min-height:130px}
 }
+/* ===== Aviso (substitui o alert nativo) ===== */
+#toastWrap{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));z-index:200;display:flex;flex-direction:column;gap:8px;width:min(440px,calc(100% - 24px));pointer-events:none}
+.toast{background:var(--ink);color:#fff;border-radius:12px;padding:12px 15px;font-size:13.5px;line-height:1.45;box-shadow:0 8px 26px rgba(20,24,30,.28);display:flex;gap:9px;align-items:flex-start;animation:toastIn .18s ease-out;pointer-events:auto}
+.toast .tico{flex:0 0 auto;font-weight:800;line-height:1.35}
+.toast.erro{background:var(--red)}
+.toast.ok{background:var(--green)}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.toast{animation:none}}
+/* campo que reprovou a validação */
+.campo-erro{border-color:var(--red) !important;box-shadow:0 0 0 3px var(--red-bg)}
+@media (max-width:720px){
+  /* o chip de previsão de alta não cabia e vazava do card, esticando a página inteira */
+  .pt-pend-h{flex-wrap:wrap;row-gap:6px}
+  .pt-prev{white-space:normal}
+  /* alvo de toque: app usado de pé, com uma mão só */
+  .mini-ed{padding:6px 8px;font-size:14px;min-height:32px}
+  .pt-card input[type=checkbox],.pend-list input[type=checkbox]{width:22px;height:22px}
+}
+/* ===== Linha densa da lista de pacientes ===== */
+.pt-row{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:border-color .12s,background .12s}
+.pt-row:hover{border-color:var(--petrol);background:var(--soft)}
+.pt-row:focus-visible{outline:2px solid var(--petrol);outline-offset:2px}
+.pr-leito{flex:0 0 54px;text-align:center;font-weight:800;font-size:15px;color:var(--petrol-dark);background:var(--soft);border-radius:9px;padding:7px 4px;font-variant-numeric:tabular-nums}
+.pr-main{flex:1;min-width:0}
+.pr-l1{display:flex;align-items:baseline;gap:7px;min-width:0}
+.pr-nome{display:block;font-weight:700;font-size:14px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pr-meta{flex:0 0 auto;font-size:11.5px;color:var(--muted);font-weight:600}
+.pr-dx{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.pr-sinais{flex:0 0 auto;display:flex;align-items:center;gap:7px}
+.pr-badge{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--amber-bg);color:var(--amber);font-size:11px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+.pr-dot{width:9px;height:9px;border-radius:50%}
+.pr-dot.ok{background:var(--green)}
+.pr-dot.wait{background:var(--amber)}
+.pr-chev{color:var(--dim);font-size:16px}
+@media (max-width:720px){
+  .pt-row{padding:11px 12px}
+  .cards{gap:6px}
+  .kpi{padding:9px 11px}
+  .kpi .v{font-size:20px}
+  .kpi .l{font-size:10px}
+}
+/* rótulo de botão nunca quebra em duas linhas */
+.bar .right .btn-sm{white-space:nowrap}
+@media (max-width:720px){
+  /* 4 números numa faixa só: eram 250px antes de aparecer o 1º paciente */
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+  .kpi{padding:7px 6px;text-align:center;border-radius:10px}
+  .kpi .l{font-size:9px;letter-spacing:.02em;line-height:1.2}
+  .kpi .v{font-size:18px;margin-top:1px}
+  .bar .right{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+  .bar .right .btn-sm{padding:10px 4px;font-size:11.5px;min-height:44px;justify-content:center;gap:4px}
+}
+.pr-l1{display:block}
+.pr-meta{margin-right:6px}
 </style>
 <link rel="stylesheet" href="_mttokens.css?v=3">
 </head>
@@ -240,6 +294,30 @@ footer a{color:var(--petrol-dark);font-weight:600;text-decoration:none}
 
 <footer>© 2026 <a href="index.html">MedTech</a> · <a href="privacidade.html">Privacidade</a></footer>
 
+<script>
+/* Aviso não-bloqueante. Trocou os 12 alert() nativos: alert trava a tela,
+   não é estilizável e no iOS some atrás do teclado. */
+function toast(msg, tipo){
+  let w=document.getElementById('toastWrap');
+  if(!w){w=document.createElement('div');w.id='toastWrap';w.setAttribute('role','status');w.setAttribute('aria-live','polite');document.body.appendChild(w);}
+  const t=document.createElement('div');
+  t.className='toast'+(tipo?' '+tipo:'');
+  const ico=tipo==='erro'?'!':tipo==='ok'?'✓':'i';
+  t.innerHTML='<span class="tico">'+ico+'</span><span></span>';
+  t.lastChild.textContent=String(msg).replace(/^⚠️\s*/,'');
+  w.appendChild(t);
+  const fora=setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .2s';setTimeout(()=>t.remove(),220);}, tipo==='erro'?6500:4000);
+  t.addEventListener('click',()=>{clearTimeout(fora);t.remove();});
+}
+/* marca o campo que reprovou e leva o foco até ele */
+function focarCampo(id){
+  const el=document.getElementById(id); if(!el) return;
+  el.classList.add('campo-erro');
+  el.addEventListener('input',()=>el.classList.remove('campo-erro'),{once:true});
+  try{el.focus({preventScroll:false});}catch(e){el.focus();}
+  el.scrollIntoView({block:'center',behavior:'smooth'});
+}
+</script>
 <script>
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const SAIDA={alta:{l:'Alta',c:'b-alta'},obito:{l:'Óbito',c:'b-obito'},transferencia:{l:'Transferência',c:'b-transf'}};
@@ -295,7 +373,40 @@ function buscaSuja(q){return q.indexOf('@')>=0;}
 function matchBusca(p){const q=busca.trim().toLowerCase();if(!q||buscaSuja(q))return true;return [p.leito,p.nome,p.diagnosticos,p.setor].some(x=>(x||'').toLowerCase().includes(q));}
 function onBusca(el){if(buscaSuja(el.value)){el.value='';busca='';}else busca=el.value;renderListOnly();}
 
+/* ---------- Lista densa ----------
+   O card completo tinha 746px de altura: 1,05 paciente por tela num celular
+   de 780px, 16.311px de rolagem para 29 leitos. Numa visita isso é inviável.
+   Padrão dos apps assistenciais: lista escaneável, toque abre a ficha. */
+let denso = localStorage.getItem('enf_denso') !== '0';
+let abertos = new Set();
+function toggleDenso(){ denso = !denso; localStorage.setItem('enf_denso', denso ? '1' : '0'); abertos.clear(); render(); }
+function toggleCard(id, ev){
+  if (ev && ev.target.closest('button, input, label, .pt-prev')) return; // não abre ao clicar num controle
+  abertos.has(id) ? abertos.delete(id) : abertos.add(id);
+  renderListOnly();
+}
+function ptRow(p){
+  const meta = [p.idade || '', p.sexo || ''].filter(Boolean).join(' · ');
+  const pend = (p.pendencias || []).filter(x => !x.done).length;
+  const visitHoje = p.visitaEm === ymd();
+  const dx1 = String(p.diagnosticos || '').split('\n').map(x => x.replace(/^[-•*>]\s*/, '').trim()).filter(Boolean)[0] || '';
+  return `<div class="pt-row" onclick="toggleCard('${p.id}',event)" tabindex="0" role="button"
+      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCard('${p.id}')}"
+      aria-label="Abrir ficha de ${esc(p.nome || 'paciente')}">
+    <div class="pr-leito">${esc(p.leito || '—')}</div>
+    <div class="pr-main">
+      <div class="pr-l1"><span class="pr-nome">${esc(p.nome || 'Paciente')}</span></div>
+      <div class="pr-dx">${meta ? `<span class="pr-meta">${esc(meta)}</span>` : ''}${dx1 ? esc(dx1) : '<span class="pt-muted">sem diagnóstico</span>'}</div>
+    </div>
+    <div class="pr-sinais">
+      ${pend ? `<span class="pr-badge" title="${pend} pendência(s) em aberto">${pend}</span>` : ''}
+      <span class="pr-dot ${visitHoje ? 'ok' : 'wait'}" title="${visitHoje ? 'visto hoje' : 'aguarda visita'}"></span>
+      <i class="ti ti-chevron-right pr-chev"></i>
+    </div>
+  </div>`;
+}
 function ptCard(p){
+  if (denso && !abertos.has(p.id)) return ptRow(p);
   const meta=[p.idade||'',p.sexo||'',p.setor||''].filter(Boolean).join(' · ');
   const pend=(p.pendencias||[]);
   const exFmt=examesFmt(p);
@@ -359,7 +470,7 @@ function renderAtivos(){
   </div>
   <div class="bar">
     <input class="search" id="sin" type="text" name="filtro-leito" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" data-1p-ignore data-lpignore="true" placeholder="Buscar leito, nome ou diagnóstico..." value="${esc(busca)}" oninput="onBusca(this)" onfocus="if(buscaSuja(this.value)){this.value='';busca='';renderListOnly();}">
-    <div class="right"><button class="btn btn-g btn-sm" onclick="toggleAllExames()" title="Recolher/expandir os exames de todos">${examAllOpen?'<i class="ti ti-chevrons-up"></i> Recolher exames':'<i class="ti ti-chevrons-down"></i> Expandir exames'}</button><button class="btn btn-g btn-sm" onclick="resumoPlantao()"><i class="ti ti-clipboard-list"></i> Passar plantão</button><button class="btn btn-p btn-sm" onclick="openForm()">+ Novo paciente</button></div>
+    <div class="right"><button class="btn btn-g btn-sm" onclick="toggleAllExames()" title="Recolher/expandir os exames de todos">${examAllOpen?'<i class="ti ti-chevrons-up"></i> Exames':'<i class="ti ti-chevrons-down"></i> Exames'}</button><button class="btn btn-g btn-sm" onclick="toggleDenso()" title="Alternar entre lista compacta e fichas completas">${denso?'<i class="ti ti-layout-rows"></i> Fichas':'<i class="ti ti-list"></i> Compacta'}</button><button class="btn btn-g btn-sm" onclick="resumoPlantao()"><i class="ti ti-clipboard-list"></i> Plantão</button><button class="btn btn-p btn-sm" onclick="openForm()">+ Paciente</button></div>
   </div><div id="ptlist"></div>`;
   document.getElementById('view').innerHTML=html;
   const inp=document.getElementById('sin');if(inp&&busca){inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length);}
@@ -404,12 +515,12 @@ function admStop(){admListening=false;if(admStream){admStream.getTracks().forEac
 async function gravarAdmissao(id){
   const btn=document.getElementById('admRecBtn');
   if(admListening){if(admRec&&admRec.state!=='inactive')admRec.stop();return;}
-  if(MT.mode!=='cloud'||!MT.aiAudio){alert('Para gravar a admissão em áudio, entre na sua conta MedTech.');return;}
+  if(MT.mode!=='cloud'||!MT.aiAudio){toast('Para gravar a admissão em áudio, entre na sua conta MedTech.','erro');return;}
   try{admStream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true}});}
-  catch(e){alert('Permita o acesso ao microfone.');return;}
+  catch(e){toast('Permita o acesso ao microfone nas configurações do navegador.','erro');return;}
   const mime=pickAudioMime();admChunks=[];
   try{admRec=new MediaRecorder(admStream,mime?{mimeType:mime,audioBitsPerSecond:24000}:{audioBitsPerSecond:24000});}
-  catch(e){try{admRec=new MediaRecorder(admStream);}catch(e2){alert('Não foi possível iniciar a gravação.');admStop();return;}}
+  catch(e){try{admRec=new MediaRecorder(admStream);}catch(e2){toast('Não foi possível iniciar a gravação.','erro');admStop();return;}}
   admRec.ondataavailable=e=>{if(e.data&&e.data.size)admChunks.push(e.data);};
   admRec.onstop=()=>{admStop();processAdmissaoAudio(id);};
   admRec.start(1000);admListening=true;
@@ -423,14 +534,14 @@ async function processAdmissaoAudio(id){
   if(btn){btn.disabled=true;btn.style.background='';btn.style.color='';btn.innerHTML='<span class="spin"></span> Transcrevendo…';}
   try{
     const b64=await blobToB64(blob);
-    if(b64.length>9400000){alert('Gravação muito longa (~30–40 min máx por bloco). Grave em partes menores.');reset();return;}
+    if(b64.length>9400000){toast('Gravação muito longa (~30–40 min por bloco). Grave em partes menores.','erro');reset();return;}
     const mt=(blob.type||'audio/webm').split(';')[0];
     const prompt='Você recebeu o ÁUDIO da ADMISSÃO de um paciente sendo INTERNADO (anamnese de admissão — fala do médico e do paciente). Transcreva internamente e organize uma ANAMNESE DE ADMISSÃO clara em português do Brasil, com as seções: Identificação, Queixa principal, História da doença atual, Antecedentes pessoais, Medicações em uso, Alergias, Exame físico e Hipóteses/Conduta inicial. REGRAS: a HDA deve ser TEXTO CORRIDO e CRONOLÓGICO, conectando os sintomas; em Antecedentes use os DIAGNÓSTICOS padronizados (ex.: "pressão alta"→HAS, "colesterol alto"→dislipidemia/DLP, "diabetes"→DM2), não a fala literal; em Medicações em uso liste APENAS os nomes; não invente — escreva "[não informado]" se faltar; texto limpo, SEM markdown (sem # nem *).';
     const text=await MT.aiAudio(b64,mt,prompt);
     const ev=document.getElementById('f_evol');if(ev)ev.value=(text||'').trim();
     if(btn)btn.innerHTML='<span class="spin"></span> Preenchendo a ficha…';
     await extrairEvol(id||'');
-  }catch(e){alert('⚠️ '+(e.message||'Falha ao processar o áudio.'));}
+  }catch(e){toast(e.message||'Falha ao processar o áudio.','erro');}
   finally{reset();}
 }
 function openForm(id){
@@ -473,7 +584,7 @@ function saveForm(id){
   const oldP=id?((state.pacientes.find(x=>x.id===id)||{}).pendencias||[]):[];
   const pend=getVal('f_pend').split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>up(o.t)===up(t));return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});
   const o={leito:getVal('f_leito'),setor:getVal('f_setor'),nome:getVal('f_nome'),idade:getVal('f_idade'),sexo:getVal('f_sexo'),diagnosticos:bullets(getVal('f_dx')),comorbidades:getVal('f_comorb'),alergias:getVal('f_alergias'),muc:getVal('f_muc'),hda:getVal('f_hda'),laboratorio:bullets(getVal('f_lab')),culturas:bullets(getVal('f_culturas')),imagem:bullets(getVal('f_imagem')),exameFisico:getVal('f_ef'),conduta:bullets(getVal('f_conduta')),pendencias:pend,previsaoAlta:getVal('f_prevAlta'),obs:getVal('f_obs')};
-  if(!o.leito&&!o.nome){alert('Informe ao menos o leito ou o nome do paciente.');return;}
+  if(!o.leito&&!o.nome){toast('Informe ao menos o leito ou o nome do paciente.','erro');focarCampo(getVal('f_leito')?'f_nome':'f_leito');return;}
   if(id){const cur=state.pacientes.find(x=>x.id===id);if(!cur){state.pacientes.push({id,status:'ativo',criadoEm:nowISO(),...o,updatedAt:Date.now()});}else{delete cur.exames;Object.assign(cur,o,{updatedAt:Date.now()});}}
   else{state.pacientes.push({id:uid(),status:'ativo',criadoEm:nowISO(),...o,updatedAt:Date.now()});}
   persist();clearDraft();closeModal();render();
@@ -689,7 +800,7 @@ const PARAM_PROMPT='Você é um escriba clínico. Recebe a FOTO manuscrita de UM
  +'(H) Sem folha hídrica: escreva "DIURESE NÃO AFERIDA" e "BH NÃO AFERIDO". '
  +'(I) Se um sinal não aparece nas fotos, omita o campo inteiro. Repito: a resposta é SÓ a linha de parâmetros, nada mais.';
 async function transcreverParams(){
-  if(!visitaImgs.length){alert('Anexe ao menos uma foto dos parâmetros.');return;}
+  if(!visitaImgs.length){toast('Anexe ao menos uma foto dos parâmetros.','erro');return;}
   const b=document.getElementById('transBtn');b.innerHTML='<span class="spin"></span> Transcrevendo...';b.disabled=true;
   // 1 chamada de IA POR FOTO (campo visual menor lê o manuscrito muito melhor que fotos juntas)
   const extrairFinal=out=>{
@@ -721,7 +832,7 @@ async function transcreverParams(){
     if(clean)setVal('v_param',up(clean));
     b.innerHTML='<i class="ti ti-check"></i> Transcrito';setTimeout(()=>{b.innerHTML='<i class="ti ti-sparkles"></i> Transcrever com IA';b.disabled=false;},1600);
     return;
-  }catch(e){alert('⚠️ '+(e.message||'Falha na IA.'));}
+  }catch(e){toast(e.message||'Falha na IA.','erro');}
   b.innerHTML='<i class="ti ti-sparkles"></i> Transcrever com IA';b.disabled=false;
 }
 
@@ -787,7 +898,7 @@ function copyTa(taId,btnId,label){const t=document.getElementById(taId);if(!t)re
 
 function resumoPlantao(){
   const list=ativos();
-  if(!list.length){alert('Não há pacientes internados para resumir.');return;}
+  if(!list.length){toast('Não há pacientes internados para resumir.');return;}
   const g=agrupaPorSetor(list);
   let txt='PASSAGEM DE PLANTÃO — '+fmtData(ymd())+' ('+list.length+' internado(s))\n';
   grupoKeys(g).forEach(k=>{txt+='\n== '+k+' ('+g[k].length+') ==\n';
@@ -825,7 +936,7 @@ function parseJsonLoose(t){if(!t)return null;t=String(t).trim().replace(/^```[a-
 async function extrairEvol(id){
   const raw=getVal('f_evol');
   const editar=!!id;
-  if(!raw){alert('Cole a evolução do paciente antes de '+(editar?'atualizar.':'extrair.'));return;}
+  if(!raw){toast('Cole a evolução do paciente antes de '+(editar?'atualizar.':'extrair.'),'erro');return;}
   const b=document.getElementById('extrairBtn');b.innerHTML='<span class="spin"></span> '+(editar?'Atualizando…':'Extraindo…');b.disabled=true;
   const KEYS=''
    +'- "nome" (string)\n'
@@ -863,7 +974,7 @@ async function extrairEvol(id){
   try{
     const txt=await MT.ai(prompt);
     const data=parseJsonLoose(txt);
-    if(!data){alert('Não consegui estruturar automaticamente. Tente colar novamente ou preencha manualmente.');}
+    if(!data){toast('Não consegui estruturar automaticamente. Confira o texto ou preencha à mão.');}
     else{
       const toLines=v=>Array.isArray(v)?v.filter(Boolean).join('\n'):(v||'');
       setVal('f_nome',data.nome||'');
@@ -883,7 +994,7 @@ async function extrairEvol(id){
       const bb=document.getElementById('extrairBtn');if(bb){bb.innerHTML=(editar?'✓ Ficha atualizada':'✓ Ficha preenchida')+okN;setTimeout(()=>{bb.innerHTML=editar?'<i class="ti ti-sparkles"></i> Atualizar dados':'<i class="ti ti-sparkles"></i> Extrair dados';bb.disabled=false;},1800);}
       return;
     }
-  }catch(e){alert('⚠️ Não consegui '+(editar?'atualizar':'extrair')+' agora: '+(e.message||'falha na IA')+'. Tente novamente — a evolução continua no campo.');}
+  }catch(e){toast('Não consegui '+(editar?'atualizar':'extrair')+' agora: '+(e.message||'falha na IA')+'. A evolução continua no campo — pode tentar de novo.','erro');}
   b.innerHTML=editar?'<i class="ti ti-sparkles"></i> Atualizar dados':'<i class="ti ti-sparkles"></i> Extrair dados';b.disabled=false;
 }
 

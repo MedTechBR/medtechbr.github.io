@@ -35,17 +35,17 @@
   --primary-soft: #EAF1FA;
   --teal: #0E8A63;
   --danger: #C6453D;
-  --warn: #A3730A;
-  --warn-soft: #2a1e08;
-  --info: #1D6FD0;
-  --info-soft: #14243f;
+  --warn: #8A6009;              /* 4,19:1 no branco reprovava AA */
+  --warn-soft: #F1ECE1;         /* era marrom escuro do tema dark */
+  --info: #1758A6;              /* escurecido p/ passar AA no tom claro */
+  --info-soft: #E4EEF9;         /* era navy escuro do tema dark */
   --success: #186139;
   --success-soft: rgba(29,122,70,.12);
-  --purple: #a78bfa;
-  --purple-soft: #241a44;
-  --caso: #fb923c;
+  --purple: #5B3BC4;            /* lilás claro sobre tom claro dava 2,44:1 */
+  --purple-soft: #EBE7F8;       /* era roxo escuro do tema dark */
+  --caso: #8A6009;              /* laranja claro não passava AA */
   --caso-dark: #fdba74;
-  --caso-soft: #2c1808;
+  --caso-soft: #F1ECE1;         /* era marrom escuro do tema dark */
   --shadow: 0 1px 3px rgba(0,0,0,.42), 0 1px 2px rgba(0,0,0,.3);
   --shadow-lg: 0 14px 34px -10px rgba(0,0,0,.6), 0 0 0 1px var(--line);
 }
@@ -958,6 +958,33 @@ main, #main { display: block !important; height: auto !important; overflow: visi
 .pflag.seen{background:var(--success-soft);color:var(--success)}
 .library-tab.saved-toggle{margin-left:auto}
 .library-tab.saved-toggle.active{background:var(--primary);border-color:var(--primary);color:#fff}
+/* ===== Leitura longa (régua: UpToDate/AMBOSS) =====
+   A coluna tinha 730px = 98 caracteres por linha; acima de ~75 o olho erra a
+   volta de linha. E o corpo estava em 15px. */
+/* 68ch dava 88 caracteres reais (o 'ch' mede o zero, mais largo que a média):
+   medido no app, 54ch cai em ~70 caracteres, dentro da faixa de leitura. */
+.content p, .content li { max-width: 54ch; font-size: 16px; }
+.content li { line-height: 1.65; }
+.content p { line-height: 1.7; }
+/* tabela, diagrama e bloco de código continuam usando a largura toda */
+.content table, .content pre, .content .mermaid { max-width: none; }
+
+/* sumário acompanha a rolagem: documento de 3.000px sem isso obriga voltar ao topo */
+@media (min-width: 1024px){
+  .protocol-card{ position: sticky; top: 14px; z-index: 5; }
+}
+
+/* input abaixo de 16px faz o iOS dar zoom ao focar */
+#globalSearch, #aiPanelInput, .ai-panel-input textarea { font-size: 16px; }
+
+/* alvo de toque */
+#newBtn, #themeBtn, .icon-btn, .ai-panel-send { min-width: 44px; min-height: 44px; }
+
+/* botões de ação da conduta: 29px é pequeno para o polegar */
+@media (max-width: 720px){
+  .action-btn{ min-height: 44px; padding-left: 14px; padding-right: 14px; }
+}
+
 </style>
 <style>/* mt-a11y-16px */@media(max-width:680px){input,select,textarea{font-size:16px}}</style>
 <link rel="stylesheet" href="_mttokens.css?v=3">
@@ -1508,13 +1535,13 @@ main, #main { display: block !important; height: auto !important; overflow: visi
       <div class="ai-panel-title">💬 Pergunte sobre esta conduta</div>
       <div class="ai-panel-subtitle" id="aiPanelSubtitle">—</div>
     </div>
-    <button class="icon-btn" id="aiPanelClose" title="Fechar">✕</button>
+    <button class="icon-btn" id="aiPanelClose" title="Fechar" aria-label="Fechar"><i class="ti ti-x"></i></button>
   </div>
   <div class="ai-panel-chips" id="aiPanelChips"></div>
   <div class="ai-panel-messages" id="aiPanelMessages"></div>
   <div class="ai-panel-inputrow">
     <textarea id="aiPanelInput" placeholder="Pergunte algo sobre esta conduta…" rows="1"></textarea>
-    <button class="ai-panel-send" id="aiPanelSend" title="Enviar">➤</button>
+    <button class="ai-panel-send" id="aiPanelSend" title="Enviar" aria-label="Enviar"><i class="ti ti-send"></i></button>
   </div>
   <div class="ai-panel-disclaimer">Respondo com base no conteúdo desta conduta. Verifique se a resposta se aplica ao seu caso.</div>
 </div>
@@ -1587,13 +1614,13 @@ let aiPanelHistory = []; // [{role:'user'|'model', display: text}]
 // Tema
 const theme = localStorage.getItem(LS_THEME) || 'light';
 document.documentElement.setAttribute('data-theme', theme);
-document.getElementById('themeBtn').textContent = theme === 'dark' ? '☀' : '🌙';
+document.getElementById('themeBtn').innerHTML = theme === 'dark' ? '<i class="ti ti-sun"></i>' : '<i class="ti ti-moon"></i>';
 document.getElementById('themeBtn').onclick = () => {
   const cur = document.documentElement.getAttribute('data-theme');
   const next = cur === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   localStorage.setItem(LS_THEME, next);
-  document.getElementById('themeBtn').textContent = next === 'dark' ? '☀' : '🌙';
+  document.getElementById('themeBtn').innerHTML = next === 'dark' ? '<i class="ti ti-sun"></i>' : '<i class="ti ti-moon"></i>';
 };
 
 // ============ Biblioteca de Protocolos ============

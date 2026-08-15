@@ -10,7 +10,7 @@
 
   --text: #23272E;            /* tinta clara pros números */
   --muted: #5E646B;
-  --muted-2: #767C84;
+  --muted-2: #686E76;        /* era #767C84 = 4.03:1 no fundo do app, reprovava AA */
 
   /* Acento único — azul MedTech */
   --primary: #6D46D8;
@@ -22,7 +22,7 @@
   --income-2: #5738AC;
   --expense: #23272E;         /* mesma tinta do texto pra leitura limpa */
   --expense-2: #C6453D;       /* só pra estouros / alertas */
-  --warning: #A3730A;
+  --warning: #8A6009;         /* era #A3730A = 4.19:1 no branco, reprovava AA */
 
   --glow: rgba(109,70,216,.42);
   --shadow: 0 1px 0 rgba(0,0,0,.30), 0 8px 24px rgba(0,0,0,.36);
@@ -74,8 +74,8 @@ input:-webkit-autofill, input:-webkit-autofill:focus { -webkit-box-shadow: 0 0 0
 .topbar .icon-btn {
   background: transparent;
   border: 1px solid var(--border);
-  width: 40px; height: 40px;
-  border-radius: 10px;
+  width: 44px; height: 44px;   /* alvo de toque mínimo */
+  border-radius: 11px;
 }
 .topbar .icon-btn svg { color: var(--text); opacity: .75; }
 .brand { display: flex; align-items: center; gap: 12px; }
@@ -194,7 +194,7 @@ main { padding: 8px 16px; max-width: 760px; margin: 0 auto; }
 .flow-bar > i.over { background: var(--expense-2); }
 
 .hero-cta { padding-top: 6px; border-top: 1px solid var(--border); }
-.hero-cta .link { padding: 6px 0; font-size: 13px; }
+.hero-cta .link { padding: 12px 0; font-size: 13px; }
 .hero-yearly { margin: -4px 0 0; font-style: italic; }
 
 /* SECTION TITLES */
@@ -502,7 +502,8 @@ button.danger {
 }
 button.danger.full { width: 100%; margin-top: 10px; }
 button.link {
-  background: transparent; border: none; color: var(--primary-2); font-weight: 600; padding: 6px;
+  background: transparent; border: none; color: var(--primary-2); font-weight: 600;
+  padding: 12px 6px; min-height: 44px;   /* alvo de toque */
 }
 
 .file-btn {
@@ -665,7 +666,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
 
 /* abas do dashboard */
 .dash-tabs{display:flex;gap:6px;background:var(--surface, #fff);border:1px solid #E4E4DE;border-radius:12px;padding:4px;margin:2px 0 14px}
-.dash-tabs button{flex:1;border:none;background:none;padding:9px;border-radius:9px;font:600 13.5px inherit;color:#5E646B;cursor:pointer}
+.dash-tabs button{flex:1;border:none;background:none;padding:12px 9px;min-height:44px;border-radius:9px;font:600 13.5px inherit;color:#5E646B;cursor:pointer}
 .dash-tabs button.on{background:#6D46D8;color:#fff}
 /* ferramentas das transações */
 .tx-tools{display:flex;gap:8px;margin:0 0 10px}
@@ -888,3 +889,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
 .sf-chip .sf-apply:hover { background:var(--panel-2,rgba(0,0,0,.05)); }
 .sf-chip .sf-del { border:0; background:transparent; padding:5px 8px 5px 2px; color:var(--muted,#888); cursor:pointer; line-height:1; }
 .sf-chip .sf-del:hover { color:#ef4444; }
+
+/* alvo de toque mínimo: botão redondo do seletor de mês e o "+ Lançar" do resumo */
+.round { min-width: 44px; min-height: 44px; }
+#dashLancar { min-height: 44px; }
