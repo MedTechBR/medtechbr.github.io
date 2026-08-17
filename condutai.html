@@ -24,7 +24,7 @@
   --panel2: #F1F1EC;
   --text: #23272E;
   --text-soft: #5E646B;
-  --text-mute: #6E747C;
+  --text-mute: #686E76;   /* 4,16:1 sobre o painel #F1F1EC reprovava AA */
   --border: #DDDDD5;
   --line: #E8E8E2;
   --line-strong: #DDDDD5;
@@ -40,40 +40,59 @@
   --info: #1758A6;              /* escurecido p/ passar AA no tom claro */
   --info-soft: #E4EEF9;         /* era navy escuro do tema dark */
   --success: #186139;
+  --success-btn: #186139;   /* fundo sólido de chip: branco por cima precisa de verde escuro */
   --success-soft: rgba(29,122,70,.12);
   --purple: #5B3BC4;            /* lilás claro sobre tom claro dava 2,44:1 */
   --purple-soft: #EBE7F8;       /* era roxo escuro do tema dark */
   --caso: #8A6009;              /* laranja claro não passava AA */
   --caso-dark: #fdba74;
   --caso-soft: #F1ECE1;         /* era marrom escuro do tema dark */
-  --shadow: 0 1px 3px rgba(0,0,0,.42), 0 1px 2px rgba(0,0,0,.3);
-  --shadow-lg: 0 14px 34px -10px rgba(0,0,0,.6), 0 0 0 1px var(--line);
+  --shadow: 0 1px 3px rgba(20,24,30,.07);          /* era 42% de preto: sombra de tema escuro num app claro */
+  --shadow-lg: 0 10px 30px -12px rgba(20,24,30,.18), 0 0 0 1px var(--line);
 }
 [data-theme="dark"] {
-  --bg: #FAFAF8;
-  --bg-card: #FFFFFF;
-  --bg-soft: #F1F1EC;
-  --panel2: #F1F1EC;
-  --text: #23272E;
-  --text-soft: #5E646B;
-  --text-mute: #6E747C;
-  --border: #DDDDD5;
-  --primary: #1D6FD0;
-  --primary-dark: #1758A6;
-  --primary-soft: #EAF1FA;
+  /* Tema escuro de verdade. O rebrand claro sobrescreveu este bloco com cores
+     CLARAS e deixou só quatro fundos escuros (--*-soft) para trás: alternar o
+     tema dava uma tela clara com caixas navy/marrom soltas. Paleta restaurada. */
+  --bg: #0A0E14;
+  --bg-card: #111823;
+  --bg-soft: #18222f;
+  --panel2: #0E141D;
+  --text: #E7EEF7;
+  --text-soft: #8A98AC;
+  --text-mute: #97A6B8;
+  --border: rgba(140,160,185,.16);
+  --line: rgba(88,166,255,.12);
+  --line-strong: rgba(140,160,185,.16);
+  --soft: rgba(76,141,255,.12);
+  --glow: rgba(76,141,255,.42);
+  --primary: #4C8DFF;
+  --primary-dark: #2f6ae0;
+  --primary-soft: #15294d;
+  --teal: #38E1C6;
+  --danger: #F85149;
+  --warn: #E3B341;
   --warn-soft: #2a1e08;
+  --info: #4C8DFF;
   --info-soft: #14243f;
-  --success-soft: rgba(29,122,70,.12);
+  --success: #3FB950;
+  --success-btn: #1B7A38;
+  --success-soft: #10281a;
+  --purple: #a78bfa;
   --purple-soft: #241a44;
+  --caso: #fb923c;
+  --caso-dark: #fdba74;
   --caso-soft: #2c1808;
+  --shadow: 0 1px 3px rgba(0,0,0,.42), 0 1px 2px rgba(0,0,0,.3);
+  --shadow-lg: 0 14px 34px -10px rgba(0,0,0,.6), 0 0 0 1px var(--line);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
 body {
   font-family: 'Figtree', -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   letter-spacing: -.011em;
-  background-color: #FAFAF8;
-  background-image: radial-gradient(1100px 460px at 84% -10%,rgba(29,111,208,.12),transparent 60%),radial-gradient(840px 460px at 4% 110%,rgba(14,138,99,.06),transparent 55%),linear-gradient(rgba(140,160,185,.032) 1px,transparent 1px),linear-gradient(90deg,rgba(140,160,185,.032) 1px,transparent 1px);
+  background-color: var(--bg);   /* estava cravado em #FAFAF8: o fundo não acompanhava o tema */
+  background-image: radial-gradient(1100px 460px at 84% -10%,var(--glow-bg,rgba(29,111,208,.10)),transparent 60%),linear-gradient(rgba(140,160,185,.032) 1px,transparent 1px),linear-gradient(90deg,rgba(140,160,185,.032) 1px,transparent 1px);
   background-size: auto,auto,34px 34px,34px 34px;
   background-attachment: fixed;
   color: var(--text);
@@ -145,7 +164,8 @@ aside {
   transition: all .15s;
 }
 .side-tab.active { background: var(--primary-soft); color: var(--primary); }
-[data-theme="dark"] .side-tab.active { color: var(--primary); }
+[data-theme="dark"] .side-tab.active { color: #7FB0FF; }
+[data-theme="dark"] { --nav-ativa: #7FB0FF; }
 .side-list { flex: 1; overflow-y: auto; padding: 8px; }
 .history-item {
   padding: 10px 12px;
@@ -619,7 +639,7 @@ main { grid-area: main; overflow-y: auto; padding: 24px 32px 60px; }
   display: inline-flex; align-items: center; gap: 4px;
 }
 .library-tab:hover { border-color: var(--success); color: var(--success); }
-.library-tab.active { background: var(--success); color: white; border-color: var(--success); }
+.library-tab.active { background: var(--success-btn, #186139); color: #fff; border-color: var(--success-btn, #186139); }
 .library-grid { display: flex; flex-direction: column; gap: 5px; max-height: 480px; overflow-y: auto; padding-right: 4px; }
 .library-grid::-webkit-scrollbar { width: 6px; }
 .library-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
@@ -912,7 +932,9 @@ main, #main { display: block !important; height: auto !important; overflow: visi
   }
   .wb-nav button .nic { font-size: 19px; }
   .wb-nav button:hover { background: var(--bg-soft); }
-  .wb-nav button.active { background: var(--primary-soft); color: var(--primary-dark); }
+  /* --primary-dark sobre --primary-soft dá 2,9:1 no tema escuro (azul escuro
+     sobre azul escuro). Usa o --primary, que é claro no escuro. */
+  .wb-nav button.active { background: var(--primary-soft); color: var(--nav-ativa, var(--primary-dark)); }
   /* o botão central de IA deixa de ser o círculo flutuante do celular */
   .wb-nav button.center .nic {
     background: none; color: inherit; width: auto; height: auto; border-radius: 0;
