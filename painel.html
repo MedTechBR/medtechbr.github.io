@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#0d0d0d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Leitos HRSC">
+<link rel="manifest" href="painel.webmanifest">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAACLklEQVR42u3dwXHCMBBAUVvDVS4gFXBIBamMSQGeVJYKOFBBCnAFdMCBCbvS8l4Dxta3JDNmWHvvCzyruQQICAEhIAQEAkJACAgBgYAQEAJCQCAgBISAEBAICAEhIASEgEBACAgBISAQEAJCQAgIBISAEBACAgEhIASEgBAQCAgBISAEBAJCQAgIAYGAEBACQkAgIASEgBAQCAgBISAEhIBAQAgIASEgEBACQkAICATEfzulf4LjOFKOu22b4Z9+BsqqJ/fQAioyhBqaOKBBBk9DUwY01LBpyFMYAkJACAgEhIAQEAICASEgBISAQEAICAEhIFiWEV6qH8Hn9232U7ju55Tjrr33lNH6vXwMcum/fv4q3QzBJbWse32QYStWT/xs2hLPLX3w6tUT31DLPavEIaxaT3BDQXugArtU+6G0GUg9heehph4NzfQURjECYuCArF/lVzEzEAJCQAgIAYGAEBACQkAgIATE2waU9VMBwkbBDISAKByQVazw+hU0A2moaj1xS5iGStYTugfSUL16ojfRGqp3nVvhc1NPgBf+MvXxu9zX/eyV+wJVnd7nXqkt6270RSICQkAICAGBgBAQAkJAICAEhIAQEAgIASEgBAQCQkAICAEhIHhGwr82YwYCASEgBISAEBAICAEhIAQEAkJACAgBgYAQEAJCQCAgBISAEBACAgEhIASEgEBACAgBISAQEAJCQAgIBISAEBACAgEhIASEgBAQCIhgd4niYemuwK0LAAAAAElFTkSuQmCC">
+<title>Leitos HRSC</title>
+<style>
+:root{
+  color-scheme:dark;
+  --plane:#0d0d0d; --surface:#191918; --surface2:#232321;
+  --ink:#fff; --ink2:#c3c2b7; --muted:#8b8985;
+  --grid:#2c2c2a; --ring:rgba(255,255,255,.11);
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --crit:#e04a4a;
+  --sb:env(safe-area-inset-bottom); --st:env(safe-area-inset-top);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--plane);color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.45;
+  overscroll-behavior-y:contain;-webkit-font-smoothing:antialiased}
+button{font-family:inherit}
+
+/* ---------- PIN ---------- */
+#lock{position:fixed;inset:0;background:var(--plane);z-index:60;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:16px}
+#lock .mark{width:52px;height:52px;border-radius:14px;background:var(--s1);display:flex;
+  align-items:center;justify-content:center;margin-bottom:4px}
+#lock .mark svg{width:30px;height:30px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#lock h1{font-size:17px;margin:0;font-weight:600}
+#lock p{color:var(--muted);font-size:13px;margin:0}
+.dots{display:flex;gap:13px;margin:6px 0 2px}
+.dots i{width:12px;height:12px;border-radius:99px;border:1.5px solid #6b6a66;transition:.14s}
+.dots i.on{background:var(--ink);border-color:var(--ink);transform:scale(1.15)}
+.keys{display:grid;grid-template-columns:repeat(3,72px);gap:12px}
+.keys button{height:60px;border-radius:99px;border:1px solid var(--ring);background:var(--surface);
+  color:var(--ink);font-size:23px;cursor:pointer;transition:background .1s}
+.keys button:active{background:#333331}
+.keys button.fn{background:transparent;border-color:transparent;font-size:20px;color:var(--ink2)}
+#lockerr{color:var(--crit);font-size:13px;min-height:19px;font-weight:600}
+.shake{animation:sh .34s}
+@keyframes sh{0%,100%{transform:translateX(0)}22%{transform:translateX(-9px)}66%{transform:translateX(9px)}}
+
+/* ---------- topo ---------- */
+#top{position:sticky;top:0;z-index:30;background:rgba(13,13,13,.94);
+  backdrop-filter:saturate(1.7) blur(16px);padding:calc(var(--st) + 10px) 0 0;
+  border-bottom:1px solid var(--ring)}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;padding:0 15px 9px;gap:12px}
+.hd h1{font-size:20px;margin:0;letter-spacing:-.02em;font-weight:650}
+.hd .when{color:var(--muted);font-size:12px;margin-top:1px}
+.hd .when b{color:var(--warn);font-weight:600}
+#rec{background:var(--surface);border:1px solid var(--ring);color:var(--ink2);border-radius:99px;
+  width:34px;height:34px;flex:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+#rec svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+#rec.busy svg{animation:sp .9s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.chips{display:flex;gap:7px;overflow-x:auto;padding:0 15px 10px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:6px 13px;border-radius:99px;border:1px solid var(--ring);
+  background:var(--surface);color:var(--ink2);font-size:13px;font-weight:600;
+  white-space:nowrap;cursor:pointer;display:flex;align-items:center;gap:6px}
+.chip.on{background:var(--ink);color:#0d0d0d;border-color:var(--ink)}
+.chip u{text-decoration:none;font-variant-numeric:tabular-nums;opacity:.65;font-size:11.5px}
+.chip.on u{opacity:.55}
+
+#view{padding:14px 0 calc(var(--sb) + 90px);min-height:60vh}
+
+/* ---------- navegação ---------- */
+nav{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(13,13,13,.94);
+  backdrop-filter:saturate(1.7) blur(16px);border-top:1px solid var(--ring);
+  padding:6px 6px calc(var(--sb) + 6px);display:grid;grid-template-columns:repeat(4,1fr);gap:3px}
+nav button{background:none;border:0;color:var(--muted);font-size:10.5px;font-weight:600;
+  padding:7px 2px 5px;border-radius:11px;cursor:pointer;display:flex;flex-direction:column;
+  align-items:center;gap:4px}
+nav button.on{color:var(--ink);background:var(--surface)}
+nav svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.75;
+  stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- blocos ---------- */
+.card{background:var(--surface);border:1px solid var(--ring);border-radius:15px;
+  padding:15px;margin:0 15px 10px}
+.card.press{cursor:pointer;transition:background .12s}
+.card.press:active{background:var(--surface2)}
+.hero .n{font-size:46px;font-weight:650;letter-spacing:-.035em;line-height:.98}
+.hero .n.crit{color:var(--crit)} .hero .n.good{color:var(--good)}
+.hero .lab{color:var(--ink2);font-size:14px;margin-top:6px;font-weight:500}
+.hero .sub{color:var(--muted);font-size:12.5px;margin-top:10px;line-height:1.55}
+.hero .sub b{color:var(--ink2)}
+h2{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);
+  margin:22px 15px 9px;font-weight:700}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.row+.row{margin-top:6px}
+.k{color:var(--ink2);font-size:13.5px}
+.v{font-variant-numeric:tabular-nums;font-weight:600}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:0 15px 10px}
+.tile{background:var(--surface);border:1px solid var(--ring);border-radius:15px;padding:13px 14px}
+.tile .n{font-size:27px;font-weight:650;letter-spacing:-.025em;line-height:1.08}
+.tile .l{color:var(--ink2);font-size:11.5px;margin-top:3px;line-height:1.35}
+.bar{height:9px;background:var(--grid);border-radius:5px;overflow:hidden;display:flex;margin:10px 0 9px}
+.bar i{display:block;height:100%}
+.bar i.o{background:var(--s1)} .bar i.x{background:var(--s2);border-left:2px solid var(--surface)}
+.meta{color:var(--muted);font-size:12px;display:flex;gap:12px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.badge{font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:99px;border:1px solid currentColor;white-space:nowrap}
+.b-crit{color:var(--crit)} .b-warn{color:var(--serious)} .b-good{color:var(--good)} .b-mut{color:var(--muted)}
+.nome{font-weight:600;font-size:15px}
+.num{font-size:33px;font-weight:650;letter-spacing:-.025em;line-height:1;font-variant-numeric:tabular-nums}
+.split{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+.calc{color:var(--muted);font-size:12px;margin-top:10px;line-height:1.6;border-top:1px solid var(--grid);padding-top:9px}
+.calc b{color:var(--ink2);font-weight:600}
+.acao{display:flex;gap:11px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--grid)}
+.acao:last-child{border-bottom:0;padding-bottom:0}
+.acao .dot{width:7px;height:7px;border-radius:99px;flex:none;margin-top:7px}
+.acao .tx{font-size:13.5px;line-height:1.45}
+.acao .tx b{font-weight:600}
+.acao .tx span{color:var(--muted);font-size:12px;display:block;margin-top:2px}
+
+/* pacientes */
+.pac{background:var(--surface);border:1px solid var(--ring);border-radius:15px;margin:0 15px 8px;
+  padding:13px 15px;cursor:pointer}
+.pac .h{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.pac .id{font-weight:600;font-size:14.5px;font-variant-numeric:tabular-nums}
+.pac .id span{color:var(--muted);font-weight:400;font-size:12px}
+.pac .exc{font-variant-numeric:tabular-nums;font-weight:700;font-size:14.5px;flex:none}
+.pac .dias{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums;margin-top:3px}
+.pac .pend{color:var(--ink2);font-size:13px;line-height:1.5;margin-top:9px;display:none}
+.pac.open .pend{display:block}
+.pac .tags{margin-top:8px;display:flex;gap:5px;flex-wrap:wrap}
+.tag{font-size:9.5px;font-weight:700;letter-spacing:.05em;padding:2px 6px;border-radius:5px;
+  border:1px solid currentColor;text-transform:uppercase}
+.t-v{color:var(--crit)} .t-t{color:var(--s1)} .t-c{color:var(--s2)} .t-a{color:var(--good)}
+.spark{display:flex;align-items:flex-end;gap:3px;height:46px;margin-top:12px}
+.spark i{flex:1;border-radius:2px 2px 0 0;min-height:2px;background:var(--s1)}
+.spark i.hj{background:var(--warn)}
+.sparkl{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-top:6px}
+.empty{color:var(--muted);font-size:13.5px;text-align:center;padding:44px 24px;line-height:1.6}
+.foot{color:var(--muted);font-size:11.5px;line-height:1.65;padding:14px 17px 0}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--sb) + 78px);
+  background:var(--ink);color:#0d0d0d;font-size:13px;font-weight:600;padding:9px 17px;
+  border-radius:99px;z-index:50;opacity:0;pointer-events:none;transition:.22s}
+#toast.on{opacity:1}
+</style>
+</head>
+<body>
+
+<div id="lock">
+  <div class="mark"><svg viewBox="0 0 24 24"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6M3 18h18M3 18v2M21 18v2M6 10V7a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg></div>
+  <h1>Painel de Leitos · HRSC</h1>
+  <p>PIN de 6 dígitos</p>
+  <div class="dots" id="dots"></div>
+  <div id="lockerr"></div>
+  <div class="keys" id="keys"></div>
+</div>
+
+<div id="app" hidden>
+  <div id="top">
+    <div class="hd">
+      <div><h1 id="ttl">Hoje</h1><div class="when" id="when"></div></div>
+      <button id="rec" title="Recarregar"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7M21 4v5h-5"/></svg></button>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+  <div id="view"></div>
+</div>
+
+<nav id="nav" hidden>
+  <button data-t="hoje" class="on"><svg viewBox="0 0 24 24"><path d="M12 3l9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V10z"/></svg>Hoje</button>
+  <button data-t="leitos"><svg viewBox="0 0 24 24"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6M3 18h18M3 18v2M21 18v2M6 10V7a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg>Leitos</button>
+  <button data-t="altas"><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>Altas</button>
+  <button data-t="perm"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Permanência</button>
+</nav>
+
+<div id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const NL=6;
+let D=null, TAB='hoje', FILT=new Set();
+const esc=s=>String(s).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+const nf=n=>String(n).replace('.',',');
+const buzz=n=>navigator.vibrate&&navigator.vibrate(n);
+
+/* ============ dados ============ */
+const encT=new TextEncoder();
+const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function derive(pin,salt){
+  const km=await crypto.subtle.importKey('raw',encT.encode(pin),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:600000,hash:'SHA-256'},
+    km,{name:'AES-GCM',length:256},false,['decrypt']);
+}
+async function carregar(pin){
+  const r=await fetch('painel-dados.json?t='+Date.now(),{cache:'no-store'}).catch(()=>fetch('painel-dados.json'));
+  const raw=await r.json();
+  if(!raw.cifrado) return raw;
+  const key=await derive(pin,b64(raw.salt));
+  const buf=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(raw.iv)},key,b64(raw.dados));
+  return JSON.parse(new TextDecoder().decode(buf));
+}
+
+/* ============ PIN ============ */
+let pin='';
+const dots=()=>$('#dots').innerHTML=Array.from({length:NL},(_,i)=>`<i class="${i<pin.length?'on':''}"></i>`).join('');
+$('#keys').innerHTML=[1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(k=>
+  k===''?'<button class="fn" disabled></button>':`<button class="${k==='⌫'?'fn':''}" data-k="${k}">${k}</button>`).join('');
+$('#keys').onclick=async e=>{
+  const b=e.target.closest('button'); if(!b||!b.dataset.k) return;
+  buzz(8);
+  if(b.dataset.k==='⌫'){ pin=pin.slice(0,-1); dots(); return; }
+  if(pin.length>=NL) return;
+  pin+=b.dataset.k; dots();
+  if(pin.length===NL){
+    $('#lockerr').textContent='verificando…';
+    try{ D=await carregar(pin); sessionStorage.setItem('pin',pin); iniciar(); }
+    catch(_){ $('#lockerr').textContent='PIN incorreto'; pin=''; dots();
+      $('#lock').classList.add('shake'); setTimeout(()=>$('#lock').classList.remove('shake'),380); buzz([60,50,60]); }
+  }
+};
+dots();
+
+/* ============ cálculo ============ */
+const nec=s=>Math.max(0,Math.round(s.entra+s.interno+s.eletivos-s.livres));
+const vis =()=>FILT.size?D.setores.filter(s=>FILT.has(s.k)):D.setores;
+const vpac=()=>FILT.size?D.pacientes.filter(p=>FILT.has(p.s)):D.pacientes;
+const nomeS=k=>(D.setores.find(s=>s.k===k)||{}).curto||k;
+const corte=k=>(D.setores.find(s=>s.k===k)||{}).corte;
+
+/* ============ início ============ */
+function iniciar(){
+  const l=$('#lock'); if(l) l.remove();
+  $('#app').hidden=false; $('#nav').hidden=false;
+  chips(); render();
+  $$('#nav button').forEach(b=>b.onclick=()=>{
+    TAB=b.dataset.t; $$('#nav button').forEach(x=>x.classList.toggle('on',x===b));
+    buzz(8); window.scrollTo({top:0}); render();
+  });
+  $('#rec').onclick=async()=>{
+    const r=$('#rec'); r.classList.add('busy');
+    try{ D=await carregar(sessionStorage.getItem('pin')||''); render(); toast('Atualizado'); }
+    catch(_){ toast('Sem conexão — mostrando a última rodada'); }
+    r.classList.remove('busy');
+  };
+}
+function toast(t){ const e=$('#toast'); e.textContent=t; e.classList.add('on');
+  clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('on'),2100); }
+
+function carimbo(){
+  const g=new Date(D.gerado), h=(Date.now()-g)/36e5;
+  const rel = h<1?'agora há pouco' : h<24?`há ${Math.round(h)} h` : `há ${Math.round(h/24)} dias`;
+  const velho = h>=20;
+  return `Censo de ${D.referencia_censo} · ${velho?`<b>atualizado ${rel}</b>`:`atualizado ${rel}`}`;
+}
+function chips(){
+  const S=D.setores.slice().sort((a,b)=>nec(b)-nec(a));
+  $('#chips').innerHTML=`<button class="chip on" data-s="">Todos</button>`+
+    S.map(s=>{const n=nec(s);return `<button class="chip" data-s="${s.k}">${s.curto}${n?`<u>${n}</u>`:''}</button>`}).join('');
+  $('#chips').onclick=e=>{
+    const b=e.target.closest('.chip'); if(!b) return; buzz(8);
+    const k=b.dataset.s;
+    if(!k) FILT.clear(); else FILT.has(k)?FILT.delete(k):FILT.add(k);
+    $$('#chips .chip').forEach(c=>c.classList.toggle('on', c.dataset.s?FILT.has(c.dataset.s):FILT.size===0));
+    render();
+  };
+}
+const TITULO={hoje:'Hoje',leitos:'Leitos',altas:'Altas',perm:'Permanência'};
+function render(){
+  $('#ttl').textContent=TITULO[TAB];
+  $('#when').innerHTML=carimbo();
+  $('#view').innerHTML={hoje:vHoje,leitos:vLeitos,altas:vAltas,perm:vPerm}[TAB]();
+  $$('.pac').forEach(c=>c.onclick=()=>{c.classList.toggle('open');buzz(6)});
+  const cp=$('#copiar'); if(cp) cp.onclick=copiar;
+}
+
+/* ============ HOJE ============ */
+function vHoje(){
+  const S=vis().slice().sort((a,b)=>nec(b)-nec(a));
+  const tot=S.reduce((a,b)=>a+nec(b),0), cap=D.global.media_altas_dia;
+  const P=vpac();
+  const acoes=[];
+  P.filter(p=>p.t.includes('a')).forEach(p=>acoes.push(['var(--good)',`Alta já programada · ${nomeS(p.s)} leito ${p.l}`,`prontuário ${p.p} — confirmar que saiu`]));
+  P.filter(p=>p.t.includes('v')).forEach(p=>acoes.push(['var(--crit)',`Previsão vencida em ${p.pr.split(' ')[0]} · ${nomeS(p.s)} leito ${p.l}`,p.pend]));
+  P.filter(p=>p.t.includes('t')).slice(0,5).forEach(p=>acoes.push(['var(--s1)',`Travado por vaga · ${nomeS(p.s)} leito ${p.l} (${p.dl}d)`,p.pend]));
+  const el=D.eletivos_datados.filter(e=>!FILT.size||FILT.has(e.setor));
+  return `
+  <div class="card hero">
+    <div class="n ${tot>cap?'crit':'good'}">${tot}</div>
+    <div class="lab">altas necessárias hoje</div>
+    <div class="sub">O hospital dá <b>${nf(cap)} altas por dia</b> em média.
+      ${tot>cap?`Hoje precisa de <b>${nf((tot-cap).toFixed(1))} a mais</b> que o habitual — é assim que a cama extra aparece.`
+              :`Está dentro do ritmo habitual.`}</div>
+  </div>
+  <div class="tiles">
+    <div class="tile"><div class="n ${D.global.livres===0?'':''}" style="color:${vis().reduce((a,b)=>a+b.livres,0)?'var(--ink)':'var(--crit)'}">${vis().reduce((a,b)=>a+b.livres,0)}</div><div class="l">leitos livres agora</div></div>
+    <div class="tile"><div class="n" style="color:${vis().reduce((a,b)=>a+b.extra,0)?'var(--s2)':'var(--ink)'}">${vis().reduce((a,b)=>a+b.extra,0)}</div><div class="l">camas extras em uso</div></div>
+    <div class="tile"><div class="n">${D.emergencia.ocup}</div><div class="l">na emergência, de ${D.emergencia.cap} boxes</div></div>
+    <div class="tile"><div class="n">${vpac().length}</div><div class="l">acima do corte do setor</div></div>
+  </div>
+  ${S.filter(s=>nec(s)>0).length?`<h2>Onde dar as altas</h2>
+  <div class="card">${S.filter(s=>nec(s)>0).map(s=>`
+    <div class="acao"><span class="dot" style="background:${nec(s)>s.sai?'var(--crit)':'var(--serious)'}"></span>
+      <div class="tx"><b>${nec(s)} em ${esc(s.nome)}</b>
+      <span>costuma dar ${nf(s.sai.toFixed(1))} por dia${nec(s)>s.sai?' — acima do que este setor consegue':''}</span></div></div>`).join('')}
+  </div>`:''}
+  ${el.length?`<h2>Entram amanhã</h2>
+  <div class="card"><div class="acao"><span class="dot" style="background:var(--warn)"></span>
+    <div class="tx"><b>${el.length} eletivos de ${esc(el[0].tipo)}</b>
+    <span>internam ${el[0].interna.slice(0,5)} para procedimento em ${el[0].data.slice(0,5)} · destino ${nomeS(el[0].setor)} · prontuários ${el.map(e=>e.pront).join(', ')}</span></div></div>
+  </div>`:''}
+  ${acoes.length?`<h2>O que cobrar</h2>
+  <div class="card">${acoes.map(a=>`<div class="acao"><span class="dot" style="background:${a[0]}"></span>
+    <div class="tx"><b>${esc(a[1])}</b><span>${esc(a[2])}</span></div></div>`).join('')}</div>`:''}
+  <div class="card press" id="copiar" style="text-align:center;color:var(--s1);font-weight:600;font-size:14px">
+    Copiar resumo para enviar
+  </div>
+  <div class="foot">O eletivo interna na véspera do procedimento — a conta de hoje já olha quem entra amanhã.</div>`;
+}
+function copiar(){
+  const S=D.setores.slice().sort((a,b)=>nec(b)-nec(a)).filter(s=>nec(s)>0);
+  const t=`PAINEL DE LEITOS HRSC — censo de ${D.referencia_censo}\n\n`+
+    `${S.reduce((a,b)=>a+nec(b),0)} altas necessárias hoje (a casa dá ${nf(D.global.media_altas_dia)}/dia)\n`+
+    `${D.global.internados} internados · ${D.global.livres} livres · ${D.global.extras} camas extras\n`+
+    `${D.emergencia.ocup} pacientes na emergência\n\n`+
+    S.map(s=>`• ${s.nome}: ${nec(s)} altas (${s.livres} livres, dá ~${nf(s.sai.toFixed(1))}/dia)`).join('\n')+
+    `\n\n${D.pacientes.filter(p=>p.t.includes('t')).length} pacientes travados por vaga ou transferência.`;
+  (navigator.share?navigator.share({text:t}):navigator.clipboard.writeText(t).then(()=>toast('Copiado')))
+    .catch(()=>navigator.clipboard.writeText(t).then(()=>toast('Copiado')).catch(()=>toast('Não consegui copiar')));
+}
+
+/* ============ LEITOS ============ */
+function vLeitos(){
+  const S=vis();
+  const cap=S.reduce((a,b)=>a+b.cap,0), oc=S.reduce((a,b)=>a+b.ocup,0);
+  const ex=S.reduce((a,b)=>a+b.extra,0), lv=S.reduce((a,b)=>a+b.livres,0);
+  const zero=S.filter(s=>s.livres===0).length;
+  const E=D.emergencia;
+  return `
+  <div class="card hero">
+    <div class="n ${lv===0?'crit':''}">${lv}</div>
+    <div class="lab">leitos livres em ${cap} instalados</div>
+    <div class="sub">${oc+ex} internados${ex?` · <b>${ex} em cama extra</b>`:''} · ocupação ${nf((oc/cap*100).toFixed(1))}%${
+      zero?` · <b>${zero} ${zero>1?'setores lotados':'setor lotado'}</b>`:''}</div>
+  </div>
+  ${S.map(s=>{
+    const bd=s.livres===0?(s.extra?'<span class="badge b-crit">transbordo</span>':'<span class="badge b-crit">lotado</span>')
+      :s.livres<=2?'<span class="badge b-warn">margem mínima</span>':`<span class="badge b-good">${s.livres} livres</span>`;
+    return `<div class="card">
+      <div class="row"><span class="nome">${esc(s.nome)}</span>${bd}</div>
+      <div class="bar"><i class="o" style="width:${Math.min(s.ocup/s.cap*100,100)}%"></i>${
+        s.extra?`<i class="x" style="width:${s.extra/s.cap*100}%"></i>`:''}</div>
+      <div class="meta"><span>${s.cap} leitos</span><span>${s.ocup+s.extra} ocupados</span>
+        ${s.extra?`<span style="color:var(--s2)">${s.extra} extras</span>`:''}
+        <span>entram ~${nf(s.entra.toFixed(1))}/dia</span></div>
+    </div>`;}).join('')}
+  ${FILT.size?'':`<h2>Emergência agora · ${E.hora}</h2>
+  <div class="card">
+    <div class="row"><span class="nome">${E.ocup} de ${E.cap} boxes</span>
+      <span class="badge ${E.ocupacao>85?'b-crit':E.ocupacao>65?'b-warn':'b-good'}">${nf(E.ocupacao)}%</span></div>
+    <div class="bar"><i class="o" style="width:${E.ocupacao}%"></i></div>
+    ${E.boxes.map(b=>`<div class="row"><span class="k">${esc(b.n)}</span>
+      <span class="v">${b.oc}/${b.cap}</span></div>`).join('')}
+    <div class="calc">Estes são os pacientes que vão pedir leito de enfermaria nas próximas horas.
+      É a fonte viva — não depende do kanban ser preenchido.</div>
+  </div>`}
+  <div class="foot">Capacidade sem camas extras e sem o leito da Pediatria. Extras são transbordo acima da capacidade instalada, não capacidade.</div>`;
+}
+
+/* ============ ALTAS ============ */
+function vAltas(){
+  const S=vis().slice().sort((a,b)=>nec(b)-nec(a));
+  const tot=S.reduce((a,b)=>a+nec(b),0), cap=D.global.media_altas_dia;
+  const C=D.cirurgias, mx=Math.max(...D.serie.map(d=>d.i));
+  const el=D.eletivos_datados.filter(e=>!FILT.size||FILT.has(e.setor));
+  return `
+  <div class="card hero">
+    <div class="n ${tot>cap?'crit':'good'}">${tot}</div>
+    <div class="lab">altas necessárias hoje</div>
+    <div class="sub">Entradas esperadas amanhã, mais o que já está pedido, menos o que está livre.</div>
+  </div>
+  ${S.filter(s=>nec(s)>0||s.entra>=1).map(s=>{
+    const n=nec(s);
+    return `<div class="card">
+      <div class="split">
+        <div><div class="nome">${esc(s.nome)}</div>
+          <div class="meta" style="margin-top:4px"><span>${s.livres} livres</span><span>dá ~${nf(s.sai.toFixed(1))} altas/dia</span></div></div>
+        <div class="num" style="color:${n===0?'var(--good)':n>s.sai?'var(--crit)':'var(--serious)'}">${n}</div>
+      </div>
+      <div class="calc"><b>${nf(s.entra.toFixed(1))}</b> entradas esperadas amanhã${
+        s.interno?` + <b>${s.interno}</b> ${s.interno>1?'pedidos internos':'pedido interno'} de vaga`:''}${
+        s.eletivos?` + <b>${s.eletivos}</b> ${s.eletivos>1?'eletivos internando amanhã':'eletivo internando amanhã'}`:''}
+        − <b>${s.livres}</b> ${s.livres===1?'leito livre':'leitos livres'}${
+        n>s.sai?`<br>Acima do que este setor costuma dar.`:''}</div>
+    </div>`;}).join('')}
+  ${el.length?`<h2>Eletivos com data</h2>${el.map(e=>`<div class="card">
+    <div class="row"><span class="nome">${esc(e.tipo)}</span><span class="badge b-warn">interna ${e.interna.slice(0,5)}</span></div>
+    <div class="meta" style="margin-top:7px"><span>prontuário ${esc(e.pront)}</span><span>${nomeS(e.setor)}</span>
+      <span>procedimento ${e.data.slice(0,5)}</span></div>
+    <div class="calc">${esc(e.obs)}</div></div>`).join('')}`:''}
+  <h2>Mapa cirúrgico</h2>
+  <div class="card">
+    <div class="row"><span class="k">Média de ${C.janela}</span><span class="v">${nf(C.media_dia)} cirurgias/dia</span></div>
+    ${C.agenda.map(a=>`<div class="row"><span class="k">${a.d}${a.hoje?' · hoje':''}</span>
+      <span class="v" style="color:${a.n?'var(--ink)':'var(--muted)'}">${a.n||'—'}</span></div>`).join('')}
+    <div class="calc">${esc(C.nota)}</div>
+  </div>
+  <h2>Movimento de 14 dias</h2>
+  <div class="card">
+    <div class="row"><span class="k">Entradas por dia</span><span class="v">${nf(D.global.media_internacoes_dia)}</span></div>
+    <div class="row"><span class="k">Altas por dia</span><span class="v">${nf(D.global.media_altas_dia)}</span></div>
+    <div class="row"><span class="k">Saldo</span><span class="v" style="color:var(--crit)">+${nf(D.global.saldo_dia)} leito/dia</span></div>
+    <div class="spark">${D.serie.map(d=>`<i style="height:${d.i/mx*100}%"></i>`).join('')}</div>
+    <div class="sparkl"><span>${D.serie[0].d}</span><span>entradas diárias</span><span>${D.serie[D.serie.length-1].d}</span></div>
+  </div>
+  <h2>Fila eletiva com AIH</h2>
+  ${D.fila_eletiva.map(f=>`<div class="card">
+    <div class="nome">${esc(f.grupo)}</div>
+    <div class="meta" style="margin-top:4px"><span>${esc(f.detalhe)}</span></div>
+    <div class="row" style="margin-top:10px"><span class="k">Agendamento confirmado</span><span class="v">${f.confirmado}</span></div>
+    <div class="row"><span class="k">Agendamento realizado</span><span class="v">${f.agendado}</span></div>
+    <div class="row"><span class="k">Liberada, aguardando</span><span class="v">${f.liberada+f.aguardando+f.internar_local}</span></div>
+  </div>`).join('')}
+  <div class="foot">A média de entradas já inclui os eletivos de rotina; os eletivos com data são somados à parte por estarem confirmados.</div>`;
+}
+
+/* ============ PERMANÊNCIA ============ */
+function vPerm(){
+  const P=vpac().slice().sort((a,b)=>b.e-a.e);
+  const TG={v:'vencida',t:'vaga',c:'exame',a:'alta hoje'};
+  if(!P.length) return `<div class="empty">Nenhum paciente acima do corte nos setores filtrados.<br>Toque em “Todos” para ver a casa inteira.</div>`;
+  const vaga=P.filter(p=>p.t.includes('t')).length;
+  const comPrev=P.filter(p=>p.pr!=='SP'&&p.pr!=='—').length;
+  return `
+  <div class="tiles">
+    <div class="tile"><div class="n">${P.length}</div><div class="l">acima do corte do setor</div></div>
+    <div class="tile"><div class="n" style="color:var(--s1)">${vaga}</div><div class="l">travados por vaga ou transferência</div></div>
+  </div>
+  <div class="card"><div class="row"><span class="k">Previsão de alta lançada no prontuário</span>
+    <span class="v" style="color:${comPrev/P.length<.3?'var(--crit)':'var(--ink)'}">${comPrev} de ${P.length}</span></div>
+    <div class="calc">Sem previsão registrada não há como cobrar prazo. É o indicador de cobrança das chefias.</div></div>
+  <h2>Toque para ver a pendência</h2>
+  ${P.map(p=>`<div class="pac">
+    <div class="h"><div class="id">${nomeS(p.s)} · leito ${esc(p.l)} <span>· ${esc(p.p)}</span></div>
+      <div class="exc" style="color:${p.e>=2.5?'var(--crit)':p.e>=1.5?'var(--serious)':'var(--ink2)'}">${nf(p.e.toFixed(2))}×</div></div>
+    <div class="dias">${p.dl} d na clínica · ${p.dh} d no hospital · corte ${nf(corte(p.s))} d</div>
+    ${p.t.length||p.pr!=='SP'?`<div class="tags">${p.t.map(t=>`<span class="tag t-${t}">${TG[t]}</span>`).join('')}${
+      p.pr!=='SP'&&p.pr!=='—'?`<span class="tag t-v">${esc(p.pr)}</span>`:''}</div>`:''}
+    <div class="pend">${esc(p.pend)}</div>
+  </div>`).join('')}
+  <div class="foot">Excesso = dias na clínica ÷ corte do setor, para que 7 dias na Cirúrgica pesem mais que 25 na UTI.
+    Pendências extraídas do bloco de conduta da última evolução médica.</div>`;
+}
+
+/* ============ arranque ============ */
+(async()=>{
+  try{ D=await carregar(sessionStorage.getItem('pin')||''); if(D) iniciar(); }catch(_){}
+})();
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+</script>
+</body>
+</html>

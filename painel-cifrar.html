@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cifrar dados — Painel de Leitos HRSC</title>
+<style>
+body{margin:0;background:#0d0d0d;color:#fff;font-family:system-ui,-apple-system,sans-serif;
+  font-size:15px;line-height:1.5}
+.w{max-width:620px;margin:0 auto;padding:34px 20px 60px}
+h1{font-size:20px;margin:0 0 6px;letter-spacing:-.01em}
+p.s{color:#898781;font-size:13.5px;margin:0 0 26px}
+.card{background:#1a1a19;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:20px;margin-bottom:14px}
+label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#898781;
+  font-weight:700;margin-bottom:8px}
+input[type=file]{color:#c3c2b7;font-size:13.5px;width:100%}
+input[type=password]{width:100%;padding:13px 15px;border-radius:10px;border:1px solid rgba(255,255,255,.14);
+  background:#232321;color:#fff;font-size:21px;letter-spacing:.35em;font-family:inherit;
+  text-align:center;font-variant-numeric:tabular-nums}
+button{width:100%;padding:14px;border-radius:10px;border:0;background:#3987e5;color:#fff;
+  font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:6px}
+button:disabled{background:#2c2c2a;color:#898781;cursor:default}
+#msg{font-size:13.5px;margin-top:14px;min-height:20px}
+.ok{color:#0ca30c} .err{color:#d03b3b}
+ol{color:#c3c2b7;font-size:13.5px;padding-left:20px;margin:0}
+ol li{margin-bottom:7px}
+code{background:#232321;padding:1px 6px;border-radius:5px;font-size:12.5px}
+.warn{color:#fab219;font-size:12.5px;line-height:1.6;margin-top:12px}
+</style></head><body><div class="w">
+
+<h1>Cifrar o painel-dados.json</h1>
+<p class="s">Tudo acontece dentro deste navegador. O PIN não é enviado para lugar nenhum e não fica gravado em parte alguma — nem no arquivo gerado.</p>
+
+<div class="card">
+  <label>1 · Arquivo painel-dados.json em claro</label>
+  <input type="file" id="f" accept=".json,application/json">
+</div>
+
+<div class="card">
+  <label>2 · PIN de 6 dígitos</label>
+  <input type="password" id="pin" inputmode="numeric" maxlength="6" placeholder="······" autocomplete="off">
+  <div class="warn">Use o mesmo PIN sempre. Se esquecer, é só cifrar de novo com outro — não há como recuperar o arquivo antigo.</div>
+</div>
+
+<div class="card">
+  <label>3 · Gerar</label>
+  <button id="go" disabled>Cifrar e baixar painel-dados.json</button>
+  <div id="msg"></div>
+</div>
+
+<div class="card">
+  <label>Depois</label>
+  <ol>
+    <li>Suba o <code>painel-dados.json</code> baixado para o repositório, substituindo o anterior.</li>
+    <li>Em 1 a 2 minutos o GitHub Pages publica. Puxe para baixo no app para recarregar.</li>
+    <li>O app pede o PIN uma vez por sessão e guarda só até você fechar.</li>
+  </ol>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+let JS=null;
+$('#f').onchange=async e=>{
+  const file=e.target.files[0]; if(!file) return;
+  try{ JS=JSON.parse(await file.text()); if(JS.cifrado){ msg('Esse arquivo já está cifrado. Use o painel-dados.json em claro.','err'); JS=null; } else msg('Arquivo lido: '+(JS.pacientes?JS.pacientes.length+' pacientes':'ok'),'ok'); }
+  catch(x){ msg('Não consegui ler o JSON.','err'); JS=null; }
+  chk();
+};
+$('#pin').oninput=e=>{ e.target.value=e.target.value.replace(/\D/g,''); chk(); };
+function chk(){ $('#go').disabled=!(JS && $('#pin').value.length===6); }
+function msg(t,c){ const m=$('#msg'); m.textContent=t; m.className=c||''; }
+
+$('#go').onclick=async()=>{
+  $('#go').disabled=true; msg('Cifrando… isso leva alguns segundos.','');
+  try{
+    const enc=new TextEncoder();
+    const salt=crypto.getRandomValues(new Uint8Array(16));
+    const iv=crypto.getRandomValues(new Uint8Array(12));
+    const km=await crypto.subtle.importKey('raw',enc.encode($('#pin').value),'PBKDF2',false,['deriveKey']);
+    const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:600000,hash:'SHA-256'},
+      km,{name:'AES-GCM',length:256},false,['encrypt']);
+    const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,enc.encode(JSON.stringify(JS)));
+    const b64=u=>btoa(String.fromCharCode(...new Uint8Array(u)));
+    const out={cifrado:true,alg:'AES-GCM/PBKDF2-SHA256/600000',
+      referencia_censo:JS.referencia_censo,gerado:JS.gerado,
+      salt:b64(salt),iv:b64(iv),dados:b64(ct)};
+    const blob=new Blob([JSON.stringify(out)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download='painel-dados.json'; a.click();
+    msg('Pronto. Arquivo cifrado baixado — suba ele no lugar do antigo.','ok');
+  }catch(x){ msg('Falhou: '+x.message,'err'); }
+  $('#go').disabled=false;
+};
+</script>
+</div></body></html>
