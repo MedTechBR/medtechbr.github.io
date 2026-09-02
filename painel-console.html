@@ -615,6 +615,21 @@ function serieDiaria(){
   });
   return Object.values(por).sort((a, b) => a.k.localeCompare(b.k));
 }
+/* tabela "ALTA SE POR SETOR" da aba PILOTO (atualizar_piloto.py) — antes×depois já calculado por setor, usando
+   o 1º envio REAL daquele setor (não o do hospital todo, que é mais grosseiro) */
+function porSetor(){
+  const P = S.piloto || []; let i = P.findIndex(r => /POR SETOR/.test(String((r || [])[0] || '')));
+  if (i < 0) return [];
+  const out = [];
+  for (let j = i + 2; j < P.length; j++) {
+    const r = P[j] || []; const setor = String(r[0] || '').trim();
+    if (!setor) break;
+    out.push({setor, sinalizadas: num(r[1]), sairam: num(r[2]), pct: (r[3] === '—' ? null : num(r[3])),
+      desde: String(r[4] || ''), antes: (r[5] === '—' ? null : num(r[5])), depois: (r[6] === '—' ? null : num(r[6])),
+      delta: (r[7] === '—' ? null : num(r[7]))});
+  }
+  return out;
+}
 /* primeiro dia em que os PDFs saíram de verdade para um setor/coordenação (não teste) — o "antes × depois" gira em torno dele */
 function dataPrimeiroEnvio(){
   const ds = S.envios.filter(r => /^enviado/.test(String(r[4] || '')) && !/teste/i.test(String(r[1] || ''))).map(r => String(r[0] || '').slice(0, 5)).filter(x => /^\d{2}\/\d{2}$/.test(x));
@@ -652,6 +667,17 @@ function vPiloto(){
       '<div class="msg">Percentual ponderado (soma das que saíram ÷ soma das sinalizadas). Com poucos dias "depois" a diferença ainda é frágil; acompanhe por 2 semanas antes de concluir.</div>';
   } else h += '<div class="bloq">sem dias suficientes de um lado ou do outro</div>';
   h += '</div></div>';
+  /* por setor — a tabela que responde "melhorou depois que o coordenador passou a receber?" setor a setor */
+  const ps = porSetor();
+  if (ps.length) {
+    h += '<div class="card" style="margin-bottom:12px"><header><h2>ALTA SE por setor</h2><span class="hint">"Coordenador desde" = 1º PDF real daquele setor (não teste)</span></header><div class="body scroll"><table class="tb"><thead><tr><th>Setor</th><th class="r">Sinalizadas</th><th class="r">Saíram</th><th class="r">% acumulado</th><th>Coordenador desde</th><th class="r">Antes</th><th class="r">Depois</th><th class="r">Δ</th></tr></thead><tbody>' +
+      ps.map(x => '<tr><td class="lt">' + esc(x.setor) + '</td><td class="r num">' + (x.sinalizadas ?? '—') + '</td><td class="r num">' + (x.sairam ?? '—') + '</td>' +
+        '<td class="r num"><b>' + (x.pct == null ? '—' : x.pct + '%') + '</b></td>' +
+        '<td>' + (/ainda sem/.test(x.desde) ? '<span class="flag nao">ainda sem e-mail real</span>' : '<span class="flag ok">' + esc(x.desde) + '</span>') + '</td>' +
+        '<td class="r num">' + (x.antes == null ? '—' : x.antes + '%') + '</td><td class="r num">' + (x.depois == null ? '—' : x.depois + '%') + '</td>' +
+        '<td class="r"><span class="delta ' + (x.delta == null ? '' : (x.delta >= 0 ? 'down' : 'up')) + '">' + (x.delta == null ? '—' : (x.delta >= 0 ? '+' : '') + x.delta + ' pp') + '</span></td></tr>').join('') +
+      '</tbody></table></div></div>';
+  }
   /* série por dia */
   h += '<div class="row r-2"><div class="card"><header><h2>Dia a dia</h2><span class="hint">barra = % que saiu · ' + (d0 ? 'a partir de ' + esc(d0) + ' os setores recebem o PDF' : '') + '</span></header><div class="body scroll"><table class="tb"><thead><tr><th>Dia</th><th>ALTA SE saíram</th><th class="r">%</th><th>ALTA HOJE saíram</th><th class="r">%</th><th class="r">Esc.</th><th class="r">Sens.</th></tr></thead><tbody>' +
     serie.slice().reverse().map(x => { const pse = pct(x.ases, x.ase), pah = pct(x.ahs, x.ah), dep = k0 && x.k >= k0;
