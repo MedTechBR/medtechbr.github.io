@@ -460,7 +460,7 @@ function vHoje(){
   h += '<div class="row r-kpi">' +
     kpi('k-meta', 'Altas necessárias hoje', D.meta, 'ontem: ' + (D.ontem ? D.ontem.altas + ' altas, ' + D.ontem.entradas + ' entradas, ' + D.ontem.obitos + ' óbitos' : '—')) +
     kpi('k-fila', 'Fila da emergência', (D.fila || []).length, (emg ? emg.ocup + '/' + emg.cap + ' na emergência · ' : '') + fila + ' pedidos com destino') +
-    kpi('k-elet', 'Eletivas de hoje', elet, 'cirurgias marcadas nos setores') +
+    kpi('k-elet', 'Eletivas para entrar hoje', elet, 'aguardando internação — já descontadas as que já têm leito') +
     kpi('k-livre', 'Leitos livres', D.glob ? D.glob.livres : '—', D.glob ? D.glob.ocup + '/' + D.glob.leitos + ' ocupados · ' + D.glob.extras + ' em cama extra' : '') + '</div>';
   h += '<div class="row r-2"><div class="card"><header><h2>Setores</h2><span class="hint">meta = altas necessárias hoje · AH alta hoje · ASE alta se</span></header><div class="body scroll"><table class="tb"><thead><tr>' +
     '<th>Setor</th><th>Ocupação</th><th class="r">Livres</th><th class="r">Fila</th><th class="r">Elet.</th><th class="r">Meta</th><th class="r">AH</th><th class="r">ASE</th><th>Status</th></tr></thead><tbody>' +
