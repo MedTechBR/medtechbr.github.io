@@ -348,7 +348,7 @@ async function carregar(silencioso){
   try {
     const r = await api('pacote');
     if (!r.dados || !r.versao) { S.versao = 15; pintarTudo(); return; }   /* ponte antiga: ignora `acao` e devolve {ok,abas:[]} */
-    S.versao = r.versao; S.D = r.dados; S.V = r.val || {}; S.emails = r.emails || {}; S.envios = r.envios || []; S.textos = r.textos || null;
+    S.versao = r.versao; S.D = r.dados; S.V = r.val || {}; S.emails = r.emails || {}; S.envios = r.envios || []; S.textos = r.textos || null; S.piloto = r.piloto || [];
     S.hoje = r.hoje || ''; S.quando = r.quando || '';
     /* edições locais de outro dia não valem mais */
     Object.keys(S.edits).forEach(id => { if (S.edits[id].data !== S.D.data) delete S.edits[id]; });
@@ -597,17 +597,68 @@ function vReg(){
 }
 
 /* ================= PILOTO ================= */
+const num = v => { const m = String(v == null ? '' : v).replace(',', '.').match(/-?\d+(\.\d+)?/); return m ? parseFloat(m[0]) : null; };
+const pct = (a, b) => (a == null || !b) ? null : Math.round(100 * a / b);
+const ddmm = s => { const m = String(s || '').match(/^(\d{2})\/(\d{2})/); return m ? m[2] + m[1] : ''; };   /* "22/08" → "0822" (ordenável) */
+/* lê as duas tabelas por dia da aba PILOTO: "SENSIBILIDADE POR DIA" (AH e ASE sinalizadas × saíram) e "DIA A DIA" (escaparam, sensibilidade, meta) */
+function serieDiaria(){
+  const P = S.piloto || [], por = {};
+  let modo = null;
+  P.forEach(r => {
+    const c0 = String(r[0] || '').trim();
+    if (c0 === 'Data') { modo = /Sinalizadas/.test(r.join('|')) ? 'A' : (/mostradas/.test(r.join('|')) ? 'B' : null); return; }
+    if (!/^\d{2}\/\d{2}$/.test(c0)) { if (!c0) modo = null; return; }
+    const d = por[c0] = por[c0] || {d: c0, k: ddmm(c0), ah: null, ahs: null, ase: null, ases: null, esc: null, sens: null, meta: null};
+    if (modo === 'A') { d.ah = num(r[1]); d.ahs = num(r[2]); d.ase = num(r[4]); d.ases = num(r[5]); }
+    if (modo === 'B') { if (d.ah == null) d.ah = num(r[2]); if (d.ahs == null) d.ahs = num(r[3]); if (d.ase == null) d.ase = num(r[5]); if (d.ases == null) d.ases = num(r[6]);
+      d.esc = num(r[7]); const s = num(r[8]); d.sens = s == null ? null : (s <= 1 ? Math.round(s * 100) : Math.round(s)); d.meta = num(r[10]); }
+  });
+  return Object.values(por).sort((a, b) => a.k.localeCompare(b.k));
+}
+/* primeiro dia em que os PDFs saíram de verdade para um setor/coordenação (não teste) — o "antes × depois" gira em torno dele */
+function dataPrimeiroEnvio(){
+  const ds = S.envios.filter(r => /^enviado/.test(String(r[4] || '')) && !/teste/i.test(String(r[1] || ''))).map(r => String(r[0] || '').slice(0, 5)).filter(x => /^\d{2}\/\d{2}$/.test(x));
+  ds.sort((a, b) => ddmm(a).localeCompare(ddmm(b)));
+  return ds[0] || '';
+}
+function barra(p, cor){ return '<span class="bar" style="min-width:60px;width:100%"><i style="width:' + (p == null ? 0 : Math.max(0, Math.min(100, p))) + '%;background:' + cor + '"></i></span>'; }
 function vPiloto(){
-  const D = S.D, hist = D.hist || [], esc_ = D.esc_selo || {};
+  const D = S.D, esc_ = D.esc_selo || {};
   const tot = Object.values(esc_).reduce((a, b) => a + b, 0), max = Math.max(1, ...Object.values(esc_));
-  const viu = hist.reduce((a, x) => a + x.viu, 0), escn = hist.reduce((a, x) => a + x.esc, 0);
-  let h = cabecalho('Piloto', 'O que o painel viu e o que escapou, dia a dia (aba PILOTO).');
-  h += '<div class="row r-kpi">' + kpi('k-elet', 'Dias de piloto', hist.length, 'desde ' + (hist[0] ? hist[0].d : '—')) +
-    kpi('k-livre', 'Altas que o painel viu', viu, 'ALTA HOJE + ALTA SE que saíram') +
-    kpi('k-meta', 'Altas que escaparam', escn, 'saíram sem selo de alta') +
-    kpi('k-fila', 'Sensibilidade', (viu + escn) ? Math.round(100 * viu / (viu + escn)) + '%' : '—', 'acumulada no período') + '</div>';
-  h += '<div class="row r-2"><div class="card"><header><h2>Dia a dia</h2></header><div class="body scroll"><table class="tb"><thead><tr><th>Dia</th><th class="r">Viu</th><th class="r">Escaparam</th><th class="r">Sens.</th><th>Auditado</th></tr></thead><tbody>' +
-    hist.slice().reverse().map(x => '<tr><td class="lt">' + esc(x.d) + '</td><td class="r num">' + x.viu + '</td><td class="r num">' + x.esc + '</td><td class="r num">' + x.sens + '%</td><td>' + (x.aud ? '<span class="flag ok">sim</span>' : '<span class="flag nao">não</span>') + '</td></tr>').join('') + '</tbody></table></div></div>' +
+  const serie = serieDiaria(), fechados = serie.filter(x => x.ases != null && x.ase != null);
+  const soma = (arr, f) => arr.reduce((a, x) => a + (f(x) || 0), 0);
+  const AH = soma(fechados, x => x.ah), AHS = soma(fechados, x => x.ahs), ASE = soma(fechados, x => x.ase), ASES = soma(fechados, x => x.ases);
+  const viu = AHS + ASES, escn = soma(fechados, x => x.esc);
+  const d0 = dataPrimeiroEnvio(), k0 = ddmm(d0);
+  const antes = fechados.filter(x => k0 && x.k < k0 && x.ase), depois = fechados.filter(x => k0 && x.k >= k0 && x.ase);
+  const pA = pct(soma(antes, x => x.ases), soma(antes, x => x.ase)), pD = pct(soma(depois, x => x.ases), soma(depois, x => x.ase));
+  const pAh = pct(soma(antes, x => x.ahs), soma(antes, x => x.ah)), pDh = pct(soma(depois, x => x.ahs), soma(depois, x => x.ah));
+  let h = cabecalho('Piloto', 'Quanto do que o painel sinaliza vira alta de verdade — e se mudou depois que os coordenadores passaram a receber o PDF (aba PILOTO).');
+  if (!serie.length) h += '<div class="nota warn" style="margin-bottom:12px">A ponte ainda não mandou a aba PILOTO (precisa da versão 16.2). Toque em atualizar; se persistir, avise.</div>';
+  h += '<div class="row r-kpi">' +
+    kpi('k-elet', 'ALTA SE realizadas', ASE ? pct(ASES, ASE) + '%' : '—', ASES + ' de ' + ASE + ' possibilidades saíram · ' + fechados.length + ' dias fechados') +
+    kpi('k-livre', 'ALTA HOJE executadas', AH ? pct(AHS, AH) + '%' : '—', AHS + ' de ' + AH + ' sinalizadas saíram no dia') +
+    kpi('k-fila', 'Sensibilidade', (viu + escn) ? pct(viu, viu + escn) + '%' : '—', viu + ' altas vistas · ' + escn + ' escaparam') +
+    kpi('k-meta', 'Altas que escaparam', escn, 'saíram sem selo de alta no dia') + '</div>';
+  /* antes × depois dos e-mails */
+  h += '<div class="card" style="margin-bottom:12px"><header><h2>Antes × depois dos PDFs aos coordenadores</h2><span class="hint">' + (d0 ? 'primeiro envio real registrado: <b>' + esc(d0) + '</b> (aba ENVIOS_EMAIL)' : 'nenhum envio real registrado ainda') + '</span></header><div class="body">';
+  if (d0 && (antes.length || depois.length)) {
+    const linha = (rot, a, b, na, nb) => '<div style="display:grid;grid-template-columns:150px 1fr 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line-2)">' +
+      '<div style="font-size:12px;font-weight:600">' + rot + '</div>' +
+      '<div><div class="slab" style="margin-bottom:2px">antes · ' + na + ' dia(s)</div><div class="num" style="font-family:Archivo,sans-serif;font-size:24px;font-weight:700">' + (a == null ? '—' : a + '%') + '</div></div>' +
+      '<div><div class="slab" style="margin-bottom:2px">depois · ' + nb + ' dia(s)</div><div class="num" style="font-family:Archivo,sans-serif;font-size:24px;font-weight:700;color:' + (a != null && b != null ? (b >= a ? 'var(--good-ink)' : 'var(--crit-ink)') : 'inherit') + '">' + (b == null ? '—' : b + '%') +
+      (a != null && b != null ? ' <span class="delta ' + (b >= a ? 'down' : 'up') + '" style="vertical-align:middle">' + (b >= a ? '+' : '') + (b - a) + ' pp</span>' : '') + '</div></div></div>';
+    h += linha('ALTA SE realizadas', pA, pD, antes.length, depois.length) + linha('ALTA HOJE executadas', pAh, pDh, antes.filter(x => x.ah).length, depois.filter(x => x.ah).length) +
+      '<div class="msg">Percentual ponderado (soma das que saíram ÷ soma das sinalizadas). Com poucos dias "depois" a diferença ainda é frágil; acompanhe por 2 semanas antes de concluir.</div>';
+  } else h += '<div class="bloq">sem dias suficientes de um lado ou do outro</div>';
+  h += '</div></div>';
+  /* série por dia */
+  h += '<div class="row r-2"><div class="card"><header><h2>Dia a dia</h2><span class="hint">barra = % que saiu · ' + (d0 ? 'a partir de ' + esc(d0) + ' os setores recebem o PDF' : '') + '</span></header><div class="body scroll"><table class="tb"><thead><tr><th>Dia</th><th>ALTA SE saíram</th><th class="r">%</th><th>ALTA HOJE saíram</th><th class="r">%</th><th class="r">Esc.</th><th class="r">Sens.</th></tr></thead><tbody>' +
+    serie.slice().reverse().map(x => { const pse = pct(x.ases, x.ase), pah = pct(x.ahs, x.ah), dep = k0 && x.k >= k0;
+      return '<tr' + (dep ? ' style="background:var(--brand-soft)"' : '') + '><td class="lt">' + esc(x.d) + (dep ? ' <span class="flag ok" title="setores já recebiam o PDF">PDF</span>' : '') + '</td>' +
+        '<td><div style="display:flex;align-items:center;gap:8px"><span class="num" style="min-width:52px">' + (x.ases == null ? '—' : x.ases + '/' + x.ase) + '</span>' + barra(pse, 'var(--altase)') + '</div></td><td class="r num"><b>' + (pse == null ? '—' : pse + '%') + '</b></td>' +
+        '<td><div style="display:flex;align-items:center;gap:8px"><span class="num" style="min-width:52px">' + (x.ahs == null ? '—' : x.ahs + '/' + x.ah) + '</span>' + barra(pah, 'var(--alta)') + '</div></td><td class="r num"><b>' + (pah == null ? '—' : pah + '%') + '</b></td>' +
+        '<td class="r num">' + (x.esc == null ? '—' : x.esc) + '</td><td class="r num">' + (x.sens == null ? '—' : x.sens + '%') + '</td></tr>'; }).join('') + '</tbody></table></div></div>' +
     '<div class="card"><header><h2>Selo que o painel tinha dado às altas que escaparam</h2></header><div class="body">' +
     Object.keys(esc_).sort((a, b) => esc_[b] - esc_[a]).map(k => '<div style="display:grid;grid-template-columns:110px 1fr 36px;gap:8px;align-items:center;padding:4px 0;font-size:12px"><span class="selo s-' + (SELO_G[k] || 'pend') + '">' + esc(k) + '</span><span class="bar"><i style="width:' + Math.round(100 * esc_[k] / max) + '%"></i></span><span class="num" style="text-align:right;font-weight:600">' + esc_[k] + '</span></div>').join('') +
     (tot ? '<div class="msg">' + tot + ' altas escaparam no período.</div>' : '<div class="bloq">sem altas escapadas registradas</div>') + '</div></div></div>';
