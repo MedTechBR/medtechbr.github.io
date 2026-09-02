@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2f8576">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Console Leitos">
+<meta name="robots" content="noindex">
+<link rel="manifest" href="painel-console.webmanifest">
+<link rel="apple-touch-icon" href="icone-painel-192.png">
+<link rel="icon" href="icone-painel-192.png">
+<title>Console · Painel de Leitos HRSC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Mesmos tokens da página publicada do painel (BI_TPL) — o console é a mesma família */
+:root{
+  color-scheme:light;
+  --plane:#eef2f1; --card:#ffffff; --card-2:#f4f7f6; --card-3:#e9efed;
+  --line:#dde5e3; --line-2:#edf2f1;
+  --ink:#0f1c19; --ink-2:#4b5a56; --ink-3:#7b8a86;
+  --brand:#2f8576; --brand-2:#20635a; --brand-3:#8fc4b9; --brand-soft:#e2f0ed;
+  --good:#0ca30c; --good-soft:#e3f4e3; --good-ink:#0a6b0a;
+  --alta:#008300; --alta-soft:#dcefdc; --alta-ink:#005c00;
+  --altase:#1baf7a; --altase-soft:#ddf2ea; --altase-ink:#0d6b4a;
+  --warn:#fab219; --warn-soft:#fdf2da; --warn-ink:#7a5502;
+  --crit:#d03b3b; --crit-soft:#fae5e5; --crit-ink:#8f2020;
+  --info:#2a78d6; --info-soft:#e4edfb; --info-ink:#1a4f92;
+  --neutral:#b7c2bf; --neutral-soft:#eef1f0;
+  --shadow:0 1px 2px rgba(15,28,25,.05),0 4px 14px rgba(15,28,25,.05);
+  --r:14px; --r-sm:9px; --sb:env(safe-area-inset-bottom); --st:env(safe-area-inset-top);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --plane:#0c1110; --card:#151d1b; --card-2:#1c2624; --card-3:#243230;
+    --line:#2a3735; --line-2:#212d2b;
+    --ink:#eef4f2; --ink-2:#a9b8b4; --ink-3:#7d8c88;
+    --brand:#4bb3a0; --brand-2:#2f8576; --brand-3:#1d4f47; --brand-soft:#12302b;
+    --good:#3cc23c; --good-soft:#122f12; --good-ink:#7fdd7f;
+    --alta:#4cd04c; --alta-soft:#13300f; --alta-ink:#8fe58f;
+    --altase:#25a882; --altase-soft:#0d2b23; --altase-ink:#6fd6ba;
+    --warn:#fab219; --warn-soft:#33280b; --warn-ink:#f6cb63;
+    --crit:#ef6a6a; --crit-soft:#3a1a1a; --crit-ink:#f5a0a0;
+    --info:#5b9bea; --info-soft:#14243c; --info-ink:#9cc4f4;
+    --neutral:#5d6b67; --neutral-soft:#1e2a28;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.35);
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--plane);color:var(--ink);
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:Archivo,"IBM Plex Sans",sans-serif;margin:0;letter-spacing:-.012em}
+.num,.p{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--brand-2)}
+[hidden]{display:none!important}
+
+/* ---------- esqueleto ---------- */
+.shell{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;background:var(--card);
+  border-right:1px solid var(--line);padding:16px 14px 20px;display:flex;flex-direction:column;gap:12px}
+.main{padding:16px 20px 40px;min-width:0}
+.brand{display:flex;align-items:center;gap:10px}
+.mark{width:36px;height:36px;border-radius:10px;flex:0 0 36px;background:linear-gradient(140deg,var(--brand),var(--brand-2));
+  color:#fff;display:grid;place-items:center;font-family:Archivo,sans-serif;font-weight:700;font-size:13px}
+.brand b{display:block;font-family:Archivo,sans-serif;font-size:14.5px;line-height:1.15}
+.brand span{display:block;font-size:10.5px;color:var(--ink-3)}
+.slab{font-size:9.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px}
+.sval{font-size:12.5px;color:var(--ink-2)} .sval b{color:var(--ink)}
+.stamp{display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:var(--r-sm);font-size:11.5px;font-weight:600;line-height:1.25;
+  background:var(--warn-soft);color:var(--warn-ink);border:1px solid rgba(250,178,25,.35)}
+.stamp.ok{background:var(--good-soft);color:var(--good-ink);border-color:rgba(12,163,12,.3)}
+.stamp.err{background:var(--crit-soft);color:var(--crit-ink);border-color:rgba(208,59,59,.3)}
+.stamp svg{flex:0 0 14px}
+.navf{display:flex;flex-direction:column;gap:1px}
+.navf button{display:flex;align-items:center;gap:9px;width:100%;border:0;background:none;cursor:pointer;text-align:left;
+  padding:7px 8px;border-radius:8px;font-size:12.5px;color:var(--ink-2)}
+.navf button svg{width:16px;height:16px;flex:0 0 16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.navf button:hover{background:var(--card-2);color:var(--ink)}
+.navf button[aria-pressed="true"]{background:var(--brand-soft);color:var(--brand-2);font-weight:600}
+.navf .n{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-3)}
+.navf .n.warn{color:var(--crit-ink);font-weight:700}
+.sfoot{margin-top:auto;font-size:11px;color:var(--ink-3);line-height:1.4}
+.sfoot button{border:0;background:none;color:var(--brand);padding:0;cursor:pointer;font-size:11px;text-decoration:underline}
+
+/* ---------- cabeçalho de página ---------- */
+.head{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
+.head h1{font-size:21px;font-weight:700}
+.head .sub{font-size:12.5px;color:var(--ink-2);margin-top:2px}
+.pills{display:flex;gap:7px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:100px;font-size:11.5px;font-weight:600;
+  background:var(--card);border:1px solid var(--line);color:var(--ink-2)}
+.pill .dot{width:7px;height:7px;border-radius:50%;background:var(--ink-3)}
+.pill.warn{background:var(--warn-soft);border-color:rgba(250,178,25,.4);color:var(--warn-ink)} .pill.warn .dot{background:var(--warn)}
+.pill.good{background:var(--good-soft);border-color:rgba(12,163,12,.35);color:var(--good-ink)} .pill.good .dot{background:var(--good)}
+.pill.crit{background:var(--crit-soft);border-color:rgba(208,59,59,.35);color:var(--crit-ink)} .pill.crit .dot{background:var(--crit)}
+
+/* ---------- cartões / grades ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.card>header{padding:13px 15px 0;display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.card h2{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2)}
+.card .hint{font-size:11.5px;color:var(--ink-3);margin-top:3px;line-height:1.4}
+.card>.body{padding:12px 15px 15px}
+.row{display:grid;gap:12px;margin-bottom:12px}
+.r-kpi{grid-template-columns:repeat(4,minmax(0,1fr))}
+.r-2{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}
+@media (max-width:1180px){.r-kpi{grid-template-columns:repeat(2,minmax(0,1fr))}.r-2{grid-template-columns:1fr}}
+.kpi{position:relative;overflow:hidden;padding:14px 15px 13px}
+.kpi .rail{position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--neutral)}
+.kpi.k-meta .rail{background:var(--crit)} .kpi.k-fila .rail{background:var(--warn)} .kpi.k-livre .rail{background:var(--info)} .kpi.k-elet .rail{background:var(--brand)}
+.kpi .lab{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.kpi .val{font-family:Archivo,sans-serif;font-size:34px;font-weight:700;line-height:1.1;letter-spacing:-.03em;margin:3px 0 1px}
+.kpi.k-meta .val{color:var(--crit)} .kpi.k-fila .val{color:var(--warn-ink)} .kpi.k-livre .val{color:var(--info)} .kpi.k-elet .val{color:var(--brand-2)}
+.kpi .foot{font-size:11.5px;color:var(--ink-2);line-height:1.35}
+
+/* ---------- tabelas ---------- */
+.scroll{overflow:auto;max-width:100%}
+.tb{width:100%;border-collapse:collapse;font-size:12px}
+.tb th{position:sticky;top:0;background:var(--card);text-align:left;padding:5px 7px;font-size:9.5px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-3);border-bottom:1px solid var(--line);z-index:1;white-space:nowrap}
+.tb th.r,.tb td.r{text-align:right}
+.tb td{padding:6px 7px;border-bottom:1px solid var(--line-2);vertical-align:top;line-height:1.35}
+.tb tr:hover td{background:var(--card-2)}
+.tb td.lt{white-space:nowrap;font-weight:600}
+.occ{position:relative;min-width:130px}
+.occ .track{height:18px;border-radius:5px;background:var(--card-3);overflow:hidden;position:relative;display:block}
+.occ .fill{position:absolute;left:0;top:0;bottom:0;background:var(--brand);border-radius:5px 0 0 5px}
+.occ .xtra{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(135deg,var(--crit) 0 5px,rgba(255,255,255,.55) 5px 10px)}
+.occ .txt{position:absolute;left:7px;top:0;height:18px;line-height:18px;font-size:10.5px;font-weight:700;color:#fff;font-family:"IBM Plex Mono",monospace;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.flag{display:inline-block;padding:1px 7px;border-radius:100px;font-size:10px;font-weight:700;white-space:nowrap}
+.flag.sim,.flag.crit{background:var(--crit-soft);color:var(--crit-ink)}
+.flag.nao{background:var(--neutral-soft);color:var(--ink-3)}
+.flag.ok{background:var(--good-soft);color:var(--good-ink)}
+.flag.warn{background:var(--warn-soft);color:var(--warn-ink)}
+.bar{height:8px;border-radius:4px;background:var(--card-3);overflow:hidden;min-width:80px}
+.bar i{display:block;height:100%;background:var(--brand);border-radius:4px}
+
+/* ---------- filtros ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+.fb{border:1px solid var(--line);background:var(--card);color:var(--ink-2);cursor:pointer;padding:4px 10px;border-radius:100px;font-size:11.5px;font-weight:600}
+.fb:hover{border-color:var(--brand-3);color:var(--ink)}
+.fb[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+.fb .sw{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;vertical-align:1px}
+.busca{width:100%;max-width:280px;padding:7px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);font-size:16px}
+@media (min-width:761px){.busca{font-size:13px}}
+
+/* ---------- leito a leito (editável) ---------- */
+.grupo{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:2;background:var(--card);padding:9px 2px 6px;
+  font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.grupo .n{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:11px}
+.item{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px 12px;align-items:start;padding:9px 10px;border-radius:var(--r-sm);
+  border:1px solid var(--line-2);margin-bottom:6px;background:var(--card)}
+.item.dirty{border-color:var(--warn);box-shadow:inset 3px 0 0 var(--warn)}
+.item .leito{font-family:"IBM Plex Mono",monospace;font-size:12.5px;font-weight:600;line-height:1.3}
+.item .leito small{display:block;font-size:10px;color:var(--ink-3);font-weight:400;font-family:"IBM Plex Sans",sans-serif}
+.item .leito .p{display:block;font-size:12px;color:var(--ink-2)}
+.item .ctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.item select{padding:5px 8px;border:1px solid var(--line);border-radius:7px;background:var(--card);font-size:12px;font-weight:600}
+.item textarea{width:100%;min-height:36px;padding:6px 8px;border:1px solid var(--line);border-radius:7px;background:var(--card);font-size:12.5px;line-height:1.4;resize:vertical}
+.item .lab{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:4px 0 2px}
+.item textarea.acao{font-weight:600}
+.selo{display:inline-block;padding:2px 8px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.04em;white-space:nowrap}
+.s-alta{background:var(--alta);color:#fff}
+.s-altase{background:var(--altase-soft);color:var(--altase-ink);box-shadow:inset 0 0 0 1px var(--altase)}
+.s-pend{background:var(--warn-soft);color:var(--warn-ink)}
+.s-sem{background:var(--crit-soft);color:var(--crit-ink)}
+.s-trat{background:var(--info-soft);color:var(--info-ink)}
+.s-fora{background:var(--neutral-soft);color:var(--ink-3)}
+.barra{position:sticky;bottom:calc(var(--sb) + 0px);z-index:5;display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;
+  padding:10px 12px;border-radius:var(--r-sm);background:var(--ink);color:var(--plane);font-size:12.5px;box-shadow:var(--shadow)}
+.barra b{font-family:"IBM Plex Mono",monospace}
+.barra .sp{flex:1}
+
+/* ---------- botões / formulários ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 14px;border-radius:var(--r-sm);border:1px solid var(--brand);
+  background:var(--brand);color:#fff;font-size:12.5px;font-weight:700;cursor:pointer;line-height:1.2}
+.btn:hover{background:var(--brand-2);border-color:var(--brand-2)}
+.btn:disabled{opacity:.55;cursor:default}
+.btn.sec{background:var(--card);color:var(--brand-2);border-color:var(--line)}
+.btn.sec:hover{background:var(--card-2)}
+.btn.crit{background:var(--crit);border-color:var(--crit)}
+.btn.warn{background:var(--warn);border-color:var(--warn);color:#3a2800}
+.btn.mini{padding:5px 10px;font-size:11.5px}
+.btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mails{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.mail label{display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.mail input{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);font-size:16px}
+@media (min-width:761px){.mail input{font-size:13px}}
+.mail input.ruim{border-color:var(--crit);background:var(--crit-soft)}
+.msg{font-size:12px;color:var(--ink-2);margin-top:8px;line-height:1.45}
+.msg.ok{color:var(--good-ink)} .msg.erro{color:var(--crit-ink)}
+.nota{font-size:12px;color:var(--ink-2);line-height:1.5;padding:10px 12px;border-radius:var(--r-sm);background:var(--card-2)}
+.nota.warn{background:var(--warn-soft);color:var(--warn-ink)}
+.nota.crit{background:var(--crit-soft);color:var(--crit-ink)}
+.check{display:grid;gap:8px}
+.check .it{display:grid;grid-template-columns:22px 1fr;gap:9px;align-items:start;font-size:12.5px;line-height:1.4}
+.check .it svg{width:18px;height:18px;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.check .ok svg{stroke:var(--good)} .check .warn svg{stroke:var(--warn)} .check .crit svg{stroke:var(--crit)}
+.check .it small{display:block;color:var(--ink-3);font-size:11px}
+.bloq{padding:24px 12px;text-align:center;color:var(--ink-3);font-size:13px;line-height:1.5}
+.toast{position:fixed;left:50%;bottom:calc(var(--sb) + 76px);transform:translateX(-50%);z-index:80;padding:9px 14px;border-radius:100px;
+  background:var(--ink);color:var(--plane);font-size:12.5px;font-weight:600;box-shadow:var(--shadow);opacity:0;transition:opacity .15s;pointer-events:none;max-width:92vw}
+.toast.on{opacity:1}
+.toast.erro{background:var(--crit);color:#fff}
+@media (min-width:761px){.toast{bottom:24px}}
+
+/* ---------- configuração (chave da ponte) ---------- */
+#cfg{position:fixed;inset:0;z-index:50;background:var(--plane);display:grid;place-items:center;padding:20px;overflow:auto}
+#cfg .box{width:100%;max-width:460px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:var(--shadow)}
+#cfg h1{font-size:18px;margin:10px 0 4px}
+#cfg p{font-size:12.5px;color:var(--ink-2);line-height:1.5;margin:0 0 12px}
+#cfg label{display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:10px 0 4px}
+#cfg input,#cfg textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);font-size:16px;font-family:"IBM Plex Mono",monospace}
+@media (min-width:761px){#cfg input,#cfg textarea{font-size:12.5px}}
+
+/* ---------- modo app (celular) ---------- */
+@media (max-width:760px){
+  .shell{grid-template-columns:1fr}
+  .side{position:fixed;left:0;right:0;bottom:0;top:auto;height:auto;z-index:40;border-right:0;border-top:1px solid var(--line);
+    padding:6px 4px calc(6px + var(--sb));background:rgba(255,255,255,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  @media (prefers-color-scheme:dark){.side{background:rgba(21,29,27,.96)}}
+  .side .brand,.side .sblock,.side .sfoot{display:none}
+  .navf{flex-direction:row;justify-content:space-around;gap:0}
+  .navf button{flex-direction:column;gap:3px;padding:4px 2px;font-size:10px;justify-content:center;align-items:center;text-align:center;border-radius:8px;min-width:0}
+  .navf button svg{width:21px;height:21px;flex-basis:21px}
+  .navf .n{margin-left:0;position:absolute;transform:translate(16px,-4px);font-size:9.5px}
+  .navf button{position:relative}
+  .main{padding:calc(12px + var(--st)) 12px calc(96px + var(--sb))}
+  .head h1{font-size:18px}
+  .r-kpi{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .item{grid-template-columns:1fr}
+  .item .leito{display:flex;gap:10px;align-items:baseline} .item .leito small,.item .leito .p{display:inline}
+  .barra{bottom:calc(var(--sb) + 70px)}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= chave da ponte ================= -->
+<div id="cfg" hidden>
+  <div class="box">
+    <div class="brand"><div class="mark">PL</div><div><b>Console do Painel de Leitos</b><span>HRSC · fala direto com a planilha</span></div></div>
+    <h1>Chave da ponte</h1>
+    <p>Cole o conteúdo do arquivo <span class="p">gsheet/config.json</span> (URL da ponte + token). A chave fica <b>só neste aparelho</b> — nunca vai para o GitHub nem para terceiros.</p>
+    <label for="cfg-json">config.json</label>
+    <textarea id="cfg-json" rows="4" placeholder='{"url":"https://script.google.com/macros/s/…/exec","token":"…"}' autocomplete="off" spellcheck="false"></textarea>
+    <div class="msg erro" id="cfg-msg" hidden></div>
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <button class="btn" id="cfg-ok">Guardar e testar</button>
+      <button class="btn sec" id="cfg-cancel" hidden>Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="shell">
+  <aside class="side">
+    <div class="brand"><div class="mark">PL</div><div><b>Console de Leitos</b><span>HRSC · painel do dia</span></div></div>
+    <div class="sblock"><div class="slab">Painel</div><div class="sval" id="s-dia">—</div><div class="sval" id="s-censo"></div></div>
+    <div class="sblock" id="s-stamp-wrap"><div class="stamp" id="s-stamp">carregando…</div></div>
+    <nav class="navf" id="nav"></nav>
+    <div class="sfoot">Ponte <span id="s-versao">?</span> · <button id="b-refresh">atualizar</button> · <button id="b-cfg">chave</button><br>
+      <span id="s-quando"></span></div>
+  </aside>
+  <main class="main" id="main"><div class="bloq">carregando…</div></main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================================================================
+   Console do Painel de Leitos — HRSC
+   · lê e grava na planilha "PAINEL DE LEITOS - HRSC" pela ponte (Apps Script v16)
+   · pacientes só por prontuário (LGPD); nada de dado clínico é guardado neste aparelho
+   · CFM 2.454/2026: o painel nasce RASCUNHO; validar é ato do médico responsável,
+     e só depois do carimbo os PDFs saem para os coordenadores
+   ================================================================ */
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const LS_CFG = 'plc.cfg', LS_EDITS = 'plc.edits', LS_TAB = 'plc.tab';
+
+const SELOS = ['ALTA HOJE','ALTA SE','ATB','EM EXAME','CIRURGIA','PÓS-OP','REGULAÇÃO','VIGILÂNCIA','PIORA CLÍNICA','PALIATIVO','UTI','OBSTETRÍCIA','RN','SEM LEITURA'];
+const SELO_G = {'ALTA HOJE':'alta','ALTA SE':'altase','ATB':'pend','EM EXAME':'pend','CIRURGIA':'pend','PÓS-OP':'pend','REGULAÇÃO':'pend',
+  'SEM LEITURA':'sem','VIGILÂNCIA':'trat','PIORA CLÍNICA':'trat','PALIATIVO':'trat','UTI':'fora','OBSTETRÍCIA':'fora','RN':'fora'};
+const GRUPOS = [
+  {g:'alta',   nome:'Alta já escrita',          cor:'var(--alta)'},
+  {g:'altase', nome:'Possibilidade a analisar', cor:'var(--altase)'},
+  {g:'pend',   nome:'Pendência a resolver',     cor:'var(--warn)'},
+  {g:'sem',    nome:'Sem leitura',              cor:'var(--crit)'},
+  {g:'trat',   nome:'Em tratamento ativo',      cor:'var(--info)'},
+  {g:'fora',   nome:'Fora do escopo de alta',   cor:'var(--neutral)'}];
+const ORDEM_K = ['CIR','CM1','TRAU','UCE','UTIA','AVC','EMG','OBS','NEO'];
+const ICO = {
+  hoje:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>',
+  leitos:'<svg viewBox="0 0 24 24"><path d="M3 7v11M3 14h18M21 18v-7a2 2 0 0 0-2-2h-8v5"/><circle cx="7" cy="10" r="2"/></svg>',
+  reg:'<svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/><circle cx="18" cy="18" r="2"/></svg>',
+  piloto:'<svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>',
+  mail:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+  val:'<svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/></svg>',
+  ok:'<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>',
+  warn:'<svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>',
+  crit:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>'};
+
+const S = { cfg:null, D:null, V:null, emails:{}, envios:[], versao:null, hoje:'', quando:'',
+            tab: localStorage.getItem(LS_TAB) || 'hoje', edits:{}, filtro:{k:'', g:'', q:''}, ocupado:false };
+try { S.edits = JSON.parse(localStorage.getItem(LS_EDITS) || '{}') || {}; } catch (_) { S.edits = {}; }
+
+/* ---------------- ponte ---------------- */
+function lerCfg(){ try { return JSON.parse(localStorage.getItem(LS_CFG) || 'null'); } catch (_) { return null; } }
+async function api(acao, extra){
+  if (!S.cfg) throw new Error('sem chave da ponte');
+  const corpo = JSON.stringify(Object.assign({token: S.cfg.token, acao}, extra || {}));
+  /* text/plain = requisição "simples": o Apps Script não responde preflight CORS */
+  const r = await fetch(S.cfg.url, {method:'POST', body: corpo, headers:{'Content-Type':'text/plain;charset=utf-8'}, redirect:'follow'});
+  const t = await r.text();
+  let j; try { j = JSON.parse(t); } catch (_) { throw new Error('a ponte não respondeu JSON (HTTP ' + r.status + ')'); }
+  if (!j.ok) throw new Error(j.erro || (j.envio && j.envio.msg) || 'a ponte recusou');
+  return j;
+}
+let toastT;
+function toast(msg, erro){ const t = $('toast'); t.textContent = msg; t.className = 'toast on' + (erro ? ' erro' : '');
+  clearTimeout(toastT); toastT = setTimeout(() => t.className = 'toast', erro ? 5200 : 2600); }
+
+async function carregar(silencioso){
+  if (!S.cfg) return;
+  if (!silencioso) $('s-stamp').textContent = 'lendo a planilha…';
+  try {
+    const r = await api('pacote');
+    if (!r.dados || !r.versao) { S.versao = 15; pintarTudo(); return; }   /* ponte antiga: ignora `acao` e devolve {ok,abas:[]} */
+    S.versao = r.versao; S.D = r.dados; S.V = r.val || {}; S.emails = r.emails || {}; S.envios = r.envios || [];
+    S.hoje = r.hoje || ''; S.quando = r.quando || '';
+    /* edições locais de outro dia não valem mais */
+    Object.keys(S.edits).forEach(id => { if (S.edits[id].data !== S.D.data) delete S.edits[id]; });
+    guardarEdits();
+    pintarTudo();
+  } catch (e) {
+    S.versao = S.versao || null;
+    $('s-stamp').className = 'stamp err'; $('s-stamp').textContent = 'Não li a planilha: ' + e.message;
+    if (!S.D) $('main').innerHTML = '<div class="bloq"><b>Não consegui ler a planilha.</b><br>' + esc(e.message) +
+      '<br><br><button class="btn sec" onclick="carregar()">Tentar de novo</button> <button class="btn sec" onclick="abrirCfg(true)">Trocar a chave</button></div>';
+    toast('Falha ao ler: ' + e.message, true);
+  }
+}
+
+/* ---------------- configuração ---------------- */
+function abrirCfg(cancelavel){
+  $('cfg').hidden = false; $('cfg-cancel').hidden = !cancelavel; $('cfg-msg').hidden = true;
+  $('cfg-json').value = S.cfg ? JSON.stringify({url: S.cfg.url, token: '••••••'}, null, 1) : '';
+  if (S.cfg) $('cfg-json').value = '';
+  setTimeout(() => $('cfg-json').focus(), 50);
+}
+$('cfg-cancel').addEventListener('click', () => { $('cfg').hidden = true; });
+$('cfg-ok').addEventListener('click', async () => {
+  const m = $('cfg-msg'); m.hidden = true;
+  let c; try { c = JSON.parse($('cfg-json').value.trim()); } catch (_) { m.textContent = 'Isso não é um JSON válido — cole o arquivo inteiro, com as chaves.'; m.hidden = false; return; }
+  const urlOk = u => /^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(u) || (location.hostname === 'localhost' && /^http:\/\/localhost:\d+\//.test(u));
+  if (!c || !urlOk(c.url || '') || !c.token) {
+    m.textContent = 'Precisa ter "url" (…/macros/s/…/exec) e "token".'; m.hidden = false; return; }
+  const b = $('cfg-ok'); b.disabled = true; b.textContent = 'Testando…';
+  S.cfg = {url: c.url, token: c.token};
+  try {
+    const r = await api('ping');
+    localStorage.setItem(LS_CFG, JSON.stringify(S.cfg));
+    $('cfg').hidden = true;
+    toast(r.versao ? 'Ponte respondeu: versão ' + r.versao : 'Ponte respondeu (versão antiga)');
+    carregar();
+  } catch (e) { S.cfg = lerCfg(); m.textContent = 'A ponte não aceitou: ' + e.message; m.hidden = false; }
+  b.disabled = false; b.textContent = 'Guardar e testar';
+});
+$('b-cfg').addEventListener('click', () => abrirCfg(!!S.cfg));
+$('b-refresh').addEventListener('click', () => carregar());
+
+/* ---------------- navegação ---------------- */
+const ABAS = [
+  {id:'hoje',   nome:'Hoje',       ic:'hoje'},
+  {id:'leitos', nome:'Leitos',     ic:'leitos'},
+  {id:'reg',    nome:'Regulação',  ic:'reg'},
+  {id:'piloto', nome:'Piloto',     ic:'piloto'},
+  {id:'mail',   nome:'E-mails',    ic:'mail'},
+  {id:'val',    nome:'Validar',    ic:'val'}];
+function nEdits(){ return Object.keys(S.edits).length; }
+function pintarNav(){
+  $('nav').innerHTML = ABAS.map(a => {
+    let n = '';
+    if (a.id === 'leitos' && nEdits()) n = '<span class="n warn">' + nEdits() + '</span>';
+    if (a.id === 'val' && S.V) n = '<span class="n">' + (String(S.V.estado).toUpperCase() === 'VALIDADO' ? '✓' : '') + '</span>';
+    return '<button data-tab="' + a.id + '" aria-pressed="' + (S.tab === a.id) + '">' + ICO[a.ic] + '<span>' + a.nome + '</span>' + n + '</button>';
+  }).join('');
+  $('nav').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+    S.tab = b.dataset.tab; localStorage.setItem(LS_TAB, S.tab); pintarNav(); pintarMain(); window.scrollTo(0, 0);
+  }));
+}
+function pintarTudo(){ pintarLateral(); pintarNav(); pintarMain(); }
+function validado(){ return S.V && String(S.V.estado || '').toUpperCase() === 'VALIDADO'; }
+
+function pintarLateral(){
+  $('s-versao').textContent = S.versao ? 'v' + S.versao : '?';
+  $('s-quando').textContent = S.quando ? 'lido ' + new Date(S.quando).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) : '';
+  if (!S.D) return;
+  $('s-dia').innerHTML = '<b>' + esc(S.D.data) + '</b>';
+  $('s-censo').textContent = 'censo ' + (S.D.censo || '') + ' · ' + (S.D.glob ? S.D.glob.leitos + ' leitos' : '');
+  const st = $('s-stamp'), ok = validado();
+  st.className = 'stamp' + (ok ? ' ok' : '');
+  st.innerHTML = (ok ? ICO.ok : ICO.warn).replace('<svg', '<svg width="14" height="14" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"') +
+    '<span>' + (ok ? esc(S.V.quem || 'VALIDADO') : 'RASCUNHO — aguardando validação médica') + '</span>';
+}
+
+function pintarMain(){
+  const m = $('main');
+  if (S.versao === 15) { m.innerHTML = telaV15(); return; }
+  if (!S.D) { m.innerHTML = '<div class="bloq">carregando…</div>'; return; }
+  m.innerHTML = ({hoje: vHoje, leitos: vLeitos, reg: vReg, piloto: vPiloto, mail: vMail, val: vVal})[S.tab]();
+  ({leitos: ligarLeitos, mail: ligarMail, val: ligarVal})[S.tab] && ({leitos: ligarLeitos, mail: ligarMail, val: ligarVal})[S.tab]();
+}
+
+function telaV15(){
+  return '<div class="head"><div><h1>Ponte na versão 15</h1><div class="sub">A ponte respondeu, mas ainda não conhece as ações do console.</div></div></div>' +
+    '<div class="card"><div class="body"><div class="nota warn">Implante a <b>Versão 16</b> no Apps Script do projeto "PAINEL HRSC" (arquivo <span class="p">gsheet/ponte_v16.gs</span>, passo a passo no cabeçalho dele). ' +
+    'A URL da ponte não muda; depois é só tocar em <b>atualizar</b> aqui.</div>' +
+    '<div class="msg">Até lá este console não lê nem grava nada — de propósito: a leitura antiga (doGet) devolve a planilha inteira, inclusive abas de rascunho com texto de evolução, e isso não deve chegar a um navegador.</div>' +
+    '<div style="margin-top:12px"><button class="btn sec" onclick="carregar()">Testar de novo</button></div></div></div>';
+}
+
+/* ================= HOJE ================= */
+function cabecalho(titulo, sub){
+  const ok = validado();
+  return '<div class="head"><div><h1>' + titulo + '</h1><div class="sub">' + sub + '</div></div>' +
+    '<div class="pills"><span class="pill ' + (ok ? 'good' : 'warn') + '"><span class="dot"></span>' + (ok ? 'VALIDADO' : 'RASCUNHO') + '</span>' +
+    (nEdits() ? '<span class="pill crit"><span class="dot"></span>' + nEdits() + ' edição(ões) não gravada(s)</span>' : '') + '</div></div>';
+}
+function kpi(cls, lab, val, foot){ return '<div class="card kpi ' + cls + '"><div class="rail"></div><div class="lab">' + lab + '</div><div class="val num">' + val + '</div><div class="foot">' + foot + '</div></div>'; }
+function setoresOrd(){ return (S.D.setores || []).slice().sort((a, b) => ORDEM_K.indexOf(a.k) - ORDEM_K.indexOf(b.k)); }
+function vHoje(){
+  const D = S.D, sets = setoresOrd();
+  const elet = sets.reduce((a, s) => a + (s.elet || 0), 0), fila = sets.reduce((a, s) => a + (s.fila || 0), 0);
+  const emg = (D.setores || []).find(s => s.k === 'EMG');
+  const sem = (D.selos || {})['SEM LEITURA'] || 0;
+  let h = cabecalho('Painel de ' + esc(D.data), 'Censo de ' + esc(D.censo) + ' · ' + esc(D.nota || ''));
+  h += '<div class="row r-kpi">' +
+    kpi('k-meta', 'Altas necessárias hoje', D.meta, 'ontem: ' + (D.ontem ? D.ontem.altas + ' altas, ' + D.ontem.entradas + ' entradas, ' + D.ontem.obitos + ' óbitos' : '—')) +
+    kpi('k-fila', 'Fila da emergência', (D.fila || []).length, (emg ? emg.ocup + '/' + emg.cap + ' na emergência · ' : '') + fila + ' pedidos com destino') +
+    kpi('k-elet', 'Eletivas de hoje', elet, 'cirurgias marcadas nos setores') +
+    kpi('k-livre', 'Leitos livres', D.glob ? D.glob.livres : '—', D.glob ? D.glob.ocup + '/' + D.glob.leitos + ' ocupados · ' + D.glob.extras + ' em cama extra' : '') + '</div>';
+  h += '<div class="row r-2"><div class="card"><header><h2>Setores</h2><span class="hint">meta = altas necessárias hoje · AH alta hoje · ASE alta se</span></header><div class="body scroll"><table class="tb"><thead><tr>' +
+    '<th>Setor</th><th>Ocupação</th><th class="r">Livres</th><th class="r">Fila</th><th class="r">Elet.</th><th class="r">Meta</th><th class="r">AH</th><th class="r">ASE</th><th>Status</th></tr></thead><tbody>' +
+    sets.map(s => {
+      const pct = s.cap ? Math.min(100, Math.round(100 * s.ocup / s.cap)) : 0, px = s.cap ? Math.min(100 - pct, Math.round(100 * s.extra / s.cap)) : 0;
+      const status = s.paralelo ? '<span class="flag nao">paralelo</span>' : (s.meta > 0 ? '<span class="flag crit">faltam ' + s.meta + '</span>' : '<span class="flag ok">OK</span>');
+      return '<tr><td class="lt">' + esc(s.nome) + '</td><td class="occ"><span class="track"><i class="fill" style="width:' + pct + '%"></i>' + (px ? '<i class="xtra" style="left:' + pct + '%;width:' + px + '%"></i>' : '') +
+        '<span class="txt">' + s.ocup + (s.extra ? '+' + s.extra : '') + '/' + s.cap + '</span></span></td>' +
+        '<td class="r num">' + s.livres + '</td><td class="r num">' + s.fila + '</td><td class="r num">' + s.elet + '</td><td class="r num"><b>' + s.meta + '</b></td>' +
+        '<td class="r num">' + s.ah + '</td><td class="r num">' + s.ase + '</td><td>' + status + '</td></tr>'; }).join('') + '</tbody></table></div></div>' +
+    '<div class="card"><header><h2>Selos de hoje</h2><span class="hint">' + (sem ? '<b style="color:var(--crit-ink)">' + sem + ' SEM LEITURA</b>' : 'nenhum SEM LEITURA') + '</span></header><div class="body">' +
+    GRUPOS.map(G => { const ss = SELOS.filter(s => SELO_G[s] === G.g && D.selos[s]); const n = ss.reduce((a, s) => a + D.selos[s], 0); if (!n) return '';
+      return '<div style="display:grid;grid-template-columns:10px 1fr auto;gap:8px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--line-2);font-size:12px">' +
+        '<span style="width:10px;height:10px;border-radius:3px;background:' + G.cor + ';display:block;margin-top:3px"></span><span><b>' + G.nome + '</b><br><small style="color:var(--ink-3)">' +
+        esc(ss.map(s => s + ' ' + D.selos[s]).join(' · ')) + '</small></span><span class="num" style="font-weight:600">' + n + '</span></div>'; }).join('') +
+    '<div class="msg">Toque em <b>Leitos</b> para corrigir selo, pendência ou conduta de qualquer leito.</div></div></div></div>';
+  return h;
+}
+
+/* ================= LEITOS (editável) ================= */
+function idDe(l){ return l.k + '|' + l.p; }
+function efetivo(l){ const e = S.edits[idDe(l)]; return e ? Object.assign({}, l, e) : l; }
+function guardarEdits(){ localStorage.setItem(LS_EDITS, JSON.stringify(S.edits)); }
+function vLeitos(){
+  const D = S.D, f = S.filtro;
+  const ks = [...new Set(D.leitos.map(l => l.k))].sort((a, b) => ORDEM_K.indexOf(a) - ORDEM_K.indexOf(b));
+  const nomeK = {}; D.leitos.forEach(l => nomeK[l.k] = l.s);
+  let lista = D.leitos.map(efetivo).filter(l => (!f.k || l.k === f.k) && (!f.g || SELO_G[l.selo] === f.g) && (!f.q || String(l.p).indexOf(f.q) >= 0 || String(l.l).toLowerCase().indexOf(f.q.toLowerCase()) >= 0));
+  let h = cabecalho('Leito a leito', 'Corrija o selo, a pendência ou a conduta e toque em <b>Gravar na planilha</b>: a coluna Selo, a página e o PDF passam a refletir a correção.');
+  h += '<div class="card"><div class="body">' +
+    '<div class="chips"><button class="fb" data-k="" aria-pressed="' + !f.k + '">Todos</button>' + ks.map(k => '<button class="fb" data-k="' + k + '" aria-pressed="' + (f.k === k) + '">' + esc(nomeK[k]) + '</button>').join('') + '</div>' +
+    '<div class="chips">' + GRUPOS.map(G => '<button class="fb" data-g="' + G.g + '" aria-pressed="' + (f.g === G.g) + '"><span class="sw" style="background:' + G.cor + '"></span>' + G.nome + '</button>').join('') +
+    '<input class="busca" id="busca" type="search" inputmode="numeric" placeholder="prontuário ou leito" value="' + esc(f.q) + '" autocomplete="off"></div>' +
+    '<div id="lista">' + (lista.length ? '' : '<div class="bloq">nenhum leito com esse filtro</div>');
+  let kAtual = null;
+  lista.sort((a, b) => ORDEM_K.indexOf(a.k) - ORDEM_K.indexOf(b.k) || String(a.l).localeCompare(String(b.l), 'pt-BR', {numeric: true}));
+  lista.forEach(l => {
+    if (l.k !== kAtual) { kAtual = l.k; h += '<div class="grupo">' + esc(l.s) + '<span class="n">' + lista.filter(x => x.k === l.k).length + '</span></div>'; }
+    const id = idDe(l), dirty = !!S.edits[id], emg = l.k === 'EMG';
+    h += '<div class="item' + (dirty ? ' dirty' : '') + '" data-id="' + esc(id) + '">' +
+      '<div class="leito">' + esc(l.l) + '<span class="p">#' + esc(l.p) + '</span><small>' + l.dl + 'd na clínica · ' + l.dh + 'd no hospital</small></div>' +
+      '<div>' + (emg ? '<div class="ctl"><span class="selo s-' + (SELO_G[l.selo] || 'pend') + '">' + esc(l.selo) + '</span><small style="color:var(--ink-3)">emergência: edite pela planilha (aba HOJE)</small></div><div class="pend" style="font-size:12px;color:var(--ink-2)">' + esc(l.pend) + '</div>' :
+      '<div class="ctl"><select class="selo-sel">' + SELOS.map(s => '<option' + (s === l.selo ? ' selected' : '') + '>' + s + '</option>').join('') + '</select>' +
+      '<select class="dep-sel"' + (l.selo === 'ALTA SE' ? '' : ' hidden') + '><option value=""' + (!l.dep ? ' selected' : '') + '>depende de…</option><option value="nossa"' + (l.dep === 'nossa' ? ' selected' : '') + '>pendência nossa</option><option value="terceiro"' + (l.dep === 'terceiro' ? ' selected' : '') + '>de terceiro</option></select>' +
+      '<span class="selo s-' + (SELO_G[l.selo] || 'pend') + '">' + esc(l.selo) + '</span>' + (dirty ? '<button class="btn sec mini b-undo">desfazer</button>' : '') + '</div>' +
+      '<div class="lab">Pendência (última evolução)</div><textarea class="pend">' + esc(l.pend) + '</textarea>' +
+      '<div class="lab">O que fazer</div><textarea class="acao">' + esc(l.acao) + '</textarea>') + '</div></div>';
+  });
+  h += '</div>';
+  if (nEdits()) h += '<div class="barra"><span><b>' + nEdits() + '</b> leito(s) alterado(s) — ainda só neste aparelho</span><span class="sp"></span>' +
+    '<button class="btn sec mini" id="b-descartar">Descartar tudo</button><button class="btn mini" id="b-gravar">Gravar na planilha</button></div>';
+  h += '</div></div>';
+  return h;
+}
+function ligarLeitos(){
+  document.querySelectorAll('.fb[data-k]').forEach(b => b.addEventListener('click', () => { S.filtro.k = b.dataset.k; pintarMain(); }));
+  document.querySelectorAll('.fb[data-g]').forEach(b => b.addEventListener('click', () => { S.filtro.g = S.filtro.g === b.dataset.g ? '' : b.dataset.g; pintarMain(); }));
+  const bq = $('busca'); let t;
+  bq.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => { S.filtro.q = bq.value.trim(); const pos = bq.selectionStart; pintarMain(); const nb = $('busca'); nb.focus(); try { nb.setSelectionRange(pos, pos); } catch (_) {} }, 350); });
+  document.querySelectorAll('.item[data-id]').forEach(it => {
+    const id = it.dataset.id, base = S.D.leitos.find(l => idDe(l) === id); if (!base) return;
+    const sel = it.querySelector('.selo-sel'), dep = it.querySelector('.dep-sel'), pend = it.querySelector('textarea.pend'), acao = it.querySelector('textarea.acao');
+    if (!sel) return;
+    function ler(){
+      const e = {selo: sel.value, dep: sel.value === 'ALTA SE' ? dep.value : '', pend: pend.value.trim(), acao: acao.value.trim(), data: S.D.data};
+      const igual = e.selo === base.selo && e.dep === (base.dep || '') && e.pend === (base.pend || '').trim() && e.acao === (base.acao || '').trim();
+      if (igual) delete S.edits[id]; else S.edits[id] = e;
+      guardarEdits(); pintarNav();
+      it.classList.toggle('dirty', !igual);
+      dep.hidden = sel.value !== 'ALTA SE';
+      const chip = it.querySelector('.selo'); chip.className = 'selo s-' + (SELO_G[sel.value] || 'pend'); chip.textContent = sel.value;
+      atualizarBarra();
+    }
+    sel.addEventListener('change', ler); dep.addEventListener('change', ler);
+    pend.addEventListener('input', ler); acao.addEventListener('input', ler);
+    const u = it.querySelector('.b-undo'); if (u) u.addEventListener('click', () => { delete S.edits[id]; guardarEdits(); pintarNav(); pintarMain(); });
+  });
+  atualizarBarra(true);
+}
+function atualizarBarra(ligar){
+  const n = nEdits(), lista = $('lista'); if (!lista) return;
+  let b = document.querySelector('.barra');
+  if (!n) { if (b) b.remove(); return; }
+  if (!b) { b = document.createElement('div'); b.className = 'barra'; lista.parentNode.insertBefore(b, lista.nextSibling); ligar = true; }
+  b.innerHTML = '<span><b>' + n + '</b> leito(s) alterado(s) — ainda só neste aparelho</span><span class="sp"></span>' +
+    '<button class="btn sec mini" id="b-descartar">Descartar tudo</button><button class="btn mini" id="b-gravar">Gravar na planilha</button>';
+  $('b-descartar').addEventListener('click', () => { if (confirm('Descartar as ' + n + ' alterações não gravadas?')) { S.edits = {}; guardarEdits(); pintarNav(); pintarMain(); } });
+  $('b-gravar').addEventListener('click', gravarLeitos);
+}
+async function gravarLeitos(){
+  if (S.ocupado) return;
+  const itens = Object.keys(S.edits).map(id => { const [k, p] = id.split('|'); const e = S.edits[id]; return {k, p, selo: e.selo, dep: e.dep, pend: e.pend, acao: e.acao}; });
+  if (!itens.length) return;
+  if (validado() && !confirm('O painel de hoje já está VALIDADO. Gravar mesmo assim? (a validação continua valendo; os PDFs já enviados não mudam)')) return;
+  S.ocupado = true; const b = $('b-gravar'); if (b) { b.disabled = true; b.textContent = 'Gravando…'; }
+  try {
+    const r = await api('leitos', {itens});
+    toast('Gravado: ' + r.gravados + ' leito(s)' + (r.naoAchados && r.naoAchados.length ? ' · não achei: ' + r.naoAchados.join(', ') : '') + (r.json ? '' : ' · página NÃO atualizada'), !r.json || (r.naoAchados || []).length > 0);
+    S.edits = {}; guardarEdits();
+    await carregar(true);
+  } catch (e) { toast('Não gravou: ' + e.message, true); if (b) { b.disabled = false; b.textContent = 'Gravar na planilha'; } }
+  S.ocupado = false;
+}
+
+/* ================= REGULAÇÃO ================= */
+function vReg(){
+  const D = S.D, dl = (D.dialise && D.dialise.lista) || [], te = D.te || [], fila = D.fila || [];
+  let h = cabecalho('Regulação e fila', 'Diálise, transferência externa e a fila da emergência — como estão na planilha.');
+  h += '<div class="row r-2"><div class="card"><header><h2>Fila da emergência · ' + fila.length + '</h2></header><div class="body scroll"><table class="tb"><thead><tr><th>Box</th><th>Pront.</th><th>Aguarda</th><th class="r">h</th><th>Selo</th></tr></thead><tbody>' +
+    (fila.length ? fila.slice().sort((a, b) => b.espera_h - a.espera_h).map(f => '<tr><td class="lt">' + esc(f.box !== '—' ? f.box : f.area) + '</td><td class="p">' + esc(f.pront) + '</td><td>' + esc(f.aguarda) + '<br><small style="color:var(--ink-3)">' + esc(f.diag) + '</small></td>' +
+      '<td class="r num">' + f.espera_h + '</td><td><span class="flag ' + (f.destino ? 'warn' : 'nao') + '">' + esc(f.selo || (f.destino ? 'AGUARDA' : 'CLASSIFICAR')) + '</span></td></tr>').join('') : '<tr><td colspan="5" class="bloq">fila vazia</td></tr>') + '</tbody></table></div></div>' +
+    '<div><div class="card" style="margin-bottom:12px"><header><h2>Diálise · ' + dl.length + '</h2><span class="hint">' + esc((D.dialise && D.dialise.nota) || '') + '</span></header><div class="body scroll"><table class="tb"><thead><tr><th>Leito</th><th>Pront.</th><th>Situação</th><th>Nossa?</th></tr></thead><tbody>' +
+    (dl.length ? dl.map(d => '<tr><td class="lt">' + esc(d.l) + '</td><td class="p">' + esc(d.p) + '</td><td>' + esc(d.estado) + '<br><small style="color:var(--ink-2)">' + esc(d.acao) + '</small></td><td><span class="flag ' + (d.nossa === 'SIM' ? 'sim' : 'nao') + '">' + esc(d.nossa) + '</span></td></tr>').join('') : '<tr><td colspan="4" class="bloq">ninguém em diálise pendente</td></tr>') + '</tbody></table></div></div>' +
+    '<div class="card"><header><h2>Transferência externa · ' + te.length + '</h2></header><div class="body scroll"><table class="tb"><thead><tr><th>Setor/leito</th><th>Pront.</th><th>Motivo</th><th>Destino</th><th class="r">Dias</th></tr></thead><tbody>' +
+    (te.length ? te.map(t => '<tr><td class="lt">' + esc(t.s) + '</td><td class="p">' + esc(t.p) + '</td><td>' + esc(t.motivo) + '</td><td>' + esc(t.destino) + '</td><td class="r num">' + t.dias + '</td></tr>').join('') : '<tr><td colspan="5" class="bloq">nenhum pedido aberto</td></tr>') + '</tbody></table></div></div></div></div>';
+  return h;
+}
+
+/* ================= PILOTO ================= */
+function vPiloto(){
+  const D = S.D, hist = D.hist || [], esc_ = D.esc_selo || {};
+  const tot = Object.values(esc_).reduce((a, b) => a + b, 0), max = Math.max(1, ...Object.values(esc_));
+  const viu = hist.reduce((a, x) => a + x.viu, 0), escn = hist.reduce((a, x) => a + x.esc, 0);
+  let h = cabecalho('Piloto', 'O que o painel viu e o que escapou, dia a dia (aba PILOTO).');
+  h += '<div class="row r-kpi">' + kpi('k-elet', 'Dias de piloto', hist.length, 'desde ' + (hist[0] ? hist[0].d : '—')) +
+    kpi('k-livre', 'Altas que o painel viu', viu, 'ALTA HOJE + ALTA SE que saíram') +
+    kpi('k-meta', 'Altas que escaparam', escn, 'saíram sem selo de alta') +
+    kpi('k-fila', 'Sensibilidade', (viu + escn) ? Math.round(100 * viu / (viu + escn)) + '%' : '—', 'acumulada no período') + '</div>';
+  h += '<div class="row r-2"><div class="card"><header><h2>Dia a dia</h2></header><div class="body scroll"><table class="tb"><thead><tr><th>Dia</th><th class="r">Viu</th><th class="r">Escaparam</th><th class="r">Sens.</th><th>Auditado</th></tr></thead><tbody>' +
+    hist.slice().reverse().map(x => '<tr><td class="lt">' + esc(x.d) + '</td><td class="r num">' + x.viu + '</td><td class="r num">' + x.esc + '</td><td class="r num">' + x.sens + '%</td><td>' + (x.aud ? '<span class="flag ok">sim</span>' : '<span class="flag nao">não</span>') + '</td></tr>').join('') + '</tbody></table></div></div>' +
+    '<div class="card"><header><h2>Selo que o painel tinha dado às altas que escaparam</h2></header><div class="body">' +
+    Object.keys(esc_).sort((a, b) => esc_[b] - esc_[a]).map(k => '<div style="display:grid;grid-template-columns:110px 1fr 36px;gap:8px;align-items:center;padding:4px 0;font-size:12px"><span class="selo s-' + (SELO_G[k] || 'pend') + '">' + esc(k) + '</span><span class="bar"><i style="width:' + Math.round(100 * esc_[k] / max) + '%"></i></span><span class="num" style="text-align:right;font-weight:600">' + esc_[k] + '</span></div>').join('') +
+    (tot ? '<div class="msg">' + tot + ' altas escaparam no período.</div>' : '<div class="bloq">sem altas escapadas registradas</div>') + '</div></div></div>';
+  return h;
+}
+
+/* ================= E-MAILS ================= */
+function listaSetoresMail(){
+  const base = setoresOrd().filter(s => s.k !== 'EMG').map(s => s.nome).concat(['Emergência', 'Coordenação']);
+  Object.keys(S.emails).forEach(k => { if (base.indexOf(k) < 0) base.push(k); });
+  return base;
+}
+const emailOk = t => !t || t.split(',').every(x => !x.trim() || /^[^\s@,]+@[^\s@,]+\.[^\s@,]+$/.test(x.trim()));
+function vMail(){
+  let h = cabecalho('E-mails dos coordenadores', 'Quem recebe o PDF de cada setor quando o painel é validado. A Coordenação recebe um consolidado. Vários endereços: separe por vírgula.');
+  h += '<div class="card"><div class="body"><div class="mails">' + listaSetoresMail().map((s, i) => '<div class="mail"><label for="em' + i + '">' + esc(s) + '</label><input id="em' + i + '" data-setor="' + esc(s) + '" type="text" inputmode="email" autocomplete="off" autocapitalize="off" placeholder="nome@isgh.org.br" value="' + esc(S.emails[s] || '') + '"></div>').join('') + '</div>' +
+    '<div style="display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap"><button class="btn" id="b-mail">Salvar e-mails</button><span class="msg" id="m-mail" style="margin:0">Salvo na aba EMAILS_SETOR da planilha.</span></div></div></div>';
+  h += '<div class="card" style="margin-top:12px"><header><h2>Envios registrados</h2><span class="hint">últimos 30 · aba ENVIOS_EMAIL</span></header><div class="body scroll"><table class="tb"><thead><tr><th>Painel de</th><th>Setor</th><th>Para</th><th>Quando</th><th>Resultado</th></tr></thead><tbody>' +
+    (S.envios.length ? S.envios.slice().reverse().map(r => '<tr><td class="lt">' + esc(r[0]) + '</td><td>' + esc(r[1]) + '</td><td style="word-break:break-all">' + esc(r[2]) + '</td><td class="num">' + esc(r[3]) + '</td><td>' + (String(r[4]).indexOf('ERRO') === 0 ? '<span class="flag crit">' + esc(r[4]) + '</span>' : '<span class="flag ok">' + esc(r[4]) + '</span>') + '</td></tr>').join('') : '<tr><td colspan="5" class="bloq">nenhum envio ainda</td></tr>') + '</tbody></table></div></div>';
+  return h;
+}
+function ligarMail(){
+  const ins = [...document.querySelectorAll('.mail input')];
+  ins.forEach(i => i.addEventListener('input', () => i.classList.toggle('ruim', !emailOk(i.value))));
+  $('b-mail').addEventListener('click', async () => {
+    const maus = ins.filter(i => !emailOk(i.value)), m = $('m-mail');
+    if (maus.length) { m.className = 'msg erro'; m.textContent = 'Endereço com formato estranho em: ' + maus.map(i => i.dataset.setor).join(', '); return; }
+    const obj = {}; ins.forEach(i => obj[i.dataset.setor] = i.value.trim());
+    const b = $('b-mail'); b.disabled = true; m.className = 'msg'; m.textContent = 'Salvando…';
+    try { const r = await api('emails', {emails: obj}); S.emails = r.emails || obj; m.className = 'msg ok'; m.textContent = 'Salvo na planilha.'; toast('E-mails salvos'); }
+    catch (e) { m.className = 'msg erro'; m.textContent = 'Não deu certo: ' + e.message; }
+    b.disabled = false;
+  });
+}
+
+/* ================= VALIDAR ================= */
+function vVal(){
+  const D = S.D, V = S.V || {}, ok = validado();
+  const sem = (D.selos || {})['SEM LEITURA'] || 0, piora = (D.selos || {})['PIORA CLÍNICA'] || 0;
+  const comMail = listaSetoresMail().filter(s => S.emails[s]).length, semMail = listaSetoresMail().filter(s => !S.emails[s]);
+  const mesmoDia = !S.hoje || D.data === S.hoje;
+  const enviouHoje = S.envios.some(r => String(r[0]).trim() === D.data && String(r[4]).indexOf('enviado') === 0 && String(r[1]).indexOf('teste') < 0);
+  const it = (cls, txt, sub) => '<div class="it ' + cls + '">' + ICO[cls === 'ok' ? 'ok' : cls] + '<span>' + txt + (sub ? '<small>' + sub + '</small>' : '') + '</span></div>';
+  let h = cabecalho('Validar o painel de ' + esc(D.data), 'Validar é declarar que você revisou as sinalizações de hoje (Res. CFM 2.454/2026, art. 15). Só depois do carimbo os PDFs saem para os coordenadores.');
+  h += '<div class="row r-2"><div class="card"><header><h2>Antes de validar</h2></header><div class="body check">' +
+    it(mesmoDia ? 'ok' : 'crit', 'Página e planilha ' + (mesmoDia ? 'do mesmo dia (' + esc(D.data) + ')' : 'de dias diferentes: página ' + esc(D.data) + ', planilha ' + esc(S.hoje)), mesmoDia ? '' : 'rode a rodada antes de validar') +
+    it(nEdits() ? 'crit' : 'ok', nEdits() ? nEdits() + ' edição(ões) ainda não gravada(s)' : 'Nenhuma edição pendente', nEdits() ? 'grave na aba Leitos — senão o PDF sai sem elas' : '') +
+    it(sem ? 'warn' : 'ok', sem ? sem + ' leito(s) SEM LEITURA' : 'Nenhum leito sem leitura', sem ? 'o painel vai dizer isso no PDF; aceitável se você revisou' : '') +
+    it(piora ? 'warn' : 'ok', piora + ' com PIORA CLÍNICA', piora ? 'confira na aba Leitos antes de assinar' : '') +
+    it(comMail ? (semMail.length ? 'warn' : 'ok') : 'crit', comMail + ' destinatário(s) cadastrado(s)', semMail.length ? 'sem e-mail: ' + esc(semMail.join(', ')) : '') +
+    it(enviouHoje ? 'ok' : 'warn', enviouHoje ? 'PDFs de hoje já foram enviados' : 'PDFs de hoje ainda não saíram', enviouHoje ? 'validar de novo não reenvia; use "Reenviar"' : '') +
+    '</div></div>' +
+    '<div class="card"><header><h2>' + (ok ? 'Painel validado' : 'Painel em rascunho') + '</h2></header><div class="body">' +
+    '<div class="stamp ' + (ok ? 'ok' : '') + '" style="margin-bottom:12px">' + (ok ? esc(V.quem) : 'RASCUNHO — aguardando validação médica') + '</div>' +
+    (V.vencida ? '<div class="nota warn" style="margin-bottom:10px">A validação anterior era de outro dia e venceu: validação é ato médico do dia.</div>' : '') +
+    '<div id="val-acoes" style="display:grid;gap:8px">' +
+    (ok ? '<button class="btn sec" id="b-desfazer">Desfazer validação</button>' : '<button class="btn" id="b-validar"' + (mesmoDia ? '' : ' disabled') + '>Validar o painel de hoje</button>') +
+    '</div><div class="msg" id="m-val"></div>' +
+    '<hr style="border:0;border-top:1px solid var(--line-2);margin:14px 0">' +
+    '<div class="slab">PDFs por setor</div>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn sec mini" id="b-teste"' + (ok ? '' : ' disabled') + '>Enviar teste só para mim</button><button class="btn warn mini" id="b-reenviar"' + (ok ? '' : ' disabled') + '>Reenviar aos setores agora</button></div>' +
+    '<div class="msg">' + (ok ? 'O envio normal já aconteceu na validação (uma vez por dia). Reenviar manda de novo para todos os cadastrados.' : 'Disponível depois de validar.') + '</div>' +
+    '</div></div></div>';
+  h += '<div class="nota">' + esc('Painel produzido por rotina automática com apoio de inteligência artificial, a partir do prontuário eletrônico. As sinalizações são apoio à decisão e não substituem o julgamento do médico assistente (Res. CFM 2.454/2026, arts. 15 e 18).') + '</div>';
+  return h;
+}
+function ligarVal(){
+  const m = $('m-val');
+  async function rodar(botao, acao, extra, rotulo){
+    if (S.ocupado) return; S.ocupado = true;
+    const b = $(botao); const txt = b.textContent; b.disabled = true; b.textContent = rotulo; m.className = 'msg'; m.textContent = 'Falando com a planilha… (pode levar até 1 min quando há PDFs)';
+    try {
+      const r = await api(acao, extra);
+      S.V = r.val || S.V;
+      const env = r.envio && r.envio.msg ? r.envio.msg : '';
+      m.className = 'msg ok'; m.textContent = (acao === 'validar' ? 'Validado. ' : acao === 'desfazer' ? 'Voltou a rascunho. ' : '') + env;
+      toast(acao === 'validar' ? 'Painel validado' : acao === 'desfazer' ? 'Validação desfeita' : 'Pedido enviado');
+      await carregar(true);
+      const m2 = $('m-val'); if (m2) { m2.className = 'msg ok'; m2.textContent = (acao === 'validar' ? 'Validado. ' : acao === 'desfazer' ? 'Voltou a rascunho. ' : '') + env; }
+    } catch (e) { m.className = 'msg erro'; m.textContent = 'Não deu certo: ' + e.message; b.disabled = false; b.textContent = txt; }
+    S.ocupado = false;
+  }
+  const bv = $('b-validar');
+  if (bv) bv.addEventListener('click', () => {
+    if (nEdits() && !confirm('Há ' + nEdits() + ' edição(ões) não gravada(s). O PDF sairá SEM elas. Validar mesmo assim?')) return;
+    const alvo = $('val-acoes');
+    alvo.innerHTML = '<div class="nota warn">Você está declarando que revisou as sinalizações de hoje. Assina como <b>' + esc(S.V.eu || 'responsável') + '</b>; os PDFs saem em seguida.</div>' +
+      '<button class="btn" id="b-confirma">Confirmar validação</button><button class="btn sec" id="b-cancela">Cancelar</button>';
+    $('b-cancela').addEventListener('click', () => pintarMain());
+    $('b-confirma').addEventListener('click', () => rodar('b-confirma', 'validar', {}, 'Validando…'));
+  });
+  const bd = $('b-desfazer'); if (bd) bd.addEventListener('click', () => { if (confirm('Desfazer a validação de hoje? Os PDFs já enviados não voltam.')) rodar('b-desfazer', 'desfazer', {}, 'Desfazendo…'); });
+  const bt = $('b-teste'); if (bt) bt.addEventListener('click', () => rodar('b-teste', 'enviar', {teste: true}, 'Enviando…'));
+  const br = $('b-reenviar'); if (br) br.addEventListener('click', () => { if (confirm('Reenviar os PDFs de hoje para TODOS os setores cadastrados?')) rodar('b-reenviar', 'enviar', {forcar: true}, 'Reenviando…'); });
+}
+
+/* ---------------- arranque ---------------- */
+S.cfg = lerCfg();
+pintarNav();
+if (!S.cfg) { abrirCfg(false); $('main').innerHTML = '<div class="bloq">informe a chave da ponte para começar</div>'; }
+else carregar();
+document.addEventListener('visibilitychange', () => { if (!document.hidden && S.cfg && S.quando && Date.now() - new Date(S.quando).getTime() > 10 * 60000) carregar(true); });
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('painel-console-sw.js', {scope: './painel-console'}).catch(() => {});
+</script>
+</body>
+</html>
