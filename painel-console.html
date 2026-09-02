@@ -348,7 +348,7 @@ async function carregar(silencioso){
   try {
     const r = await api('pacote');
     if (!r.dados || !r.versao) { S.versao = 15; pintarTudo(); return; }   /* ponte antiga: ignora `acao` e devolve {ok,abas:[]} */
-    S.versao = r.versao; S.D = r.dados; S.V = r.val || {}; S.emails = r.emails || {}; S.envios = r.envios || [];
+    S.versao = r.versao; S.D = r.dados; S.V = r.val || {}; S.emails = r.emails || {}; S.envios = r.envios || []; S.textos = r.textos || null;
     S.hoje = r.hoje || ''; S.quando = r.quando || '';
     /* edições locais de outro dia não valem mais */
     Object.keys(S.edits).forEach(id => { if (S.edits[id].data !== S.D.data) delete S.edits[id]; });
@@ -625,6 +625,11 @@ function vMail(){
   let h = cabecalho('E-mails dos coordenadores', 'Quem recebe o PDF de cada setor quando o painel é validado. A Coordenação recebe um consolidado. Vários endereços: separe por vírgula.');
   h += '<div class="card"><div class="body"><div class="mails">' + listaSetoresMail().map((s, i) => '<div class="mail"><label for="em' + i + '">' + esc(s) + '</label><input id="em' + i + '" data-setor="' + esc(s) + '" type="text" inputmode="email" autocomplete="off" autocapitalize="off" placeholder="nome@isgh.org.br" value="' + esc(S.emails[s] || '') + '"></div>').join('') + '</div>' +
     '<div style="display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap"><button class="btn" id="b-mail">Salvar e-mails</button><span class="msg" id="m-mail" style="margin:0">Salvo na aba EMAILS_SETOR da planilha.</span></div></div></div>';
+  const T = S.textos || {}, corpo = T.corpo || T.padrao || '';
+  h += '<div class="card" style="margin-top:12px"><header><h2>Texto do e-mail</h2><span class="hint">vale para os setores e para o consolidado; o PDF vai em anexo</span></header><div class="body">' +
+    '<textarea id="t-corpo" style="width:100%;min-height:210px;padding:9px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);font-size:13px;line-height:1.45;resize:vertical">' + esc(corpo) + '</textarea>' +
+    '<div class="msg" style="margin-top:6px">Marcadores que o script preenche: <span class="p">{{DIA}}</span> data do painel · <span class="p">{{SETOR}}</span> nome do setor (ou "consolidado…") · <span class="p">{{LINHA}}</span> ocupação/altas do setor · <span class="p">{{CARIMBO}}</span> "VALIDADO POR…" · <span class="p">{{DECLARACAO}}</span> texto da Res. CFM 2.454/2026 (mantenha) · <span class="p">{{META}}</span> · <span class="p">{{CENSO}}</span></div>' +
+    '<div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap"><button class="btn" id="b-corpo">Salvar texto</button><button class="btn sec" id="b-corpo-padrao">Voltar ao padrão</button><span class="msg" id="m-corpo" style="margin:0">' + (T.corpo ? 'Texto personalizado em uso.' : 'Texto padrão em uso.') + '</span></div></div></div>';
   h += '<div class="card" style="margin-top:12px"><header><h2>Envios registrados</h2><span class="hint">últimos 30 · aba ENVIOS_EMAIL</span></header><div class="body scroll"><table class="tb"><thead><tr><th>Painel de</th><th>Setor</th><th>Para</th><th>Quando</th><th>Resultado</th></tr></thead><tbody>' +
     (S.envios.length ? S.envios.slice().reverse().map(r => '<tr><td class="lt">' + esc(r[0]) + '</td><td>' + esc(r[1]) + '</td><td style="word-break:break-all">' + esc(r[2]) + '</td><td class="num">' + esc(r[3]) + '</td><td>' + (String(r[4]).indexOf('ERRO') === 0 ? '<span class="flag crit">' + esc(r[4]) + '</span>' : '<span class="flag ok">' + esc(r[4]) + '</span>') + '</td></tr>').join('') : '<tr><td colspan="5" class="bloq">nenhum envio ainda</td></tr>') + '</tbody></table></div></div>';
   return h;
@@ -641,6 +646,18 @@ function ligarMail(){
     catch (e) { m.className = 'msg erro'; m.textContent = 'Não deu certo: ' + e.message; }
     b.disabled = false;
   });
+  const bc = $('b-corpo'), mc = $('m-corpo');
+  if (bc) {
+    const salvarCorpo = async (txt) => {
+      if (txt && txt.indexOf('{{DECLARACAO}}') < 0 && !confirm('O texto está sem {{DECLARACAO}} (Res. CFM 2.454/2026). Salvar mesmo assim?')) return;
+      bc.disabled = true; mc.className = 'msg'; mc.textContent = 'Salvando…';
+      try { const r = await api('textos', {corpo: txt}); S.textos = r.textos || S.textos; mc.className = 'msg ok'; mc.textContent = txt ? 'Texto personalizado salvo na planilha.' : 'Voltou ao texto padrão.'; $('t-corpo').value = (S.textos && (S.textos.corpo || S.textos.padrao)) || ''; toast('Texto do e-mail salvo'); }
+      catch (e) { mc.className = 'msg erro'; mc.textContent = 'Não deu certo: ' + e.message; }
+      bc.disabled = false;
+    };
+    bc.addEventListener('click', () => salvarCorpo($('t-corpo').value.trim()));
+    $('b-corpo-padrao').addEventListener('click', () => { if (confirm('Descartar o texto personalizado e voltar ao padrão?')) salvarCorpo(''); });
+  }
 }
 
 /* ================= VALIDAR ================= */
