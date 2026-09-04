@@ -97,6 +97,12 @@ a{color:var(--brand-2)}
 .pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:100px;font-size:11.5px;font-weight:600;
   background:var(--card);border:1px solid var(--line);color:var(--ink-2)}
 .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--ink-3)}
+/* o "atualizar" da lateral não existe no celular (a lateral vira barra de abas):
+   este pill fica no cabeçalho de toda tela, ao alcance do polegar */
+button.pill{cursor:pointer;font:inherit;font-size:11.5px;font-weight:600}
+button.pill:hover{border-color:var(--brand-3);color:var(--ink)}
+button.pill:disabled{opacity:.6;cursor:default}
+.pill svg{width:13px;height:13px;flex:0 0 13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .pill.warn{background:var(--warn-soft);border-color:rgba(250,178,25,.4);color:var(--warn-ink)} .pill.warn .dot{background:var(--warn)}
 .pill.good{background:var(--good-soft);border-color:rgba(12,163,12,.35);color:var(--good-ink)} .pill.good .dot{background:var(--good)}
 .pill.crit{background:var(--crit-soft);border-color:rgba(208,59,59,.35);color:var(--crit-ink)} .pill.crit .dot{background:var(--crit)}
@@ -108,6 +114,10 @@ a{color:var(--brand-2)}
 .card .hint{font-size:11.5px;color:var(--ink-3);margin-top:3px;line-height:1.4}
 .card>.body{padding:12px 15px 15px}
 .row{display:grid;gap:12px;margin-bottom:12px}
+/* filho de grade só encolhe com min-width:0. Sem isto a tabela de dentro (th com
+   white-space:nowrap) esticava o cartão, a página rolava de lado no celular e a
+   barra de abas mudava de largura de uma aba para outra. */
+.row>*,.r-set>*{min-width:0}
 .r-kpi{grid-template-columns:repeat(4,minmax(0,1fr))}
 .r-2{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}
 @media (max-width:1180px){.r-kpi{grid-template-columns:repeat(2,minmax(0,1fr))}.r-2{grid-template-columns:1fr}}
@@ -231,8 +241,12 @@ a{color:var(--brand-2)}
 .mail input{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);font-size:16px}
 @media (min-width:761px){.mail input{font-size:13px}}
 .mail input.ruim{border-color:var(--crit);background:var(--crit-soft)}
+/* rascunho de e-mail: o que ele digitou e ainda não gravou na planilha */
+.mail.rasc input{border-color:var(--warn);background:var(--warn-soft)}
+.mail.rasc label::after{content:" · não salvo";color:var(--warn-ink)}
+.mail.conf label::after{content:" · não salvo · a planilha mudou";color:var(--crit-ink)}
 .msg{font-size:12px;color:var(--ink-2);margin-top:8px;line-height:1.45}
-.msg.ok{color:var(--good-ink)} .msg.erro{color:var(--crit-ink)}
+.msg.ok{color:var(--good-ink)} .msg.erro{color:var(--crit-ink)} .msg.pend{color:var(--warn-ink);font-weight:600}
 .nota{font-size:12px;color:var(--ink-2);line-height:1.5;padding:10px 12px;border-radius:var(--r-sm);background:var(--card-2)}
 .nota.warn{background:var(--warn-soft);color:var(--warn-ink)}
 .nota.crit{background:var(--crit-soft);color:var(--crit-ink)}
@@ -265,11 +279,15 @@ a{color:var(--brand-2)}
   @media (prefers-color-scheme:dark){.side{background:rgba(21,29,27,.96)}}
   .side .brand,.side .sblock,.side .sfoot{display:none}
   .navf{flex-direction:row;justify-content:space-around;gap:0}
-  /* cada botão ocupa 1/6 fixo: a largura não muda com o texto em negrito nem com o contador */
-  .navf button{flex:1 1 0;min-width:0;flex-direction:column;gap:3px;padding:4px 1px;font-size:9.5px;font-weight:600;justify-content:center;align-items:center;text-align:center;border-radius:8px;white-space:nowrap;letter-spacing:-.01em}
+  /* cada botão ocupa 1/7 fixo: a largura não muda com o texto em negrito, com o
+     contador (que é absoluto) nem com a aba escolhida — a barra fica parada */
+  .navf button{flex:1 1 0;min-width:0;max-width:14.2857%;flex-direction:column;gap:3px;padding:4px 1px;font-size:9.5px;font-weight:600;justify-content:center;align-items:center;text-align:center;border-radius:8px;white-space:nowrap;letter-spacing:-.01em}
+  /* o rótulo é cortado dentro do próprio botão: nada empurra a barra para fora dos 375px */
+  .navf button>span:not(.n){display:block;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .navf button svg{width:21px;height:21px;flex-basis:21px}
   .navf .n{margin-left:0;position:absolute;transform:translate(16px,-4px);font-size:9.5px}
   .navf button{position:relative}
+  @media (max-width:380px){ .navf button{font-size:9px;letter-spacing:-.02em} }
   .main{padding:calc(12px + var(--st)) 12px calc(96px + var(--sb))}
   .head h1{font-size:18px}
   .r-kpi{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -322,12 +340,14 @@ a{color:var(--brand-2)}
    Console do Painel de Leitos — HRSC
    · lê e grava na planilha "PAINEL DE LEITOS - HRSC" pela ponte (Apps Script v16)
    · pacientes só por prontuário (LGPD); nada de dado clínico é guardado neste aparelho
-   · CFM 2.454/2026: o painel nasce RASCUNHO; validar é ato do médico responsável,
-     e só depois do carimbo os PDFs saem para os coordenadores
+   · desde 03/09/2026 a rodada das 5h publica a página e DISPARA os PDFs sozinha,
+     antes de qualquer olhar humano. Validar, portanto, não libera envio nenhum:
+     é a revisão médica a posteriori (Res. CFM 2.454/2026), que fica registrada no
+     carimbo da página e nos PDFs seguintes. E-mail já enviado não volta.
    ================================================================ */
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const LS_CFG = 'plc.cfg', LS_EDITS = 'plc.edits', LS_TAB = 'plc.tab';
+const LS_CFG = 'plc.cfg', LS_EDITS = 'plc.edits', LS_TAB = 'plc.tab', LS_MAIL = 'plc.mail';
 
 const SELOS = ['ALTA HOJE','ALTA SE','ATB','EM EXAME','CIRURGIA','PÓS-OP','REGULAÇÃO','VIGILÂNCIA','PIORA CLÍNICA','PALIATIVO','UTI','OBSTETRÍCIA','RN','SEM LEITURA'];
 const SELO_G = {'ALTA HOJE':'alta','ALTA SE':'altase','ATB':'pend','EM EXAME':'pend','CIRURGIA':'pend','PÓS-OP':'pend','REGULAÇÃO':'pend',
@@ -350,12 +370,15 @@ const ICO = {
   setor:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
   ok:'<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>',
   warn:'<svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>',
-  crit:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>'};
+  crit:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>',
+  refresh:'<svg viewBox="0 0 24 24"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6"/><path d="M20.5 3.5V9H15"/></svg>'};
 
 const S = { cfg:null, D:null, V:null, emails:{}, envios:[], versao:null, hoje:'', quando:'',
             tab: localStorage.getItem(LS_TAB) || 'hoje', edits:{}, filtro:{k:'', g:'', q:''}, ocupado:false, aberto:null,
-            AD:null, setorSel: localStorage.getItem('painel.setor') || '' };
+            AD:null, setorSel: localStorage.getItem('painel.setor') || '', rasc:{emails:{}, corpo:null} };
 try { S.edits = JSON.parse(localStorage.getItem(LS_EDITS) || '{}') || {}; } catch (_) { S.edits = {}; }
+/* rascunho da aba E-mails: sobrevive a bloquear a tela e ao recarregamento automático */
+try { const r = JSON.parse(localStorage.getItem(LS_MAIL) || 'null'); if (r && r.emails) S.rasc = {emails: r.emails || {}, corpo: r.corpo || null}; } catch (_) {}
 
 /* ---------------- ponte ---------------- */
 function lerCfg(){ try { return JSON.parse(localStorage.getItem(LS_CFG) || 'null'); } catch (_) { return null; } }
@@ -384,6 +407,7 @@ async function carregar(silencioso){
     /* edições locais de outro dia não valem mais */
     Object.keys(S.edits).forEach(id => { if (S.edits[id].data !== S.D.data) delete S.edits[id]; });
     guardarEdits();
+    conferirRascunhos();   /* o que ele está digitando na aba E-mails não pode sumir calado */
     pintarTudo();
   } catch (e) {
     S.versao = S.versao || null;
@@ -436,6 +460,7 @@ function pintarNav(){
   $('nav').innerHTML = ABAS.map(a => {
     let n = '';
     if (a.id === 'leitos' && nEdits()) n = '<span class="n warn">' + nEdits() + '</span>';
+    if (a.id === 'mail' && nRascMail()) n = '<span class="n warn">' + nRascMail() + '</span>';   /* e-mail digitado e não salvo */
     if (a.id === 'val' && S.V) n = '<span class="n">' + (String(S.V.estado).toUpperCase() === 'VALIDADO' ? '✓' : '') + '</span>';
     return '<button data-tab="' + a.id + '" aria-pressed="' + (S.tab === a.id) + '">' + ICO[a.ic] + '<span>' + a.nome + '</span>' + n + '</button>';
   }).join('');
@@ -455,7 +480,7 @@ function pintarLateral(){
   const st = $('s-stamp'), ok = validado();
   st.className = 'stamp' + (ok ? ' ok' : '');
   st.innerHTML = (ok ? ICO.ok : ICO.warn).replace('<svg', '<svg width="14" height="14" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"') +
-    '<span>' + (ok ? esc(S.V.quem || 'VALIDADO') : 'RASCUNHO — aguardando validação médica') + '</span>';
+    '<span>' + (ok ? esc(S.V.quem || 'VALIDADO') : 'Publicado às 5h — ainda sem revisão médica') + '</span>';
 }
 
 function pintarMain(){
@@ -465,6 +490,15 @@ function pintarMain(){
   m.innerHTML = ({hoje: vHoje, setor: vSetor, leitos: vLeitos, reg: vReg, piloto: vPiloto, mail: vMail, val: vVal})[S.tab]();
   const LIGA = {setor: ligarSetor, leitos: ligarLeitos, mail: ligarMail, val: ligarVal};
   LIGA[S.tab] && LIGA[S.tab]();
+  /* "atualizar" no conteúdo: no celular a lateral (onde fica o outro) some */
+  const br = $('b-recarregar');
+  if (br) br.addEventListener('click', async () => {
+    br.disabled = true; br.textContent = 'lendo a planilha…';
+    await carregar();
+    /* se deu certo a tela foi repintada e este botão nem existe mais; se a leitura
+       falhou (o toast avisa), ele volta ao normal em vez de ficar travado */
+    if ($('b-recarregar') === br) { br.disabled = false; br.innerHTML = ICO.refresh + 'atualizar'; }
+  });
 }
 
 function telaV15(){
@@ -478,57 +512,104 @@ function telaV15(){
 /* ================= HOJE ================= */
 function cabecalho(titulo, sub){
   const ok = validado();
+  const hora = S.quando ? new Date(S.quando).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) : '';
   return '<div class="head"><div><h1>' + titulo + '</h1><div class="sub">' + sub + '</div></div>' +
-    '<div class="pills"><span class="pill ' + (ok ? 'good' : 'warn') + '"><span class="dot"></span>' + (ok ? 'VALIDADO' : 'RASCUNHO') + '</span>' +
-    (nEdits() ? '<span class="pill crit"><span class="dot"></span>' + nEdits() + ' edição(ões) não gravada(s)</span>' : '') + '</div></div>';
+    '<div class="pills"><span class="pill ' + (ok ? 'good' : 'warn') + '"><span class="dot"></span>' + (ok ? 'REVISADO' : 'SEM REVISÃO MÉDICA') + '</span>' +
+    (nEdits() ? '<span class="pill crit"><span class="dot"></span>' + nEdits() + ' edição(ões) não gravada(s)</span>' : '') +
+    (nRascMail() ? '<span class="pill warn"><span class="dot"></span>' + nRascMail() + ' e-mail(s) não salvo(s)</span>' : '') +
+    '<button class="pill" type="button" id="b-recarregar" title="reler a planilha agora">' + ICO.refresh + 'atualizar' + (hora ? ' · lido ' + hora : '') + '</button>' +
+    '</div></div>';
 }
 function kpi(cls, lab, val, foot){ return '<div class="card kpi ' + cls + '"><div class="rail"></div><div class="lab">' + lab + '</div><div class="val num">' + val + '</div><div class="foot">' + foot + '</div></div>'; }
 function setoresOrd(){ return (S.D.setores || []).slice().sort((a, b) => ORDEM_K.indexOf(a.k) - ORDEM_K.indexOf(b.k)); }
 function vHoje(){
-  const D = S.D, sets = setoresOrd();
+  const D = S.D, sets = setoresOrd(), DF = difEdits();
   const elet = sets.reduce((a, s) => a + (s.elet || 0), 0), fila = sets.reduce((a, s) => a + (s.fila || 0), 0);
   const emg = (D.setores || []).find(s => s.k === 'EMG');
-  const sem = (D.selos || {})['SEM LEITURA'] || 0;
+  const sem = seloEf(DF, 'SEM LEITURA');
   let h = cabecalho('Painel de ' + esc(D.data), 'Censo de ' + esc(D.censo) + ' · ' + esc(D.nota || ''));
   h += '<div class="row r-kpi">' +
     kpi('k-meta', 'Altas necessárias hoje', D.meta, 'ontem: ' + (D.ontem ? D.ontem.altas + ' altas, ' + D.ontem.entradas + ' entradas, ' + D.ontem.obitos + ' óbitos' : '—')) +
     kpi('k-fila', 'Fila da emergência', (D.fila || []).length, (emg ? emg.ocup + '/' + emg.cap + ' na emergência · ' : '') + fila + ' pedidos com destino') +
     kpi('k-elet', 'Eletivas para entrar hoje', elet, 'aguardando internação — já descontadas as que já têm leito') +
     kpi('k-livre', 'Leitos livres', D.glob ? D.glob.livres : '—', D.glob ? D.glob.ocup + '/' + D.glob.leitos + ' ocupados · ' + D.glob.extras + ' em cama extra' : '') + '</div>';
-  h += '<div class="row r-2"><div class="card"><header><h2>Setores</h2><span class="hint">meta = altas necessárias hoje · AH alta hoje · ASE alta se</span></header><div class="body scroll"><table class="tb"><thead><tr>' +
+  h += '<div class="row r-2"><div class="card"><header><h2>Setores</h2><span class="hint">meta = altas necessárias hoje · AH alta hoje · ASE alta se' +
+    (nEdits() ? ' · <b style="color:var(--warn-ink)">AH/ASE já contam as suas ' + nEdits() + ' edição(ões) não gravada(s)</b>' : '') + '</span></header><div class="body scroll"><table class="tb"><thead><tr>' +
     '<th>Setor</th><th>Ocupação</th><th class="r">Livres</th><th class="r">Fila</th><th class="r">Elet.</th><th class="r">Meta</th><th class="r">AH</th><th class="r">ASE</th><th>Status</th></tr></thead><tbody>' +
     sets.map(s => {
       const pct = s.cap ? Math.min(100, Math.round(100 * s.ocup / s.cap)) : 0, px = s.cap ? Math.min(100 - pct, Math.round(100 * s.extra / s.cap)) : 0;
       const status = s.paralelo ? '<span class="flag nao">paralelo</span>' : (s.meta > 0 ? '<span class="flag crit">faltam ' + s.meta + '</span>' : '<span class="flag ok">OK</span>');
+      const e = setEf(DF, s);   /* AH/ASE com as edições locais — a aba Leitos já mostra assim */
       return '<tr><td class="lt">' + esc(s.nome) + '</td><td class="occ"><span class="track"><i class="fill" style="width:' + pct + '%"></i>' + (px ? '<i class="xtra" style="left:' + pct + '%;width:' + px + '%"></i>' : '') +
         '<span class="txt">' + s.ocup + (s.extra ? '+' + s.extra : '') + '/' + s.cap + '</span></span></td>' +
         '<td class="r num">' + s.livres + '</td><td class="r num">' + s.fila + '</td><td class="r num">' + s.elet + '</td><td class="r num"><b>' + s.meta + '</b></td>' +
-        '<td class="r num">' + s.ah + '</td><td class="r num">' + s.ase + '</td><td>' + status + '</td></tr>'; }).join('') + '</tbody></table></div></div>' +
+        '<td class="r num">' + e.ah + '</td><td class="r num">' + e.ase + '</td><td>' + status + (e.ed ? ' ' + FLAG_ED : '') + '</td></tr>'; }).join('') + '</tbody></table></div></div>' +
     '<div class="card"><header><h2>Selos de hoje</h2><span class="hint">' + (sem ? '<b style="color:var(--crit-ink)">' + sem + ' SEM LEITURA</b>' : 'nenhum SEM LEITURA') + '</span></header><div class="body">' +
-    GRUPOS.map(G => { const ss = SELOS.filter(s => SELO_G[s] === G.g && D.selos[s]); const n = ss.reduce((a, s) => a + D.selos[s], 0); if (!n) return '';
+    GRUPOS.map(G => { const todos = SELOS.filter(s => SELO_G[s] === G.g);
+      const ss = todos.filter(s => seloEf(DF, s)), n = ss.reduce((a, s) => a + seloEf(DF, s), 0);
+      const n0 = todos.reduce((a, s) => a + ((D.selos || {})[s] || 0), 0);
+      if (!n && !n0) return '';
       return '<div style="display:grid;grid-template-columns:10px 1fr auto;gap:8px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--line-2);font-size:12px">' +
-        '<span style="width:10px;height:10px;border-radius:3px;background:' + G.cor + ';display:block;margin-top:3px"></span><span><b>' + G.nome + '</b><br><small style="color:var(--ink-3)">' +
-        esc(ss.map(s => s + ' ' + D.selos[s]).join(' · ')) + '</small></span><span class="num" style="font-weight:600">' + n + '</span></div>'; }).join('') +
-    '<div class="msg">Toque em <b>Leitos</b> para corrigir selo, pendência ou conduta de qualquer leito.</div></div></div></div>';
+        '<span style="width:10px;height:10px;border-radius:3px;background:' + G.cor + ';display:block;margin-top:3px"></span><span><b>' + G.nome + '</b>' + (n !== n0 ? ' ' + FLAG_ED : '') + '<br><small style="color:var(--ink-3)">' +
+        (ss.length ? esc(ss.map(s => s + ' ' + seloEf(DF, s)).join(' · ')) : 'nenhum') + '</small></span><span class="num" style="font-weight:600">' + n + '</span></div>'; }).join('') +
+    '<div class="msg">Toque em <b>Leitos</b> para corrigir selo, pendência ou conduta de qualquer leito.' +
+    (nEdits() ? ' <b style="color:var(--warn-ink)">Estes números já são os seus — a planilha e a página publicada só mudam depois de gravar.</b>' : '') + '</div></div></div></div>';
   return h;
 }
 
 /* ================= LEITOS (editável) ================= */
 function idDe(l){ return l.k + '|' + l.p; }
 function efetivo(l){ const e = S.edits[idDe(l)]; return e ? Object.assign({}, l, e) : l; }
-function guardarEdits(){ localStorage.setItem(LS_EDITS, JSON.stringify(S.edits)); }/* ================= SETORES ================= */
+function guardarEdits(){ localStorage.setItem(LS_EDITS, JSON.stringify(S.edits)); }
+
+/* ---- contagens efetivas (edições locais aplicadas) ------------------------
+   Só a aba Leitos usava efetivo(); Hoje e Setores somavam o número cru da ponte,
+   então o mesmo leito aparecia corrigido num lugar e antigo no outro, sem aviso.
+   Trabalhamos por DIFERENÇA (o que a edição muda) em vez de recontar tudo: assim,
+   sem nenhuma edição, os totais continuam idênticos aos que a planilha mandou. */
+const FLAG_ED = '<span class="flag warn" title="conta com as suas edições ainda não gravadas na planilha">editado</span>';
+function difEdits(){
+  const d = {setor:{}, selos:{}, n:0};
+  const ids = Object.keys(S.edits);
+  if (!ids.length || !S.D) return d;
+  const porId = {}; (S.D.leitos || []).forEach(l => porId[idDe(l)] = l);
+  ids.forEach(id => {
+    const base = porId[id]; if (!base) return;
+    const novo = S.edits[id].selo;
+    if (!novo || novo === base.selo) return;   /* mexer só no texto não muda contagem */
+    d.n++;
+    d.selos[base.selo] = (d.selos[base.selo] || 0) - 1;
+    d.selos[novo] = (d.selos[novo] || 0) + 1;
+    const c = d.setor[base.k] || (d.setor[base.k] = {ah:0, ase:0});
+    if (base.selo === 'ALTA HOJE') c.ah--; else if (base.selo === 'ALTA SE') c.ase--;
+    if (novo === 'ALTA HOJE') c.ah++; else if (novo === 'ALTA SE') c.ase++;
+  });
+  return d;
+}
+function seloEf(DF, nome){ return ((S.D.selos || {})[nome] || 0) + (DF.selos[nome] || 0); }
+function setEf(DF, s){
+  const c = DF.setor[s.k];
+  return {ah: (s.ah || 0) + (c ? c.ah : 0), ase: (s.ase || 0) + (c ? c.ase : 0), ed: !!(c && (c.ah || c.ase))};
+}
+
+/* ================= SETORES ================= */
 /* Uma tela por setor: as possibilidades de alta de hoje e o destino do que foi cobrado ontem.
    A aderência vem de painel-aderencia.json (aderencia.py), publicado ao lado deste arquivo. */
 function adSet(k){ return (S.AD && S.AD.setores) ? (S.AD.setores[k] || null) : null; }
 function nomeSetor(k){ const s = (S.D.setores || []).find(x => x.k === k); return s ? s.nome : k; }
 
 function vSetor(){
-  const D = S.D, sets = setoresOrd(), AD = S.AD;
-  const AH = sets.reduce((a, s) => a + (s.ah || 0), 0), ASE = sets.reduce((a, s) => a + (s.ase || 0), 0);
+  const D = S.D, sets = setoresOrd(), AD = S.AD, DF = difEdits();
+  /* mesmas contas da aba Leitos: sem isto o setor mostrava o número antigo depois
+     de ele corrigir um leito, e nada dizia qual dos dois valia */
+  const EFs = sets.map(s => setEf(DF, s));
+  const AH = EFs.reduce((a, e) => a + e.ah, 0), ASE = EFs.reduce((a, e) => a + e.ase, 0);
+  const AH0 = sets.reduce((a, s) => a + (s.ah || 0), 0), ASE0 = sets.reduce((a, s) => a + (s.ase || 0), 0);
   let h = cabecalho('Setores', 'As possibilidades de alta de hoje, setor a setor — e o que aconteceu com o que o painel cobrou no dia anterior.');
 
   h += '<div class="row r-kpi">' +
-    kpi('k-elet', 'Possibilidades de alta hoje', AH + ASE, '<b>' + AH + '</b> ALTA HOJE · <b>' + ASE + '</b> ALTA SE');
+    kpi('k-elet', 'Possibilidades de alta hoje', AH + ASE, '<b>' + AH + '</b> ALTA HOJE · <b>' + ASE + '</b> ALTA SE' +
+      (AH !== AH0 || ASE !== ASE0 ? '<br>' + FLAG_ED + ' na planilha ainda são ' + AH0 + ' e ' + ASE0 + ' — grave na aba Leitos' : ''));
   if (AD && AD.geral && AD.geral.n) {
     h += kpi('k-livre', 'Resolvidas em 24h', AD.geral.pct_resolvida + '%', AD.geral.resolvida + ' de ' + AD.geral.n + ' pendências cobradas no painel de ' + esc(AD.dia_br || AD.dia)) +
          kpi('k-fila', 'Andaram, mas não fecharam', AD.geral.encaminhada, 'equipe agiu e o resultado não voltou — gargalo fora do setor') +
@@ -538,12 +619,12 @@ function vSetor(){
   }
   h += '</div>';
 
-  h += '<div class="row r-set">' + sets.map(s => {
-    const a = adSet(s.k);
+  h += '<div class="row r-set">' + sets.map((s, i) => {
+    const a = adSet(s.k), e = EFs[i];
     const pct = s.cap ? Math.min(100, Math.round(100 * s.ocup / s.cap)) : 0;
-    const poss = (s.ah || 0) + (s.ase || 0);
+    const poss = e.ah + e.ase;
     return '<button class="card setc" data-k="' + esc(s.k) + '" aria-pressed="' + (S.setorSel === s.k) + '">' +
-      '<div class="sh"><b>' + esc(s.nome) + '</b><span>' + s.ocup + '/' + s.cap + '</span></div>' +
+      '<div class="sh"><b>' + esc(s.nome) + (e.ed ? ' ' + FLAG_ED : '') + '</b><span>' + s.ocup + '/' + s.cap + '</span></div>' +
       '<span class="track"><i class="fill" style="width:' + pct + '%"></i></span>' +
       '<div class="sn">' +
         '<div><span class="num ' + (poss ? 'good' : 'off') + '">' + poss + '</span><span class="lab">possib.</span></div>' +
@@ -555,13 +636,13 @@ function vSetor(){
   const k = S.setorSel;
   if (!k) return h + '<div class="card"><div class="body"><div class="msg">Toque em um setor para ver os leitos e o que ficou parado.</div></div></div>';
 
-  const leitos = (D.leitos || []).filter(l => l.k === k);
+  const leitos = (D.leitos || []).filter(l => l.k === k).map(efetivo);   /* com as correções dele */
   const poss = leitos.filter(l => l.selo === 'ALTA HOJE' || l.selo === 'ALTA SE');
   h += '<div class="card" style="margin-bottom:12px"><header><h2>' + esc(nomeSetor(k)) + ' — possibilidades de alta hoje</h2>' +
     '<span class="hint">' + poss.length + ' leito(s) · toque em “ver na aba Leitos” para editar</span></header><div class="body scroll">';
   h += poss.length
     ? poss.map(l => '<div class="pit"><div class="ph"><b>' + esc(l.l) + '</b><span class="mn">' + esc(l.p) + '</span>' +
-        '<span class="flag s-' + (l.selo === 'ALTA HOJE' ? 'alta' : 'altase') + '">' + esc(l.selo) + '</span></div>' +
+        '<span class="flag s-' + (l.selo === 'ALTA HOJE' ? 'alta' : 'altase') + '">' + esc(l.selo) + '</span>' + (S.edits[idDe(l)] ? FLAG_ED : '') + '</div>' +
         '<div class="pb">' + esc(l.pend || '') + '</div>' +
         (l.acao ? '<div class="pa"><b>Fazer hoje:</b> ' + esc(l.acao) + '</div>' : '') + '</div>').join('')
     : '<div class="msg">Nenhuma alta ou alta condicional sinalizada neste setor hoje.</div>';
@@ -601,7 +682,7 @@ function vLeitos(){
   const ks = [...new Set(D.leitos.map(l => l.k))].sort((a, b) => ORDEM_K.indexOf(a) - ORDEM_K.indexOf(b));
   const nomeK = {}; D.leitos.forEach(l => nomeK[l.k] = l.s);
   let lista = D.leitos.map(efetivo).filter(l => (!f.k || l.k === f.k) && (!f.g || SELO_G[l.selo] === f.g) && (!f.q || String(l.p).indexOf(f.q) >= 0 || String(l.l).toLowerCase().indexOf(f.q.toLowerCase()) >= 0));
-  let h = cabecalho('Leito a leito', 'Corrija o selo, a pendência ou a conduta e toque em <b>Gravar na planilha</b>: a coluna Selo, a página e o PDF passam a refletir a correção.');
+  let h = cabecalho('Leito a leito', 'Corrija o selo, a pendência ou a conduta e toque em <b>Gravar na planilha</b>: a coluna Selo e a página publicada passam a refletir a correção na hora. O PDF de hoje já foi enviado às 5h — para que os coordenadores vejam a correção, use <b>Validar › Reenviar aos setores</b>.');
   h += '<div class="card"><div class="body">' +
     '<div class="chips"><button class="fb" data-k="" aria-pressed="' + !f.k + '">Todos</button>' + ks.map(k => '<button class="fb" data-k="' + k + '" aria-pressed="' + (f.k === k) + '">' + esc(nomeK[k]) + '</button>').join('') + '</div>' +
     '<div class="chips">' + GRUPOS.map(G => '<button class="fb" data-g="' + G.g + '" aria-pressed="' + (f.g === G.g) + '"><span class="sw" style="background:' + G.cor + '"></span>' + G.nome + '</button>').join('') +
@@ -683,7 +764,7 @@ async function gravarLeitos(){
   if (S.ocupado) return;
   const itens = Object.keys(S.edits).map(id => { const [k, p] = id.split('|'); const e = S.edits[id]; return {k, p, selo: e.selo, dep: e.dep, pend: e.pend, acao: e.acao}; });
   if (!itens.length) return;
-  if (validado() && !confirm('O painel de hoje já está VALIDADO. Gravar mesmo assim? (a validação continua valendo; os PDFs já enviados não mudam)')) return;
+  if (validado() && !confirm('Você já revisou (validou) o painel de hoje. Gravar mesmo assim? (a revisão continua valendo; os PDFs já enviados às 5h não mudam — reenvie pela aba Validar)')) return;
   S.ocupado = true; const b = $('b-gravar'); if (b) { b.disabled = true; b.textContent = 'Gravando…'; }
   try {
     const r = await api('leitos', {itens});
@@ -810,38 +891,110 @@ function listaSetoresMail(){
   return base;
 }
 const emailOk = t => !t || t.split(',').every(x => !x.trim() || /^[^\s@,]+@[^\s@,]+\.[^\s@,]+$/.test(x.trim()));
+/* ---- rascunho da aba E-mails -------------------------------------------
+   pintarMain() reescreve o main inteiro e carregar(true) dispara sozinho ao
+   voltar para o app: sem guardar o que ele digita, o campo voltava calado ao
+   valor da planilha. Mesma ideia das edições de leito (S.edits + localStorage). */
+function guardarRasc(){ try { localStorage.setItem(LS_MAIL, JSON.stringify(S.rasc)); } catch (_) {} }
+function nRascMail(){ return Object.keys(S.rasc.emails).length + (S.rasc.corpo ? 1 : 0); }
+function corpoPlanilha(){ const T = S.textos || {}; return T.corpo || T.padrao || ''; }
+function marcarRascEmail(setor, valor){
+  const atual = S.emails[setor] || '';
+  if (valor === atual) delete S.rasc.emails[setor];
+  else S.rasc.emails[setor] = {v: valor, base: atual, conflito: (S.rasc.emails[setor] || {}).conflito || false};
+  guardarRasc();
+}
+function marcarRascCorpo(valor){
+  const atual = corpoPlanilha();
+  if (valor === atual) S.rasc.corpo = null;
+  else S.rasc.corpo = {v: valor, base: atual, conflito: (S.rasc.corpo || {}).conflito || false};
+  guardarRasc();
+}
+function limparRascMail(){ S.rasc = {emails:{}, corpo:null}; guardarRasc(); }
+/* chamado a cada leitura da planilha: o rascunho continua valendo (não sobrescrevemos
+   o que ele digitou), mas se a planilha mudou por baixo do campo, ele é avisado */
+function conferirRascunhos(){
+  let n = 0;
+  Object.keys(S.rasc.emails).forEach(s => {
+    const r = S.rasc.emails[s], atual = S.emails[s] || '';
+    if (r.v === atual) { delete S.rasc.emails[s]; return; }        /* já está igual na planilha */
+    if (r.base !== atual) { r.conflito = true; r.base = atual; n++; }   /* avisa uma vez por mudança */
+  });
+  if (S.rasc.corpo) {
+    const atual = corpoPlanilha();
+    if (S.rasc.corpo.v === atual) S.rasc.corpo = null;
+    else if (S.rasc.corpo.base !== atual) { S.rasc.corpo.conflito = true; S.rasc.corpo.base = atual; n++; }
+  }
+  guardarRasc();
+  if (n) toast('A planilha mudou em ' + n + ' campo(s) de e-mail — o que você digitou foi mantido', true);
+}
 function vMail(){
-  let h = cabecalho('E-mails dos coordenadores', 'Quem recebe o PDF de cada setor quando o painel é validado. A Coordenação recebe um consolidado. Vários endereços: separe por vírgula.');
-  h += '<div class="card"><div class="body"><div class="mails">' + listaSetoresMail().map((s, i) => '<div class="mail"><label for="em' + i + '">' + esc(s) + '</label><input id="em' + i + '" data-setor="' + esc(s) + '" type="text" inputmode="email" autocomplete="off" autocapitalize="off" placeholder="nome@isgh.org.br" value="' + esc(S.emails[s] || '') + '"></div>').join('') + '</div>' +
-    '<div style="display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap"><button class="btn" id="b-mail">Salvar e-mails</button><span class="msg" id="m-mail" style="margin:0">Salvo na aba EMAILS_SETOR da planilha.</span></div></div></div>';
-  const T = S.textos || {}, corpo = T.corpo || T.padrao || '';
+  const nr = nRascMail();
+  let h = cabecalho('E-mails dos coordenadores', 'Quem recebe o PDF de cada setor no envio automático das 5h (e nos reenvios). A Coordenação recebe um consolidado. Vários endereços: separe por vírgula.');
+  h += '<div class="card"><div class="body">' +
+    (nr ? '<div class="nota warn" style="margin-bottom:10px"><b>' + nr + ' campo(s) alterado(s) e ainda não salvo(s)</b> — está guardado só neste aparelho e sobrevive a bloquear a tela. Toque em <b>Salvar e-mails</b> (ou <b>Salvar texto</b>) para gravar na planilha. <button class="btn sec mini" id="b-rasc-limpar" style="margin-left:6px">Descartar e voltar ao da planilha</button></div>' : '') +
+    '<div class="mails">' + listaSetoresMail().map((s, i) => {
+      const r = S.rasc.emails[s], val = r ? r.v : (S.emails[s] || '');
+      return '<div class="mail' + (r ? (r.conflito ? ' rasc conf' : ' rasc') : '') + '"><label for="em' + i + '">' + esc(s) + '</label>' +
+        '<input id="em' + i + '" data-setor="' + esc(s) + '" type="text" inputmode="email" autocomplete="off" autocapitalize="off" placeholder="nome@isgh.org.br" value="' + esc(val) + '">' +
+        (r && r.conflito ? '<div class="msg erro" style="margin-top:4px">na planilha está: ' + (esc(S.emails[s] || '') || '<i>vazio</i>') + '</div>' : '') + '</div>'; }).join('') + '</div>' +
+    '<div style="display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap"><button class="btn" id="b-mail">Salvar e-mails</button><span class="msg' + (Object.keys(S.rasc.emails).length ? ' pend' : '') + '" id="m-mail" style="margin:0">' +
+    (Object.keys(S.rasc.emails).length ? 'Alterações não salvas na planilha.' : 'Salvo na aba EMAILS_SETOR da planilha.') + '</span></div></div></div>';
+  const corpo = S.rasc.corpo ? S.rasc.corpo.v : corpoPlanilha();
   h += '<div class="card" style="margin-top:12px"><header><h2>Texto do e-mail</h2><span class="hint">vale para os setores e para o consolidado; o PDF vai em anexo</span></header><div class="body">' +
-    '<textarea id="t-corpo" style="width:100%;min-height:210px;padding:9px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);font-size:13px;line-height:1.45;resize:vertical">' + esc(corpo) + '</textarea>' +
+    '<textarea id="t-corpo" style="width:100%;min-height:210px;padding:9px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:' + (S.rasc.corpo ? 'var(--warn-soft)' : 'var(--card)') + ';font-size:13px;line-height:1.45;resize:vertical">' + esc(corpo) + '</textarea>' +
     '<div class="msg" style="margin-top:6px">Marcadores que o script preenche: <span class="p">{{DIA}}</span> data do painel · <span class="p">{{SETOR}}</span> nome do setor (ou "consolidado…") · <span class="p">{{LINHA}}</span> ocupação/altas do setor · <span class="p">{{CARIMBO}}</span> "VALIDADO POR…" · <span class="p">{{DECLARACAO}}</span> texto da Res. CFM 2.454/2026 (mantenha) · <span class="p">{{META}}</span> · <span class="p">{{CENSO}}</span></div>' +
-    '<div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap"><button class="btn" id="b-corpo">Salvar texto</button><button class="btn sec" id="b-corpo-padrao">Voltar ao padrão</button><span class="msg" id="m-corpo" style="margin:0">' + (T.corpo ? 'Texto personalizado em uso.' : 'Texto padrão em uso.') + '</span></div></div></div>';
+    '<div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap"><button class="btn" id="b-corpo">Salvar texto</button><button class="btn sec" id="b-corpo-padrao">Voltar ao padrão</button><span class="msg' + (S.rasc.corpo ? ' pend' : '') + '" id="m-corpo" style="margin:0">' +
+    (S.rasc.corpo ? 'Alteração não salva na planilha' + (S.rasc.corpo.conflito ? ' — e a planilha mudou desde que você começou a escrever.' : '.') : ((S.textos && S.textos.corpo) ? 'Texto personalizado em uso.' : 'Texto padrão em uso.')) + '</span></div></div></div>';
   h += '<div class="card" style="margin-top:12px"><header><h2>Envios registrados</h2><span class="hint">últimos 30 · aba ENVIOS_EMAIL</span></header><div class="body scroll"><table class="tb"><thead><tr><th>Painel de</th><th>Setor</th><th>Para</th><th>Quando</th><th>Resultado</th></tr></thead><tbody>' +
     (S.envios.length ? S.envios.slice().reverse().map(r => '<tr><td class="lt">' + esc(r[0]) + '</td><td>' + esc(r[1]) + '</td><td style="word-break:break-all">' + esc(r[2]) + '</td><td class="num">' + esc(r[3]) + '</td><td>' + (String(r[4]).indexOf('ERRO') === 0 ? '<span class="flag crit">' + esc(r[4]) + '</span>' : '<span class="flag ok">' + esc(r[4]) + '</span>') + '</td></tr>').join('') : '<tr><td colspan="5" class="bloq">nenhum envio ainda</td></tr>') + '</tbody></table></div></div>';
   return h;
 }
 function ligarMail(){
   const ins = [...document.querySelectorAll('.mail input')];
-  ins.forEach(i => i.addEventListener('input', () => i.classList.toggle('ruim', !emailOk(i.value))));
+  /* a cada tecla: guarda o rascunho (localStorage) e marca o campo como não salvo */
+  ins.forEach(i => i.addEventListener('input', () => {
+    i.classList.toggle('ruim', !emailOk(i.value));
+    marcarRascEmail(i.dataset.setor, i.value);
+    const cx = i.closest('.mail');
+    if (cx) { cx.classList.toggle('rasc', !!S.rasc.emails[i.dataset.setor]); if (!S.rasc.emails[i.dataset.setor]) cx.classList.remove('conf'); }
+    const m = $('m-mail');
+    if (m) { const n = Object.keys(S.rasc.emails).length; m.className = 'msg' + (n ? ' pend' : ''); m.textContent = n ? n + ' campo(s) não salvo(s) na planilha.' : 'Igual ao que está na planilha.'; }
+    pintarNav();   /* o contador da aba avisa mesmo se ele sair daqui */
+  }));
+  const bl = $('b-rasc-limpar');
+  if (bl) bl.addEventListener('click', () => { if (confirm('Descartar o que você digitou e voltar ao que está na planilha?')) { limparRascMail(); pintarNav(); pintarMain(); } });
   $('b-mail').addEventListener('click', async () => {
     const maus = ins.filter(i => !emailOk(i.value)), m = $('m-mail');
     if (maus.length) { m.className = 'msg erro'; m.textContent = 'Endereço com formato estranho em: ' + maus.map(i => i.dataset.setor).join(', '); return; }
     const obj = {}; ins.forEach(i => obj[i.dataset.setor] = i.value.trim());
     const b = $('b-mail'); b.disabled = true; m.className = 'msg'; m.textContent = 'Salvando…';
-    try { const r = await api('emails', {emails: obj}); S.emails = r.emails || obj; m.className = 'msg ok'; m.textContent = 'Salvo na planilha.'; toast('E-mails salvos'); }
-    catch (e) { m.className = 'msg erro'; m.textContent = 'Não deu certo: ' + e.message; }
+    try {
+      const r = await api('emails', {emails: obj}); S.emails = r.emails || obj;
+      S.rasc.emails = {}; guardarRasc();     /* gravado: o rascunho perdeu a razão de existir */
+      toast('E-mails salvos'); pintarNav(); pintarMain();
+      const m2 = $('m-mail'); if (m2) { m2.className = 'msg ok'; m2.textContent = 'Salvo na planilha.'; }
+      return;
+    }
+    catch (e) { m.className = 'msg erro'; m.textContent = 'Não deu certo: ' + e.message + ' — o que você digitou continua guardado neste aparelho.'; }
     b.disabled = false;
   });
-  const bc = $('b-corpo'), mc = $('m-corpo');
+  const bc = $('b-corpo'), mc = $('m-corpo'), tc = $('t-corpo');
+  if (tc) tc.addEventListener('input', () => {
+    marcarRascCorpo(tc.value);
+    tc.style.background = S.rasc.corpo ? 'var(--warn-soft)' : 'var(--card)';
+    if (mc) { mc.className = 'msg' + (S.rasc.corpo ? ' pend' : ''); mc.textContent = S.rasc.corpo ? 'Alteração não salva na planilha.' : 'Igual ao que está na planilha.'; }
+    pintarNav();
+  });
   if (bc) {
     const salvarCorpo = async (txt) => {
       if (txt && txt.indexOf('{{DECLARACAO}}') < 0 && !confirm('O texto está sem {{DECLARACAO}} (Res. CFM 2.454/2026). Salvar mesmo assim?')) return;
       bc.disabled = true; mc.className = 'msg'; mc.textContent = 'Salvando…';
-      try { const r = await api('textos', {corpo: txt}); S.textos = r.textos || S.textos; mc.className = 'msg ok'; mc.textContent = txt ? 'Texto personalizado salvo na planilha.' : 'Voltou ao texto padrão.'; $('t-corpo').value = (S.textos && (S.textos.corpo || S.textos.padrao)) || ''; toast('Texto do e-mail salvo'); }
-      catch (e) { mc.className = 'msg erro'; mc.textContent = 'Não deu certo: ' + e.message; }
+      try { const r = await api('textos', {corpo: txt}); S.textos = r.textos || S.textos;
+        S.rasc.corpo = null; guardarRasc();
+        mc.className = 'msg ok'; mc.textContent = txt ? 'Texto personalizado salvo na planilha.' : 'Voltou ao texto padrão.';
+        $('t-corpo').value = corpoPlanilha(); $('t-corpo').style.background = 'var(--card)'; pintarNav(); toast('Texto do e-mail salvo'); }
+      catch (e) { mc.className = 'msg erro'; mc.textContent = 'Não deu certo: ' + e.message + ' — o texto continua guardado neste aparelho.'; }
       bc.disabled = false;
     };
     bc.addEventListener('click', () => salvarCorpo($('t-corpo').value.trim()));
@@ -857,25 +1010,28 @@ function vVal(){
   const mesmoDia = !S.hoje || D.data === S.hoje;
   const enviouHoje = S.envios.some(r => String(r[0]).trim() === D.data && String(r[4]).indexOf('enviado') === 0 && String(r[1]).indexOf('teste') < 0);
   const it = (cls, txt, sub) => '<div class="it ' + cls + '">' + ICO[cls === 'ok' ? 'ok' : cls] + '<span>' + txt + (sub ? '<small>' + sub + '</small>' : '') + '</span></div>';
-  let h = cabecalho('Validar o painel de ' + esc(D.data), 'Validar é declarar que você revisou as sinalizações de hoje (Res. CFM 2.454/2026, art. 15). Só depois do carimbo os PDFs saem para os coordenadores.');
-  h += '<div class="row r-2"><div class="card"><header><h2>Antes de validar</h2></header><div class="body check">' +
-    it(mesmoDia ? 'ok' : 'crit', 'Página e planilha ' + (mesmoDia ? 'do mesmo dia (' + esc(D.data) + ')' : 'de dias diferentes: página ' + esc(D.data) + ', planilha ' + esc(S.hoje)), mesmoDia ? '' : 'rode a rodada antes de validar') +
-    it(nEdits() ? 'crit' : 'ok', nEdits() ? nEdits() + ' edição(ões) ainda não gravada(s)' : 'Nenhuma edição pendente', nEdits() ? 'grave na aba Leitos — senão o PDF sai sem elas' : '') +
-    it(sem ? 'warn' : 'ok', sem ? sem + ' leito(s) SEM LEITURA' : 'Nenhum leito sem leitura', sem ? 'o painel vai dizer isso no PDF; aceitável se você revisou' : '') +
-    it(piora ? 'warn' : 'ok', piora + ' com PIORA CLÍNICA', piora ? 'confira na aba Leitos antes de assinar' : '') +
-    it(comMail ? (semMail.length ? 'warn' : 'ok') : 'crit', comMail + ' destinatário(s) cadastrado(s)', semMail.length ? 'sem e-mail: ' + esc(semMail.join(', ')) : '') +
-    it(enviouHoje ? 'ok' : 'warn', enviouHoje ? 'PDFs de hoje já foram enviados' : 'PDFs de hoje ainda não saíram', enviouHoje ? 'validar de novo não reenvia; use "Reenviar"' : '') +
+  let h = cabecalho('Revisar o painel de ' + esc(D.data), 'A rodada das 5h já publicou a página e já mandou os PDFs. Validar agora é a sua revisão médica a posteriori (Res. CFM 2.454/2026, art. 15): ela carimba a página publicada e vale para o que sair daqui para frente — não segura nem desfaz o que já foi enviado.');
+  h += '<div class="row r-2"><div class="card"><header><h2>O que conferir na revisão</h2><span class="hint">a checagem é sua; nada aqui bloqueia envio, porque o envio já ocorreu</span></header><div class="body check">' +
+    it(enviouHoje ? 'ok' : 'warn', enviouHoje ? 'PDFs de hoje já saíram (rodada das 5h)' : 'Nenhum envio de hoje registrado ainda', enviouHoje ? 'sua revisão entra no carimbo da página; para os coordenadores verem correções, use "Reenviar"' : 'confira a rodada — o normal é sair às 5h; a lista fica na aba E-mails') +
+    it(mesmoDia ? 'ok' : 'crit', 'Página e planilha ' + (mesmoDia ? 'do mesmo dia (' + esc(D.data) + ')' : 'de dias diferentes: página ' + esc(D.data) + ', planilha ' + esc(S.hoje)), mesmoDia ? '' : 'rode a rodada antes de revisar — você estaria carimbando um painel velho') +
+    it(nEdits() ? 'crit' : 'ok', nEdits() ? nEdits() + ' edição(ões) ainda não gravada(s)' : 'Nenhuma edição pendente', nEdits() ? 'grave na aba Leitos: a página publicada ainda está sem elas' : '') +
+    it(sem ? 'warn' : 'ok', sem ? sem + ' leito(s) SEM LEITURA' : 'Nenhum leito sem leitura', sem ? 'o PDF que já saiu diz isso; se corrigir, reenvie' : '') +
+    it(piora ? 'warn' : 'ok', piora + ' com PIORA CLÍNICA', piora ? 'confira na aba Leitos antes de carimbar' : '') +
+    it(comMail ? (semMail.length ? 'warn' : 'ok') : 'crit', comMail + ' destinatário(s) cadastrado(s)', semMail.length ? 'sem e-mail (não receberam nada hoje): ' + esc(semMail.join(', ')) : '') +
     '</div></div>' +
-    '<div class="card"><header><h2>' + (ok ? 'Painel validado' : 'Painel em rascunho') + '</h2></header><div class="body">' +
-    '<div class="stamp ' + (ok ? 'ok' : '') + '" style="margin-bottom:12px">' + (ok ? esc(V.quem) : 'RASCUNHO — aguardando validação médica') + '</div>' +
-    (V.vencida ? '<div class="nota warn" style="margin-bottom:10px">A validação anterior era de outro dia e venceu: validação é ato médico do dia.</div>' : '') +
+    '<div class="card"><header><h2>' + (ok ? 'Revisado por você' : 'Publicado, ainda sem revisão médica') + '</h2></header><div class="body">' +
+    '<div class="stamp ' + (ok ? 'ok' : '') + '" style="margin-bottom:12px">' + (ok ? esc(V.quem) : 'Publicado às 5h — ainda sem revisão médica') + '</div>' +
+    (V.vencida ? '<div class="nota warn" style="margin-bottom:10px">A revisão anterior era de outro dia e venceu: validação é ato médico do dia.</div>' : '') +
     '<div id="val-acoes" style="display:grid;gap:8px">' +
-    (ok ? '<button class="btn sec" id="b-desfazer">Desfazer validação</button>' : '<button class="btn" id="b-validar"' + (mesmoDia ? '' : ' disabled') + '>Validar o painel de hoje</button>') +
+    (ok ? '<button class="btn sec" id="b-desfazer">Desfazer a revisão</button>' : '<button class="btn" id="b-validar"' + (mesmoDia ? '' : ' disabled') + '>Registrar minha revisão de hoje</button>') +
     '</div><div class="msg" id="m-val"></div>' +
+    '<div class="nota" style="margin-top:10px"><b>O que a revisão muda:</b> carimba a página publicada com o seu nome e a hora, registra na planilha que um médico revisou o painel do dia e passa a valer nos PDFs que forem enviados a partir de agora.<br>' +
+    '<b>O que ela não faz:</b> não segura, não corrige e não apaga o e-mail das 5h — <b>e-mail enviado não volta</b>. Desfazer a revisão só tira o carimbo; o PDF que está na caixa dos coordenadores continua lá. Corrigiu algo importante? grave na aba Leitos e use <b>Reenviar</b>.</div>' +
     '<hr style="border:0;border-top:1px solid var(--line-2);margin:14px 0">' +
     '<div class="slab">PDFs por setor</div>' +
-    '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn sec mini" id="b-teste"' + (ok ? '' : ' disabled') + '>Enviar teste só para mim</button><button class="btn warn mini" id="b-reenviar"' + (ok ? '' : ' disabled') + '>Reenviar aos setores agora</button></div>' +
-    '<div class="msg">' + (ok ? 'O envio normal já aconteceu na validação (uma vez por dia). Reenviar manda de novo para todos os cadastrados.' : 'Disponível depois de validar.') + '</div>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn sec mini" id="b-teste">Enviar teste só para mim</button><button class="btn warn mini" id="b-reenviar">Reenviar aos setores agora</button></div>' +
+    '<div class="msg">O envio do dia já aconteceu automaticamente. <b>Reenviar</b> manda o PDF de novo, agora com as correções gravadas e com o seu carimbo se você já revisou — todos os cadastrados recebem uma segunda mensagem.' +
+    (ok ? '' : ' Se a ponte recusar por falta de carimbo, registre a revisão acima primeiro.') + '</div>' +
     '</div></div></div>';
   h += '<div class="nota">' + esc('Painel produzido por rotina automática com apoio de inteligência artificial, a partir do prontuário eletrônico. As sinalizações são apoio à decisão e não substituem o julgamento do médico assistente (Res. CFM 2.454/2026, arts. 15 e 18).') + '</div>';
   return h;
@@ -889,23 +1045,23 @@ function ligarVal(){
       const r = await api(acao, extra);
       S.V = r.val || S.V;
       const env = r.envio && r.envio.msg ? r.envio.msg : '';
-      m.className = 'msg ok'; m.textContent = (acao === 'validar' ? 'Validado. ' : acao === 'desfazer' ? 'Voltou a rascunho. ' : '') + env;
-      toast(acao === 'validar' ? 'Painel validado' : acao === 'desfazer' ? 'Validação desfeita' : 'Pedido enviado');
+      m.className = 'msg ok'; m.textContent = (acao === 'validar' ? 'Revisão registrada. ' : acao === 'desfazer' ? 'Carimbo de revisão removido (os PDFs já enviados continuam valendo). ' : '') + env;
+      toast(acao === 'validar' ? 'Revisão registrada' : acao === 'desfazer' ? 'Carimbo removido' : 'Pedido enviado');
       await carregar(true);
-      const m2 = $('m-val'); if (m2) { m2.className = 'msg ok'; m2.textContent = (acao === 'validar' ? 'Validado. ' : acao === 'desfazer' ? 'Voltou a rascunho. ' : '') + env; }
+      const m2 = $('m-val'); if (m2) { m2.className = 'msg ok'; m2.textContent = (acao === 'validar' ? 'Revisão registrada. ' : acao === 'desfazer' ? 'Carimbo de revisão removido (os PDFs já enviados continuam valendo). ' : '') + env; }
     } catch (e) { m.className = 'msg erro'; m.textContent = 'Não deu certo: ' + e.message; b.disabled = false; b.textContent = txt; }
     S.ocupado = false;
   }
   const bv = $('b-validar');
   if (bv) bv.addEventListener('click', () => {
-    if (nEdits() && !confirm('Há ' + nEdits() + ' edição(ões) não gravada(s). O PDF sairá SEM elas. Validar mesmo assim?')) return;
+    if (nEdits() && !confirm('Há ' + nEdits() + ' edição(ões) não gravada(s) — a página publicada ainda está sem elas. Registrar a revisão mesmo assim?')) return;
     const alvo = $('val-acoes');
-    alvo.innerHTML = '<div class="nota warn">Você está declarando que revisou as sinalizações de hoje. Assina como <b>' + esc(S.V.eu || 'responsável') + '</b>; os PDFs saem em seguida.</div>' +
-      '<button class="btn" id="b-confirma">Confirmar validação</button><button class="btn sec" id="b-cancela">Cancelar</button>';
+    alvo.innerHTML = '<div class="nota warn">Você está declarando que revisou as sinalizações de hoje, que já foram publicadas e enviadas às 5h. Assina como <b>' + esc(S.V.eu || 'responsável') + '</b>: o carimbo entra na página e vale para os próximos envios; o e-mail das 5h não volta atrás.</div>' +
+      '<button class="btn" id="b-confirma">Confirmar revisão</button><button class="btn sec" id="b-cancela">Cancelar</button>';
     $('b-cancela').addEventListener('click', () => pintarMain());
-    $('b-confirma').addEventListener('click', () => rodar('b-confirma', 'validar', {}, 'Validando…'));
+    $('b-confirma').addEventListener('click', () => rodar('b-confirma', 'validar', {}, 'Registrando…'));
   });
-  const bd = $('b-desfazer'); if (bd) bd.addEventListener('click', () => { if (confirm('Desfazer a validação de hoje? Os PDFs já enviados não voltam.')) rodar('b-desfazer', 'desfazer', {}, 'Desfazendo…'); });
+  const bd = $('b-desfazer'); if (bd) bd.addEventListener('click', () => { if (confirm('Desfazer a sua revisão de hoje? Sai só o carimbo da página — os PDFs já enviados continuam na caixa dos coordenadores.')) rodar('b-desfazer', 'desfazer', {}, 'Desfazendo…'); });
   const bt = $('b-teste'); if (bt) bt.addEventListener('click', () => rodar('b-teste', 'enviar', {teste: true}, 'Enviando…'));
   const br = $('b-reenviar'); if (br) br.addEventListener('click', () => { if (confirm('Reenviar os PDFs de hoje para TODOS os setores cadastrados?')) rodar('b-reenviar', 'enviar', {forcar: true}, 'Reenviando…'); });
 }
