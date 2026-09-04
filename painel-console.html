@@ -118,6 +118,35 @@ a{color:var(--brand-2)}
 .kpi .val{font-family:Archivo,sans-serif;font-size:34px;font-weight:700;line-height:1.1;letter-spacing:-.03em;margin:3px 0 1px}
 .kpi.k-meta .val{color:var(--crit)} .kpi.k-fila .val{color:var(--warn-ink)} .kpi.k-livre .val{color:var(--info)} .kpi.k-elet .val{color:var(--brand-2)}
 .kpi .foot{font-size:11.5px;color:var(--ink-2);line-height:1.35}
+/* ---------- setores ---------- */
+.r-set{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}
+@media (max-width:1240px){.r-set{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:820px){.r-set{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.setc{padding:11px 12px 10px;text-align:left;border:0;cursor:pointer;font:inherit;color:inherit;width:100%;display:block}
+.setc:hover{background:var(--card-2)}
+.setc[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--brand)}
+.setc .sh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px}
+.setc .sh b{font-size:13px}
+.setc .sh span{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3)}
+.setc .track{height:6px;border-radius:3px;background:var(--card-3);overflow:hidden;position:relative;display:block}
+.setc .track .fill{position:absolute;left:0;top:0;bottom:0;background:var(--brand);display:block}
+.setc .sn{display:flex;gap:10px;margin-top:9px}
+.setc .sn div{flex:1 1 0;min-width:0}
+.setc .sn .num{display:block;font-family:Archivo,sans-serif;font-size:19px;font-weight:700;line-height:1.1;letter-spacing:-.02em}
+.setc .sn .num.warn{color:var(--warn-ink)} .setc .sn .num.good{color:var(--brand-2)} .setc .sn .num.off{color:var(--ink-3)}
+.setc .sn .lab{display:block;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-top:1px}
+.dsf{display:inline-block;padding:1px 6px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap}
+.dsf.res{background:var(--brand-soft);color:var(--brand-2)}
+.dsf.enc{background:var(--card-3);color:var(--ink-2)}
+.dsf.par{background:var(--crit-soft,#fdeaea);color:var(--crit-ink,#a12020)}
+.pit{padding:10px 0;border-bottom:1px solid var(--line-2)}
+.pit:last-child{border-bottom:0}
+.pit .ph{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+.pit .ph b{font-size:12.5px;font-weight:700}
+.pit .ph .mn{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-3)}
+.pit .pb{font-size:12.5px;line-height:1.45;color:var(--ink)}
+.pit .pa{font-size:12.5px;line-height:1.45;color:var(--ink-2);margin-top:3px}
+.pit .pa b{color:var(--brand-2);font-weight:700}
 
 /* ---------- tabelas ---------- */
 .scroll{overflow:auto;max-width:100%}
@@ -237,7 +266,7 @@ a{color:var(--brand-2)}
   .side .brand,.side .sblock,.side .sfoot{display:none}
   .navf{flex-direction:row;justify-content:space-around;gap:0}
   /* cada botão ocupa 1/6 fixo: a largura não muda com o texto em negrito nem com o contador */
-  .navf button{flex:1 1 0;min-width:0;flex-direction:column;gap:3px;padding:4px 2px;font-size:10px;font-weight:600;justify-content:center;align-items:center;text-align:center;border-radius:8px;white-space:nowrap}
+  .navf button{flex:1 1 0;min-width:0;flex-direction:column;gap:3px;padding:4px 1px;font-size:9.5px;font-weight:600;justify-content:center;align-items:center;text-align:center;border-radius:8px;white-space:nowrap;letter-spacing:-.01em}
   .navf button svg{width:21px;height:21px;flex-basis:21px}
   .navf .n{margin-left:0;position:absolute;transform:translate(16px,-4px);font-size:9.5px}
   .navf button{position:relative}
@@ -318,12 +347,14 @@ const ICO = {
   piloto:'<svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>',
   mail:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
   val:'<svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/></svg>',
+  setor:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
   ok:'<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>',
   warn:'<svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>',
   crit:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>'};
 
 const S = { cfg:null, D:null, V:null, emails:{}, envios:[], versao:null, hoje:'', quando:'',
-            tab: localStorage.getItem(LS_TAB) || 'hoje', edits:{}, filtro:{k:'', g:'', q:''}, ocupado:false, aberto:null };
+            tab: localStorage.getItem(LS_TAB) || 'hoje', edits:{}, filtro:{k:'', g:'', q:''}, ocupado:false, aberto:null,
+            AD:null, setorSel: localStorage.getItem('painel.setor') || '' };
 try { S.edits = JSON.parse(localStorage.getItem(LS_EDITS) || '{}') || {}; } catch (_) { S.edits = {}; }
 
 /* ---------------- ponte ---------------- */
@@ -394,6 +425,7 @@ $('b-refresh').addEventListener('click', () => carregar());
 /* ---------------- navegação ---------------- */
 const ABAS = [
   {id:'hoje',   nome:'Hoje',       ic:'hoje'},
+  {id:'setor',  nome:'Setores',    ic:'setor'},
   {id:'leitos', nome:'Leitos',     ic:'leitos'},
   {id:'reg',    nome:'Regulação',  ic:'reg'},
   {id:'piloto', nome:'Piloto',     ic:'piloto'},
@@ -430,8 +462,9 @@ function pintarMain(){
   const m = $('main');
   if (S.versao === 15) { m.innerHTML = telaV15(); return; }
   if (!S.D) { m.innerHTML = '<div class="bloq">carregando…</div>'; return; }
-  m.innerHTML = ({hoje: vHoje, leitos: vLeitos, reg: vReg, piloto: vPiloto, mail: vMail, val: vVal})[S.tab]();
-  ({leitos: ligarLeitos, mail: ligarMail, val: ligarVal})[S.tab] && ({leitos: ligarLeitos, mail: ligarMail, val: ligarVal})[S.tab]();
+  m.innerHTML = ({hoje: vHoje, setor: vSetor, leitos: vLeitos, reg: vReg, piloto: vPiloto, mail: vMail, val: vVal})[S.tab]();
+  const LIGA = {setor: ligarSetor, leitos: ligarLeitos, mail: ligarMail, val: ligarVal};
+  LIGA[S.tab] && LIGA[S.tab]();
 }
 
 function telaV15(){
@@ -483,7 +516,86 @@ function vHoje(){
 /* ================= LEITOS (editável) ================= */
 function idDe(l){ return l.k + '|' + l.p; }
 function efetivo(l){ const e = S.edits[idDe(l)]; return e ? Object.assign({}, l, e) : l; }
-function guardarEdits(){ localStorage.setItem(LS_EDITS, JSON.stringify(S.edits)); }
+function guardarEdits(){ localStorage.setItem(LS_EDITS, JSON.stringify(S.edits)); }/* ================= SETORES ================= */
+/* Uma tela por setor: as possibilidades de alta de hoje e o destino do que foi cobrado ontem.
+   A aderência vem de painel-aderencia.json (aderencia.py), publicado ao lado deste arquivo. */
+function adSet(k){ return (S.AD && S.AD.setores) ? (S.AD.setores[k] || null) : null; }
+function nomeSetor(k){ const s = (S.D.setores || []).find(x => x.k === k); return s ? s.nome : k; }
+
+function vSetor(){
+  const D = S.D, sets = setoresOrd(), AD = S.AD;
+  const AH = sets.reduce((a, s) => a + (s.ah || 0), 0), ASE = sets.reduce((a, s) => a + (s.ase || 0), 0);
+  let h = cabecalho('Setores', 'As possibilidades de alta de hoje, setor a setor — e o que aconteceu com o que o painel cobrou no dia anterior.');
+
+  h += '<div class="row r-kpi">' +
+    kpi('k-elet', 'Possibilidades de alta hoje', AH + ASE, '<b>' + AH + '</b> ALTA HOJE · <b>' + ASE + '</b> ALTA SE');
+  if (AD && AD.geral && AD.geral.n) {
+    h += kpi('k-livre', 'Resolvidas em 24h', AD.geral.pct_resolvida + '%', AD.geral.resolvida + ' de ' + AD.geral.n + ' pendências cobradas no painel de ' + esc(AD.dia_br || AD.dia)) +
+         kpi('k-fila', 'Andaram, mas não fecharam', AD.geral.encaminhada, 'equipe agiu e o resultado não voltou — gargalo fora do setor') +
+         kpi('k-meta', 'Paradas', AD.geral.parada, 'o dia passou sem nenhum registro de ação sobre o item');
+  } else {
+    h += '<div class="card"><div class="body"><div class="nota">A medição de aderência começa no primeiro dia em que houver painel publicado <b>e</b> a coleta do dia seguinte. Até lá esta faixa fica vazia — nada foi estimado.</div></div></div>';
+  }
+  h += '</div>';
+
+  h += '<div class="row r-set">' + sets.map(s => {
+    const a = adSet(s.k);
+    const pct = s.cap ? Math.min(100, Math.round(100 * s.ocup / s.cap)) : 0;
+    const poss = (s.ah || 0) + (s.ase || 0);
+    return '<button class="card setc" data-k="' + esc(s.k) + '" aria-pressed="' + (S.setorSel === s.k) + '">' +
+      '<div class="sh"><b>' + esc(s.nome) + '</b><span>' + s.ocup + '/' + s.cap + '</span></div>' +
+      '<span class="track"><i class="fill" style="width:' + pct + '%"></i></span>' +
+      '<div class="sn">' +
+        '<div><span class="num ' + (poss ? 'good' : 'off') + '">' + poss + '</span><span class="lab">possib.</span></div>' +
+        '<div><span class="num ' + (a && a.pct_andou != null ? '' : 'off') + '">' + (a && a.pct_andou != null ? a.pct_andou + '%' : '—') + '</span><span class="lab">andou</span></div>' +
+        '<div><span class="num ' + (a && a.parada ? 'warn' : 'off') + '">' + (a ? a.parada : '—') + '</span><span class="lab">paradas</span></div>' +
+      '</div></button>';
+  }).join('') + '</div>';
+
+  const k = S.setorSel;
+  if (!k) return h + '<div class="card"><div class="body"><div class="msg">Toque em um setor para ver os leitos e o que ficou parado.</div></div></div>';
+
+  const leitos = (D.leitos || []).filter(l => l.k === k);
+  const poss = leitos.filter(l => l.selo === 'ALTA HOJE' || l.selo === 'ALTA SE');
+  h += '<div class="card" style="margin-bottom:12px"><header><h2>' + esc(nomeSetor(k)) + ' — possibilidades de alta hoje</h2>' +
+    '<span class="hint">' + poss.length + ' leito(s) · toque em “ver na aba Leitos” para editar</span></header><div class="body scroll">';
+  h += poss.length
+    ? poss.map(l => '<div class="pit"><div class="ph"><b>' + esc(l.l) + '</b><span class="mn">' + esc(l.p) + '</span>' +
+        '<span class="flag s-' + (l.selo === 'ALTA HOJE' ? 'alta' : 'altase') + '">' + esc(l.selo) + '</span></div>' +
+        '<div class="pb">' + esc(l.pend || '') + '</div>' +
+        (l.acao ? '<div class="pa"><b>Fazer hoje:</b> ' + esc(l.acao) + '</div>' : '') + '</div>').join('')
+    : '<div class="msg">Nenhuma alta ou alta condicional sinalizada neste setor hoje.</div>';
+  h += '<div style="margin-top:10px"><button class="btn sec" id="b-ver-leitos">Ver todos os leitos deste setor</button></div></div></div>';
+
+  const trav = (AD && AD.travados ? AD.travados : []).filter(x => x.s === k);
+  h += '<div class="card"><header><h2>Não andou no dia anterior</h2><span class="hint">' +
+    (AD ? 'painel de ' + esc(AD.dia_br || AD.dia) + ' · ordenado pelos mais antigos' : 'ainda sem medição') + '</span></header><div class="body scroll">';
+  h += trav.length
+    ? trav.map(x => '<div class="pit"><div class="ph"><b>' + esc(x.l) + '</b>' +
+        '<span class="dsf ' + (x.desfecho === 'PARADA' ? 'par' : 'enc') + '">' + (x.desfecho === 'PARADA' ? 'parada' : 'encaminhada') + '</span>' +
+        '<span class="mn">' + (x.dias || 1) + (x.dias > 1 ? ' dias' : ' dia') + '</span></div>' +
+        '<div class="pb">' + esc(x.item || x.pend || '') + '</div>' +
+        (x.prova ? '<div class="pa">' + esc(x.prova) + '</div>' : '') + '</div>').join('')
+    : '<div class="msg">' + (AD ? 'Nada ficou parado neste setor — tudo que foi cobrado teve registro de ação.' : 'A primeira medição sai no dia seguinte ao primeiro painel publicado.') + '</div>';
+  h += '</div></div>';
+  return h;
+}
+
+function ligarSetor(){
+  document.querySelectorAll('.setc').forEach(b => b.addEventListener('click', () => {
+    S.setorSel = (S.setorSel === b.dataset.k) ? '' : b.dataset.k;
+    localStorage.setItem('painel.setor', S.setorSel);
+    pintarMain(); window.scrollTo(0, 0);
+  }));
+  const bv = $('b-ver-leitos');
+  if (bv) bv.addEventListener('click', () => {
+    S.filtro.k = S.setorSel; S.filtro.g = ''; S.filtro.q = '';
+    S.tab = 'leitos'; localStorage.setItem(LS_TAB, S.tab);
+    pintarNav(); pintarMain(); window.scrollTo(0, 0);
+  });
+}
+
+
 function vLeitos(){
   const D = S.D, f = S.filtro;
   const ks = [...new Set(D.leitos.map(l => l.k))].sort((a, b) => ORDEM_K.indexOf(a) - ORDEM_K.indexOf(b));
@@ -798,8 +910,27 @@ function ligarVal(){
   const br = $('b-reenviar'); if (br) br.addEventListener('click', () => { if (confirm('Reenviar os PDFs de hoje para TODOS os setores cadastrados?')) rodar('b-reenviar', 'enviar', {forcar: true}, 'Reenviando…'); });
 }
 
+/* ---------------- aderência ----------------
+   Vem pela ponte (canal com token), NÃO por arquivo público: o resultado traz prontuário e
+   trecho de evolução, e o repositório desta página é público. O fetch local só existe para o
+   mock de desenvolvimento (localhost) — em produção nunca é tentado. */
+async function carregarAderencia(){
+  try {
+    const d = await api('aderencia', {});
+    if (d && d.aderencia && d.aderencia.setores) { S.AD = d.aderencia; if (S.tab === 'setor') pintarMain(); return; }
+  } catch (_) { /* ponte ainda sem a ação — cai no mock local, se houver */ }
+  if (!/^localhost$|^127\.0\.0\.1$/.test(location.hostname)) return;
+  try {
+    const r = await fetch('painel-aderencia.json?v=' + Date.now(), {cache: 'no-store'});
+    if (!r.ok) return;
+    const d = await r.json();
+    if (d && d.setores) { S.AD = d; if (S.tab === 'setor') pintarMain(); }
+  } catch (_) { /* sem medição ainda — a tela explica */ }
+}
+
 /* ---------------- arranque ---------------- */
 S.cfg = lerCfg();
+carregarAderencia();
 pintarNav();
 if (!S.cfg) { abrirCfg(false); $('main').innerHTML = '<div class="bloq">informe a chave da ponte para começar</div>'; }
 else carregar();
