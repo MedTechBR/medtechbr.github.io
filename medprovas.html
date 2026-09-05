@@ -2354,7 +2354,9 @@ async function gerarProva() {
 
     const data = await chamarGeminiNoServidor({
       parts,
-      generationConfig: { responseMimeType: 'application/json', temperature: 0.4 },
+      /* maxOutputTokens explícito: sem ele o backend usa 8192, e como o gemini-2.5 gasta
+         parte desse teto "pensando", a prova voltava cortada no meio de uma frase (JSON quebrado). */
+      generationConfig: { responseMimeType: 'application/json', temperature: 0.4, maxOutputTokens: 65536 },
       model: 'gemini-2.5-flash',
       intent: 'gerarProva'
     });
@@ -2363,9 +2365,11 @@ async function gerarProva() {
     }
     const texto = data.candidates[0].content.parts[0].text.trim();
     const jsonMatch = texto.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('Resposta sem JSON: ' + texto.slice(0, 200));
+    if (!jsonMatch) throw new Error('A IA respondeu cortado. Tente gerar menos questões de uma vez, ou divida os materiais em duas provas.');
 
-    const resultado = JSON.parse(jsonMatch[0]);
+    let resultado;
+    try { resultado = JSON.parse(jsonMatch[0]); }
+    catch (e) { throw new Error('A IA respondeu cortado no meio da prova. Tente gerar menos questões de uma vez, ou divida os materiais em duas provas.'); }
     if (!Array.isArray(resultado.questoes) || resultado.questoes.length === 0) {
       throw new Error('IA não retornou questões.');
     }
@@ -3968,7 +3972,7 @@ Retorne APENAS este JSON, sem markdown:
 
     const data = await chamarGemini({
       parts,
-      generationConfig: { responseMimeType: 'application/json', temperature: 0.7 },
+      generationConfig: { responseMimeType: 'application/json', temperature: 0.7, maxOutputTokens: 65536 },
       intent: 'helper'
     });
     if (!data.candidates || !data.candidates[0]) throw new Error('Resposta vazia da IA');
@@ -4114,7 +4118,8 @@ Retorne APENAS este JSON, sem markdown:
       parts,
       generationConfig: {
         responseMimeType: 'application/json',
-        temperature: 0.7
+        temperature: 0.7,
+        maxOutputTokens: 65536
       },
       intent: 'helper'
     });
