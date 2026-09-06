@@ -394,7 +394,7 @@ const ICO = {
 
 const S = { cfg:null, D:null, V:null, emails:{}, envios:[], versao:null, hoje:'', quando:'',
             tab: localStorage.getItem(LS_TAB) || 'hoje', edits:{}, filtro:{k:'', g:'', q:''}, ocupado:false, aberto:null,
-            AD:null, setorSel: localStorage.getItem('painel.setor') || '', rasc:{emails:{}, corpo:null} };
+            AD:null, envio1:'', setorSel: localStorage.getItem('painel.setor') || '', rasc:{emails:{}, corpo:null} };
 try { S.edits = JSON.parse(localStorage.getItem(LS_EDITS) || '{}') || {}; } catch (_) { S.edits = {}; }
 /* rascunho da aba E-mails: sobrevive a bloquear a tela e ao recarregamento automático */
 try { const r = JSON.parse(localStorage.getItem(LS_MAIL) || 'null'); if (r && r.emails) S.rasc = {emails: r.emails || {}, corpo: r.corpo || null}; } catch (_) {}
@@ -421,7 +421,7 @@ async function carregar(silencioso){
   try {
     const r = await api('pacote');
     if (!r.dados || !r.versao) { S.versao = 15; pintarTudo(); return; }   /* ponte antiga: ignora `acao` e devolve {ok,abas:[]} */
-    S.versao = r.versao; S.D = r.dados; S.V = r.val || {}; S.emails = r.emails || {}; S.envios = r.envios || []; S.textos = r.textos || null; S.piloto = r.piloto || [];
+    S.versao = r.versao; S.D = r.dados; S.V = r.val || {}; S.emails = r.emails || {}; S.envios = r.envios || []; S.envio1 = r.envio1 || ''; S.textos = r.textos || null; S.piloto = r.piloto || [];
     S.hoje = r.hoje || ''; S.quando = r.quando || '';
     /* edições locais de outro dia não valem mais */
     Object.keys(S.edits).forEach(id => { if (S.edits[id].data !== S.D.data) delete S.edits[id]; });
@@ -907,11 +907,16 @@ function porSetor(){
   return out;
 }
 /* primeiro dia em que os PDFs saíram de verdade para um setor/coordenação (não teste) — o "antes × depois" gira em torno dele */
+/* 06/09: isto lia só as 30 últimas linhas de ENVIOS_EMAIL, que com 8 setores/dia cobrem 2 dias —
+   o console concluía que o 1º envio foi HOJE e o comparativo antes × depois nunca fechava. A ponte
+   agora manda `envio1`, varrido da aba inteira; o log curto continua valendo como plano B. */
 function dataPrimeiroEnvio(){
+  if (S.envio1) return String(S.envio1).slice(0, 5);
   const ds = S.envios.filter(r => /^enviado/.test(String(r[4] || '')) && !/teste/i.test(String(r[1] || ''))).map(r => String(r[0] || '').slice(0, 5)).filter(x => /^\d{2}\/\d{2}$/.test(x));
   ds.sort((a, b) => ddmm(a).localeCompare(ddmm(b)));
   return ds[0] || '';
 }
+function dataEnvioTruncada(){ return !S.envio1 && S.envios.length >= 30; }
 function barra(p, cor){ return '<span class="bar" style="min-width:60px;width:100%"><i style="width:' + (p == null ? 0 : Math.max(0, Math.min(100, p))) + '%;background:' + cor + '"></i></span>'; }
 function vPiloto(){
   const D = S.D, esc_ = D.esc_selo || {};
@@ -933,14 +938,16 @@ function vPiloto(){
     kpi('k-meta', 'Altas que escaparam', escn, 'saíram sem selo de alta no dia') + '</div>';
   /* antes × depois dos e-mails */
   h += '<div class="card" style="margin-bottom:12px"><header><h2>Antes × depois dos PDFs aos coordenadores</h2><span class="hint">' + (d0 ? 'primeiro envio real registrado: <b>' + esc(d0) + '</b> (aba ENVIOS_EMAIL)' : 'nenhum envio real registrado ainda') + '</span></header><div class="body">';
+  if (dataEnvioTruncada()) h += '<div class="nota warn" style="margin-bottom:10px">A ponte ainda não manda a data do 1º envio (falta reimplantar a v16). Enquanto isso a data acima vem só das últimas 30 linhas de envio, que cobrem ~2 dias — o "antes × depois" abaixo fica achatado.</div>';
   if (d0 && (antes.length || depois.length)) {
     const linha = (rot, a, b, na, nb) => '<div style="display:grid;grid-template-columns:150px 1fr 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line-2)">' +
       '<div style="font-size:12px;font-weight:600">' + rot + '</div>' +
       '<div><div class="slab" style="margin-bottom:2px">antes · ' + na + ' dia(s)</div><div class="num" style="font-family:Archivo,sans-serif;font-size:24px;font-weight:700">' + (a == null ? '—' : a + '%') + '</div></div>' +
       '<div><div class="slab" style="margin-bottom:2px">depois · ' + nb + ' dia(s)</div><div class="num" style="font-family:Archivo,sans-serif;font-size:24px;font-weight:700;color:' + (a != null && b != null ? (b >= a ? 'var(--good-ink)' : 'var(--crit-ink)') : 'inherit') + '">' + (b == null ? '—' : b + '%') +
-      (a != null && b != null ? ' <span class="delta ' + (b >= a ? 'down' : 'up') + '" style="vertical-align:middle">' + (b >= a ? '+' : '') + (b - a) + ' pp</span>' : '') + '</div></div></div>';
+      (a != null && b != null ? ' <span class="delta ' + (b >= a ? 'down' : 'up') + '" style="vertical-align:middle">' + (b >= a ? '+' : '') + (b - a) + ' pp' +
+        (a ? ' · ' + (b >= a ? '+' : '') + Math.round(100 * (b - a) / a) + '%' : '') + '</span>' : '') + '</div></div></div>';
     h += linha('ALTA SE realizadas', pA, pD, antes.length, depois.length) + linha('ALTA HOJE executadas', pAh, pDh, antes.filter(x => x.ah).length, depois.filter(x => x.ah).length) +
-      '<div class="msg">Percentual ponderado (soma das que saíram ÷ soma das sinalizadas). Com poucos dias "depois" a diferença ainda é frágil; acompanhe por 2 semanas antes de concluir.</div>';
+      '<div class="msg">Percentual ponderado (soma das que saíram ÷ soma das sinalizadas). <b>pp</b> = diferença absoluta entre os dois percentuais; <b>%</b> = quanto isso representa de aumento ou queda sobre o valor de antes. Com poucos dias "depois" a diferença ainda é frágil; acompanhe por 2 semanas antes de concluir.</div>';
   } else h += '<div class="bloq">sem dias suficientes de um lado ou do outro</div>';
   h += '</div></div>';
   /* por setor — a tabela que responde "melhorou depois que o coordenador passou a receber?" setor a setor */
@@ -951,7 +958,8 @@ function vPiloto(){
         '<td class="r num"><b>' + (x.pct == null ? '—' : x.pct + '%') + '</b></td>' +
         '<td>' + (/ainda sem/.test(x.desde) ? '<span class="flag nao">ainda sem e-mail real</span>' : '<span class="flag ok">' + esc(x.desde) + '</span>') + '</td>' +
         '<td class="r num">' + (x.antes == null ? '—' : x.antes + '%') + '</td><td class="r num">' + (x.depois == null ? '—' : x.depois + '%') + '</td>' +
-        '<td class="r"><span class="delta ' + (x.delta == null ? '' : (x.delta >= 0 ? 'down' : 'up')) + '">' + (x.delta == null ? '—' : (x.delta >= 0 ? '+' : '') + x.delta + ' pp') + '</span></td></tr>').join('') +
+        '<td class="r"><span class="delta ' + (x.delta == null ? '' : (x.delta >= 0 ? 'down' : 'up')) + '">' + (x.delta == null ? '—' : (x.delta >= 0 ? '+' : '') + x.delta + ' pp') + '</span>' +
+          (x.delta != null && x.antes ? '<div class="slab">' + (x.delta >= 0 ? '+' : '') + Math.round(100 * x.delta / x.antes) + '%</div>' : '') + '</td></tr>').join('') +
       '</tbody></table></div></div>';
   }
   /* série por dia */
