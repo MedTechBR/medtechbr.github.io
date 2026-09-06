@@ -134,7 +134,26 @@ button.pill:disabled{opacity:.6;cursor:default}
 @media (max-width:820px){.r-set{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .setc{padding:11px 12px 10px;text-align:left;border:0;cursor:pointer;font:inherit;color:inherit;width:100%;display:block}
 .setc:hover{background:var(--card-2)}
+.setc:active{transform:scale(.995)}
 .setc[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--brand)}
+/* 06/09: nada dizia que o card abria alguma coisa — ele pediu para "clicar e abrir a página do setor" */
+.setc .sh .go{font-family:inherit;font-size:15px;color:var(--ink-3);line-height:1}
+.setc:hover .sh .go{color:var(--brand-2)}
+.setc .abrir{display:block;margin-top:9px;font-size:9.5px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-3);border-top:1px solid var(--line-2);padding-top:7px}
+.setc:hover .abrir{color:var(--brand-2)}
+/* página de um setor */
+.sethd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.sethd .volta{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:8px;border:1px solid var(--line);
+  background:var(--card);color:var(--ink-2);font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.sethd .volta:hover{background:var(--card-2);color:var(--ink)}
+.sethd h2{font-family:Archivo,sans-serif;font-size:20px;font-weight:700;letter-spacing:-.02em;margin:0}
+.sethd .sub{font-size:11.5px;color:var(--ink-3)}
+.setres{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.setres b{display:inline-flex;align-items:baseline;gap:5px;padding:6px 11px;border-radius:100px;background:var(--card);
+  border:1px solid var(--line);font-size:11.5px;font-weight:700;color:var(--ink-2)}
+.setres b i{font-style:normal;font-family:Archivo,sans-serif;font-size:15px;font-weight:700;color:var(--ink)}
+.setres b.ok i{color:var(--brand-2)} .setres b.wa i{color:var(--warn-ink)} .setres b.cr i{color:var(--crit-ink,#a12020)}
 .setc .sh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px}
 .setc .sh b{font-size:13px}
 .setc .sh span{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3)}
@@ -600,6 +619,7 @@ function nomeSetor(k){ const s = (S.D.setores || []).find(x => x.k === k); retur
 
 function vSetor(){
   const D = S.D, sets = setoresOrd(), AD = S.AD, DF = difEdits();
+  if (S.setorSel) return paginaSetor(S.setorSel, AD);   /* setor aberto: a tela inteira é dele */
   /* mesmas contas da aba Leitos: sem isto o setor mostrava o número antigo depois
      de ele corrigir um leito, e nada dizia qual dos dois valia */
   const EFs = sets.map(s => setEf(DF, s));
@@ -624,22 +644,50 @@ function vSetor(){
     const pct = s.cap ? Math.min(100, Math.round(100 * s.ocup / s.cap)) : 0;
     const poss = e.ah + e.ase;
     return '<button class="card setc" data-k="' + esc(s.k) + '" aria-pressed="' + (S.setorSel === s.k) + '">' +
-      '<div class="sh"><b>' + esc(s.nome) + (e.ed ? ' ' + FLAG_ED : '') + '</b><span>' + s.ocup + '/' + s.cap + '</span></div>' +
+      '<div class="sh"><b>' + esc(s.nome) + (e.ed ? ' ' + FLAG_ED : '') + '</b><span>' + s.ocup + '/' + s.cap + ' <span class="go">›</span></span></div>' +
       '<span class="track"><i class="fill" style="width:' + pct + '%"></i></span>' +
       '<div class="sn">' +
         '<div><span class="num ' + (poss ? 'good' : 'off') + '">' + poss + '</span><span class="lab">possib.</span></div>' +
         '<div><span class="num ' + (a && a.pct_andou != null ? '' : 'off') + '">' + (a && a.pct_andou != null ? a.pct_andou + '%' : '—') + '</span><span class="lab">andou</span></div>' +
         '<div><span class="num ' + (a && a.parada ? 'warn' : 'off') + '">' + (a ? a.parada : '—') + '</span><span class="lab">paradas</span></div>' +
-      '</div></button>';
+      '</div><span class="abrir">abrir o setor ›</span></button>';
   }).join('') + '</div>';
 
   const k = S.setorSel;
-  if (!k) return h + '<div class="card"><div class="body"><div class="msg">Toque em um setor para ver os leitos e o que ficou parado.</div></div></div>';
+  if (!k) return h + '<div class="card"><div class="body"><div class="msg">Toque em um setor para abrir a página dele: as possibilidades de alta de hoje, o que andou e o que ficou parado.</div></div></div>';
+  return paginaSetor(k, AD);
+}
 
+/* 06/09 (pedido dele): o card do setor abre uma PÁGINA do setor. Antes o detalhe vinha empilhado
+   embaixo da grade dos 7 setores — ele nunca chegava a ver — e mostrava só o que NÃO andou.
+   Agora a grade sai da frente, tem botão de voltar, e o que ANDOU aparece junto do que parou. */
+function paginaSetor(k, AD){
+  const D = S.D, a = adSet(k);
   const leitos = (D.leitos || []).filter(l => l.k === k).map(efetivo);   /* com as correções dele */
   const poss = leitos.filter(l => l.selo === 'ALTA HOJE' || l.selo === 'ALTA SE');
-  h += '<div class="card" style="margin-bottom:12px"><header><h2>' + esc(nomeSetor(k)) + ' — possibilidades de alta hoje</h2>' +
-    '<span class="hint">' + poss.length + ' leito(s) · toque em “ver na aba Leitos” para editar</span></header><div class="body scroll">';
+  const doSetor = x => x.s === k;
+  const andaram = (AD && AD.andaram ? AD.andaram : []).filter(doSetor);
+  const trav = (AD && AD.travados ? AD.travados : []).filter(doSetor);
+  const enc = trav.filter(x => x.desfecho === 'ENCAMINHADA'), par = trav.filter(x => x.desfecho === 'PARADA');
+  const set = (S.D.setores || []).find(x => x.k === k) || {};
+
+  let h = '<div class="sethd"><button class="volta" id="b-voltar-set">‹ todos os setores</button>' +
+    '<h2>' + esc(nomeSetor(k)) + '</h2>' +
+    '<span class="sub">' + (set.ocup != null ? set.ocup + '/' + set.cap + ' leitos' : '') +
+      (a && a.pct_andou != null ? ' · ' + a.pct_andou + '% do que foi cobrado em ' + esc(AD.dia_br || AD.dia) + ' andou' : '') +
+    '</span></div>';
+
+  h += '<div class="setres">' +
+    '<b class="ok"><i>' + poss.length + '</i> possibilidades hoje</b>' +
+    (a ? '<b class="ok"><i>' + a.resolvida + '</i> resolvidas</b>' +
+         '<b class="wa"><i>' + a.encaminhada + '</i> encaminhadas</b>' +
+         '<b class="cr"><i>' + a.parada + '</i> paradas</b>' +
+         (a.prejudicada ? '<b><i>' + a.prejudicada + '</i> fora do denominador</b>' : '')
+       : '<b><i>—</i> sem medição da véspera</b>') + '</div>';
+
+  /* 1. o que dá para dar alta hoje */
+  h += '<div class="card" style="margin-bottom:12px"><header><h2>Possibilidades de alta hoje</h2>' +
+    '<span class="hint">' + poss.length + ' leito(s) · toque no botão abaixo para editar na aba Leitos</span></header><div class="body scroll">';
   h += poss.length
     ? poss.map(l => '<div class="pit"><div class="ph"><b>' + esc(l.l) + '</b><span class="mn">' + esc(l.p) + '</span>' +
         '<span class="flag s-' + (l.selo === 'ALTA HOJE' ? 'alta' : 'altase') + '">' + esc(l.selo) + '</span>' + (S.edits[idDe(l)] ? FLAG_ED : '') + '</div>' +
@@ -648,18 +696,48 @@ function vSetor(){
     : '<div class="msg">Nenhuma alta ou alta condicional sinalizada neste setor hoje.</div>';
   h += '<div style="margin-top:10px"><button class="btn sec" id="b-ver-leitos">Ver todos os leitos deste setor</button></div></div></div>';
 
-  const trav = (AD && AD.travados ? AD.travados : []).filter(x => x.s === k);
-  h += '<div class="card"><header><h2>Não andou no dia anterior</h2><span class="hint">' +
-    (AD ? 'painel de ' + esc(AD.dia_br || AD.dia) + ' · ordenado pelos mais antigos' : 'ainda sem medição') + '</span></header><div class="body scroll">';
-  h += trav.length
-    ? trav.map(x => '<div class="pit"><div class="ph"><b>' + esc(x.l) + '</b>' +
-        '<span class="dsf ' + (x.desfecho === 'PARADA' ? 'par' : 'enc') + '">' + (x.desfecho === 'PARADA' ? 'parada' : 'encaminhada') + '</span>' +
-        '<span class="mn">' + (x.dias || 1) + (x.dias > 1 ? ' dias' : ' dia') + '</span></div>' +
-        '<div class="pb">' + esc(x.item || x.pend || '') + '</div>' +
-        (x.prova ? '<div class="pa">' + esc(x.prova) + '</div>' : '') + '</div>').join('')
+  /* 2. o que ANDOU — o setor precisa ver o que a equipe dele fechou, não só a cobrança que falhou */
+  /* o pacote traz no máximo 10 resolvidas e 14 travados por setor — quando corta, a tela diz,
+     senão o número do card (ex.: 15 paradas) briga com a lista mais curta logo abaixo */
+  const deQuantos = (mostra, total) => (total && mostra < total) ? ' · mostrando ' + mostra + ' de ' + total : '';
+  const totAndou = a ? (a.resolvida + a.encaminhada) : 0;
+  h += '<div class="card" style="margin-bottom:12px"><header><h2>O que andou no dia anterior</h2><span class="hint">' +
+    (AD ? 'painel de ' + esc(AD.dia_br || AD.dia) + ' · a frase é a evolução que comprova' + deQuantos(andaram.length + enc.length, totAndou) : 'ainda sem medição') + '</span></header><div class="body scroll">';
+  h += (andaram.length || enc.length)
+    ? andaram.map(x => itemAd(x, 'res', 'resolvida')).join('') + enc.map(x => itemAd(x, 'enc', 'encaminhada')).join('')
+    : '<div class="msg">' + (AD ? 'Nenhum item cobrado neste setor teve registro de ação no dia.' : 'A primeira medição sai no dia seguinte ao primeiro painel publicado.') + '</div>';
+  h += '</div></div>';
+
+  /* 3. o que parou */
+  h += '<div class="card"><header><h2>O que ficou parado</h2><span class="hint">' +
+    (AD ? 'o dia passou sem registro de ação · ordenado pelos mais antigos' + deQuantos(par.length, a ? a.parada : 0) : 'ainda sem medição') + '</span></header><div class="body scroll">';
+  h += par.length
+    ? par.map(x => itemAd(x, 'par', 'parada')).join('')
     : '<div class="msg">' + (AD ? 'Nada ficou parado neste setor — tudo que foi cobrado teve registro de ação.' : 'A primeira medição sai no dia seguinte ao primeiro painel publicado.') + '</div>';
   h += '</div></div>';
   return h;
+}
+
+/* A prova vem copiada da evolução, e o prontuário escreve tudo em caixa alta. Numa tela cheia
+   de provas isso vira um paredão ilegível — aqui só a apresentação muda, o dado é o mesmo. */
+const SIGLA_OK = new Set(['TC','RM','RNM','USG','RX','ECG','ECO','EDA','EDB','PO','POI','HD','HDF','FX','PAM','PA','FC','FR','HB','HT','ATB','UTI','UCE','EMG','VM','VNI','IOT','SNE','SNG','SVD','CVC','PICC','TQT','PEG','NPT','VLP','CPRE','CPRM','TEP','TVP','AVC','AIT','TCE','HSA','HSD','DPOC','DM','HAS','LRA','IRA','DRC','ICC','ITU','PNM','NAC','KPC','HIV','TB','UPA','SUS','MMII','MMSS','MSD','MSE','MID','MIE','FO','CTO','TU']);
+function humaniza(t){
+  t = String(t || '');
+  if (!/[A-ZÁÉÍÓÚÂÊÔÃÕÇ]{3,}/.test(t) || /[a-záéíóúâêôãõç]{3,}/.test(t)) return t;   /* já é texto normal */
+  t = t.replace(/[A-ZÁÉÍÓÚÂÊÔÃÕÇ0-9][A-ZÁÉÍÓÚÂÊÔÃÕÇ0-9\-\/\u00C0-\u00DC]*/g, w => {
+    if (/\d/.test(w)) return w;                                    /* T6-T7, D10, PAM 55 */
+    if (w.length <= 4 && SIGLA_OK.has(w)) return w;                 /* sigla de verdade fica */
+    return w.toLowerCase();
+  });
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
+function itemAd(x, cls, rot){
+  return '<div class="pit"><div class="ph"><b>' + esc(x.l) + '</b>' +
+    '<span class="dsf ' + cls + '">' + rot + '</span>' +
+    '<span class="mn">' + (x.dias || 1) + (x.dias > 1 ? ' dias' : ' dia') + '</span></div>' +
+    '<div class="pb">' + esc(x.item || x.pend || '') + '</div>' +
+    (x.prova ? '<div class="pa">' + esc(humaniza(x.prova)) + '</div>' : '') + '</div>';
 }
 
 function ligarSetor(){
@@ -668,6 +746,11 @@ function ligarSetor(){
     localStorage.setItem('painel.setor', S.setorSel);
     pintarMain(); window.scrollTo(0, 0);
   }));
+  const bt = $('b-voltar-set');
+  if (bt) bt.addEventListener('click', () => {
+    S.setorSel = ''; localStorage.setItem('painel.setor', '');
+    pintarMain(); window.scrollTo(0, 0);
+  });
   const bv = $('b-ver-leitos');
   if (bv) bv.addEventListener('click', () => {
     S.filtro.k = S.setorSel; S.filtro.g = ''; S.filtro.q = '';
