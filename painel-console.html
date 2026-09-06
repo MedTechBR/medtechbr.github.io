@@ -893,6 +893,17 @@ function serieDiaria(){
 }
 /* tabela "ALTA SE POR SETOR" da aba PILOTO (atualizar_piloto.py) — antes×depois já calculado por setor, usando
    o 1º envio REAL daquele setor (não o do hospital todo, que é mais grosseiro) */
+/* A aba manda a data do 1º envio às vezes como número de série do Sheets (46268 = 03/09/2026),
+   e o console imprimia o número cru. Converte quando vier assim. */
+function dataSheets(v){
+  const t = String(v == null ? '' : v).trim();
+  if (/^\d{5}$/.test(t)) {
+    const d = new Date(Date.UTC(1899, 11, 30) + Number(t) * 86400000);
+    return String(d.getUTCDate()).padStart(2, '0') + '/' + String(d.getUTCMonth() + 1).padStart(2, '0');
+  }
+  return t;
+}
+
 function porSetor(){
   const P = S.piloto || []; let i = P.findIndex(r => /POR SETOR/.test(String((r || [])[0] || '')));
   if (i < 0) return [];
@@ -901,7 +912,7 @@ function porSetor(){
     const r = P[j] || []; const setor = String(r[0] || '').trim();
     if (!setor) break;
     out.push({setor, sinalizadas: num(r[1]), sairam: num(r[2]), pct: (r[3] === '—' ? null : num(r[3])),
-      desde: String(r[4] || ''), antes: (r[5] === '—' ? null : num(r[5])), depois: (r[6] === '—' ? null : num(r[6])),
+      desde: dataSheets(r[4]), antes: (r[5] === '—' ? null : num(r[5])), depois: (r[6] === '—' ? null : num(r[6])),
       delta: (r[7] === '—' ? null : num(r[7]))});
   }
   return out;
