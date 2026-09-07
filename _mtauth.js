@@ -180,7 +180,6 @@ const MT_FUNCS = [
   { id:'clinicamed',    nm:'ClínicaMed',    ic:'ti-heartbeat',          c:'#23272E', url:'/clinicamed/' },
   { id:'trafegotitulo', nm:'TráfegoTítulo', ic:'ti-car',                c:'#23272E', url:'/trafego-titulo/' },
   { id:'enarefarmacia', nm:'Banca ENARE',   ic:'ti-flask',              c:'#23272E', url:'/quiz-enare-farmacia/' },
-  { id:'farmaciagest',  nm:'FarmáciaGest',  ic:'ti-building-hospital',  c:'#23272E', url:'/farmaciagest/' },
   { id:'clinicar',      nm:'Clinicar',      ic:'ti-calendar-heart',     c:'#23272E', url:'/clinicar/' }
 ];
 /* O Portal guarda a escolha do usuário em localStorage (mesmo domínio): o trocador mostra só o que
