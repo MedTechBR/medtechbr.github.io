@@ -171,7 +171,6 @@ const LINHAS = {
   provas:  { nm: 'MedTech Provas',  home: '/provas.html' }
 };
 const MT_FUNCS = [
-  { id:'agendaai',   nm:'ConsultAI',  ic:'ti-calendar-event', c:'#2B5CE6', url:'/consultai.html',  linha:'clinica' },
   { id:'condutai',   nm:'CondutAI',   ic:'ti-stethoscope',    c:'#1D6FD0', url:'/condutai.html',   linha:'clinica' },
   { id:'atbguia',    nm:'ATBguia',    ic:'ti-pill',           c:'#0E8A9C', url:'/atbguia.html',    linha:'clinica' },
   { id:'enfermaria', nm:'EnfermarIA', ic:'ti-bed',            c:'#3B7BE0', url:'/enfermaria.html', linha:'clinica' },
@@ -199,7 +198,7 @@ function linhaAtual() {
 /* O Portal guarda a escolha do usuário em localStorage (mesmo domínio): o trocador mostra só o que
    ele escolheu — e sempre o app atual — SEMPRE dentro da própria linha. */
 const FUNCS_PADRAO = {
-  clinica: ['agendaai','condutai','atbguia','enfermaria','pocusai','laudai','paliai','calcmed','guiainterno','foco','plantaohub','granae','logbook'],
+  clinica: ['condutai','atbguia','enfermaria','pocusai','laudai','paliai','calcmed','guiainterno','foco','plantaohub','granae','logbook'],
   provas:  ['medprovas','flashmed','clinicamed','trafegotitulo']
 };
 function funcsVisiveis() {
