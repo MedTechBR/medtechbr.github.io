@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-astra="condutai">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#FAFAF8">
+<meta name="theme-color" content="#000000">
 <title>CondutAI — Abordagem clínica baseada em diretrizes</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%95%EF%B8%8F%3C/text%3E%3C/svg%3E">
 <script defer src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
@@ -13,7 +13,7 @@
 <script type="module" src="_mtauth.js?v=17"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
 <style>
 :root {
@@ -89,7 +89,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
 body {
-  font-family: 'Figtree', -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   letter-spacing: -.011em;
   background-color: var(--bg);   /* estava cravado em #FAFAF8: o fundo não acompanhava o tema */
   background-image: radial-gradient(1100px 460px at 84% -10%,var(--glow-bg,rgba(29,111,208,.10)),transparent 60%),linear-gradient(rgba(140,160,185,.032) 1px,transparent 1px),linear-gradient(90deg,rgba(140,160,185,.032) 1px,transparent 1px);
@@ -107,7 +107,7 @@ body {
   overflow: hidden;
 }
 /* Console Dark — tipografia + inputs */
-.logo, .result-title, .content h1, .content h2, .content h3, .wb-hero h3, .wb-section-title, .wb-hi, .wb-card .ttl, .modal h2, .modal h3 { font-family: 'Figtree', 'Figtree', sans-serif; }
+.logo, .result-title, .content h1, .content h2, .content h3, .wb-hero h3, .wb-section-title, .wb-hi, .wb-card .ttl, .modal h2, .modal h3 { font-family: 'Inter', 'Inter', sans-serif; }
 .mode-badge, .result-title .badge, .result-meta, .history-date, .wb-badge, .chip, .option-select { font-family: 'JetBrains Mono', ui-monospace, monospace; letter-spacing: 0; }
 input:-webkit-autofill, input:-webkit-autofill:focus, textarea:-webkit-autofill, select:-webkit-autofill { -webkit-box-shadow: 0 0 0 100px #FFFFFF inset; -webkit-text-fill-color: #23272E; caret-color: #23272E; transition: background-color 99999s; }
 .wb-card .ic { background: var(--soft) !important; color: var(--primary) !important; box-shadow: inset 0 0 0 1px var(--line); }
@@ -221,7 +221,7 @@ aside {
   display: flex; align-items: flex-start; justify-content: space-between;
   gap: 10px; padding: 16px 16px 12px; border-bottom: 1px solid var(--border);
 }
-.ai-panel-title { font-family: 'Figtree', Inter, sans-serif; font-weight: 600; font-size: 15px; color: var(--text); }
+.ai-panel-title { font-family: 'Inter', Inter, sans-serif; font-weight: 600; font-size: 15px; color: var(--text); }
 .ai-panel-subtitle { font-size: 12px; color: var(--text-mute); margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ai-panel-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
 .ai-panel-chip {
@@ -1017,6 +1017,7 @@ main, #main { display: block !important; height: auto !important; overflow: visi
 </style>
 <style>/* mt-a11y-16px */@media(max-width:680px){input,select,textarea{font-size:16px}}</style>
 <link rel="stylesheet" href="_mttokens.css?v=3">
+<link rel="stylesheet" href="_mtastra.css?v=1">
 </head>
 <body>
 
@@ -1588,9 +1589,31 @@ function initMermaid(){
   theme: 'base',
   securityLevel: 'loose',
   fontSize: 15,
-  themeVariables: {
+  themeVariables: (document.documentElement.hasAttribute('data-astra') ? {
+    /* tema Astra: fluxograma preto/branco, no vocabulario do app */
     fontSize: '15px',
-    fontFamily: '"Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
+    fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
+    background: '#000000',
+    mainBkg: '#1F1F1F',
+    primaryColor: '#1F1F1F',
+    primaryTextColor: '#FFFFFF',
+    primaryBorderColor: 'rgba(255,255,255,.35)',
+    secondaryColor: '#0F0F0F',
+    secondaryTextColor: '#FFFFFF',
+    secondaryBorderColor: 'rgba(255,255,255,.35)',
+    tertiaryColor: '#0F0F0F',
+    tertiaryTextColor: 'rgba(255,255,255,.7)',
+    tertiaryBorderColor: 'rgba(255,255,255,.2)',
+    lineColor: 'rgba(255,255,255,.6)',
+    textColor: '#FFFFFF',
+    nodeTextColor: '#FFFFFF',
+    edgeLabelBackground: '#000000',
+    clusterBkg: '#0F0F0F',
+    clusterBorder: 'rgba(255,255,255,.2)',
+    titleColor: '#FFFFFF'
+  } : {
+    fontSize: '15px',
+    fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
     background: '#FAFAF8',
     mainBkg: '#EAF1FA',
     primaryColor: '#EAF1FA',
@@ -1609,7 +1632,7 @@ function initMermaid(){
     clusterBkg: '#FFFFFF',
     clusterBorder: 'rgba(140,160,185,.25)',
     titleColor: '#23272E'
-  },
+  }),
   flowchart: {
     useMaxWidth: false,   // renderiza no tamanho natural; o container faz scroll
     htmlLabels: true,
