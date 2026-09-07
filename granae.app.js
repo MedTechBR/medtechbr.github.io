@@ -828,9 +828,14 @@ function misturar(a, b, t) {
 /** Escurece `cor` até alcançar 4,5:1 contra `fundo`. Devolve hex. */
 function corLegivel(cor, fundo, alvo) {
   alvo = alvo || 4.5;
-  const bg = _hexRgb(fundo);
+  // Tema Astra (fundo preto): o chip é a cor a 12% sobre preto, então a cor tem de CLAREAR até passar.
+  const astra = document.documentElement.hasAttribute('data-astra');
+  const bg = astra ? _hexRgb('#000000') : _hexRgb(fundo);
   let c = _hexRgb(cor);
-  for (let i = 0; i < 24 && _razao(c, bg) < alvo; i++) c = { r: c.r * 0.88, g: c.g * 0.88, b: c.b * 0.88 };
+  for (let i = 0; i < 24 && _razao(c, bg) < alvo; i++) {
+    c = astra ? { r: c.r + (255 - c.r) * 0.14, g: c.g + (255 - c.g) * 0.14, b: c.b + (255 - c.b) * 0.14 }
+              : { r: c.r * 0.88, g: c.g * 0.88, b: c.b * 0.88 };
+  }
   return _rgbHex(c);
 }
 
