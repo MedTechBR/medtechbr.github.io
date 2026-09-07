@@ -94,6 +94,12 @@ html[data-astra], html[data-astra][data-theme], html[data-astra] [data-theme] {
   --red-bg: var(--a-danger-bg); --wrong-bg: var(--a-danger-bg);
   --violet: var(--a-violet); --purple: var(--a-violet); --violet-btn: var(--a-violet-btn);
   --violet-bg: var(--a-violet-bg); --purple-soft: var(--a-violet-bg);
+  /* aliases dos apps com CSS externo (LaudAI, Granaê) e do MedProvas */
+  --text-dim: var(--a-fg60); --text-faint: var(--a-fg60); --text-muted: var(--a-fg60); --muted-2: var(--a-fg60);
+  --border-2: var(--a-fg20); --accent-2: var(--a-fg); --accent-grad: var(--a-fg); --primary-2: var(--a-fg);
+  --income: var(--a-ok); --income-2: var(--a-ok); --expense: var(--a-fg); --expense-2: var(--a-danger);
+  --warning: var(--a-warn); --warning-soft: var(--a-warn-bg); --danger-soft: var(--a-danger-bg);
+  --shadow-xs: none; --shadow-sm: none; --shadow-md: none; --shadow-glow: none; --shadow-glow-pink: none;
   /* sombra e brilho: não existem na Astra */
   --shadow: none; --shadow-lg: none; --mt-shadow: none;
   --glow: transparent; --glow-bg: transparent; --mt-glow: transparent;
@@ -217,6 +223,26 @@ html[data-astra] body footer { color: var(--a-fg60); border-top: 1px solid var(-
 html[data-astra] body footer a { color: var(--a-fg60); font-weight: 500; }
 html[data-astra] body footer a:hover { color: var(--a-fg); }
 
+/* ---------- família de template dos apps clínicos (.btn-p/.btn-g/.tabs/.logo .mark/.usr) ---------- */
+html[data-astra] body .btn-p, html[data-astra] body .tabs button.on, html[data-astra] body .logo .mark,
+html[data-astra] body .seg.on, html[data-astra] body .sugg.on, html[data-astra] body .msg.u .av,
+html[data-astra] body .ask button, html[data-astra] body .btn-ai { color: #000 !important; }
+html[data-astra] body .btn-p:hover, html[data-astra] body .btn-ai:hover { background: #e6e6e6; }
+html[data-astra] body .btn-p .spin { border-color: #000; border-top-color: transparent; }
+html[data-astra] body .btn-g { background: var(--a-fg12); color: #fff; border-color: transparent; }
+html[data-astra] body .btn-g:hover { background: var(--a-fg20); color: #fff; }
+html[data-astra] body .btn-dn { background: var(--a-danger-bg); color: var(--a-danger); }
+html[data-astra] body .logo .mark { box-shadow: none !important; }
+html[data-astra] body .tabs { background: var(--a-fg6); border: 0; border-radius: 999px; box-shadow: none !important; }
+html[data-astra] body .tabs button { border-radius: 999px; font-weight: 500; min-height: 44px; }
+html[data-astra] body .usr a, html[data-astra] body .usr button { border-radius: 999px; background: var(--a-fg12); border-color: transparent; color: #fff; font-weight: 500; min-height: 44px; padding: 8px 16px; }
+html[data-astra] body .usr a:hover, html[data-astra] body .usr button:hover { background: var(--a-fg20); color: #fff; }
+html[data-astra] body .modal-x { border-radius: 999px; background: var(--a-fg12); border-color: transparent; color: #fff; box-shadow: none !important; }
+@media (max-width: 640px) {
+  html[data-astra] body .tabs { background: rgba(0,0,0,.85); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); border-top: 1px solid var(--a-fg12); border-radius: 0; }
+  html[data-astra] body .tabs button.on { background: var(--a-fg12); color: #fff !important; }
+}
+
 /* ============================================================
    MÓDULO COMPARTILHADO (_mtauth.js) — login, splash, trocador, botão
    "voltar ao MedTech", barra de demonstração. Só nos apps Astra.
@@ -324,6 +350,143 @@ html[data-astra="condutai"] body .content a { text-decoration: underline; text-d
 html[data-astra="condutai"] body .alert-warn, html[data-astra="condutai"] body .alert-info,
 html[data-astra="condutai"] body .alert-socratic, html[data-astra="condutai"] body .alert-caso { border-color: var(--a-fg20); }
 html[data-astra="condutai"] body .content .wb-acc > summary { font-weight: 500; }
+
+/* ---- ConsultAI ---- */
+html[data-astra="consultai"] body .phead .av, html[data-astra="consultai"] body .rx-num, html[data-astra="consultai"] body .mcount,
+html[data-astra="consultai"] body .dias-pick button.on, html[data-astra="consultai"] body .btn-wa, html[data-astra="consultai"] body .wa-tpls button.on { color: #000 !important; }
+html[data-astra="consultai"] body .ini-hero { background: var(--a-panel) !important; background-image: none !important; border: 1px solid var(--a-fg12); box-shadow: none !important; color: #fff; }
+html[data-astra="consultai"] body .s-ca { background: var(--a-fg12); color: var(--a-fg60); }
+
+/* ---- ATBguia / PocusAI ---- */
+html[data-astra="atbguia"] body .card.ai, html[data-astra="pocusai"] body .card.ai { background: var(--a-panel2) !important; border: 1px solid var(--a-fg20) !important; color: #fff; }
+html[data-astra="atbguia"] body .card.ai .cn, html[data-astra="pocusai"] body .card.ai .cn { color: #fff !important; }
+html[data-astra="atbguia"] body .btn-ai, html[data-astra="pocusai"] body .btn-ai { background: #fff; }
+html[data-astra="atbguia"] body .card:hover, html[data-astra="pocusai"] body .card:hover { box-shadow: none !important; border-color: var(--a-fg20); }
+html[data-astra="pocusai"] body .bf { background: #fff; color: #0f3a44; }
+
+/* ---- PaliAI ---- */
+html[data-astra="paliai"] body .logo .mark, html[data-astra="paliai"] body .btn-p, html[data-astra="paliai"] body .navtab.on {
+  background: #fff !important; background-image: none !important; color: #000 !important; box-shadow: none !important; }
+html[data-astra="paliai"] body .navtab { border-radius: 999px; }
+html[data-astra="paliai"] body .spin { border-color: rgba(0,0,0,.25); border-top-color: #000; }
+
+/* ---- Guia do Interno / Logbook ---- */
+html[data-astra="guiainterno"] body .btn, html[data-astra="logbook"] body .btn { color: #000 !important; }
+html[data-astra="guiainterno"] body .btn:hover, html[data-astra="logbook"] body .btn:hover { background: #e6e6e6; }
+html[data-astra="logbook"] body .btn-g { background: var(--a-fg12) !important; color: #fff !important; border-color: transparent; }
+html[data-astra="guiainterno"] body .spin { border-color: rgba(0,0,0,.25); border-top-color: #000; }
+
+/* ---- CalcMed ---- */
+html[data-astra="calcmed"] body .list button.active { color: #000 !important; }
+
+/* ---- LaudAI (CSS externo: laudai.css) ---- */
+html[data-astra="laudai"] body .land-btn-primary, html[data-astra="laudai"] body .land-step-num, html[data-astra="laudai"] body .land-price-badge,
+html[data-astra="laudai"] body .land-cta, html[data-astra="laudai"] body .auth-brand .logo-big, html[data-astra="laudai"] body .auth-form .primary,
+html[data-astra="laudai"] body .brand-mark, html[data-astra="laudai"] body .user-chip .avatar, html[data-astra="laudai"] body .card-title .num,
+html[data-astra="laudai"] body .btn-primary, html[data-astra="laudai"] body .land-brand-mark {
+  background: #fff !important; background-image: none !important; color: #000 !important; box-shadow: none !important; }
+html[data-astra="laudai"] body .land-cta h2, html[data-astra="laudai"] body .land-cta p { color: #000 !important; }
+html[data-astra="laudai"] body .land-cta .land-btn { background: #000 !important; color: #fff !important; }
+html[data-astra="laudai"] body .land-cta::before { display: none; }
+html[data-astra="laudai"] body .landing {
+  --land-bg: #000; --land-bg-2: var(--a-panel2); --land-surface: var(--a-panel); --land-border: var(--a-fg12);
+  --land-text: #fff; --land-text-dim: var(--a-fg60); --land-text-faint: var(--a-fg60);
+  --land-blue: #fff; --land-blue-2: #fff; --land-blue-soft: var(--a-fg12); --land-grad: #fff;
+  background: transparent !important; font-family: 'Inter', system-ui, sans-serif; }
+html[data-astra="laudai"] body .land-footer { background: var(--a-panel) !important; }
+html[data-astra="laudai"] body .land-footer h5, html[data-astra="laudai"] body .land-footer-brand, html[data-astra="laudai"] body .land-footer a:hover { color: #fff !important; }
+html[data-astra="laudai"] body .land-footer-bottom { border-color: var(--a-fg12) !important; }
+html[data-astra="laudai"] body .card { box-shadow: none !important; }
+
+/* ---- FlashMed ---- */
+html[data-astra="flashmed"] body .btn, html[data-astra="flashmed"] body .qty-val, html[data-astra="flashmed"] body .tab.active,
+html[data-astra="flashmed"] body .opt.sel .key, html[data-astra="flashmed"] body .pen-fab, html[data-astra="flashmed"] body .restore-bar button:hover,
+html[data-astra="flashmed"] body .build, html[data-astra="flashmed"] body .opt.right .key, html[data-astra="flashmed"] body .opt.wrong .key,
+html[data-astra="flashmed"] body .perf-focus:hover, html[data-astra="flashmed"] body .focus-banner button:hover, html[data-astra="flashmed"] body .pen-fab.on { color: #000 !important; }
+html[data-astra="flashmed"] body .build { background: #fff !important; background-image: none !important; box-shadow: none !important; }
+html[data-astra="flashmed"] body .btn:hover { background: #e6e6e6; }
+html[data-astra="flashmed"] body .btn.sec { background: var(--a-fg12) !important; color: #fff !important; border-color: transparent !important; }
+html[data-astra="flashmed"] body .btn.sec:hover { background: var(--a-fg20) !important; }
+html[data-astra="flashmed"] body .tab { border-radius: 999px; }
+html[data-astra="flashmed"] body header { background: rgba(0,0,0,.72) !important; }
+
+/* ---- MedProvas ---- */
+html[data-astra="medprovas"] body button { color: #000; border-radius: 999px; box-shadow: none !important; }
+html[data-astra="medprovas"] body button:hover { transform: none; box-shadow: none !important; }
+html[data-astra="medprovas"] body button.secondary, html[data-astra="medprovas"] body button.ghost { background: var(--a-fg12); color: #fff; border-color: transparent; }
+html[data-astra="medprovas"] body button.secondary:hover, html[data-astra="medprovas"] body button.ghost:hover { background: var(--a-fg20); color: #fff; }
+html[data-astra="medprovas"] body button:disabled { background: var(--a-fg12); color: var(--a-fg40); }
+html[data-astra="medprovas"] body .sidebar-brand .brand-mark, html[data-astra="medprovas"] body .avatar-circle, html[data-astra="medprovas"] body .auth-logo .brand-mark {
+  background: #fff !important; background-image: none !important; color: #000 !important; box-shadow: none !important; }
+html[data-astra="medprovas"] body .dashboard-hero, html[data-astra="medprovas"] body .auth-side {
+  background: var(--a-panel) !important; background-image: none !important; border: 1px solid var(--a-fg12); box-shadow: none !important; color: #fff; }
+html[data-astra="medprovas"] body .dashboard-hero::before, html[data-astra="medprovas"] body .dashboard-hero::after,
+html[data-astra="medprovas"] body .auth-side::before, html[data-astra="medprovas"] body .auth-side::after { display: none; }
+html[data-astra="medprovas"] body .pro-badge.pro { background: var(--a-fg12) !important; background-image: none !important; color: #fff !important; }
+html[data-astra="medprovas"] body .alt-btn.selected, html[data-astra="medprovas"] body .resp-mini-btn.selected { color: #000 !important; }
+html[data-astra="medprovas"] body .paywall-modal, html[data-astra="medprovas"] body .img-modal { background: rgba(0,0,0,.72) !important; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+html[data-astra="medprovas"] body .img-modal-card { background: var(--a-solid) !important; border: 1px solid var(--a-fg12); }
+/* área exportada para PDF/Word: continua em papel branco (variáveis re-escopadas para o tema claro) */
+html[data-astra="medprovas"] body .prova-export {
+  --text: #23272E; --text-muted: #5E646B; --text-soft: #5E646B; --border: #DDDDD5; --border-strong: #C8C8C0; --line: #E8E8E2;
+  --surface: #fff; --bg: #fff; --bg-2: #F1F1EC; --bg-3: #EDEDE8; --primary: #C07C0A; --primary-dark: #996208; --primary-soft: rgba(192,124,10,.10);
+  background: #fff !important; color: #23272E !important; }
+
+/* ---- Foco ---- */
+html[data-astra="foco"] body .cal-cell.sel, html[data-astra="foco"] body .qa-row button, html[data-astra="foco"] body .rec-mic {
+  color: #000 !important; background: #fff !important; background-image: none !important; box-shadow: none !important; }
+html[data-astra="foco"] body .cal-cell.sel .ch { background: rgba(0,0,0,.12); color: #000; }
+html[data-astra="foco"] body .cal-cell.sel .ch.dd { background: rgba(0,0,0,.08); color: rgba(0,0,0,.55); }
+html[data-astra="foco"] body .prio-pick button.sel.alta, html[data-astra="foco"] body .prio-pick button.sel.media, html[data-astra="foco"] body .prio-pick button.sel.baixa { color: #000 !important; }
+html[data-astra="foco"] body .ev .evcheck.done { background: #fff; border-color: #fff; color: #000; }
+html[data-astra="foco"] body .check.done { background: #fff; border-color: #fff; }
+html[data-astra="foco"] body .check.done::after, html[data-astra="foco"] body .item.completing .check::after { color: #000; border-color: #000; }
+
+/* ---- Granaê (CSS externo: granae.css) ---- */
+html[data-astra="granae"] body .brand .logo, html[data-astra="granae"] body .fab, html[data-astra="granae"] body .new-tx-fab,
+html[data-astra="granae"] body button.primary, html[data-astra="granae"] body .dash-tabs button.on {
+  background: #fff !important; background-image: none !important; color: #000 !important; box-shadow: none !important; }
+html[data-astra="granae"] body .fab svg, html[data-astra="granae"] body .new-tx-fab svg, html[data-astra="granae"] body #micBtn svg { color: #000 !important; stroke: currentColor; }
+html[data-astra="granae"] body .fab.small.danger { background: var(--a-danger) !important; }
+html[data-astra="granae"] body button.primary:hover { background: #e6e6e6 !important; }
+html[data-astra="granae"] body .dash-tabs button { border-radius: 999px; }
+html[data-astra="granae"] body .bar-item .track { background: var(--a-fg12); }
+
+/* ---- PlantãoHub ---- */
+html[data-astra="plantaohub"] body .tabs button.on, html[data-astra="plantaohub"] body .btn-p {
+  background: #fff !important; background-image: none !important; color: #000 !important; box-shadow: none !important; }
+html[data-astra="plantaohub"] body .cal .cell.today .dn { color: #000 !important; }
+html[data-astra="plantaohub"] body .clipbar button { background: var(--a-fg12); color: #fff; border-radius: 999px; }
+html[data-astra="plantaohub"] body .cal .cell.out { background: rgba(255,255,255,.04); }
+
+/* ---------- correções da rodada 2 (13 apps) ---------- */
+html[data-astra] body .disclaimer { color: var(--a-warn) !important; background: var(--a-warn-bg) !important; border-color: rgba(251,191,36,.3) !important; }
+@media (max-width: 640px) {
+  /* iOS dá zoom em campo < 16px */
+  html[data-astra] body input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]), html[data-astra] body select, html[data-astra] body textarea { font-size: 16px !important; }
+}
+html[data-astra="guiainterno"] body .btn-light { background: var(--a-fg12) !important; color: #fff !important; }
+html[data-astra="guiainterno"] body .btn-light:hover { background: var(--a-fg20) !important; }
+html[data-astra="calcmed"] body .list button { min-height: 44px; }
+html[data-astra="granae"] body .dash-tabs button { color: var(--a-fg60); }
+html[data-astra="granae"] body .dash-tabs button.on { color: #000 !important; }
+/* LaudAI: a landing e o rodapé vivem fora de .landing em parte; variáveis no body inteiro */
+html[data-astra="laudai"] body {
+  --land-bg: #000; --land-bg-2: var(--a-panel2); --land-surface: var(--a-panel); --land-border: var(--a-fg12);
+  --land-text: #fff; --land-text-dim: var(--a-fg60); --land-text-faint: var(--a-fg60);
+  --land-blue: #fff; --land-blue-2: #fff; --land-blue-soft: var(--a-fg12); --land-grad: #fff; }
+html[data-astra="laudai"] body .land-nav { background: rgba(0,0,0,.72) !important; -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); border-bottom: 1px solid var(--a-fg12) !important; box-shadow: none !important; }
+html[data-astra="laudai"] body .land-brand-text, html[data-astra="laudai"] body .land-footer-wordmark, html[data-astra="laudai"] body .land-hero h1 .grad {
+  background: none !important; -webkit-background-clip: initial !important; background-clip: initial !important; -webkit-text-fill-color: #fff !important; color: #fff !important; }
+html[data-astra="laudai"] body .land-btn { border-radius: 999px; box-shadow: none !important; }
+html[data-astra="laudai"] body .land-btn-secondary { background: var(--a-fg12) !important; color: #fff !important; border-color: transparent !important; }
+html[data-astra="laudai"] body .land-btn-secondary:hover { background: var(--a-fg20) !important; color: #fff !important; }
+html[data-astra="laudai"] body .land-btn-primary:hover { transform: none; }
+html[data-astra="laudai"] body .land-footer-tagline, html[data-astra="laudai"] body .land-footer-disclaimer, html[data-astra="laudai"] body .land-footer-bottom, html[data-astra="laudai"] body .land-footer a { color: var(--a-fg60) !important; }
+
+html[data-astra="plantaohub"] body .logo .mark { background: #fff !important; background-image: none !important; color: #000 !important; }
+html[data-astra="foco"] body .fab, html[data-astra="foco"] body .fab-mic { background: #fff !important; background-image: none !important; color: #000 !important; box-shadow: none !important; }
+html[data-astra="foco"] body .fab svg, html[data-astra="foco"] body .fab-mic svg { color: #000; stroke: currentColor; }
 
 /* ---- Portal ---- */
 html[data-astra="portal"] body .app .ic { box-shadow: none !important; }
