@@ -161,35 +161,53 @@ function injectCSS() {
    só quando logado. Todos os apps carregam este módulo, então fica num lugar só. */
 /* ===== Trocador de funções (shell do super-app) =====
    As "funções" do MedTech: um toque no selo abre a grade e salta de app em app. */
+/* LINHAS DE PRODUTO (decisão do Matheus, 07/09/2026): cada app pertence a uma linha e o trocador,
+   o botão de início e o portal só mostram a própria linha. Público diferente não se mistura —
+   quem estuda para o TECM não vê ambulatório; quem atende não vê prova. Farmácia saiu do
+   ecossistema (os apps seguem no ar para quem já usa, sem trocador); institucional não entra no
+   PWA (vendido por contrato). */
+const LINHAS = {
+  clinica: { nm: 'MedTech Clínica', home: '/app.html' },
+  provas:  { nm: 'MedTech Provas',  home: '/provas.html' }
+};
 const MT_FUNCS = [
-  { id:'agendaai',   nm:'ConsultAI',  ic:'ti-calendar-event', c:'#2B5CE6', url:'/consultai.html' },
-  { id:'condutai',   nm:'CondutAI',   ic:'ti-stethoscope',    c:'#1D6FD0', url:'/condutai.html' },
-  { id:'atbguia',    nm:'ATBguia',    ic:'ti-pill',           c:'#0E8A9C', url:'/atbguia.html' },
-  { id:'enfermaria', nm:'EnfermarIA', ic:'ti-bed',            c:'#3B7BE0', url:'/enfermaria.html' },
-  { id:'pocusai',    nm:'PocusAI',    ic:'ti-scan',           c:'#2456B8', url:'/pocusai.html' },
-  { id:'laudai',     nm:'LaudAI',     ic:'ti-report-medical', c:'#4166D6', url:'/laudai.html' },
-  { id:'paliai',     nm:'PaliAI',     ic:'ti-heart-handshake',c:'#B84A86', url:'/paliai.html' },
-  { id:'calcmed',    nm:'CalcMed',    ic:'ti-calculator',     c:'#4C7A99', url:'/calcmed.html' },
-  { id:'medprovas',  nm:'MedProvas',  ic:'ti-clipboard-text', c:'#C07C0A', url:'/medprovas.html' },
-  { id:'flashmed',   nm:'FlashMed',   ic:'ti-cards',          c:'#D0902A', url:'/flashmed.html' },
-  { id:'guiainterno',nm:'Guia do Interno', ic:'ti-school',    c:'#A8730F', url:'/guiainterno.html' },
-  { id:'foco',       nm:'Foco',       ic:'ti-target-arrow',   c:'#0E8A63', url:'/foco.html' },
-  { id:'plantaohub', nm:'PlantãoHub', ic:'ti-clock',          c:'#15966F', url:'/plantaohub.html' },
-  { id:'granae',     nm:'Granaê',     ic:'ti-wallet',         c:'#6D46D8', url:'/granae.html' },
-  { id:'logbook',    nm:'Logbook',    ic:'ti-notebook',       c:'#B0532F', url:'/logbook.html' },
-  { id:'clinicamed',    nm:'ClínicaMed',    ic:'ti-heartbeat',          c:'#23272E', url:'/clinicamed/' },
-  { id:'trafegotitulo', nm:'TráfegoTítulo', ic:'ti-car',                c:'#23272E', url:'/trafego-titulo/' },
-  { id:'enarefarmacia', nm:'Banca ENARE',   ic:'ti-flask',              c:'#23272E', url:'/quiz-enare-farmacia/' },
-  { id:'clinicar',      nm:'Clinicar',      ic:'ti-calendar-heart',     c:'#23272E', url:'/clinicar/' }
+  { id:'agendaai',   nm:'ConsultAI',  ic:'ti-calendar-event', c:'#2B5CE6', url:'/consultai.html',  linha:'clinica' },
+  { id:'condutai',   nm:'CondutAI',   ic:'ti-stethoscope',    c:'#1D6FD0', url:'/condutai.html',   linha:'clinica' },
+  { id:'atbguia',    nm:'ATBguia',    ic:'ti-pill',           c:'#0E8A9C', url:'/atbguia.html',    linha:'clinica' },
+  { id:'enfermaria', nm:'EnfermarIA', ic:'ti-bed',            c:'#3B7BE0', url:'/enfermaria.html', linha:'clinica' },
+  { id:'pocusai',    nm:'PocusAI',    ic:'ti-scan',           c:'#2456B8', url:'/pocusai.html',    linha:'clinica' },
+  { id:'laudai',     nm:'LaudAI',     ic:'ti-report-medical', c:'#4166D6', url:'/laudai.html',     linha:'clinica' },
+  { id:'paliai',     nm:'PaliAI',     ic:'ti-heart-handshake',c:'#B84A86', url:'/paliai.html',     linha:'clinica' },
+  { id:'calcmed',    nm:'CalcMed',    ic:'ti-calculator',     c:'#4C7A99', url:'/calcmed.html',    linha:'clinica' },
+  { id:'guiainterno',nm:'Guia do Interno', ic:'ti-school',    c:'#A8730F', url:'/guiainterno.html',linha:'clinica' },
+  { id:'foco',       nm:'Foco',       ic:'ti-target-arrow',   c:'#0E8A63', url:'/foco.html',       linha:'clinica' },
+  { id:'plantaohub', nm:'PlantãoHub', ic:'ti-clock',          c:'#15966F', url:'/plantaohub.html', linha:'clinica' },
+  { id:'granae',     nm:'Granaê',     ic:'ti-wallet',         c:'#6D46D8', url:'/granae.html',     linha:'clinica' },
+  { id:'logbook',    nm:'Logbook',    ic:'ti-notebook',       c:'#B0532F', url:'/logbook.html',    linha:'clinica' },
+  { id:'clinicar',   nm:'Clinicar',   ic:'ti-calendar-heart', c:'#23272E', url:'/clinicar/',       linha:'clinica' },
+  { id:'medprovas',  nm:'MedProvas',  ic:'ti-clipboard-text', c:'#C07C0A', url:'/medprovas.html',  linha:'provas' },
+  { id:'flashmed',   nm:'FlashMed',   ic:'ti-cards',          c:'#D0902A', url:'/flashmed.html',   linha:'provas' },
+  { id:'clinicamed',    nm:'ClínicaMed',    ic:'ti-heartbeat', c:'#0B6A72', url:'/clinicamed/',     linha:'provas' },
+  { id:'trafegotitulo', nm:'TráfegoTítulo', ic:'ti-car',       c:'#23272E', url:'/trafego-titulo/', linha:'provas' }
 ];
+/* A linha do app vem do MT_APP.linha; sem ela, do catálogo pelo id; sem nada, clínica. */
+function linhaAtual() {
+  if (APP.linha) return APP.linha;
+  const f = MT_FUNCS.find(x => x.id === APP.id);
+  return f ? f.linha : 'clinica';
+}
 /* O Portal guarda a escolha do usuário em localStorage (mesmo domínio): o trocador mostra só o que
-   ele escolheu — e sempre o app atual. Sem escolha salva, mostra o conjunto clássico. */
-const FUNCS_PADRAO = ['agendaai','condutai','atbguia','enfermaria','pocusai','laudai','paliai','calcmed','medprovas','flashmed','guiainterno','foco','plantaohub','granae','logbook'];
+   ele escolheu — e sempre o app atual — SEMPRE dentro da própria linha. */
+const FUNCS_PADRAO = {
+  clinica: ['agendaai','condutai','atbguia','enfermaria','pocusai','laudai','paliai','calcmed','guiainterno','foco','plantaohub','granae','logbook'],
+  provas:  ['medprovas','flashmed','clinicamed','trafegotitulo']
+};
 function funcsVisiveis() {
+  const linha = linhaAtual();
   let sel = null;
-  try { const c = JSON.parse(localStorage.getItem('mt.portal.apps') || 'null'); if (Array.isArray(c)) sel = c; } catch (e) {}
-  const set = new Set(sel || FUNCS_PADRAO);
-  return MT_FUNCS.filter(f => set.has(f.id) || f.id === APP.id);
+  try { const c = JSON.parse(localStorage.getItem('mt.portal.apps.' + linha) || 'null'); if (Array.isArray(c)) sel = c; } catch (e) {}
+  const set = new Set(sel || FUNCS_PADRAO[linha] || []);
+  return MT_FUNCS.filter(f => f.linha === linha && (set.has(f.id) || f.id === APP.id));
 }
 MT.FUNCS = MT_FUNCS;
 MT.openSwitcher = () => openSwitcher();
@@ -205,19 +223,22 @@ function openSwitcher() {
   const ov = document.createElement('div'); ov.id = 'mt-sw'; ov.className = 'mt-sw';
   const item = f => '<a class="mt-sw-a' + (f.id === APP.id ? ' cur' : '') + '" href="' + f.url + '">' +
     '<span class="k" style="background:' + f.c + '"><i class="ti ' + f.ic + '"></i></span><span class="n">' + f.nm + '</span></a>';
-  ov.innerHTML = '<div class="mt-sw-box"><p class="mt-sw-h">Funções do MedTech</p><div class="mt-sw-g">' +
-    '<a class="mt-sw-a" href="/app.html"><span class="k" style="background:#23272E"><i class="ti ti-home"></i></span><span class="n">Início</span></a>' +
+  const L = LINHAS[linhaAtual()];
+  ov.innerHTML = '<div class="mt-sw-box"><p class="mt-sw-h">' + (L ? L.nm : 'MedTech') + '</p><div class="mt-sw-g">' +
+    (L ? '<a class="mt-sw-a" href="' + L.home + '"><span class="k" style="background:#23272E"><i class="ti ti-home"></i></span><span class="n">Início</span></a>' : '') +
     funcsVisiveis().map(item).join('') + '</div></div>';
   ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
   document.addEventListener('keydown', function esc(e){ if (e.key === 'Escape') { ov.remove(); document.removeEventListener('keydown', esc); } });
   document.body.appendChild(ov);
 }
 function injectHomeButton() {
-  if (APP.id === 'portal') return;
+  if (/^portal/.test(APP.id)) return;            // os portais são o próprio início
+  if (!LINHAS[linhaAtual()]) return;              // farmácia / institucional: sem trocador
   if (document.getElementById('mt-home')) return;
   document.body.classList.add('mt-shell');   // reserva uma faixa no topo p/ o botão não cobrir conteúdo
   const a = document.createElement('a');
-  a.id = 'mt-home'; a.className = 'mt-home'; a.href = '/app.html'; a.title = 'Trocar de função · MedTech';
+  const L = LINHAS[linhaAtual()];
+  a.id = 'mt-home'; a.className = 'mt-home'; a.href = L.home; a.title = 'Trocar de função · ' + L.nm;
   a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/></svg>MedTech';
   a.addEventListener('click', e => { e.preventDefault(); openSwitcher(); });
   document.body.appendChild(a);
@@ -238,7 +259,7 @@ const LOGO = `<span class="mk"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -
 function authMarkup() {
   return `<div class="mt-auth" id="mt-auth"><div class="mt-card">
     <div class="mt-brand">${LOGO}<span>${APP.name.replace(/AI$/,'')}<b>${/AI$/.test(APP.name)?'AI':''}</b></span></div>
-    <div class="mt-sub">Acesse sua conta MedTech · uma conta para todos os apps</div>
+    <div class="mt-sub">Acesse sua conta MedTech</div>
     <form id="mt-login">
       <h2>Entrar</h2>
       <input name="email" type="email" placeholder="E-mail" autocomplete="username" required>
