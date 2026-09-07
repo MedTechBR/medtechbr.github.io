@@ -167,7 +167,7 @@ function injectCSS() {
    ecossistema (os apps seguem no ar para quem já usa, sem trocador); institucional não entra no
    PWA (vendido por contrato). */
 const LINHAS = {
-  clinica: { nm: 'MedTech Clínica', home: '/app.html' },
+  clinica: { nm: 'MedTech App', home: '/app.html' },
   provas:  { nm: 'MedTech Provas',  home: '/provas.html' }
 };
 const MT_FUNCS = [
