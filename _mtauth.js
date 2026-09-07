@@ -98,7 +98,7 @@ const MT = {
       d.style.cssText = 'position:fixed;inset:0;background:rgba(28,32,38,.45);z-index:99990;display:flex;align-items:center;justify-content:center;padding:20px';
       d.innerHTML = '<div style="background:#FFFFFF;border:1px solid #E5E5DF;border-radius:16px;max-width:400px;width:100%;padding:26px;font-family:system-ui,sans-serif;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.45)">' +
         '<div style="font-size:19px;font-weight:800;color:#23272E;margin-bottom:8px;font-family:system-ui,sans-serif">Assine o MedTech</div>' +
-        '<div style="font-size:14px;color:#5E646B;line-height:1.5;margin-bottom:16px">Acesso a todos os apps do ecossistema, com IA incluída.<br>1 app R$ 19,90 · 2 apps R$ 34,90 · tudo R$ 59,90/mês.</div>' +
+        '<div style="font-size:14px;color:#5E646B;line-height:1.5;margin-bottom:16px">Acesso a todos os apps do ecossistema, com IA incluída.<br>1 app R$ 29,90 · 2 apps R$ 49,90 · tudo R$ 89,90/mês.</div>' +
         '<a href="' + url + '" target="_blank" rel="noopener" style="display:block;background:#2B5CE6;color:#fff;border-radius:10px;padding:13px;font-weight:700;text-decoration:none;box-shadow:0 8px 22px rgba(43,92,230,.25)">Assinar agora</a>' +
         '<button onclick="document.getElementById(\'mt-paywall\').remove()" style="margin-top:10px;background:none;border:none;color:#5E646B;font-size:13px;cursor:pointer">Agora não</button></div>';
       document.body.appendChild(d);
