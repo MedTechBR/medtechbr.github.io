@@ -36,6 +36,18 @@ header.solid{background:rgba(0,0,0,.72);-webkit-backdrop-filter:blur(18px);backd
 .pnav a{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;font-size:14px;font-weight:500;color:var(--fg60);transition:color .2s,background-color .2s;white-space:nowrap}
 .pnav a i{font-size:18px;line-height:1}
 .pnav a:hover,.pnav a.on{color:var(--fg);background:var(--fg6)}
+/* menus suspensos por linha */
+.pn{position:relative}
+.pn::after{content:"";position:absolute;left:0;right:0;top:100%;height:14px}
+.pn .menu{position:absolute;left:0;top:calc(100% + 10px);min-width:250px;padding:8px;background:#0F0F0F;border:1px solid var(--fg12);border-radius:14px;opacity:0;transform:translateY(6px);pointer-events:none;transition:opacity .18s,transform .22s var(--ease);z-index:60}
+.pn .menu.cols{min-width:470px;display:grid;grid-template-columns:1fr 1fr;gap:0 6px}
+.pn .menu.cols a:first-child{grid-column:1/-1}
+.pn:hover .menu,.pn:focus-within .menu{opacity:1;transform:none;pointer-events:auto}
+.pnav .menu a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;font-size:13.5px;color:var(--fg);white-space:nowrap}
+.pnav .menu a:first-child{color:var(--fg60);border-bottom:1px solid var(--fg12);border-radius:9px 9px 0 0;margin-bottom:4px}
+.pnav .menu a:hover{background:var(--fg6);color:var(--fg)}
+.pnav .menu a i{font-size:17px;color:var(--fg60)}
+.pnav .menu a:hover i{color:var(--fg)}
 .acts{display:flex;align-items:center;gap:8px}
 .pill{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 18px;border-radius:40px;font-size:14px;font-weight:500;line-height:1;white-space:nowrap;transition:background-color .2s,color .2s,transform .2s var(--ease);cursor:pointer;border:0}
 .pill.ghost{background:var(--fg12);color:var(--fg)}
@@ -212,6 +224,12 @@ footer{border-top:1px solid var(--fg12);padding:48px 0 40px;font-size:13px;color
 .desk+.cap,.shots+.cap{font-size:13px;color:var(--fg60);margin-top:12px}
 @media(max-width:560px){.phone{width:216px}.shots{gap:14px}}
 
+.mosaic{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:36px}
+.mosaic figure{margin:0}
+.mosaic img{display:block;width:100%;height:auto;aspect-ratio:16/10;border-radius:12px;border:1px solid var(--fg12);background:#050505;object-fit:cover;object-position:top}
+.mosaic figcaption{font-size:13px;color:var(--fg60);margin-top:8px;line-height:1.45}
+@media(max-width:760px){.mosaic{grid-template-columns:1fr}}
+
 /* reveal */
 .rv{opacity:0;transform:translateY(18px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
 .rv.in{opacity:1;transform:none}
@@ -223,11 +241,13 @@ footer{border-top:1px solid var(--fg12);padding:48px 0 40px;font-size:13px;color
 <header id="hdr"><div class="wrap top">
   <a class="wm" href="#">MedTech</a>
   <nav class="pnav" id="pnav" aria-label="Produtos">
-    <a href="#app"><i class="ti ti-apps"></i>MedTech App</a>
-    <a href="#provas"><i class="ti ti-school"></i>MedTech Provas</a>
-    <a href="#institucional"><i class="ti ti-building-hospital"></i>MedTech Institucional</a>
+    <div class="pn"><a href="#app"><i class="ti ti-apps"></i>MedTech App</a><div class="menu cols"><a href="app.html"><i class="ti ti-apps"></i>Abrir o portal</a><a href="enfermaria.html"><i class="ti ti-bed"></i>EnfermarIA</a><a href="condutai.html"><i class="ti ti-stethoscope"></i>CondutAI</a><a href="atbguia.html"><i class="ti ti-pill"></i>ATBguia</a><a href="calcmed.html"><i class="ti ti-calculator"></i>CalcMed</a><a href="paliai.html"><i class="ti ti-heart-handshake"></i>PaliAI</a><a href="guiainterno.html"><i class="ti ti-school"></i>Guia do Interno</a><a href="pocusai.html"><i class="ti ti-scan"></i>PocusAI</a><a href="laudai.html"><i class="ti ti-report-medical"></i>LaudAI</a><a href="foco.html"><i class="ti ti-target-arrow"></i>Foco</a><a href="plantaohub.html"><i class="ti ti-clock"></i>PlantãoHub</a><a href="granae.html"><i class="ti ti-wallet"></i>Granaê</a><a href="logbook.html"><i class="ti ti-notebook"></i>Logbook</a></div></div>
+    <div class="pn"><a href="#provas"><i class="ti ti-school"></i>MedTech Provas</a><div class="menu"><a href="provas.html"><i class="ti ti-school"></i>Abrir o portal Provas</a><a href="clinicamed/"><i class="ti ti-heartbeat"></i>ClínicaMed</a><a href="trafego-titulo/"><i class="ti ti-car"></i>TráfegoTítulo</a><a href="flashmed.html"><i class="ti ti-cards"></i>FlashMed</a><a href="medprovas.html"><i class="ti ti-clipboard-text"></i>MedProvas</a><a href="mailto:medtechbr1@gmail.com?subject=Plataforma%20de%20treinamento%20para%20provas"><i class="ti ti-mail"></i>Plataforma para a sua prova</a></div></div>
+    <div class="pn"><a href="#institucional"><i class="ti ti-building-hospital"></i>MedTech Institucional</a><div class="menu"><a href="clinicar/"><i class="ti ti-calendar-heart"></i>Clinicar — clínicas e consultórios</a><a href="#hospitalar"><i class="ti ti-building-hospital"></i>Sistema Hospitalar (HospSys)</a><a href="#faturamento"><i class="ti ti-zoom-money"></i>Auditoria e Treinamento de Faturamento</a><a href="#casos"><i class="ti ti-user-heart"></i>Casos Clínicos Interativos</a><a href="#capacita"><i class="ti ti-certificate-2"></i>Treinamentos hospitalares (Capacita)</a><a href="#internato"><i class="ti ti-school"></i>InternaMed — gestão do internato</a><a href="#internato"><i class="ti ti-stethoscope"></i>MedRes — gestão da residência</a><a href="#sobmedida"><i class="ti ti-code"></i>Desenvolvimento sob medida</a></div></div>
+    <a href="#planos" class="top"><i class="ti ti-receipt"></i>Planos</a>
   </nav>
   <div class="acts">
+    <a class="pill ghost" href="#planos">Planos e pagamento</a>
     <a class="pill ghost" href="app.html">Entrar</a>
     <a class="pill solid" href="app.html">Começar grátis</a>
   </div>
@@ -236,6 +256,7 @@ footer{border-top:1px solid var(--fg12);padding:48px 0 40px;font-size:13px;color
   <a href="#app"><i class="ti ti-apps"></i>MedTech App</a>
   <a href="#provas"><i class="ti ti-school"></i>MedTech Provas</a>
   <a href="#institucional"><i class="ti ti-building-hospital"></i>MedTech Institucional</a>
+  <a href="#planos"><i class="ti ti-receipt"></i>Planos</a>
 </nav></div>
 
 <main>
@@ -318,7 +339,6 @@ footer{border-top:1px solid var(--fg12);padding:48px 0 40px;font-size:13px;color
       <figure class="phone"><div class="scr"><img src="img/vitrine/trafego-390.webp" width="780" height="1688" loading="lazy" decoding="async" alt="TráfegoTítulo no celular"></div><b>TráfegoTítulo</b><span>Título de Medicina do Tráfego, no formato da prova</span></figure>
       <figure class="phone"><div class="scr"><img src="img/vitrine/flashmed-390.webp" width="780" height="1688" loading="lazy" decoding="async" alt="FlashMed no celular"></div><b>FlashMed</b><span>Questões e simulados de residência</span></figure>
       <figure class="phone"><div class="scr"><img src="img/vitrine/medprovas-390.webp" width="780" height="1688" loading="lazy" decoding="async" alt="MedProvas no celular"></div><b>MedProvas</b><span>O professor elabora e corrige provas com IA</span></figure>
-      <figure class="phone"><div class="scr"><img src="img/vitrine/enare-390.webp" width="780" height="1688" loading="lazy" decoding="async" alt="Banca ENARE no celular"></div><b>Banca ENARE</b><span>Farmácia multiprofissional, tema a tema do edital</span></figure>
     </div>
     <div class="desk rv"><img src="img/vitrine/clinicamed-1440.webp" width="1600" height="1000" loading="lazy" decoding="async" alt="ClínicaMed no computador: questão com filtros por área e cenário"></div>
     <div class="nums rv">
@@ -336,8 +356,8 @@ footer{border-top:1px solid var(--fg12);padding:48px 0 40px;font-size:13px;color
     <div class="rv">
       <div class="eyebrow"><i class="ti ti-building-hospital"></i>MedTech Institucional</div>
       <h2>Para hospitais, faculdades e serviços: sistemas e programas contratados pela instituição.</h2>
-      <p class="p">Cinco frentes, contratadas pela instituição: o <b>Clinicar</b> para clínicas e consultórios, o sistema hospitalar HospSys, auditoria e treinamento de faturamento, casos clínicos interativos para o ensino e desenvolvimento sob medida. Nenhuma delas entra nos portais do médico ou do estudante.</p>
-      <div class="row"><a class="pill line" href="/clinicar/">Clinicar</a><a class="pill line" href="#hospitalar">Sistema Hospitalar</a><a class="pill line" href="#faturamento">Faturamento</a><a class="pill line" href="#casos">Casos Clínicos</a><a class="pill line" href="#sobmedida">Sob medida</a><a class="pill solid" href="mailto:medtechbr1@gmail.com?subject=MedTech%20Institucional">Falar com a MedTech</a></div>
+      <p class="p">Contratadas pela instituição: o <b>Clinicar</b> para clínicas e consultórios, o sistema hospitalar HospSys, auditoria e treinamento de faturamento, casos clínicos interativos, a plataforma de treinamentos hospitalares, a <b>gestão do internato e da residência</b> e desenvolvimento sob medida. Nenhuma delas entra nos portais do médico ou do estudante.</p>
+      <div class="row"><a class="pill line" href="/clinicar/">Clinicar</a><a class="pill line" href="#hospitalar">Sistema Hospitalar</a><a class="pill line" href="#faturamento">Faturamento</a><a class="pill line" href="#casos">Casos Clínicos</a><a class="pill line" href="#capacita">Treinamentos hospitalares</a><a class="pill line" href="#internato">Internato e residência</a><a class="pill line" href="#sobmedida">Sob medida</a><a class="pill solid" href="mailto:medtechbr1@gmail.com?subject=MedTech%20Institucional">Falar com a MedTech</a></div>
     </div>
   </div></section>
 
@@ -418,10 +438,62 @@ footer{border-top:1px solid var(--fg12);padding:48px 0 40px;font-size:13px;color
     <p class="p rv"><b>Já no ar:</b> a biblioteca de casos ilustrados da MedTech — como <i>O sangue que não saiu</i>, um caso de pulmão-rim conduzido em 49 etapas, com perguntas de múltipla escolha e devolutiva a cada decisão.</p>
     <div class="row rv"><a class="pill solid" href="casos-clinicos/">Conduzir um caso agora</a><a class="pill ghost" href="mailto:medtechbr1@gmail.com?subject=Casos%20Cl%C3%ADnicos%20Interativos%20para%20institui%C3%A7%C3%B5es">Casos para a minha instituição</a></div>
     <div class="fine rv">Para estudantes, residentes, instituições de ensino e serviços. Ferramenta de apoio ao ensino; não substitui a supervisão clínica.</div>
-  </div>    <div class="desk rv"><img src="img/vitrine/casos-1440.webp" width="1600" height="1000" loading="lazy" decoding="async" alt="Casos Clínicos Interativos: biblioteca de casos para o ensino"></div>
+  </div>    <div class="mosaic rv">
+      <figure><img src="img/vitrine/casos-lib.webp" width="1200" height="750" loading="lazy" decoding="async" alt="Biblioteca de casos clínicos"><figcaption>A biblioteca: cada caso é uma sessão pronta para conduzir em aula.</figcaption></figure>
+      <figure><img src="img/vitrine/casos-hda.webp" width="1200" height="750" loading="lazy" decoding="async" alt="Slide da história da doença atual, com ilustração do paciente"><figcaption>A história avança em blocos — HDA, exame físico, exames — e o grupo discute a cada um.</figcaption></figure>
+      <figure><img src="img/vitrine/casos-pergunta.webp" width="1200" height="750" loading="lazy" decoding="async" alt="Slide de pergunta ao grupo com oito alternativas"><figcaption>Antes de revelar, a pergunta: o aluno marca e recebe o comentário de cada alternativa.</figcaption></figure>
+      <figure><img src="img/vitrine/casos-decisao.webp" width="1200" height="750" loading="lazy" decoding="async" alt="Slide de decisão com três condutas possíveis"><figcaption>Nas decisões, o caso se ramifica: a conduta escolhida muda o que vem depois.</figcaption></figure>
+    </div>
   </section>
 
   <!-- ===== Sob medida ===== -->
+  <!-- ===== Internato e residência (InternaMed · MedRes) ===== -->
+  <section class="chap sub" id="internato"><div class="wrap">
+    <div class="rv">
+      <div class="eyebrow"><i class="ti ti-users-group"></i>MedTech Institucional · Gestão do internato e da residência</div>
+      <h2>Escalas, rodízios, termos e avaliações do ensino em serviço — num sistema só.</h2>
+      <p class="p">Dois sistemas para quem coordena formação médica dentro do hospital ou da faculdade: o <b>InternaMed</b>, para o internato, e o <b>MedRes</b>, para as residências. Cada um com os papéis de quem coordena, quem supervisiona e quem está em formação.</p>
+    </div>
+    <div class="cols rv">
+      <div class="col"><span class="tag">Internato</span><h3><i class="ti ti-school"></i>InternaMed</h3>
+        <ul>
+          <li>Escalas e rodízios por período, turma e grupo — com metades, remanejamentos individuais e rodízios externos/eletivos</li>
+          <li>Termos de compromisso gerados por serviço e assinados digitalmente: o aluno assina, a coordenação assina com certificado ICP-Brasil e o termo vai para a concedente</li>
+          <li>Notas, faltas e regras do curso aplicadas automaticamente; relatório mensal por serviço e local</li>
+          <li>Painel da coordenação com trilha de ações, coordenação adjunta e backup diário</li>
+        </ul>
+      </div>
+      <div class="col"><span class="tag">Residência</span><h3><i class="ti ti-stethoscope"></i>MedRes</h3>
+        <ul>
+          <li>Escalas e rodízios por hospital e programa, com cronograma filtrável</li>
+          <li>Papéis de residente, preceptor e coordenação, cada um vendo só o que lhe cabe</li>
+          <li>Funciona no celular como app instalável e segue operando sem rede</li>
+          <li>Nasceu de um projeto de mestrado, com piloto hospitalar</li>
+        </ul>
+      </div>
+    </div>
+    <div class="row rv"><a class="pill solid" href="mailto:medtechbr1@gmail.com?subject=InternaMed%20%E2%80%94%20gest%C3%A3o%20do%20internato">Conversar sobre o InternaMed</a><a class="pill ghost" href="https://medres-app.web.app" target="_blank" rel="noopener">Ver o MedRes</a></div>
+  </div></section>
+
+  <!-- ===== Treinamentos hospitalares (Capacita) ===== -->
+  <section class="chap sub" id="capacita"><div class="wrap">
+    <div class="rv">
+      <div class="eyebrow"><i class="ti ti-certificate-2"></i>MedTech Institucional · Treinamentos hospitalares (Capacita)</div>
+      <h2>Treinamento assistencial que a equipe faz no celular, em minutos — e a instituição acompanha.</h2>
+      <p class="p">Plataforma de capacitação para hospitais e serviços. Cada treinamento nasce da <b>prova primeiro</b> — o que a equipe precisa saber fazer — e o conteúdo chega em formatos curtos, para caber no plantão. Entrada por CPF, sem senha para decorar.</p>
+    </div>
+    <div class="feats rv">
+      <div class="feat"><i class="ti ti-cards"></i><div><b>Cartões</b><span>Conceito e conduta em blocos de 1 minuto, com repetição espaçada.</span></div></div>
+      <div class="feat"><i class="ti ti-user-heart"></i><div><b>Caso clínico</b><span>Uma situação real do setor, decisão por decisão.</span></div></div>
+      <div class="feat"><i class="ti ti-search"></i><div><b>Caça-erro</b><span>Uma prescrição, uma evolução ou um checklist com o erro escondido.</span></div></div>
+      <div class="feat"><i class="ti ti-pill"></i><div><b>Pílula</b><span>Um protocolo novo ou uma mudança de rotina em uma tela.</span></div></div>
+      <div class="feat"><i class="ti ti-users"></i><div><b>Presencial</b><span>Registro de presença e avaliação das capacitações em sala.</span></div></div>
+      <div class="feat"><i class="ti ti-clipboard-check"></i><div><b>Prova primeiro</b><span>A avaliação define o conteúdo — e mostra quem já domina e quem precisa reforçar.</span></div></div>
+    </div>
+    <div class="row rv"><a class="pill solid" href="mailto:medtechbr1@gmail.com?subject=Capacita%20%E2%80%94%20treinamentos%20hospitalares">Conversar sobre treinamentos</a></div>
+    <div class="fine rv">Implantado por instituição, com os treinamentos montados junto com a coordenação de cada setor.</div>
+  </div></section>
+
   <section class="chap sub" id="sobmedida"><div class="wrap">
     <div class="rv">
       <div class="eyebrow"><i class="ti ti-code"></i>MedTech Institucional · Desenvolvimento sob medida</div>
@@ -466,7 +538,7 @@ footer{border-top:1px solid var(--fg12);padding:48px 0 40px;font-size:13px;color
 <footer><div class="wrap">
   <div class="fgrid">
     <div><b>MedTech</b><span style="display:block;max-width:260px;line-height:1.5">Ecossistema de ferramentas médicas com IA. Feito no Brasil, por médico.</span></div>
-    <div><b>Produtos</b><a href="#app">MedTech App</a><a href="#provas">MedTech Provas</a><a href="#institucional">MedTech Institucional</a><a class="sub" href="/clinicar/">Clinicar — clínicas e consultórios</a><a class="sub" href="#hospitalar">Sistema Hospitalar</a><a class="sub" href="#faturamento">Auditoria e Treinamento de Faturamento</a><a class="sub" href="#casos">Casos Clínicos Interativos</a><a class="sub" href="#sobmedida">Sob medida</a></div>
+    <div><b>Produtos</b><a href="#app">MedTech App</a><a href="#provas">MedTech Provas</a><a href="#institucional">MedTech Institucional</a><a class="sub" href="/clinicar/">Clinicar — clínicas e consultórios</a><a class="sub" href="#hospitalar">Sistema Hospitalar</a><a class="sub" href="#faturamento">Auditoria e Treinamento de Faturamento</a><a class="sub" href="#casos">Casos Clínicos Interativos</a><a class="sub" href="#capacita">Treinamentos hospitalares</a><a class="sub" href="#internato">InternaMed e MedRes — internato e residência</a><a class="sub" href="#sobmedida">Sob medida</a></div>
     <div><b>Conta</b><a href="app.html">Entrar</a><a href="app.html">Criar conta</a><a href="#planos">Planos</a></div>
     <div><b>Contato</b><a href="mailto:medtechbr1@gmail.com">medtechbr1@gmail.com</a><a href="https://instagram.com/med.tech.br" target="_blank" rel="noopener">Instagram</a><a href="privacidade.html">Privacidade</a><a href="termos.html">Termos</a></div>
   </div>
@@ -520,9 +592,9 @@ renderBench('Conteúdo clínico');
 const hdr=document.getElementById('hdr'),pbw=document.getElementById('pbarw');
 function onScroll(){const y=scrollY;hdr.classList.toggle('solid',y>40);pbw.classList.toggle('show',y>innerHeight*0.6)}
 addEventListener('scroll',onScroll,{passive:true});onScroll();
-const ids=['app','provas','institucional','hospitalar','faturamento','casos','sobmedida'];
-const INST=new Set(['hospitalar','faturamento','casos','sobmedida']);
-const navLinks=[...document.querySelectorAll('#pnav a,#pbar a')];
+const ids=['app','provas','institucional','hospitalar','faturamento','casos','capacita','internato','sobmedida','planos'];
+const INST=new Set(['hospitalar','faturamento','casos','capacita','internato','sobmedida']);
+const navLinks=[...document.querySelectorAll('#pnav .pn > a,#pnav > a,#pbar a')];
 const spy=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const alvo=INST.has(e.target.id)?'institucional':e.target.id;navLinks.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+alvo))}})},{rootMargin:'-40% 0px -55% 0px'});
 ids.forEach(id=>{const el=document.getElementById(id);if(el)spy.observe(el)});
 
