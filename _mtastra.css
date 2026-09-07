@@ -1,0 +1,312 @@
+/* ============================================================
+   _mtastra.css — tema "Astra" do ecossistema MedTech
+   Preto puro, Inter, hierarquia por alpha de branco (60/40/20/12/6),
+   pílulas, fios de 12%, painéis a 6%, zero sombra. Mesmo vocabulário
+   da landing (index.html).
+
+   COMO ENTRA NUM APP (3 linhas, nada mais):
+     <html lang="pt-BR" data-astra="<id do app>">
+     Inter no lugar da Figtree (400;500;600 — o 600 é o peso máximo:
+       todo 700/800 dos apps cai para 600 sem sintetizar negrito)
+     <link rel="stylesheet" href="_mtastra.css?v=N">  ← ÚLTIMO css do <head>
+
+   Por que é um arquivo só: os 16 apps nomeiam as cores de 16 jeitos
+   (--petrol, --primary, --teal, --ink, --txt…). Aqui cada alias é
+   remapeado uma vez; o que sobra são os pontos em que o app crava a cor
+   primária como FUNDO com texto branco por cima (a primária virou branco,
+   então o texto vira preto) — esses ficam por app, no fim, sob
+   html[data-astra="<id>"].
+
+   Tudo dentro de @media screen: impressão continua em papel branco.
+   Contraste: texto secundário em 60% de branco = 5,9:1 sobre preto (AA).
+   ============================================================ */
+@media screen {
+
+html[data-astra] { color-scheme: dark; }
+
+html[data-astra], html[data-astra][data-theme], html[data-astra] [data-theme] {
+  /* ---- paleta Astra (canônica) ---- */
+  --a-bg: #000; --a-fg: #fff;
+  --a-fg60: rgba(255,255,255,.6); --a-fg40: rgba(255,255,255,.4);
+  --a-fg20: rgba(255,255,255,.2); --a-fg12: rgba(255,255,255,.12); --a-fg6: rgba(255,255,255,.06);
+  --a-panel: #0F0F0F;   /* = 6% de branco sobre preto, opaco (modal, sticky) */
+  --a-panel2: #1F1F1F;  /* = 12% */
+  --a-panel3: #2A2A2A;
+  --a-ease: cubic-bezier(.16,1,.3,1);
+  /* semânticos: claros o bastante para AA sobre preto E sobre o próprio tint */
+  --a-ok: #4ADE80; --a-ok-bg: rgba(74,222,128,.14); --a-ok-btn: #1F7A45;
+  --a-warn: #FBBF24; --a-warn-bg: rgba(251,191,36,.14);
+  --a-danger: #F87171; --a-danger-bg: rgba(248,113,113,.14);
+  --a-violet: #C4B5FD; --a-violet-bg: rgba(196,181,253,.14); --a-violet-btn: #6D5BD0;
+
+  /* ---- remapeamento dos aliases legados (todos os apps) ---- */
+  /* fundos de página */
+  --bg: var(--a-bg); --paper: var(--a-bg); --mt-bg: var(--a-bg);
+  /* superfícies (card, box, modal) */
+  --surface: var(--a-panel); --card: var(--a-panel); --bg-card: var(--a-panel); --mt-surface: var(--a-panel);
+  /* painel secundário (input, faixa, tint) */
+  --panel2: var(--a-panel2); --bg-soft: var(--a-panel2); --surface2: var(--a-panel2); --surface-2: var(--a-panel2);
+  --bg-2: var(--a-panel2); --mt-surface-2: var(--a-panel2); --bg-3: var(--a-panel3);
+  /* texto */
+  --ink: var(--a-fg); --text: var(--a-fg); --txt: var(--a-fg); --mt-text: var(--a-fg);
+  --muted: var(--a-fg60); --text-soft: var(--a-fg60); --ink-soft: var(--a-fg60); --mt-text-dim: var(--a-fg60);
+  --dim: var(--a-fg60); --text-mute: var(--a-fg60); --mt-text-faint: var(--a-fg60);
+  /* fios */
+  --line: var(--a-fg12); --border: var(--a-fg12); --mt-line: var(--a-fg12);
+  --line-strong: var(--a-fg20); --border-strong: var(--a-fg20); --mt-line-strong: var(--a-fg20);
+  --primary-border: var(--a-fg20);
+  /* primária / acento → branco (a Astra não tem cor de marca) */
+  --petrol: var(--a-fg); --petrol-dark: var(--a-fg); --petrol-btn: var(--a-fg); --petrol-d: var(--a-fg);
+  --mint: var(--a-fg); --mint-dark: var(--a-fg); --mint-d: var(--a-fg);
+  --primary: var(--a-fg); --primary-dark: var(--a-fg); --primary-hover: var(--a-fg60);
+  --accent: var(--a-fg); --accent2: var(--a-fg); --teal: var(--a-fg); --teal-deep: var(--a-fg); --teal-btn: var(--a-fg);
+  --blue: var(--a-fg); --info: var(--a-fg);
+  --mt-brand: var(--a-fg); --mt-brand-strong: var(--a-fg); --mt-accent: var(--a-fg);
+  --mt-brand-grad: var(--a-fg);
+  --on-mint: #000;
+  /* tints da primária */
+  --soft: var(--a-fg12); --primary-soft: var(--a-fg12); --primary-soft-2: var(--a-panel2); --teal-tint: var(--a-fg12);
+  --blue-bg: var(--a-fg12); --info-soft: var(--a-fg12); --accent-soft: var(--a-fg12);
+  /* semânticos */
+  --green: var(--a-ok); --ok: var(--a-ok); --success: var(--a-ok); --right: var(--a-ok); --mt-ok: var(--a-ok);
+  --success-btn: var(--a-ok-btn);
+  --green-bg: var(--a-ok-bg); --success-soft: var(--a-ok-bg); --right-bg: var(--a-ok-bg);
+  --amber: var(--a-warn); --warn: var(--a-warn); --caso: var(--a-warn); --caso-dark: #FCD34D; --mt-warn: var(--a-warn);
+  --amber-bg: var(--a-warn-bg); --warn-soft: var(--a-warn-bg); --caso-soft: var(--a-warn-bg);
+  --red: var(--a-danger); --danger: var(--a-danger); --wrong: var(--a-danger); --mt-danger: var(--a-danger);
+  --red-bg: var(--a-danger-bg); --wrong-bg: var(--a-danger-bg);
+  --violet: var(--a-violet); --purple: var(--a-violet); --violet-btn: var(--a-violet-btn);
+  --violet-bg: var(--a-violet-bg); --purple-soft: var(--a-violet-bg);
+  /* sombra e brilho: não existem na Astra */
+  --shadow: none; --shadow-lg: none; --mt-shadow: none;
+  --glow: transparent; --glow-bg: transparent; --mt-glow: transparent;
+  --mt-overlay: rgba(0,0,0,.72);
+  --mt-ring: 0 0 0 2px rgba(255,255,255,.6);
+  /* tipografia */
+  --disp: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mt-font-display: var(--disp); --mt-font-text: var(--disp);
+}
+
+/* ---------- base ---------- */
+html[data-astra], html[data-astra] body {
+  background: var(--a-bg) !important;
+  background-image: none !important;
+  color: var(--a-fg);
+}
+html[data-astra] body {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  box-shadow: none;
+}
+html[data-astra] body ::selection { background: var(--a-fg); color: #000; }
+html[data-astra] body h1, html[data-astra] body h2, html[data-astra] body h3, html[data-astra] body h4 {
+  font-weight: 500; letter-spacing: -.02em; color: var(--a-fg);
+}
+html[data-astra] body a { color: var(--a-fg); }
+html[data-astra] body hr { border-color: var(--a-fg12); }
+html[data-astra] body :where(a,button,[role=button],input,select,textarea,summary,[tabindex]):focus-visible {
+  outline: 2px solid var(--a-fg60); outline-offset: 3px; box-shadow: none;
+}
+html[data-astra] body ::-webkit-scrollbar { width: 10px; height: 10px; }
+html[data-astra] body ::-webkit-scrollbar-thumb { background: var(--a-fg20); border-radius: 999px; border: 2px solid #000; }
+html[data-astra] body ::-webkit-scrollbar-track { background: transparent; }
+
+/* ---------- cabeçalho: preto com blur, fio embaixo, sem sombra ---------- */
+html[data-astra] body header, html[data-astra] body .topbar, html[data-astra] body .header {
+  background: rgba(0,0,0,.72) !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--a-fg12) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: var(--a-fg);
+}
+
+/* ---------- campos ---------- */
+html[data-astra] body input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),
+html[data-astra] body select,
+html[data-astra] body textarea {
+  background: var(--a-panel) !important;
+  color: var(--a-fg) !important;
+  border: 1px solid var(--a-fg20) !important;
+  border-radius: 12px;
+  box-shadow: none !important;
+  font-family: inherit;
+}
+html[data-astra] body input::placeholder, html[data-astra] body textarea::placeholder { color: var(--a-fg40); }
+html[data-astra] body input:focus, html[data-astra] body select:focus, html[data-astra] body textarea:focus {
+  border-color: var(--a-fg60) !important; outline: none; box-shadow: none !important;
+}
+html[data-astra] body input:-webkit-autofill, html[data-astra] body input:-webkit-autofill:focus,
+html[data-astra] body textarea:-webkit-autofill, html[data-astra] body select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 100px var(--a-panel) inset !important;
+  -webkit-text-fill-color: var(--a-fg) !important; caret-color: var(--a-fg);
+}
+html[data-astra] body input[type=checkbox], html[data-astra] body input[type=radio] { accent-color: #fff; }
+
+/* ---------- botões viram pílulas; sombras somem ---------- */
+html[data-astra] body button, html[data-astra] body .btn, html[data-astra] body a.btn, html[data-astra] body [role=button] {
+  font-family: inherit; box-shadow: none !important; text-shadow: none;
+  transition: background-color .2s, color .2s, border-color .2s, transform .2s var(--a-ease);
+}
+html[data-astra] body .btn, html[data-astra] body a.btn, html[data-astra] body button.btn,
+html[data-astra] body [class*="btn-"], html[data-astra] body [class$="-btn"] {
+  border-radius: 999px;
+}
+html[data-astra] body .btn:active, html[data-astra] body button:active { transform: scale(.98); }
+html[data-astra] body button:disabled, html[data-astra] body .btn:disabled { opacity: .45; }
+
+/* ---------- superfícies: fio de 12%, sem sombra ---------- */
+html[data-astra] body [class*="card"], html[data-astra] body .box, html[data-astra] body .panel,
+html[data-astra] body .kpi, html[data-astra] body .empty, html[data-astra] body .note,
+html[data-astra] body .sheet, html[data-astra] body .toast, html[data-astra] body .tabs {
+  box-shadow: none !important;
+  background-image: none;
+}
+html[data-astra] body .chip, html[data-astra] body .badge, html[data-astra] body .tag, html[data-astra] body .pill {
+  box-shadow: none !important; border-radius: 999px;
+}
+
+/* ---------- modais: fundo escurecido, caixa opaca com fio ---------- */
+html[data-astra] body .modal, html[data-astra] body .modal-backdrop, html[data-astra] body .sug-modal, html[data-astra] body .sheet-bg {
+  background: rgba(0,0,0,.72) !important;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+html[data-astra] body .modal .box, html[data-astra] body .modal-backdrop .modal, html[data-astra] body .sug-box,
+html[data-astra] body .mt-sw-box {
+  background: var(--a-panel) !important;
+  border: 1px solid var(--a-fg12);
+  box-shadow: none !important;
+  color: var(--a-fg);
+}
+
+/* ---------- tabelas ---------- */
+html[data-astra] body table { border-color: var(--a-fg12); }
+html[data-astra] body th, html[data-astra] body td { border-color: var(--a-fg12) !important; }
+html[data-astra] body th { color: var(--a-fg60); font-weight: 500; }
+html[data-astra] body tr:nth-child(even) td { background: transparent; }
+
+/* ---------- avisos ---------- */
+html[data-astra] body .toast { background: #fff !important; color: #000 !important; border: 0; }
+html[data-astra] body .toast.erro, html[data-astra] body .toast.error, html[data-astra] body .toast.err { background: var(--a-danger) !important; color: #000 !important; }
+html[data-astra] body .toast.ok, html[data-astra] body .toast.success { background: var(--a-ok) !important; color: #000 !important; }
+
+/* ---------- rodapé ---------- */
+html[data-astra] body footer { color: var(--a-fg60); border-top: 1px solid var(--a-fg12); }
+html[data-astra] body footer a { color: var(--a-fg60); font-weight: 500; }
+html[data-astra] body footer a:hover { color: var(--a-fg); }
+
+/* ============================================================
+   MÓDULO COMPARTILHADO (_mtauth.js) — login, splash, trocador, botão
+   "voltar ao MedTech", barra de demonstração. Só nos apps Astra.
+   ============================================================ */
+html[data-astra] .mt-auth { background: #000; font-family: 'Inter', system-ui, sans-serif; }
+html[data-astra] .mt-card { background: var(--a-panel); border: 1px solid var(--a-fg12); box-shadow: none; border-radius: 20px; }
+html[data-astra] .mt-brand { color: #fff; font-family: 'Inter', system-ui, sans-serif; font-weight: 600; letter-spacing: -.02em; }
+html[data-astra] .mt-brand .mk { background: var(--a-fg12); }
+html[data-astra] .mt-brand b { color: #fff; font-weight: 600; }
+html[data-astra] .mt-sub, html[data-astra] .mt-consent { color: var(--a-fg60); }
+html[data-astra] .mt-auth h2 { color: #fff; font-family: 'Inter', system-ui, sans-serif; font-weight: 500; letter-spacing: -.02em; }
+html[data-astra] .mt-auth input { background: var(--a-panel2); color: #fff; border: 1px solid var(--a-fg20); border-radius: 12px; }
+html[data-astra] .mt-auth input:focus { border-color: var(--a-fg60); box-shadow: none; }
+html[data-astra] .mt-auth input:-webkit-autofill, html[data-astra] .mt-auth input:-webkit-autofill:hover, html[data-astra] .mt-auth input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 100px var(--a-panel2) inset; -webkit-text-fill-color: #fff; caret-color: #fff;
+}
+html[data-astra] .mt-auth .mt-btn { background: #fff; color: #000; border-radius: 999px; box-shadow: none; font-weight: 500; }
+html[data-astra] .mt-auth .mt-btn:hover { filter: none; background: #e6e6e6; }
+html[data-astra] .mt-auth .mt-link { color: #fff; font-weight: 500; }
+html[data-astra] .mt-consent a { color: #fff; font-weight: 500; }
+html[data-astra] .mt-err { color: var(--a-danger); }
+html[data-astra] .mt-demobar { background: var(--a-panel); color: var(--a-fg60); border-top: 1px solid var(--a-fg12); }
+html[data-astra] .mt-demobar b { color: #fff; }
+html[data-astra] .mt-demobar button { background: #fff; color: #000; border-radius: 999px; font-weight: 500; }
+html[data-astra] .mt-home { background: var(--a-fg12); color: #fff; box-shadow: inset 0 0 0 1px var(--a-fg20); font-family: 'Inter', system-ui, sans-serif; font-weight: 500; opacity: .9; }
+html[data-astra] .mt-sw { background: rgba(0,0,0,.72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+html[data-astra] .mt-sw-box { background: var(--a-panel); border: 1px solid var(--a-fg12); box-shadow: none; }
+html[data-astra] .mt-sw-h { color: var(--a-fg60); font-family: 'Inter', system-ui, sans-serif; }
+html[data-astra] .mt-sw-a { color: #fff; }
+html[data-astra] .mt-sw-a .n { font-family: 'Inter', system-ui, sans-serif; }
+html[data-astra] .mt-sw-a .k { background: var(--a-fg12) !important; box-shadow: none; color: #fff; }
+html[data-astra] .mt-sw-a:hover .k { background: #fff !important; color: #000; transform: none; }
+html[data-astra] .mt-sw-a.cur .k { outline: 0; background: #fff !important; color: #000; }
+html[data-astra] .mt-splash { background: #000; }
+html[data-astra] .mt-splash .mk { background: var(--a-fg12); }
+html[data-astra] .mt-splash .sp { border-color: var(--a-fg20); border-top-color: #fff; }
+
+/* ============================================================
+   POR APP — só o que a primária-virou-branco quebrou (fundo branco
+   com texto branco por cima) e cores cravadas fora das variáveis.
+   ============================================================ */
+
+/* ---- EnfermarIA ---- */
+html[data-astra="enfermaria"] body .logo .mark,
+html[data-astra="enfermaria"] body .tabs button.on,
+html[data-astra="enfermaria"] body .btn-p,
+html[data-astra="enfermaria"] body .leito,
+html[data-astra="enfermaria"] body .chip:active,
+html[data-astra="enfermaria"] body .sug-ok:active { color: #000 !important; }
+html[data-astra="enfermaria"] body .btn-p:hover { background: #e6e6e6; }
+html[data-astra="enfermaria"] body .btn-p .spin { border-color: #000; border-top-color: transparent; }
+html[data-astra="enfermaria"] body .btn-g { background: var(--a-fg12); color: #fff; border-color: transparent; }
+html[data-astra="enfermaria"] body .btn-g:hover { background: var(--a-fg20); }
+html[data-astra="enfermaria"] body .btn-dn { background: var(--a-danger-bg); color: var(--a-danger); }
+html[data-astra="enfermaria"] body .b-obito { background: var(--a-fg12); color: var(--a-fg60); }
+html[data-astra="enfermaria"] body .tabs { background: var(--a-fg6); border: 0; border-radius: 999px; }
+html[data-astra="enfermaria"] body .tabs button { border-radius: 999px; font-weight: 500; min-height: 44px; }
+html[data-astra="enfermaria"] body .usr a, html[data-astra="enfermaria"] body .usr button { border-radius: 999px; background: var(--a-fg12); border-color: transparent; color: #fff; font-weight: 500; min-height: 44px; padding: 8px 16px; }
+html[data-astra="enfermaria"] body .usr a:hover, html[data-astra="enfermaria"] body .usr button:hover { background: var(--a-fg20); color: #fff; }
+html[data-astra="enfermaria"] body .logo .mark { box-shadow: none; }
+html[data-astra="enfermaria"] body .pt-row:hover { background: var(--a-fg6); border-color: var(--a-fg20); }
+html[data-astra="enfermaria"] body .pt-acts button { border-radius: 999px; }
+html[data-astra="enfermaria"] body .pt-fechar { background: var(--a-fg12); border-color: transparent; color: #fff; }
+html[data-astra="enfermaria"] body .modal-x { border-radius: 999px; background: var(--a-fg12); border-color: transparent; color: #fff; }
+html[data-astra="enfermaria"] body .modal h3 { box-shadow: 0 -30px 0 0 var(--a-panel) !important; background: var(--a-panel); }
+html[data-astra="enfermaria"] body .row.actions { background: var(--a-panel); }
+html[data-astra="enfermaria"] body .kpi .v, html[data-astra="enfermaria"] body .leito .ln, html[data-astra="enfermaria"] body .pt-top .nome { font-weight: 600; }
+@media (max-width: 640px) {
+  html[data-astra="enfermaria"] body .tabs { background: rgba(0,0,0,.85); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); border-top: 1px solid var(--a-fg12); border-radius: 0; }
+  html[data-astra="enfermaria"] body .tabs button.on { background: var(--a-fg12); color: #fff !important; }
+}
+
+/* ---- CondutAI ---- */
+html[data-astra="condutai"] body #themeBtn { display: none !important; }
+html[data-astra="condutai"] body .logo-icon,
+html[data-astra="condutai"] body .ai-panel-send,
+html[data-astra="condutai"] body .send-btn,
+html[data-astra="condutai"] body .source-item .src-num,
+html[data-astra="condutai"] body .btn-primary,
+html[data-astra="condutai"] body .wb-bigsearch button,
+html[data-astra="condutai"] body .gaso-btn,
+html[data-astra="condutai"] body .wb-nav button.center .nic,
+html[data-astra="condutai"] body .library-tab.saved-toggle.active,
+html[data-astra="condutai"] body .followup-send { color: #000 !important; background-image: none !important; }
+html[data-astra="condutai"] body .followup-send { background: #fff; }
+html[data-astra="condutai"] body .gaso-btn:hover, html[data-astra="condutai"] body .btn-primary:hover { background: #e6e6e6; }
+html[data-astra="condutai"] body .btn-secondary, html[data-astra="condutai"] body .followup-finish, html[data-astra="condutai"] body .action-btn,
+html[data-astra="condutai"] body .wb-quick button { background: var(--a-fg12); color: #fff; border-color: transparent; border-radius: 999px; }
+html[data-astra="condutai"] body .wb-hero { background: var(--a-panel) !important; background-image: none !important; border: 1px solid var(--a-fg12); box-shadow: none !important; color: #fff; }
+html[data-astra="condutai"] body .wb-search { box-shadow: none !important; background: var(--a-panel); border-color: var(--a-fg20); border-radius: 999px; }
+html[data-astra="condutai"] body .wb-search input { background: transparent !important; border: 0 !important; }
+html[data-astra="condutai"] body .wb-card { box-shadow: none !important; }
+html[data-astra="condutai"] body .wb-card:hover { border-color: var(--a-fg20); background: var(--a-panel2); }
+html[data-astra="condutai"] body .wb-card .ic { box-shadow: none !important; }
+html[data-astra="condutai"] body .wb-hi { font-weight: 500; letter-spacing: -.02em; }
+html[data-astra="condutai"] body .wb-section-title { font-weight: 500; color: var(--a-fg60); }
+html[data-astra="condutai"] body .wb-headbtns button { border-radius: 999px; }
+html[data-astra="condutai"] body .wb-nav button { min-height: 44px; }
+html[data-astra="condutai"] body .wb-nav { background: rgba(0,0,0,.85) !important; -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); border-top: 1px solid var(--a-fg12); box-shadow: none !important; }
+html[data-astra="condutai"] body .library-tab.active { color: #fff; }
+html[data-astra="condutai"] body .mode-btn.active { background: var(--a-fg12); color: #fff; }
+html[data-astra="condutai"] body .history-item.active { border-color: var(--a-fg20); }
+html[data-astra="condutai"] body .content h3 { color: var(--a-fg); }
+html[data-astra="condutai"] body .content a { text-decoration: underline; text-decoration-color: var(--a-fg40); }
+html[data-astra="condutai"] body .alert-warn, html[data-astra="condutai"] body .alert-info,
+html[data-astra="condutai"] body .alert-socratic, html[data-astra="condutai"] body .alert-caso { border-color: var(--a-fg20); }
+html[data-astra="condutai"] body .content .wb-acc > summary { font-weight: 500; }
+
+/* ---- Portal ---- */
+html[data-astra="portal"] body .app .ic { box-shadow: none !important; }
+
+} /* @media screen */
