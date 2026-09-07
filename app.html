@@ -18,7 +18,7 @@
 <meta name="apple-mobile-web-app-title" content="MedTech">
 <script>window.MT_APP={id:"portal",name:"MedTech"};</script>
 <script src="_mtfb.js?v=1"></script>
-<script type="module" src="_mtauth.js?v=17"></script>
+<script type="module" src="_mtauth.js?v=18"></script>
 <style>
 :root{--ink:#fff;--muted:rgba(255,255,255,.6);--dim:rgba(255,255,255,.6);--paper:#000;--line:rgba(255,255,255,.12);--line-strong:rgba(255,255,255,.2);--accent:#fff;--ok:#4ADE80;--danger:#F87171;--fg6:rgba(255,255,255,.06);--fg12:rgba(255,255,255,.12);--fg20:rgba(255,255,255,.2);--ease:cubic-bezier(.16,1,.3,1)}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -76,6 +76,35 @@ footer a{color:var(--muted);text-decoration:none;display:inline-block;padding:10
 .cfg-sec .desc{font-size:13px;color:var(--muted);margin:2px 0 8px;line-height:1.5}
 .cfg-msg{font-size:13px;margin-top:8px;min-height:14px;line-height:1.5}
 .cfg-msg.ok{color:var(--ok)}.cfg-msg.err{color:var(--danger)}
+/* Meus apps: catálogo com interruptores */
+.link{background:none;border:0;color:var(--muted);font:500 13px 'Inter',system-ui,sans-serif;cursor:pointer;padding:10px 6px;border-radius:999px}
+.link:hover{color:#fff}
+.apps-cat{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:16px 0 4px}
+.apps-cat:first-child{margin-top:4px}
+.sug-box .apps-row{display:flex;align-items:center;gap:12px;padding:10px 0;margin:0;border-bottom:1px solid var(--line);cursor:pointer;color:#fff;font-size:14px;font-weight:400}
+.sug-box .apps-row:hover{background:var(--fg6)}
+.sug-box .apps-row:last-child{border-bottom:0}
+.apps-row .k{width:38px;height:38px;border-radius:11px;background:var(--fg12);display:grid;place-items:center;font-size:19px;color:#fff;flex:0 0 auto}
+.apps-row .t{flex:1;min-width:0}
+.apps-row .t b{display:block;font-weight:500;font-size:14.5px}
+.apps-row .t small{display:block;font-size:12px;color:var(--muted);margin-top:1px}
+.sw{position:relative;width:44px;height:26px;flex:0 0 auto}
+.sw input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.sw span{position:absolute;inset:0;border-radius:999px;background:var(--fg20);transition:background-color .2s}
+.sw span::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s var(--ease),background-color .2s}
+.sw input:checked+span{background:#fff}
+.sw input:checked+span::after{transform:translateX(18px);background:#000}
+.sw input:focus-visible+span{outline:2px solid rgba(255,255,255,.6);outline-offset:3px}
+.perfis{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 2px}
+.perfil{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:0 16px;border-radius:999px;border:0;background:var(--fg12);color:#fff;font:500 13px 'Inter',system-ui,sans-serif;cursor:pointer;transition:background-color .2s,color .2s}
+.perfil i{font-size:16px;color:var(--muted)}
+.perfil:hover{background:var(--fg20)}
+.sug-box .perfil.on{background:#fff;color:#000}.sug-box .perfil.on i{color:#000}
+.apps-tools{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 2px}
+.apps-tools .b{flex:0 0 auto;min-height:44px;padding:0 16px;font-size:13px}
+.apps-vazio{grid-column:1/-1;text-align:center;color:var(--muted);padding:34px 16px;border:1px dashed var(--fg20);border-radius:16px;font-size:14px;line-height:1.5}
+.apps-vazio .b{display:inline-flex;align-items:center;justify-content:center;margin-top:14px;min-height:44px;padding:0 18px;border-radius:999px;background:#fff;color:#000;border:0;font:500 14px 'Inter',system-ui,sans-serif;cursor:pointer}
+@media(max-width:560px){.ghost .lbl{display:none}.ghost{width:44px;padding:0;justify-content:center}.ghost i{font-size:19px}}
 @media(max-width:560px){.wrap{padding:0 18px}.grid{grid-template-columns:repeat(4,1fr);gap:26px 8px}.app .ic{width:62px;height:62px;border-radius:16px;font-size:29px}.app .nm{font-size:11.5px}.hello{margin-bottom:30px}.hello h1{font-size:26px}main{padding-top:36px}.usr .who{display:none}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -87,7 +116,8 @@ footer a{color:var(--muted);text-decoration:none;display:inline-block;padding:10
   <div class="wrap top">
     <span class="wm">Med<b>Tech</b></span>
     <div class="top-r">
-      <button class="ghost" id="btnSug" onclick="openSug()"><i class="ti ti-bulb" aria-hidden="true"></i>Sugestão</button>
+      <button class="ghost" id="btnApps" onclick="openMeusApps()" title="Escolher quais apps aparecem aqui"><i class="ti ti-layout-grid-add" aria-hidden="true"></i><span class="lbl">Meus apps</span></button>
+      <button class="ghost" id="btnSug" onclick="openSug()"><i class="ti ti-bulb" aria-hidden="true"></i><span class="lbl">Sugestão</span></button>
       <button class="install" id="btnInstall" hidden><i class="ti ti-download" aria-hidden="true"></i>Instalar</button>
       <div class="usr" id="usr"></div>
     </div>
@@ -97,45 +127,141 @@ footer a{color:var(--muted);text-decoration:none;display:inline-block;padding:10
 <main>
   <div class="hello"><h1 id="hello">Bem-vindo</h1><div class="dt" id="issueDate"></div></div>
   <div class="grid" id="grid"></div>
+  <div class="fine"><button class="link" onclick="openMeusApps()">Escolher quais apps aparecem aqui</button></div>
 </main>
 
 <footer>© 2026 <a href="index.html">MedTech</a> · <a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a></footer>
 
 <script>
 const BASE = 'https://medtechbr.github.io/';
-const APPS = [
-  { nm:'ConsultAI',  ic:'ti-calendar-event', c:'#2B5CE6', url:BASE+'consultai.html' },
-  { nm:'CondutAI',   ic:'ti-stethoscope',    c:'#1D6FD0', url:BASE+'condutai.html' },
-  { nm:'ATBguia',    ic:'ti-pill',           c:'#0E8A9C', url:BASE+'atbguia.html' },
-  { nm:'EnfermarIA', ic:'ti-bed',            c:'#3B7BE0', url:BASE+'enfermaria.html' },
-  { nm:'PocusAI',    ic:'ti-scan',           c:'#2456B8', url:BASE+'pocusai.html' },
-  { nm:'LaudAI',     ic:'ti-report-medical', c:'#4166D6', url:BASE+'laudai.html' },
-  { nm:'PaliAI',     ic:'ti-heart-handshake',c:'#B84A86', url:BASE+'paliai.html' },
-  { nm:'CalcMed',    ic:'ti-calculator',     c:'#4C7A99', url:BASE+'calcmed.html' },
-  { nm:'MedProvas',  ic:'ti-clipboard-text', c:'#C07C0A', url:BASE+'medprovas.html' },
-  { nm:'FlashMed',   ic:'ti-cards',          c:'#D0902A', url:BASE+'flashmed.html' },
-  { nm:'Guia do Interno', ic:'ti-school',    c:'#A8730F', url:BASE+'guiainterno.html' },
-  { nm:'Foco',       ic:'ti-target-arrow',   c:'#0E8A63', url:BASE+'foco.html' },
-  { nm:'PlantãoHub', ic:'ti-clock',          c:'#15966F', url:BASE+'plantaohub.html' },
-  { nm:'Granaê',     ic:'ti-wallet',         c:'#6D46D8', url:BASE+'granae.html' },
-  { nm:'Logbook',    ic:'ti-notebook',       c:'#B0532F', url:BASE+'logbook.html' }
+/* Catálogo de TUDO que o MedTech oferece. O id é o mesmo do trocador de funções (_mtauth.js).
+   O que aparece na página é a escolha do usuário (salva na conta, sincroniza entre aparelhos). */
+const CATALOGO = [
+  { id:'agendaai',      nm:'ConsultAI',        ic:'ti-calendar-event',   url:BASE+'consultai.html',        cat:'Atendimento' },
+  { id:'enfermaria',    nm:'EnfermarIA',       ic:'ti-bed',              url:BASE+'enfermaria.html',       cat:'Atendimento' },
+  { id:'clinicar',      nm:'Clinicar',         ic:'ti-calendar-heart',   url:BASE+'clinicar/',             cat:'Atendimento', sub:'sistema da clínica · login próprio' },
+  { id:'condutai',      nm:'CondutAI',         ic:'ti-stethoscope',      url:BASE+'condutai.html',         cat:'Referência clínica' },
+  { id:'atbguia',       nm:'ATBguia',          ic:'ti-pill',             url:BASE+'atbguia.html',          cat:'Referência clínica' },
+  { id:'calcmed',       nm:'CalcMed',          ic:'ti-calculator',       url:BASE+'calcmed.html',          cat:'Referência clínica' },
+  { id:'paliai',        nm:'PaliAI',           ic:'ti-heart-handshake',  url:BASE+'paliai.html',           cat:'Referência clínica' },
+  { id:'guiainterno',   nm:'Guia do Interno',  ic:'ti-school',           url:BASE+'guiainterno.html',      cat:'Referência clínica' },
+  { id:'pocusai',       nm:'PocusAI',          ic:'ti-scan',             url:BASE+'pocusai.html',          cat:'Hospital e imagem' },
+  { id:'laudai',        nm:'LaudAI',           ic:'ti-report-medical',   url:BASE+'laudai.html',           cat:'Hospital e imagem' },
+  { id:'farmaciagest',  nm:'FarmáciaGest',     ic:'ti-building-hospital',url:BASE+'farmaciagest/',         cat:'Hospital e imagem', sub:'escala e banco de horas da farmácia' },
+  { id:'medprovas',     nm:'MedProvas',        ic:'ti-clipboard-text',   url:BASE+'medprovas.html',        cat:'Estudo e residência' },
+  { id:'flashmed',      nm:'FlashMed',         ic:'ti-cards',            url:BASE+'flashmed.html',         cat:'Estudo e residência' },
+  { id:'clinicamed',    nm:'ClínicaMed',       ic:'ti-heartbeat',        url:BASE+'clinicamed/',           cat:'Estudo e residência', sub:'título de Clínica Médica' },
+  { id:'trafegotitulo', nm:'TráfegoTítulo',    ic:'ti-car',              url:BASE+'trafego-titulo/',       cat:'Estudo e residência', sub:'título de Medicina do Tráfego' },
+  { id:'enarefarmacia', nm:'Banca ENARE',      ic:'ti-flask',            url:BASE+'quiz-enare-farmacia/',  cat:'Estudo e residência', sub:'Farmácia multiprofissional' },
+  { id:'foco',          nm:'Foco',             ic:'ti-target-arrow',     url:BASE+'foco.html',             cat:'Rotina do médico' },
+  { id:'plantaohub',    nm:'PlantãoHub',       ic:'ti-clock',            url:BASE+'plantaohub.html',       cat:'Rotina do médico' },
+  { id:'granae',        nm:'Granaê',           ic:'ti-wallet',           url:BASE+'granae.html',           cat:'Rotina do médico' },
+  { id:'logbook',       nm:'Logbook',          ic:'ti-notebook',         url:BASE+'logbook.html',          cat:'Rotina do médico' }
 ];
+const CATEGORIAS = ['Atendimento','Referência clínica','Hospital e imagem','Estudo e residência','Rotina do médico'];
+/* Quem nunca escolheu vê o conjunto que sempre esteve aqui (os 15 apps do ecossistema). */
+const PADRAO = ['agendaai','condutai','atbguia','enfermaria','pocusai','laudai','paliai','calcmed','medprovas','flashmed','guiainterno','foco','plantaohub','granae','logbook'];
+/* Perfis por público: atalhos que marcam um conjunto; o usuário ajusta e salva o seu. */
+const PERFIS = [
+  { id:'interno',    nm:'Interno',              ic:'ti-school',            apps:['condutai','atbguia','guiainterno','enfermaria','calcmed','logbook','flashmed'] },
+  { id:'residente',  nm:'Residente',            ic:'ti-stethoscope',       apps:['condutai','atbguia','enfermaria','pocusai','paliai','calcmed','logbook','plantaohub'] },
+  { id:'hospital',   nm:'Médico do hospital',   ic:'ti-building-hospital', apps:['condutai','atbguia','enfermaria','pocusai','paliai','calcmed','laudai','plantaohub','granae'] },
+  { id:'consultorio',nm:'Consultório',          ic:'ti-calendar-event',    apps:['agendaai','condutai','atbguia','calcmed','granae','foco','clinicar'] },
+  { id:'professor',  nm:'Professor / preceptor',ic:'ti-presentation',      apps:['medprovas','flashmed','condutai','guiainterno','foco'] },
+  { id:'titulo',     nm:'Prova de título',      ic:'ti-certificate',       apps:['flashmed','clinicamed','trafegotitulo','enarefarmacia'] },
+  { id:'farmacia',   nm:'Farmácia hospitalar',  ic:'ti-flask',             apps:['farmaciagest','atbguia','enarefarmacia','calcmed'] }
+];
+const CACHE_APPS = 'mt.portal.apps';   // lido também pelo trocador de funções (_mtauth.js), mesmo domínio
+
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 function fmtName(nm){ return /(AI|IA)$/.test(nm) ? esc(nm.slice(0,-2))+'<b>'+nm.slice(-2)+'</b>' : esc(nm); }
+function dados(){ return (window.MT && MT._data && typeof MT._data==='object') ? MT._data : null; }
+/* Contratação: se a conta tiver `contratados` (lista de ids), o catálogo só oferece esses.
+   Sem o campo, tudo está disponível — é onde a cobrança se encaixa quando existir. */
+function disponiveis(){
+  const d = dados(); const c = d && Array.isArray(d.contratados) ? d.contratados : null;
+  return c ? CATALOGO.filter(a => c.includes(a.id)) : CATALOGO;
+}
+function selecao(){
+  const d = dados();
+  let sel = (d && d.apps && Array.isArray(d.apps.sel)) ? d.apps.sel : null;
+  if (!sel) { try { const c = JSON.parse(localStorage.getItem(CACHE_APPS)||'null'); if (Array.isArray(c)) sel = c; } catch(e){} }
+  if (!sel) sel = PADRAO;
+  const ok = new Set(disponiveis().map(a=>a.id));
+  return sel.filter(id => ok.has(id));
+}
 function appItem(a){
-  return `<a class="app" href="${a.url}" style="--c:${a.c}">
+  return `<a class="app" href="${a.url}">
     <span class="ic"><i class="ti ${a.ic}" aria-hidden="true"></i></span>
     <span class="nm">${fmtName(a.nm)}</span>
   </a>`;
 }
-document.getElementById('grid').innerHTML = APPS.map(appItem).join('');
+function renderGrid(){
+  const sel = new Set(selecao());
+  const lista = disponiveis().filter(a => sel.has(a.id));
+  const g = document.getElementById('grid');
+  g.innerHTML = lista.length ? lista.map(appItem).join('')
+    : `<div class="apps-vazio">Nenhum app na sua página ainda.<br><button class="b" onclick="openMeusApps()"><i class="ti ti-layout-grid-add" aria-hidden="true"></i>&nbsp;Escolher apps</button></div>`;
+  try { localStorage.setItem(CACHE_APPS, JSON.stringify([...sel])); } catch(e){}
+}
+function openMeusApps(){
+  const sel = new Set(selecao());
+  const disp = disponiveis();
+  const wrap = document.createElement('div'); wrap.className='sug-modal'; wrap.id='appsModal';
+  const linhas = CATEGORIAS.map(cat => {
+    const itens = disp.filter(a => a.cat===cat);
+    if (!itens.length) return '';
+    return `<div class="apps-cat">${esc(cat)}</div>` + itens.map(a => `
+      <label class="apps-row">
+        <span class="k"><i class="ti ${a.ic}" aria-hidden="true"></i></span>
+        <span class="t"><b>${esc(a.nm)}</b>${a.sub?`<small>${esc(a.sub)}</small>`:''}</span>
+        <span class="sw"><input type="checkbox" data-id="${esc(a.id)}" ${sel.has(a.id)?'checked':''}><span></span></span>
+      </label>`).join('');
+  }).join('');
+  wrap.innerHTML = `<div class="sug-box">
+    <h3 style="display:flex;align-items:center;gap:8px"><i class="ti ti-layout-grid-add" aria-hidden="true"></i>Meus apps</h3>
+    <p class="sub">Escolha o que aparece na sua página. Vale em todos os seus aparelhos.</p>
+    <div class="apps-cat">Comece por um perfil</div>
+    <div class="perfis">${PERFIS.map(p=>`<button type="button" class="perfil" onclick="marcarPerfil('${p.id}')"><i class="ti ${p.ic}" aria-hidden="true"></i>${esc(p.nm)}</button>`).join('')}</div>
+    <div class="apps-cat">Ou ajuste um a um</div>
+    <div class="apps-tools"><button class="b cancel" onclick="marcarApps(true)">Todos</button><button class="b cancel" onclick="marcarApps(false)">Nenhum</button><button class="b cancel" onclick="marcarApps('padrao')">Padrão</button></div>
+    <div id="appsLista">${linhas}</div>
+    <div class="sug-row"><button class="b ok" onclick="salvarApps()">Salvar</button><button class="b cancel" onclick="closeApps()">Cancelar</button></div>
+    <div class="cfg-msg" id="appsMsg"></div>
+  </div>`;
+  wrap.onclick = e => { if (e.target===wrap) closeApps(); };
+  document.body.appendChild(wrap);
+}
+function marcarApps(modo){
+  document.querySelectorAll('#appsLista input[type=checkbox]').forEach(i => {
+    i.checked = modo===true ? true : modo===false ? false : PADRAO.includes(i.dataset.id);
+  });
+}
+function marcarPerfil(id){
+  const p = PERFIS.find(x => x.id===id); if (!p) return;
+  const ok = new Set(disponiveis().map(a=>a.id));
+  document.querySelectorAll('#appsLista input[type=checkbox]').forEach(i => { i.checked = p.apps.includes(i.dataset.id) && ok.has(i.dataset.id); });
+  document.querySelectorAll('.perfil').forEach(b => b.classList.toggle('on', b.textContent.trim()===p.nm));
+}
+function closeApps(){ const m=document.getElementById('appsModal'); if (m) m.remove(); }
+async function salvarApps(){
+  const sel = [...document.querySelectorAll('#appsLista input[type=checkbox]:checked')].map(i => i.dataset.id);
+  const msg = document.getElementById('appsMsg'); msg.className='cfg-msg'; msg.textContent='Salvando…';
+  try { localStorage.setItem(CACHE_APPS, JSON.stringify(sel)); } catch(e){}
+  try {
+    const base = dados() || {};
+    if (window.MT && MT.save) await MT.save(Object.assign({}, base, { apps: { sel, v:1, updatedAt: Date.now() } }));
+    closeApps(); renderGrid();
+  } catch(e) { msg.className='cfg-msg err'; msg.textContent='Não foi possível salvar: '+(e.message||e); }
+}
+renderGrid();
 document.getElementById('issueDate').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
 
 /* ===== Sugestões de funções (vão por e-mail para a equipe MedTech) ===== */
 const SUG_EMAIL = 'medtechbr1@gmail.com';
 function openSug(){
   const u = window.MT && window.MT.user;
-  const opts = ['Geral / portal'].concat(APPS.map(a=>a.nm)).map(n=>`<option>${esc(n)}</option>`).join('');
+  const opts = ['Geral / portal'].concat(CATALOGO.map(a=>a.nm)).map(n=>`<option>${esc(n)}</option>`).join('');
   const wrap = document.createElement('div'); wrap.className='sug-modal'; wrap.id='sugModal';
   wrap.innerHTML = `<div class="sug-box">
     <h3 style="display:flex;align-items:center;gap:8px"><i class="ti ti-bulb" aria-hidden="true"></i>Sugerir uma função</h3>
@@ -271,7 +397,13 @@ function refreshUser(){
     hello.textContent = 'Bem-vindo';
   }
 }
-(function waitMT(){ if(window.MT){ MT.onData(refreshUser); refreshUser(); } else setTimeout(waitMT,40); })();
+let perfilOferecido = false;
+(function waitMT(){ if(window.MT){ MT.onData(function(){
+  refreshUser(); renderGrid();
+  // primeira vez na conta: ainda não escolheu → oferece os perfis
+  const u = MT.user, d = dados();
+  if (!perfilOferecido && u && !u.demo && !(d && d.apps && Array.isArray(d.apps.sel))) { perfilOferecido = true; setTimeout(() => { if (!document.getElementById('appsModal')) openMeusApps(); }, 500); }
+}); refreshUser(); } else setTimeout(waitMT,40); })();
 
 /* PWA: service worker + botão instalar */
 if ('serviceWorker' in navigator) {

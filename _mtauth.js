@@ -176,8 +176,22 @@ const MT_FUNCS = [
   { id:'foco',       nm:'Foco',       ic:'ti-target-arrow',   c:'#0E8A63', url:'/foco.html' },
   { id:'plantaohub', nm:'PlantãoHub', ic:'ti-clock',          c:'#15966F', url:'/plantaohub.html' },
   { id:'granae',     nm:'Granaê',     ic:'ti-wallet',         c:'#6D46D8', url:'/granae.html' },
-  { id:'logbook',    nm:'Logbook',    ic:'ti-notebook',       c:'#B0532F', url:'/logbook.html' }
+  { id:'logbook',    nm:'Logbook',    ic:'ti-notebook',       c:'#B0532F', url:'/logbook.html' },
+  { id:'clinicamed',    nm:'ClínicaMed',    ic:'ti-heartbeat',          c:'#23272E', url:'/clinicamed/' },
+  { id:'trafegotitulo', nm:'TráfegoTítulo', ic:'ti-car',                c:'#23272E', url:'/trafego-titulo/' },
+  { id:'enarefarmacia', nm:'Banca ENARE',   ic:'ti-flask',              c:'#23272E', url:'/quiz-enare-farmacia/' },
+  { id:'farmaciagest',  nm:'FarmáciaGest',  ic:'ti-building-hospital',  c:'#23272E', url:'/farmaciagest/' },
+  { id:'clinicar',      nm:'Clinicar',      ic:'ti-calendar-heart',     c:'#23272E', url:'/clinicar/' }
 ];
+/* O Portal guarda a escolha do usuário em localStorage (mesmo domínio): o trocador mostra só o que
+   ele escolheu — e sempre o app atual. Sem escolha salva, mostra o conjunto clássico. */
+const FUNCS_PADRAO = ['agendaai','condutai','atbguia','enfermaria','pocusai','laudai','paliai','calcmed','medprovas','flashmed','guiainterno','foco','plantaohub','granae','logbook'];
+function funcsVisiveis() {
+  let sel = null;
+  try { const c = JSON.parse(localStorage.getItem('mt.portal.apps') || 'null'); if (Array.isArray(c)) sel = c; } catch (e) {}
+  const set = new Set(sel || FUNCS_PADRAO);
+  return MT_FUNCS.filter(f => set.has(f.id) || f.id === APP.id);
+}
 MT.FUNCS = MT_FUNCS;
 MT.openSwitcher = () => openSwitcher();
 function ensureTabler() {
@@ -194,7 +208,7 @@ function openSwitcher() {
     '<span class="k" style="background:' + f.c + '"><i class="ti ' + f.ic + '"></i></span><span class="n">' + f.nm + '</span></a>';
   ov.innerHTML = '<div class="mt-sw-box"><p class="mt-sw-h">Funções do MedTech</p><div class="mt-sw-g">' +
     '<a class="mt-sw-a" href="/app.html"><span class="k" style="background:#23272E"><i class="ti ti-home"></i></span><span class="n">Início</span></a>' +
-    MT_FUNCS.map(item).join('') + '</div></div>';
+    funcsVisiveis().map(item).join('') + '</div></div>';
   ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
   document.addEventListener('keydown', function esc(e){ if (e.key === 'Escape') { ov.remove(); document.removeEventListener('keydown', esc); } });
   document.body.appendChild(ov);
