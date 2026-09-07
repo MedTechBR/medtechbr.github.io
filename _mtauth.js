@@ -183,7 +183,6 @@ const MT_FUNCS = [
   { id:'plantaohub', nm:'PlantãoHub', ic:'ti-clock',          c:'#15966F', url:'/plantaohub.html', linha:'clinica' },
   { id:'granae',     nm:'Granaê',     ic:'ti-wallet',         c:'#6D46D8', url:'/granae.html',     linha:'clinica' },
   { id:'logbook',    nm:'Logbook',    ic:'ti-notebook',       c:'#B0532F', url:'/logbook.html',    linha:'clinica' },
-  { id:'clinicar',   nm:'Clinicar',   ic:'ti-calendar-heart', c:'#23272E', url:'/clinicar/',       linha:'clinica' },
   { id:'medprovas',  nm:'MedProvas',  ic:'ti-clipboard-text', c:'#C07C0A', url:'/medprovas.html',  linha:'provas' },
   { id:'flashmed',   nm:'FlashMed',   ic:'ti-cards',          c:'#D0902A', url:'/flashmed.html',   linha:'provas' },
   { id:'clinicamed',    nm:'ClínicaMed',    ic:'ti-heartbeat', c:'#0B6A72', url:'/clinicamed/',     linha:'provas' },
