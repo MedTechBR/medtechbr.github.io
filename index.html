@@ -40,7 +40,7 @@ header.solid{background:rgba(0,0,0,.72);-webkit-backdrop-filter:blur(18px);backd
 /* o item ocupa a altura inteira do cabeçalho: o menu encosta nele (sem vão para o mouse cair) */
 .pn{position:relative;display:flex;align-items:center;height:var(--header)}
 .pn::after{content:"";position:absolute;left:0;right:0;top:100%;height:12px}
-.pn .menu{position:absolute;left:0;top:calc(100% - 6px);min-width:250px;padding:8px;background:#0F0F0F;border:1px solid var(--fg12);border-radius:14px;opacity:0;transform:translateY(6px);pointer-events:none;transition:opacity .15s .18s,transform .22s .18s;z-index:60}
+.pn .menu{position:absolute;left:0;top:calc(100% - 6px);margin:0 !important;min-width:250px;padding:8px;background:#0F0F0F;border:1px solid var(--fg12);border-radius:14px;opacity:0;transform:translateY(6px);pointer-events:none;transition:opacity .15s .18s,transform .22s .18s;z-index:60}
 .pn .menu.cols{min-width:470px;display:grid;grid-template-columns:1fr 1fr;gap:0 6px}
 .pn .menu.cols a:first-child{grid-column:1/-1}
 .pn:hover .menu,.pn:focus-within .menu{opacity:1;transform:none;pointer-events:auto;transition-delay:0s}
@@ -245,7 +245,6 @@ footer{border-top:1px solid var(--fg12);padding:48px 0 40px;font-size:13px;color
     <div class="pn"><a href="#app"><i class="ti ti-apps"></i>MedTech App</a><div class="menu cols"><a href="app.html"><i class="ti ti-apps"></i>Abrir o portal</a><a href="enfermaria.html"><i class="ti ti-bed"></i>EnfermarIA</a><a href="condutai.html"><i class="ti ti-stethoscope"></i>CondutAI</a><a href="atbguia.html"><i class="ti ti-pill"></i>ATBguia</a><a href="calcmed.html"><i class="ti ti-calculator"></i>CalcMed</a><a href="paliai.html"><i class="ti ti-heart-handshake"></i>PaliAI</a><a href="guiainterno.html"><i class="ti ti-school"></i>Guia do Interno</a><a href="pocusai.html"><i class="ti ti-scan"></i>PocusAI</a><a href="laudai.html"><i class="ti ti-report-medical"></i>LaudAI</a><a href="foco.html"><i class="ti ti-target-arrow"></i>Foco</a><a href="plantaohub.html"><i class="ti ti-clock"></i>PlantãoHub</a><a href="granae.html"><i class="ti ti-wallet"></i>Granaê</a><a href="logbook.html"><i class="ti ti-notebook"></i>Logbook</a></div></div>
     <div class="pn"><a href="#provas"><i class="ti ti-school"></i>MedTech Provas</a><div class="menu"><a href="provas.html"><i class="ti ti-school"></i>Abrir o portal Provas</a><a href="clinicamed/"><i class="ti ti-heartbeat"></i>ClínicaMed</a><a href="trafego-titulo/"><i class="ti ti-car"></i>TráfegoTítulo</a><a href="flashmed.html"><i class="ti ti-cards"></i>FlashMed</a><a href="medprovas.html"><i class="ti ti-clipboard-text"></i>MedProvas</a><a href="mailto:medtechbr1@gmail.com?subject=Plataforma%20de%20treinamento%20para%20provas"><i class="ti ti-mail"></i>Plataforma para a sua prova</a></div></div>
     <div class="pn"><a href="#institucional"><i class="ti ti-building-hospital"></i>MedTech Institucional</a><div class="menu"><a href="clinicar/"><i class="ti ti-calendar-heart"></i>Clinicar — clínicas e consultórios</a><a href="#hospitalar"><i class="ti ti-building-hospital"></i>Sistema Hospitalar (HospSys)</a><a href="#faturamento"><i class="ti ti-zoom-money"></i>Auditoria e Treinamento de Faturamento</a><a href="#casos"><i class="ti ti-user-heart"></i>Casos Clínicos Interativos</a><a href="#capacita"><i class="ti ti-certificate-2"></i>Treinamentos hospitalares (Capacita)</a><a href="#internato"><i class="ti ti-school"></i>InternaMed — gestão do internato</a><a href="#internato"><i class="ti ti-stethoscope"></i>MedRes — gestão da residência</a><a href="#sobmedida"><i class="ti ti-code"></i>Desenvolvimento sob medida</a></div></div>
-    <a href="#planos" class="top"><i class="ti ti-receipt"></i>Planos</a>
   </nav>
   <div class="acts">
     <a class="pill ghost" href="#planos">Planos e pagamento</a>
@@ -595,7 +594,7 @@ function onScroll(){const y=scrollY;hdr.classList.toggle('solid',y>40);pbw.class
 addEventListener('scroll',onScroll,{passive:true});onScroll();
 const ids=['app','provas','institucional','hospitalar','faturamento','casos','capacita','internato','sobmedida','planos'];
 const INST=new Set(['hospitalar','faturamento','casos','capacita','internato','sobmedida']);
-const navLinks=[...document.querySelectorAll('#pnav .pn > a,#pnav > a,#pbar a')];
+const navLinks=[...document.querySelectorAll('#pnav .pn > a,#pbar a')];
 const spy=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const alvo=INST.has(e.target.id)?'institucional':e.target.id;navLinks.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+alvo))}})},{rootMargin:'-40% 0px -55% 0px'});
 ids.forEach(id=>{const el=document.getElementById(id);if(el)spy.observe(el)});
 
