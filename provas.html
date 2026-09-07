@@ -18,7 +18,7 @@
 <meta name="apple-mobile-web-app-title" content="MedTech Provas">
 <script>window.MT_APP={id:"portal-provas",name:"MedTech Provas",linha:"provas"};</script>
 <script src="_mtfb.js?v=1"></script>
-<script type="module" src="_mtauth.js?v=22"></script>
+<script type="module" src="_mtauth.js?v=23"></script>
 <style>
 :root{--ink:#fff;--muted:rgba(255,255,255,.6);--dim:rgba(255,255,255,.6);--paper:#000;--line:rgba(255,255,255,.12);--line-strong:rgba(255,255,255,.2);--accent:#fff;--ok:#4ADE80;--danger:#F87171;--fg6:rgba(255,255,255,.06);--fg12:rgba(255,255,255,.12);--fg20:rgba(255,255,255,.2);--ease:cubic-bezier(.16,1,.3,1)}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -95,11 +95,6 @@ footer a{color:var(--muted);text-decoration:none;display:inline-block;padding:10
 .sw input:checked+span{background:#fff}
 .sw input:checked+span::after{transform:translateX(18px);background:#000}
 .sw input:focus-visible+span{outline:2px solid rgba(255,255,255,.6);outline-offset:3px}
-.perfis{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 2px}
-.perfil{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:0 16px;border-radius:999px;border:0;background:var(--fg12);color:#fff;font:500 13px 'Inter',system-ui,sans-serif;cursor:pointer;transition:background-color .2s,color .2s}
-.perfil i{font-size:16px;color:var(--muted)}
-.perfil:hover{background:var(--fg20)}
-.sug-box .perfil.on{background:#fff;color:#000}.sug-box .perfil.on i{color:#000}
 .apps-tools{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 2px}
 .apps-tools .b{flex:0 0 auto;min-height:44px;padding:0 16px;font-size:13px}
 .apps-vazio{grid-column:1/-1;text-align:center;color:var(--muted);padding:34px 16px;border:1px dashed var(--fg20);border-radius:16px;font-size:14px;line-height:1.5}
@@ -138,7 +133,6 @@ const BASE = 'https://medtechbr.github.io/';
    O que aparece na página é a escolha do usuário (salva na conta, sincroniza entre aparelhos). */
 const CATALOGO = [
   { id:'enfermaria',    nm:'EnfermarIA',       ic:'ti-bed',              url:BASE+'enfermaria.html',       cat:'Atendimento',          linha:'clinica' },
-  { id:'clinicar',      nm:'Clinicar',         ic:'ti-calendar-heart',   url:BASE+'clinicar/',             cat:'Atendimento',          linha:'clinica', sub:'sistema da clínica · login próprio' },
   { id:'condutai',      nm:'CondutAI',         ic:'ti-stethoscope',      url:BASE+'condutai.html',         cat:'Referência clínica',   linha:'clinica' },
   { id:'atbguia',       nm:'ATBguia',          ic:'ti-pill',             url:BASE+'atbguia.html',          cat:'Referência clínica',   linha:'clinica' },
   { id:'calcmed',       nm:'CalcMed',          ic:'ti-calculator',       url:BASE+'calcmed.html',          cat:'Referência clínica',   linha:'clinica' },
@@ -163,17 +157,6 @@ const CATEGORIAS = LINHA === 'provas' ? ['Prova de título','Residência e concu
 const PADRAO = LINHA === 'provas'
   ? ['clinicamed','trafegotitulo','medprovas','flashmed']
   : ['condutai','atbguia','enfermaria','pocusai','laudai','paliai','calcmed','guiainterno','foco','plantaohub','granae','logbook'];
-/* Perfis por público: atalhos que marcam um conjunto; o usuário ajusta e salva o seu. */
-const PERFIS = LINHA === 'provas' ? [
-  { id:'titulo',     nm:'Prova de título',       ic:'ti-certificate',       apps:['clinicamed','trafegotitulo'] },
-  { id:'residencia', nm:'Residência e R+',       ic:'ti-school',            apps:['medprovas','flashmed','clinicamed'] },
-  { id:'professor',  nm:'Professor / preceptor', ic:'ti-presentation',      apps:['medprovas','flashmed'] }
-] : [
-  { id:'interno',    nm:'Interno',              ic:'ti-school',            apps:['condutai','atbguia','guiainterno','enfermaria','calcmed','logbook'] },
-  { id:'residente',  nm:'Residente',            ic:'ti-stethoscope',       apps:['condutai','atbguia','enfermaria','pocusai','paliai','calcmed','logbook','plantaohub'] },
-  { id:'hospital',   nm:'Médico do hospital',   ic:'ti-building-hospital', apps:['condutai','atbguia','enfermaria','pocusai','paliai','calcmed','laudai','plantaohub','granae'] },
-  { id:'consultorio',nm:'Consultório',          ic:'ti-calendar-event',    apps:['condutai','atbguia','calcmed','granae','foco','clinicar'] }
-];
 const CACHE_APPS = 'mt.portal.apps.' + LINHA;   // lido também pelo trocador de funções (_mtauth.js), mesmo domínio
 const CAMPO_SEL = LINHA === 'provas' ? 'appsProvas' : 'apps';   // no doc da conta, um campo por linha
 
@@ -225,9 +208,6 @@ function openMeusApps(){
   wrap.innerHTML = `<div class="sug-box">
     <h3 style="display:flex;align-items:center;gap:8px"><i class="ti ti-layout-grid-add" aria-hidden="true"></i>Meus apps</h3>
     <p class="sub">Escolha o que aparece na sua página. Vale em todos os seus aparelhos.</p>
-    <div class="apps-cat">Comece por um perfil</div>
-    <div class="perfis">${PERFIS.map(p=>`<button type="button" class="perfil" onclick="marcarPerfil('${p.id}')"><i class="ti ${p.ic}" aria-hidden="true"></i>${esc(p.nm)}</button>`).join('')}</div>
-    <div class="apps-cat">Ou ajuste um a um</div>
     <div class="apps-tools"><button class="b cancel" onclick="marcarApps(true)">Todos</button><button class="b cancel" onclick="marcarApps(false)">Nenhum</button><button class="b cancel" onclick="marcarApps('padrao')">Padrão</button></div>
     <div id="appsLista">${linhas}</div>
     <div class="sug-row"><button class="b ok" onclick="salvarApps()">Salvar</button><button class="b cancel" onclick="closeApps()">Cancelar</button></div>
@@ -240,12 +220,6 @@ function marcarApps(modo){
   document.querySelectorAll('#appsLista input[type=checkbox]').forEach(i => {
     i.checked = modo===true ? true : modo===false ? false : PADRAO.includes(i.dataset.id);
   });
-}
-function marcarPerfil(id){
-  const p = PERFIS.find(x => x.id===id); if (!p) return;
-  const ok = new Set(disponiveis().map(a=>a.id));
-  document.querySelectorAll('#appsLista input[type=checkbox]').forEach(i => { i.checked = p.apps.includes(i.dataset.id) && ok.has(i.dataset.id); });
-  document.querySelectorAll('.perfil').forEach(b => b.classList.toggle('on', b.textContent.trim()===p.nm));
 }
 function closeApps(){ const m=document.getElementById('appsModal'); if (m) m.remove(); }
 async function salvarApps(){
