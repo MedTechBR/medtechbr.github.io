@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#2f8576">
+<meta name="theme-color" content="#000000" id="meta-theme">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Console Leitos">
 <meta name="robots" content="noindex">
 <link rel="manifest" href="painel-console.webmanifest">
@@ -14,64 +14,66 @@
 <title>Console · Painel de Leitos HRSC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
 <style>
-/* Mesmos tokens da página publicada do painel (BI_TPL) — o console é a mesma família */
+/* 09/09: tema ASTRA (o mesmo dos apps MedTech): preto puro, Inter 400/500/600, hierarquia por alpha de branco
+   (60/40/20/12/6), pílulas, fios de 12%, painéis a 6%, zero sombra. Cor só nos estados que exigem atenção.
+   O tema claro é o mesmo desenho invertido (alpha de preto) e é escolhido pelo próprio usuário em "Mais". */
 :root{
+  color-scheme:dark;
+  --plane:#000; --solid:#0f0f0f; --solid-t:rgba(15,15,15,.94);
+  --card:rgba(255,255,255,.06); --card-2:rgba(255,255,255,.09); --card-3:rgba(255,255,255,.14);
+  --line:rgba(255,255,255,.12); --line-2:rgba(255,255,255,.08);
+  --ink:#fff; --ink-2:rgba(255,255,255,.6); --ink-3:rgba(255,255,255,.4);
+  --brand:#fff; --brand-2:#fff; --brand-3:rgba(255,255,255,.4); --brand-soft:rgba(255,255,255,.12); --on-brand:#000;
+  --good:#3cc23c; --good-soft:rgba(60,194,60,.16); --good-ink:#8fe58f;
+  --alta:#2fb52f; --alta-soft:rgba(60,194,60,.18); --alta-ink:#9be89b;
+  --altase:#25a882; --altase-soft:rgba(37,168,130,.18); --altase-ink:#7fdcc0;
+  --warn:#fab219; --warn-soft:rgba(250,178,25,.16); --warn-ink:#f6cb63;
+  --crit:#ef6a6a; --crit-soft:rgba(239,106,106,.16); --crit-ink:#f5a0a0;
+  --info:#5b9bea; --info-soft:rgba(91,155,234,.16); --info-ink:#9cc4f4;
+  --neutral:rgba(255,255,255,.3); --neutral-soft:rgba(255,255,255,.08);
+  --shadow:none;
+  --r:12px; --r-sm:10px; --sb:env(safe-area-inset-bottom); --st:env(safe-area-inset-top);
+}
+html[data-theme="light"]{
   color-scheme:light;
-  --plane:#eef2f1; --card:#ffffff; --card-2:#f4f7f6; --card-3:#e9efed;
-  --line:#dde5e3; --line-2:#edf2f1;
-  --ink:#0f1c19; --ink-2:#4b5a56; --ink-3:#7b8a86;
-  --brand:#2f8576; --brand-2:#20635a; --brand-3:#8fc4b9; --brand-soft:#e2f0ed;
+  --plane:#fff; --solid:#fff; --solid-t:rgba(255,255,255,.94);
+  --card:rgba(0,0,0,.035); --card-2:rgba(0,0,0,.06); --card-3:rgba(0,0,0,.1);
+  --line:rgba(0,0,0,.12); --line-2:rgba(0,0,0,.07);
+  --ink:#000; --ink-2:rgba(0,0,0,.62); --ink-3:rgba(0,0,0,.45);
+  --brand:#000; --brand-2:#000; --brand-3:rgba(0,0,0,.35); --brand-soft:rgba(0,0,0,.08); --on-brand:#fff;
   --good:#0ca30c; --good-soft:#e3f4e3; --good-ink:#0a6b0a;
   --alta:#008300; --alta-soft:#dcefdc; --alta-ink:#005c00;
   --altase:#1baf7a; --altase-soft:#ddf2ea; --altase-ink:#0d6b4a;
-  --warn:#fab219; --warn-soft:#fdf2da; --warn-ink:#7a5502;
+  --warn:#e09a00; --warn-soft:#fdf2da; --warn-ink:#7a5502;
   --crit:#d03b3b; --crit-soft:#fae5e5; --crit-ink:#8f2020;
   --info:#2a78d6; --info-soft:#e4edfb; --info-ink:#1a4f92;
-  --neutral:#b7c2bf; --neutral-soft:#eef1f0;
-  --shadow:0 1px 2px rgba(15,28,25,.05),0 4px 14px rgba(15,28,25,.05);
-  --r:14px; --r-sm:9px; --sb:env(safe-area-inset-bottom); --st:env(safe-area-inset-top);
-}
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
-    color-scheme:dark;
-    --plane:#0c1110; --card:#151d1b; --card-2:#1c2624; --card-3:#243230;
-    --line:#2a3735; --line-2:#212d2b;
-    --ink:#eef4f2; --ink-2:#a9b8b4; --ink-3:#7d8c88;
-    --brand:#4bb3a0; --brand-2:#2f8576; --brand-3:#1d4f47; --brand-soft:#12302b;
-    --good:#3cc23c; --good-soft:#122f12; --good-ink:#7fdd7f;
-    --alta:#4cd04c; --alta-soft:#13300f; --alta-ink:#8fe58f;
-    --altase:#25a882; --altase-soft:#0d2b23; --altase-ink:#6fd6ba;
-    --warn:#fab219; --warn-soft:#33280b; --warn-ink:#f6cb63;
-    --crit:#ef6a6a; --crit-soft:#3a1a1a; --crit-ink:#f5a0a0;
-    --info:#5b9bea; --info-soft:#14243c; --info-ink:#9cc4f4;
-    --neutral:#5d6b67; --neutral-soft:#1e2a28;
-    --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.35);
-  }
+  --neutral:rgba(0,0,0,.25); --neutral-soft:rgba(0,0,0,.06);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--plane);color:var(--ink);
-  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
-h1,h2,h3{font-family:Archivo,"IBM Plex Sans",sans-serif;margin:0;letter-spacing:-.012em}
-.num,.p{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-weight:400;
+  font-size:14.5px;line-height:1.45;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:inherit;font-weight:600;margin:0;letter-spacing:-.012em}
+.num,.p{font-family:inherit;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+b,strong{font-weight:600}
 button,input,select,textarea{font:inherit;color:inherit}
 a{color:var(--brand-2)}
 [hidden]{display:none!important}
 
 /* ---------- esqueleto ---------- */
 .shell{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh}
-.side{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;background:var(--card);
+.side{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;background:var(--solid);
   border-right:1px solid var(--line);padding:16px 14px 20px;display:flex;flex-direction:column;gap:12px}
 .main{padding:16px 20px 40px;min-width:0}
 .brand{display:flex;align-items:center;gap:10px}
-.mark{width:36px;height:36px;border-radius:10px;flex:0 0 36px;background:linear-gradient(140deg,var(--brand),var(--brand-2));
-  color:#fff;display:grid;place-items:center;font-family:Archivo,sans-serif;font-weight:700;font-size:13px}
-.brand b{display:block;font-family:Archivo,sans-serif;font-size:14.5px;line-height:1.15}
+.mark{width:36px;height:36px;border-radius:10px;flex:0 0 36px;background:var(--brand);
+  color:var(--on-brand);display:grid;place-items:center;font-weight:600;font-size:13px}
+.brand b{display:block;font-size:14.5px;line-height:1.15}
 .brand span{display:block;font-size:10.5px;color:var(--ink-3)}
-.slab{font-size:9.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px}
+.slab{font-size:10.5px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px}
 .sval{font-size:12.5px;color:var(--ink-2)} .sval b{color:var(--ink)}
 .stamp{display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:var(--r-sm);font-size:11.5px;font-weight:600;line-height:1.25;
   background:var(--warn-soft);color:var(--warn-ink);border:1px solid rgba(250,178,25,.35)}
@@ -83,18 +85,18 @@ a{color:var(--brand-2)}
   padding:7px 8px;border-radius:8px;font-size:12.5px;color:var(--ink-2)}
 .navf button svg{width:16px;height:16px;flex:0 0 16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .navf button:hover{background:var(--card-2);color:var(--ink)}
-.navf button[aria-pressed="true"]{background:var(--brand-soft);color:var(--brand-2);font-weight:600}
-.navf .n{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-3)}
-.navf .n.warn{color:var(--crit-ink);font-weight:700}
+.navf button[aria-pressed="true"]{background:var(--brand-soft);color:var(--ink);font-weight:600}
+.navf .n{margin-left:auto;font-size:11px;color:var(--ink-3)}
+.navf .n.warn{color:var(--crit-ink);font-weight:600}
 .sfoot{margin-top:auto;font-size:11px;color:var(--ink-3);line-height:1.4}
 .sfoot button{border:0;background:none;color:var(--brand);padding:0;cursor:pointer;font-size:11px;text-decoration:underline}
 
 /* ---------- cabeçalho de página ---------- */
 .head{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
-.head h1{font-size:21px;font-weight:700}
-.head .sub{font-size:12.5px;color:var(--ink-2);margin-top:2px}
+.head h1{font-size:21px;font-weight:600}
+.head .sub{font-size:13.5px;color:var(--ink-2);margin-top:2px}
 .pills{display:flex;gap:7px;flex-wrap:wrap}
-.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:100px;font-size:11.5px;font-weight:600;
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:100px;font-size:12px;font-weight:500;
   background:var(--card);border:1px solid var(--line);color:var(--ink-2)}
 .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--ink-3)}
 /* o "atualizar" da lateral não existe no celular (a lateral vira barra de abas):
@@ -108,10 +110,10 @@ button.pill:disabled{opacity:.6;cursor:default}
 .pill.crit{background:var(--crit-soft);border-color:rgba(208,59,59,.35);color:var(--crit-ink)} .pill.crit .dot{background:var(--crit)}
 
 /* ---------- cartões / grades ---------- */
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.card{background:var(--card);border:1px solid var(--line-2);border-radius:var(--r)}
 .card>header{padding:13px 15px 0;display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.card h2{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2)}
-.card .hint{font-size:11.5px;color:var(--ink-3);margin-top:3px;line-height:1.4}
+.card h2{font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.card .hint{font-size:12.5px;color:var(--ink-3);margin-top:3px;line-height:1.4}
 .card>.body{padding:12px 15px 15px}
 .row{display:grid;gap:12px;margin-bottom:12px}
 /* filho de grade só encolhe com min-width:0. Sem isto a tabela de dentro (th com
@@ -124,14 +126,15 @@ button.pill:disabled{opacity:.6;cursor:default}
 .kpi{position:relative;overflow:hidden;padding:14px 15px 13px}
 .kpi .rail{position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--neutral)}
 .kpi.k-meta .rail{background:var(--crit)} .kpi.k-fila .rail{background:var(--warn)} .kpi.k-livre .rail{background:var(--info)} .kpi.k-elet .rail{background:var(--brand)}
-.kpi .lab{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
-.kpi .val{font-family:Archivo,sans-serif;font-size:34px;font-weight:700;line-height:1.1;letter-spacing:-.03em;margin:3px 0 1px}
+.kpi .lab{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.kpi .val{font-size:34px;font-weight:600;line-height:1.1;letter-spacing:-.03em;margin:3px 0 1px}
 .kpi.k-meta .val{color:var(--crit)} .kpi.k-fila .val{color:var(--warn-ink)} .kpi.k-livre .val{color:var(--info)} .kpi.k-elet .val{color:var(--brand-2)}
-.kpi .foot{font-size:11.5px;color:var(--ink-2);line-height:1.35}
+.kpi .foot{font-size:12.5px;color:var(--ink-2);line-height:1.35}
 /* ---------- setores ---------- */
 .r-set{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}
 @media (max-width:1240px){.r-set{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:820px){.r-set{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){.r-set{grid-template-columns:1fr}.setc .sn .lab{white-space:nowrap}}
 .setc{padding:11px 12px 10px;text-align:left;border:0;cursor:pointer;font:inherit;color:inherit;width:100%;display:block}
 .setc:hover{background:var(--card-2)}
 .setc:active{transform:scale(.995)}
@@ -139,54 +142,54 @@ button.pill:disabled{opacity:.6;cursor:default}
 /* 06/09: nada dizia que o card abria alguma coisa — ele pediu para "clicar e abrir a página do setor" */
 .setc .sh .go{font-family:inherit;font-size:15px;color:var(--ink-3);line-height:1}
 .setc:hover .sh .go{color:var(--brand-2)}
-.setc .abrir{display:block;margin-top:9px;font-size:9.5px;font-weight:700;letter-spacing:.06em;
+.setc .abrir{display:block;margin-top:9px;font-size:9.5px;font-weight:600;letter-spacing:.06em;
   text-transform:uppercase;color:var(--ink-3);border-top:1px solid var(--line-2);padding-top:7px}
 .setc:hover .abrir{color:var(--brand-2)}
 /* página de um setor */
 .sethd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
 .sethd .volta{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:8px;border:1px solid var(--line);
-  background:var(--card);color:var(--ink-2);font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+  background:var(--card);color:var(--ink-2);font:inherit;font-size:12px;font-weight:600;cursor:pointer}
 .sethd .volta:hover{background:var(--card-2);color:var(--ink)}
-.sethd h2{font-family:Archivo,sans-serif;font-size:20px;font-weight:700;letter-spacing:-.02em;margin:0}
+.sethd h2{font-size:20px;font-weight:600;letter-spacing:-.02em;margin:0}
 .sethd .sub{font-size:11.5px;color:var(--ink-3)}
 .setres{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.setres b{display:inline-flex;align-items:baseline;gap:5px;padding:6px 11px;border-radius:100px;background:var(--card);
-  border:1px solid var(--line);font-size:11.5px;font-weight:700;color:var(--ink-2)}
-.setres b i{font-style:normal;font-family:Archivo,sans-serif;font-size:15px;font-weight:700;color:var(--ink)}
+.setres b{display:inline-flex;align-items:baseline;gap:5px;padding:7px 12px;border-radius:100px;background:transparent;
+  border:1px solid var(--line);font-size:12.5px;font-weight:500;color:var(--ink-2);cursor:pointer}
+.setres b i{font-style:normal;font-size:15px;font-weight:600;color:var(--ink)}
 .setres b.ok i{color:var(--brand-2)} .setres b.wa i{color:var(--warn-ink)} .setres b.cr i{color:var(--crit-ink,#a12020)}
 .setc .sh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px}
 .setc .sh b{font-size:13px}
-.setc .sh span{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3)}
+.setc .sh span{font-size:10.5px;color:var(--ink-3)}
 .setc .track{height:6px;border-radius:3px;background:var(--card-3);overflow:hidden;position:relative;display:block}
 .setc .track .fill{position:absolute;left:0;top:0;bottom:0;background:var(--brand);display:block}
 .setc .sn{display:flex;gap:10px;margin-top:9px}
 .setc .sn div{flex:1 1 0;min-width:0}
-.setc .sn .num{display:block;font-family:Archivo,sans-serif;font-size:19px;font-weight:700;line-height:1.1;letter-spacing:-.02em}
+.setc .sn .num{display:block;font-size:19px;font-weight:600;line-height:1.1;letter-spacing:-.02em}
 .setc .sn .num.warn{color:var(--warn-ink)} .setc .sn .num.good{color:var(--brand-2)} .setc .sn .num.off{color:var(--ink-3)}
-.setc .sn .lab{display:block;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-top:1px}
-.dsf{display:inline-block;padding:1px 6px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap}
+.setc .sn .lab{display:block;font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-top:1px}
+.dsf{display:inline-block;padding:1px 6px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
 .dsf.res{background:var(--brand-soft);color:var(--brand-2)}
 .dsf.enc{background:var(--card-3);color:var(--ink-2)}
 .dsf.par{background:var(--crit-soft,#fdeaea);color:var(--crit-ink,#a12020)}
 .txt.vitae{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
-.vt{display:inline-flex;flex-direction:column;padding:3px 7px;border-radius:6px;background:var(--warn-soft);border:1px solid rgba(250,178,25,.35);font-size:11px;line-height:1.25;max-width:100%}
-.vt b{font-weight:600;color:var(--warn-ink)} .vt small{color:var(--ink-3);font-size:9.5px}
+.vt{display:inline-flex;flex-direction:column;padding:4px 8px;border-radius:8px;background:var(--warn-soft);border:1px solid rgba(250,178,25,.35);font-size:12px;line-height:1.25;max-width:100%}
+.vt b{font-weight:500;color:var(--warn-ink)} .vt small{color:var(--ink-3);font-size:10.5px}
 .vt.cr{background:var(--crit-soft);border-color:rgba(208,59,59,.3)} .vt.cr b{color:var(--crit-ink)}
 .vt.nt{background:var(--card);border-color:var(--line-2)} .vt.nt b{color:var(--ink-2)}
-.tb td.lt2{white-space:nowrap} .tb .urg{color:var(--crit-ink);font-weight:700}
+.tb td.lt2{white-space:nowrap} .tb .urg{color:var(--crit-ink);font-weight:600}
 .pit{padding:10px 0;border-bottom:1px solid var(--line-2)}
 .pit:last-child{border-bottom:0}
 .pit .ph{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
-.pit .ph b{font-size:12.5px;font-weight:700}
-.pit .ph .mn{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-3)}
-.pit .pb{font-size:12.5px;line-height:1.45;color:var(--ink)}
-.pit .pa{font-size:12.5px;line-height:1.45;color:var(--ink-2);margin-top:3px}
-.pit .pa b{color:var(--brand-2);font-weight:700}
+.pit .ph b{font-size:14px;font-weight:600}
+.pit .ph .mn{font-size:12px;color:var(--ink-3)}
+.pit .pb{font-size:14px;line-height:1.45;color:var(--ink)}
+.pit .pa{font-size:14px;line-height:1.45;color:var(--ink-2);margin-top:3px}
+.pit .pa b{color:var(--brand-2);font-weight:600}
 
 /* ---------- tabelas ---------- */
 .scroll{overflow:auto;max-width:100%}
-.tb{width:100%;border-collapse:collapse;font-size:12px}
-.tb th{position:sticky;top:0;background:var(--card);text-align:left;padding:5px 7px;font-size:9.5px;font-weight:700;letter-spacing:.08em;
+.tb{width:100%;border-collapse:collapse;font-size:13px}
+.tb th{position:sticky;top:0;background:var(--solid);text-align:left;padding:6px 7px;font-size:10.5px;font-weight:600;letter-spacing:.06em;
   text-transform:uppercase;color:var(--ink-3);border-bottom:1px solid var(--line);z-index:1;white-space:nowrap}
 .tb th.r,.tb td.r{text-align:right}
 .tb td{padding:6px 7px;border-bottom:1px solid var(--line-2);vertical-align:top;line-height:1.35}
@@ -196,8 +199,8 @@ button.pill:disabled{opacity:.6;cursor:default}
 .occ .track{height:18px;border-radius:5px;background:var(--card-3);overflow:hidden;position:relative;display:block}
 .occ .fill{position:absolute;left:0;top:0;bottom:0;background:var(--brand);border-radius:5px 0 0 5px}
 .occ .xtra{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(135deg,var(--crit) 0 5px,rgba(255,255,255,.55) 5px 10px)}
-.occ .txt{position:absolute;left:7px;top:0;height:18px;line-height:18px;font-size:10.5px;font-weight:700;color:#fff;font-family:"IBM Plex Mono",monospace;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-.flag{display:inline-block;padding:1px 7px;border-radius:100px;font-size:10px;font-weight:700;white-space:nowrap}
+.occ .txt{position:absolute;left:7px;top:0;height:18px;line-height:18px;font-size:10.5px;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.flag{display:inline-block;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:600;white-space:nowrap}
 .flag.sim,.flag.crit{background:var(--crit-soft);color:var(--crit-ink)}
 .flag.nao{background:var(--neutral-soft);color:var(--ink-3)}
 .flag.ok{background:var(--good-soft);color:var(--good-ink)}
@@ -207,18 +210,18 @@ button.pill:disabled{opacity:.6;cursor:default}
 
 /* ---------- filtros ---------- */
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
-.fb{border:1px solid var(--line);background:var(--card);color:var(--ink-2);cursor:pointer;padding:4px 10px;border-radius:100px;font-size:11.5px;font-weight:600}
+.fb{border:1px solid var(--line);background:transparent;color:var(--ink-2);cursor:pointer;padding:6px 12px;border-radius:100px;font-size:13px;font-weight:500}
 .fb:hover{border-color:var(--brand-3);color:var(--ink)}
-.fb[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+.fb[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
 .fb .sw{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;vertical-align:1px}
 .busca{width:100%;max-width:280px;padding:7px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);font-size:16px}
 @media (min-width:761px){.busca{font-size:13px}}
 
 /* ---------- leito a leito (editável) ---------- */
-.grupo{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:2;background:var(--card);padding:9px 2px 6px;
-  font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
-.grupo .n{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:11px}
-.item{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px 12px;align-items:start;padding:9px 10px;border-radius:var(--r-sm);
+.grupo{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:2;background:var(--solid);padding:9px 2px 6px;
+  font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.grupo .n{margin-left:auto;font-size:11px}
+.item{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px 12px;align-items:start;padding:10px 12px;border-radius:var(--r-sm);
   border:1px solid var(--line-2);margin-bottom:6px;background:var(--card)}
 .item.dirty{border-color:var(--warn);box-shadow:inset 3px 0 0 var(--warn)}
 .item.view{cursor:pointer;padding:8px 10px}
@@ -228,17 +231,17 @@ button.pill:disabled{opacity:.6;cursor:default}
 .item.aberto{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand-soft)}
 .item .info{min-width:0}
 .item .txt{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.35}
-.item .txt.acao{font-size:12.5px;font-weight:600;margin-top:4px}
-.item .txt.pend{font-size:11.5px;color:var(--ink-2);margin-top:2px}
-.item .leito{font-family:"IBM Plex Mono",monospace;font-size:12.5px;font-weight:600;line-height:1.3}
-.item .leito small{display:block;font-size:10px;color:var(--ink-3);font-weight:400;font-family:"IBM Plex Sans",sans-serif}
-.item .leito .p{display:block;font-size:12px;color:var(--ink-2)}
+.item .txt.acao{font-size:14px;font-weight:600;margin-top:4px}
+.item .txt.pend{font-size:13px;color:var(--ink-2);margin-top:2px}
+.item .leito{font-size:14px;font-weight:600;line-height:1.3}
+.item .leito small{display:block;font-size:11.5px;color:var(--ink-3);font-weight:400;font-family:inherit}
+.item .leito .p{display:block;font-size:13px;color:var(--ink-2)}
 .item .ctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .item select{padding:5px 8px;border:1px solid var(--line);border-radius:7px;background:var(--card);font-size:12px;font-weight:600}
 .item textarea{width:100%;min-height:36px;padding:6px 8px;border:1px solid var(--line);border-radius:7px;background:var(--card);font-size:12.5px;line-height:1.4;resize:vertical}
-.item .lab{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:4px 0 2px}
+.item .lab{font-size:9.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:4px 0 2px}
 .item textarea.acao{font-weight:600}
-.selo{display:inline-block;padding:2px 8px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.04em;white-space:nowrap}
+.selo{display:inline-block;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:600;letter-spacing:.04em;white-space:nowrap}
 .s-alta{background:var(--alta);color:#fff}
 .s-altase{background:var(--altase-soft);color:var(--altase-ink);box-shadow:inset 0 0 0 1px var(--altase)}
 .s-pend{background:var(--warn-soft);color:var(--warn-ink)}
@@ -252,17 +255,17 @@ button.pill:disabled{opacity:.6;cursor:default}
 
 /* ---------- botões / formulários ---------- */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 14px;border-radius:var(--r-sm);border:1px solid var(--brand);
-  background:var(--brand);color:#fff;font-size:12.5px;font-weight:700;cursor:pointer;line-height:1.2}
-.btn:hover{background:var(--brand-2);border-color:var(--brand-2)}
+  background:var(--brand);color:var(--on-brand);font-size:13.5px;font-weight:600;cursor:pointer;line-height:1.2;border-radius:100px}
+.btn:hover{opacity:.88}
 .btn:disabled{opacity:.55;cursor:default}
-.btn.sec{background:var(--card);color:var(--brand-2);border-color:var(--line)}
+.btn.sec{background:transparent;color:var(--ink);border-color:var(--line)}
 .btn.sec:hover{background:var(--card-2)}
 .btn.crit{background:var(--crit);border-color:var(--crit)}
 .btn.warn{background:var(--warn);border-color:var(--warn);color:#3a2800}
 .btn.mini{padding:5px 10px;font-size:11.5px}
 .btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .mails{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
-.mail label{display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.mail label{display:block;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
 .mail input{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);font-size:16px}
 @media (min-width:761px){.mail input{font-size:13px}}
 .mail input.ruim{border-color:var(--crit);background:var(--crit-soft)}
@@ -270,9 +273,9 @@ button.pill:disabled{opacity:.6;cursor:default}
 .mail.rasc input{border-color:var(--warn);background:var(--warn-soft)}
 .mail.rasc label::after{content:" · não salvo";color:var(--warn-ink)}
 .mail.conf label::after{content:" · não salvo · a planilha mudou";color:var(--crit-ink)}
-.msg{font-size:12px;color:var(--ink-2);margin-top:8px;line-height:1.45}
+.msg{font-size:13px;color:var(--ink-2);margin-top:8px;line-height:1.45}
 .msg.ok{color:var(--good-ink)} .msg.erro{color:var(--crit-ink)} .msg.pend{color:var(--warn-ink);font-weight:600}
-.nota{font-size:12px;color:var(--ink-2);line-height:1.5;padding:10px 12px;border-radius:var(--r-sm);background:var(--card-2)}
+.nota{font-size:13px;color:var(--ink-2);line-height:1.5;padding:10px 12px;border-radius:var(--r-sm);background:var(--card-2)}
 .nota.warn{background:var(--warn-soft);color:var(--warn-ink)}
 .nota.crit{background:var(--crit-soft);color:var(--crit-ink)}
 .check{display:grid;gap:8px}
@@ -287,12 +290,63 @@ button.pill:disabled{opacity:.6;cursor:default}
 .toast.erro{background:var(--crit);color:#fff}
 @media (min-width:761px){.toast{bottom:24px}}
 
+/* ---------- 09/09: tela Hoje, Mais, visita ---------- */
+.big{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.big .b{padding:12px 12px 10px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--card);text-align:left;cursor:pointer;font:inherit;color:inherit}
+.big .b .v{font-size:34px;font-weight:600;line-height:1;letter-spacing:-.03em}
+.big .b .l{font-size:12px;color:var(--ink-2);margin-top:5px;line-height:1.25}
+.big .b.cr .v{color:var(--crit)} .big .b.ok .v{color:var(--good-ink)} .big .b.wa .v{color:var(--warn-ink)}
+.sub2{font-size:13px;color:var(--ink-2);margin:-4px 0 12px}
+.acoes{display:grid;gap:0}
+.acao-row{display:grid;grid-template-columns:52px minmax(0,1fr) 18px;gap:10px;align-items:center;width:100%;padding:10px 4px;border:0;border-bottom:1px solid var(--line-2);
+  background:none;text-align:left;cursor:pointer;font:inherit;color:inherit}
+.acao-row:last-child{border-bottom:0}
+.acao-row .n{font-size:24px;font-weight:600;line-height:1;letter-spacing:-.02em;color:var(--ink)}
+.acao-row .n.cr{color:var(--crit)} .acao-row .n.wa{color:var(--warn-ink)} .acao-row .n.ok{color:var(--good-ink)} .acao-row .n.off{color:var(--ink-3)}
+.acao-row .t{font-size:14.5px;font-weight:500} .acao-row .s{font-size:12.5px;color:var(--ink-3);margin-top:1px}
+.acao-row .go{color:var(--ink-3);font-size:18px;text-align:right}
+.setrow{border-bottom:1px solid var(--line-2)} .setrow:last-child{border-bottom:0}
+.setrow summary{list-style:none;cursor:pointer;padding:11px 2px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center}
+.setrow summary::-webkit-details-marker{display:none}
+.setrow .nm{font-size:15px;font-weight:600} .setrow .oc{font-size:12.5px;color:var(--ink-3);text-align:right}
+.setrow .tk{grid-column:1/-1;height:5px;border-radius:3px;background:var(--card-3);overflow:hidden;position:relative}
+.setrow .tk i{position:absolute;left:0;top:0;bottom:0;background:var(--brand-3)}
+.setrow .ln{grid-column:1/-1;display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--ink-2)}
+.setrow .ln b{color:var(--ink)} .setrow .ln .imp{color:var(--warn-ink)}
+.setrow .dt{padding:2px 2px 12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.setrow .dt div{font-size:12px;color:var(--ink-3)} .setrow .dt div b{display:block;font-size:17px;color:var(--ink);font-weight:600}
+.setrow .dt .full{grid-column:1/-1}
+.so-mobile{display:none}
+@media (max-width:760px){.so-mobile{display:block}.so-desk{display:none}.big .b .v{font-size:30px}}
+.mud{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.mud button{border:1px solid var(--line);background:transparent;color:var(--ink-2);border-radius:100px;padding:6px 11px;font:inherit;font-size:12.5px;cursor:pointer}
+.mud button[aria-pressed="true"]{background:var(--brand);color:var(--on-brand);border-color:var(--brand)}
+.mud-it{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:8px 2px;border-bottom:1px solid var(--line-2);cursor:pointer}
+.mud-it:last-child{border-bottom:0}
+.mud-it .a{font-size:13.5px} .mud-it .a small{color:var(--ink-3);font-size:12px;display:block}
+.mais-list{display:grid;gap:8px}
+.mais-list button{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;padding:13px 14px;border:1px solid var(--line-2);border-radius:var(--r);
+  background:var(--card);text-align:left;cursor:pointer;font:inherit;color:inherit}
+.mais-list button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mais-list .t{font-size:15px;font-weight:500} .mais-list .s{font-size:12.5px;color:var(--ink-3);margin-top:1px}
+.mais-list .bd{font-size:12px;color:var(--warn-ink);font-weight:600}
+.visita{position:sticky;bottom:calc(var(--sb) + 0px);z-index:6;display:flex;gap:8px;align-items:center;margin-top:10px;padding:8px 10px;border-radius:100px;
+  background:var(--solid);border:1px solid var(--line);font-size:13px}
+.visita .sp{flex:1;text-align:center;color:var(--ink-2)} .visita .sp b{color:var(--ink)}
+.visita button{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:100px;padding:7px 13px;font:inherit;font-size:13px;font-weight:500;cursor:pointer}
+.visita button:disabled{opacity:.4}
+@media (max-width:760px){.visita{bottom:calc(var(--sb) + 70px)}.barra{bottom:calc(var(--sb) + 122px)}}
+.estado{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+details.card>summary{list-style:none;cursor:pointer;padding:13px 15px} details.card>summary::-webkit-details-marker{display:none}
+details.card>summary h2{display:inline} details.card>summary .hint{display:inline;margin-left:8px}
+.occ .fill{background:var(--brand-3)!important} .occ .txt{color:var(--ink)!important;text-shadow:none!important}
+
 /* ---------- configuração (chave da ponte) ---------- */
 #cfg{position:fixed;inset:0;z-index:50;background:var(--plane);display:grid;place-items:center;padding:20px;overflow:auto}
-#cfg .box{width:100%;max-width:460px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:var(--shadow)}
+#cfg .box{width:100%;max-width:460px;background:var(--solid);border:1px solid var(--line);border-radius:var(--r);padding:22px}
 #cfg h1{font-size:18px;margin:10px 0 4px}
 #cfg p{font-size:12.5px;color:var(--ink-2);line-height:1.5;margin:0 0 12px}
-#cfg label{display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:10px 0 4px}
+#cfg label{display:block;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:10px 0 4px}
 #cfg input,#cfg textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);font-size:16px;font-family:"IBM Plex Mono",monospace}
 @media (min-width:761px){#cfg input,#cfg textarea{font-size:12.5px}}
 
@@ -300,19 +354,18 @@ button.pill:disabled{opacity:.6;cursor:default}
 @media (max-width:760px){
   .shell{grid-template-columns:1fr}
   .side{position:fixed;left:0;right:0;bottom:0;top:auto;height:auto;z-index:40;border-right:0;border-top:1px solid var(--line);
-    padding:6px 4px calc(6px + var(--sb));background:rgba(255,255,255,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-  @media (prefers-color-scheme:dark){.side{background:rgba(21,29,27,.96)}}
+    padding:6px 4px calc(6px + var(--sb));background:var(--solid-t);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
   .side .brand,.side .sblock,.side .sfoot{display:none}
   .navf{flex-direction:row;justify-content:space-around;gap:0}
   /* cada botão ocupa 1/7 fixo: a largura não muda com o texto em negrito, com o
      contador (que é absoluto) nem com a aba escolhida — a barra fica parada */
-  .navf button{flex:1 1 0;min-width:0;max-width:14.2857%;flex-direction:column;gap:3px;padding:4px 1px;font-size:9.5px;font-weight:600;justify-content:center;align-items:center;text-align:center;border-radius:8px;white-space:nowrap;letter-spacing:-.01em}
+  .navf button{flex:1 1 0;min-width:0;max-width:25%;flex-direction:column;gap:3px;padding:5px 1px;font-size:11px;font-weight:500;justify-content:center;align-items:center;text-align:center;border-radius:8px;white-space:nowrap;letter-spacing:-.01em}
   /* o rótulo é cortado dentro do próprio botão: nada empurra a barra para fora dos 375px */
   .navf button>span:not(.n){display:block;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .navf button svg{width:21px;height:21px;flex-basis:21px}
   .navf .n{margin-left:0;position:absolute;transform:translate(16px,-4px);font-size:9.5px}
   .navf button{position:relative}
-  @media (max-width:380px){ .navf button{font-size:9px;letter-spacing:-.02em} }
+  @media (max-width:380px){ .navf button{font-size:10.5px;letter-spacing:-.02em} }
   .main{padding:calc(12px + var(--st)) 12px calc(96px + var(--sb))}
   .head h1{font-size:18px}
   .r-kpi{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -372,7 +425,8 @@ button.pill:disabled{opacity:.6;cursor:default}
    ================================================================ */
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const LS_CFG = 'plc.cfg', LS_EDITS = 'plc.edits', LS_TAB = 'plc.tab', LS_MAIL = 'plc.mail';
+const LS_CFG = 'plc.cfg', LS_EDITS = 'plc.edits', LS_TAB = 'plc.tab', LS_MAIL = 'plc.mail', LS_SUB = 'plc.sub', LS_TEMA = 'plc.tema', LS_FILTRO = 'plc.filtro';
+const CORTE = {CIR: 4, CM1: 10, TRAU: 5.5, UCE: 20, AVC: 10, UTIA: 10};   /* corte de permanência por setor (o mesmo do PDF) */
 
 const SELOS = ['ALTA HOJE','ALTA SE','ATB','EM EXAME','CIRURGIA','PÓS-OP','REGULAÇÃO','VIGILÂNCIA','PIORA CLÍNICA','PALIATIVO','UTI','OBSTETRÍCIA','RN','SEM LEITURA'];
 const SELO_G = {'ALTA HOJE':'alta','ALTA SE':'altase','ATB':'pend','EM EXAME':'pend','CIRURGIA':'pend','PÓS-OP':'pend','REGULAÇÃO':'pend',
@@ -396,12 +450,28 @@ const ICO = {
   ok:'<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>',
   warn:'<svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>',
   crit:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>',
-  refresh:'<svg viewBox="0 0 24 24"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6"/><path d="M20.5 3.5V9H15"/></svg>'};
+  refresh:'<svg viewBox="0 0 24 24"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6"/><path d="M20.5 3.5V9H15"/></svg>',
+  mais:'<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>',
+  tema:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg>',
+  key:'<svg viewBox="0 0 24 24"><circle cx="8" cy="14" r="4"/><path d="M11 11 20 2M16 6l2 2M13 9l2 2"/></svg>'};
 
 const S = { cfg:null, D:null, V:null, emails:{}, envios:[], versao:null, hoje:'', quando:'',
-            tab: localStorage.getItem(LS_TAB) || 'hoje', edits:{}, filtro:{k:'', g:'', q:''}, ocupado:false, aberto:null,
+            tab: localStorage.getItem(LS_TAB) || 'hoje', sub: localStorage.getItem(LS_SUB) || '', edits:{}, filtro:{k:'', g:'', q:'', v:''}, ocupado:false, aberto:null, visita:false,
             AD:null, envio1:'', setorSel: localStorage.getItem('painel.setor') || '', rasc:{emails:{}, corpo:null} };
 try { S.edits = JSON.parse(localStorage.getItem(LS_EDITS) || '{}') || {}; } catch (_) { S.edits = {}; }
+/* 09/09: filtros da aba Leitos persistem (modo visita); abas antigas gravadas no aparelho viram sub-páginas de Mais */
+try { const f = JSON.parse(localStorage.getItem(LS_FILTRO) || 'null'); if (f) S.filtro = Object.assign({k:'', g:'', q:'', v:''}, f); } catch (_) {}
+if ({reg:1, piloto:1, mail:1, val:1}[S.tab]) { S.sub = S.tab === 'piloto' ? 'res' : S.tab; S.tab = 'mais'; }
+function guardarFiltro(){ try { localStorage.setItem(LS_FILTRO, JSON.stringify(S.filtro)); } catch (_) {} }
+function aplicarTema(){ const t = localStorage.getItem(LS_TEMA) || 'dark'; document.documentElement.setAttribute('data-theme', t); const m = $('meta-theme'); if (m) m.content = t === 'light' ? '#ffffff' : '#000000'; }
+function alternarTema(){ localStorage.setItem(LS_TEMA, (localStorage.getItem(LS_TEMA) || 'dark') === 'dark' ? 'light' : 'dark'); aplicarTema(); pintarMain(); }
+/* navega para uma aba/sub-página, opcionalmente já com um filtro da aba Leitos */
+function irPara(tab, sub, filtro, aberto){
+  S.tab = tab; S.sub = sub || ''; localStorage.setItem(LS_TAB, S.tab); localStorage.setItem(LS_SUB, S.sub);
+  if (filtro) { S.filtro = Object.assign({k:'', g:'', q:'', v:''}, filtro); guardarFiltro(); }
+  if (aberto !== undefined) S.aberto = aberto;
+  pintarNav(); pintarMain(); window.scrollTo(0, 0);
+}
 /* rascunho da aba E-mails: sobrevive a bloquear a tela e ao recarregamento automático */
 try { const r = JSON.parse(localStorage.getItem(LS_MAIL) || 'null'); if (r && r.emails) S.rasc = {emails: r.emails || {}, corpo: r.corpo || null}; } catch (_) {}
 
@@ -472,25 +542,28 @@ $('b-cfg').addEventListener('click', () => abrirCfg(!!S.cfg));
 $('b-refresh').addEventListener('click', () => carregar());
 
 /* ---------------- navegação ---------------- */
+/* 09/09 (pedido dele + revisão externa): 4 abas no polegar; o resto mora em "Mais" */
 const ABAS = [
   {id:'hoje',   nome:'Hoje',       ic:'hoje'},
   {id:'setor',  nome:'Setores',    ic:'setor'},
   {id:'leitos', nome:'Leitos',     ic:'leitos'},
-  {id:'reg',    nome:'Regulação',  ic:'reg'},
-  {id:'piloto', nome:'Piloto',     ic:'piloto'},
-  {id:'mail',   nome:'E-mails',    ic:'mail'},
-  {id:'val',    nome:'Validar',    ic:'val'}];
+  {id:'mais',   nome:'Mais',       ic:'mais'}];
+const SUBS = {
+  reg:  {nome:'Regulação',        ic:'reg',    hint:'fila da emergência, diálise, transferências externas'},
+  res:  {nome:'Resultados',       ic:'piloto', hint:'o que o painel sinalizou virou alta? evolução dia a dia'},
+  mail: {nome:'E-mails',          ic:'mail',   hint:'quem recebe o PDF de cada setor e o texto da mensagem'},
+  val:  {nome:'Revisão e envios', ic:'val',    hint:'estado do painel de hoje, revisão médica, reenvio'}};
 function nEdits(){ return Object.keys(S.edits).length; }
 function pintarNav(){
   $('nav').innerHTML = ABAS.map(a => {
     let n = '';
     if (a.id === 'leitos' && nEdits()) n = '<span class="n warn">' + nEdits() + '</span>';
-    if (a.id === 'mail' && nRascMail()) n = '<span class="n warn">' + nRascMail() + '</span>';   /* e-mail digitado e não salvo */
-    if (a.id === 'val' && S.V) n = '<span class="n">' + (String(S.V.estado).toUpperCase() === 'VALIDADO' ? '✓' : '') + '</span>';
+    if (a.id === 'mais' && nRascMail()) n = '<span class="n warn">' + nRascMail() + '</span>';   /* e-mail digitado e não salvo */
     return '<button data-tab="' + a.id + '" aria-pressed="' + (S.tab === a.id) + '">' + ICO[a.ic] + '<span>' + a.nome + '</span>' + n + '</button>';
   }).join('');
   $('nav').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
-    S.tab = b.dataset.tab; localStorage.setItem(LS_TAB, S.tab); pintarNav(); pintarMain(); window.scrollTo(0, 0);
+    /* tocar em "Mais" estando numa sub-página volta ao menu de Mais */
+    irPara(b.dataset.tab, b.dataset.tab === 'mais' && S.tab === 'mais' ? '' : (b.dataset.tab === 'mais' ? S.sub : ''));
   }));
 }
 function pintarTudo(){ pintarLateral(); pintarNav(); pintarMain(); }
@@ -512,9 +585,15 @@ function pintarMain(){
   const m = $('main');
   if (S.versao === 15) { m.innerHTML = telaV15(); return; }
   if (!S.D) { m.innerHTML = '<div class="bloq">carregando…</div>'; return; }
-  m.innerHTML = ({hoje: vHoje, setor: vSetor, leitos: vLeitos, reg: vReg, piloto: vPiloto, mail: vMail, val: vVal})[S.tab]();
-  const LIGA = {setor: ligarSetor, leitos: ligarLeitos, mail: ligarMail, val: ligarVal};
-  LIGA[S.tab] && LIGA[S.tab]();
+  const chave = S.tab === 'mais' ? (S.sub || 'mais') : S.tab;
+  const VIEWS = {hoje: vHoje, setor: vSetor, leitos: vLeitos, mais: vMais, reg: vReg, res: vPiloto, mail: vMail, val: vVal};
+  m.innerHTML = (VIEWS[chave] || vHoje)();
+  const LIGA = {hoje: ligarHoje, setor: ligarSetor, leitos: ligarLeitos, mais: ligarMais, mail: ligarMail, val: ligarVal, res: ligarRes};
+  LIGA[chave] && LIGA[chave]();
+  const bv = $('b-voltar-mais'); if (bv) bv.addEventListener('click', () => irPara('mais', ''));
+  document.querySelectorAll('[data-ir]').forEach(el => el.addEventListener('click', () => {
+    const d = el.dataset; irPara(d.ir, d.sub || '', d.k !== undefined || d.v !== undefined || d.q !== undefined ? {k: d.k || '', g: d.g || '', q: d.q || '', v: d.v || ''} : null, d.aberto !== undefined ? d.aberto : undefined);
+  }));
   /* "atualizar" no conteúdo: no celular a lateral (onde fica o outro) some */
   const br = $('b-recarregar');
   if (br) br.addEventListener('click', async () => {
@@ -532,6 +611,25 @@ function telaV15(){
     'A URL da ponte não muda; depois é só tocar em <b>atualizar</b> aqui.</div>' +
     '<div class="msg">Até lá este console não lê nem grava nada — de propósito: a leitura antiga (doGet) devolve a planilha inteira, inclusive abas de rascunho com texto de evolução, e isso não deve chegar a um navegador.</div>' +
     '<div style="margin-top:12px"><button class="btn sec" onclick="carregar()">Testar de novo</button></div></div></div>';
+}
+
+/* ================= MAIS ================= */
+function voltarMais(){ return '<div class="sethd"><button class="volta" id="b-voltar-mais">‹ Mais</button></div>'; }
+function vMais(){
+  const tema = (localStorage.getItem(LS_TEMA) || 'dark');
+  let h = cabecalho('Mais', 'Regulação, resultados, e-mails, revisão e envios, aparência e chave da ponte.');
+  h += '<div class="mais-list">' + Object.keys(SUBS).map(k => { const a = SUBS[k];
+      const bd = k === 'mail' && nRascMail() ? nRascMail() + ' não salvo(s)' : (k === 'val' ? (validado() ? 'revisado' : 'sem revisão') : '');
+      return '<button data-ir="mais" data-sub="' + k + '">' + ICO[a.ic] + '<span><span class="t">' + a.nome + '</span><div class="s">' + a.hint + '</div></span><span class="bd">' + bd + '</span></button>'; }).join('') +
+    '<button id="b-tema">' + ICO.tema + '<span><span class="t">Tema ' + (tema === 'dark' ? 'escuro' : 'claro') + '</span><div class="s">tocar para mudar para o ' + (tema === 'dark' ? 'claro' : 'escuro') + '</div></span><span class="bd"></span></button>' +
+    '<button id="b-atualizar2">' + ICO.refresh + '<span><span class="t">Atualizar</span><div class="s">reler a planilha agora' + (S.quando ? ' · última leitura ' + new Date(S.quando).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) : '') + '</div></span><span class="bd"></span></button>' +
+    '<button id="b-chave2">' + ICO.key + '<span><span class="t">Chave da ponte</span><div class="s">ponte ' + (S.versao ? 'v' + S.versao : '?') + ' · a chave fica só neste aparelho</div></span><span class="bd"></span></button></div>';
+  return h;
+}
+function ligarMais(){
+  const bt = $('b-tema'); if (bt) bt.addEventListener('click', alternarTema);
+  const ba = $('b-atualizar2'); if (ba) ba.addEventListener('click', () => carregar());
+  const bc = $('b-chave2'); if (bc) bc.addEventListener('click', () => abrirCfg(!!S.cfg));
 }
 
 /* ================= HOJE ================= */
@@ -642,46 +740,128 @@ function cardVitae(k){
   return h + '</div></div>';
 }
 
+/* 09/09 — a tela Hoje reorganizada (pedido dele, com a revisão externa): 3 números grandes → "precisa de ação" com os
+   contadores clicáveis (abrem a aba Leitos já filtrada) → setores (linha expandível no celular, tabela no computador)
+   → dia anterior → o que mudou desde a última rodada. Cor só onde exige atenção. */
+function filtroV(l, v){
+  if (!v) return true;
+  if (v === 'piora') return l.selo === 'PIORA CLÍNICA';
+  if (v === 'sem') return l.selo === 'SEM LEITURA';
+  if (v === 'ah') return l.selo === 'ALTA HOJE';
+  if (v === 'ase') return l.selo === 'ALTA SE';
+  if (v === 'corte') return CORTE[l.k] ? (Number(l.dl) || 0) > CORTE[l.k] : false;
+  if (v === 'ex') return vitaeDe(l.p).some(x => x.tipo === 'ex');
+  if (v === 'par') return vitaeDe(l.p).some(x => x.tipo === 'par');
+  if (v === 'cir') return !!cirTravada(l);
+  return true;
+}
+const ROT_V = {piora:'Piora clínica', sem:'Sem leitura', ah:'Alta hoje', ase:'Alta se…', corte:'Acima do corte', ex:'Exames parados', par:'Pareceres sem resposta', cir:'Cirurgias travadas'};
+function diasV(l, v){   /* tempo de espera para ordenar a lista filtrada */
+  if (v === 'ex' || v === 'par') return Math.max(0, ...vitaeDe(l.p).filter(x => x.tipo === v).map(x => x.dias || 0));
+  if (v === 'cir') { const t = cirTravada(l); return t && t.dias ? t.dias : 0; }
+  return Number(l.dl) || 0;
+}
+function impedimento(k){   /* o gargalo mais frequente do setor, em uma frase */
+  const L = (S.D.leitos || []).filter(l => l.k === k).map(efetivo), c = contasVitae(k);
+  const cont = sel => L.filter(l => l.selo === sel).length;
+  const cand = [[c.cir, c.cir + ' cirurgia' + (c.cir > 1 ? 's' : '') + ' travada' + (c.cir > 1 ? 's' : '')], [c.ex, c.ex + ' exame' + (c.ex > 1 ? 's' : '') + ' parado' + (c.ex > 1 ? 's' : '')],
+    [c.par, c.par + ' parecer' + (c.par > 1 ? 'es' : '') + ' sem resposta'], [cont('REGULAÇÃO'), cont('REGULAÇÃO') + ' aguardando regulação'],
+    [cont('EM EXAME'), cont('EM EXAME') + ' em exame'], [cont('ATB'), cont('ATB') + ' em antibiótico'], [cont('PIORA CLÍNICA'), cont('PIORA CLÍNICA') + ' com piora clínica']];
+  cand.sort((x, y) => y[0] - x[0]);
+  return cand[0][0] ? cand[0][1] : 'sem trava registrada';
+}
 function vHoje(){
-  const D = S.D, sets = setoresOrd(), DF = difEdits();
-  const elet = sets.reduce((a, s) => a + (s.elet || 0), 0), fila = sets.reduce((a, s) => a + (s.fila || 0), 0);
+  const D = S.D, sets = setoresOrd(), DF = difEdits(), lido = vitaeLido();
+  const elet = sets.reduce((a, s) => a + (s.elet || 0), 0), fila = (D.fila || []).length;
   const emg = (D.setores || []).find(s => s.k === 'EMG');
-  const sem = seloEf(DF, 'SEM LEITURA');
+  const EFs = sets.map(s => setEf(DF, s));
+  const AH = EFs.reduce((a, e) => a + e.ah, 0), ASE = EFs.reduce((a, e) => a + e.ase, 0);
+  const c = contasVitae(null);
+  const sem = seloEf(DF, 'SEM LEITURA'), piora = seloEf(DF, 'PIORA CLÍNICA');
+  const acima = (D.leitos || []).filter(l => l.k !== 'EMG' && CORTE[l.k] && (Number(l.dl) || 0) > CORTE[l.k]).length;
   let h = cabecalho('Painel de ' + esc(D.data), 'Censo de ' + esc(D.censo) + ' · ' + esc(D.nota || ''));
-  h += '<div class="row r-kpi">' +
-    kpi('k-meta', 'Altas necessárias hoje', D.meta, 'ontem: ' + (D.ontem ? D.ontem.altas + ' altas, ' + D.ontem.entradas + ' entradas, ' + D.ontem.obitos + ' óbitos' : '—')) +
-    kpi('k-fila', 'Fila da emergência', (D.fila || []).length, (emg ? emg.ocup + '/' + emg.cap + ' na emergência · ' : '') + fila + ' pedidos com destino') +
-    kpi('k-elet', 'Eletivas para entrar hoje', elet, 'aguardando internação — já descontadas as que já têm leito') +
-    kpi('k-livre', 'Leitos livres', D.glob ? D.glob.livres : '—', D.glob ? D.glob.ocup + '/' + D.glob.leitos + ' ocupados · ' + D.glob.extras + ' em cama extra' : '') + '</div>';
-  { /* 09/09: o que o Vitae diz que está parado no hospital inteiro */
-    const c = contasVitae(null), lido = vitaeLido();
-    h += '<div class="row r-kpi">' +
-      kpi('k-fila', 'Exames parados', lido ? c.ex : '—', lido ? 'sem programação ou vencidos · ' + c.exLeitos + ' leito(s) · Lista de Exames' : 'Lista de Exames não lida hoje') +
-      kpi('k-fila', 'Pareceres sem resposta', lido ? c.par : '—', lido ? 'há mais de 24 h · ' + c.urg + ' urgente(s) · Interconsultas' : 'Interconsultas não lidas hoje') +
-      kpi('k-meta', 'Cirurgias travadas', c.cir, 'material ' + c.mat + ' · anestesia ' + c.ane + ' · sem data no mapa ' + c.semData) + '</div>';
-  }
-  h += '<div class="row r-2"><div class="card"><header><h2>Setores</h2><span class="hint">meta = altas necessárias hoje · AH alta hoje · ASE alta se' +
-    (nEdits() ? ' · <b style="color:var(--warn-ink)">AH/ASE já contam as suas ' + nEdits() + ' edição(ões) não gravada(s)</b>' : '') + '</span></header><div class="body scroll"><table class="tb"><thead><tr>' +
-    '<th>Setor</th><th>Ocupação</th><th class="r">Livres</th><th class="r">Fila</th><th class="r">Elet.</th><th class="r">Meta</th><th class="r">AH</th><th class="r">ASE</th><th>Status</th></tr></thead><tbody>' +
-    sets.map(s => {
-      const pct = s.cap ? Math.min(100, Math.round(100 * s.ocup / s.cap)) : 0, px = s.cap ? Math.min(100 - pct, Math.round(100 * s.extra / s.cap)) : 0;
-      const status = s.paralelo ? '<span class="flag nao">paralelo</span>' : (s.meta > 0 ? '<span class="flag crit">faltam ' + s.meta + '</span>' : '<span class="flag ok">OK</span>');
-      const e = setEf(DF, s);   /* AH/ASE com as edições locais — a aba Leitos já mostra assim */
+
+  /* 1. três números */
+  h += '<div class="big">' +
+    '<button class="b cr" data-ir="setor"><div class="v">' + (D.meta ?? '—') + '</div><div class="l">altas necessárias hoje</div></button>' +
+    '<button class="b ok" data-ir="leitos" data-g="alta"><div class="v">' + (AH + ASE) + '</div><div class="l">altas potenciais<br><small>' + AH + ' alta hoje · ' + ASE + ' alta se…</small></div></button>' +
+    '<button class="b wa" data-ir="mais" data-sub="reg"><div class="v">' + fila + '</div><div class="l">fila da emergência<br><small>' + (emg ? emg.ocup + '/' + emg.cap + ' ocupados' : '') + '</small></div></button></div>' +
+    '<div class="sub2">' + (D.glob ? '<b>' + D.glob.livres + '</b> leitos livres · ' + D.glob.ocup + '/' + D.glob.leitos + ' ocupados · ' + D.glob.extras + ' em cama extra · ' : '') + '<b>' + elet + '</b> eletivas para entrar' +
+    (nEdits() ? ' · <b style="color:var(--warn-ink)">' + nEdits() + ' edição(ões) não gravada(s)</b>' : '') + '</div>';
+
+  /* 2. precisa de ação — cada linha abre a aba Leitos já filtrada */
+  const linha = (n, cls, t, sub, v, k) => '<button class="acao-row" data-ir="leitos" data-v="' + v + '" data-k="' + (k || '') + '"><span class="n ' + (n ? cls : 'off') + '">' + n + '</span><span><div class="t">' + t + '</div><div class="s">' + sub + '</div></span><span class="go">›</span></button>';
+  h += '<div class="card" style="margin-bottom:12px"><header><h2>Precisa de ação</h2><span class="hint">toque para ver os leitos, do mais antigo para o mais novo</span></header><div class="body acoes" style="padding-top:4px">' +
+    linha(piora, 'cr', 'Piora clínica', 'resposta hoje; não conta para alta', 'piora') +
+    linha(AH, 'ok', 'Alta hoje', 'decisão já escrita na evolução — dar baixa', 'ah') +
+    linha(ASE, 'ok', 'Alta se…', 'falta um item resolvível no dia', 'ase') +
+    (lido ? linha(c.ex, 'wa', 'Exames parados', 'sem programação ou vencidos · ' + c.exLeitos + ' leito(s) · Lista de Exames', 'ex') : linha('—', 'off', 'Exames parados', 'Lista de Exames não lida hoje', 'ex')) +
+    (lido ? linha(c.par, 'wa', 'Pareceres sem resposta', 'há mais de 24 h · ' + c.urg + ' urgente(s) · Interconsultas', 'par') : linha('—', 'off', 'Pareceres sem resposta', 'Interconsultas não lidas hoje', 'par')) +
+    linha(c.cir, 'wa', 'Cirurgias travadas', 'material ' + c.mat + ' · anestesia ' + c.ane + ' · sem data no mapa ' + c.semData, 'cir') +
+    linha(acima, 'wa', 'Acima do corte do setor', 'permanência acima da régua de cada setor', 'corte') +
+    linha(sem, 'cr', 'Sem leitura', 'o coletor não leu a evolução — conferir no Vitae', 'sem') + '</div></div>';
+
+  /* 3. setores: linha expandível no celular, tabela no computador */
+  const st = s => s.paralelo ? '<span class="flag nao">paralelo</span>' : (s.meta > 0 ? '<span class="flag crit">faltam ' + s.meta + '</span>' : '<span class="flag ok">OK</span>');
+  h += '<div class="card so-mobile" style="margin-bottom:12px"><header><h2>Setores</h2><span class="hint">demanda · possibilidades de alta · principal impedimento</span></header><div class="body" style="padding-top:2px">' +
+    sets.map((s, i) => { const e = EFs[i], pct = s.cap ? Math.min(100, Math.round(100 * s.ocup / s.cap)) : 0, a = adSet(s.k), cv = contasVitae(s.k);
+      return '<details class="setrow"><summary><span class="nm">' + esc(s.nome) + (e.ed ? ' ' + FLAG_ED : '') + '</span><span class="oc">' + s.ocup + (s.extra ? '+' + s.extra : '') + '/' + s.cap + ' ocupados</span>' +
+        '<span class="tk"><i style="width:' + pct + '%"></i></span>' +
+        '<span class="ln"><span>demanda <b' + (s.meta > 0 ? ' style="color:var(--crit)"' : '') + '>' + (s.paralelo ? '—' : s.meta) + '</b></span><span>possib. <b' + ((e.ah + e.ase) ? ' style="color:var(--good-ink)"' : '') + '>' + (e.ah + e.ase) + '</b></span><span class="imp">' + esc(impedimento(s.k)) + '</span></span></summary>' +
+        '<div class="dt"><div>livres<b>' + s.livres + '</b></div><div>fila p/ cá<b>' + s.fila + '</b></div><div>eletivas<b>' + s.elet + '</b></div>' +
+        '<div>alta hoje<b>' + e.ah + '</b></div><div>alta se…<b>' + e.ase + '</b></div><div>acima do corte<b>' + (D.leitos || []).filter(l => l.k === s.k && CORTE[s.k] && (Number(l.dl) || 0) > CORTE[s.k]).length + '</b></div>' +
+        '<div>exames parados<b>' + (lido ? cv.ex : '—') + '</b></div><div>pareceres<b>' + (lido ? cv.par : '—') + '</b></div><div>cirurgias travadas<b>' + cv.cir + '</b></div>' +
+        (a ? '<div class="full">cobranças de ' + esc(S.AD.dia_br || S.AD.dia) + ': <b style="display:inline;font-size:13px">' + a.pct_resolvida + '% resolvidas · ' + a.parada + ' paradas de ' + a.n + '</b></div>' : '') +
+        '<div class="full" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px"><button class="btn sec mini" data-ir="setor" data-abrir="' + esc(s.k) + '">Abrir o setor</button><button class="btn sec mini" data-ir="leitos" data-k="' + esc(s.k) + '">Ver os leitos</button></div></div></details>'; }).join('') + '</div></div>';
+  h += '<div class="card so-desk" style="margin-bottom:12px"><header><h2>Setores</h2><span class="hint">demanda = altas necessárias hoje' +
+    (nEdits() ? ' · <b style="color:var(--warn-ink)">alta hoje / alta se já contam as suas ' + nEdits() + ' edição(ões) não gravada(s)</b>' : '') + '</span></header><div class="body scroll"><table class="tb"><thead><tr>' +
+    '<th>Setor</th><th>Ocupação</th><th class="r">Livres</th><th class="r">Fila</th><th class="r">Eletivas</th><th class="r">Demanda</th><th class="r">Alta hoje</th><th class="r">Alta se…</th><th>Principal impedimento</th><th>Status</th></tr></thead><tbody>' +
+    sets.map((s, i) => {
+      const pct = s.cap ? Math.min(100, Math.round(100 * s.ocup / s.cap)) : 0, px = s.cap ? Math.min(100 - pct, Math.round(100 * s.extra / s.cap)) : 0, e = EFs[i];
       return '<tr><td class="lt">' + esc(s.nome) + '</td><td class="occ"><span class="track"><i class="fill" style="width:' + pct + '%"></i>' + (px ? '<i class="xtra" style="left:' + pct + '%;width:' + px + '%"></i>' : '') +
         '<span class="txt">' + s.ocup + (s.extra ? '+' + s.extra : '') + '/' + s.cap + '</span></span></td>' +
         '<td class="r num">' + s.livres + '</td><td class="r num">' + s.fila + '</td><td class="r num">' + s.elet + '</td><td class="r num"><b>' + s.meta + '</b></td>' +
-        '<td class="r num">' + e.ah + '</td><td class="r num">' + e.ase + '</td><td>' + status + (e.ed ? ' ' + FLAG_ED : '') + '</td></tr>'; }).join('') + '</tbody></table></div></div>' +
-    '<div class="card"><header><h2>Selos de hoje</h2><span class="hint">' + (sem ? '<b style="color:var(--crit-ink)">' + sem + ' SEM LEITURA</b>' : 'nenhum SEM LEITURA') + '</span></header><div class="body">' +
+        '<td class="r num">' + e.ah + '</td><td class="r num">' + e.ase + '</td><td>' + esc(impedimento(s.k)) + '</td><td>' + st(s) + (e.ed ? ' ' + FLAG_ED : '') + '</td></tr>'; }).join('') + '</tbody></table></div></div>';
+
+  /* 4. dia anterior */
+  const o = D.ontem || {}; const saidas = (o.altas || 0) + (o.obitos || 0); const saldo = saidas - (o.entradas || 0);
+  const res = o.meta ? (saidas >= o.meta ? '<span class="flag ok">bateu a meta de ' + o.meta + '</span>' : '<span class="flag crit">faltaram ' + (o.meta - saidas) + ' para a meta de ' + o.meta + '</span>') : '<span class="flag nao">sem meta registrada</span>';
+  h += '<div class="card" style="margin-bottom:12px"><header><h2>Dia anterior</h2><span class="hint">' + esc(String(o.data || '').replace(/ \(.*\)/, '')) + '</span></header><div class="body">' +
+    '<div class="setrow"><div class="dt" style="padding-top:6px"><div>entradas<b>' + (o.entradas ?? '—') + '</b></div><div>saídas<b>' + saidas + '</b></div><div>saldo de leitos<b style="color:' + (saldo > 0 ? 'var(--good-ink)' : (saldo < 0 ? 'var(--crit)' : 'inherit')) + '">' + (saldo > 0 ? '+' : '') + saldo + '</b></div></div></div>' +
+    '<div class="msg">' + (o.altas ?? '—') + ' altas + ' + (o.obitos || 0) + ' óbito(s) · ' + res + '</div></div></div>';
+
+  /* 5. o que mudou desde a última rodada */
+  h += cardMudancas();
+
+  /* 6. selos, recolhido */
+  h += '<details class="card"><summary><h2>Selos de hoje</h2><span class="hint">' + (sem ? '<b style="color:var(--crit-ink)">' + sem + ' sem leitura</b>' : 'nenhum sem leitura') + ' · toque para abrir</span></summary><div class="body" style="padding-top:0">' +
     GRUPOS.map(G => { const todos = SELOS.filter(s => SELO_G[s] === G.g);
       const ss = todos.filter(s => seloEf(DF, s)), n = ss.reduce((a, s) => a + seloEf(DF, s), 0);
       const n0 = todos.reduce((a, s) => a + ((D.selos || {})[s] || 0), 0);
       if (!n && !n0) return '';
-      return '<div style="display:grid;grid-template-columns:10px 1fr auto;gap:8px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--line-2);font-size:12px">' +
+      return '<div style="display:grid;grid-template-columns:10px 1fr auto;gap:8px;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--line-2);font-size:13.5px">' +
         '<span style="width:10px;height:10px;border-radius:3px;background:' + G.cor + ';display:block;margin-top:3px"></span><span><b>' + G.nome + '</b>' + (n !== n0 ? ' ' + FLAG_ED : '') + '<br><small style="color:var(--ink-3)">' +
-        (ss.length ? esc(ss.map(s => s + ' ' + seloEf(DF, s)).join(' · ')) : 'nenhum') + '</small></span><span class="num" style="font-weight:600">' + n + '</span></div>'; }).join('') +
-    '<div class="msg">Toque em <b>Leitos</b> para corrigir selo, pendência ou conduta de qualquer leito.' +
-    (nEdits() ? ' <b style="color:var(--warn-ink)">Estes números já são os seus — a planilha e a página publicada só mudam depois de gravar.</b>' : '') + '</div></div></div></div>';
+        (ss.length ? esc(ss.map(s => s + ' ' + seloEf(DF, s)).join(' · ')) : 'nenhum') + '</small></span><span class="num" style="font-weight:600">' + n + '</span></div>'; }).join('') + '</div></details>';
   return h;
+}
+function cardMudancas(){
+  const M = S.D.mudancas; if (!M) return '';
+  const tot = (M.novos || []).length + (M.sairam || []).length + (M.selo || []).length + (M.pend || []).length;
+  const chip = x => '<span class="selo s-' + (SELO_G[x] || 'pend') + '">' + esc(x) + '</span>';
+  const it = (x, txt, sub) => '<div class="mud-it" data-ir="leitos" data-q="' + esc(x.p) + '" data-k="' + esc(x.k) + '" data-aberto="' + esc(x.k + '|' + x.p) + '"><span class="a">' + esc(nomeSetor(x.k)) + ' · <b>' + esc(x.l) + '</b> · #' + esc(x.p) + ' — ' + txt + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</span><span style="color:var(--ink-3)">›</span></div>';
+  const bloco = (rot, lista, f) => lista && lista.length ? '<details style="margin-top:6px"><summary style="cursor:pointer;font-size:14px;padding:6px 0"><b>' + lista.length + '</b> ' + rot + '</summary>' + lista.slice(0, 40).map(f).join('') + (lista.length > 40 ? '<div class="msg">… e mais ' + (lista.length - 40) + '</div>' : '') + '</details>' : '';
+  let h = '<div class="card" style="margin-bottom:12px"><header><h2>O que mudou desde a última rodada</h2><span class="hint">' + (M.ontem ? 'em relação ao painel de ' + esc(M.ontem) : 'sem painel anterior para comparar') + '</span></header><div class="body" style="padding-top:4px">';
+  if (!tot && !(M.corrigidos || []).length) h += '<div class="msg">Nada mudou.</div>';
+  h += bloco('corrigido(s) por você hoje, depois da publicação', M.corrigidos, x => it(x, chip(x.de) + ' → ' + chip(x.para), x.campo !== 'selo' ? 'mudou a ' + x.campo : '')) +
+    bloco('viraram alta (hoje ou alta se…)', (M.selo || []).filter(x => /^ALTA/.test(x.para)), x => it(x, chip(x.de) + ' → ' + chip(x.para), x.pend)) +
+    bloco('mudaram de selo', (M.selo || []).filter(x => !/^ALTA/.test(x.para)), x => it(x, chip(x.de) + ' → ' + chip(x.para), x.pend)) +
+    bloco('com pendência nova (mesmo selo)', M.pend, x => it(x, chip(x.selo), x.pend)) +
+    bloco('leito(s) novo(s) no painel', M.novos, x => it(x, chip(x.selo))) +
+    bloco('saíram do painel desde ' + esc(M.ontem || 'ontem'), M.sairam, x => '<div class="mud-it" style="cursor:default"><span class="a">' + esc(nomeSetor(x.k)) + ' · <b>' + esc(x.l) + '</b> · #' + esc(x.p) + ' — estava como ' + chip(x.selo) + '</span><span></span></div>');
+  return h + '</div></div>';
+}
+function ligarHoje(){
+  document.querySelectorAll('[data-abrir]').forEach(b => b.addEventListener('click', () => { S.setorSel = b.dataset.abrir; localStorage.setItem('painel.setor', S.setorSel); }));
 }
 
 /* ================= LEITOS (editável) ================= */
@@ -736,7 +916,7 @@ function vSetor(){
   let h = cabecalho('Setores', 'As possibilidades de alta de hoje, setor a setor — e o que aconteceu com o que o painel cobrou no dia anterior.');
 
   h += '<div class="row r-kpi">' +
-    kpi('k-elet', 'Possibilidades de alta hoje', AH + ASE, '<b>' + AH + '</b> ALTA HOJE · <b>' + ASE + '</b> ALTA SE' +
+    kpi('k-elet', 'Possibilidades de alta hoje', AH + ASE, '<b>' + AH + '</b> alta hoje · <b>' + ASE + '</b> alta se…' +
       (AH !== AH0 || ASE !== ASE0 ? '<br>' + FLAG_ED + ' na planilha ainda são ' + AH0 + ' e ' + ASE0 + ' — grave na aba Leitos' : ''));
   if (AD && AD.geral && AD.geral.n) {
     h += kpi('k-livre', 'Resolvidas em 24h', AD.geral.pct_resolvida + '%', AD.geral.resolvida + ' de ' + AD.geral.n + ' pendências cobradas no painel de ' + esc(AD.dia_br || AD.dia)) +
@@ -787,14 +967,15 @@ function paginaSetor(k, AD){
     '</span></div>';
 
   h += '<div class="setres">' +
-    '<b class="ok"><i>' + poss.length + '</i> possibilidades hoje</b>' +
+    '<b class="ok" data-ir="leitos" data-k="' + esc(k) + '" data-g="alta"><i>' + poss.length + '</i> possibilidades hoje ›</b>' +
     (a ? '<b class="ok"><i>' + a.resolvida + '</i> resolvidas</b>' +
          '<b class="wa"><i>' + a.encaminhada + '</i> encaminhadas</b>' +
          '<b class="cr"><i>' + a.parada + '</i> paradas</b>' +
          (a.prejudicada ? '<b><i>' + a.prejudicada + '</i> fora do denominador</b>' : '')
        : '<b><i>—</i> sem medição da véspera</b>') +
-    (function(){ const c = contasVitae(k), lido = vitaeLido(); return '<b class="' + (c.ex ? 'wa' : '') + '"><i>' + (lido ? c.ex : '—') + '</i> exames parados</b>' +
-      '<b class="' + (c.par ? 'wa' : '') + '"><i>' + (lido ? c.par : '—') + '</i> pareceres &gt; 24 h</b>' + '<b class="' + (c.cir ? 'cr' : '') + '"><i>' + c.cir + '</i> cirurgias travadas</b>'; })() + '</div>';
+    (function(){ const c = contasVitae(k), lido = vitaeLido(); return '<b class="' + (c.ex ? 'wa' : '') + '" data-ir="leitos" data-k="' + esc(k) + '" data-v="ex"><i>' + (lido ? c.ex : '—') + '</i> exames parados ›</b>' +
+      '<b class="' + (c.par ? 'wa' : '') + '" data-ir="leitos" data-k="' + esc(k) + '" data-v="par"><i>' + (lido ? c.par : '—') + '</i> pareceres &gt; 24 h ›</b>' + '<b class="' + (c.cir ? 'cr' : '') + '" data-ir="leitos" data-k="' + esc(k) + '" data-v="cir"><i>' + c.cir + '</i> cirurgias travadas ›</b>'; })() + '</div>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:-4px 0 12px"><button class="btn" data-ir="leitos" data-k="' + esc(k) + '" data-aberto="">Iniciar a visita neste setor</button><button class="btn sec" data-ir="leitos" data-k="' + esc(k) + '" data-g="alta">Só as altas</button></div>';
 
   /* 1. o que dá para dar alta hoje */
   h += '<div class="card" style="margin-bottom:12px"><header><h2>Possibilidades de alta hoje</h2>' +
@@ -876,15 +1057,18 @@ function vLeitos(){
   const D = S.D, f = S.filtro;
   const ks = [...new Set(D.leitos.map(l => l.k))].sort((a, b) => ORDEM_K.indexOf(a) - ORDEM_K.indexOf(b));
   const nomeK = {}; D.leitos.forEach(l => nomeK[l.k] = l.s);
-  let lista = D.leitos.map(efetivo).filter(l => (!f.k || l.k === f.k) && (!f.g || SELO_G[l.selo] === f.g) && (!f.q || String(l.p).indexOf(f.q) >= 0 || String(l.l).toLowerCase().indexOf(f.q.toLowerCase()) >= 0));
-  let h = cabecalho('Leito a leito', 'Corrija o selo, a pendência ou a conduta e toque em <b>Gravar na planilha</b>: a coluna Selo e a página publicada passam a refletir a correção na hora. O PDF de hoje já foi enviado às 5h — para que os coordenadores vejam a correção, use <b>Validar › Reenviar aos setores</b>.');
+  let lista = D.leitos.map(efetivo).filter(l => (!f.k || l.k === f.k) && (!f.g || SELO_G[l.selo] === f.g) && filtroV(l, f.v) && (!f.q || String(l.p).indexOf(f.q) >= 0 || String(l.l).toLowerCase().indexOf(f.q.toLowerCase()) >= 0));
+  let h = cabecalho('Leito a leito', 'Corrija o selo, a pendência ou a conduta e toque em <b>Gravar na planilha</b>: a coluna Selo e a página publicada passam a refletir a correção na hora. O PDF de hoje já foi enviado às 5h — para que os coordenadores vejam a correção, use <b>Mais › Revisão e envios › Reenviar</b>.');
   h += '<div class="card"><div class="body">' +
     '<div class="chips"><button class="fb" data-k="" aria-pressed="' + !f.k + '">Todos</button>' + ks.map(k => '<button class="fb" data-k="' + k + '" aria-pressed="' + (f.k === k) + '">' + esc(nomeK[k]) + '</button>').join('') + '</div>' +
     '<div class="chips">' + GRUPOS.map(G => '<button class="fb" data-g="' + G.g + '" aria-pressed="' + (f.g === G.g) + '"><span class="sw" style="background:' + G.cor + '"></span>' + G.nome + '</button>').join('') +
     '<input class="busca" id="busca" type="search" inputmode="numeric" placeholder="prontuário ou leito" value="' + esc(f.q) + '" autocomplete="off"></div>' +
+    '<div class="chips">' + Object.keys(ROT_V).map(v => '<button class="fb" data-v="' + v + '" aria-pressed="' + (f.v === v) + '">' + ROT_V[v] + '</button>').join('') + '</div>' +
+    (f.v ? '<div class="msg" style="margin:0 0 8px">Mostrando <b>' + ROT_V[f.v] + '</b>' + (f.k ? ' em ' + esc(nomeK[f.k] || f.k) : '') + ', do mais antigo para o mais novo.' + (f.v === 'ex' || f.v === 'par' ? ' Fonte: Lista de Exames / Interconsultas do Vitae.' : '') + '</div>' : '') +
     '<div id="lista">' + (lista.length ? '' : '<div class="bloq">nenhum leito com esse filtro</div>');
   let kAtual = null;
-  lista.sort((a, b) => ORDEM_K.indexOf(a.k) - ORDEM_K.indexOf(b.k) || ordLeito(a.l, b.l));
+  lista.sort((a, b) => ORDEM_K.indexOf(a.k) - ORDEM_K.indexOf(b.k) || (f.v ? diasV(b, f.v) - diasV(a, f.v) : 0) || ordLeito(a.l, b.l));
+  S.listaIds = lista.filter(l => l.k !== 'EMG').map(idDe);
   lista.forEach(l => {
     if (l.k !== kAtual) { kAtual = l.k; h += '<div class="grupo">' + esc(l.s) + '<span class="n">' + lista.filter(x => x.k === l.k).length + '</span></div>'; }
     const id = idDe(l), dirty = !!S.edits[id], emg = l.k === 'EMG', aberto = S.aberto === id && !emg;
@@ -908,14 +1092,26 @@ function vLeitos(){
     }
   });
   h += '</div>';
+  /* 09/09: modo visita — com um setor filtrado, uma barra fixa anda leito a leito (abre o editor de cada um) */
+  if (f.k && f.k !== 'EMG' && S.listaIds.length) {
+    const i = S.listaIds.indexOf(S.aberto);
+    h += '<div class="visita"><button id="v-ant"' + (i <= 0 ? ' disabled' : '') + '>‹ anterior</button><span class="sp">' + (i >= 0 ? 'leito <b>' + (i + 1) + '</b> de ' + S.listaIds.length : '<b>' + S.listaIds.length + '</b> leitos · toque em próximo para começar a visita') + '</span><button id="v-prox"' + (i >= S.listaIds.length - 1 ? ' disabled' : '') + '>próximo ›</button></div>';
+  }
   if (nEdits()) h += '<div class="barra"><span><b>' + nEdits() + '</b> leito(s) alterado(s) — ainda só neste aparelho</span><span class="sp"></span>' +
     '<button class="btn sec mini" id="b-descartar">Descartar tudo</button><button class="btn mini" id="b-gravar">Gravar na planilha</button></div>';
   h += '</div></div>';
   return h;
 }
 function ligarLeitos(){
+  guardarFiltro();
+  document.querySelectorAll('.fb[data-v]').forEach(b => b.addEventListener('click', () => { S.filtro.v = S.filtro.v === b.dataset.v ? '' : b.dataset.v; guardarFiltro(); pintarMain(); }));
+  const irLeito = (delta) => { const i = S.listaIds.indexOf(S.aberto); const j = i < 0 ? 0 : Math.max(0, Math.min(S.listaIds.length - 1, i + delta)); S.aberto = S.listaIds[j]; pintarMain();
+    const el = document.querySelector('.item.aberto'); if (el) el.scrollIntoView({block: 'start', behavior: 'smooth'}); };
+  const va = $('v-ant'), vp = $('v-prox');
+  if (va) va.addEventListener('click', () => irLeito(-1));
+  if (vp) vp.addEventListener('click', () => irLeito(1));
   document.querySelectorAll('.fb[data-k]').forEach(b => b.addEventListener('click', () => { S.filtro.k = b.dataset.k; pintarMain(); }));
-  document.querySelectorAll('.fb[data-g]').forEach(b => b.addEventListener('click', () => { S.filtro.g = S.filtro.g === b.dataset.g ? '' : b.dataset.g; pintarMain(); }));
+  document.querySelectorAll('.fb[data-g]').forEach(b => b.addEventListener('click', () => { S.filtro.g = S.filtro.g === b.dataset.g ? '' : b.dataset.g; guardarFiltro(); pintarMain(); }));
   const bq = $('busca'); let t;
   bq.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => { S.filtro.q = bq.value.trim(); const pos = bq.selectionStart; pintarMain(); const nb = $('busca'); nb.focus(); try { nb.setSelectionRange(pos, pos); } catch (_) {} }, 350); });
   /* linha fixa → toque abre o editor daquele leito (um por vez) */
@@ -973,7 +1169,7 @@ async function gravarLeitos(){
 /* ================= REGULAÇÃO ================= */
 function vReg(){
   const D = S.D, dl = (D.dialise && D.dialise.lista) || [], te = D.te || [], fila = D.fila || [];
-  let h = cabecalho('Regulação e fila', 'Diálise, transferência externa e a fila da emergência — como estão na planilha.');
+  let h = voltarMais() + cabecalho('Regulação e fila', 'Diálise, transferência externa e a fila da emergência — como estão na planilha.');
   h += '<div class="row r-2"><div class="card"><header><h2>Fila da emergência · ' + fila.length + '</h2></header><div class="body scroll"><table class="tb"><thead><tr><th>Box</th><th>Pront.</th><th>Aguarda</th><th class="r">h</th><th>Selo</th></tr></thead><tbody>' +
     (fila.length ? fila.slice().sort((a, b) => b.espera_h - a.espera_h).map(f => '<tr><td class="lt">' + esc(f.box !== '—' ? f.box : f.area) + '</td><td class="p">' + esc(f.pront) + '</td><td>' + esc(f.aguarda) + '<br><small style="color:var(--ink-3)">' + esc(f.diag) + '</small></td>' +
       '<td class="r num">' + f.espera_h + '</td><td><span class="flag ' + (f.destino ? 'warn' : 'nao') + '">' + esc(f.selo || (f.destino ? 'AGUARDA' : 'CLASSIFICAR')) + '</span></td></tr>').join('') : '<tr><td colspan="5" class="bloq">fila vazia</td></tr>') + '</tbody></table></div></div>' +
@@ -1057,7 +1253,8 @@ function vPiloto(){
   const antes = fechados.filter(x => k0 && x.k < k0 && x.ase), depois = fechados.filter(x => k0 && x.k >= k0 && x.ase);
   const pA = pct(soma(antes, x => x.ases), soma(antes, x => x.ase)), pD = pct(soma(depois, x => x.ases), soma(depois, x => x.ase));
   const pAh = pct(soma(antes, x => x.ahs), soma(antes, x => x.ah)), pDh = pct(soma(depois, x => x.ahs), soma(depois, x => x.ah));
-  let h = cabecalho('Piloto', 'Quanto do que o painel sinaliza vira alta de verdade — e se mudou depois que os coordenadores passaram a receber o PDF (aba PILOTO).');
+  let h = voltarMais() + cabecalho('Resultados', 'Quanto do que o painel sinaliza vira alta de verdade, dia a dia, e o que aconteceu com o que ele cobrou. Denominadores sempre à vista.');
+  h += cardEvolucao(serie);
   if (!serie.length) h += '<div class="nota warn" style="margin-bottom:12px">A ponte ainda não mandou a aba PILOTO (precisa da versão 16.2). Toque em atualizar; se persistir, avise.</div>';
   h += '<div class="row r-kpi">' +
     kpi('k-elet', 'ALTA SE realizadas', ASE ? pct(ASES, ASE) + '%' : '—', ASES + ' de ' + ASE + ' possibilidades saíram · ' + fechados.length + ' dias fechados') +
@@ -1070,8 +1267,8 @@ function vPiloto(){
   if (d0 && (antes.length || depois.length)) {
     const linha = (rot, a, b, na, nb) => '<div style="display:grid;grid-template-columns:150px 1fr 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line-2)">' +
       '<div style="font-size:12px;font-weight:600">' + rot + '</div>' +
-      '<div><div class="slab" style="margin-bottom:2px">antes · ' + na + ' dia(s)</div><div class="num" style="font-family:Archivo,sans-serif;font-size:24px;font-weight:700">' + (a == null ? '—' : a + '%') + '</div></div>' +
-      '<div><div class="slab" style="margin-bottom:2px">depois · ' + nb + ' dia(s)</div><div class="num" style="font-family:Archivo,sans-serif;font-size:24px;font-weight:700;color:' + (a != null && b != null ? (b >= a ? 'var(--good-ink)' : 'var(--crit-ink)') : 'inherit') + '">' + (b == null ? '—' : b + '%') +
+      '<div><div class="slab" style="margin-bottom:2px">antes · ' + na + ' dia(s)</div><div class="num" style="font-size:24px;font-weight:600">' + (a == null ? '—' : a + '%') + '</div></div>' +
+      '<div><div class="slab" style="margin-bottom:2px">depois · ' + nb + ' dia(s)</div><div class="num" style="font-size:24px;font-weight:600;color:' + (a != null && b != null ? (b >= a ? 'var(--good-ink)' : 'var(--crit-ink)') : 'inherit') + '">' + (b == null ? '—' : b + '%') +
       (a != null && b != null ? ' <span class="delta ' + (b >= a ? 'down' : 'up') + '" style="vertical-align:middle">' + (b >= a ? '+' : '') + (b - a) + ' pp' +
         (a ? ' · ' + (b >= a ? '+' : '') + Math.round(100 * (b - a) / a) + '%' : '') + '</span>' : '') + '</div></div></div>';
     h += linha('ALTA SE realizadas', pA, pD, antes.length, depois.length) + linha('ALTA HOJE executadas', pAh, pDh, antes.filter(x => x.ah).length, depois.filter(x => x.ah).length) +
@@ -1102,6 +1299,24 @@ function vPiloto(){
     (tot ? '<div class="msg">' + tot + ' altas escaparam no período.</div>' : '<div class="bloq">sem altas escapadas registradas</div>') + '</div></div></div>';
   return h;
 }
+
+/* 09/09: evolução no tempo — movimento (entradas/saídas/meta), altas previstas × realizadas e aderência, por dia */
+function cardEvolucao(serie){
+  const SR = (S.D.series || []).slice(); if (!SR.length && !serie.length) return '';
+  const porD = {}; serie.forEach(x => porD[x.d] = x);
+  const dias = SR.length ? SR : serie.map(x => ({d: x.d}));
+  const mini = (p, cor) => '<span class="bar" style="min-width:44px;width:44px;display:inline-block;vertical-align:middle;margin-left:6px"><i style="width:' + (p == null ? 0 : Math.max(0, Math.min(100, p))) + '%;background:' + cor + '"></i></span>';
+  const linhas = dias.slice().reverse().map(x => { const q = porD[x.d] || {}; const pse = pct(q.ases, q.ase), pah = pct(q.ahs, q.ah); const a = x.ader;
+    const res = x.meta ? (x.saidas != null && x.saidas >= x.meta ? '<span class="flag ok">bateu</span>' : (x.saidas != null ? '<span class="flag crit">−' + (x.meta - x.saidas) + '</span>' : '—')) : '—';
+    return '<tr><td class="lt">' + esc(x.d) + '</td><td class="r num">' + (x.entradas ?? '—') + '</td><td class="r num">' + (x.saidas ?? '—') + '</td><td class="r num">' + (x.meta ?? '—') + '</td><td>' + res + '</td>' +
+      '<td class="r num" style="white-space:nowrap">' + (q.ah != null ? (q.ahs ?? '—') + '/' + q.ah + mini(pah, 'var(--alta)') : '—') + '</td>' +
+      '<td class="r num" style="white-space:nowrap">' + (q.ase != null ? (q.ases ?? '—') + '/' + q.ase + mini(pse, 'var(--altase)') : '—') + '</td>' +
+      '<td class="r num" style="white-space:nowrap">' + (a && a.n ? a.pct_resolvida + '% <small style="color:var(--ink-3)">de ' + a.n + '</small> · <span style="color:var(--crit-ink)">' + a.parada + ' par.</span>' : '—') + '</td></tr>'; }).join('');
+  return '<div class="card" style="margin-bottom:12px"><header><h2>Evolução dia a dia</h2><span class="hint">saídas = altas + óbitos · "saíram/sinalizadas" = alta hoje e alta se… que viraram saída no dia · cobranças = % resolvidas em 24 h e quantas ficaram paradas</span></header>' +
+    '<div class="body scroll"><table class="tb"><thead><tr><th>Dia</th><th class="r">Entradas</th><th class="r">Saídas</th><th class="r">Meta</th><th>Resultado</th><th class="r">Alta hoje saíram</th><th class="r">Alta se… saíram</th><th class="r">Cobranças</th></tr></thead><tbody>' + linhas + '</tbody></table>' +
+    '<div class="msg">Ontem ainda não fecha: as altas do dia só são conferidas na rodada seguinte, e a aderência é medida um dia depois da cobrança.</div></div></div>';
+}
+function ligarRes(){}
 
 /* ================= E-MAILS ================= */
 function listaSetoresMail(){
@@ -1149,7 +1364,7 @@ function conferirRascunhos(){
 }
 function vMail(){
   const nr = nRascMail();
-  let h = cabecalho('E-mails dos coordenadores', 'Quem recebe o PDF de cada setor no envio automático das 5h (e nos reenvios). A Coordenação recebe um consolidado. Vários endereços: separe por vírgula.');
+  let h = voltarMais() + cabecalho('E-mails dos coordenadores', 'Quem recebe o PDF de cada setor no envio automático das 5h (e nos reenvios). A Coordenação recebe um consolidado. Vários endereços: separe por vírgula.');
   h += '<div class="card"><div class="body">' +
     (nr ? '<div class="nota warn" style="margin-bottom:10px"><b>' + nr + ' campo(s) alterado(s) e ainda não salvo(s)</b> — está guardado só neste aparelho e sobrevive a bloquear a tela. Toque em <b>Salvar e-mails</b> (ou <b>Salvar texto</b>) para gravar na planilha. <button class="btn sec mini" id="b-rasc-limpar" style="margin-left:6px">Descartar e voltar ao da planilha</button></div>' : '') +
     '<div class="mails">' + listaSetoresMail().map((s, i) => {
@@ -1229,7 +1444,12 @@ function vVal(){
   const mesmoDia = !S.hoje || D.data === S.hoje;
   const enviouHoje = S.envios.some(r => String(r[0]).trim() === D.data && String(r[4]).indexOf('enviado') === 0 && String(r[1]).indexOf('teste') < 0);
   const it = (cls, txt, sub) => '<div class="it ' + cls + '">' + ICO[cls === 'ok' ? 'ok' : cls] + '<span>' + txt + (sub ? '<small>' + sub + '</small>' : '') + '</span></div>';
-  let h = cabecalho('Revisar o painel de ' + esc(D.data), 'A rodada das 5h já publicou a página e já mandou os PDFs. Validar agora é a sua revisão médica a posteriori (Res. CFM 2.454/2026, art. 15): ela carimba a página publicada e vale para o que sair daqui para frente — não segura nem desfaz o que já foi enviado.');
+  const corr = ((D.mudancas || {}).corrigidos || []).length;
+  let h = voltarMais() + cabecalho('Revisão e envios · ' + esc(D.data), 'A rodada das 5h publicou a página e mandou os PDFs. A revisão médica é a posteriori (Res. CFM 2.454/2026, art. 15): carimba a página e vale para o que sair daqui para frente — não segura nem desfaz o que já foi enviado.');
+  h += '<div class="estado">' +
+    '<span class="pill ' + (enviouHoje ? 'good' : 'warn') + '"><span class="dot"></span>' + (enviouHoje ? 'publicado e enviado automaticamente às 5h' : 'publicado · envio de hoje ainda não registrado') + '</span>' +
+    '<span class="pill ' + (ok ? 'good' : 'warn') + '"><span class="dot"></span>' + (ok ? 'revisado · ' + esc(V.quem || '') : 'sem revisão médica') + '</span>' +
+    ((corr || nEdits()) ? '<span class="pill crit"><span class="dot"></span>alterado após o envio: ' + corr + ' gravado(s)' + (nEdits() ? ' + ' + nEdits() + ' não gravado(s)' : '') + ' — os coordenadores ainda têm o PDF das 5h</span>' : '<span class="pill"><span class="dot"></span>sem alteração depois do envio</span>') + '</div>';
   h += '<div class="row r-2"><div class="card"><header><h2>O que conferir na revisão</h2><span class="hint">a checagem é sua; nada aqui bloqueia envio, porque o envio já ocorreu</span></header><div class="body check">' +
     it(enviouHoje ? 'ok' : 'warn', enviouHoje ? 'PDFs de hoje já saíram (rodada das 5h)' : 'Nenhum envio de hoje registrado ainda', enviouHoje ? 'sua revisão entra no carimbo da página; para os coordenadores verem correções, use "Reenviar"' : 'confira a rodada — o normal é sair às 5h; a lista fica na aba E-mails') +
     it(mesmoDia ? 'ok' : 'crit', 'Página e planilha ' + (mesmoDia ? 'do mesmo dia (' + esc(D.data) + ')' : 'de dias diferentes: página ' + esc(D.data) + ', planilha ' + esc(S.hoje)), mesmoDia ? '' : 'rode a rodada antes de revisar — você estaria carimbando um painel velho') +
@@ -1304,6 +1524,8 @@ async function carregarAderencia(){
 }
 
 /* ---------------- arranque ---------------- */
+aplicarTema();
+S.listaIds = [];
 S.cfg = lerCfg();
 carregarAderencia();
 pintarNav();
