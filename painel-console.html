@@ -540,6 +540,15 @@ function cabecalho(titulo, sub){
     '</div></div>';
 }
 function kpi(cls, lab, val, foot){ return '<div class="card kpi ' + cls + '"><div class="rail"></div><div class="lab">' + lab + '</div><div class="val num">' + val + '</div><div class="foot">' + foot + '</div></div>'; }
+/* 09/09 (Matheus): "setor → leito em ordem crescente". O código do leito é "enfermaria.leito"
+   ("02.308", "05.118"); ordenar pelo texto agrupa pela ENFERMARIA e o 308 aparece antes do 118.
+   Aqui vale o NÚMERO do leito (o que está depois do ponto); extras (EXTRA.EXT01…) vão para o fim. */
+function numLeito(l){ const m = String(l || '').match(/(\d+)\s*$/); return m ? parseInt(m[1], 10) : Infinity; }
+function ordLeito(a, b){
+  const ea = /EXTRA/i.test(a), eb = /EXTRA/i.test(b);
+  if (ea !== eb) return ea ? 1 : -1;
+  return (numLeito(a) - numLeito(b)) || String(a).localeCompare(String(b), 'pt-BR', {numeric: true});
+}
 function setoresOrd(){ return (S.D.setores || []).slice().sort((a, b) => ORDEM_K.indexOf(a.k) - ORDEM_K.indexOf(b.k)); }
 function vHoje(){
   const D = S.D, sets = setoresOrd(), DF = difEdits();
@@ -664,7 +673,7 @@ function vSetor(){
 function paginaSetor(k, AD){
   const D = S.D, a = adSet(k);
   const leitos = (D.leitos || []).filter(l => l.k === k).map(efetivo);   /* com as correções dele */
-  const poss = leitos.filter(l => l.selo === 'ALTA HOJE' || l.selo === 'ALTA SE');
+  const poss = leitos.filter(l => l.selo === 'ALTA HOJE' || l.selo === 'ALTA SE').sort((a, b) => ordLeito(a.l, b.l));
   const doSetor = x => x.s === k;
   const andaram = (AD && AD.andaram ? AD.andaram : []).filter(doSetor);
   const trav = (AD && AD.travados ? AD.travados : []).filter(doSetor);
@@ -772,7 +781,7 @@ function vLeitos(){
     '<input class="busca" id="busca" type="search" inputmode="numeric" placeholder="prontuário ou leito" value="' + esc(f.q) + '" autocomplete="off"></div>' +
     '<div id="lista">' + (lista.length ? '' : '<div class="bloq">nenhum leito com esse filtro</div>');
   let kAtual = null;
-  lista.sort((a, b) => ORDEM_K.indexOf(a.k) - ORDEM_K.indexOf(b.k) || String(a.l).localeCompare(String(b.l), 'pt-BR', {numeric: true}));
+  lista.sort((a, b) => ORDEM_K.indexOf(a.k) - ORDEM_K.indexOf(b.k) || ordLeito(a.l, b.l));
   lista.forEach(l => {
     if (l.k !== kAtual) { kAtual = l.k; h += '<div class="grupo">' + esc(l.s) + '<span class="n">' + lista.filter(x => x.k === l.k).length + '</span></div>'; }
     const id = idDe(l), dirty = !!S.edits[id], emg = l.k === 'EMG', aberto = S.aberto === id && !emg;
