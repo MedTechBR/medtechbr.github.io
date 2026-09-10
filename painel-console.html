@@ -1321,6 +1321,10 @@ function ligarRes(){}
 /* ================= E-MAILS ================= */
 function listaSetoresMail(){
   const base = setoresOrd().filter(s => s.k !== 'EMG').map(s => s.nome).concat(['Emergência', 'Coordenação']);
+  /* 10/09: destinatários além dos setores — NAC (exames sem marcação), Imagem (priorizar realização/laudo) e
+     um coordenador por especialidade cirúrgica (os nomes vêm do painel do dia) */
+  ['NAC', 'Imagem'].forEach(k => { if (base.indexOf(k) < 0) base.push(k); });
+  [...new Set(Object.values((S.D && S.D.especialidades) || {}))].filter(e => e && !/^Sem /.test(e)).sort().forEach(e => { if (base.indexOf(e) < 0) base.push(e); });
   Object.keys(S.emails).forEach(k => { if (base.indexOf(k) < 0) base.push(k); });
   return base;
 }
