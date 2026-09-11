@@ -770,6 +770,29 @@ function impedimento(k){   /* o gargalo mais frequente do setor, em uma frase */
   cand.sort((x, y) => y[0] - x[0]);
   return cand[0][0] ? cand[0][1] : 'sem trava registrada';
 }
+/* 11/09 (Matheus): "você resumiu algumas informações como eletivas para entrar, pacientes em mapa".
+   Os dois números viram lista: o mapa cirúrgico do dia (leito e prontuário de quem já está internado)
+   e as eletivas liberadas/agendadas que ainda não têm leito. Sem nome de paciente (LGPD). */
+function cardEntradas(){
+  const D = S.D, M = (D.mapa_hoje && D.mapa_hoje.lista) || [], E = (D.eletivas && D.eletivas.lista) || [];
+  if (!M.length && !E.length) return '';
+  const intern = M.filter(x => x.p).length, casa = M.length - intern;
+  const hj = E.filter(x => x.quando === 'hoje').length, am = E.length - hj;
+  const linhaM = x => x.p
+    ? '<div class="mud-it" data-ir="leitos" data-q="' + esc(x.p) + '" data-k="' + esc(x.k) + '" data-aberto="' + esc(x.k + '|' + x.p) + '"><span class="a">' +
+      esc(nomeSetor(x.k)) + ' · <b>' + esc(x.l) + '</b> · #' + esc(x.p) + '<small>' + esc(x.proc) + ' · ' + esc(x.centro) + '</small></span><span style="color:var(--ink-3)">›</span></div>'
+    : '<div class="mud-it" style="cursor:default"><span class="a">entra no dia da cirurgia<small>' + esc(x.proc) + ' · ' + esc(x.centro) + '</small></span><span></span></div>';
+  const linhaE = x => '<div class="mud-it" style="cursor:default"><span class="a">' + esc(nomeSetor(x.k)) + ' · #' + esc(x.p) +
+    ' · <b>' + esc(x.quando) + '</b><small>' + esc(x.esp) + (x.sit ? ' · ' + esc(x.sit.toLowerCase()) : '') + '</small></span><span></span></div>';
+  const bloco = (id, titulo, n, sub, itens, nota) => '<details class="setrow" id="' + id + '"><summary>' +
+    '<span class="nm">' + titulo + ' <b style="color:var(--brand-3)">' + n + '</b></span><span class="oc">' + sub + '</span></summary>' +
+    '<div style="padding-bottom:10px">' + (itens || '<div class="mud-it" style="cursor:default"><span class="a">nada para hoje</span><span></span></div>') +
+    '<div style="font-size:12px;color:var(--ink-3);padding:8px 2px 0">' + esc(nota || '') + '</div></div></details>';
+  return '<div class="card" style="margin-bottom:12px"><header><h2>Entram hoje</h2><span class="hint">quem chega ao hospital — toque para ver a lista</span></header><div class="body" style="padding-top:2px">' +
+    (M.length ? bloco('det-mapa', 'Cirurgias no mapa de hoje', M.length, intern + ' já internado(s) · ' + casa + ' vem de casa', M.map(linhaM).join(''), (D.mapa_hoje || {}).nota) : '') +
+    (E.length ? bloco('det-eletivas', 'Eletivas para entrar', E.length, hj + ' hoje · ' + am + ' amanhã', E.map(linhaE).join(''), (D.eletivas || {}).nota) : '') +
+    '</div></div>';
+}
 function vHoje(){
   const D = S.D, sets = setoresOrd(), DF = difEdits(), lido = vitaeLido();
   const elet = sets.reduce((a, s) => a + (s.elet || 0), 0), fila = (D.fila || []).length;
@@ -800,6 +823,7 @@ function vHoje(){
     linha(c.cir, 'wa', 'Cirurgias travadas', 'material ' + c.mat + ' · anestesia ' + c.ane + ' · sem data no mapa ' + c.semData, 'cir') +
     linha(acima, 'wa', 'Acima do corte do setor', 'permanência acima da régua de cada setor', 'corte') +
     linha(sem, 'cr', 'Sem leitura', 'o coletor não leu a evolução — conferir no Vitae', 'sem') + '</div></div>';
+  h += cardEntradas();
 
   /* 3. setores: linha expandível no celular, tabela no computador */
   const st = s => s.paralelo ? '<span class="flag nao">paralelo</span>' : (s.meta > 0 ? '<span class="flag crit">faltam ' + s.meta + '</span>' : '<span class="flag ok">OK</span>');
