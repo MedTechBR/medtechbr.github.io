@@ -798,7 +798,9 @@ function vHoje(){
   const elet = sets.reduce((a, s) => a + (s.elet || 0), 0), fila = (D.fila || []).length;
   const emg = (D.setores || []).find(s => s.k === 'EMG');
   const EFs = sets.map(s => setEf(DF, s));
-  const AH = EFs.reduce((a, e) => a + e.ah, 0), ASE = EFs.reduce((a, e) => a + e.ase, 0);
+  /* 12/09 (Matheus): sair da UTI não é sair do hospital — a UTI fica fora do total de altas potenciais */
+  const AH = EFs.reduce((a, e, i) => a + (sets[i].k === 'UTIA' ? 0 : e.ah), 0), ASE = EFs.reduce((a, e, i) => a + (sets[i].k === 'UTIA' ? 0 : e.ase), 0);
+  const utiP = EFs.reduce((a, e, i) => a + (sets[i].k === 'UTIA' ? e.ah + e.ase : 0), 0);
   const c = contasVitae(null);
   const sem = seloEf(DF, 'SEM LEITURA'), piora = seloEf(DF, 'PIORA CLÍNICA');
   const acima = (D.leitos || []).filter(l => l.k !== 'EMG' && CORTE[l.k] && (Number(l.dl) || 0) > CORTE[l.k]).length;
@@ -807,7 +809,7 @@ function vHoje(){
   /* 1. três números */
   h += '<div class="big">' +
     '<button class="b cr" data-ir="setor"><div class="v">' + (D.meta ?? '—') + '</div><div class="l">altas necessárias hoje</div></button>' +
-    '<button class="b ok" data-ir="leitos" data-g="alta"><div class="v">' + (AH + ASE) + '</div><div class="l">altas potenciais<br><small>' + AH + ' alta hoje · ' + ASE + ' alta se…</small></div></button>' +
+    '<button class="b ok" data-ir="leitos" data-g="alta"><div class="v">' + (AH + ASE) + '</div><div class="l">altas potenciais<br><small>' + AH + ' alta hoje · ' + ASE + ' alta se…' + (utiP ? ' · UTI fora (' + utiP + ')' : '') + '</small></div></button>' +
     '<button class="b wa" data-ir="mais" data-sub="reg"><div class="v">' + fila + '</div><div class="l">fila da emergência<br><small>' + (emg ? emg.ocup + '/' + emg.cap + ' ocupados' : '') + '</small></div></button></div>' +
     '<div class="sub2">' + (D.glob ? '<b>' + D.glob.livres + '</b> leitos livres · ' + D.glob.ocup + '/' + D.glob.leitos + ' ocupados · ' + D.glob.extras + ' em cama extra · ' : '') + '<b>' + elet + '</b> eletivas para entrar' +
     (nEdits() ? ' · <b style="color:var(--warn-ink)">' + nEdits() + ' edição(ões) não gravada(s)</b>' : '') + '</div>';
