@@ -9,7 +9,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
+<link rel="preload" href="fonts/ti-vitrine.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+/* Ícones Tabler (MIT) — subconjunto com só os 44 ícones desta página (a fonte completa tem 462 KB) */
+@font-face{font-family:"tabler-icons";src:url("fonts/ti-vitrine.woff2") format("woff2");font-weight:400;font-style:normal;font-display:block}
+.ti{font-family:"tabler-icons" !important;speak:none;font-style:normal;font-weight:normal;font-variant:normal;text-transform:none;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.ti-apps:before{content:"\ebb6"}.ti-arrow-down:before{content:"\ea16"}.ti-bed:before{content:"\eb5c"}.ti-building-hospital:before{content:"\ea4d"}.ti-calculator:before{content:"\eb80"}.ti-calendar-heart:before{content:"\f82a"}.ti-calendar-week:before{content:"\fd30"}.ti-car:before{content:"\ebbb"}.ti-cards:before{content:"\f510"}.ti-cash:before{content:"\ea55"}.ti-certificate-2:before{content:"\f073"}.ti-chart-histogram:before{content:"\f65c"}.ti-clipboard-check:before{content:"\ea6c"}.ti-clipboard-text:before{content:"\f089"}.ti-clock:before{content:"\ea70"}.ti-clock-check:before{content:"\f7c1"}.ti-code:before{content:"\ea77"}.ti-device-mobile:before{content:"\ea8a"}.ti-files:before{content:"\edef"}.ti-git-compare:before{content:"\eab4"}.ti-heart-handshake:before{content:"\f0f3"}.ti-heartbeat:before{content:"\ef92"}.ti-list-check:before{content:"\eb6a"}.ti-mail:before{content:"\eae5"}.ti-microscope:before{content:"\ef64"}.ti-notebook:before{content:"\eb96"}.ti-photo:before{content:"\eb0a"}.ti-pill:before{content:"\ec44"}.ti-prescription:before{content:"\ef99"}.ti-presentation:before{content:"\eb70"}.ti-receipt:before{content:"\edfd"}.ti-report-medical:before{content:"\eecc"}.ti-scan:before{content:"\ebc8"}.ti-school:before{content:"\ecf7"}.ti-scissors:before{content:"\eb1b"}.ti-search:before{content:"\eb1c"}.ti-stethoscope:before{content:"\edbe"}.ti-target-arrow:before{content:"\f51a"}.ti-user-heart:before{content:"\f7cd"}.ti-users:before{content:"\ebf2"}.ti-users-group:before{content:"\fa21"}.ti-vaccine-bottle:before{content:"\ef69"}.ti-wallet:before{content:"\eb75"}.ti-zoom-money:before{content:"\ef0a"}
+</style>
 <link rel="icon" type="image/png" href="favicon.png">
 <style>
 :root{
@@ -19,9 +25,10 @@
   --ease:cubic-bezier(.16,1,.3,1);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth;background:var(--bg)}
+html{scroll-behavior:smooth;background:var(--bg);-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--fg);background:var(--bg);line-height:1.5;font-size:17px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
+a,button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 :focus-visible{outline:2px solid var(--fg60);outline-offset:3px;border-radius:6px}
 .wrap{max-width:var(--w);margin:0 auto;padding:0 var(--gutter)}
 .narrow{max-width:760px;margin:0 auto}
@@ -71,7 +78,7 @@ header.solid{background:rgba(0,0,0,.72);-webkit-backdrop-filter:blur(18px);backd
   .pbar-wrap{position:fixed;top:var(--header);left:0;right:0;z-index:49;background:rgba(0,0,0,.72);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-bottom:1px solid var(--fg12);transform:translateY(-6px);opacity:0;pointer-events:none;transition:transform .3s var(--ease),opacity .3s}
   .pbar-wrap.show{transform:none;opacity:1;pointer-events:auto}
 }
-@media(max-width:560px){.acts .ghost{display:none}}
+@media(max-width:560px){.acts{gap:6px}.acts .ghost{display:none}.acts .ghost.entrar{display:inline-flex;padding:0 14px}}
 
 /* ---------- hero ---------- */
 .hero{position:relative;height:190svh}
@@ -235,6 +242,61 @@ footer{border-top:1px solid var(--fg12);padding:48px 0 40px;font-size:13px;color
 .rv{opacity:0;transform:translateY(18px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
 .rv.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}.split span,.hero .sub{opacity:1;transform:none}}
+/* ---------- celular: menos cromo fixo, alvos de toque de 44px, seções mais curtas, planos em cartões ---------- */
+@media(max-width:760px){
+  :root{--header:56px}
+  .wm{font-size:18px;padding:8px 0}
+  header.solid,.pbar-wrap{-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+  .pill{height:44px;padding:0 18px}
+  .pill.lg{height:48px}
+  .acts .pill{height:40px;padding:0 16px}
+  .pbar{padding:8px var(--gutter) 10px}
+  .pbar a{min-height:40px;padding:8px 14px}
+  .hero{height:150svh}
+  .core{filter:blur(26px)}
+  .intro{padding:88px 0 56px}
+  .intro .row{margin-top:28px}
+  .bench{margin-top:48px}
+  .chap{padding:64px 0}
+  .chap.sub{padding:56px 0}
+  .chap,.quote,.final{scroll-margin-top:calc(var(--header) + 50px)}
+  .quote{padding:64px 0}
+  .final{padding:80px 0}
+  .tabs{margin-top:32px}
+  .tabs button{padding:14px 14px}
+  .shots{margin-left:calc(-1*var(--gutter));margin-right:calc(-1*var(--gutter));padding-left:var(--gutter);padding-right:var(--gutter);scroll-padding-left:var(--gutter)}
+  .fgrid a{padding:11px 0}
+  .fbot{margin-top:32px}
+}
+@media(max-width:640px){
+  .table{overflow:visible}
+  table{min-width:0;display:block}
+  thead{display:none}
+  tbody,tr,td{display:block}
+  tr{padding:20px 0;border-bottom:1px solid var(--fg12)}
+  td{padding:0;border:0}
+  td:first-child{font-size:16px;font-weight:500}
+  td:nth-child(2){margin-top:8px}
+  td.d{margin-top:8px}
+  td:last-child{margin-top:16px}
+  td:last-child .pill{width:100%}
+  tr.hi td{background:none}
+  tr.hi{margin:0 calc(-1*var(--gutter));padding:20px var(--gutter);background:linear-gradient(180deg,var(--fg6),transparent)}
+}
+@media(max-width:560px){
+  .phone{width:min(216px,64vw)}
+  .nums{gap:22px 32px}
+  .nums b{font-size:26px}
+  .desk{border-radius:12px}
+  .mosaic{gap:20px}
+}
+@media(max-width:480px){
+  .intro .row .pill,.final .row .pill{flex:1 1 100%}
+  .fgrid{grid-template-columns:1fr;gap:22px}
+  .fgrid a.sub{font-size:13px}
+}
+/* toque (tablet/celular largo): sem menu suspenso por hover, que ficava aberto sobre a página */
+@media(hover:none){.pn .menu{display:none}.app:hover{transform:none}}
 </style>
 </head>
 <body>
@@ -248,7 +310,7 @@ footer{border-top:1px solid var(--fg12);padding:48px 0 40px;font-size:13px;color
   </nav>
   <div class="acts">
     <a class="pill ghost" href="#planos">Planos e pagamento</a>
-    <a class="pill ghost" href="app.html">Entrar</a>
+    <a class="pill ghost entrar" href="app.html">Entrar</a>
     <a class="pill solid" href="app.html">Começar grátis</a>
   </div>
 </div></header>
@@ -276,7 +338,7 @@ footer{border-top:1px solid var(--fg12);padding:48px 0 40px;font-size:13px;color
       <p>Tudo roda na nuvem, em qualquer aparelho, com a inteligência artificial já integrada — sem chave, sem configuração, sem depender de ninguém para começar.</p>
       <div class="row"><a class="pill solid lg" href="app.html">Começar grátis</a><a class="pill ghost lg" href="#app">Conhecer os produtos</a></div>
 
-      <div class="desk rv"><img src="img/vitrine/portal-1440.webp" width="1600" height="1000" loading="lazy" decoding="async" alt="MedTech App: a página inicial com os apps do médico"></div>
+      <div class="desk rv"><img src="img/vitrine/portal-1440.webp" srcset="img/vitrine/portal-1440-800.webp 800w, img/vitrine/portal-1440.webp 1600w" sizes="(max-width:760px) calc(100vw - 48px), min(1152px, calc(100vw - 48px))" width="1600" height="1000" loading="lazy" decoding="async" alt="MedTech App: a página inicial com os apps do médico"></div>
 
       <div class="bench" id="bench">
         <div class="t"><span class="on">Conteúdo clínico</span><span>Estudo</span><span>Hospital</span></div>
@@ -308,7 +370,7 @@ footer{border-top:1px solid var(--fg12);padding:48px 0 40px;font-size:13px;color
       <figure class="phone"><div class="scr"><img src="img/vitrine/guiainterno-390.webp" width="780" height="1688" loading="lazy" decoding="async" alt="Guia do Interno no celular"></div><b>Guia do Interno</b><span>O manual de bolso do internato, com mentor de IA</span></figure>
       <figure class="phone"><div class="scr"><img src="img/vitrine/laudai-390.webp" width="780" height="1688" loading="lazy" decoding="async" alt="LaudAI no celular"></div><b>LaudAI</b><span>Laudos estruturados com IA como segunda opinião</span></figure>
     </div>
-    <div class="desk rv"><img src="img/vitrine/enfermaria-1440.webp" width="1600" height="1000" loading="lazy" decoding="async" alt="EnfermarIA no computador: lista de internados por setor com pendências"></div>
+    <div class="desk rv"><img src="img/vitrine/enfermaria-1440.webp" srcset="img/vitrine/enfermaria-1440-800.webp 800w, img/vitrine/enfermaria-1440.webp 1600w" sizes="(max-width:760px) calc(100vw - 48px), min(1152px, calc(100vw - 48px))" width="1600" height="1000" loading="lazy" decoding="async" alt="EnfermarIA no computador: lista de internados por setor com pendências"></div>
     <p class="cap rv">Telas reais dos apps, com dados fictícios.</p>
     <div class="tabs rv" id="tabs" role="tablist">
       <button class="on" data-f="all" role="tab">Todos</button>
@@ -340,7 +402,7 @@ footer{border-top:1px solid var(--fg12);padding:48px 0 40px;font-size:13px;color
       <figure class="phone"><div class="scr"><img src="img/vitrine/flashmed-390.webp" width="780" height="1688" loading="lazy" decoding="async" alt="FlashMed no celular"></div><b>FlashMed</b><span>Questões e simulados de residência</span></figure>
       <figure class="phone"><div class="scr"><img src="img/vitrine/medprovas-390.webp" width="780" height="1688" loading="lazy" decoding="async" alt="MedProvas no celular"></div><b>MedProvas</b><span>O professor elabora e corrige provas com IA</span></figure>
     </div>
-    <div class="desk rv"><img src="img/vitrine/clinicamed-1440.webp" width="1600" height="1000" loading="lazy" decoding="async" alt="ClínicaMed no computador: questão com filtros por área e cenário"></div>
+    <div class="desk rv"><img src="img/vitrine/clinicamed-1440.webp" srcset="img/vitrine/clinicamed-1440-800.webp 800w, img/vitrine/clinicamed-1440.webp 1600w" sizes="(max-width:760px) calc(100vw - 48px), min(1152px, calc(100vw - 48px))" width="1600" height="1000" loading="lazy" decoding="async" alt="ClínicaMed no computador: questão com filtros por área e cenário"></div>
     <div class="nums rv">
       <div><b>4</b>plataformas prontas</div>
       <div><b>3.000+</b>questões na maior delas</div>
@@ -438,13 +500,13 @@ footer{border-top:1px solid var(--fg12);padding:48px 0 40px;font-size:13px;color
     <p class="p rv"><b>Já no ar:</b> a biblioteca de casos ilustrados da MedTech — como <i>O sangue que não saiu</i>, um caso de pulmão-rim conduzido em 49 etapas, com perguntas de múltipla escolha e devolutiva a cada decisão.</p>
     <div class="row rv"><a class="pill solid" href="casos-clinicos/">Conduzir um caso agora</a><a class="pill ghost" href="mailto:medtechbr1@gmail.com?subject=Casos%20Cl%C3%ADnicos%20Interativos%20para%20institui%C3%A7%C3%B5es">Casos para a minha instituição</a></div>
     <div class="fine rv">Para estudantes, residentes, instituições de ensino e serviços. Ferramenta de apoio ao ensino; não substitui a supervisão clínica.</div>
-  </div>    <div class="mosaic rv">
-      <figure><img src="img/vitrine/casos-lib.webp" width="1200" height="750" loading="lazy" decoding="async" alt="Biblioteca de casos clínicos"><figcaption>A biblioteca: cada caso é uma sessão pronta para conduzir em aula.</figcaption></figure>
-      <figure><img src="img/vitrine/casos-hda.webp" width="1200" height="750" loading="lazy" decoding="async" alt="Slide da história da doença atual, com ilustração do paciente"><figcaption>A história avança em blocos — HDA, exame físico, exames — e o grupo discute a cada um.</figcaption></figure>
-      <figure><img src="img/vitrine/casos-pergunta.webp" width="1200" height="750" loading="lazy" decoding="async" alt="Slide de pergunta ao grupo com oito alternativas"><figcaption>Antes de revelar, a pergunta: o aluno marca e recebe o comentário de cada alternativa.</figcaption></figure>
-      <figure><img src="img/vitrine/casos-decisao.webp" width="1200" height="750" loading="lazy" decoding="async" alt="Slide de decisão com três condutas possíveis"><figcaption>Nas decisões, o caso se ramifica: a conduta escolhida muda o que vem depois.</figcaption></figure>
+    <div class="mosaic rv">
+      <figure><img src="img/vitrine/casos-lib.webp" srcset="img/vitrine/casos-lib-800.webp 800w, img/vitrine/casos-lib.webp 1200w" sizes="(max-width:760px) calc(100vw - 48px), 568px" width="1200" height="750" loading="lazy" decoding="async" alt="Biblioteca de casos clínicos"><figcaption>A biblioteca: cada caso é uma sessão pronta para conduzir em aula.</figcaption></figure>
+      <figure><img src="img/vitrine/casos-hda.webp" srcset="img/vitrine/casos-hda-800.webp 800w, img/vitrine/casos-hda.webp 1200w" sizes="(max-width:760px) calc(100vw - 48px), 568px" width="1200" height="750" loading="lazy" decoding="async" alt="Slide da história da doença atual, com ilustração do paciente"><figcaption>A história avança em blocos — HDA, exame físico, exames — e o grupo discute a cada um.</figcaption></figure>
+      <figure><img src="img/vitrine/casos-pergunta.webp" srcset="img/vitrine/casos-pergunta-800.webp 800w, img/vitrine/casos-pergunta.webp 1200w" sizes="(max-width:760px) calc(100vw - 48px), 568px" width="1200" height="750" loading="lazy" decoding="async" alt="Slide de pergunta ao grupo com oito alternativas"><figcaption>Antes de revelar, a pergunta: o aluno marca e recebe o comentário de cada alternativa.</figcaption></figure>
+      <figure><img src="img/vitrine/casos-decisao.webp" srcset="img/vitrine/casos-decisao-800.webp 800w, img/vitrine/casos-decisao.webp 1200w" sizes="(max-width:760px) calc(100vw - 48px), 568px" width="1200" height="750" loading="lazy" decoding="async" alt="Slide de decisão com três condutas possíveis"><figcaption>Nas decisões, o caso se ramifica: a conduta escolhida muda o que vem depois.</figcaption></figure>
     </div>
-  </section>
+  </div></section>
 
   <!-- ===== Sob medida ===== -->
   <!-- ===== Internato e residência (InternaMed · MedRes) ===== -->
@@ -635,9 +697,15 @@ ids.forEach(id=>{const el=document.getElementById(id);if(el)spy.observe(el)});
     const tp=Math.max(0,(e-.55)/.45);
     tag.style.opacity=tp;tag.style.transform=`translateY(${10-10*tp}px)`;
     sub.style.opacity=Math.max(0,1-p*2.2);
-    requestAnimationFrame(frame);
+    if(running)raf=requestAnimationFrame(frame);
   }
-  requestAnimationFrame(frame);
+  // o laço só roda enquanto o herói está na tela: fora dele os elementos estão invisíveis e o
+  // celular gastava CPU e bateria redesenhando 60 vezes por segundo a página inteira
+  let running=false,raf=0;
+  function start(){if(running)return;running=true;raf=requestAnimationFrame(frame)}
+  function stop(){running=false;cancelAnimationFrame(raf)}
+  new IntersectionObserver(es=>es.forEach(x=>x.isIntersecting?start():stop())).observe(hero);
+  start();
 })();
 
 /* ---------- reveal ---------- */
