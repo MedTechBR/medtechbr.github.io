@@ -409,7 +409,7 @@ details.card>summary h2{display:inline} details.card>summary .hint{display:inlin
     <div class="sfoot">Ponte <span id="s-versao">?</span> · <button id="b-refresh">atualizar</button> · <button id="b-cfg">chave</button><br>
       <span id="s-quando"></span></div>
   </aside>
-  <main class="main" id="main"><div class="bloq">carregando…</div></main>
+  <main class="main" id="main"><div class="bloq">carregando…<br><small style="color:#8a8a8a">versão do app: 13/09b</small></div></main>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -425,6 +425,7 @@ details.card>summary h2{display:inline} details.card>summary .hint{display:inlin
    ================================================================ */
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const APP_V = '13/09b';   /* aparece na tela de carregamento — serve para saber qual casca o celular abriu */
 const LS_CFG = 'plc.cfg', LS_EDITS = 'plc.edits', LS_TAB = 'plc.tab', LS_MAIL = 'plc.mail', LS_SUB = 'plc.sub', LS_TEMA = 'plc.tema', LS_FILTRO = 'plc.filtro';
 const CORTE = {CIR: 4, CM1: 10, TRAU: 5.5, UCE: 20, AVC: 10, UTIA: 10};   /* corte de permanência por setor (o mesmo do PDF) */
 
@@ -487,21 +488,31 @@ async function api(acao, extra, tentativa){
   if (!S.cfg) throw new Error('sem chave da ponte');
   const corpo = JSON.stringify(Object.assign({token: S.cfg.token, acao}, extra || {}));
   const n = tentativa || 1;
+  /* 13/09, 2ª rodada: no celular a tela ficava em "carregando…" PARA SEMPRE — a requisição não dava erro,
+     ela pendurava. fetch não tem timeout próprio; sem AbortController a promessa nunca resolve e não há o que
+     repetir. 40 s por tentativa: a ponte responde em 3–8 s mesmo no pior dia. */
+  const ac = ('AbortController' in window) ? new AbortController() : null;
+  const relogio = ac ? setTimeout(() => ac.abort(), 40000) : null;
   try {
+    if (S.aoTentar) S.aoTentar(n);
     /* text/plain = requisição "simples": o Apps Script não responde preflight CORS */
-    const r = await fetch(S.cfg.url, {method:'POST', body: corpo, headers:{'Content-Type':'text/plain;charset=utf-8'}, redirect:'follow'});
+    const r = await fetch(S.cfg.url, {method:'POST', body: corpo, headers:{'Content-Type':'text/plain;charset=utf-8'}, redirect:'follow', signal: ac ? ac.signal : undefined});
     const t = await r.text();
     let j; try { j = JSON.parse(t); } catch (_) { throw new Error('a ponte não respondeu JSON (HTTP ' + r.status + ')'); }
     if (!j.ok) throw new Error(j.erro || (j.envio && j.envio.msg) || 'a ponte recusou');
     return j;
   } catch (e) {
-    const rede = /failed to fetch|networkerror|load failed|n[aã]o respondeu JSON/i.test(String(e && e.message));
+    const abortou = (e && (e.name === 'AbortError' || /abort/i.test(String(e.message))));
+    const rede = abortou || /failed to fetch|networkerror|load failed|n[aã]o respondeu JSON/i.test(String(e && e.message));
+    if (abortou) e = new Error('a ponte não respondeu em 40 s');
     if (rede && n < 3 && API_LE.test(String(acao || ''))) {
       await new Promise(r => setTimeout(r, n * 1800));
       return api(acao, extra, n + 1);
     }
-    if (rede) throw new Error('a ponte não respondeu (' + (e.message || 'falha de rede') + ') — tentei ' + n + 'x; toque em "Tentar de novo"');
+    if (rede) throw new Error((e.message || 'falha de rede') + ' — tentei ' + n + ' vez(es)');
     throw e;
+  } finally {
+    if (relogio) clearTimeout(relogio);
   }
 }
 let toastT;
@@ -511,6 +522,11 @@ function toast(msg, erro){ const t = $('toast'); t.textContent = msg; t.classNam
 async function carregar(silencioso){
   if (!S.cfg) return;
   if (!silencioso) $('s-stamp').textContent = 'lendo a planilha…';
+  S.aoTentar = n => {
+    const txt = n === 1 ? 'falando com a planilha…' : 'a rede falhou; tentativa ' + n + ' de 3…';
+    if (!silencioso) $('s-stamp').textContent = txt;
+    if (!S.D) $('main').innerHTML = '<div class="bloq">' + txt + '<br><small style="color:var(--ink-3)">versão do app: ' + APP_V + '</small></div>';
+  };
   try {
     const r = await api('pacote');
     if (!r.dados || !r.versao) { S.versao = 15; pintarTudo(); return; }   /* ponte antiga: ignora `acao` e devolve {ok,abas:[]} */
