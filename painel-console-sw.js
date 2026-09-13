@@ -2,7 +2,7 @@
    Só a casca (html + manifest), rede primeiro; nunca guarda dado da planilha
    nem toca em script.google.com. Escopo restrito a /painel-console para não
    disputar com o sw.js do portal. */
-const CACHE = 'painel-console-v3';   /* 13/09: bump para o celular baixar a casca nova */
+const CACHE = 'painel-console-v4';   /* 13/09: bump para o celular baixar a casca nova */
 const CASCA = ['painel-console.html', 'painel-console.webmanifest'];
 self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c => c.addAll(CASCA)).catch(() => {})); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('painel-console-') && k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
