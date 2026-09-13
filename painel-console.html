@@ -477,15 +477,32 @@ try { const r = JSON.parse(localStorage.getItem(LS_MAIL) || 'null'); if (r && r.
 
 /* ---------------- ponte ---------------- */
 function lerCfg(){ try { return JSON.parse(localStorage.getItem(LS_CFG) || 'null'); } catch (_) { return null; } }
-async function api(acao, extra){
+/* 13/09 (Matheus: "o painel do PWA não está funcionando"): a chamada à ponte falha de vez em quando com
+   "Failed to fetch" — o Apps Script responde 302 para script.googleusercontent.com e, quando esse salto sai
+   sem o cabeçalho de CORS (ou o celular troca de rede no meio), o navegador derruba a requisição. Uma falha
+   dessas deixava a tela inteira em "Não consegui ler a planilha". Agora: 3 tentativas com espera crescente,
+   e a mensagem diz o que aconteceu. Leitura é idempotente; SÓ a leitura repete (escrita nunca). */
+const API_LE = /^(pacote|ping|aderencia)$/i;   /* só leitura repete; 'leitos', 'emails' e 'textos' GRAVAM */
+async function api(acao, extra, tentativa){
   if (!S.cfg) throw new Error('sem chave da ponte');
   const corpo = JSON.stringify(Object.assign({token: S.cfg.token, acao}, extra || {}));
-  /* text/plain = requisição "simples": o Apps Script não responde preflight CORS */
-  const r = await fetch(S.cfg.url, {method:'POST', body: corpo, headers:{'Content-Type':'text/plain;charset=utf-8'}, redirect:'follow'});
-  const t = await r.text();
-  let j; try { j = JSON.parse(t); } catch (_) { throw new Error('a ponte não respondeu JSON (HTTP ' + r.status + ')'); }
-  if (!j.ok) throw new Error(j.erro || (j.envio && j.envio.msg) || 'a ponte recusou');
-  return j;
+  const n = tentativa || 1;
+  try {
+    /* text/plain = requisição "simples": o Apps Script não responde preflight CORS */
+    const r = await fetch(S.cfg.url, {method:'POST', body: corpo, headers:{'Content-Type':'text/plain;charset=utf-8'}, redirect:'follow'});
+    const t = await r.text();
+    let j; try { j = JSON.parse(t); } catch (_) { throw new Error('a ponte não respondeu JSON (HTTP ' + r.status + ')'); }
+    if (!j.ok) throw new Error(j.erro || (j.envio && j.envio.msg) || 'a ponte recusou');
+    return j;
+  } catch (e) {
+    const rede = /failed to fetch|networkerror|load failed|n[aã]o respondeu JSON/i.test(String(e && e.message));
+    if (rede && n < 3 && API_LE.test(String(acao || ''))) {
+      await new Promise(r => setTimeout(r, n * 1800));
+      return api(acao, extra, n + 1);
+    }
+    if (rede) throw new Error('a ponte não respondeu (' + (e.message || 'falha de rede') + ') — tentei ' + n + 'x; toque em "Tentar de novo"');
+    throw e;
+  }
 }
 let toastT;
 function toast(msg, erro){ const t = $('toast'); t.textContent = msg; t.className = 'toast on' + (erro ? ' erro' : '');
