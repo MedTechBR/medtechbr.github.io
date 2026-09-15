@@ -425,7 +425,7 @@ details.card>summary h2{display:inline} details.card>summary .hint{display:inlin
    ================================================================ */
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const APP_V = '13/09b';   /* aparece na tela de carregamento — serve para saber qual casca o celular abriu */
+const APP_V = '15/09';   /* aparece na tela de carregamento — serve para saber qual casca o celular abriu */
 const LS_CFG = 'plc.cfg', LS_EDITS = 'plc.edits', LS_TAB = 'plc.tab', LS_MAIL = 'plc.mail', LS_SUB = 'plc.sub', LS_TEMA = 'plc.tema', LS_FILTRO = 'plc.filtro';
 const CORTE = {CIR: 4, CM1: 10, TRAU: 5.5, UCE: 20, AVC: 10, UTIA: 10};   /* corte de permanência por setor (o mesmo do PDF) */
 
@@ -788,7 +788,7 @@ function filtroV(l, v){
   if (v === 'cir') return !!cirTravada(l);
   return true;
 }
-const ROT_V = {piora:'Piora clínica', sem:'Sem leitura', ah:'Alta hoje', ase:'Alta se…', corte:'Acima do corte', ex:'Exames parados', par:'Pareceres sem resposta', cir:'Cirurgias travadas'};
+const ROT_V = {piora:'Piora clínica', sem:'Sem leitura', ah:'Alta hoje', ase:'Alta se…', corte:'Permanência acima da referência', ex:'Exames parados', par:'Pareceres sem resposta', cir:'Cirurgias travadas'};
 function diasV(l, v){   /* tempo de espera para ordenar a lista filtrada */
   if (v === 'ex' || v === 'par') return Math.max(0, ...vitaeDe(l.p).filter(x => x.tipo === v).map(x => x.dias || 0));
   if (v === 'cir') { const t = cirTravada(l); return t && t.dias ? t.dias : 0; }
@@ -851,12 +851,12 @@ function vHoje(){
   const linha = (n, cls, t, sub, v, k) => '<button class="acao-row" data-ir="leitos" data-v="' + v + '" data-k="' + (k || '') + '"><span class="n ' + (n ? cls : 'off') + '">' + n + '</span><span><div class="t">' + t + '</div><div class="s">' + sub + '</div></span><span class="go">›</span></button>';
   h += '<div class="card" style="margin-bottom:12px"><header><h2>Precisa de ação</h2><span class="hint">toque para ver os leitos, do mais antigo para o mais novo</span></header><div class="body acoes" style="padding-top:4px">' +
     linha(piora, 'cr', 'Piora clínica', 'resposta hoje; não conta para alta', 'piora') +
-    linha(AH, 'ok', 'Alta hoje', 'decisão já escrita na evolução — dar baixa', 'ah') +
-    linha(ASE, 'ok', 'Alta se…', 'falta um item resolvível no dia', 'ase') +
+    linha(AH, 'ok', 'Alta hoje', 'alta definida: decisão escrita na evolução; falta concluir a saída', 'ah') +
+    linha(ASE, 'ok', 'Alta se…', 'possibilidade condicional: falta um item resolvível no dia', 'ase') +
     (lido ? linha(c.ex, 'wa', 'Exames parados', 'sem programação ou vencidos · ' + c.exLeitos + ' leito(s) · Lista de Exames', 'ex') : linha('—', 'off', 'Exames parados', 'Lista de Exames não lida hoje', 'ex')) +
     (lido ? linha(c.par, 'wa', 'Pareceres sem resposta', 'há mais de 24 h · ' + c.urg + ' urgente(s) · Interconsultas', 'par') : linha('—', 'off', 'Pareceres sem resposta', 'Interconsultas não lidas hoje', 'par')) +
     linha(c.cir, 'wa', 'Cirurgias travadas', 'material ' + c.mat + ' · anestesia ' + c.ane + ' · sem data no mapa ' + c.semData, 'cir') +
-    linha(acima, 'wa', 'Acima do corte do setor', 'permanência acima da régua de cada setor', 'corte') +
+    linha(acima, 'wa', 'Permanência acima da referência', 'dias na clínica acima da referência do setor; não afirma inadequação', 'corte') +
     linha(sem, 'cr', 'Sem leitura', 'o coletor não leu a evolução — conferir no Vitae', 'sem') + '</div></div>';
   h += cardEntradas();
 
@@ -1314,6 +1314,7 @@ function vPiloto(){
   const pAh = pct(soma(antes, x => x.ahs), soma(antes, x => x.ah)), pDh = pct(soma(depois, x => x.ahs), soma(depois, x => x.ah));
   let h = voltarMais() + cabecalho('Resultados', 'Quanto do que o painel sinaliza vira alta de verdade, dia a dia, e o que aconteceu com o que ele cobrou. Denominadores sempre à vista.');
   h += cardEvolucao(serie);
+  h += cardAprendizado();   /* 15/09: o que o painel aprendeu sobre o hospital (D.aprendizado, do BI_JSON) */
   if (!serie.length) h += '<div class="nota warn" style="margin-bottom:12px">A ponte ainda não mandou a aba PILOTO (precisa da versão 16.2). Toque em atualizar; se persistir, avise.</div>';
   h += '<div class="row r-kpi">' +
     kpi('k-elet', 'ALTA SE realizadas', ASE ? pct(ASES, ASE) + '%' : '—', ASES + ' de ' + ASE + ' possibilidades saíram · ' + fechados.length + ' dias fechados') +
@@ -1374,6 +1375,28 @@ function cardEvolucao(serie){
   return '<div class="card" style="margin-bottom:12px"><header><h2>Evolução dia a dia</h2><span class="hint">saídas = altas + óbitos · "saíram/sinalizadas" = alta hoje e alta se… que viraram saída no dia · cobranças = % resolvidas em 24 h e quantas ficaram paradas</span></header>' +
     '<div class="body scroll"><table class="tb"><thead><tr><th>Dia</th><th class="r">Entradas</th><th class="r">Saídas</th><th class="r">Meta</th><th>Resultado</th><th class="r">Alta hoje saíram</th><th class="r">Alta se… saíram</th><th class="r">Cobranças</th></tr></thead><tbody>' + linhas + '</tbody></table>' +
     '<div class="msg">Ontem ainda não fecha: as altas do dia só são conferidas na rodada seguinte, e a aderência é medida um dia depois da cobrança.</div></div></div>';
+}
+/* 15/09 (Matheus): "vá aprendendo cada vez mais sobre o hospital… esses dados devem chegar no painel da efetividade".
+   O BI_JSON traz D.aprendizado (piloto/conhecimento.json, recalculado na rodada antes de publicar): fatos com n,
+   período e fonte, por tema; "novo"/"mudou" em relação à véspera. Só agregados — nenhum nome ou prontuário. */
+function cardAprendizado(){
+  const A = (S.D && S.D.aprendizado) || null;
+  const cab = '<div class="card" style="margin-bottom:12px"><header><h2>O que o painel aprendeu sobre o hospital</h2>';
+  if (!A || !A.fatos || !A.fatos.length) return cab + '</header><div class="body"><div class="bloq">ainda sem conhecimento publicado — chega na rodada das 5h (o aprendizado roda antes de publicar o painel)</div></div></div>';
+  const F = A.fatos, nov = F.filter(f => f.estado === 'novo'), mud = F.filter(f => f.estado === 'mudou');
+  const ev = f => ' <span class="slab">n=' + esc(f.n) + ' · ' + esc(f.periodo || '') + (f.fonte ? ' · ' + esc(f.fonte) : '') + '</span>';
+  const li = (f, pref) => '<div style="padding:6px 0;border-bottom:1px solid var(--line-2);font-size:13px;line-height:1.4">' + (pref || '') + esc(f.texto) + ev(f) + '</div>';
+  let h = cab + '<span class="hint">' + F.length + ' fatos · recalculado em ' + esc(A.atualizado || '') + ' a partir de ' + esc(A.dias_coleta || '?') + ' dias de coleta · só agregados · observacional (descreve, não prova)</span></header><div class="body">';
+  if (nov.length > 15) h += '<div class="msg"><b>Novo hoje:</b> ' + nov.length + ' fatos entraram nesta rodada (primeira construção ou reconstrução) — estão todos por tema abaixo.</div>';
+  else if (nov.length || mud.length) h += '<div style="margin-bottom:10px"><div class="slab" style="margin-bottom:4px">NOVO HOJE · ' + (nov.length + mud.length) + '</div>' +
+    nov.slice(0, 20).map(f => li(f, '<span class="flag ok">novo</span> ')).join('') +
+    mud.slice(0, 20).map(f => li(f, '<span class="flag crit">mudou</span> ' + (f.antes != null ? '<small style="color:var(--ink-3)">(antes ' + esc(f.antes) + ')</small> ' : ''))).join('') + '</div>';
+  else h += '<div class="msg">Nada novo hoje: os fatos abaixo foram reconfirmados com um dia a mais de registros.</div>';
+  (A.temas || []).forEach(par => { const t = par[0], nome = par[1]; const fs = F.filter(f => f.tema === t); if (!fs.length) return;
+    h += '<details style="margin:4px 0"><summary style="cursor:pointer;font-weight:600;font-size:13px;padding:7px 0;list-style:none">▸ ' + esc(nome) + ' <span class="slab">' + fs.length + '</span></summary>' +
+      fs.map(f => li(f, f.estado === 'mudou' ? '<span class="flag crit">mudou</span> ' : (f.estado === 'novo' && nov.length <= 15 ? '<span class="flag ok">novo</span> ' : ''))).join('') + '</details>'; });
+  h += '<div class="msg">Como se aprende: todo dia, antes de publicar o painel, o aprendizado recalcula cada fato a partir do histórico local (censo e movimento do Vitae, evoluções lidas, Lista de Exames, Interconsultas, mapa cirúrgico, painel publicado, aderência, auditoria das altas) e compara com a véspera. Nenhum nome, prontuário ou médico entra. Tudo isto também vai no PDF de gestão.</div></div></div>';
+  return h;
 }
 function ligarRes(){}
 
