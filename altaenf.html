@@ -233,16 +233,12 @@
       <h2>Identificação</h2>
       <div class="card-body">
         <div class="field-grid">
-          <div class="field full"><label>Unidade / Hospital</label><input id="f_hospital" type="text" placeholder="Nome da instituição"></div>
+          <div class="field full"><label>Unidade hospitalar</label><input id="f_hospital" type="text" placeholder="Nome da instituição"></div>
           <div class="field full"><label>Nome do paciente</label><input id="f_nome" type="text" placeholder="Nome completo"></div>
           <div class="field"><label>Data de nascimento</label><input id="f_nasc" type="text" placeholder="__/__/____"></div>
-          <div class="field"><label>Idade</label><input id="f_idade" type="text" placeholder="Ex.: 68 anos"></div>
-          <div class="field"><label>Registro / Prontuário</label><input id="f_pront" type="text"></div>
-          <div class="field"><label>Setor / Leito</label><input id="f_setor" type="text"></div>
+          <div class="field"><label>Prontuário</label><input id="f_pront" type="text"></div>
           <div class="field"><label>Data da alta</label><input id="f_alta" type="text" placeholder="__/__/____"></div>
-          <div class="field"><label>Acompanhante / Cuidador</label><input id="f_cuidador" type="text"></div>
-          <div class="field full"><label>Diagnóstico / Motivo da internação</label><input id="f_dx" type="text"></div>
-          <div class="field full"><label>Enfermeiro(a) responsável — COREN</label><input id="f_enf" type="text"></div>
+          <div class="field"><label>Enfermeiro(a) responsável — COREN</label><input id="f_enf" type="text"></div>
         </div>
       </div>
     </div>
@@ -276,6 +272,10 @@
 ============================================================ */
 const DATA = [
  { g:"Cuidados gerais", open:true, items:[
+   { id:"gerais", label:"Orientações gerais",
+     or:["Seguir as orientações da equipe multiprofissional.",
+         "Fazer uso das medicações de acordo com receituário médico.",
+         "Procurar atendimento em caso de piora."] },
    { id:"repouso", label:"Repouso e retorno às atividades",
      or:["Nos primeiros 3 a 7 dias, alternar repouso com pequenas caminhadas dentro de casa; aumentar a distância e o tempo um pouco a cada dia, conforme a tolerância.",
          "Não levantar peso acima de 2 kg (ex.: sacola de compras, criança de colo, balde com água) até liberação da equipe — em geral por 4 a 6 semanas após cirurgia abdominal.",
@@ -597,12 +597,8 @@ function render(){
   const push = (label,v,full)=>{ if(v) idRows.push(`<div class="row ${full?'full':''}"><b>${label}</b><span>${v}</span></div>`); };
   push('Paciente', esc(val('f_nome')), true);
   push('Data de nascimento', esc(val('f_nasc')));
-  push('Idade', esc(val('f_idade')));
-  push('Registro / Prontuário', esc(val('f_pront')));
-  push('Setor / Leito', esc(val('f_setor')));
+  push('Prontuário', esc(val('f_pront')));
   push('Data da alta', esc(val('f_alta')));
-  push('Acompanhante / Cuidador', esc(val('f_cuidador')));
-  push('Diagnóstico / Motivo', esc(val('f_dx')), true);
   if(idRows.length) body += `<div class="doc-id">${idRows.join('')}</div>`;
 
   if(items.length===0 && !val('f_extra')){
@@ -641,12 +637,8 @@ function plainText(){
   const line=(l,v)=>{ if(v) t.push(l+': '+v); };
   line('Paciente', val('f_nome'));
   line('Data de nascimento', val('f_nasc'));
-  line('Idade', val('f_idade'));
-  line('Registro/Prontuário', val('f_pront'));
-  line('Setor/Leito', val('f_setor'));
+  line('Prontuário', val('f_pront'));
   line('Data da alta', val('f_alta'));
-  line('Acompanhante/Cuidador', val('f_cuidador'));
-  line('Diagnóstico/Motivo', val('f_dx'));
   t.push('');
   selectedItems().forEach(it=>{
     t.push((it.alert?'⚠ ':'')+it.label.toUpperCase());
