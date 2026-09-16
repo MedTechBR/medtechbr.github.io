@@ -425,11 +425,13 @@ details.card>summary h2{display:inline} details.card>summary .hint{display:inlin
    ================================================================ */
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const APP_V = '15/09';   /* aparece na tela de carregamento — serve para saber qual casca o celular abriu */
+const APP_V = '16/09';   /* aparece na tela de carregamento — serve para saber qual casca o celular abriu */
 const LS_CFG = 'plc.cfg', LS_EDITS = 'plc.edits', LS_TAB = 'plc.tab', LS_MAIL = 'plc.mail', LS_SUB = 'plc.sub', LS_TEMA = 'plc.tema', LS_FILTRO = 'plc.filtro';
 const CORTE = {CIR: 4, CM1: 10, TRAU: 5.5, UCE: 20, AVC: 10, UTIA: 10};   /* corte de permanência por setor (o mesmo do PDF) */
 
 const SELOS = ['ALTA HOJE','ALTA SE','ATB','EM EXAME','CIRURGIA','PÓS-OP','REGULAÇÃO','VIGILÂNCIA','PIORA CLÍNICA','PALIATIVO','UTI','OBSTETRÍCIA','RN','SEM LEITURA'];
+const SELO_ROT = {'ALTA HOJE':'ALTA DECIDIDA','ALTA SE':'ALTA POTENCIAL'};   /* 16/09 (Matheus): rótulo exibido; o código gravado continua o mesmo */
+const rotSelo = x => SELO_ROT[x] || x;
 const SELO_G = {'ALTA HOJE':'alta','ALTA SE':'altase','ATB':'pend','EM EXAME':'pend','CIRURGIA':'pend','PÓS-OP':'pend','REGULAÇÃO':'pend',
   'SEM LEITURA':'sem','VIGILÂNCIA':'trat','PIORA CLÍNICA':'trat','PALIATIVO':'trat','UTI':'fora','OBSTETRÍCIA':'fora','RN':'fora'};
 const GRUPOS = [
@@ -788,7 +790,7 @@ function filtroV(l, v){
   if (v === 'cir') return !!cirTravada(l);
   return true;
 }
-const ROT_V = {piora:'Piora clínica', sem:'Sem leitura', ah:'Alta hoje', ase:'Alta se…', corte:'Permanência acima da referência', ex:'Exames parados', par:'Pareceres sem resposta', cir:'Cirurgias travadas'};
+const ROT_V = {piora:'Piora clínica', sem:'Sem leitura', ah:'Alta decidida', ase:'Alta potencial', corte:'Permanência acima da referência', ex:'Exames parados', par:'Pareceres sem resposta', cir:'Cirurgias travadas'};
 function diasV(l, v){   /* tempo de espera para ordenar a lista filtrada */
   if (v === 'ex' || v === 'par') return Math.max(0, ...vitaeDe(l.p).filter(x => x.tipo === v).map(x => x.dias || 0));
   if (v === 'cir') { const t = cirTravada(l); return t && t.dias ? t.dias : 0; }
@@ -842,7 +844,7 @@ function vHoje(){
   /* 1. três números */
   h += '<div class="big">' +
     '<button class="b cr" data-ir="setor"><div class="v">' + (D.meta ?? '—') + '</div><div class="l">altas necessárias hoje</div></button>' +
-    '<button class="b ok" data-ir="leitos" data-g="alta"><div class="v">' + (AH + ASE) + '</div><div class="l">altas potenciais<br><small>' + AH + ' alta hoje · ' + ASE + ' alta se…' + (utiP ? ' · UTI fora (' + utiP + ')' : '') + '</small></div></button>' +
+    '<button class="b ok" data-ir="leitos" data-g="alta"><div class="v">' + (AH + ASE) + '</div><div class="l">altas decididas e potenciais<br><small>' + AH + ' decididas · ' + ASE + ' potenciais' + (utiP ? ' · UTI fora (' + utiP + ')' : '') + '</small></div></button>' +
     '<button class="b wa" data-ir="mais" data-sub="reg"><div class="v">' + fila + '</div><div class="l">fila da emergência<br><small>' + (emg ? emg.ocup + '/' + emg.cap + ' ocupados' : '') + '</small></div></button></div>' +
     '<div class="sub2">' + (D.glob ? '<b>' + D.glob.livres + '</b> leitos livres · ' + D.glob.ocup + '/' + D.glob.leitos + ' ocupados · ' + D.glob.extras + ' em cama extra · ' : '') + '<b>' + elet + '</b> eletivas para entrar' +
     (nEdits() ? ' · <b style="color:var(--warn-ink)">' + nEdits() + ' edição(ões) não gravada(s)</b>' : '') + '</div>';
@@ -851,8 +853,8 @@ function vHoje(){
   const linha = (n, cls, t, sub, v, k) => '<button class="acao-row" data-ir="leitos" data-v="' + v + '" data-k="' + (k || '') + '"><span class="n ' + (n ? cls : 'off') + '">' + n + '</span><span><div class="t">' + t + '</div><div class="s">' + sub + '</div></span><span class="go">›</span></button>';
   h += '<div class="card" style="margin-bottom:12px"><header><h2>Precisa de ação</h2><span class="hint">toque para ver os leitos, do mais antigo para o mais novo</span></header><div class="body acoes" style="padding-top:4px">' +
     linha(piora, 'cr', 'Piora clínica', 'resposta hoje; não conta para alta', 'piora') +
-    linha(AH, 'ok', 'Alta hoje', 'alta definida: decisão escrita na evolução; falta concluir a saída', 'ah') +
-    linha(ASE, 'ok', 'Alta se…', 'possibilidade condicional: falta um item resolvível no dia', 'ase') +
+    linha(AH, 'ok', 'Alta decidida', 'decisão de alta escrita na evolução; falta concluir a saída', 'ah') +
+    linha(ASE, 'ok', 'Alta potencial', 'falta um item resolvível no dia', 'ase') +
     (lido ? linha(c.ex, 'wa', 'Exames parados', 'sem programação ou vencidos · ' + c.exLeitos + ' leito(s) · Lista de Exames', 'ex') : linha('—', 'off', 'Exames parados', 'Lista de Exames não lida hoje', 'ex')) +
     (lido ? linha(c.par, 'wa', 'Pareceres sem resposta', 'há mais de 24 h · ' + c.urg + ' urgente(s) · Interconsultas', 'par') : linha('—', 'off', 'Pareceres sem resposta', 'Interconsultas não lidas hoje', 'par')) +
     linha(c.cir, 'wa', 'Cirurgias travadas', 'material ' + c.mat + ' · anestesia ' + c.ane + ' · sem data no mapa ' + c.semData, 'cir') +
@@ -868,13 +870,13 @@ function vHoje(){
         '<span class="tk"><i style="width:' + pct + '%"></i></span>' +
         '<span class="ln"><span>demanda <b' + (s.meta > 0 ? ' style="color:var(--crit)"' : '') + '>' + (s.paralelo ? '—' : s.meta) + '</b></span><span>possib. <b' + ((e.ah + e.ase) ? ' style="color:var(--good-ink)"' : '') + '>' + (e.ah + e.ase) + '</b></span><span class="imp">' + esc(impedimento(s.k)) + '</span></span></summary>' +
         '<div class="dt"><div>livres<b>' + s.livres + '</b></div><div>fila p/ cá<b>' + s.fila + '</b></div><div>eletivas<b>' + s.elet + '</b></div>' +
-        '<div>alta hoje<b>' + e.ah + '</b></div><div>alta se…<b>' + e.ase + '</b></div><div>acima do corte<b>' + (D.leitos || []).filter(l => l.k === s.k && CORTE[s.k] && (Number(l.dl) || 0) > CORTE[s.k]).length + '</b></div>' +
+        '<div>alta decidida<b>' + e.ah + '</b></div><div>alta potencial<b>' + e.ase + '</b></div><div>acima do corte<b>' + (D.leitos || []).filter(l => l.k === s.k && CORTE[s.k] && (Number(l.dl) || 0) > CORTE[s.k]).length + '</b></div>' +
         '<div>exames parados<b>' + (lido ? cv.ex : '—') + '</b></div><div>pareceres<b>' + (lido ? cv.par : '—') + '</b></div><div>cirurgias travadas<b>' + cv.cir + '</b></div>' +
         (a ? '<div class="full">cobranças de ' + esc(S.AD.dia_br || S.AD.dia) + ': <b style="display:inline;font-size:13px">' + a.pct_resolvida + '% resolvidas · ' + a.parada + ' paradas de ' + a.n + '</b></div>' : '') +
         '<div class="full" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px"><button class="btn sec mini" data-ir="setor" data-abrir="' + esc(s.k) + '">Abrir o setor</button><button class="btn sec mini" data-ir="leitos" data-k="' + esc(s.k) + '">Ver os leitos</button></div></div></details>'; }).join('') + '</div></div>';
   h += '<div class="card so-desk" style="margin-bottom:12px"><header><h2>Setores</h2><span class="hint">demanda = altas necessárias hoje' +
-    (nEdits() ? ' · <b style="color:var(--warn-ink)">alta hoje / alta se já contam as suas ' + nEdits() + ' edição(ões) não gravada(s)</b>' : '') + '</span></header><div class="body scroll"><table class="tb"><thead><tr>' +
-    '<th>Setor</th><th>Ocupação</th><th class="r">Livres</th><th class="r">Fila</th><th class="r">Eletivas</th><th class="r">Demanda</th><th class="r">Alta hoje</th><th class="r">Alta se…</th><th>Principal impedimento</th><th>Status</th></tr></thead><tbody>' +
+    (nEdits() ? ' · <b style="color:var(--warn-ink)">alta decidida / alta potencial já contam as suas ' + nEdits() + ' edição(ões) não gravada(s)</b>' : '') + '</span></header><div class="body scroll"><table class="tb"><thead><tr>' +
+    '<th>Setor</th><th>Ocupação</th><th class="r">Livres</th><th class="r">Fila</th><th class="r">Eletivas</th><th class="r">Demanda</th><th class="r">Alta decidida</th><th class="r">Alta potencial</th><th>Principal impedimento</th><th>Status</th></tr></thead><tbody>' +
     sets.map((s, i) => {
       const pct = s.cap ? Math.min(100, Math.round(100 * s.ocup / s.cap)) : 0, px = s.cap ? Math.min(100 - pct, Math.round(100 * s.extra / s.cap)) : 0, e = EFs[i];
       return '<tr><td class="lt">' + esc(s.nome) + '</td><td class="occ"><span class="track"><i class="fill" style="width:' + pct + '%"></i>' + (px ? '<i class="xtra" style="left:' + pct + '%;width:' + px + '%"></i>' : '') +
@@ -906,13 +908,13 @@ function vHoje(){
 function cardMudancas(){
   const M = S.D.mudancas; if (!M) return '';
   const tot = (M.novos || []).length + (M.sairam || []).length + (M.selo || []).length + (M.pend || []).length;
-  const chip = x => '<span class="selo s-' + (SELO_G[x] || 'pend') + '">' + esc(x) + '</span>';
+  const chip = x => '<span class="selo s-' + (SELO_G[x] || 'pend') + '">' + esc(rotSelo(x)) + '</span>';
   const it = (x, txt, sub) => '<div class="mud-it" data-ir="leitos" data-q="' + esc(x.p) + '" data-k="' + esc(x.k) + '" data-aberto="' + esc(x.k + '|' + x.p) + '"><span class="a">' + esc(nomeSetor(x.k)) + ' · <b>' + esc(x.l) + '</b> · #' + esc(x.p) + ' — ' + txt + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</span><span style="color:var(--ink-3)">›</span></div>';
   const bloco = (rot, lista, f) => lista && lista.length ? '<details style="margin-top:6px"><summary style="cursor:pointer;font-size:14px;padding:6px 0"><b>' + lista.length + '</b> ' + rot + '</summary>' + lista.slice(0, 40).map(f).join('') + (lista.length > 40 ? '<div class="msg">… e mais ' + (lista.length - 40) + '</div>' : '') + '</details>' : '';
   let h = '<div class="card" style="margin-bottom:12px"><header><h2>O que mudou desde a última rodada</h2><span class="hint">' + (M.ontem ? 'em relação ao painel de ' + esc(M.ontem) : 'sem painel anterior para comparar') + '</span></header><div class="body" style="padding-top:4px">';
   if (!tot && !(M.corrigidos || []).length) h += '<div class="msg">Nada mudou.</div>';
   h += bloco('corrigido(s) por você hoje, depois da publicação', M.corrigidos, x => it(x, chip(x.de) + ' → ' + chip(x.para), x.campo !== 'selo' ? 'mudou a ' + x.campo : '')) +
-    bloco('viraram alta (hoje ou alta se…)', (M.selo || []).filter(x => /^ALTA/.test(x.para)), x => it(x, chip(x.de) + ' → ' + chip(x.para), x.pend)) +
+    bloco('viraram alta (decidida ou potencial)', (M.selo || []).filter(x => /^ALTA/.test(x.para)), x => it(x, chip(x.de) + ' → ' + chip(x.para), x.pend)) +
     bloco('mudaram de selo', (M.selo || []).filter(x => !/^ALTA/.test(x.para)), x => it(x, chip(x.de) + ' → ' + chip(x.para), x.pend)) +
     bloco('com pendência nova (mesmo selo)', M.pend, x => it(x, chip(x.selo), x.pend)) +
     bloco('leito(s) novo(s) no painel', M.novos, x => it(x, chip(x.selo))) +
@@ -975,7 +977,7 @@ function vSetor(){
   let h = cabecalho('Setores', 'As possibilidades de alta de hoje, setor a setor — e o que aconteceu com o que o painel cobrou no dia anterior.');
 
   h += '<div class="row r-kpi">' +
-    kpi('k-elet', 'Possibilidades de alta hoje', AH + ASE, '<b>' + AH + '</b> alta hoje · <b>' + ASE + '</b> alta se…' +
+    kpi('k-elet', 'Altas decididas e potenciais', AH + ASE, '<b>' + AH + '</b> decididas · <b>' + ASE + '</b> potenciais' +
       (AH !== AH0 || ASE !== ASE0 ? '<br>' + FLAG_ED + ' na planilha ainda são ' + AH0 + ' e ' + ASE0 + ' — grave na aba Leitos' : ''));
   if (AD && AD.geral && AD.geral.n) {
     h += kpi('k-livre', 'Resolvidas em 24h', AD.geral.pct_resolvida + '%', AD.geral.resolvida + ' de ' + AD.geral.n + ' pendências cobradas no painel de ' + esc(AD.dia_br || AD.dia)) +
@@ -1037,14 +1039,14 @@ function paginaSetor(k, AD){
     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:-4px 0 12px"><button class="btn" data-ir="leitos" data-k="' + esc(k) + '" data-aberto="">Iniciar a visita neste setor</button><button class="btn sec" data-ir="leitos" data-k="' + esc(k) + '" data-g="alta">Só as altas</button></div>';
 
   /* 1. o que dá para dar alta hoje */
-  h += '<div class="card" style="margin-bottom:12px"><header><h2>Possibilidades de alta hoje</h2>' +
+  h += '<div class="card" style="margin-bottom:12px"><header><h2>Altas decididas e potenciais</h2>' +
     '<span class="hint">' + poss.length + ' leito(s) · toque no botão abaixo para editar na aba Leitos</span></header><div class="body scroll">';
   h += poss.length
     ? poss.map(l => '<div class="pit"><div class="ph"><b>' + esc(l.l) + '</b><span class="mn">' + esc(l.p) + '</span>' +
-        '<span class="flag s-' + (l.selo === 'ALTA HOJE' ? 'alta' : 'altase') + '">' + esc(l.selo) + '</span>' + (S.edits[idDe(l)] ? FLAG_ED : '') + '</div>' +
+        '<span class="flag s-' + (l.selo === 'ALTA HOJE' ? 'alta' : 'altase') + '">' + esc(rotSelo(l.selo)) + '</span>' + (S.edits[idDe(l)] ? FLAG_ED : '') + '</div>' +
         '<div class="pb">' + esc(l.pend || '') + '</div>' +
         (l.acao ? '<div class="pa"><b>Fazer hoje:</b> ' + esc(l.acao) + '</div>' : '') + vitaeHtml(l.p) + '</div>').join('')
-    : '<div class="msg">Nenhuma alta ou alta condicional sinalizada neste setor hoje.</div>';
+    : '<div class="msg">Nenhuma alta decidida ou potencial sinalizada neste setor hoje.</div>';
   h += '<div style="margin-top:10px"><button class="btn sec" id="b-ver-leitos">Ver todos os leitos deste setor</button></div></div></div>';
   h += cardVitae(k);   /* 09/09: exames, pareceres e cirurgias travadas — o mesmo bloco do PDF */
 
@@ -1131,7 +1133,7 @@ function vLeitos(){
   lista.forEach(l => {
     if (l.k !== kAtual) { kAtual = l.k; h += '<div class="grupo">' + esc(l.s) + '<span class="n">' + lista.filter(x => x.k === l.k).length + '</span></div>'; }
     const id = idDe(l), dirty = !!S.edits[id], emg = l.k === 'EMG', aberto = S.aberto === id && !emg;
-    const chip = '<span class="selo s-' + (SELO_G[l.selo] || 'pend') + '">' + esc(l.selo) + (l.selo === 'ALTA SE' && l.dep ? ' · ' + (l.dep === 'nossa' ? 'nossa' : '3º') : '') + '</span>';
+    const chip = '<span class="selo s-' + (SELO_G[l.selo] || 'pend') + '">' + esc(rotSelo(l.selo)) + (l.selo === 'ALTA SE' && l.dep ? ' · ' + (l.dep === 'nossa' ? 'nossa' : '3º') : '') + '</span>';
     const cab = '<div class="leito">' + esc(l.l) + '<span class="p">#' + esc(l.p) + '</span><small>' + l.dl + 'd clín · ' + l.dh + 'd hosp</small></div>';
     if (!aberto) {
       /* linha fixa: só leitura; toque abre o editor */
@@ -1191,7 +1193,7 @@ function ligarLeitos(){
       guardarEdits(); pintarNav();
       it.classList.toggle('dirty', !igual);
       dep.hidden = sel.value !== 'ALTA SE';
-      const chip = it.querySelector('.selo'); chip.className = 'selo s-' + (SELO_G[sel.value] || 'pend'); chip.textContent = sel.value;
+      const chip = it.querySelector('.selo'); chip.className = 'selo s-' + (SELO_G[sel.value] || 'pend'); chip.textContent = rotSelo(sel.value);
       atualizarBarra();
     }
     sel.addEventListener('change', ler); dep.addEventListener('change', ler);
