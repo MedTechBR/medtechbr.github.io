@@ -425,15 +425,15 @@ details.card>summary h2{display:inline} details.card>summary .hint{display:inlin
    ================================================================ */
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const APP_V = '16/09b';   /* aparece na tela de carregamento — serve para saber qual casca o celular abriu */
+const APP_V = '17/09';   /* aparece na tela de carregamento — serve para saber qual casca o celular abriu */
 const LS_CFG = 'plc.cfg', LS_EDITS = 'plc.edits', LS_TAB = 'plc.tab', LS_MAIL = 'plc.mail', LS_SUB = 'plc.sub', LS_TEMA = 'plc.tema', LS_FILTRO = 'plc.filtro';
 const CORTE = {CIR: 4, CM1: 10, TRAU: 5.5, UCE: 20, AVC: 10, UTIA: 10};   /* corte de permanência por setor (o mesmo do PDF) */
 
-const SELOS = ['ALTA HOJE','ALTA SE','ATB','EM EXAME','CIRURGIA','PÓS-OP','REGULAÇÃO','VIGILÂNCIA','PIORA CLÍNICA','PALIATIVO','UTI','OBSTETRÍCIA','RN','SEM LEITURA'];
+const SELOS = ['ALTA HOJE','ALTA SE','ATB','EM EXAME','CIRURGIA','PÓS-OP','REGULAÇÃO','VIGILÂNCIA','PIORA CLÍNICA','PALIATIVO','UTI','OBSTETRÍCIA','RN','SEM LEITURA','ÓBITO'];
 const SELO_ROT = {'ALTA HOJE':'ALTA DECIDIDA','ALTA SE':'ALTA POTENCIAL'};   /* 16/09 (Matheus): rótulo exibido; o código gravado continua o mesmo */
 const rotSelo = x => SELO_ROT[x] || x;
 const SELO_G = {'ALTA HOJE':'alta','ALTA SE':'altase','ATB':'pend','EM EXAME':'pend','CIRURGIA':'pend','PÓS-OP':'pend','REGULAÇÃO':'pend',
-  'SEM LEITURA':'sem','VIGILÂNCIA':'trat','PIORA CLÍNICA':'trat','PALIATIVO':'trat','UTI':'fora','OBSTETRÍCIA':'fora','RN':'fora'};
+  'SEM LEITURA':'sem','VIGILÂNCIA':'trat','PIORA CLÍNICA':'trat','PALIATIVO':'trat','UTI':'fora','OBSTETRÍCIA':'fora','RN':'fora','ÓBITO':'fora'};
 const GRUPOS = [
   {g:'alta',   nome:'Alta já escrita',          cor:'var(--alta)'},
   {g:'altase', nome:'Possibilidade a analisar', cor:'var(--altase)'},
