@@ -425,7 +425,7 @@ details.card>summary h2{display:inline} details.card>summary .hint{display:inlin
    ================================================================ */
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const APP_V = '16/09';   /* aparece na tela de carregamento — serve para saber qual casca o celular abriu */
+const APP_V = '16/09b';   /* aparece na tela de carregamento — serve para saber qual casca o celular abriu */
 const LS_CFG = 'plc.cfg', LS_EDITS = 'plc.edits', LS_TAB = 'plc.tab', LS_MAIL = 'plc.mail', LS_SUB = 'plc.sub', LS_TEMA = 'plc.tema', LS_FILTRO = 'plc.filtro';
 const CORTE = {CIR: 4, CM1: 10, TRAU: 5.5, UCE: 20, AVC: 10, UTIA: 10};   /* corte de permanência por setor (o mesmo do PDF) */
 
@@ -808,6 +808,28 @@ function impedimento(k){   /* o gargalo mais frequente do setor, em uma frase */
 /* 11/09 (Matheus): "você resumiu algumas informações como eletivas para entrar, pacientes em mapa".
    Os dois números viram lista: o mapa cirúrgico do dia (leito e prontuário de quem já está internado)
    e as eletivas liberadas/agendadas que ainda não têm leito. Sem nome de paciente (LGPD). */
+/* 16/09 (Matheus): leitura parcial da tarde — às ~14h30 o painel relê só os leitos que de manhã estavam alta decidida,
+   alta potencial, antibiótico terminando ou piora, com as evoluções de hoje. Vem no BI_JSON como D.tarde (pwa/tarde_<dia>.json).
+   Não muda a lista da manhã: mostra o que mudou e o que continua. Sem e-mail. */
+function cardTarde(){
+  const T = D.tarde; if (!T || !T.itens || !T.itens.length) return '';
+  const r = T.resumo || {};
+  const mud = T.itens.filter(i => i.mudou), cont = T.itens.filter(i => !i.mudou);
+  const rot = x => rotSelo(x);
+  const it = i => '<li><b>' + esc(i.nome) + ' ' + esc(String(i.l || '').replace(/^.*\./, '')) + '</b> #' + esc(i.p) + ' · ' + chip(i.selo_manha) + ' → ' + chip(i.selo) +
+    (i.acao ? '<div class="hint" style="margin:2px 0 4px">' + esc(i.acao) + '</div>' : '') + '</li>';
+  return '<div class="card" style="margin-bottom:12px;border-left:4px solid var(--warn)"><header><h2>Atualização da tarde · ' + esc(T.hora || '') + '</h2>' +
+    '<span class="hint">' + r.total + ' leitos relidos com as evoluções de hoje (' + r.com_evolucao_hoje + ' já evoluídos) · a lista da manhã não muda</span></header>' +
+    '<div class="body"><div class="setrow"><div class="dt" style="padding-top:6px">' +
+    '<div>decididas de manhã ainda no leito<b>' + r.decidida_manha_continua + '</b></div>' +
+    '<div>potenciais que viraram decididas<b>' + r.potencial_virou_decidida + '</b></div>' +
+    '<div>potenciais que caíram<b>' + r.potencial_caiu + '</b></div>' +
+    '<div>antibiótico → alta<b>' + r.atb_virou_alta + '</b></div>' +
+    '<div>piora persiste<b>' + r.piora_persiste + '</b></div></div></div>' +
+    (mud.length ? '<h3 style="margin:8px 0 4px">Mudaram desde a manhã</h3><ul class="lst">' + mud.map(it).join('') + '</ul>' : '<div class="msg">Nenhum selo mudou desde a manhã.</div>') +
+    (cont.length ? '<details><summary>' + cont.length + ' sem mudança de selo</summary><ul class="lst">' + cont.map(it).join('') + '</ul></details>' : '') +
+    '</div></div>';
+}
 function cardEntradas(){
   const D = S.D, M = (D.mapa_hoje && D.mapa_hoje.lista) || [], E = (D.eletivas && D.eletivas.lista) || [];
   if (!M.length && !E.length) return '';
@@ -860,6 +882,7 @@ function vHoje(){
     linha(c.cir, 'wa', 'Cirurgias travadas', 'material ' + c.mat + ' · anestesia ' + c.ane + ' · sem data no mapa ' + c.semData, 'cir') +
     linha(acima, 'wa', 'Permanência acima da referência', 'dias na clínica acima da referência do setor; não afirma inadequação', 'corte') +
     linha(sem, 'cr', 'Sem leitura', 'o coletor não leu a evolução — conferir no Vitae', 'sem') + '</div></div>';
+  h += cardTarde();   /* 16/09: leitura parcial da tarde (D.tarde), quando houver */
   h += cardEntradas();
 
   /* 3. setores: linha expandível no celular, tabela no computador */
