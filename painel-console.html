@@ -425,7 +425,7 @@ details.card>summary h2{display:inline} details.card>summary .hint{display:inlin
    ================================================================ */
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const APP_V = '17/09b';   /* aparece na tela de carregamento — serve para saber qual casca o celular abriu */
+const APP_V = '17/09c';   /* aparece na tela de carregamento — serve para saber qual casca o celular abriu */
 const LS_CFG = 'plc.cfg', LS_EDITS = 'plc.edits', LS_TAB = 'plc.tab', LS_MAIL = 'plc.mail', LS_SUB = 'plc.sub', LS_TEMA = 'plc.tema', LS_FILTRO = 'plc.filtro';
 const CORTE = {CIR: 4, CM1: 10, TRAU: 5.5, UCE: 20, AVC: 10, UTIA: 10};   /* corte de permanência por setor (o mesmo do PDF) */
 
@@ -1294,6 +1294,7 @@ function dataSheets(v){
     const d = new Date(Date.UTC(1899, 11, 30) + Number(t) * 86400000);
     return String(d.getUTCDate()).padStart(2, '0') + '/' + String(d.getUTCMonth() + 1).padStart(2, '0');
   }
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(t)) return t.slice(0, 5);   /* 17/09: a aba passou a mostrar dd/mm/aaaa */
   return t;
 }
 
