@@ -425,7 +425,7 @@ details.card>summary h2{display:inline} details.card>summary .hint{display:inlin
    ================================================================ */
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const APP_V = '17/09';   /* aparece na tela de carregamento — serve para saber qual casca o celular abriu */
+const APP_V = '17/09b';   /* aparece na tela de carregamento — serve para saber qual casca o celular abriu */
 const LS_CFG = 'plc.cfg', LS_EDITS = 'plc.edits', LS_TAB = 'plc.tab', LS_MAIL = 'plc.mail', LS_SUB = 'plc.sub', LS_TEMA = 'plc.tema', LS_FILTRO = 'plc.filtro';
 const CORTE = {CIR: 4, CM1: 10, TRAU: 5.5, UCE: 20, AVC: 10, UTIA: 10};   /* corte de permanência por setor (o mesmo do PDF) */
 
@@ -812,7 +812,8 @@ function impedimento(k){   /* o gargalo mais frequente do setor, em uma frase */
    alta potencial, antibiótico terminando ou piora, com as evoluções de hoje. Vem no BI_JSON como D.tarde (pwa/tarde_<dia>.json).
    Não muda a lista da manhã: mostra o que mudou e o que continua. Sem e-mail. */
 function cardTarde(){
-  const T = D.tarde; if (!T || !T.itens || !T.itens.length) return '';
+  const T = (S.D && S.D.tarde) || null; if (!T || !T.itens || !T.itens.length) return '';
+  const chip = x => '<span class="selo s-' + (SELO_G[x] || 'pend') + '">' + esc(rotSelo(x)) + '</span>';
   const r = T.resumo || {};
   const mud = T.itens.filter(i => i.mudou), cont = T.itens.filter(i => !i.mudou);
   const rot = x => rotSelo(x);
