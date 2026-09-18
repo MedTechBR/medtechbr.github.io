@@ -425,7 +425,7 @@ details.card>summary h2{display:inline} details.card>summary .hint{display:inlin
    ================================================================ */
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const APP_V = '17/09c';   /* aparece na tela de carregamento — serve para saber qual casca o celular abriu */
+const APP_V = '18/09';   /* aparece na tela de carregamento — serve para saber qual casca o celular abriu */
 const LS_CFG = 'plc.cfg', LS_EDITS = 'plc.edits', LS_TAB = 'plc.tab', LS_MAIL = 'plc.mail', LS_SUB = 'plc.sub', LS_TEMA = 'plc.tema', LS_FILTRO = 'plc.filtro';
 const CORTE = {CIR: 4, CM1: 10, TRAU: 5.5, UCE: 20, AVC: 10, UTIA: 10};   /* corte de permanência por setor (o mesmo do PDF) */
 
@@ -1341,6 +1341,7 @@ function vPiloto(){
   const pAh = pct(soma(antes, x => x.ahs), soma(antes, x => x.ah)), pDh = pct(soma(depois, x => x.ahs), soma(depois, x => x.ah));
   let h = voltarMais() + cabecalho('Resultados', 'Quanto do que o painel sinaliza vira alta de verdade, dia a dia, e o que aconteceu com o que ele cobrou. Denominadores sempre à vista.');
   h += cardEvolucao(serie);
+  h += cardServicos();     /* 18/09: NAC e Imagem estão resolvendo o que o painel sinalizou? (D.servicos, do BI_JSON) */
   h += cardAprendizado();   /* 15/09: o que o painel aprendeu sobre o hospital (D.aprendizado, do BI_JSON) */
   if (!serie.length) h += '<div class="nota warn" style="margin-bottom:12px">A ponte ainda não mandou a aba PILOTO (precisa da versão 16.2). Toque em atualizar; se persistir, avise.</div>';
   h += '<div class="row r-kpi">' +
@@ -1406,6 +1407,33 @@ function cardEvolucao(serie){
 /* 15/09 (Matheus): "vá aprendendo cada vez mais sobre o hospital… esses dados devem chegar no painel da efetividade".
    O BI_JSON traz D.aprendizado (piloto/conhecimento.json, recalculado na rodada antes de publicar): fatos com n,
    período e fonte, por tema; "novo"/"mudou" em relação à véspera. Só agregados — nenhum nome ou prontuário. */
+/* 18/09 (pedido do Matheus): cada item que os PDFs mandam ao NAC (exame sem data) e à Imagem (exame a realizar, laudo
+   aguardado) é seguido dia a dia na Lista de Exames até resolver. Resolvido: NAC = ganhou data ou foi feito; Imagem = realizado;
+   laudo = situação Baixado. Pedido cancelado e alta antes ficam fora da taxa. */
+function cardServicos(){
+  const R = (S.D && S.D.servicos) || null;
+  const cab = '<div class="card" style="margin-bottom:12px"><header><h2>NAC e Imagem estão resolvendo o que o painel sinalizou?</h2>';
+  if (!R || !R.por_tipo) return cab + '</header><div class="body"><div class="bloq">ainda sem acompanhamento publicado — chega na rodada das 5h</div></div></div>';
+  const P = R.por_tipo, ORD = [['nac', 'NAC', 'marcar exame sem data'], ['imagem_realizar', 'Imagem', 'realizar exame agendado'], ['imagem_laudo', 'Imagem', 'liberar laudo']];
+  const pc = (n, d) => d ? Math.round(100 * n / d) + '%' : '—';
+  let lin = '';
+  for (const [t, sv, oq] of ORD) {
+    const v = P[t]; if (!v) continue; const base = v.resolvidos + v.abertos;
+    lin += '<tr><td><b>' + esc(sv) + '</b> — ' + esc(oq) + '</td><td class="r num">' + v.enviados + '</td><td class="r num"><b>' + v.resolvidos + '</b> <span class="hint">' + pc(v.resolvidos, base) + '</span></td>' +
+      '<td class="r num">' + pc(v.em_1d, base) + '</td><td class="r num">' + (v.mediana_d == null ? '—' : v.mediana_d + ' d') + '</td>' +
+      '<td class="r num">' + (v.abertos ? '<b style="color:var(--warn-ink)">' + v.abertos + '</b>' : '0') + '</td><td class="r num">' + (v.cancelados || 0) + '</td><td class="r num">' + (v.saiu || 0) + '</td></tr>';
+  }
+  const ROT = {nac: 'NAC — sem data', imagem_realizar: 'Imagem — não realizado', imagem_laudo: 'Imagem — sem laudo'};
+  const ab = [];
+  for (const [t] of ORD) for (const r of ((P[t] || {}).abertos_lista || [])) ab.push(Object.assign({t}, r));
+  ab.sort((a, b) => b.dias - a.dias);
+  let h = cab + '<span class="hint">desde ' + esc(String(R.desde || '').split('-').reverse().slice(0, 2).join('/')) + ' · cada pedido seguido dia a dia na Lista de Exames</span></header><div class="body scroll">' +
+    '<table class="tb"><thead><tr><th>Serviço — o que se pede</th><th class="r">Sinalizados</th><th class="r">Resolvidos</th><th class="r">Em até 1 d</th><th class="r">Mediana</th><th class="r">Abertos</th><th class="r">Cancelados</th><th class="r">Alta antes</th></tr></thead><tbody>' + lin + '</tbody></table>';
+  if (ab.length) h += '<details style="margin-top:8px"><summary>' + ab.length + ' item(ns) ainda abertos, do mais antigo</summary><table class="tb"><thead><tr><th>Setor · leito</th><th>Pront.</th><th>Exame</th><th>Falta</th><th class="r">Há</th></tr></thead><tbody>' +
+    ab.map(r => '<tr><td>' + esc(nomeSetor(r.k) || r.k || '') + ' · <b>' + esc(String(r.l || '').replace(/^.*\./, '')) + '</b></td><td>#' + esc(r.p) + '</td><td>' + esc(r.exame) + '</td><td>' + esc(ROT[r.t]) + '</td><td class="r num">' + (r.dias ? (r.dias >= 3 ? '<b style="color:var(--warn-ink)">' + r.dias + ' d</b>' : r.dias + ' d') : 'hoje') + '</td></tr>').join('') + '</tbody></table></details>';
+  h += '<div class="hint" style="margin-top:6px">Resolvido: NAC = ganhou data ou foi feito · Imagem = realizado · laudo = "Baixado" na Lista de Exames. Cancelado (pedido sumiu com o paciente internado) e alta antes ficam fora da taxa. Raio-X e ECG não entram.</div></div></div>';
+  return h;
+}
 function cardAprendizado(){
   const A = (S.D && S.D.aprendizado) || null;
   const cab = '<div class="card" style="margin-bottom:12px"><header><h2>O que o painel aprendeu sobre o hospital</h2>';
