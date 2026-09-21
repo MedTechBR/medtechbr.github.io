@@ -22,6 +22,8 @@
 <style>
 :root{--ink:#fff;--muted:rgba(255,255,255,.6);--dim:rgba(255,255,255,.6);--paper:#000;--line:rgba(255,255,255,.12);--line-strong:rgba(255,255,255,.2);--accent:#fff;--ok:#4ADE80;--danger:#F87171;--fg6:rgba(255,255,255,.06);--fg12:rgba(255,255,255,.12);--fg20:rgba(255,255,255,.2);--ease:cubic-bezier(.16,1,.3,1)}
 *{margin:0;padding:0;box-sizing:border-box}
+html,body{overflow-x:clip}
+.install[hidden]{display:none}
 html{background:#000}
 body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--ink);background:var(--paper);min-height:100vh;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 :focus-visible{outline:2px solid rgba(255,255,255,.6);outline-offset:3px;border-radius:8px}
@@ -100,7 +102,7 @@ footer a{color:var(--muted);text-decoration:none;display:inline-block;padding:10
 .apps-vazio{grid-column:1/-1;text-align:center;color:var(--muted);padding:34px 16px;border:1px dashed var(--fg20);border-radius:16px;font-size:14px;line-height:1.5}
 .apps-vazio .b{display:inline-flex;align-items:center;justify-content:center;margin-top:14px;min-height:44px;padding:0 18px;border-radius:999px;background:#fff;color:#000;border:0;font:500 14px 'Inter',system-ui,sans-serif;cursor:pointer}
 @media(max-width:560px){.ghost .lbl{display:none}.ghost{width:44px;padding:0;justify-content:center}.ghost i{font-size:19px}}
-@media(max-width:560px){.wrap{padding:0 18px}.grid{grid-template-columns:repeat(4,1fr);gap:26px 8px}.app .ic{width:62px;height:62px;border-radius:16px;font-size:29px}.app .nm{font-size:11.5px}.hello{margin-bottom:30px}.hello h1{font-size:26px}main{padding-top:36px}.usr .who{display:none}}
+@media(max-width:560px){.wrap{padding:0 16px}.wm{font-size:17px}.top-r{gap:6px}.install .lbl{display:none}.install{width:44px;padding:0}.usr button{width:44px;padding:0}#btnOut{display:none}.grid{grid-template-columns:repeat(4,1fr);gap:26px 8px}.app .ic{width:62px;height:62px;border-radius:16px;font-size:29px}.app .nm{font-size:11.5px}.hello{margin-bottom:30px}.hello h1{font-size:26px}main{padding-top:36px}.usr .who{display:none}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <link rel="stylesheet" href="_mttokens.css?v=3">
@@ -113,7 +115,7 @@ footer a{color:var(--muted);text-decoration:none;display:inline-block;padding:10
     <div class="top-r">
       <button class="ghost" id="btnApps" onclick="openMeusApps()" title="Escolher quais apps aparecem aqui"><i class="ti ti-layout-grid-add" aria-hidden="true"></i><span class="lbl">Meus apps</span></button>
       <button class="ghost" id="btnSug" onclick="openSug()"><i class="ti ti-bulb" aria-hidden="true"></i><span class="lbl">Sugestão</span></button>
-      <button class="install" id="btnInstall" hidden><i class="ti ti-download" aria-hidden="true"></i>Instalar</button>
+      <button class="install" id="btnInstall" hidden aria-label="Instalar o app" title="Instalar o app"><i class="ti ti-download" aria-hidden="true"></i><span class="lbl">Instalar</span></button>
       <div class="usr" id="usr"></div>
     </div>
   </div>
@@ -303,7 +305,7 @@ function openCfg(){
       <div class="sug-row"><button class="b ok" onclick="abrirPagamento()">Gerenciar assinatura / pagamento</button></div>
       <div class="cfg-msg" id="cfgPagMsg"></div>
     </div>
-    <div class="sug-row"><button class="b cancel" onclick="closeCfg()">Fechar</button></div>
+    <div class="sug-row"><button class="b cancel" onclick="window.MT.signOut()"><i class="ti ti-logout" aria-hidden="true"></i> Sair da conta</button><button class="b cancel" onclick="closeCfg()">Fechar</button></div>
   </div>`;
   wrap.onclick = e => { if (e.target===wrap) closeCfg(); };
   document.body.appendChild(wrap);
@@ -365,7 +367,7 @@ function refreshUser(){
   const hello = document.getElementById('hello');
   if (u && !u.demo){
     const nm = u.displayName || u.email || 'Conta';
-    el.innerHTML = `<span class="who">${esc(nm)}</span><button id="btnCfg" title="Configurações" aria-label="Configurações"><i class="ti ti-settings" aria-hidden="true"></i></button><button id="btnOut"><i class="ti ti-logout" aria-hidden="true"></i>Sair</button>`;
+    el.innerHTML = `<span class="who">${esc(nm)}</span><button id="btnCfg" title="Configurações" aria-label="Configurações"><i class="ti ti-settings" aria-hidden="true"></i></button><button id="btnOut" aria-label="Sair" title="Sair"><i class="ti ti-logout" aria-hidden="true"></i><span class="lbl">Sair</span></button>`;
     document.getElementById('btnOut').onclick = () => window.MT.signOut();
     document.getElementById('btnCfg').onclick = openCfg;
     const first = (u.displayName||'').split(' ')[0];
