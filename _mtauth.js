@@ -272,7 +272,7 @@ function authMarkup() {
       <input name="name" type="text" placeholder="Seu nome" autocomplete="name" required>
       <input name="email" type="email" placeholder="E-mail" autocomplete="username" required>
       <input name="password" type="password" placeholder="Senha (mín. 6 caracteres)" minlength="6" autocomplete="new-password" required>
-      <label class="mt-consent"><input type="checkbox" required style="margin-top:2px"><span>Li e aceito os <a href="https://medtechbr.github.io/termos.html" target="_blank" rel="noopener">Termos</a> e a <a href="https://medtechbr.github.io/privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a> (LGPD).</span></label>
+      <label class="mt-consent"><input type="checkbox" required style="margin-top:2px"><span>Li e aceito os <a href="https://medtechbr.com.br/termos.html" target="_blank" rel="noopener">Termos</a> e a <a href="https://medtechbr.com.br/privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a> (LGPD).</span></label>
       <p class="mt-err" id="mt-err-r"></p>
       <button class="mt-btn" type="submit">Criar conta</button>
       <button class="mt-link" type="button" id="mt-go-login">Já tenho conta</button>
