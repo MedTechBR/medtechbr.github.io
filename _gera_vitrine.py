@@ -16,7 +16,7 @@ O gerador confere que todo link local aponta para arquivo existente e que todo
 import io, os, re, sys, glob
 
 RAIZ = os.path.dirname(os.path.abspath(__file__))
-V = '6'   # versão de vitrine.css / vitrine.js (bumpar ao mudar qualquer um dos dois)
+V = '7'   # versão de vitrine.css / vitrine.js (bumpar ao mudar qualquer um dos dois)
 
 def ler(p): return io.open(os.path.join(RAIZ, p), encoding='utf-8').read()
 
