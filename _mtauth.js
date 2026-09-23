@@ -223,6 +223,9 @@ function openSwitcher() {
 function injectHomeButton() {
   if (/^portal/.test(APP.id)) return;            // os portais são o próprio início
   if (!LINHAS[linhaAtual()]) return;              // farmácia / institucional: sem trocador
+  /* 23/09/2026, pedido do Matheus: os apps de estudo (linha Provas) são produtos separados do
+     MedTech App; o selo "MedTech" por cima da marca do app não faz sentido neles. */
+  if (linhaAtual() === 'provas') return;
   if (document.getElementById('mt-home')) return;
   document.body.classList.add('mt-shell');   // reserva uma faixa no topo p/ o botão não cobrir conteúdo
   const a = document.createElement('a');
