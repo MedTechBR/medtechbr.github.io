@@ -16,7 +16,7 @@ O gerador confere que todo link local aponta para arquivo existente e que todo
 import io, os, re, sys, glob
 
 RAIZ = os.path.dirname(os.path.abspath(__file__))
-V = '5'   # versão de vitrine.css / vitrine.js (bumpar ao mudar qualquer um dos dois)
+V = '6'   # versão de vitrine.css / vitrine.js (bumpar ao mudar qualquer um dos dois)
 
 def ler(p): return io.open(os.path.join(RAIZ, p), encoding='utf-8').read()
 
@@ -75,13 +75,24 @@ for parte in sorted(glob.glob(os.path.join(RAIZ, '_vitrine/paginas/*.html'))):
 
 # conferência depois de gerar tudo: links locais precisam existir; ícones precisam estar no subconjunto
 for nome, html in htmls.items():
-    for href in set(re.findall(r'(?:href|src|srcset)="([^"#?]+)', html)):
+    for href in set(re.findall(r'(?<![\w-])(?:href|src|srcset)="([^"#?]+)', html)):
         for h in re.split(r',\s*', href):
             h = h.split(' ')[0]
             if re.match(r'^(https?:|mailto:|/|data:)', h) or h in EXTERNOS: continue
             if not os.path.exists(os.path.join(RAIZ, h)): erros.append(f'{nome}: link para arquivo inexistente: {h}')
     for ic in set(re.findall(r'class="ti ti-([a-z0-9-]+)"', html)):
         if ic not in icones_ok: erros.append(f'{nome}: ícone ti-{ic} não está no subconjunto da fonte (vitrine.css)')
+# imagens das galerias (data-src) e das vitrines do vitrine.js: nome base em img/vitrine/, com a variante leve
+def confere_tela(origem, n):
+    leve = f'img/vitrine/{n}-500.webp' if n.endswith('-390') else f'img/vitrine/{n}-800.webp'
+    for f in (f'img/vitrine/{n}.webp', leve):
+        if not os.path.exists(os.path.join(RAIZ, f)): erros.append(f'{origem}: imagem inexistente: {f}')
+for nome, html in htmls.items():
+    for n in set(re.findall(r'data-src="([a-z0-9-]+)"', html)): confere_tela(nome, n)
+js = ler('vitrine.js')
+telas_js = set(re.findall(r"img:'([a-z0-9-]+)'", js))
+for arr in re.findall(r"(?:desk|ph):\[([^\]]*)\]", js): telas_js |= set(re.findall(r"'([a-z0-9-]+)'", arr))
+for n in telas_js: confere_tela('vitrine.js', n)
 for ic in set(re.findall(r"'ti-([a-z0-9-]+)'", ler('vitrine.js'))):
     if ic not in icones_ok: erros.append(f'vitrine.js: ícone ti-{ic} não está no subconjunto da fonte')
 
