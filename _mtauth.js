@@ -82,6 +82,22 @@ const MT = {
   async requirePlan(onOk) { const r = await MT.verificarAcesso(); if (r.ok && onOk) onOk(r); return !!r.ok; }
 };
 window.MT = MT;
+/* A IA central decide o acesso pelo app que chama (acesso por produto). As chamadas HTTP
+   diretas ao aigateway/geminiDocHttp (Foco, CondutAI, Granaê) ganham o id do app aqui, num
+   ponto só. Prefixa sem reescrever o corpo: se o app já mandou "app", o JSON.parse do
+   servidor fica com a última ocorrência, que é a do app. */
+(function () {
+  const f0 = window.fetch; if (!f0 || f0.__mtApp) return;
+  const f = function (u, o) {
+    try {
+      const url = typeof u === 'string' ? u : ((u && u.url) || '');
+      if (/cloudfunctions\.net\/(aigateway|geminiDocHttp)\b/.test(url) && o && typeof o.body === 'string' && o.body.charAt(0) === '{')
+        o = Object.assign({}, o, { body: '{"app":' + JSON.stringify(APP.id) + (o.body.trim() === '{}' ? '' : ',') + o.body.slice(1) });
+    } catch (e) {}
+    return f0.call(this, u, o);
+  };
+  f.__mtApp = true; window.fetch = f;
+})();
 
 /* ---------- estilos da tela de login (injetados) ---------- */
 function injectCSS() {
@@ -315,19 +331,19 @@ else {
       MT.ai = async (prompt, model = "gemini-2.5-flash") => {
         if (!MT.user) throw new Error("Entre na sua conta MedTech para usar a IA.");
         const callable = Fn.httpsCallable(functions, "gemini");
-        const res = await callable({ prompt, model });
+        const res = await callable({ prompt, model, app: APP.id });
         return (res && res.data && res.data.text) || "";
       };
       MT.aiAudio = async (audio, mimeType, prompt, model = "gemini-2.5-flash") => {
         if (!MT.user) throw new Error("Entre na sua conta MedTech para usar a IA.");
         const callable = Fn.httpsCallable(functions, "geminiAudio");
-        const res = await callable({ audio, mimeType, prompt, model });
+        const res = await callable({ audio, mimeType, prompt, model, app: APP.id });
         return (res && res.data && res.data.text) || "";
       };
       MT.aiImage = async (images, prompt, model = "gemini-2.5-flash") => {
         if (!MT.user) throw new Error("Entre na sua conta MedTech para usar a IA.");
         const callable = Fn.httpsCallable(functions, "geminiImage");
-        const res = await callable({ images, prompt, model });
+        const res = await callable({ images, prompt, model, app: APP.id });
         return (res && res.data && res.data.text) || "";
       };
     } catch (e) { MT.ai = async () => { throw new Error("IA MedTech indisponível no momento."); }; MT.aiAudio = async () => { throw new Error("IA MedTech indisponível no momento."); }; MT.aiImage = async () => { throw new Error("IA MedTech indisponível no momento."); }; }
