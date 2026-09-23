@@ -606,3 +606,88 @@ html,body{overflow-x:clip}
 .show-cap .row .pill.ghost{display:inline-flex}
 @media(max-width:560px){.show-cap .row .pill.ghost{flex:0 0 auto}.show-cap .row .pill.solid{flex:1 1 auto}}
 .show{scroll-margin-top:calc(var(--header) + 110px)}
+
+/* =====================================================================
+   v8 (23/09/2026): o nome MedTech em destaque na primeira tela e a home curta
+   (produtos dentro do herói, planos e perguntas compactos, sem bloco final).
+   ===================================================================== */
+.marca{display:flex;font-size:clamp(68px,9.2vw,136px);font-weight:500;letter-spacing:-.055em;line-height:.92;margin-left:-.045em}
+.marca span{display:inline-block;animation:junta 1.3s var(--ease) both}
+.marca .m1{--dx:-.3em}.marca .m2{--dx:.3em;animation-delay:.06s}
+@keyframes junta{from{opacity:0;transform:translateX(var(--dx))}to{opacity:1;transform:none}}
+.h2txt .tg{font-size:clamp(20px,2.1vw,27px);font-weight:500;letter-spacing:-.02em;line-height:1.25;margin-top:20px}
+.h2txt .lead{margin-top:10px;font-size:16px;max-width:520px}
+.h2txt .row{margin-top:24px}
+.hero2 .lsw{margin-top:28px}
+/* o nome gigante é o da marca; o do cabeçalho só aparece depois de rolar */
+header .wm{transition:opacity .3s}
+body[data-home] header:not(.solid) .wm{opacity:0;pointer-events:none}
+/* produtos da linha escolhida, dentro do herói */
+.lapps{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;max-width:560px;min-height:40px}
+.lapps a{position:relative;width:40px;height:40px;border-radius:11px;background:var(--fg6);display:grid;place-items:center;font-size:19px;color:var(--fg);transition:background-color .2s,color .2s}
+.lapps a:hover,.lapps a:focus-visible{background:var(--fg);color:#000}
+.lapps a .tp{position:absolute;z-index:6;top:calc(100% + 6px);left:50%;transform:translateX(-50%);white-space:nowrap;padding:5px 9px;border-radius:8px;background:#141416;border:1px solid var(--fg12);color:var(--fg);font-size:12px;opacity:0;pointer-events:none;transition:opacity .15s}
+@media(hover:hover){.lapps a:hover .tp,.lapps a:focus-visible .tp{opacity:1}}
+@media(hover:none){.lapps a .tp{display:none}}
+/* planos compactos */
+.planos2{padding:72px 0 64px}
+.planos2 .eyebrow{margin-bottom:12px}
+.planos2 h2{margin:0}
+.planos2 .calc{margin-top:24px}
+.planos2 .pcs{margin-top:16px}
+.planos2 .pc{padding:18px 20px}
+.planos2 .pc .vl{font-size:30px;margin-top:4px}
+.planos2 .sumr{padding:14px 18px}
+.others2{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.others2 a{display:flex;gap:12px;align-items:center;padding:13px 16px;border-radius:14px;background:var(--fg6);font-size:13px;color:var(--fg60);line-height:1.35;transition:background-color .2s}
+.others2 a:hover{background:var(--fg12)}
+.others2 i{font-size:20px;color:var(--fg)}
+.others2 b{display:block;color:var(--fg);font-weight:500;font-size:14px}
+.faq2{display:grid;grid-template-columns:1fr 1fr;gap:0 36px;max-width:none;margin-top:28px}
+.faq2 summary{font-size:15px;padding:15px 0}
+.faq2 details p{font-size:14px}
+@media(max-width:900px){
+  .others2{grid-template-columns:1fr}
+  .faq2{grid-template-columns:1fr}
+}
+@media(max-width:700px){
+  .planos2 .pcs{grid-template-columns:1fr;gap:8px}
+  .planos2 .pc{display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 12px;padding:14px 16px}
+  .planos2 .pc .nm{grid-column:1;grid-row:1}
+  .planos2 .pc .vl{grid-column:2;grid-row:1/3;font-size:23px;margin:0;text-align:right}
+  .planos2 .pc .eq{grid-column:1;grid-row:2;min-height:0}
+  .planos2 .pc .ds{display:none}
+}
+@media(max-width:900px){.hero2{padding-bottom:40px}}
+@media(max-width:560px){
+  .marca{font-size:clamp(64px,19vw,84px)}
+  .h2txt .tg{margin-top:14px}
+  .h2txt .lead{font-size:15px}
+  .hero2 .lsw{margin-top:22px}
+  .lapps{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:10px calc(-1*var(--gutter)) 0;padding:0 var(--gutter)}
+  .lapps::-webkit-scrollbar{display:none}
+  .lapps a{flex:0 0 auto;width:auto;height:36px;padding:0 12px 0 10px;display:inline-flex;align-items:center;gap:7px;font-size:13px;border-radius:999px}
+  .lapps a i{font-size:17px}
+  .lapps a .tp{display:inline;position:static;transform:none;opacity:1;padding:0;border:0;background:none;font-size:13px;color:inherit}
+  .stage3{aspect-ratio:1/.9}
+  .planos2{padding:52px 0 48px}
+  /* rodapé mais curto no celular: duas colunas, sem a sublista institucional */
+  footer{padding:36px 0 28px}
+  .fgrid{grid-template-columns:1fr 1fr;gap:20px 16px}
+  .fgrid>div:first-child{grid-column:1/-1}
+  .fgrid a.sub{display:none}
+  .fgrid a{padding:9px 0}
+  .fbot{margin-top:22px}
+}
+@media(prefers-reduced-motion:reduce){.marca span{animation:none;opacity:1;transform:none}}
+/* v8: a regra antiga .h2txt h1 (título de 64px e animação por palavra) vencia a da marca */
+.h2txt h1.marca{font-size:clamp(68px,9.2vw,136px);letter-spacing:-.055em;line-height:.92}
+.h2txt .marca span{display:inline-block;opacity:1;transform:none;animation:junta 1.3s var(--ease) both}
+.h2txt .marca .m2{animation-delay:.06s}
+.lapps{gap:5px}.lapps a{width:38px;height:38px;font-size:18px}
+@media(max-width:560px){.h2txt h1.marca{font-size:clamp(64px,19vw,84px)}.lapps a{width:auto;height:36px}}
+@media(prefers-reduced-motion:reduce){.h2txt .marca span{animation:none}}
+/* a fileira de ícones (rolagem lateral) alargava a coluna do herói no celular: trilha minmax(0,1fr) */
+@media(max-width:900px){.h2grid{grid-template-columns:minmax(0,1fr)}}
+.h2txt,.stage3{min-width:0}
+@media(max-width:560px){.sumr .row{width:100%}.sumr .row .pill{flex:1 1 0}}

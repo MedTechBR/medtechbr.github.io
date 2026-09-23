@@ -91,7 +91,10 @@ if(stage){
   lsw.style.setProperty('--dur',DUR+'ms');
   /* o palco está na primeira dobra: as imagens carregam já (lazy não dispararia enquanto invisíveis) */
   function monta(L){dk.innerHTML=L.desk.map((n,i)=>imgTag(n,ALT[n]||L.nm,'(max-width:900px) 92vw, 560px',i?'':'on',true)).join('');ph.innerHTML=L.ph.map((n,i)=>imgTag(n,ALT[n]||L.nm,'200px',i?'':'on',true)).join('')}
-  function linha(i,user){li=i;fi=0;const L=LINHAS3[i];monta(L);cap.href=L.url;cap.innerHTML=`<b>${L.nm}</b><span>${L.t}</span><span class="go">Conhecer ${SVG.dir.replace('<svg','<svg width="14" height="14"')}</span>`;
+  const lapps=$('#lapps');
+  function produtosDa(k){return k==='app'?APPS.map(a=>({nm:a.nm,ic:a.ic,url:'medtech-app.html#app='+a.id})):k==='provas'?PROVAS.map(a=>({nm:a.nm,ic:a.ic,url:'medtech-provas.html#app='+a.id})):INST}
+  function linha(i,user){li=i;fi=0;const L=LINHAS3[i];monta(L);
+    if(lapps)lapps.innerHTML=produtosDa(L.k).map(a=>`<a href="${a.url}" aria-label="${esc(a.nm)}"><i class="ti ${a.ic}" aria-hidden="true"></i><span class="tp">${esc(a.nm)}</span></a>`).join('');cap.href=L.url;cap.innerHTML=`<b>${L.nm}</b><span>${L.t}</span><span class="go">Conhecer ${SVG.dir.replace('<svg','<svg width="14" height="14"')}</span>`;
     $$('button',lsw).forEach((b,k)=>{b.classList.toggle('on',k===i);b.setAttribute('aria-selected',k===i)});
     if(user){auto=false;lsw.classList.add('parado')}
     agenda()}
