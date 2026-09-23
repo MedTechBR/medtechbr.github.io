@@ -323,6 +323,10 @@
   .pen-color{width:28px;height:28px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);
     cursor:pointer;padding:0}
   .pen-color.sel{box-shadow:0 0 0 2px var(--teal)}
+  /* tinta padrão segue o tema: escura no claro, clara na Astra (preto) */
+  :root{--pen-ink:#23272E}
+  html[data-astra]{--pen-ink:#F2F1EC}
+  .pen-color[data-color="ink"]{background:var(--pen-ink)!important}
   .pen-btn{font:inherit;font-size:.8rem;font-weight:700;border:1px solid var(--line);background:var(--paper);
     color:var(--ink-soft);border-radius:9px;padding:6px 11px;cursor:pointer}
   .pen-btn.sel{border-color:var(--wrong);color:var(--wrong);background:var(--wrong-bg)}
@@ -1313,6 +1317,7 @@ function saveSession(){ try{ localStorage.setItem(SESS_KEY, JSON.stringify(sessi
 function showSetup(){
   $("setup").hidden = false; $("run").hidden = true;
   document.body.dataset.q = "setup"; fmVista(); pintaHero(); vivo($("setup"));
+  if(window.QuizInk && typeof window.QuizInk.switchTo==="function") window.QuizInk.switchTo("tela:setup");
   $("resumeBtn").hidden = !(session.ids && session.ids.length);
   countAvailable();
   window.scrollTo({top:0, behavior:"instant"});
@@ -1394,6 +1399,7 @@ function render(){
 }
 
 /* ---- riscar alternativa: arraste para o lado (eliminar) ---- */
+function getStruck(qid){ return new Set(strikes[qid] || []); }   // usado também pelo Simulado (chave "S:prova:pos")
 function saveStruck(qid, set){
   if(set.size) strikes[qid] = [...set]; else delete strikes[qid];
   saveStrikesAll();
@@ -1589,6 +1595,12 @@ function setTab(name){
     document.getElementById(TABS[k].btn).classList.toggle("active", k === name);
   }
   if(name==="simulado" && window.__simRefresh) window.__simRefresh();
+  if(window.QuizInk && typeof window.QuizInk.switchTo==="function"){   // tinta é da tela, não fica por cima da outra aba
+    const qidAtual = session.ids && session.ids[session.pos];
+    window.QuizInk.switchTo(name === "simulado"
+      ? (window.__simInkKey ? window.__simInkKey() : "tela:simulado")
+      : ($("run").hidden || !qidAtual ? "tela:setup" : "q:"+qidAtual));
+  }
   try{ localStorage.setItem("enareTab", name); }catch(e){}
   document.body.dataset.aba = name; fmVista();
   const pn = document.getElementById(TABS[name].panel);
@@ -1617,7 +1629,11 @@ document.getElementById("tabBtnSim").onclick = ()=> setTab("simulado");
   const key = (id)=> "enareSim_"+id;
   const loadState = (id)=>{ try{ return JSON.parse(localStorage.getItem(key(id))||"null"); }catch(e){ return null; } };
   const saveState = ()=>{ if(cur){ try{ localStorage.setItem(key(cur.sim.id), JSON.stringify(cur.state)); }catch(e){} } };
+  let simInk = "tela:sim-list";   // chave de tinta da tela visível do Simulado (lida pelo setTab)
+  const inkTo = (k)=>{ simInk = k; if(window.QuizInk && typeof window.QuizInk.switchTo==="function") window.QuizInk.switchTo(k); };
+  window.__simInkKey = ()=> simInk;
   const show = (v)=>{ vList.hidden=v!=="list"; vRun.hidden=v!=="run"; vRes.hidden=v!=="result";
+    if(v!=="run") inkTo("tela:sim-"+v);
     document.body.dataset.sim = v; fmVista(); if(v!=="run") vivo(v==="list" ? vList : vRes); };
   let simDir = 1;
 
@@ -1672,7 +1688,7 @@ document.getElementById("tabBtnSim").onclick = ()=> setTab("simulado");
     const p=card.querySelector("[data-prev]"); if(p) p.onclick=()=>{ if(state.pos>0){state.pos--;saveState();simDir=-1;renderQuestion();} };
     const nx=card.querySelector("[data-next]"); if(nx) nx.onclick=()=>{ if(state.pos<n-1){state.pos++;saveState();renderQuestion();} };
     const f2=card.querySelector("[data-finish2]"); if(f2) f2.onclick=confirmFinish;
-    if(window.QuizInk && typeof window.QuizInk.switchTo==="function") window.QuizInk.switchTo(skey);  // tinta da caneta fica só nesta questão do simulado
+    inkTo(skey);  // tinta da caneta fica só nesta questão do simulado
     window.scrollTo({top:0,behavior:"instant"});
     entraQuestao(card, simDir); simDir = 1;
   }
@@ -1758,7 +1774,7 @@ document.getElementById("tabBtnSim").onclick = ()=> setTab("simulado");
     const rp=card.querySelector("[data-rprev]"); if(rp) rp.onclick=()=>{ if(i>0){ simDir=-1; renderReview(i-1); } };
     const rn=card.querySelector("[data-rnext]"); if(rn) rn.onclick=()=>{ if(i<n-1) renderReview(i+1); };
     card.querySelector("[data-rback]").onclick=()=>renderResult();
-    if(window.QuizInk && typeof window.QuizInk.switchTo==="function") window.QuizInk.switchTo("R:"+sim.id+":"+i);
+    inkTo("R:"+sim.id+":"+i);
     window.scrollTo({top:0,behavior:"instant"});
     entraQuestao(card, simDir); simDir = 1;
   }
@@ -1776,9 +1792,9 @@ document.getElementById("tabBtnSim").onclick = ()=> setTab("simulado");
 <canvas id="inkCanvas" class="ink-canvas" aria-hidden="true"></canvas>
 <div class="penbar">
   <div class="pen-tools" id="penTools" hidden>
-    <button class="pen-color" data-color="#23272E" style="background:#23272E" title="Tinta" aria-label="Cor tinta"></button>
+    <button class="pen-color" data-color="ink" title="Tinta" aria-label="Cor tinta (segue o tema)"></button>
     <button class="pen-color" data-color="#C6453D" style="background:#C6453D" title="Vermelho" aria-label="Cor vermelho"></button>
-    <button class="pen-color" data-color="#D0902A" style="background:#D0902A" title="Azul" aria-label="Cor azul"></button>
+    <button class="pen-color" data-color="#D0902A" style="background:#D0902A" title="Âmbar" aria-label="Cor âmbar"></button>
     <button class="pen-color" data-color="#1D7A46" style="background:#1D7A46" title="Verde" aria-label="Cor verde"></button>
     <button class="pen-btn" id="penEraser" type="button">Borracha</button>
     <button class="pen-btn" id="penClear" type="button">Limpar</button>
@@ -1795,8 +1811,8 @@ document.getElementById("tabBtnSim").onclick = ()=> setTab("simulado");
   const ctx    = canvas.getContext("2d");
   const fab    = document.getElementById("penFab");
   const tools  = document.getElementById("penTools");
-  let penMode=false, drawing=false, erasing=false, color="#23272E";
-  let activeId=null, lastPen=0, lastX=0, lastY=0;
+  let penMode=false, drawing=false, erasing=false, color="ink";   // "ink" = tinta do tema (--pen-ink)
+  let activeId=null, lastPen=0, lastX=0, lastY=0, stroke="#23272E";
   const FM_PEN_SVG = fab.innerHTML;   // ícone da caneta (SVG) para restaurar ao sair do modo
   const inkStore = new Map();   // tinta por questão (na memória): chave -> dataURL
   let curKey = null;
@@ -1868,7 +1884,7 @@ document.getElementById("tabBtnSim").onclick = ()=> setTab("simulado");
 
   function seg(x,y,pressure){
     ctx.globalCompositeOperation = erasing ? "destination-out" : "source-over";
-    ctx.strokeStyle = color;
+    ctx.strokeStyle = stroke;
     ctx.lineWidth = erasing ? 26 : 2.4*(0.35 + 1.3*(pressure||0.5));
     ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(x,y); ctx.stroke();
     lastX=x; lastY=y;
@@ -1879,6 +1895,7 @@ document.getElementById("tabBtnSim").onclick = ()=> setTab("simulado");
     if(e.pointerType==="touch" && (performance.now()-lastPen)<1000){ e.preventDefault(); return; }
     if(e.pointerType==="pen") lastPen=performance.now();
     drawing=true; activeId=e.pointerId;
+    stroke = color==="ink" ? (getComputedStyle(document.documentElement).getPropertyValue("--pen-ink").trim() || "#23272E") : color;
     try{ canvas.setPointerCapture(e.pointerId); }catch(_){}
     lastX=e.clientX; lastY=e.clientY;
     seg(e.clientX+0.01, e.clientY+0.01, e.pressure); // pontinho ao tocar
