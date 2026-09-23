@@ -18,7 +18,7 @@
 <meta name="apple-mobile-web-app-title" content="MedTech Provas">
 <script>window.MT_APP={id:"portal-provas",name:"MedTech Provas",linha:"provas"};</script>
 <script src="_mtfb.js?v=1"></script>
-<script type="module" src="_mtauth.js?v=23"></script>
+<script type="module" src="_mtauth.js?v=24"></script>
 <style>
 :root{--ink:#fff;--muted:rgba(255,255,255,.6);--dim:rgba(255,255,255,.6);--paper:#000;--line:rgba(255,255,255,.12);--line-strong:rgba(255,255,255,.2);--accent:#fff;--ok:#4ADE80;--danger:#F87171;--fg6:rgba(255,255,255,.06);--fg12:rgba(255,255,255,.12);--fg20:rgba(255,255,255,.2);--ease:cubic-bezier(.16,1,.3,1)}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -104,6 +104,11 @@ footer a{color:var(--muted);text-decoration:none;display:inline-block;padding:10
 @media(max-width:560px){.ghost .lbl{display:none}.ghost{width:44px;padding:0;justify-content:center}.ghost i{font-size:19px}}
 @media(max-width:560px){.wrap{padding:0 16px}.wm{font-size:17px}.top-r{gap:6px}.install .lbl{display:none}.install{width:44px;padding:0}.usr button{width:44px;padding:0}#btnOut{display:none}.grid{grid-template-columns:repeat(4,1fr);gap:26px 8px}.app .ic{width:62px;height:62px;border-radius:16px;font-size:29px}.app .nm{font-size:11.5px}.hello{margin-bottom:30px}.hello h1{font-size:26px}main{padding-top:36px}.usr .who{display:none}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.app .ic{position:relative}
+#cfgAssinBt{flex-wrap:wrap}#cfgAssinBt .b{flex:1 1 150px}
+.app.trav .ic{background:var(--fg6);color:var(--muted)}
+.app .lk{position:absolute;right:-5px;top:-5px;width:22px;height:22px;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center;font-size:13px}
+.aviso{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:90;max-width:min(520px,calc(100vw - 32px));padding:14px 18px;border-radius:14px;background:#141416;border:1px solid var(--line);color:#fff;font-size:14px;line-height:1.45;box-shadow:0 20px 60px rgba(0,0,0,.6)}
 </style>
 <link rel="stylesheet" href="_mttokens.css?v=3">
 <link rel="stylesheet" href="_mtastra.css?v=5">
@@ -179,9 +184,17 @@ function selecao(){
   const ok = new Set(disponiveis().map(a=>a.id));
   return sel.filter(id => ok.has(id));
 }
+/* acesso por produto: ACESSO = {P, venda, mt} vindo do _mtacesso.js (null até carregar) */
+let ACESSO = null;
+function travado(id){
+  if (!ACESSO || !ACESSO.venda || ACESSO.falha || !window.MTAcesso) return null;
+  const r = MTAcesso.liberado(ACESSO.P, ACESSO.mt, id);
+  return r.ok ? null : r;
+}
 function appItem(a){
-  return `<a class="app" href="${a.url}">
-    <span class="ic"><i class="ti ${a.ic}" aria-hidden="true"></i></span>
+  const tv = travado(a.id);
+  return `<a class="app${tv?' trav':''}" href="${a.url}" data-id="${esc(a.id)}"${tv?' aria-label="'+esc(a.nm)+' (fora do seu plano)"':''}>
+    <span class="ic"><i class="ti ${a.ic}" aria-hidden="true"></i>${tv?'<span class="lk"><i class="ti ti-lock" aria-hidden="true"></i></span>':''}</span>
     <span class="nm">${fmtName(a.nm)}</span>
   </a>`;
 }
@@ -269,7 +282,7 @@ function enviarSug(){
 }
 
 /* ===== Configurações (perfil, senha, assinatura) ===== */
-const KIWIFY_PORTAL_URL = ''; // portal do cliente Kiwify (definir quando os pagamentos forem configurados)
+/* área do cliente do meio de pagamento: campo area_cliente do /planos.json */
 const SUPORTE_EMAIL = 'medtechbr1@gmail.com';
 function cfgVal(id){ const e = document.getElementById(id); return e ? e.value.trim() : ''; }
 function openCfg(){
@@ -301,14 +314,15 @@ function openCfg(){
     </div>
     <div class="cfg-sec">
       <h4><i class="ti ti-credit-card" aria-hidden="true"></i>Assinatura e pagamento</h4>
-      <div class="desc">Seu pagamento é processado com segurança pela Kiwify. Para trocar o cartão, ver faturas ou cancelar, use o portal do cliente — <b>nunca pedimos o número do cartão aqui</b>.</div>
-      <div class="sug-row"><button class="b ok" onclick="abrirPagamento()">Gerenciar assinatura / pagamento</button></div>
+      <div class="desc" id="cfgAssin">Carregando a sua assinatura…</div>
+      <div class="sug-row" id="cfgAssinBt"><button class="b ok" onclick="abrirPlanos()">Ver planos</button><button class="b cancel" onclick="abrirPagamento()">Gerenciar pagamento</button></div>
       <div class="cfg-msg" id="cfgPagMsg"></div>
     </div>
     <div class="sug-row"><button class="b cancel" onclick="window.MT.signOut()"><i class="ti ti-logout" aria-hidden="true"></i> Sair da conta</button><button class="b cancel" onclick="closeCfg()">Fechar</button></div>
   </div>`;
   wrap.onclick = e => { if (e.target===wrap) closeCfg(); };
   document.body.appendChild(wrap);
+  preencheAssinatura();
 }
 function closeCfg(){ const m=document.getElementById('cfgModal'); if (m) m.remove(); }
 async function salvarPerfil(){
@@ -354,8 +368,85 @@ async function enviarResetSenha(){
   try{ await MT._fb.A.sendPasswordResetEmail(MT._fb.auth, MT.user.email); msg.className='cfg-msg ok'; msg.textContent='✓ Link enviado para '+MT.user.email+'.'; }
   catch(e){ msg.className='cfg-msg err'; msg.textContent='Erro: '+(e.message||e); }
 }
+/* ---------- assinatura: estado, planos, escolha de apps ---------- */
+function preencheAssinatura(){
+  const el = document.getElementById('cfgAssin'); if (!el) return;
+  if (!ACESSO) { el.textContent = 'Carregando a sua assinatura…'; return; }
+  if (!ACESSO.venda) { el.innerHTML = 'As assinaturas abrem em breve. Até lá, <b>todos os apps estão liberados</b> na sua conta.'; return; }
+  if (ACESSO.falha) { el.textContent = 'Não foi possível consultar a assinatura agora. Os apps seguem abertos; tente de novo mais tarde.'; return; }
+  const P = ACESSO.P, mt = ACESSO.mt || {}, ag = Math.floor(Date.now()/1000), L = [];
+  if (mt.adm) L.push('Acesso de administração: todos os apps.');
+  if (mt.t) L.push(mt.t > ag ? `Teste grátis de tudo até <b>${MTAcesso.dataBR(mt.t)}</b>.` : `Teste grátis encerrado em ${MTAcesso.dataBR(mt.t)}.`);
+  Object.entries(mt.p || {}).forEach(([id, ate]) => {
+    const pr = MTAcesso.produtoPorId(P, id); const nm = pr ? (pr.nome || id) : id;
+    L.push(ate > ag ? `<b>${esc(nm)}</b> · válido até ${MTAcesso.dataBR(ate)}` : `${esc(nm)} · venceu em ${MTAcesso.dataBR(ate)}`);
+  });
+  const vg = MTAcesso.vagas(P, mt, LINHA), esc2 = MTAcesso.escolhidos(P, mt, LINHA).slice(0, vg);
+  if (vg) L.push(`Apps do seu plano (${esc2.length} de ${vg}): ${esc2.length ? esc2.map(a => esc(MTAcesso.NOMES[a] || a)).join(', ') : 'nenhum escolhido ainda'}.`);
+  if (!L.length) L.push('Nenhuma assinatura ativa nesta conta.');
+  el.innerHTML = L.join('<br>') + '<br><span style="opacity:.8">Nunca pedimos o número do cartão aqui: o pagamento é feito na página segura do meio de pagamento.</span>';
+  const bt = document.getElementById('cfgAssinBt');
+  if (bt && vg && !document.getElementById('btEscolher')) bt.insertAdjacentHTML('afterbegin', '<button class="b ok" id="btEscolher" onclick="escolherAppsPlano()">Escolher os apps do plano</button>');
+}
+function abrirPlanos(){
+  const msg = document.getElementById('cfgPagMsg');
+  if (!ACESSO || !ACESSO.venda) { location.href = '/index.html#planos'; return; }
+  const prods = (ACESSO.P.produtos || []).filter(p => !p.interno && p.linha === LINHA && Object.values(p.checkout||{}).some(Boolean));
+  const itens = prods.map(p => Object.keys(p.checkout).filter(per => p.checkout[per] && p.preco && p.preco[per]!=null).map(per =>
+    `<a class="b ok" style="display:flex;justify-content:space-between;text-decoration:none" href="${esc(MTAcesso.checkoutUrl(p, per, MT.user))}"><span>${esc(p.nome||p.id)}</span><span>${MTAcesso.brl(p.preco[per])}${per==='anual'?'/ano':'/mês'}</span></a>`).join('')).join('');
+  msg.className = 'cfg-msg'; msg.innerHTML = itens ? `<div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">${itens}</div>` : 'Os planos desta linha abrem em breve.';
+}
+function escolherAppsPlano(){
+  const P = ACESSO.P, mt = ACESSO.mt || {}, vg = MTAcesso.vagas(P, mt, LINHA);
+  const atuais = new Set(MTAcesso.escolhidos(P, mt, LINHA).slice(0, vg));
+  const wrap = document.createElement('div'); wrap.className = 'sug-modal'; wrap.id = 'escModal';
+  wrap.innerHTML = `<div class="sug-box"><h3>Apps do seu plano</h3><p class="sub">Escolha ${vg===1?'1 app':vg+' apps'}. Trocar um app já escolhido só é possível uma vez a cada ${P.troca_dias||30} dias; preencher uma vaga livre é sempre possível.</p>` +
+    CATALOGO_LINHA.filter(a => (P.linhas[LINHA]||[]).includes(a.id)).map(a => `<label class="apps-row"><span class="k"><i class="ti ${a.ic}" aria-hidden="true"></i></span><span class="t"><b>${esc(a.nm)}</b></span><span class="sw"><input type="checkbox" data-id="${esc(a.id)}" ${atuais.has(a.id)?'checked':''}><span></span></span></label>`).join('') +
+    `<div class="cfg-msg" id="escMsg"></div><div class="sug-row"><button class="b ok" id="escSalvar">Salvar</button><button class="b cancel" onclick="document.getElementById('escModal').remove()">Cancelar</button></div></div>`;
+  document.body.appendChild(wrap);
+  const caixas = [...wrap.querySelectorAll('input[type=checkbox]')];
+  const limita = () => { const n = caixas.filter(c => c.checked).length; caixas.forEach(c => { c.disabled = !c.checked && n >= vg; }); };
+  caixas.forEach(c => c.addEventListener('change', limita)); limita();
+  wrap.querySelector('#escSalvar').onclick = async () => {
+    const m = wrap.querySelector('#escMsg'); m.className = 'cfg-msg'; m.textContent = 'Salvando…';
+    try { await MTAcesso.chamar('mtEscolherApps', { linha: LINHA, apps: caixas.filter(c => c.checked).map(c => c.dataset.id) }, MT.user);
+      await MT.user.getIdToken(true); ACESSO.mt = await MTAcesso.lerMt(MT.user, false); wrap.remove(); renderGrid(); preencheAssinatura();
+    } catch (e) { m.className = 'cfg-msg err'; m.textContent = e.message || 'Não foi possível salvar.'; }
+  };
+}
+/* chegada pela calculadora de planos do site: ?plano=<id>&periodo=<mensal|anual>&apps=<ids> */
+function planoDaURL(){
+  const q = new URLSearchParams(location.search), id = q.get('plano');
+  if (!id || !ACESSO) return;
+  history.replaceState(null, '', location.pathname);
+  const per = q.get('periodo') || 'mensal', apps = (q.get('apps') || '').split(',').filter(Boolean);
+  const p = MTAcesso.produtoPorId(ACESSO.P, id), url = p ? MTAcesso.checkoutUrl(p, per, MT.user) : '';
+  if (apps.length) { try { localStorage.setItem('mt.escolha.pendente', JSON.stringify({ linha: p && p.linha, apps })); } catch(e){} }
+  if (url) { location.href = url; return; }
+  aviso('As assinaturas abrem em breve. Enquanto isso, use à vontade: todos os apps estão liberados na sua conta.');
+}
+/* apps escolhidos na calculadora do site: aplicados assim que a compra liberar vagas */
+async function escolhaPendente(){
+  let pend = null; try { pend = JSON.parse(localStorage.getItem('mt.escolha.pendente') || 'null'); } catch(e){}
+  if (!pend || !ACESSO || !ACESSO.venda || !ACESSO.mt || pend.linha !== LINHA) return;
+  const vg = MTAcesso.vagas(ACESSO.P, ACESSO.mt, LINHA); if (!vg) return;
+  const atuais = MTAcesso.escolhidos(ACESSO.P, ACESSO.mt, LINHA);
+  const novos = [...new Set(atuais.concat(pend.apps))].slice(0, vg);
+  try { await MTAcesso.chamar('mtEscolherApps', { linha: LINHA, apps: novos }, MT.user); await MT.user.getIdToken(true); ACESSO.mt = await MTAcesso.lerMt(MT.user, false); localStorage.removeItem('mt.escolha.pendente'); renderGrid(); } catch(e) { console.warn('escolha pendente', e); }
+}
+function aviso(txt){
+  const d = document.createElement('div'); d.className = 'aviso'; d.setAttribute('role', 'status'); d.textContent = txt;
+  document.body.appendChild(d); setTimeout(() => d.remove(), 7000);
+}
+async function carregaAcesso(){
+  if (ACESSO !== null || !window.MT || !MT.user || MT.user.demo) return;
+  ACESSO = false;   // em andamento
+  try { ACESSO = (await MT.acessoEstado()) || { venda: false }; } catch(e) { ACESSO = { venda: false }; }
+  renderGrid(); preencheAssinatura(); planoDaURL(); escolhaPendente();
+}
 function abrirPagamento(){
   const msg=document.getElementById('cfgPagMsg');
+  const KIWIFY_PORTAL_URL = (ACESSO && ACESSO.P && ACESSO.P.area_cliente) || '';
   if (KIWIFY_PORTAL_URL){ window.open(KIWIFY_PORTAL_URL,'_blank','noopener'); return; }
   msg.className='cfg-msg'; msg.innerHTML='A área de assinatura está sendo finalizada. Para trocar pagamento, ver faturas ou cancelar, fale com a gente: <a href="mailto:'+SUPORTE_EMAIL+'?subject=Assinatura%20MedTech" style="color:var(--petrol);font-weight:700">'+SUPORTE_EMAIL+'</a>.';
 }
@@ -378,8 +469,14 @@ function refreshUser(){
   }
 }
 let perfilOferecido = false;
+document.addEventListener('click', e => {
+  const a = e.target.closest('.app.trav'); if (!a) return;
+  const r = travado(a.dataset.id); if (!r) return;
+  e.preventDefault();
+  MTAcesso.paywall({ P: ACESSO.P, mt: ACESSO.mt, appId: a.dataset.id, motivo: r.motivo, livres: r.livres, user: MT.user, signOut: () => MT.signOut(), onOk: () => { location.href = a.getAttribute('href'); } });
+});
 (function waitMT(){ if(window.MT){ MT.onData(function(){
-  refreshUser(); renderGrid();
+  refreshUser(); renderGrid(); carregaAcesso();
   // primeira vez na conta: ainda não escolheu → oferece os perfis
   const u = MT.user, d = dados();
   if (!perfilOferecido && u && !u.demo && !(d && d[CAMPO_SEL] && Array.isArray(d[CAMPO_SEL].sel))) { perfilOferecido = true; setTimeout(() => { if (!document.getElementById('appsModal')) openMeusApps(); }, 500); }

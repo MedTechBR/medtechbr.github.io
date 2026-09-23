@@ -61,50 +61,25 @@ const MT = {
     return out;
   },
 
-  /* ---------- Assinatura do ecossistema (Kiwify central) ----------
-     SUBS_ENFORCE=false → NADA muda para os usuários (retorna active provisional).
-     Quando o produto Kiwify existir: trocar KIWIFY_CHECKOUT_URL, SUBS_ENFORCE=true
-     e bump ?v= dos apps. O webhook central grava users/{uid}.subscription
-     ({status, plan, paidUntilMs, ...}) no Firestore medtech-c658c. */
-  SUBS_ENFORCE: false,
-  KIWIFY_CHECKOUT_URL: 'https://pay.kiwify.com.br/REPLACE_ME',
-  _subCache: null,
-  async subscription() {
-    if (!MT.SUBS_ENFORCE) return { active: true, provisional: true };
-    if (!MT.user || !MT._fb) return { active: false, reason: 'nologin' };
-    const now = Date.now();
-    if (MT._subCache && (now - MT._subCache.at) < 600000) return MT._subCache.val;
-    try {
-      const { db, F } = MT._fb;
-      const snap = await F.getDoc(F.doc(db, 'users', MT.user.uid));
-      const sub = (snap.exists() && snap.data().subscription) || {};
-      const val = {
-        active: sub.status === 'active' && Number(sub.paidUntilMs || 0) > now,
-        plan: sub.plan || null,
-        paidUntilMs: Number(sub.paidUntilMs || 0)
-      };
-      MT._subCache = { at: now, val };
-      return val;
-    } catch (e) { console.warn('MT.subscription falhou', e); return { active: true, degraded: true }; }
+  /* ---------- Acesso por produto comprado (23/09/2026) ----------
+     As regras e a tela de assinatura moram em /_mtacesso.js (as mesmas do backend,
+     functions/acesso.js). O acesso vem das custom claims `mt` do login, que só o
+     servidor grava (webhook do Kiwify, teste grátis, painel de administração).
+     Enquanto nenhum produto do /planos.json tiver checkout, nada é bloqueado. */
+  _acesso: null,
+  acessoModulo() {
+    if (!MT._acesso) MT._acesso = import('/_mtacesso.js?v=1').then(() => window.MTAcesso).catch(e => { console.warn('MTAcesso indisponível', e); return null; });
+    return MT._acesso;
   },
-  async requirePlan(onOk) {
-    const s = await MT.subscription();
-    if (s.active) { if (onOk) onOk(s); return true; }
-    const uid = MT.user ? MT.user.uid : '';
-    const url = MT.KIWIFY_CHECKOUT_URL + (MT.KIWIFY_CHECKOUT_URL.indexOf('?') > -1 ? '&' : '?') + 's1=' + encodeURIComponent(uid);
-    if (!document.getElementById('mt-paywall')) {
-      const d = document.createElement('div');
-      d.id = 'mt-paywall';
-      d.style.cssText = 'position:fixed;inset:0;background:rgba(28,32,38,.45);z-index:99990;display:flex;align-items:center;justify-content:center;padding:20px';
-      d.innerHTML = '<div style="background:#FFFFFF;border:1px solid #E5E5DF;border-radius:16px;max-width:400px;width:100%;padding:26px;font-family:system-ui,sans-serif;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.45)">' +
-        '<div style="font-size:19px;font-weight:800;color:#23272E;margin-bottom:8px;font-family:system-ui,sans-serif">Assine o MedTech</div>' +
-        '<div style="font-size:14px;color:#5E646B;line-height:1.5;margin-bottom:16px">Acesso a todos os apps do ecossistema, com IA incluída.<br>1 app R$ 29,90 · 2 apps R$ 49,90 · tudo R$ 89,90/mês.</div>' +
-        '<a href="' + url + '" target="_blank" rel="noopener" style="display:block;background:#2B5CE6;color:#fff;border-radius:10px;padding:13px;font-weight:700;text-decoration:none;box-shadow:0 8px 22px rgba(43,92,230,.25)">Assinar agora</a>' +
-        '<button onclick="document.getElementById(\'mt-paywall\').remove()" style="margin-top:10px;background:none;border:none;color:#5E646B;font-size:13px;cursor:pointer">Agora não</button></div>';
-      document.body.appendChild(d);
-    }
-    return false;
-  }
+  async acessoEstado() { const M = await MT.acessoModulo(); return M && MT.user && !MT.user.demo ? M.estado(MT.user) : null; },
+  async verificarAcesso() {
+    const M = await MT.acessoModulo();
+    if (!M || !MT.user || MT.user.demo) return { ok: true, motivo: 'sem-modulo' };
+    return M.verificar({ appId: APP.id, user: MT.user, signOut: () => MT.signOut() });
+  },
+  /* compatibilidade com a API de julho (nenhum app a usa hoje) */
+  async subscription() { const r = await MT.verificarAcesso(); return { active: !!r.ok, motivo: r.motivo }; },
+  async requirePlan(onOk) { const r = await MT.verificarAcesso(); if (r.ok && onOk) onOk(r); return !!r.ok; }
 };
 window.MT = MT;
 
@@ -364,6 +339,7 @@ else {
       if (u) {
         const el = document.getElementById('mt-auth'); if (el) el.remove();
         injectHomeButton();
+        MT.verificarAcesso().catch(e => console.warn('verificação de acesso falhou', e));
         const ref = F.doc(db, 'users', u.uid, 'apps', APP.id);
         if (unsub) unsub();
         unsub = F.onSnapshot(ref, (snap) => {
