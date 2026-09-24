@@ -405,6 +405,10 @@ function navigate(view, doHash) {
   if (!doHash && ('#/' + view) !== location.hash) location.hash = '#/' + view;
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('hidden', v.dataset.view !== view));
   document.querySelectorAll('.bottom-nav button').forEach(b => b.classList.toggle('active', b.dataset.nav === view));
+  const _mais = document.getElementById('navMais');
+  if (_mais) _mais.classList.toggle('active', ['categorias', 'fixos', 'ia'].includes(view));
+  fecharMais();
+  document.body.dataset.tela = view;
   if (view === 'dashboard') renderDashboard();
   if (view === 'transacoes') { renderTransactions(); aplicarTabelaTx(); }
   if (view === 'categorias') renderCategories();
@@ -416,6 +420,23 @@ function navigate(view, doHash) {
 
 document.querySelectorAll('[data-nav]').forEach(el => {
   el.addEventListener('click', () => navigate(el.dataset.nav));
+});
+/* celular: 4 itens + "Mais" (Categorias, Fixos, Análise IA); o botão do meio lança */
+function fecharMais() { const m = document.getElementById('maisMenu'); if (m) m.hidden = true; const b = document.getElementById('navMais'); if (b) b.setAttribute('aria-expanded', 'false'); }
+(function () {
+  const b = document.getElementById('navMais'), m = document.getElementById('maisMenu');
+  if (b && m) b.addEventListener('click', e => { e.stopPropagation(); m.hidden = !m.hidden; b.setAttribute('aria-expanded', String(!m.hidden)); });
+  document.addEventListener('click', e => { if (m && !m.hidden && !e.target.closest('#maisMenu')) fecharMais(); });
+  const l = document.getElementById('navLancar'); if (l) l.addEventListener('click', () => openTxDialog(null));
+  const l2 = document.getElementById('sideLancar'); if (l2) l2.addEventListener('click', () => openTxDialog(null));
+})();
+/* atalhos no computador: N lança, / busca nas transações, Esc fecha o menu Mais */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { fecharMais(); return; }
+  const tg = e.target;
+  if (e.metaKey || e.ctrlKey || e.altKey || document.querySelector('dialog[open]') || (tg && /^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName))) return;
+  if (e.key === 'n' || e.key === 'N') { e.preventDefault(); openTxDialog(null); }
+  else if (e.key === '/') { e.preventDefault(); navigate('transacoes'); const q = document.getElementById('txSearch'); if (q) q.focus(); }
 });
 
 // Clique em barra de categoria do dashboard → filtra Transações por categoria + mês
@@ -487,17 +508,29 @@ function activateDuePending() {
   return changed;
 }
 
+/* números que contam (do valor anterior até o novo); o texto final é sempre fmt.format(v) */
+const _reduzMov = matchMedia('(prefers-reduced-motion: reduce)');
+function contaMoeda(el, v) {
+  if (!el) return;
+  const ini = el._v == null ? 0 : el._v; el._v = v;
+  cancelAnimationFrame(el._raf);
+  if (_reduzMov.matches || ini === v) { el.textContent = fmt.format(v); return; }
+  const t0 = performance.now(), d = 850;
+  const passo = now => { const p = Math.min(1, (now - t0) / d), e = 1 - Math.pow(1 - p, 3);
+    el.textContent = fmt.format(p < 1 ? Math.round((ini + (v - ini) * e) * 100) / 100 : v); if (p < 1) el._raf = requestAnimationFrame(passo); };
+  el._raf = requestAnimationFrame(passo);
+}
 function renderDashboard() {
   document.getElementById('monthLabel').textContent = monthLongFmt.format(currentMonth);
   const allTx = txOfMonth();
   const tx = allTx.filter(t => !t.pending); // agendados não contam até a data chegar
   const income = tx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
   const expense = tx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
-  document.getElementById('sumIncome').textContent = fmt.format(income);
-  document.getElementById('sumExpense').textContent = fmt.format(expense);
+  contaMoeda(document.getElementById('sumIncome'), income);
+  contaMoeda(document.getElementById('sumExpense'), expense);
   const balance = income - expense;
   const bal = document.getElementById('sumBalance');
-  bal.textContent = fmt.format(balance);
+  contaMoeda(bal, balance);
   bal.classList.toggle('negative', balance < 0);
 
   // Renderiza próximos agendados (global, todos os meses)
@@ -541,9 +574,9 @@ function renderDashboard() {
         const status = !hasBudget ? 'no-budget' : (pct > 100 ? 'over' : pct >= 80 ? 'warn' : 'ok');
         const fillStyle = !hasBudget
           ? `width:${Math.min(100, (r.spent / Math.max(1, total)) * 100)}%;background:${cat.color};opacity:.55`
-          : status === 'over' ? `width:100%;background:linear-gradient(90deg,var(--expense-2),var(--expense))`
-          : status === 'warn' ? `width:${fillWidth}%;background:linear-gradient(90deg,#f59e0b,#fbbf24)`
-          : `width:${fillWidth}%;background:linear-gradient(90deg,var(--income-2),var(--income))`;
+          : status === 'over' ? `width:100%;background:var(--c-vermelho)`
+          : status === 'warn' ? `width:${fillWidth}%;background:var(--c-ambar)`
+          : `width:${fillWidth}%;background:var(--c-verde)`;
         const pctColor = status === 'over' ? 'var(--expense)'
           : status === 'warn' ? 'var(--warning)'
           : status === 'ok' ? 'var(--income)' : 'var(--muted)';
@@ -687,7 +720,7 @@ function renderTrend() {
     return `
       <g class="trend-group">
         <rect x="${cx - barW - 2}" y="${yBase - incH}" width="${barW}" height="${incH}" fill="var(--income)" rx="3" opacity="0.9"/>
-        <rect x="${cx + 2}" y="${yBase - expH}" width="${barW}" height="${expH}" fill="var(--expense)" rx="3" opacity="0.9"/>
+        <rect x="${cx + 2}" y="${yBase - expH}" width="${barW}" height="${expH}" fill="var(--gasto)" rx="3" opacity="0.9"/>
         <text x="${cx}" y="${H - 10}" text-anchor="middle" class="trend-label">${label}</text>
       </g>
     `;
@@ -699,7 +732,7 @@ function renderTrend() {
     </svg>
     <div class="trend-legend">
       <span><i style="background:var(--income)"></i> Receitas</span>
-      <span><i style="background:var(--expense)"></i> Despesas</span>
+      <span><i style="background:var(--gasto)"></i> Despesas</span>
     </div>
   `;
 }
@@ -829,8 +862,9 @@ function misturar(a, b, t) {
 function corLegivel(cor, fundo, alvo) {
   alvo = alvo || 4.5;
   // Tema Astra (fundo preto): o chip é a cor a 12% sobre preto, então a cor tem de CLAREAR até passar.
-  const astra = document.documentElement.hasAttribute('data-astra');
-  const bg = astra ? _hexRgb('#000000') : _hexRgb(fundo);
+  const de = document.documentElement;
+  const astra = de.hasAttribute('data-astra') || (de.hasAttribute('data-viva-escuro') && matchMedia('(prefers-color-scheme: dark)').matches);
+  const bg = astra ? _hexRgb(de.hasAttribute('data-astra') ? '#000000' : misturar(cor, '#161B26', 0.14)) : _hexRgb(fundo);
   let c = _hexRgb(cor);
   for (let i = 0; i < 24 && _razao(c, bg) < alvo; i++) {
     c = astra ? { r: c.r + (255 - c.r) * 0.14, g: c.g + (255 - c.g) * 0.14, b: c.b + (255 - c.b) * 0.14 }
@@ -998,7 +1032,7 @@ function openTxDetail(id) {
         <div><span class="muted small">Falta pagar</span><b>${fmt.format(grupo.aPagar)}</b></div>
       </div>
       <div class="cmt-bar big"><div style="width:${pct(grupo.pagas, grupo.n)}%"></div></div>
-      <button type="button" class="link" id="verCompromisso" style="margin-top:8px">Ver todas as parcelas →</button>`;
+      <button type="button" class="link" id="verCompromisso" style="margin-top:8px">Ver todas as parcelas <i class="ti ti-chevron-right" aria-hidden="true"></i></button>`;
   }
 
   document.getElementById('txDetailBody').innerHTML = `
@@ -1032,7 +1066,7 @@ function openTxDetail(id) {
     if (vs.value) alvo.groupId = vs.value; else delete alvo.groupId;
     alvo.updatedAt = Date.now();
     saveState(); refreshAll();
-    toast(vs.value ? 'Vinculado — já abate o saldo' : 'Desvinculado');
+    toast(vs.value ? 'Vinculado. Já abate o saldo' : 'Desvinculado');
     txDetail.close();
   });
   document.getElementById('txDetailDel').hidden = false;
@@ -1308,7 +1342,7 @@ function openCmtDetail(id) {
       <span class="par-k">${i + 1}/${c.n}</span>
       <span class="par-d">${new Date(t.date + 'T00:00:00').toLocaleDateString('pt-BR')}</span>
       <span class="par-v">${fmt.format(t.amount)}</span>
-      <span class="par-s">${paga ? '✓ paga' : 'pendente'}</span>
+      <span class="par-s">${paga ? '<i class="ti ti-check" aria-hidden="true"></i> paga' : 'pendente'}</span>
     </div>`;
   }).join('');
   const body = document.getElementById('txDetailBody');
@@ -1926,7 +1960,7 @@ function renderDashLateral() {
       const aPagar = abertos.reduce((s, c) => s + c.aPagar, 0);
       const mes = abertos.reduce((s, c) => s + c.valorParcela, 0);
       box.innerHTML = `<div class="card-head row between"><span class="card-label">Parcelas em aberto</span>
-          <button class="link" data-nav="compromissos">ver →</button></div>
+          <button class="link" data-nav="compromissos">Ver <i class="ti ti-chevron-right" aria-hidden="true"></i></button></div>
         <div class="dashcmt-kpis"><div><span class="muted small">Por mês</span><strong>${fmt.format(mes)}</strong></div>
         <div><span class="muted small">Falta pagar</span><strong>${fmt.format(aPagar)}</strong></div></div>
         ${abertos.slice(0, 3).map(c => `<div class="dashcmt-row"><span>${escapeHTML(c.descricao)}</span>
@@ -2149,7 +2183,7 @@ cmtForm?.addEventListener('submit', () => {
 function fillAccountSelect(select, selecionado) {
   if (!select) return;
   const list = state.accounts || [];
-  select.innerHTML = '<option value="">— não informado —</option>' +
+  select.innerHTML = '<option value="">Não informado</option>' +
     list.map(a => `<option value="${escapeHTML(a.id)}"${a.id === selecionado ? ' selected' : ''}>${escapeHTML(a.name)}${a.kind === 'cartao' ? ' (cartão)' : ''}</option>`).join('');
 }
 
@@ -2266,7 +2300,7 @@ function renderFaturas() {
       <div class="fat-v"><strong>${fmt.format(total)}</strong>
         ${usoLimite !== null ? `<small class="muted">${usoLimite}% do limite</small>` : ''}</div>
       <button type="button" class="fat-pg ${faturaPaga(c.id, ref) ? 'on' : ''}" data-fat="${escapeHTML(c.id)}">
-        ${faturaPaga(c.id, ref) ? '✓ paga' : 'marcar paga'}</button>
+        ${faturaPaga(c.id, ref) ? '<i class="ti ti-check" aria-hidden="true"></i> paga' : 'marcar paga'}</button>
     </div>`;
   }).join('');
   el.innerHTML = `<h3 class="muted small uppercase" style="margin:16px 0 8px">Fatura aberta dos cartões</h3><div class="fat-list">${linhas}</div>`;
@@ -2352,7 +2386,7 @@ let _revIdx = 0, _revLista = [];
 function abrirRevisao() {
   _revLista = paraRevisar();
   _revIdx = 0;
-  if (!_revLista.length) { toast('Nada para revisar — tudo categorizado.'); return; }
+  if (!_revLista.length) { toast('Nada para revisar. Tudo categorizado'); return; }
   document.getElementById('revDialog').showModal();
   pintarRevisao();
 }
@@ -2392,7 +2426,7 @@ function aplicarRevisao(cat) {
     state.rules = state.rules || [];
     state.rules.push({ id: cid(), contem: termo, category: cat, updatedAt: Date.now() });
     const n = reaplicarRegras();
-    toast(`Regra criada — ${n} lançamento(s) atualizados`);
+    toast(`Regra criada. ${n} lançamento(s) atualizado(s)`);
   }
   _revIdx++;
   saveState(); pintarRevisao(); refreshAll();
@@ -2508,7 +2542,7 @@ function renderRegras() {
   if (!ul) return;
   const rs = state.rules || [];
   ul.innerHTML = rs.length ? rs.map(r => `<li class="cat-item" data-rule="${escapeHTML(r.id)}">
-      <span class="name">contém “${escapeHTML(r.contem)}” → <b>${escapeHTML(r.category || '')}</b></span>
+      <span class="name">contém “${escapeHTML(r.contem)}” <i class="ti ti-arrow-right" aria-hidden="true"></i> <b>${escapeHTML(r.category || '')}</b></span>
       <button type="button" class="ghost" data-del="${escapeHTML(r.id)}">remover</button></li>`).join('')
     : '<li class="empty muted small">Nenhuma regra ainda.</li>';
   ul.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
@@ -2530,7 +2564,7 @@ document.getElementById('ruleAdd')?.addEventListener('click', () => {
   state.rules.push({ id: cid(), contem: termo, category: cat, updatedAt: Date.now() });
   const n = reaplicarRegras();
   saveState(); renderRegras(); refreshAll();
-  toast(`Regra criada — ${n} lançamento(s) recategorizados`);
+  toast(`Regra criada. ${n} lançamento(s) recategorizado(s)`);
   document.getElementById('ruleTermo').value = '';
 });
 
@@ -2629,7 +2663,7 @@ function abrirParcela(id) {
   pagForm.valor.value = (c.valorParcela || 0).toFixed(2);
   pagForm.data.value = proximaData(ultima && ultima.date);
   const k = c.pagas + 1;
-  document.getElementById('pagTitulo').textContent = `Parcela ${k}/${c.n} — ${c.descricao}`;
+  document.getElementById('pagTitulo').textContent = `Parcela ${k}/${c.n}: ${c.descricao}`;
   document.getElementById('pagResumo').innerHTML =
     `Vai lançar como <b>${escapeHTML(c.descricao)} (${k}/${c.n})</b> em ${escapeHTML(c.categoria || 'sem categoria')}.` +
     ` Restam ${c.restantes} parcela${c.restantes === 1 ? '' : 's'} depois desta.`;
@@ -2689,10 +2723,10 @@ pagForm?.addEventListener('submit', () => {
   saveState(); pagDialog.close(); refreshAll();
   const dep = compromissos().find(x => x.id === c.id);
   if (ehParcela) {
-    toast(dep && dep.quitado ? 'Parcelamento quitado! 🎉'
+    toast(dep && dep.quitado ? 'Parcelamento quitado'
       : `Parcela ${k}/${atual.n} lançada — faltam ${dep ? dep.restantes : 0}`);
   } else {
-    toast(dep && dep.quitado ? 'Dívida quitada! 🎉' : `Pago ${fmt.format(valor)} — faltam ${fmt.format(dep ? dep.aPagar : 0)}`);
+    toast(dep && dep.quitado ? 'Dívida quitada' : `Pago ${fmt.format(valor)}. Faltam ${fmt.format(dep ? dep.aPagar : 0)}`);
   }
 });
 
@@ -2820,7 +2854,7 @@ function preencherSelectsDeFiltro() {
   const selA = document.getElementById('filterAcc');
   if (selA) {
     const atual = selA.value;
-    selA.innerHTML = '<option value="">Toda conta/cartão</option>' + (state.accounts || [])
+    selA.innerHTML = '<option value="">Todas as contas</option>' + (state.accounts || [])
       .map(a => `<option value="${escapeHTML(a.id)}">${escapeHTML(a.name)}</option>`).join('');
     selA.value = atual;
   }
@@ -2828,7 +2862,7 @@ function preencherSelectsDeFiltro() {
   if (selS) {
     const atual = selS.value;
     const subs = [...new Set(state.transactions.map(t => t.sub).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
-    selS.innerHTML = '<option value="">Toda subcategoria</option>' + subs
+    selS.innerHTML = '<option value="">Subcategorias</option>' + subs
       .map(v => `<option value="${escapeHTML(v)}">${escapeHTML(v)}</option>`).join('');
     selS.value = atual;
   }

@@ -1,15 +1,13 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-astra="atbguia">
+<html lang="pt-BR" data-viva="atbguia" data-viva-escuro>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>ATBguia — Guia prático de antibioticoterapia | MedTech</title>
+<title>ATBguia · Antibioticoterapia prática | MedTech</title>
 <meta name="description" content="ATBguia: guia prático de antibióticos — esquema empírico e escalonamento por foco, bactérias, mecanismos de resistência, espectro/cobertura, ajuste renal, IV→VO e assistente de IA.">
-<meta name="theme-color" content="#000000">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
+<meta name="theme-color" content="#F5F6FB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1017" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="vendor/tabler/tabler-icons.min.css?v=3.48.0">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="manifest" href="atbguia.webmanifest">
 <link rel="apple-touch-icon" href="icone-atbguia-180.png">
@@ -20,7 +18,7 @@
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"atbguia",name:"ATBguia"};</script>
-<script type="module" src="_mtauth.js?v=25"></script>
+<script type="module" src="_mtauth.js?v=26"></script>
 <style>
 :root{--petrol:#0E8A9C;--petrol-dark:#0B6E7D;--ink:#23272E;--mint:#0E8A9C;--mint-dark:#0B6E7D;--bg:#FAFAF8;--surface:#FFFFFF;--panel2:#F1F1EC;--soft:rgba(14,138,156,.12);--line:#E8E8E2;--line-strong:#DDDDD5;--muted:#5E646B;--dim:#767C84;--green:#1D7A46;--green-bg:rgba(29,122,70,.12);--amber:#A3730A;--amber-bg:rgba(163,115,10,.12);--red:#C6453D;--red-bg:rgba(198,69,61,.12);--blue:#0E8A9C;--blue-bg:rgba(14,138,156,.12);--violet:#a78bfa;--violet-bg:rgba(167,139,250,.14);--card:#FFFFFF;--glow:rgba(14,138,156,.42);--disp:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -136,25 +134,315 @@ footer a{color:var(--petrol-dark);font-weight:600;text-decoration:none}
 @media(max-width:680px){.grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
 </style>
 <style>/* mt-a11y-16px */@media(max-width:680px){input,select,textarea{font-size:16px}}</style>
+<!-- viva:atbguia -->
+<style>
+/* ============================================================
+   23/09/2026: camada "viva" (modelo aprovado do ClínicaMed, cm-v97).
+   Cor do app: ciano (--ac vem do _mtviva.css). Os seletores levam
+   :root para vencer a folha compartilhada, que entra DEPOIS deste bloco.
+   ============================================================ */
+@media screen{
+html:root[data-viva="atbguia"] body{font-size:14.5px}
+/* cabeçalho de uma linha: marca, busca, conta */
+html:root[data-viva="atbguia"] body header{padding:calc(10px + env(safe-area-inset-top)) 0 10px}
+html:root[data-viva="atbguia"] body header .top{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:20px;align-items:center}
+html:root[data-viva="atbguia"] body .logo{font-size:19px;letter-spacing:-.02em;gap:11px}
+html:root[data-viva="atbguia"] body .logo .mark{width:36px;height:36px;font-size:19px}
+html:root[data-viva="atbguia"] body .logo b{color:var(--acInk)}
+html:root[data-viva="atbguia"] body .search-wrap{margin:0;position:relative;display:block;width:100%;max-width:520px;justify-self:center}
+html:root[data-viva="atbguia"] body .search-wrap input{width:100%;min-height:44px;padding:10px 44px!important;border-radius:999px!important;font-size:15px;background:var(--sup2)!important;border-color:transparent!important}
+html:root[data-viva="atbguia"] body .search-wrap input:focus{background:var(--sup)!important;border-color:var(--ac)!important}
+html:root[data-viva="atbguia"] body .search-wrap .ic{left:16px;opacity:1;color:var(--tinta2);font-size:18px;pointer-events:none;display:flex}
+html:root[data-viva="atbguia"] body .search-wrap kbd{position:absolute;right:12px;top:50%;transform:translateY(-50%);min-width:24px;height:24px;display:grid;place-items:center;border-radius:8px;
+  background:var(--sup);border:1px solid var(--fioF);color:var(--tinta2);font:600 12px/1 inherit;pointer-events:none}
+html:root[data-viva="atbguia"] body .search-wrap input:focus~kbd,html:root[data-viva="atbguia"] body .search-wrap input:not(:placeholder-shown)~kbd{display:none}
+html:root[data-viva="atbguia"] body .usr .who{color:var(--tinta2)}
+html:root[data-viva="atbguia"] body .usr a,html:root[data-viva="atbguia"] body .usr button{display:inline-flex;align-items:center;gap:6px;padding:8px 14px}
+html:root[data-viva="atbguia"] body input[type=search]::-webkit-search-cancel-button{cursor:pointer}
+
+/* navegação: pílula colorida na aba ativa, ícone em círculo */
+html:root[data-viva="atbguia"] body .atb-nav{display:flex;gap:2px;width:max-content;max-width:calc(100% - 36px);margin:18px 0 0 max(18px,calc((100% - 964px)/2));overflow-x:auto;scrollbar-width:none}
+html:root[data-viva="atbguia"] body .atb-nav::-webkit-scrollbar{display:none}
+html:root[data-viva="atbguia"] body .atb-nav button{display:inline-flex;align-items:center;gap:8px;padding:5px 15px 5px 5px;font-size:14px;font-weight:600;white-space:nowrap;border:0;background:transparent;cursor:pointer;font-family:inherit}
+html:root[data-viva="atbguia"] body .atb-nav button>i{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:17px;background:var(--acSup);color:var(--acInk);transition:transform .25s var(--mola),background .2s,color .2s}
+html:root[data-viva="atbguia"] body .atb-nav button:hover>i{transform:scale(1.08) rotate(-6deg)}
+html:root[data-viva="atbguia"] body .atb-nav button{color:var(--tinta2);border-radius:999px;min-height:42px}
+html:root[data-viva="atbguia"] body .atb-nav button:hover{background:var(--sup2);color:var(--tinta)}
+html:root[data-viva="atbguia"] body .atb-nav button.on{background:var(--ac);color:var(--acTxt);box-shadow:0 6px 14px color-mix(in srgb,var(--ac) 30%,transparent)}
+html:root[data-viva="atbguia"] body .atb-nav button.on>i{background:rgba(0,0,0,.16);color:var(--acTxt)}
+html:root[data-viva="atbguia"] body .atb-nav .so-cel{display:none}
+html:root[data-viva="atbguia"] body main{max-width:1000px;padding:20px 18px 70px}
+html:root[data-viva="atbguia"] body main#view:not(.anima)>*{animation:none}
+html:root[data-viva="atbguia"] body main#view.anima #homeCorpo>*{animation:vvSobe .5s var(--suave) both}
+html:root[data-viva="atbguia"] body main#view.anima #homeCorpo>*:nth-child(2){animation-delay:.06s}html:root[data-viva="atbguia"] body main#view.anima #homeCorpo>*:nth-child(3){animation-delay:.12s}html:root[data-viva="atbguia"] body main#view.anima #homeCorpo>*:nth-child(n+4){animation-delay:.18s}
+
+/* carregando */
+html:root[data-viva="atbguia"] body .esq{display:flex;flex-direction:column;gap:10px}
+html:root[data-viva="atbguia"] body .esq-t{display:flex;align-items:center;gap:9px;color:var(--tinta2);font-size:14px;margin:4px 2px}
+html:root[data-viva="atbguia"] body .esq i{display:block;height:120px;border-radius:24px;background:var(--sup3);animation:atbPulsa 1.3s ease-in-out infinite}
+html:root[data-viva="atbguia"] body .esq i:nth-child(3){height:80px;animation-delay:.15s}html:root[data-viva="atbguia"] body .esq i:nth-child(4){height:80px;animation-delay:.3s}
+html:root[data-viva="atbguia"] body .spin{border-color:currentColor;border-top-color:transparent}
+
+/* início: destaque, ferramentas, filtros e grade */
+html:root[data-viva="atbguia"] body .busca-home{display:none}
+html:root[data-viva="atbguia"] body .atb-hero{position:relative;overflow:hidden;border-radius:28px;padding:28px 30px;background:var(--ac);color:var(--acTxt);display:flex;gap:24px;align-items:center;
+  box-shadow:0 18px 40px color-mix(in srgb,var(--ac) 28%,transparent);margin-bottom:16px}
+html:root[data-viva="atbguia"] body .atb-hero .bola{position:absolute;border-radius:50%;background:#fff;opacity:.14;pointer-events:none}
+html:root[data-viva="atbguia"] body .atb-hero .b1{width:260px;height:260px;right:-70px;top:-100px;animation:atbFlutua 9s ease-in-out infinite}
+html:root[data-viva="atbguia"] body .atb-hero .b2{width:120px;height:120px;right:190px;bottom:-60px;opacity:.1;animation:atbFlutua 7s ease-in-out infinite reverse}
+html:root[data-viva="atbguia"] body .atb-hero .txt{flex:1;min-width:0;position:relative}
+html:root[data-viva="atbguia"] body .atb-hero small{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;background:rgba(0,0,0,.18);padding:5px 12px;border-radius:999px}
+html:root[data-viva="atbguia"] body .atb-hero h2{font-size:28px;line-height:1.15;margin:14px 0 8px;font-weight:750;letter-spacing:-.03em;color:var(--acTxt)}
+html:root[data-viva="atbguia"] body .atb-hero p{margin:0 0 18px;font-size:14.5px;max-width:52ch;line-height:1.5}
+html:root[data-viva="atbguia"] body .atb-hero .acoes{display:flex;gap:10px;flex-wrap:wrap}
+html:root[data-viva="atbguia"] body .bt-hero{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;min-height:44px;padding:10px 20px;font:600 14px/1.1 inherit;cursor:pointer;
+  background:#fff;color:#141827;box-shadow:0 8px 20px rgba(0,0,0,.14)}
+html:root[data-viva="atbguia"] body .bt-hero:hover{transform:translateY(-1px)}
+html:root[data-viva="atbguia"] body .bt-hero.sec{background:rgba(0,0,0,.16);color:var(--acTxt);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35)}
+html:root[data-viva="atbguia"] body .bt-hero.sec:hover{background:rgba(0,0,0,.24)}
+html:root[data-viva="atbguia"] body .hero-ic{position:relative;width:112px;height:112px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;font-size:54px;background:rgba(255,255,255,.16);color:var(--acTxt);animation:atbPop .6s var(--mola) both}
+html:root[data-viva="atbguia"] body .atb-tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:16px}
+html:root[data-viva="atbguia"] body .tool{--k:var(--c-azul);display:flex;align-items:center;gap:13px;text-align:left;border-radius:22px;padding:15px 16px;min-width:0;cursor:pointer;font:inherit;color:var(--tinta);
+  background:color-mix(in srgb,var(--k) 10%,var(--sup));border:1px solid color-mix(in srgb,var(--k) 18%,transparent);transition:transform .2s var(--mola),box-shadow .2s}
+html:root[data-viva="atbguia"] body .tool:hover{transform:translateY(-3px);box-shadow:0 12px 26px color-mix(in srgb,var(--k) 20%,transparent)}
+html:root[data-viva="atbguia"] body .tool .ic{width:44px;height:44px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;font-size:21px;color:#fff;
+  background:color-mix(in srgb,var(--k) 84%,#141827);box-shadow:0 8px 18px color-mix(in srgb,var(--k) 30%,transparent)}
+html:root[data-viva="atbguia"] body .tool .tx{display:flex;flex-direction:column;min-width:0}
+html:root[data-viva="atbguia"] body .tool b{font-size:14px;font-weight:650;line-height:1.25;color:color-mix(in srgb,var(--k) 62%,var(--tinta))}
+html:root[data-viva="atbguia"] body .tool small{font-size:12.5px;color:var(--tinta2);margin-top:2px;font-variant-numeric:tabular-nums}
+html:root[data-viva="atbguia"] body .note{display:flex;align-items:flex-start;gap:10px;background:var(--sup2);border:0;box-shadow:none;border-radius:18px;color:var(--tinta2);font-size:13.5px;padding:12px 16px;margin:0 0 16px}
+html:root[data-viva="atbguia"] body .note>i{font-size:18px;color:var(--acInk);flex:0 0 auto;margin-top:1px}
+html:root[data-viva="atbguia"] body .note b{color:var(--tinta)}
+html:root[data-viva="atbguia"] body .cats{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 4px;align-items:center}
+html:root[data-viva="atbguia"] body .cats-l{white-space:nowrap;flex:0 0 auto;font-size:13px;color:var(--tinta2);font-weight:600;margin-right:2px}
+html:root[data-viva="atbguia"] body .chip{display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:6px 14px;border-radius:999px;border:1.5px solid var(--fioF);background:var(--sup);color:var(--tinta);font:600 13.5px/1 inherit;cursor:pointer;transition:background .2s,border-color .2s,transform .18s var(--mola)}
+html:root[data-viva="atbguia"] body .chip:hover:not(:disabled){border-color:var(--ac)}
+html:root[data-viva="atbguia"] body .chip .n{min-width:22px;height:20px;padding:0 6px;border-radius:999px;display:inline-grid;place-items:center;background:var(--sup2);color:var(--tinta2);font-size:11.5px;font-weight:700;font-variant-numeric:tabular-nums}
+html:root[data-viva="atbguia"] body .chip.on .n{background:rgba(0,0,0,.2);color:var(--acTxt)}
+html:root[data-viva="atbguia"] body .chip:disabled{opacity:.45;cursor:default}
+html:root[data-viva="atbguia"] body .asec{margin-top:8px}
+html:root[data-viva="atbguia"] body .sec-title{display:flex;align-items:center;gap:9px;font-family:inherit;font-size:16px;font-weight:700;text-transform:none;letter-spacing:-.01em;color:var(--tinta);margin:22px 2px 12px}
+html:root[data-viva="atbguia"] body .sec-title .n{background:var(--sup2);color:var(--tinta2);border-radius:999px;padding:2px 9px;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+html:root[data-viva="atbguia"] body .agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+html:root[data-viva="atbguia"] body .acard{--k:var(--ac);display:flex;flex-direction:column;align-items:flex-start;gap:5px;text-align:left;min-width:0;padding:15px 16px 16px;border-radius:20px;cursor:pointer;
+  background:var(--sup);border:1px solid var(--fio);box-shadow:var(--sombraV);color:var(--tinta);font:inherit;position:relative;overflow:hidden;transition:transform .2s var(--mola),box-shadow .2s,border-color .2s}
+html:root[data-viva="atbguia"] body .acard::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--k);opacity:.85}
+html:root[data-viva="atbguia"] body .acard:hover{transform:translateY(-3px);box-shadow:var(--sombraM);border-color:color-mix(in srgb,var(--k) 35%,var(--fio))}
+html:root[data-viva="atbguia"] body .acard .ic{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:20px;margin:4px 0 5px;
+  background:color-mix(in srgb,var(--k) 14%,var(--sup));color:color-mix(in srgb,var(--k) 70%,var(--tinta));transition:transform .25s var(--mola)}
+html:root[data-viva="atbguia"] body .acard:hover .ic{transform:scale(1.08) rotate(-6deg)}
+html:root[data-viva="atbguia"] body .acard .ic .sg{color:color-mix(in srgb,var(--k) 52%,var(--tinta));font-size:14px;font-weight:800;letter-spacing:-.02em}
+html:root[data-viva="atbguia"] body .acard .nm{font-weight:650;font-size:14.5px;line-height:1.3}
+html:root[data-viva="atbguia"] body .acard .sb{font-size:12.5px;color:var(--tinta2);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+html:root[data-viva="atbguia"] body div.empty{display:flex;flex-direction:column;align-items:center;gap:10px;padding:38px 22px;margin-top:10px;border-radius:24px;border:1.5px dashed var(--fioF);background:var(--sup);box-shadow:none;color:var(--tinta2);text-align:center}
+html:root[data-viva="atbguia"] body .empty .ei{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;background:var(--acSup);color:var(--acInk);font-size:29px;animation:atbPop .45s var(--mola) both}
+html:root[data-viva="atbguia"] body .empty h3{font-size:17px;margin:4px 0 0;color:var(--tinta)}
+html:root[data-viva="atbguia"] body .empty p{margin:0;max-width:48ch;line-height:1.55;font-size:14px}
+html:root[data-viva="atbguia"] body .acoes-v{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+
+/* telas internas */
+html:root[data-viva="atbguia"] body .back{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:8px 16px 8px 12px;border-radius:999px;border:0;background:var(--sup2);color:var(--tinta);font-weight:600;font-size:13.5px;margin-bottom:16px;cursor:pointer}
+html:root[data-viva="atbguia"] body .back:hover{background:var(--acSup);color:var(--acInk)}
+html:root[data-viva="atbguia"] body .exam-head{align-items:center;gap:16px;margin-bottom:12px}
+html:root[data-viva="atbguia"] body .exam-head .ei{--k:var(--ac);width:52px;height:52px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;font-size:25px;line-height:1;
+  background:color-mix(in srgb,var(--k) 84%,#141827);color:#fff;box-shadow:0 10px 24px color-mix(in srgb,var(--k) 32%,transparent);animation:atbPop .5s var(--mola) both}
+html:root[data-viva="atbguia"] body .exam-head .ei .sg{font-size:18px;font-weight:800}
+html:root[data-viva="atbguia"] body .exam-head h1{font-family:inherit;font-size:25px;font-weight:700;letter-spacing:-.03em;line-height:1.15}
+html:root[data-viva="atbguia"] body .exam-head .tags{font-size:13.5px;color:var(--tinta2);margin-top:4px}
+html:root[data-viva="atbguia"] body .content{font-size:14.5px;line-height:1.65}
+html:root[data-viva="atbguia"] body .content h2{font-family:inherit;font-size:16.5px;font-weight:700;color:var(--tinta);border:0;padding:0;margin:24px 0 8px;gap:10px;letter-spacing:-.01em}
+html:root[data-viva="atbguia"] body .content h2::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--ac);flex:0 0 auto}
+html:root[data-viva="atbguia"] body .content h3{color:var(--acInk);font-size:14.5px}
+html:root[data-viva="atbguia"] body .content b,html:root[data-viva="atbguia"] body .content strong{color:var(--tinta);font-weight:650}
+html:root[data-viva="atbguia"] body :is(.content,.ai-out,.bub) :is(.perla,.alarme){display:flex;gap:10px;align-items:flex-start;border:0;border-radius:16px;padding:11px 14px;margin:10px 0;font-size:14px;line-height:1.55;color:var(--tinta)}
+html:root[data-viva="atbguia"] body .perla,html:root[data-viva="atbguia"] body .alarme{display:flex;gap:10px;align-items:flex-start;border:0!important;border-radius:16px!important;padding:11px 14px!important;font-size:14px!important;line-height:1.55;color:var(--tinta)!important}
+html:root[data-viva="atbguia"] body .perla{background:var(--okSup)!important}
+html:root[data-viva="atbguia"] body .alarme{background:var(--errSup)!important}
+html:root[data-viva="atbguia"] body .perla>i,html:root[data-viva="atbguia"] body .alarme>i{font-size:19px;flex:0 0 auto;margin-top:1px}
+html:root[data-viva="atbguia"] body .perla>i{color:color-mix(in srgb,var(--okV) 75%,var(--tinta))}
+html:root[data-viva="atbguia"] body .alarme>i{color:color-mix(in srgb,var(--errV) 80%,var(--tinta))}
+html:root[data-viva="atbguia"] body .perla b{color:color-mix(in srgb,var(--okV) 65%,var(--tinta))!important}
+html:root[data-viva="atbguia"] body .alarme b{color:color-mix(in srgb,var(--errV) 72%,var(--tinta))!important}
+html:root[data-viva="atbguia"] body .panel{border-radius:22px;padding:18px;border:1px solid var(--fio);box-shadow:var(--sombraV);background:var(--sup)}
+html:root[data-viva="atbguia"] body .panel h4{font-family:inherit;font-size:14.5px;font-weight:700;text-transform:none;letter-spacing:-.01em;color:var(--tinta);margin-bottom:12px}
+html:root[data-viva="atbguia"] body .btn{border-radius:999px;min-height:44px;padding:11px 20px;font-weight:600;gap:8px}
+html:root[data-viva="atbguia"] body .btn-ai{width:auto}
+html:root[data-viva="atbguia"] body .panel .btn-ai{width:100%}
+html:root[data-viva="atbguia"] body .formcard{border-radius:24px;padding:20px;border:1px solid var(--fio);box-shadow:var(--sombraV);background:var(--sup)}
+html:root[data-viva="atbguia"] body .fc-h{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:700;color:var(--tinta);margin-bottom:14px}
+html:root[data-viva="atbguia"] body .fc-h>i{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--c-laranja) 14%,var(--sup));color:color-mix(in srgb,var(--c-laranja) 68%,var(--tinta));font-size:17px}
+html:root[data-viva="atbguia"] body .field{margin-bottom:14px}
+html:root[data-viva="atbguia"] body .field label{font-size:13px;font-weight:600;color:var(--tinta);margin-bottom:6px}
+html:root[data-viva="atbguia"] body .lbl-dim{color:var(--tinta2);font-weight:500}
+html:root[data-viva="atbguia"] body .field select,html:root[data-viva="atbguia"] body .field input[type=text],html:root[data-viva="atbguia"] body .field input[type=number]{padding:11px 13px;min-height:46px}
+html:root[data-viva="atbguia"] body .segs{gap:8px}
+html:root[data-viva="atbguia"] body .seg{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:999px;min-height:44px;padding:9px 14px;font-weight:600;background:var(--sup);border:1.5px solid var(--fioF);color:var(--tinta)}
+html:root[data-viva="atbguia"] body .seg:hover{border-color:var(--ac)}
+html:root[data-viva="atbguia"] body .seg.on{box-shadow:0 6px 14px color-mix(in srgb,var(--ac) 26%,transparent)}
+html:root[data-viva="atbguia"] body .checks{gap:4px}
+html:root[data-viva="atbguia"] body .checks label{align-items:center;gap:10px;font-size:14px;padding:7px 8px;border-radius:12px;transition:background .15s}
+html:root[data-viva="atbguia"] body .checks label:hover{background:var(--sup2)}
+html:root[data-viva="atbguia"] body .checks input{margin:0;width:20px;height:20px}
+html:root[data-viva="atbguia"] body .suggs{gap:8px}
+html:root[data-viva="atbguia"] body .suggs-h{font-size:13px;font-weight:600;color:var(--tinta2);margin:4px 2px 8px}
+html:root[data-viva="atbguia"] body .sugg{min-height:38px;padding:7px 14px;border-radius:999px;border:1.5px solid var(--fioF);background:var(--sup);color:var(--tinta);font-size:13.5px;font-weight:500}
+html:root[data-viva="atbguia"] body .sugg:hover{border-color:var(--ac);color:var(--acInk)}
+html:root[data-viva="atbguia"] body .calc-out{border-radius:18px;background:var(--acSup);border:1px solid color-mix(in srgb,var(--ac) 25%,transparent);color:var(--tinta);padding:14px 16px}
+html:root[data-viva="atbguia"] body .calc-out b{color:var(--tinta)}
+html:root[data-viva="atbguia"] body .calc-out.erro{background:var(--errSup);border-color:color-mix(in srgb,var(--errV) 25%,transparent);color:color-mix(in srgb,var(--errV) 72%,var(--tinta))}
+html:root[data-viva="atbguia"] body .calc-out.aviso{background:var(--avSup);border-color:color-mix(in srgb,var(--avV) 30%,transparent);color:color-mix(in srgb,var(--avV) 55%,var(--tinta))}
+html:root[data-viva="atbguia"] body .calc-out.erro,html:root[data-viva="atbguia"] body .calc-out.aviso,html:root[data-viva="atbguia"] body .ai-out.erro{animation:vvTreme .4s}
+html:root[data-viva="atbguia"] body .nota-p{display:block;font-size:12px;color:var(--tinta2);margin-top:8px}
+html:root[data-viva="atbguia"] body .ai-out{border-radius:20px;background:var(--sup);border:1px solid color-mix(in srgb,var(--c-verde) 30%,var(--fio));padding:14px 18px;animation:vvSobe .4s var(--suave) both}
+html:root[data-viva="atbguia"] body .ai-out h2{color:var(--tinta);border-bottom-color:var(--fio)}
+html:root[data-viva="atbguia"] body .ai-out h3{color:var(--tinta);background:color-mix(in srgb,var(--c-verde) 10%,var(--sup));border-left:0;border-radius:12px;padding:7px 12px}
+html:root[data-viva="atbguia"] body .ai-out b{color:var(--tinta)}
+html:root[data-viva="atbguia"] body .ai-out.erro{background:var(--errSup);border-color:color-mix(in srgb,var(--errV) 25%,transparent);color:color-mix(in srgb,var(--errV) 72%,var(--tinta))}
+html:root[data-viva="atbguia"] body details{border-radius:16px}
+html:root[data-viva="atbguia"] body .sum-tfg{list-style:none;display:inline-flex;align-items:center;gap:6px;min-height:40px;cursor:pointer;font-size:13.5px;font-weight:600;color:var(--acInk)}
+html:root[data-viva="atbguia"] body .sum-tfg::-webkit-details-marker{display:none}
+html:root[data-viva="atbguia"] body .sum-tfg>i{transition:transform .25s var(--mola)}
+html:root[data-viva="atbguia"] body details[open]>.sum-tfg>i{transform:rotate(90deg)}
+html:root[data-viva="atbguia"] body .disc{color:var(--tinta2);border-top-color:var(--fio)}
+/* tabela de cobertura */
+html:root[data-viva="atbguia"] body .tbl-wrap{position:relative;border-radius:18px;border:1px solid var(--fio);background:var(--sup);box-shadow:var(--sombraV)}
+html:root[data-viva="atbguia"] body table.cov{font-size:13px}
+html:root[data-viva="atbguia"] body table.cov th,html:root[data-viva="atbguia"] body table.cov td{border-color:var(--fio)!important;padding:8px 10px}
+html:root[data-viva="atbguia"] body table.cov thead th{background:var(--sup2);color:var(--tinta2);font-weight:600;font-size:12px}
+html:root[data-viva="atbguia"] body table.cov td.atb{background:var(--sup);color:var(--tinta);font-weight:600}
+html:root[data-viva="atbguia"] body table.cov thead th.atb{position:sticky;left:0;top:0;z-index:3;background:var(--sup2)}
+html:root[data-viva="atbguia"] body table.cov :is(td,th).sel{background:var(--acSup)}
+html:root[data-viva="atbguia"] body .th-bt{border:0;background:transparent;font:inherit;color:inherit;cursor:pointer;padding:2px 4px;border-radius:8px}
+html:root[data-viva="atbguia"] body th.sel .th-bt{color:var(--acInk);font-weight:700}
+html:root[data-viva="atbguia"] body .cy,html:root[data-viva="atbguia"] body .cp,html:root[data-viva="atbguia"] body .cn{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;font-size:14px;font-weight:800;vertical-align:middle}
+html:root[data-viva="atbguia"] body .cy{background:color-mix(in srgb,var(--okV) 15%,var(--sup));color:color-mix(in srgb,var(--okV) 70%,var(--tinta))}
+html:root[data-viva="atbguia"] body .cp{background:color-mix(in srgb,var(--c-ambar) 18%,var(--sup));color:color-mix(in srgb,var(--avV) 70%,var(--tinta))}
+html:root[data-viva="atbguia"] body .cn{color:var(--tinta2)}
+html:root[data-viva="atbguia"] body .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+html:root[data-viva="atbguia"] body .legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;font-size:12.5px;color:var(--tinta2)}
+html:root[data-viva="atbguia"] body .cov-alvos{margin-bottom:12px}
+html:root[data-viva="atbguia"] body .cov-alvos .chip{min-height:34px;padding:5px 12px;font-size:13px}
+/* assistente */
+html:root[data-viva="atbguia"] body .chat{gap:14px}
+html:root[data-viva="atbguia"] body .msg{gap:10px;animation:vvSobe .35s var(--suave) both}
+html:root[data-viva="atbguia"] body .av{width:34px;height:34px;border-radius:50%;font-size:17px}
+html:root[data-viva="atbguia"] body .msg.u .av{background:var(--ac);color:var(--acTxt)}
+html:root[data-viva="atbguia"] body .msg.a .av{background:color-mix(in srgb,var(--c-violeta) 14%,var(--sup));color:color-mix(in srgb,var(--c-violeta) 72%,var(--tinta))}
+html:root[data-viva="atbguia"] body .msg.erro .av{background:var(--errSup);color:color-mix(in srgb,var(--errV) 80%,var(--tinta))}
+html:root[data-viva="atbguia"] body .bub{border-radius:6px 20px 20px 20px;border:1px solid var(--fio);background:var(--sup);padding:12px 16px;box-shadow:var(--sombraV);min-width:0}
+html:root[data-viva="atbguia"] body .msg.u .bub{background:var(--acSup);border-color:transparent;box-shadow:none}
+html:root[data-viva="atbguia"] body .msg.erro .bub{background:var(--errSup);border-color:transparent;color:color-mix(in srgb,var(--errV) 72%,var(--tinta))}
+html:root[data-viva="atbguia"] body .bub h2,html:root[data-viva="atbguia"] body .bub h3{color:var(--tinta)}
+html:root[data-viva="atbguia"] body .typing span{background:color-mix(in srgb,var(--c-violeta) 72%,var(--tinta))}
+html:root[data-viva="atbguia"] body .ask{background:var(--papel);padding:10px 0 12px;gap:10px;align-items:flex-end}
+html:root[data-viva="atbguia"] body .ask textarea{border-radius:24px!important;padding:12px 18px;min-height:48px;font-size:15px}
+html:root[data-viva="atbguia"] body .ask button{width:48px;height:48px;border-radius:50%;background:var(--ac);color:var(--acTxt);font-size:20px;display:grid;place-items:center;box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 30%,transparent)}
+html:root[data-viva="atbguia"] body .ask button:hover{filter:brightness(1.06);transform:translateY(-1px)}
+/* folha "Mais" do celular */
+html:root[data-viva="atbguia"] body .mais-bg{position:fixed;inset:0;z-index:80;background:rgba(20,24,39,.42);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center}
+html:root[data-viva="atbguia"] body .mais-box{width:100%;max-width:520px;background:var(--sup);border-radius:26px 26px 0 0;padding:14px 14px calc(18px + env(safe-area-inset-bottom));box-shadow:var(--sombraM);animation:atbSobeM .3s var(--suave) both}
+html:root[data-viva="atbguia"] body .mais-h{display:flex;align-items:center;justify-content:space-between;padding:4px 6px 10px}
+html:root[data-viva="atbguia"] body .mais-h b{font-size:16px}
+html:root[data-viva="atbguia"] body .mais-x{width:40px;height:40px;border-radius:50%;border:0;background:var(--sup2);color:var(--tinta);display:grid;place-items:center;font-size:18px;cursor:pointer}
+html:root[data-viva="atbguia"] body .mais-it{--k:var(--ac);display:flex;align-items:center;gap:13px;width:100%;text-align:left;border:0;background:transparent;border-radius:18px;padding:10px;min-height:60px;cursor:pointer;color:var(--tinta);font:inherit}
+html:root[data-viva="atbguia"] body .mais-it:hover{background:var(--sup2)}
+html:root[data-viva="atbguia"] body .mais-it .ic{width:42px;height:42px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;font-size:20px;color:#fff;background:color-mix(in srgb,var(--k) 84%,#141827)}
+html:root[data-viva="atbguia"] body .mais-it .tx{flex:1;min-width:0;display:flex;flex-direction:column}
+html:root[data-viva="atbguia"] body .mais-it b{font-size:14.5px}
+html:root[data-viva="atbguia"] body .mais-it small{font-size:12.5px;color:var(--tinta2);margin-top:2px}
+html:root[data-viva="atbguia"] body .mais-it>.ti-chevron-right{color:var(--tinta2);font-size:18px}
+html:root[data-viva="atbguia"] body footer{padding-bottom:30px}
+
+@keyframes atbPulsa{0%,100%{opacity:1}50%{opacity:.55}}
+@keyframes atbPop{0%{transform:scale(.5);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes atbFlutua{0%,100%{transform:translate(0,0)}50%{transform:translate(-14px,12px)}}
+@keyframes atbSobeM{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+
+@media(min-width:641px) and (max-width:1000px){
+  html:root[data-viva="atbguia"] body .atb-tools{grid-template-columns:repeat(2,minmax(0,1fr))}
+  html:root[data-viva="atbguia"] body .atb-nav button{padding:5px 12px 5px 5px;font-size:13.5px}
+}
+/* celular: busca no Início, barra inferior com 5 itens e o resto em "Mais" */
+@media(max-width:640px){
+  html:root[data-viva="atbguia"] body header .top{grid-template-columns:minmax(0,1fr) auto;gap:10px}
+  html:root[data-viva="atbguia"] body header .search-wrap{display:none}
+  html:root[data-viva="atbguia"] body .logo{font-size:18px}
+  html:root[data-viva="atbguia"] body .usr .who{display:none}
+  html:root[data-viva="atbguia"] body main{padding:14px 14px calc(96px + env(safe-area-inset-bottom))}
+  html:root[data-viva="atbguia"] body footer{padding-bottom:calc(100px + env(safe-area-inset-bottom))}
+  html:root[data-viva="atbguia"] body .atb-nav{position:fixed;left:0;right:0;bottom:0;z-index:40;margin:0;width:auto;max-width:none;display:grid;grid-template-columns:repeat(5,1fr);gap:0;padding:6px 8px calc(8px + env(safe-area-inset-bottom))!important;overflow:visible}
+  html:root[data-viva="atbguia"] body .atb-nav .so-pc{display:none}
+  html:root[data-viva="atbguia"] body .atb-nav .so-cel{display:flex}
+  html:root[data-viva="atbguia"] body .atb-nav button{flex-direction:column;justify-content:flex-end;gap:3px;padding:4px 2px 2px!important;min-height:56px;font-size:11.5px;font-weight:600;background:transparent!important;box-shadow:none!important;color:var(--tinta2)!important}
+  html:root[data-viva="atbguia"] body .atb-nav button>i{width:52px;height:30px;border-radius:999px;background:transparent;color:inherit;font-size:21px}
+  html:root[data-viva="atbguia"] body .atb-nav button:hover>i{transform:none}
+  html:root[data-viva="atbguia"] body .atb-nav button.on{color:var(--acInk)!important;background:transparent!important}
+  html:root[data-viva="atbguia"] body .atb-nav button.on>i{background:var(--ac);color:var(--acTxt);transform:translateY(-1px)}
+  html:root[data-viva="atbguia"] body .busca-home{display:block;position:relative;margin-bottom:14px}
+  html:root[data-viva="atbguia"] body .busca-home>i{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--tinta2);font-size:19px;pointer-events:none}
+  html:root[data-viva="atbguia"] body .busca-home input{width:100%;min-height:48px;padding:11px 16px 11px 46px!important;border-radius:999px!important;font-size:16px}
+  html:root[data-viva="atbguia"] body .atb-hero{flex-direction:column-reverse;align-items:flex-start;padding:22px 20px;border-radius:24px;gap:14px}
+  html:root[data-viva="atbguia"] body .atb-hero h2{font-size:22px;margin-top:10px}
+  html:root[data-viva="atbguia"] body .atb-hero p{font-size:14px}
+  html:root[data-viva="atbguia"] body .hero-ic{display:none}
+  html:root[data-viva="atbguia"] body .atb-hero .acoes{width:100%}
+  html:root[data-viva="atbguia"] body .bt-hero{flex:1;justify-content:center;white-space:nowrap;padding:10px 14px}
+  html:root[data-viva="atbguia"] body .atb-tools{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  html:root[data-viva="atbguia"] body .tool{flex-direction:column;align-items:flex-start;gap:9px;padding:14px;border-radius:20px}
+  html:root[data-viva="atbguia"] body .tool .ic{width:38px;height:38px;font-size:18px}
+  html:root[data-viva="atbguia"] body .tool b{font-size:13.5px}
+  html:root[data-viva="atbguia"] body .cats{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:-14px;margin-right:-14px;padding:2px 14px}
+  html:root[data-viva="atbguia"] body .cats::-webkit-scrollbar{display:none}
+  html:root[data-viva="atbguia"] body .chip{flex:0 0 auto;min-height:40px}
+  html:root[data-viva="atbguia"] body .agrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  html:root[data-viva="atbguia"] body .acard{padding:13px 13px 14px;border-radius:18px}
+  html:root[data-viva="atbguia"] body .acard .ic{width:36px;height:36px;font-size:18px}
+  html:root[data-viva="atbguia"] body .acard .nm{font-size:14px}
+  html:root[data-viva="atbguia"] body .acard .sb{font-size:12px}
+  html:root[data-viva="atbguia"] body .exam-head h1{font-size:21px}
+  html:root[data-viva="atbguia"] body .exam-head .ei{width:46px;height:46px;font-size:22px}
+  html:root[data-viva="atbguia"] body .formcard{padding:16px;border-radius:22px}
+  html:root[data-viva="atbguia"] body .seg{flex:1 1 auto}
+  html:root[data-viva="atbguia"] body .ask{position:sticky;bottom:calc(72px + env(safe-area-inset-bottom))}
+  html:root[data-viva="atbguia"] body footer a{display:inline-block;padding:12px 4px}
+  html:root[data-viva="atbguia"] body .ask textarea{font-size:16px}
+  html:root[data-viva="atbguia"] body .sugg{min-height:44px}
+  html:root[data-viva="atbguia"] body .field :is(select,input,textarea){font-size:16px}
+  html:root[data-viva="atbguia"] body .cov-alvos .chip{min-height:40px}
+  html:root[data-viva="atbguia"] body table.cov thead th{padding:0 4px}
+  html:root[data-viva="atbguia"] body .th-bt{min-height:40px;padding:4px 6px}
+}
+@media(prefers-reduced-motion:reduce){html:root[data-viva="atbguia"] body main#view.anima #homeCorpo>*,html:root[data-viva="atbguia"] body .atb-hero .bola,html:root[data-viva="atbguia"] body .hero-ic,html:root[data-viva="atbguia"] body .esq i,html:root[data-viva="atbguia"] body .empty .ei,html:root[data-viva="atbguia"] body .exam-head .ei,html:root[data-viva="atbguia"] body .msg,html:root[data-viva="atbguia"] body .ai-out,html:root[data-viva="atbguia"] body .mais-box,html:root[data-viva="atbguia"] body .calc-out,html:root[data-viva="atbguia"] body .ai-out.erro{animation:none!important}}
+}
+</style>
+<!-- /viva:atbguia -->
 <link rel="stylesheet" href="_mttokens.css?v=3">
-<link rel="stylesheet" href="_mtastra.css?v=5">
+<link rel="stylesheet" href="_mtviva.css?v=1">
 </head>
 <body>
 <header>
   <div class="wrap top">
-    <div>
-      <div class="logo"><span class="mark"><i class="ti ti-pill"></i></span><span>ATB<b>guia</b></span></div>
-      <div class="subtitle">Antibioticoterapia prática · empírico, escalonamento e resistência · por MedTech</div>
-    </div>
+    <div class="logo" title="Antibioticoterapia prática: empírico, escalonamento e resistência"><span class="mark" aria-hidden="true"><i class="ti ti-pill"></i></span><span>ATB<b>guia</b></span></div>
+    <label class="search-wrap"><span class="ic" aria-hidden="true"><i class="ti ti-search"></i></span><input id="busca" type="search" name="filtro-atb" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" data-1p-ignore data-lpignore="true" aria-label="Buscar no ATBguia" placeholder="Buscar foco, germe ou antibiótico" oninput="onBusca(this.value)"><kbd aria-hidden="true">/</kbd></label>
     <div class="usr" id="usr"></div>
   </div>
-  <div class="wrap"><div class="search-wrap"><span class="ic"><i class="ti ti-search"></i></span><input id="busca" placeholder="Buscar: pneumonia, Pseudomonas, ESBL, meropenem, ITU…" oninput="onBusca(this.value)" autocomplete="off"></div></div>
 </header>
 
-<main id="view"></main>
+<nav class="tabs atb-nav" id="atbNav" aria-label="Seções">
+  <button type="button" data-v="home" onclick="navIr('home')"><i class="ti ti-home-2" aria-hidden="true"></i><span>Início</span></button>
+  <button type="button" data-v="emp" onclick="navIr('emp')"><i class="ti ti-compass" aria-hidden="true"></i><span>Empírico</span></button>
+  <button type="button" data-v="dir" class="so-pc" onclick="navIr('dir')"><i class="ti ti-microscope" aria-hidden="true"></i><span>Dirigida</span></button>
+  <button type="button" data-v="cob" class="so-pc" onclick="navIr('cob')"><i class="ti ti-target-arrow" aria-hidden="true"></i><span>Cobertura</span></button>
+  <button type="button" data-v="dose" onclick="navIr('dose')"><i class="ti ti-calculator" aria-hidden="true"></i><span>Dose</span></button>
+  <button type="button" data-v="ivvo" class="so-pc" onclick="navIr('ivvo')"><i class="ti ti-arrows-exchange" aria-hidden="true"></i><span>IV para VO</span></button>
+  <button type="button" data-v="ai" onclick="navIr('ai')"><i class="ti ti-message-chatbot" aria-hidden="true"></i><span>Assistente</span></button>
+  <button type="button" data-v="mais" class="so-cel" onclick="navMais()" aria-haspopup="true"><i class="ti ti-dots" aria-hidden="true"></i><span>Mais</span></button>
+</nav>
+
+<main id="view"><div class="esq" role="status" aria-label="Carregando"><span class="esq-t"><span class="spin"></span> Carregando o guia</span><i></i><i></i><i></i></div></main>
 
 <footer>© 2026 <a href="index.html">MedTech</a> · <a href="app.html">Portal</a> · <a href="privacidade.html">Privacidade</a>
-  <div class="disc" style="max-width:780px;margin:14px auto 0">ATBguia é uma ferramenta de <b>apoio à decisão</b> para profissionais de saúde. As sugestões são <b>empíricas e gerais</b> — sempre ajuste à <b>função renal</b>, <b>alergias</b>, gestação, ao <b>antibiograma</b> e ao <b>protocolo/perfil de resistência da sua instituição</b>. Não substitui o julgamento clínico. Confira doses antes de prescrever.</div>
+  <div class="disc" style="max-width:780px;margin:14px auto 0">ATBguia é uma ferramenta de <b>apoio à decisão</b> para profissionais de saúde. As sugestões são <b>empíricas e gerais</b>. Sempre ajuste à <b>função renal</b>, <b>alergias</b>, gestação, ao <b>antibiograma</b> e ao <b>protocolo/perfil de resistência da sua instituição</b>. Não substitui o julgamento clínico. Confira doses antes de prescrever.</div>
 </footer>
 
 <script>
@@ -170,8 +458,8 @@ function md(t){
     if(!l){closeUl();continue;}
     if(/^## /.test(l)){closeUl();html+='<h2>'+inl(l.slice(3))+'</h2>';}
     else if(/^### /.test(l)){closeUl();html+='<h3>'+inl(l.slice(4))+'</h3>';}
-    else if(/^> Perla[:：]?/i.test(l)){closeUl();html+='<div class="perla">💡 <b>Pérola:</b> '+inl(l.replace(/^> Perla[:：]?\s*/i,''))+'</div>';}
-    else if(/^> Alarme[:：]?/i.test(l)){closeUl();html+='<div class="alarme">⚠️ <b>Atenção:</b> '+inl(l.replace(/^> Alarme[:：]?\s*/i,''))+'</div>';}
+    else if(/^> Perla[:：]?/i.test(l)){closeUl();html+='<div class="perla"><i class="ti ti-bulb" aria-hidden="true"></i><span><b>Pérola:</b> '+inl(l.replace(/^> Perla[:：]?\s*/i,''))+'</span></div>';}
+    else if(/^> Alarme[:：]?/i.test(l)){closeUl();html+='<div class="alarme"><i class="ti ti-alert-triangle" aria-hidden="true"></i><span><b>Atenção:</b> '+inl(l.replace(/^> Alarme[:：]?\s*/i,''))+'</span></div>';}
     else if(/^[-*] /.test(l)){if(!inUl){html+='<ul>';inUl=true;}html+='<li>'+inl(l.slice(2))+'</li>';}
     else {closeUl();html+='<p>'+inl(l)+'</p>';}
   }
@@ -790,66 +1078,133 @@ const IVVO=[
 ];
 
 /* ===================== ESTADO / NAV ===================== */
-let busca='', curView='home';
+let busca='', curView='home', catFiltro='tudo', ultimaTela='';
 function whenMT(cb){if(window.MT){cb();}else{setTimeout(()=>whenMT(cb),30);}}
 whenMT(()=>{renderUser();if(window.MT&&MT.onData)MT.onData(()=>renderUser());routeHome();});
 function renderUser(){const el=document.getElementById('usr');if(!el)return;
-  if(MT.mode==='demo'){el.innerHTML='<span class="who">Modo demo</span><a href="index.html">← MedTech</a>';return;}
+  if(MT.mode==='demo'){el.innerHTML='<span class="who">Modo demo</span><a href="index.html"><i class="ti ti-arrow-left" aria-hidden="true"></i> MedTech</a>';return;}
   const u=MT.user;const nm=u?(u.displayName||u.email||'Conta'):'';
   el.innerHTML=`<span class="who">${esc(nm)}</span><button onclick="MT.signOut()">Sair</button>`;}
-function onBusca(v){busca=v;if(curView==='home')renderHome();}
+/* O Chrome trata campo de texto solto como login e injeta o e-mail da conta: valor com "@" nunca é busca. */
+function buscaSuja(q){return String(q||'').indexOf('@')>=0;}
+function camposBusca(){return ['busca','buscaHome'].map(i=>document.getElementById(i)).filter(Boolean);}
+function onBusca(v){
+  if(buscaSuja(v))v='';
+  busca=v;camposBusca().forEach(i=>{if(i.value!==v)i.value=v;});
+  if(curView!=='home'){curView='home';renderHome();scroll0();}else renderHomeCorpo();
+}
+function limparBusca(foca){busca='';camposBusca().forEach(i=>i.value='');if(curView==='home')renderHomeCorpo();
+  if(foca!==false){const i=camposBusca().find(x=>x.offsetParent);if(i)i.focus();}}
+function perguntarBusca(){const q=busca.trim();limparBusca(false);abrirAssistente();const t=document.getElementById('ask');if(t){t.value=q;growAsk(t);t.focus();}}
 function scroll0(){window.scrollTo(0,0);}
 function routeHome(){curView='home';renderHome();scroll0();}
 function itemById(id){return FOCOS.find(x=>x.id===id)||GUIA.find(x=>x.id===id);}
 function abrirItem(id){const e=itemById(id);if(!e)return;curView='item';renderItem(e);scroll0();}
 
+/* ===================== NAVEGAÇÃO (camada viva, 23/09/2026) ===================== */
+const NAV_DE={home:'home',item:'home',drug:'home',emp:'emp',dir:'dir',cob:'cob',dose:'dose',ivvo:'ivvo',ai:'ai'};
+function navIr(v){fecharMais();({home:routeHome,emp:abrirEmpirico,dir:abrir_dirigida,cob:abrir_cobertura,dose:abrir_dose,ivvo:abrir_ivvo,ai:abrirAssistente}[v]||routeHome)();}
+function marcaNav(){const at=NAV_DE[curView]||'home';
+  document.querySelectorAll('#atbNav button').forEach(b=>{const on=b.dataset.v===at||(b.dataset.v==='mais'&&['dir','cob','ivvo'].includes(at));
+    b.classList.toggle('on',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});}
+const MAIS_IT=[['dir','ti-microscope','Terapia dirigida','Germe do antibiograma e opções de menor espectro','--c-verde'],
+  ['cob','ti-target-arrow','Cobertura e espectro','Quem cobre MRSA, Pseudomonas, ESBL e anaeróbios','--c-violeta'],
+  ['ivvo','ti-arrows-exchange','Troca de IV para VO','Critérios e antibióticos com boa absorção oral','--c-azul']];
+function navMais(){if(document.getElementById('maisSheet')){fecharMais();return;}
+  const d=document.createElement('div');d.id='maisSheet';d.className='mais-bg';d.onclick=e=>{if(e.target===d)fecharMais();};
+  d.innerHTML='<div class="mais-box" role="dialog" aria-modal="true" aria-label="Mais ferramentas"><div class="mais-h"><b>Mais ferramentas</b><button type="button" class="mais-x" onclick="fecharMais()" aria-label="Fechar"><i class="ti ti-x" aria-hidden="true"></i></button></div>'
+    +MAIS_IT.map(x=>`<button type="button" class="mais-it" style="--k:var(${x[4]})" onclick="navIr('${x[0]}')"><span class="ic"><i class="ti ${x[1]}" aria-hidden="true"></i></span><span class="tx"><b>${x[2]}</b><small>${x[3]}</small></span><i class="ti ti-chevron-right" aria-hidden="true"></i></button>`).join('')+'</div>';
+  document.body.appendChild(d);const b=d.querySelector('.mais-it');if(b)b.focus();}
+function fecharMais(){const m=document.getElementById('maisSheet');if(m)m.remove();}
+const MOV_REDUZIDO=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+function contaNumeros(root){if(MOV_REDUZIDO)return;root.querySelectorAll('[data-conta]').forEach(el=>{const n=+el.getAttribute('data-conta')||0;if(n<3)return;const t0=performance.now();
+  const f=t=>{const k=Math.min(1,(t-t0)/700);el.textContent=Math.round(n*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(f);};requestAnimationFrame(f);});}
+/* cada troca de tela: marca a aba e faz a entrada escalonada (só quando a tela muda, não a cada tecla) */
+new MutationObserver(()=>{marcaNav();if(ultimaTela===curView)return;ultimaTela=curView;const v=document.getElementById('view');contaNumeros(v);
+  if(MOV_REDUZIDO)return;v.classList.remove('anima');void v.offsetWidth;v.classList.add('anima');clearTimeout(v._an);v._an=setTimeout(()=>v.classList.remove('anima'),900);
+}).observe(document.getElementById('view'),{childList:true});
+document.addEventListener('keydown',e=>{
+  const tg=e.target;const dig=tg&&(/^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName)||tg.isContentEditable);
+  if(e.key==='Escape'){
+    if(document.getElementById('maisSheet')){fecharMais();return;}
+    if(dig&&(tg.id==='busca'||tg.id==='buscaHome')){if(busca)limparBusca();else tg.blur();return;}
+    if(!dig&&curView!=='home')routeHome();
+    return;}
+  if(e.key==='/'&&!dig&&!e.metaKey&&!e.ctrlKey){const i=camposBusca().find(x=>x.offsetParent);if(i){e.preventDefault();i.focus();i.select();}}
+});
+
 /* ===================== HOME ===================== */
+/* os ícones do banco (bolinhas de cor, DNA, microscópio) viram círculo colorido com a sigla do germe */
+const EMO_COR={'🟣':'--c-violeta','🔵':'--c-azul','🟢':'--c-verde','🟠':'--c-laranja','🟡':'--c-ambar','🟤':'--c-terracota','⚫':'--c-cinza'};
+const SIGLA={saureus:'Sa',strepto:'Sp',enterococo:'En',ecoli:'Ec',pseudomonas:'Pa',acineto:'Ab',anaerobios:'An'};
+function icoItem(e){const ic=String(e.icon||'');
+  if(ic.startsWith('<i'))return {cor:'--c-laranja',html:ic};
+  if(ic==='🧬')return {cor:'--c-rosa',html:'<i class="ti ti-dna-2"></i>'};
+  if(ic==='🔬')return {cor:'--c-ciano',html:'<i class="ti ti-microscope"></i>'};
+  return {cor:EMO_COR[ic]||'--c-violeta',html:'<span class="sg">'+esc(SIGLA[e.id]||String(e.nome||'').slice(0,2))+'</span>'};}
+const GRUPO_COR={'Antibacterianos':'--c-ciano','Antifúngicos':'--c-violeta','Antituberculose':'--c-terracota'};
+function acard(onc,ic,cor,nome,sub){return `<button type="button" class="acard" style="--k:var(${cor})" onclick="${onc}"><span class="ic" aria-hidden="true">${ic}</span><span class="nm">${esc(nome)}</span>${sub?`<span class="sb">${esc(sub)}</span>`:''}</button>`;}
+function secao(tit,n,corpo){return `<section class="asec"><h2 class="sec-title">${tit}<span class="n">${n}</span></h2><div class="agrid">${corpo}</div></section>`;}
+function setCat(c){catFiltro=c;renderHomeCorpo();}
 function renderHome(){
-  const q=busca.trim().toLowerCase();
+  document.getElementById('view').innerHTML=`<label class="busca-home"><i class="ti ti-search" aria-hidden="true"></i><input id="buscaHome" type="search" name="filtro-atb-2" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" data-1p-ignore data-lpignore="true" aria-label="Buscar no ATBguia" placeholder="Buscar foco, germe ou antibiótico" value="${esc(busca)}" oninput="onBusca(this.value)"></label><div id="homeCorpo"></div>`;
+  renderHomeCorpo();
+}
+function renderHomeCorpo(){
+  const box=document.getElementById('homeCorpo');if(!box)return;
+  const q=buscaSuja(busca)?'':busca.trim().toLowerCase();
   const match=e=>!q||((e.nome+' '+(e.tags||'')+' '+(e.cat||'')).toLowerCase().includes(q));
-  let html=`<div class="note"><i class="ti ti-info-circle"></i> <b>Como usar:</b> abra <b>Empírico & escalonamento</b> para uma sugestão pelo foco/contexto, consulte os bancos de <b>bactérias, resistência e o bulário</b> (antibacterianos, <b>antifúngicos</b> e <b>tuberculose</b>, com calculadora de dose), ou pergunte ao <b>Assistente</b>. ${MT.mode==='demo'?'<b>Entre na conta MedTech para usar a IA.</b>':''}</div>`;
-  // destaques
-  html+=`<div class="grid">
-    <div class="card ai" onclick="abrirEmpirico()"><div class="ci"><i class="ti ti-compass"></i></div><div class="cn">Empírico & escalonamento</div><div class="ct">Foco + contexto + ATB já usado → como iniciar ou escalonar</div></div>
-    <div class="card ai" onclick="abrirAssistente()"><div class="ci"><i class="ti ti-sparkles"></i></div><div class="cn">Assistente de antibióticos</div><div class="ct">Fisiopatologia, microbiologia, resistência, esquemas e doses — pergunte tudo</div></div>
-  </div>`;
-  // ferramentas
   const tools=[
-    ['cobertura','<i class="ti ti-target-arrow"></i>','Cobertura / espectro','Quem cobre MRSA, Pseudomonas, ESBL, anaeróbio…'],
-    ['dirigida','<i class="ti ti-microscope"></i>','Terapia dirigida','Germe do antibiograma → opções (menor espectro)'],
-    ['dose','<i class="ti ti-calculator"></i>','Calculadora de dose','ATB + peso + clearance → dose ajustada + prescrição'],
-    ['ivvo','<i class="ti ti-arrows-exchange"></i>','Switch IV → VO','ATB com boa absorção oral + critérios']
-  ].filter(t=>!q||(t[2]+' '+t[3]).toLowerCase().includes(q));
-  if(tools.length){html+=`<div class="sec-title">Ferramentas</div><div class="grid">`+tools.map(t=>`<div class="card tool" onclick="abrir_${t[0]}()"><div class="ci">${t[1]}</div><div class="cn">${t[2]}</div><div class="ct">${t[3]}</div></div>`).join('')+`</div>`;}
-  // foco
-  const focos=FOCOS.filter(match);
-  if(focos.length){html+=`<div class="sec-title">Por foco de infecção</div><div class="grid">`+focos.map(e=>`<div class="card foco" onclick="abrirItem('${e.id}')"><div class="ci">${e.icon}</div><div class="cn">${esc(e.nome)}</div><div class="ct">${esc(e.tags)}</div></div>`).join('')+`</div>`;}
-  // guia por categoria
-  ORDEM_CAT.forEach(cat=>{
-    const list=GUIA.filter(e=>e.cat===cat&&match(e));if(!list.length)return;
-    html+=`<div class="sec-title">${esc(cat)}</div><div class="grid">`+list.map(e=>`<div class="card" onclick="abrirItem('${e.id}')"><div class="ci">${e.icon}</div><div class="cn">${esc(e.nome)}</div><div class="ct">${esc(e.tags)}</div></div>`).join('')+`</div>`;
-  });
-  // bulário — agrupado: antibacterianos / antifúngicos / antituberculose
+    ['dirigida','ti-microscope','--c-verde','Terapia dirigida',DIRIGIDA.length,'germes do antibiograma'],
+    ['cobertura','ti-target-arrow','--c-violeta','Cobertura e espectro',COV.length,'antibióticos por alvo'],
+    ['dose','ti-calculator','--c-laranja','Calculadora de dose',DRUGS.length,'antimicrobianos'],
+    ['ivvo','ti-arrows-exchange','--c-azul','Troca de IV para VO',IVVO.length,'opções orais']
+  ];
+  const focos=FOCOS.filter(match), bact=GUIA.filter(e=>e.cat==='Bactérias'&&match(e)), resist=GUIA.filter(e=>e.cat==='Mecanismos de resistência'&&match(e));
   const drugs=DRUGS.filter(d=>!q||((d.nome+' '+d.classe).toLowerCase().includes(q)));
-  [['Antibacterianos','Antibacterianos · bulário + calculadora'],['Antifúngicos','Antifúngicos · bulário + calculadora'],['Antituberculose','Antituberculose (esquema RIPE) · bulário']].forEach(g=>{
-    const list=drugs.filter(d=>(d.grupo||'Antibacterianos')===g[0]);if(!list.length)return;
-    html+=`<div class="sec-title">${g[1]}</div><div class="grid">`+list.map(d=>`<div class="card" onclick="abrirDrug('${d.id}')"><div class="ci"><i class="ti ti-pill"></i></div><div class="cn">${esc(d.nome)}</div><div class="ct">${esc(d.classe)}</div></div>`).join('')+`</div>`;
-  });
-  if(q && !focos.length && !tools.length && !GUIA.some(match) && !drugs.length){html+='<div class="empty">Nada encontrado para "'+esc(busca)+'". Tente o Assistente acima.</div>';}
-  document.getElementById('view').innerHTML=html;
+  const toolsQ=tools.filter(t=>q&&(t[3]+' '+t[5]).toLowerCase().includes(q));
+  let html='';
+  if(!q){
+    html+=`<section class="atb-hero"><span class="bola b1"></span><span class="bola b2"></span>
+      <div class="txt"><small><i class="ti ti-compass" aria-hidden="true"></i> Empírico e escalonamento</small>
+      <h2>Do foco ao esquema, com a dose ajustada</h2>
+      <p>Escolha o foco, o contexto e a gravidade. O guia mostra o esquema curado e a IA adapta ao caso.</p>
+      <div class="acoes"><button type="button" class="bt-hero" onclick="abrirEmpirico()"><i class="ti ti-arrow-right" aria-hidden="true"></i> Montar esquema</button><button type="button" class="bt-hero sec" onclick="abrirAssistente()"><i class="ti ti-message-chatbot" aria-hidden="true"></i> Perguntar ao assistente</button></div></div>
+      <span class="hero-ic" aria-hidden="true"><i class="ti ti-pill"></i></span></section>
+      <div class="atb-tools">${tools.map(t=>`<button type="button" class="tool" style="--k:var(${t[2]})" onclick="abrir_${t[0]}()"><span class="ic" aria-hidden="true"><i class="ti ${t[1]}"></i></span><span class="tx"><b>${t[3]}</b><small><span data-conta="${t[4]}">${t[4]}</span> ${t[5]}</small></span></button>`).join('')}</div>`;
+    if(MT.mode==='demo')html+=`<div class="note"><i class="ti ti-info-circle" aria-hidden="true"></i><span>O guia, o bulário e as calculadoras funcionam sem conta. <b>Entre na conta MedTech para usar a IA.</b></span></div>`;
+  }
+  const cats=[['tudo','Tudo',focos.length+bact.length+resist.length+drugs.length],['focos','Focos',focos.length],['bact','Bactérias',bact.length],['resist','Resistência',resist.length],['bulario','Bulário',drugs.length]];
+  const total=cats[0][2]+toolsQ.length;
+  if(total){
+    html+=`<div class="cats" role="group" aria-label="Filtrar por tipo">${cats.map(c=>`<button type="button" class="chip${catFiltro===c[0]?' on':''}" aria-pressed="${catFiltro===c[0]}" onclick="setCat('${c[0]}')" ${c[2]||c[0]==='tudo'?'':'disabled'}>${c[1]}<span class="n">${c[2]}</span></button>`).join('')}</div>`;
+    const ver=k=>catFiltro==='tudo'||catFiltro===k;
+    if(toolsQ.length&&catFiltro==='tudo')html+=secao('Ferramentas',toolsQ.length,toolsQ.map(t=>acard(`abrir_${t[0]}()`,`<i class="ti ${t[1]}"></i>`,t[2],t[3],t[4]+' '+t[5])).join(''));
+    if(ver('focos')&&focos.length)html+=secao('Por foco de infecção',focos.length,focos.map(e=>{const c=icoItem(e);return acard(`abrirItem('${e.id}')`,c.html,c.cor,e.nome,e.tags);}).join(''));
+    if(ver('bact')&&bact.length)html+=secao('Bactérias',bact.length,bact.map(e=>{const c=icoItem(e);return acard(`abrirItem('${e.id}')`,c.html,c.cor,e.nome,e.tags);}).join(''));
+    if(ver('resist')&&resist.length)html+=secao('Mecanismos de resistência',resist.length,resist.map(e=>{const c=icoItem(e);return acard(`abrirItem('${e.id}')`,c.html,c.cor,e.nome,e.tags);}).join(''));
+    if(ver('bulario'))[['Antibacterianos','Antibacterianos'],['Antifúngicos','Antifúngicos'],['Antituberculose','Antituberculose (esquema RIPE)']].forEach(g=>{
+      const list=drugs.filter(d=>(d.grupo||'Antibacterianos')===g[0]);if(!list.length)return;
+      html+=secao(g[1],list.length,list.map(d=>acard(`abrirDrug('${d.id}')`,'<i class="ti ti-pill"></i>',GRUPO_COR[g[0]],d.nome,d.classe)).join(''));
+    });
+    if(catFiltro!=='tudo'&&!cats.find(c=>c[0]===catFiltro)[2])html+=`<div class="empty"><span class="ei"><i class="ti ti-filter" aria-hidden="true"></i></span><h3>Nada neste filtro</h3><button class="btn btn-g" onclick="setCat('tudo')">Mostrar tudo</button></div>`;
+  } else {
+    html+=`<div class="empty"><span class="ei"><i class="ti ti-search" aria-hidden="true"></i></span><h3>Nada encontrado para "${esc(busca.trim())}"</h3><p>Busque pelo foco, pelo germe ou pelo nome do antibiótico. Ou leve a dúvida ao assistente.</p><div class="acoes-v"><button class="btn btn-p" onclick="perguntarBusca()"><i class="ti ti-message-chatbot" aria-hidden="true"></i> Perguntar ao assistente</button><button class="btn btn-g" onclick="limparBusca()"><i class="ti ti-x" aria-hidden="true"></i> Limpar busca</button></div></div>`;
+  }
+  box.innerHTML=html;
 }
 
 /* ===================== ITEM (md) ===================== */
 function renderItem(e){
   document.getElementById('view').innerHTML=`
-   <button class="back" onclick="routeHome()">← Voltar</button>
-   <div class="exam-head"><div class="ei">${e.icon}</div><div><h1>${esc(e.nome)}</h1><div class="tags">${esc(e.cat||'Foco de infecção')} · ${esc(e.tags||'')}</div></div></div>
+   <button class="back" onclick="routeHome()"><i class="ti ti-arrow-left" aria-hidden="true"></i> Voltar</button>
+   <div class="exam-head"><div class="ei" style="--k:var(${icoItem(e).cor})">${icoItem(e).html}</div><div><h1>${esc(e.nome)}</h1><div class="tags">${esc(e.cat||'Foco de infecção')} · ${esc(e.tags||'')}</div></div></div>
    <div class="content">${md(e.md)}</div>
    <div class="panel" style="margin-top:18px"><h4>Aprofundar com IA</h4>
      <button class="btn btn-ai" id="aprBtn" onclick="aprofundar('${e.id}')"><i class="ti ti-sparkles"></i> Casos, doses e detalhes com a IA</button>
      <div id="aprOut"></div>
    </div>
-   <div class="disc">Doses para adulto com função renal normal — confira ajuste renal, alergias, gestação e o antibiograma/protocolo local.</div>`;
+   <div class="disc">Doses para adulto com função renal normal. Confira ajuste renal, alergias, gestação e o antibiograma/protocolo local.</div>`;
 }
 
 /* ===================== BULÁRIO (drug) ===================== */
@@ -867,15 +1222,15 @@ function renderDrug(d){
   const faixaLbl=b=>(b.max>=999?'≥ '+b.min:(b.min<=0?'< '+(b.max+1):b.min+'–'+b.max))+' mL/min';
   const rows=(d.renal||[]).map(b=>`<tr><td class="atb">ClCr ${faixaLbl(b)}</td><td style="text-align:left">${inlMd(b.txt)}</td></tr>`).join('');
   document.getElementById('view').innerHTML=`
-   <button class="back" onclick="routeHome()">← Voltar</button>
-   <div class="exam-head"><div class="ei"><i class="ti ti-pill"></i></div><div><h1>${esc(d.nome)}</h1><div class="tags">${esc(d.classe)}</div></div></div>
+   <button class="back" onclick="routeHome()"><i class="ti ti-arrow-left" aria-hidden="true"></i> Voltar</button>
+   <div class="exam-head"><div class="ei" style="--k:var(${GRUPO_COR[d.grupo||'Antibacterianos']||'--ac'})"><i class="ti ti-pill"></i></div><div><h1>${esc(d.nome)}</h1><div class="tags">${esc(d.classe)}</div></div></div>
    <div class="content"><h2>Dose habitual (adulto, função renal normal)</h2>${md(d.doseNormal)}
-   ${d.kg?`<div class="perla">⚖️ <b>Dose por peso:</b> ${d.kg.lo}${d.kg.hi!==d.kg.lo?'–'+d.kg.hi:''} mg/kg ${inlMd(d.kg.intervalo)}${d.kg.nota?'. '+inlMd(d.kg.nota):''}</div>`:''}
-   ${PED[d.id]?`<h2>Dose pediátrica</h2>${md(PED[d.id])}<div style="font-size:11.5px;color:var(--muted)">Dose pediátrica geral — confirme por peso/idade e protocolo; neonatos têm regras próprias.</div>`:''}
+   ${d.kg?`<div class="perla"><i class="ti ti-scale" aria-hidden="true"></i><span><b>Dose por peso:</b> ${d.kg.lo}${d.kg.hi!==d.kg.lo?'–'+d.kg.hi:''} mg/kg ${inlMd(d.kg.intervalo)}${d.kg.nota?'. '+inlMd(d.kg.nota):''}</span></div>`:''}
+   ${PED[d.id]?`<h2>Dose pediátrica</h2>${md(PED[d.id])}<div class="nota-p">Dose pediátrica geral. Confirme por peso/idade e protocolo; neonatos têm regras próprias.</div>`:''}
    ${RX[d.id]?`<h2>Prescrição sugerida</h2>${md(RX[d.id])}`:''}</div>
    <div class="formcard">
-     <h4 style="font-size:13px;font-weight:800;color:var(--petrol-dark);margin-bottom:10px">🧮 Calculadora de dose — peso + clearance</h4>
-     <div class="field"><label>Peso (kg)${d.kg?'':' — não usado neste antibiótico'}</label><input type="number" id="dPeso" inputmode="decimal" placeholder="ex.: 70" ${d.kg?'':'disabled style="opacity:.5"'}></div>
+     <h4 class="fc-h"><i class="ti ti-calculator" aria-hidden="true"></i> Calculadora de dose por peso e clearance</h4>
+     <div class="field"><label>Peso (kg)${d.kg?'':' <span class="lbl-dim">(não usado neste antibiótico)</span>'}</label><input type="number" id="dPeso" inputmode="decimal" placeholder="ex.: 70" ${d.kg?'':'disabled style="opacity:.5"'}></div>
      <div class="field"><label>Clearance / TFG (mL/min)</label><input type="number" id="dClcr" inputmode="numeric" placeholder="ex.: 45"></div>
      <button class="btn btn-p" onclick="calcDose('${d.id}')">Calcular dose ajustada</button>
      <div id="dOut"></div>
@@ -888,28 +1243,28 @@ function renderDrug(d){
      <h2>Interações importantes</h2>${md(d.interacoes)}
    </div>
    <div class="panel" style="margin-top:14px"><h4>Aprofundar com IA</h4>
-     <button class="btn btn-ai" id="aprBtn" onclick="aprofundarDrug('${d.id}')"><i class="ti ti-sparkles"></i> Mais detalhes / dúvidas com a IA</button>
+     <button class="btn btn-ai" id="aprBtn" onclick="aprofundarDrug('${d.id}')"><i class="ti ti-sparkles"></i> Tirar dúvidas com a IA</button>
      <div id="aprOut"></div>
    </div>
-   <div class="disc">Doses para adulto — confirme na bula/protocolo local; atenção a obesidade, gestação, diálise e infecções de SNC. A calculadora é estimativa de apoio.</div>`;
+   <div class="disc">Doses para adulto. Confirme na bula/protocolo local; atenção a obesidade, gestação, diálise e infecções de SNC. A calculadora é estimativa de apoio.</div>`;
 }
 function calcDose(id){
   const d=DRUGS.find(x=>x.id===id);if(!d)return;
   const peso=+document.getElementById('dPeso').value||0, clcr=+document.getElementById('dClcr').value||0;
   const out=document.getElementById('dOut');
-  if(clcr<=0){out.innerHTML='<div class="calc-out" style="background:rgba(198,69,61,.12);border-color:rgba(198,69,61,.3);color:#C6453D">Informe o clearance (mL/min).</div>';return;}
-  if(d.kg&&peso<=0){out.innerHTML='<div class="calc-out" style="background:rgba(163,115,10,.12);border-color:rgba(163,115,10,.3);color:#A3730A">Este antibiótico é dosado por peso — informe o peso (kg).</div>';return;}
-  out.innerHTML='<div class="calc-out">'+doseAjustada(d,peso,clcr)+(RX[d.id]?'<br><b>Prescrição:</b> '+inlMd(RX[d.id]):'')+'<div style="font-size:11px;margin-top:7px;color:#5E646B">Estimativa — confirme na bula/protocolo. Ajustes em SNC, diálise e obesidade podem diferir.</div></div>';
+  if(clcr<=0){out.innerHTML='<div class="calc-out erro"><i class="ti ti-alert-circle" aria-hidden="true"></i> Informe o clearance (mL/min).</div>';return;}
+  if(d.kg&&peso<=0){out.innerHTML='<div class="calc-out aviso"><i class="ti ti-scale" aria-hidden="true"></i> Este antibiótico é dosado por peso. Informe o peso (kg).</div>';return;}
+  out.innerHTML='<div class="calc-out">'+doseAjustada(d,peso,clcr)+(RX[d.id]?'<br><b>Prescrição:</b> '+inlMd(RX[d.id]):'')+'<div class="nota-p">Estimativa. Confirme na bula/protocolo. Ajustes em SNC, diálise e obesidade podem diferir.</div></div>';
 }
 async function aprofundarDrug(id){
   const d=DRUGS.find(x=>x.id===id);if(!d)return;
   const b=document.getElementById('aprBtn'),out=document.getElementById('aprOut');
-  b.disabled=true;b.innerHTML='<span class="spin"></span> Gerando…';
+  b.disabled=true;b.innerHTML='<span class="spin"></span> Gerando';
   try{
     const prompt=SYS_ATB+`\n\nO médico está vendo o antibiótico "${d.nome}" (${d.classe}). Traga: principais indicações/espectro na prática, ajustes especiais (obesidade, diálise, gestação, SNC), erros comuns e 1–2 interações/cuidados que costumam passar batido. Doses de adulto. Conciso, markdown.`;
     const txt=await callIA(prompt);out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
-  }catch(err){out.innerHTML='<div class="ai-out" style="background:rgba(198,69,61,.12);border-color:rgba(198,69,61,.3);color:#C6453D">⚠️ '+esc(err.message||'Falha na IA')+'</div>';}
-  b.disabled=false;b.innerHTML='<i class="ti ti-sparkles"></i> Mais detalhes / dúvidas com a IA';
+  }catch(err){out.innerHTML='<div class="ai-out erro"><i class="ti ti-alert-triangle" aria-hidden="true"></i> '+esc(err.message||'Falha na IA')+'</div>';}
+  b.disabled=false;b.innerHTML='<i class="ti ti-sparkles"></i> Tirar dúvidas com a IA';
 }
 
 /* ===================== EMPÍRICO ===================== */
@@ -921,12 +1276,12 @@ function renderEmpirico(){
   const foco=FOCOS.find(f=>f.id===empForm.foco)||FOCOS[0];
   const seg=(grp,val,label)=>`<button class="seg ${empForm[grp]===val?'on':''}" onclick="setEmp('${grp}','${val}')">${label}</button>`;
   document.getElementById('view').innerHTML=`
-   <button class="back" onclick="routeHome()">← Voltar</button>
-   <div class="exam-head"><div class="ei"><i class="ti ti-compass"></i></div><div><h1>Empírico & escalonamento</h1><div class="tags">Monte o contexto → guia curado + sugestão da IA</div></div></div>
+   <button class="back" onclick="routeHome()"><i class="ti ti-arrow-left" aria-hidden="true"></i> Voltar</button>
+   <div class="exam-head"><div class="ei"><i class="ti ti-compass"></i></div><div><h1>Empírico e escalonamento</h1><div class="tags">Monte o contexto: guia curado do foco e sugestão da IA</div></div></div>
    <div class="formcard">
      <div class="field"><label>Foco / sítio de infecção</label>
        <select id="empFoco" onchange="setEmp('foco',this.value)">${FOCOS.map(f=>`<option value="${f.id}" ${f.id===empForm.foco?'selected':''}>${esc(f.nome)}</option>`).join('')}</select></div>
-     <div class="field"><label>Contexto</label><div class="segs">${seg('ctx','comunitario','🏠 Comunitário')}${seg('ctx','hospitalar','🏥 Hospitalar/nosocomial')}</div></div>
+     <div class="field"><label>Contexto</label><div class="segs">${seg('ctx','comunitario','<i class="ti ti-home" aria-hidden="true"></i> Comunitário')}${seg('ctx','hospitalar','<i class="ti ti-building-hospital" aria-hidden="true"></i> Hospitalar/nosocomial')}</div></div>
      <div class="field"><label>Gravidade / local</label><div class="segs">${seg('grav','ambulatorial','Ambulatorial')}${seg('grav','enfermaria','Internado')}${seg('grav','uti','UTI / grave')}</div></div>
      <div class="field"><label>Alergia a penicilina</label><div class="segs">${seg('alergia','nao','Não')}${seg('alergia','leve','Leve (rash)')}${seg('alergia','grave','Grave/anafilaxia')}</div></div>
      <div class="field"><label>Peso e clearance (para já ajustar as doses)</label><div style="display:flex;gap:8px"><input type="number" id="empPeso" value="${esc(empForm.peso)}" oninput="empForm.peso=this.value" inputmode="decimal" placeholder="Peso (kg)" style="flex:1"><input type="number" id="empClcr" value="${esc(empForm.clcr)}" oninput="empForm.clcr=this.value" inputmode="numeric" placeholder="ClCr (mL/min)" style="flex:1"></div></div>
@@ -946,9 +1301,9 @@ function renderEmpirico(){
      <button class="btn btn-ai" id="empBtn" onclick="sugerirEmpirico()"><i class="ti ti-sparkles"></i> Sugerir conduta</button>
      <div id="empOut"></div>
    </div>
-   <div class="sec-title">Guia curado — ${esc(foco.nome)}</div>
+   <h2 class="sec-title">Guia curado: ${esc(foco.nome)}</h2>
    <div class="content" id="empCurado">${md(foco.md)}</div>
-   <div class="disc">Sugestão empírica e geral — ajuste à função renal, alergias, gestação, ao antibiograma e ao perfil de resistência local. Em sepse/choque, não atrase o ATB e colha culturas antes.</div>`;
+   <div class="disc">Sugestão empírica e geral. Ajuste à função renal, alergias, gestação, ao antibiograma e ao perfil de resistência local. Em sepse/choque, não atrase o ATB e colha culturas antes.</div>`;
 }
 function setEmp(k,v){empForm[k]=v;renderEmpirico();}
 async function sugerirEmpirico(){
@@ -969,7 +1324,7 @@ async function sugerirEmpirico(){
   const gravL={ambulatorial:'ambulatorial',enfermaria:'internado em enfermaria',uti:'UTI / grave'}[empForm.grav];
   const algL={nao:'sem alergia a penicilina',leve:'alergia leve à penicilina (rash)',grave:'alergia GRAVE/anafilaxia à penicilina'}[empForm.alergia];
   const b=document.getElementById('empBtn'),out=document.getElementById('empOut');
-  b.disabled=true;b.innerHTML='<span class="spin"></span> Gerando sugestão…';
+  b.disabled=true;b.innerHTML='<span class="spin"></span> Gerando sugestão';
   try{
     const peso=(empForm.peso||'').trim(), clcr=(empForm.clcr||'').trim();
     const prompt=SYS_ATB+`\n\n## CASO\n`+
@@ -982,21 +1337,30 @@ async function sugerirEmpirico(){
       `${(peso||clcr)?'AJUSTE as doses ao peso/ClCr informados.':'Sem peso/ClCr informados: dê a dose habitual e oriente ajustar.'} Inclua a prescrição (diluição/infusão) em cada antibiótico. Priorize o menor espectro eficaz.`;
     const txt=await callIA(prompt);
     out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
-  }catch(err){out.innerHTML='<div class="ai-out" style="background:rgba(198,69,61,.12);border-color:rgba(198,69,61,.3);color:#C6453D">⚠️ '+esc(err.message||'Falha na IA')+'</div>';}
+  }catch(err){out.innerHTML='<div class="ai-out erro"><i class="ti ti-alert-triangle" aria-hidden="true"></i> '+esc(err.message||'Falha na IA')+'</div>';}
   b.disabled=false;b.innerHTML='<i class="ti ti-sparkles"></i> Sugerir conduta';
 }
 
 /* ===================== COBERTURA ===================== */
 function abrir_cobertura(){curView='cob';renderCobertura();scroll0();}
-function cellCov(v){return v===2?'<span class="cy">✓</span>':v===1?'<span class="cp">±</span>':'<span class="cn">—</span>';}
+function cellCov(v){return v===2?'<span class="cy" title="Cobre"><i class="ti ti-check" aria-hidden="true"></i><span class="sr">cobre</span></span>':v===1?'<span class="cp" title="Parcial ou variável">±</span>':'<span class="cn" title="Não cobre"><i class="ti ti-minus" aria-hidden="true"></i><span class="sr">não cobre</span></span>';}
+let covAlvo=-1;
+function setCovAlvo(i){covAlvo=(covAlvo===i)?-1:i;renderCobertura();
+  /* a coluna e o filtro escolhidos ficam à vista (no celular a tabela e as fichas rolam de lado) */
+  const th=document.querySelector('table.cov th.sel'),ch=document.querySelector('.cov-alvos .chip.on');
+  if(th){const w=th.closest('.tbl-wrap'),fixa=(w.querySelector('th.atb')||{}).offsetWidth||0;w.scrollLeft=Math.max(0,th.offsetLeft-fixa-(w.clientWidth-fixa-th.offsetWidth)/2);}
+  if(ch){const w=ch.parentElement;w.scrollLeft=Math.max(0,ch.offsetLeft-w.clientWidth/2+ch.offsetWidth/2);}}
 function renderCobertura(){
-  let rows=COV.map(r=>`<tr><td class="atb">${esc(r[0])}</td>`+COV_ALVOS.map((_,i)=>`<td>${cellCov(r[i+1])}</td>`).join('')+`</tr>`).join('');
+  const ord=COV.map((r,k)=>({r,k}));
+  if(covAlvo>=0)ord.sort((a,b)=>(b.r[covAlvo+1]-a.r[covAlvo+1])||(a.k-b.k));
+  let rows=ord.map(({r})=>`<tr><td class="atb">${esc(r[0])}</td>`+COV_ALVOS.map((_,i)=>`<td class="${i===covAlvo?'sel':''}">${cellCov(r[i+1])}</td>`).join('')+`</tr>`).join('');
   document.getElementById('view').innerHTML=`
-   <button class="back" onclick="routeHome()">← Voltar</button>
-   <div class="exam-head"><div class="ei"><i class="ti ti-target-arrow"></i></div><div><h1>Cobertura / espectro</h1><div class="tags">Quem cobre o quê — visão rápida de espectro</div></div></div>
-   <div class="tbl-wrap"><table class="cov"><thead><tr><th class="atb" style="text-align:left">Antibiótico</th>${COV_ALVOS.map(a=>`<th>${esc(a)}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>
-   <div class="legend"><span class="cy">✓</span> cobre &nbsp; <span class="cp">±</span> parcial/variável (depende de antibiograma, dose ou cepa) &nbsp; <span class="cn">—</span> não cobre / não confiável</div>
-   <div class="disc">Mapa simplificado de espectro — <b>não substitui o antibiograma</b>; "ESBL" e "Pseudomonas" dependem do perfil local. Para detalhes, abra cada antibiótico no banco.</div>`;
+   <button class="back" onclick="routeHome()"><i class="ti ti-arrow-left" aria-hidden="true"></i> Voltar</button>
+   <div class="exam-head"><div class="ei" style="--k:var(--c-violeta)"><i class="ti ti-target-arrow"></i></div><div><h1>Cobertura e espectro</h1><div class="tags">Quem cobre o quê, numa visão rápida</div></div></div>
+   <div class="cats cov-alvos" role="group" aria-label="Ordenar pelo alvo"><span class="cats-l">Ordenar por quem cobre:</span>${COV_ALVOS.map((a,i)=>`<button type="button" class="chip${i===covAlvo?' on':''}" aria-pressed="${i===covAlvo}" onclick="setCovAlvo(${i})">${esc(a)}</button>`).join('')}</div>
+   <div class="tbl-wrap"><table class="cov"><thead><tr><th class="atb" style="text-align:left">Antibiótico</th>${COV_ALVOS.map((a,i)=>`<th class="${i===covAlvo?'sel':''}"><button type="button" class="th-bt" onclick="setCovAlvo(${i})" title="Ordenar por ${esc(a)}">${esc(a)}</button></th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>
+   <div class="legend"><span class="cy"><i class="ti ti-check" aria-hidden="true"></i></span> cobre <span class="cp">±</span> parcial/variável (depende de antibiograma, dose ou cepa) <span class="cn"><i class="ti ti-minus" aria-hidden="true"></i></span> não cobre / não confiável</div>
+   <div class="disc">Mapa simplificado de espectro: <b>não substitui o antibiograma</b>; "ESBL" e "Pseudomonas" dependem do perfil local. Para detalhes, abra cada antibiótico no banco.</div>`;
 }
 
 /* ===================== TERAPIA DIRIGIDA ===================== */
@@ -1004,8 +1368,8 @@ function abrir_dirigida(){curView='dir';renderDirigida();scroll0();}
 function renderDirigida(){
   const opts=DIRIGIDA.map((d,i)=>`<option value="${i}">${esc(d.g)}</option>`).join('');
   document.getElementById('view').innerHTML=`
-   <button class="back" onclick="routeHome()">← Voltar</button>
-   <div class="exam-head"><div class="ei"><i class="ti ti-microscope"></i></div><div><h1>Terapia dirigida</h1><div class="tags">Germe isolado no antibiograma → opções dirigidas</div></div></div>
+   <button class="back" onclick="routeHome()"><i class="ti ti-arrow-left" aria-hidden="true"></i> Voltar</button>
+   <div class="exam-head"><div class="ei" style="--k:var(--c-verde)"><i class="ti ti-microscope"></i></div><div><h1>Terapia dirigida</h1><div class="tags">Do germe isolado no antibiograma às opções dirigidas</div></div></div>
    <div class="formcard">
      <div class="field"><label>Germe isolado</label><select id="dirSel" onchange="renderDirAlvo()">${opts}</select></div>
      <div id="dirAlvo"></div>
@@ -1022,11 +1386,11 @@ function renderDirAlvo(){
 async function sugerirDirigida(){
   const i=+document.getElementById('dirSel').value;const d=DIRIGIDA[i];
   const b=document.getElementById('dirBtn'),out=document.getElementById('dirOut');
-  b.disabled=true;b.innerHTML='<span class="spin"></span> Gerando…';
+  b.disabled=true;b.innerHTML='<span class="spin"></span> Gerando';
   try{
     const prompt=SYS_ATB+`\n\nGerme isolado: ${d.g}. Dê a terapia DIRIGIDA preferencial (menor espectro eficaz) com DOSE e via, alternativas (inclusive para alergia a penicilina), e duração típica por foco. Mencione quando associar 2ª droga (ex.: endocardite). Conciso, markdown.`;
     const txt=await callIA(prompt);out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
-  }catch(err){out.innerHTML='<div class="ai-out" style="background:rgba(198,69,61,.12);border-color:rgba(198,69,61,.3);color:#C6453D">⚠️ '+esc(err.message||'Falha na IA')+'</div>';}
+  }catch(err){out.innerHTML='<div class="ai-out erro"><i class="ti ti-alert-triangle" aria-hidden="true"></i> '+esc(err.message||'Falha na IA')+'</div>';}
   b.disabled=false;b.innerHTML='<i class="ti ti-sparkles"></i> Refinar com a IA (dose, duração, alergia)';
 }
 
@@ -1035,12 +1399,12 @@ let rSexo='M';
 function setSexo(s){rSexo=s;var m=document.getElementById('sexoM'),f=document.getElementById('sexoF');if(m)m.classList.toggle('on',s==='M');if(f)f.classList.toggle('on',s==='F');}
 /* bloco dose + prescrição reutilizado na calculadora e na monografia */
 function doseBlocoHtml(d,peso,clcr){
-  let h='<b>'+esc(d.nome)+'</b> <span style="color:#5E646B">· '+esc((d.classe||'').split('·')[0].trim())+'</span><br>';
+  let h='<b>'+esc(d.nome)+'</b> <span style="color:var(--tinta2)">· '+esc((d.classe||'').split('·')[0].trim())+'</span><br>';
   h+='<b>Posologia:</b> '+inlMd(d.doseNormal)+'<br>';
   h+='<b>Ajuste (peso/ClCr):</b> '+doseAjustada(d,peso,clcr)+'<br>';
   if(RX[d.id]) h+='<b>Prescrição:</b> '+inlMd(RX[d.id])+'<br>';
   if(PED[d.id]) h+='<b>Pediátrico:</b> '+inlMd(PED[d.id])+'<br>';
-  h+='<span style="font-size:11px;color:#5E646B">Estimativa — confirme dose/diluição na bula/protocolo institucional.</span>';
+  h+='<span class="nota-p">Estimativa. Confirme dose/diluição na bula/protocolo institucional.</span>';
   return h;
 }
 function abrir_dose(){curView='dose';renderDose();scroll0();}
@@ -1050,15 +1414,15 @@ function renderDose(){
     return `<optgroup label="${g[1]}">`+list.map(d=>`<option value="${d.id}">${esc(d.nome)}</option>`).join('')+`</optgroup>`;
   }).join('');
   document.getElementById('view').innerHTML=`
-   <button class="back" onclick="routeHome()">← Voltar</button>
-   <div class="exam-head"><div class="ei"><i class="ti ti-calculator"></i></div><div><h1>Calculadora de dose</h1><div class="tags">Selecione o ATB + peso + clearance → dose ajustada + prescrição</div></div></div>
+   <button class="back" onclick="routeHome()"><i class="ti ti-arrow-left" aria-hidden="true"></i> Voltar</button>
+   <div class="exam-head"><div class="ei" style="--k:var(--c-laranja)"><i class="ti ti-calculator"></i></div><div><h1>Calculadora de dose</h1><div class="tags">Antibiótico, peso e clearance: dose ajustada e prescrição</div></div></div>
    <div class="formcard">
      <div class="field"><label>Antibiótico</label><select id="doseAtb">${opts}</select></div>
      <div class="field"><label>Peso (kg)</label><input type="number" id="dosePeso" inputmode="decimal" placeholder="ex.: 60"></div>
      <div class="field"><label>Clearance / TFG (mL/min)</label><input type="number" id="doseClcr" inputmode="numeric" placeholder="ex.: 30"></div>
-     <button class="btn btn-p" onclick="calcDoseTool()">Calcular dose + prescrição</button>
+     <button class="btn btn-p" onclick="calcDoseTool()"><i class="ti ti-calculator" aria-hidden="true"></i> Calcular dose e prescrição</button>
      <div id="doseOut"></div>
-     <details style="margin-top:12px"><summary style="cursor:pointer;font-size:13px;color:var(--petrol);font-weight:700">▸ Não sei a função renal — calcular (CKD-EPI 2021)</summary>
+     <details style="margin-top:12px"><summary class="sum-tfg"><i class="ti ti-chevron-right" aria-hidden="true"></i> Não sei a função renal: calcular a TFG (CKD-EPI 2021)</summary>
        <div class="field" style="margin-top:10px"><label>Idade (anos)</label><input type="number" id="rIdade" inputmode="numeric" placeholder="ex.: 68"></div>
        <div class="field"><label>Creatinina sérica (mg/dL)</label><input type="number" id="rCr" inputmode="decimal" step="0.01" placeholder="ex.: 1.4"></div>
        <div class="field"><label>Sexo</label><div class="segs"><button class="seg on" id="sexoM" onclick="setSexo('M')">Homem</button><button class="seg" id="sexoF" onclick="setSexo('F')">Mulher</button></div></div>
@@ -1066,24 +1430,24 @@ function renderDose(){
        <div id="rOut" style="margin-top:8px"></div>
      </details>
    </div>
-   <div class="disc">Estimativa de apoio — confirme posologia/diluição na bula/protocolo institucional. Use peso ideal/ajustado em obesos; em LRA/função renal instável a TFG estimada (CKD-EPI 2021, mL/min/1,73m²) é imprecisa.</div>`;
+   <div class="disc">Estimativa de apoio. Confirme posologia/diluição na bula/protocolo institucional. Use peso ideal/ajustado em obesos; em LRA/função renal instável a TFG estimada (CKD-EPI 2021, mL/min/1,73m²) é imprecisa.</div>`;
 }
 function calcClcrFill(){
   const idade=+document.getElementById('rIdade').value, cr=+document.getElementById('rCr').value;
   const out=document.getElementById('rOut');
-  if(!idade||!cr){out.innerHTML='<div class="calc-out" style="background:rgba(198,69,61,.12);border-color:rgba(198,69,61,.3);color:#C6453D">Preencha a idade e a creatinina.</div>';return;}
+  if(!idade||!cr){out.innerHTML='<div class="calc-out erro"><i class="ti ti-alert-circle" aria-hidden="true"></i> Preencha a idade e a creatinina.</div>';return;}
   // CKD-EPI 2021 (sem raça) — TFG em mL/min/1,73m²
   const f=(rSexo==='F'),k=f?0.7:0.9,al=f?-0.241:-0.302;
   let tfg=142*Math.pow(Math.min(cr/k,1),al)*Math.pow(Math.max(cr/k,1),-1.200)*Math.pow(0.9938,idade)*(f?1.012:1);tfg=Math.round(tfg);
   document.getElementById('doseClcr').value=tfg;
-  out.innerHTML='<div class="calc-out"><b>TFG ≈ '+tfg+' mL/min/1,73m² (CKD-EPI 2021)</b> — preenchida acima. Agora clique em <b>Calcular dose + prescrição</b>.</div>';
+  out.innerHTML='<div class="calc-out"><b>TFG ≈ '+tfg+' mL/min/1,73m² (CKD-EPI 2021)</b>, preenchida acima. Agora toque em <b>Calcular dose e prescrição</b>.</div>';
 }
 function calcDoseTool(){
   const d=DRUGS.find(x=>x.id===document.getElementById('doseAtb').value);if(!d)return;
   const peso=+document.getElementById('dosePeso').value||0, clcr=+document.getElementById('doseClcr').value||0;
   const out=document.getElementById('doseOut');
-  if(clcr<=0){out.innerHTML='<div class="calc-out" style="background:rgba(198,69,61,.12);border-color:rgba(198,69,61,.3);color:#C6453D">Informe o clearance (ou calcule no "▸" abaixo).</div>';return;}
-  if(d.kg&&peso<=0){out.innerHTML='<div class="calc-out" style="background:rgba(163,115,10,.12);border-color:rgba(163,115,10,.3);color:#A3730A">'+esc(d.nome)+' é dosado por peso — informe o peso (kg).</div>';return;}
+  if(clcr<=0){out.innerHTML='<div class="calc-out erro"><i class="ti ti-alert-circle" aria-hidden="true"></i> Informe o clearance ou calcule a TFG logo abaixo.</div>';return;}
+  if(d.kg&&peso<=0){out.innerHTML='<div class="calc-out aviso"><i class="ti ti-scale" aria-hidden="true"></i> '+esc(d.nome)+' é dosado por peso. Informe o peso (kg).</div>';return;}
   out.innerHTML='<div class="calc-out">'+doseBlocoHtml(d,peso,clcr)+'</div>';
 }
 
@@ -1092,8 +1456,8 @@ function abrir_ivvo(){curView='ivvo';renderIVVO();scroll0();}
 function renderIVVO(){
   const rows=IVVO.map(x=>`<li><b>${esc(x.a)}</b> — ${esc(x.b)}</li>`).join('');
   document.getElementById('view').innerHTML=`
-   <button class="back" onclick="routeHome()">← Voltar</button>
-   <div class="exam-head"><div class="ei"><i class="ti ti-arrows-exchange"></i></div><div><h1>Switch IV → VO</h1><div class="tags">Quando e com o quê trocar para via oral</div></div></div>
+   <button class="back" onclick="routeHome()"><i class="ti ti-arrow-left" aria-hidden="true"></i> Voltar</button>
+   <div class="exam-head"><div class="ei" style="--k:var(--c-azul)"><i class="ti ti-arrows-exchange"></i></div><div><h1>Troca de IV para VO</h1><div class="tags">Quando e com o quê trocar para via oral</div></div></div>
    <div class="content">
      <h2>Critérios para a troca</h2>
      <ul>
@@ -1104,7 +1468,7 @@ function renderIVVO(){
      </ul>
      <h2>ATB com excelente biodisponibilidade oral</h2>
      <ul>${rows}</ul>
-     <div class="perla">💡 <b>Pérola:</b> a troca precoce IV→VO encurta internação, reduz risco de cateter e custo — reavalie diariamente quem ainda precisa de IV.</div>
+     <div class="perla"><i class="ti ti-bulb" aria-hidden="true"></i><span><b>Pérola:</b> a troca precoce IV→VO encurta internação, reduz risco de cateter e custo — reavalie diariamente quem ainda precisa de IV.</span></div>
    </div>
    <div class="disc">Confirme espectro pela cultura e ajuste a dose oral à função renal.</div>`;
 }
@@ -1119,12 +1483,12 @@ const SYS_ATB='Você é um médico infectologista brasileiro experiente, consult
 async function aprofundar(id){
   const e=itemById(id);if(!e)return;
   const b=document.getElementById('aprBtn'),out=document.getElementById('aprOut');
-  b.disabled=true;b.innerHTML='<span class="spin"></span> Gerando…';
+  b.disabled=true;b.innerHTML='<span class="spin"></span> Gerando';
   try{
     const prompt=SYS_ATB+`\n\nO médico está lendo o guia de "${e.nome}". Aprofunde com: pontos práticos avançados, doses (adulto, função renal normal) e ajustes, erros/armadilhas comuns, e 1–2 cenários clínicos curtos com a conduta esperada. Não repita o óbvio; agregue valor. Conciso.`;
     const txt=await callIA(prompt);
     out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
-  }catch(err){out.innerHTML='<div class="ai-out" style="background:rgba(198,69,61,.12);border-color:rgba(198,69,61,.3);color:#C6453D">⚠️ '+esc(err.message||'Falha na IA')+'</div>';}
+  }catch(err){out.innerHTML='<div class="ai-out erro"><i class="ti ti-alert-triangle" aria-hidden="true"></i> '+esc(err.message||'Falha na IA')+'</div>';}
   b.disabled=false;b.innerHTML='<i class="ti ti-sparkles"></i> Casos, doses e detalhes com a IA';
 }
 
@@ -1132,13 +1496,13 @@ let chat=[];
 function abrirAssistente(){curView='ai';chat=[];renderAssistente();scroll0();}
 function renderAssistente(){
   const suggs=['Esquema empírico para PAC internado','Como age a resistência ESBL vs KPC?','Mecanismo de ação dos β-lactâmicos','Explique o esquema RIPE da tuberculose','Qual a 1ª linha para candidemia?','Por que o MRSA resiste aos β-lactâmicos?','Alérgico grave a penicilina com pneumonia, o que uso?'];
-  let html=`<button class="back" onclick="routeHome()">← Voltar</button>
-   <div class="exam-head"><div class="ei"><i class="ti ti-sparkles"></i></div><div><h1>Assistente de antibióticos</h1><div class="tags">Condutas, doses, espectro, resistência, microbiologia, antifúngicos, TB — pergunte tudo</div></div></div>`;
-  if(!chat.length){html+=`<div class="suggs">`+suggs.map(s=>`<button class="sugg" onclick="enviarSug(this)">${esc(s)}</button>`).join('')+`</div>`;}
-  html+=`<div class="chat" id="chat">`+chat.map(m=>`<div class="msg ${m.role==='user'?'u':'a'}"><div class="av">${m.role==='user'?'🧑‍⚕️':'💊'}</div><div class="bub">${m.role==='user'?'<p>'+esc(m.text).replace(/\n/g,'<br>')+'</p>':md(m.text)}</div></div>`).join('')+`</div>
-   <div class="ask"><textarea id="ask" rows="1" placeholder="Ex.: paciente com colangite e alergia a penicilina, qual esquema?" oninput="growAsk(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviar();}"></textarea><button onclick="enviar()" aria-label="Enviar">➤</button></div>
-   ${MT.mode==='demo'?'<div class="note" style="margin-top:12px">Entre na conta MedTech para usar a IA.</div>':''}
-   <div class="disc">Apoio à decisão — confira doses, ajuste renal, alergias e o antibiograma/protocolo local antes de prescrever.</div>`;
+  let html=`<button class="back" onclick="routeHome()"><i class="ti ti-arrow-left" aria-hidden="true"></i> Voltar</button>
+   <div class="exam-head"><div class="ei"><i class="ti ti-message-chatbot"></i></div><div><h1>Assistente de antibióticos</h1><div class="tags">Condutas, doses, espectro, resistência, microbiologia, antifúngicos e TB</div></div></div>`;
+  if(!chat.length){html+=`<div class="suggs-h">Comece por uma pergunta</div><div class="suggs">`+suggs.map(s=>`<button class="sugg" onclick="enviarSug(this)">${esc(s)}</button>`).join('')+`</div>`;}
+  html+=`<div class="chat" id="chat">`+chat.map(m=>`<div class="msg ${m.role==='user'?'u':'a'}${m.err?' erro':''}"><div class="av" aria-hidden="true"><i class="ti ${m.role==='user'?'ti-user':(m.err?'ti-alert-triangle':'ti-pill')}"></i></div><div class="bub">${m.role==='user'?'<p>'+esc(m.text).replace(/\n/g,'<br>')+'</p>':md(m.text)}</div></div>`).join('')+`</div>
+   <div class="ask"><textarea id="ask" rows="1" placeholder="Sua pergunta sobre antibióticos" aria-label="Sua pergunta" oninput="growAsk(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviar();}"></textarea><button id="askBtn" onclick="enviar()" aria-label="Enviar pergunta"><i class="ti ti-send" aria-hidden="true"></i></button></div>
+   ${MT.mode==='demo'?'<div class="note" style="margin-top:12px"><i class="ti ti-lock" aria-hidden="true"></i><span>Entre na conta MedTech para usar a IA.</span></div>':''}
+   <div class="disc">Apoio à decisão. Confira doses, ajuste renal, alergias e o antibiograma/protocolo local antes de prescrever.</div>`;
   document.getElementById('view').innerHTML=html;
   scrollChat();
 }
@@ -1148,16 +1512,17 @@ function scrollChat(){const c=document.getElementById('chat');if(c&&c.lastElemen
 async function enviar(){
   const t=document.getElementById('ask');const q=(t.value||'').trim();if(!q)return;
   chat.push({role:'user',text:q});renderAssistente();
+  const bt=document.getElementById('askBtn');if(bt)bt.disabled=true;
   const c=document.getElementById('chat');
-  const typ=document.createElement('div');typ.className='msg a';typ.innerHTML='<div class="av">💊</div><div class="bub"><span class="typing"><span></span><span></span><span></span></span></div>';c.appendChild(typ);typ.scrollIntoView({block:'end'});
+  const typ=document.createElement('div');typ.className='msg a';typ.innerHTML='<div class="av" aria-hidden="true"><i class="ti ti-pill"></i></div><div class="bub" aria-label="Escrevendo a resposta"><span class="typing"><span></span><span></span><span></span></span></div>';c.appendChild(typ);typ.scrollIntoView({block:'end'});
   try{
-    const hist=chat.slice(-8).map(m=>(m.role==='user'?'MÉDICO: ':'ATBGUIA: ')+m.text).join('\n\n');
+    const hist=chat.filter(m=>!m.err).slice(-8).map(m=>(m.role==='user'?'MÉDICO: ':'ATBGUIA: ')+m.text).join('\n\n');
     const prompt=SYS_ATB+'\n\nConversa até aqui:\n'+hist+'\n\nResponda à última pergunta do médico de forma prática e objetiva.';
     const txt=await callIA(prompt);
     chat.push({role:'ai',text:txt});renderAssistente();
   }catch(err){
     typ.remove();
-    chat.push({role:'ai',text:'⚠️ '+(err.message||'Falha na IA. Tente novamente.')});renderAssistente();
+    chat.push({role:'ai',err:true,text:(err.message||'Falha na IA. Tente novamente.')});renderAssistente();
   }
 }
 </script>

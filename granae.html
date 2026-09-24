@@ -1,29 +1,27 @@
 <!doctype html>
-<html lang="pt-BR" data-astra="granae">
+<html lang="pt-BR" data-viva="granae" data-viva-escuro>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#FAFAF8" />
-  <title>Granaê – Sua grana sob controle</title>
+  <meta name="theme-color" content="#F5F6FB" />
+  <title>Granaê · MedTech</title>
   <link rel="icon" type="image/png" href="favicon.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
-  <link rel="stylesheet" href="granae.css?v=64" />
+  <link rel="stylesheet" href="vendor/tabler/tabler-icons.min.css?v=3.48.0">
+  <link rel="stylesheet" href="granae.css?v=65" />
   <!-- garante inputs claros na tela de login central, mesmo com o tema escuro do Granaê -->
   <style>.mt-auth input{background:#F1F1EC;color:#23272E}.mt-auth input::placeholder{color:#5E646B}</style>
   <!-- Login único MedTech + sincronização na nuvem (mesmo módulo do portal) -->
   <script>window.MT_APP={id:"granae",name:"Granaê"};</script>
   <script src="_mtfb.js?v=1"></script>
-  <script type="module" src="_mtauth.js?v=25"></script>
+  <script type="module" src="_mtauth.js?v=26"></script>
 <link rel="stylesheet" href="_mttokens.css?v=3">
-<link rel="stylesheet" href="_mtastra.css?v=5">
+<link rel="stylesheet" href="_mtviva.css?v=1">
 </head>
 <body>
 
   <header class="topbar">
     <div class="brand">
-      <span class="logo">$</span>
+      <span class="logo" aria-hidden="true"><i class="ti ti-wallet"></i></span>
       <div class="brand-text">
         <h1>Granaê</h1>
         <small class="user-name" id="userName"></small>
@@ -44,9 +42,9 @@
     <!-- DASHBOARD -->
     <section class="view" data-view="dashboard">
       <div class="month-switcher">
-        <button id="prevMonth" class="round">‹</button>
-        <h2 id="monthLabel">—</h2>
-        <button id="nextMonth" class="round">›</button>
+        <button id="prevMonth" class="round" aria-label="Mês anterior"><i class="ti ti-chevron-left"></i></button>
+        <h2 id="monthLabel">&nbsp;</h2>
+        <button id="nextMonth" class="round" aria-label="Próximo mês"><i class="ti ti-chevron-right"></i></button>
       </div>
 
       <div class="dash-tabs" id="dashTabs">
@@ -65,6 +63,7 @@
         <div class="hero-flow">
           <div class="flow-row">
             <div class="flow-label-wrap">
+              <span class="flow-ic in" aria-hidden="true"><i class="ti ti-arrow-down-left"></i></span>
               <span class="flow-label">Receitas</span>
               <span id="incomeMeta" class="flow-meta"></span>
             </div>
@@ -73,6 +72,7 @@
           </div>
           <div class="flow-row">
             <div class="flow-label-wrap">
+              <span class="flow-ic out" aria-hidden="true"><i class="ti ti-arrow-up-right"></i></span>
               <span class="flow-label">Despesas</span>
               <span id="expenseMeta" class="flow-meta"></span>
             </div>
@@ -81,17 +81,15 @@
           </div>
         </div>
         <div id="fixedCompareCta" class="hero-cta" hidden>
-          <button class="link" data-nav="fixos">Cadastrar fixos pra comparar →</button>
+          <button class="link" data-nav="fixos">Cadastrar fixos para comparar <i class="ti ti-chevron-right" aria-hidden="true"></i></button>
         </div>
         <p id="yearlyNote" class="muted small hero-yearly" hidden></p>
         <!-- legado: renderFixedCompare antiga ainda escreve aqui se houver erro; mantemos o id pra compat -->
         <div id="fixedCompare" hidden></div>
       </section>
 
-      <div style="display:flex;justify-content:center;margin:4px 0 18px">
-        <button id="dashLancar" class="ghost" style="padding:8px 18px;font-size:13.5px;font-weight:600;border-radius:999px;display:inline-flex;align-items:center;gap:6px">
-          <span style="color:var(--primary);font-size:16px;line-height:1">+</span> Lançar
-        </button>
+      <div class="lancar-wrap">
+        <button id="dashLancar" class="primary"><i class="ti ti-plus" aria-hidden="true"></i> Lançar gasto ou receita</button>
       </div>
 
       <div id="scheduledWrap" class="card alt scheduled-card" hidden>
@@ -120,7 +118,7 @@
       <div id="dashProjecao"></div>
       <div class="section-title between">
         <h3>Últimas transações</h3>
-        <button class="link" data-nav="transacoes">ver tudo →</button>
+        <button class="link" data-nav="transacoes">Ver tudo <i class="ti ti-chevron-right" aria-hidden="true"></i></button>
       </div>
       <ul id="recentList" class="tx-list"></ul>
       </div><!-- /dcol-b -->
@@ -141,7 +139,7 @@
         <div id="chartTrend"></div>
       </div>
 
-        <button id="aiMonthBtn" class="primary big" style="width:100%;margin-top:6px">✦ Análise IA deste mês</button>
+        <button id="aiMonthBtn" class="primary big" style="width:100%;margin-top:6px"><i class="ti ti-report-analytics" aria-hidden="true"></i> Analisar este mês com IA</button>
       </div>
     </section>
 
@@ -156,26 +154,26 @@
         </select>
       </div>
       <div class="month-switcher tx-month">
-        <button id="txPrevMonth" class="round" aria-label="Mês anterior">‹</button>
-        <h2 id="txMonthLabel">—</h2>
-        <button id="txNextMonth" class="round" aria-label="Próximo mês">›</button>
+        <button id="txPrevMonth" class="round" aria-label="Mês anterior"><i class="ti ti-chevron-left"></i></button>
+        <h2 id="txMonthLabel">&nbsp;</h2>
+        <button id="txNextMonth" class="round" aria-label="Próximo mês"><i class="ti ti-chevron-right"></i></button>
       </div>
       <div class="tx-month-summary" id="txMonthSummary">
-        <div class="tms-cell"><span class="tms-label">Entradas</span><strong class="tms-val income" id="txSumIn">—</strong></div>
-        <div class="tms-cell"><span class="tms-label">Saídas</span><strong class="tms-val" id="txSumOut">—</strong></div>
-        <div class="tms-cell"><span class="tms-label">Saldo</span><strong class="tms-val" id="txSumBal">—</strong></div>
+        <div class="tms-cell"><span class="tms-label">Entradas</span><strong class="tms-val income" id="txSumIn">R$ 0,00</strong></div>
+        <div class="tms-cell"><span class="tms-label">Saídas</span><strong class="tms-val" id="txSumOut">R$ 0,00</strong></div>
+        <div class="tms-cell"><span class="tms-label">Saldo</span><strong class="tms-val" id="txSumBal">R$ 0,00</strong></div>
       </div>
       <div class="tx-tools">
-        <input id="txSearch" type="search" placeholder="Buscar por descrição ou valor…" />
+        <input id="txSearch" type="search" placeholder="Buscar por descrição ou valor" />
         <button id="txRevisar" class="ghost" title="Revisar em lote o que está sem categoria">Revisar</button>
         <button id="txRegras" class="ghost" title="Regras automáticas de categoria">Regras</button>
         <button id="txTransferir" class="ghost" title="Transferir entre contas">Transferir</button>
         <button id="txCsv" class="ghost" title="Exportar o mês em CSV">CSV</button>
       </div>
       <div class="tx-tools tx-tools-2">
-        <select id="filterAcc" title="Conta ou cartão"><option value="">Toda conta/cartão</option></select>
-        <select id="filterSub" title="Subcategoria"><option value="">Toda subcategoria</option></select>
-        <button id="txSalvarFiltro" class="ghost" title="Salvar esta combinação de filtros">☆ Salvar filtro</button>
+        <select id="filterAcc" title="Conta ou cartão"><option value="">Todas as contas</option></select>
+        <select id="filterSub" title="Subcategoria"><option value="">Subcategorias</option></select>
+        <button id="txSalvarFiltro" class="ghost" title="Salvar esta combinação de filtros"><i class="ti ti-bookmark" aria-hidden="true"></i> Salvar filtro</button>
         <button id="txLimparFiltros" class="ghost" title="Limpar todos os filtros">Limpar</button>
       </div>
       <div id="savedFilters" class="saved-filters"></div>
@@ -213,7 +211,7 @@
           <h3 class="muted small uppercase" style="margin:0">Orçamento por subcategoria</h3>
           <button id="addSubBudget" class="ghost">+ Definir</button>
         </div>
-        <p class="muted small" style="margin:2px 0 8px">Teto mensal mais fino que a categoria — ex.: Alimentação › iFood.</p>
+        <p class="muted small" style="margin:2px 0 8px">Teto mensal mais fino que a categoria. Ex.: iFood dentro de Alimentação.</p>
         <ul id="subBudgetList" class="cat-list"></ul>
       </div>
     </section>
@@ -224,7 +222,7 @@
         <h2>Fixos médios</h2>
         <div class="row gap">
           <label class="file-btn ghost">
-            📎 Planilha
+            <i class="ti ti-file-spreadsheet" aria-hidden="true"></i> Planilha
             <input type="file" id="fixedSheet" accept=".csv,.tsv,.xlsx,.xls,.ods,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" hidden />
           </label>
           <button id="addFixed" class="primary">+ Item</button>
@@ -249,7 +247,7 @@
         <button id="addDivida" class="ghost">+ Dívida</button>
         <button id="addCommitment" class="primary">+ Financiamento</button>
       </div>
-      <p class="muted small" style="margin:-4px 0 12px">Parcelamentos e financiamentos em aberto — quanto já foi e quanto falta.</p>
+      <p class="muted small" style="margin:-4px 0 12px">Parcelamentos e financiamentos em aberto: quanto já foi pago e quanto falta.</p>
       <div id="cmtResumo" class="cmt-resumo"></div>
       <div id="faturas"></div>
       <h3 class="muted small uppercase" style="margin:18px 0 8px">Em aberto</h3>
@@ -272,7 +270,7 @@
       </div>
 
       <div class="ai-pane" data-aipane="ask">
-        <p class="muted small">Pergunte qualquer coisa sobre seus gastos — a IA enxerga todas as suas transações e seus fixos.</p>
+        <p class="muted small">Pergunte sobre seus gastos. A IA lê suas transações e seus fixos.</p>
         <textarea id="aiQuestion" rows="3" placeholder="Ex.: onde gastei mais que o normal este mês? Quanto economizei com mercado em relação à média?"></textarea>
         <div class="row gap" style="margin-top:8px">
           <button class="ghost chip-suggestion" data-q="Resumo do mês atual com receitas, despesas e principais categorias">Resumo do mês</button>
@@ -314,39 +312,29 @@
   </button>
 
   <!-- NAV INFERIOR -->
-  <nav class="bottom-nav">
-    <button data-nav="dashboard" class="active">
-      <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6" rx="1"/><rect x="12" y="8" width="3" height="10" rx="1"/><rect x="17" y="5" width="3" height="13" rx="1"/></svg>
-      <small>Resumo</small>
-    </button>
-    <button data-nav="transacoes">
-      <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-1"/><path d="M16 12a2 2 0 1 0 0 4h6v-4z"/></svg>
-      <small>Transações</small>
-    </button>
-    <button data-nav="categorias">
-      <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor"/></svg>
-      <small>Categorias</small>
-    </button>
-    <button data-nav="fixos">
-      <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14L17 2H7z"/></svg>
-      <small>Fixos</small>
-    </button>
-    <button data-nav="compromissos">
-      <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M7 15h4"/></svg>
-      <small>Parcelas</small>
-    </button>
-    <button data-nav="ia">
-      <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.94 14.34L6.34 18l-.96-2.65-2.65-.96 3.66-3.6 1.6 1.6 1.95 1.95z"/><path d="M14 2l2 4 4 2-4 2-2 4-2-4-4-2 4-2z"/><path d="M19 14l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"/></svg>
-      <small>IA</small>
-    </button>
+  <nav class="bottom-nav" aria-label="Seções do Granaê">
+    <button type="button" class="nav-lancar-pc" id="sideLancar"><i class="ti ti-plus" aria-hidden="true"></i> Lançar</button>
+    <button data-nav="dashboard" class="active" style="--c:var(--c-violeta)"><span class="nav-ico"><i class="ti ti-chart-pie" aria-hidden="true"></i></span><small>Resumo</small></button>
+    <button data-nav="transacoes" style="--c:var(--c-azul)"><span class="nav-ico"><i class="ti ti-arrows-exchange" aria-hidden="true"></i></span><small>Transações</small></button>
+    <button type="button" class="nav-lancar" id="navLancar" aria-label="Lançar gasto ou receita"><span class="nav-ico"><i class="ti ti-plus" aria-hidden="true"></i></span><small>Lançar</small></button>
+    <button data-nav="compromissos" style="--c:var(--c-rosa)"><span class="nav-ico"><i class="ti ti-credit-card" aria-hidden="true"></i></span><small>Parcelas</small></button>
+    <button data-nav="categorias" class="nav-extra" style="--c:var(--c-laranja)"><span class="nav-ico"><i class="ti ti-tag" aria-hidden="true"></i></span><small>Categorias</small></button>
+    <button data-nav="fixos" class="nav-extra" style="--c:var(--c-teal)"><span class="nav-ico"><i class="ti ti-pin" aria-hidden="true"></i></span><small>Fixos</small></button>
+    <button data-nav="ia" class="nav-extra" style="--c:var(--c-indigo)"><span class="nav-ico"><i class="ti ti-sparkles" aria-hidden="true"></i></span><small>Análise IA</small></button>
+    <button type="button" class="nav-mais" id="navMais" aria-haspopup="true" aria-expanded="false" style="--c:var(--c-cinza)"><span class="nav-ico"><i class="ti ti-dots" aria-hidden="true"></i></span><small>Mais</small></button>
   </nav>
+  <div class="mais-menu" id="maisMenu" hidden>
+    <button data-nav="categorias" style="--c:var(--c-laranja)"><span class="nav-ico"><i class="ti ti-tag" aria-hidden="true"></i></span>Categorias e contas</button>
+    <button data-nav="fixos" style="--c:var(--c-teal)"><span class="nav-ico"><i class="ti ti-pin" aria-hidden="true"></i></span>Fixos do mês</button>
+    <button data-nav="ia" style="--c:var(--c-indigo)"><span class="nav-ico"><i class="ti ti-sparkles" aria-hidden="true"></i></span>Análise IA</button>
+  </div>
 
   <!-- MODAL: FORM TRANSAÇÃO -->
   <dialog id="txDialog" class="modal">
     <form id="txForm" method="dialog">
       <header class="modal-head">
         <h3 id="txDialogTitle">Nova transação</h3>
-        <button type="button" class="ghost" data-close>✕</button>
+        <button type="button" class="ghost x-btn" data-close aria-label="Fechar"><i class="ti ti-x" aria-hidden="true"></i></button>
       </header>
       <div class="seg">
         <label><input type="radio" name="type" value="expense" checked /><span>Despesa</span></label>
@@ -365,7 +353,7 @@
         <select name="category" required></select>
       </label>
       <label class="field" id="txSubField">
-        <span>Subcategoria <small class="muted">— opcional</small></span>
+        <span>Subcategoria <small class="muted">(opcional)</small></span>
         <input name="sub" type="text" maxlength="40" list="subSugestoes" placeholder="Ex.: Remédios" />
         <datalist id="subSugestoes"></datalist>
       </label>
@@ -404,7 +392,7 @@
   <dialog id="txDetail" class="modal">
     <header class="modal-head">
       <h3>Detalhes</h3>
-      <button type="button" class="ghost" data-close-detail>✕</button>
+      <button type="button" class="ghost x-btn" data-close-detail aria-label="Fechar"><i class="ti ti-x" aria-hidden="true"></i></button>
     </header>
     <div id="txDetailBody"></div>
     <footer class="modal-foot">
@@ -418,14 +406,14 @@
     <form id="cmtForm" method="dialog">
       <header class="modal-head">
         <h3>Novo financiamento</h3>
-        <button type="button" class="ghost" data-close-cmt>✕</button>
+        <button type="button" class="ghost x-btn" data-close-cmt aria-label="Fechar"><i class="ti ti-x" aria-hidden="true"></i></button>
       </header>
       <p class="muted small" style="margin:0 0 10px">Diferente do parcelamento: aqui há juros, então o total pago é maior que o valor financiado.</p>
       <label class="field"><span>Do quê</span><input name="descricao" type="text" maxlength="80" required placeholder="Ex.: Carro, Apartamento" /></label>
       <label class="field"><span>Valor financiado</span><input name="valorFinanciado" type="number" step="0.01" min="0" required /></label>
       <label class="field"><span>Valor da parcela</span><input name="parcela" type="number" step="0.01" min="0" required /></label>
       <label class="field"><span>Número de parcelas</span><input name="n" type="number" step="1" min="2" max="480" required /></label>
-      <label class="field"><span>Taxa de juros ao mês (%) <small class="muted">— opcional</small></span><input name="taxa" type="number" step="0.01" min="0" /></label>
+      <label class="field"><span>Taxa de juros ao mês (%) <small class="muted">(opcional)</small></span><input name="taxa" type="number" step="0.01" min="0" /></label>
       <label class="field"><span>Categoria</span><select name="category" required></select></label>
       <label class="field"><span>1ª parcela</span><input name="date" type="date" required /></label>
       <label class="field" id="cmtAccField" hidden><span>Conta ou cartão</span><select name="accountId"></select></label>
@@ -441,11 +429,11 @@
     <form id="divForm" method="dialog">
       <header class="modal-head">
         <h3>Nova dívida</h3>
-        <button type="button" class="ghost" onclick="document.getElementById('divDialog').close()">✕</button>
+        <button type="button" class="ghost x-btn" onclick="document.getElementById('divDialog').close()" aria-label="Fechar"><i class="ti ti-x" aria-hidden="true"></i></button>
       </header>
-      <p class="muted small" style="margin:0 0 10px">Para dinheiro que você deve sem cronograma — paga quando dá, no valor que quiser. Cada pagamento entra como despesa do mês e abate o saldo.</p>
+      <p class="muted small" style="margin:0 0 10px">Para dinheiro que você deve sem cronograma: paga quando dá, no valor que quiser. Cada pagamento entra como despesa do mês e abate o saldo.</p>
       <label class="field"><span>O que é</span><input name="descricao" type="text" maxlength="60" required placeholder="Ex.: Empréstimo do meu pai" /></label>
-      <label class="field"><span>Para quem <small class="muted">— opcional</small></span><input name="credor" type="text" maxlength="40" placeholder="Ex.: Pai" /></label>
+      <label class="field"><span>Para quem <small class="muted">(opcional)</small></span><input name="credor" type="text" maxlength="40" placeholder="Ex.: Pai" /></label>
       <label class="field"><span>Valor total da dívida</span><input name="total" type="number" step="0.01" min="0.01" required /></label>
       <label class="field"><span>Categoria dos pagamentos</span><select name="category" required></select></label>
       <footer class="modal-foot"><button type="submit" class="primary">Criar</button></footer>
@@ -457,12 +445,12 @@
     <form id="pagForm" method="dialog">
       <header class="modal-head">
         <h3 id="pagTitulo">Registrar pagamento</h3>
-        <button type="button" class="ghost" onclick="document.getElementById('pagDialog').close()">✕</button>
+        <button type="button" class="ghost x-btn" onclick="document.getElementById('pagDialog').close()" aria-label="Fechar"><i class="ti ti-x" aria-hidden="true"></i></button>
       </header>
       <p class="muted small" id="pagResumo" style="margin:0 0 10px"></p>
       <label class="field"><span>Valor pago</span><input name="valor" type="number" step="0.01" min="0.01" required /></label>
       <label class="field"><span>Data</span><input name="data" type="date" required /></label>
-      <label class="field"><span>Conta <small class="muted">— opcional</small></span><select name="accountId"></select></label>
+      <label class="field"><span>Conta <small class="muted">(opcional)</small></span><select name="accountId"></select></label>
       <footer class="modal-foot"><button type="submit" class="primary">Registrar</button></footer>
     </form>
   </dialog>
@@ -471,7 +459,7 @@
   <dialog id="revDialog" class="modal">
     <header class="modal-head">
       <h3>Revisar categorias <span id="revProg" class="muted small" style="font-weight:400"></span></h3>
-      <button type="button" class="ghost" onclick="document.getElementById('revDialog').close()">✕</button>
+      <button type="button" class="ghost x-btn" onclick="document.getElementById('revDialog').close()" aria-label="Fechar"><i class="ti ti-x" aria-hidden="true"></i></button>
     </header>
     <div id="revBody"></div>
     <footer class="modal-foot">
@@ -485,14 +473,14 @@
     <form id="trfForm" method="dialog">
       <header class="modal-head">
         <h3>Transferir entre contas</h3>
-        <button type="button" class="ghost" onclick="document.getElementById('trfDialog').close()">✕</button>
+        <button type="button" class="ghost x-btn" onclick="document.getElementById('trfDialog').close()" aria-label="Fechar"><i class="ti ti-x" aria-hidden="true"></i></button>
       </header>
-      <p class="muted small" style="margin:0 0 10px">Mover dinheiro entre suas contas não é receita nem despesa — não entra nos totais do mês.</p>
+      <p class="muted small" style="margin:0 0 10px">Mover dinheiro entre suas contas não é receita nem despesa e não entra nos totais do mês.</p>
       <label class="field"><span>De</span><select name="de" required></select></label>
       <label class="field"><span>Para</span><select name="para" required></select></label>
       <label class="field"><span>Valor</span><input name="valor" type="number" step="0.01" min="0.01" required /></label>
       <label class="field"><span>Data</span><input name="data" type="date" required /></label>
-      <label class="field"><span>Descrição <small class="muted">— opcional</small></span><input name="descricao" type="text" maxlength="80" /></label>
+      <label class="field"><span>Descrição <small class="muted">(opcional)</small></span><input name="descricao" type="text" maxlength="80" /></label>
       <footer class="modal-foot"><button type="submit" class="primary">Transferir</button></footer>
     </form>
   </dialog>
@@ -501,9 +489,9 @@
   <dialog id="rulesDialog" class="modal">
     <header class="modal-head">
       <h3>Regras automáticas</h3>
-      <button type="button" class="ghost" onclick="document.getElementById('rulesDialog').close()">✕</button>
+      <button type="button" class="ghost x-btn" onclick="document.getElementById('rulesDialog').close()" aria-label="Fechar"><i class="ti ti-x" aria-hidden="true"></i></button>
     </header>
-    <p class="muted small" style="margin:0 0 10px">Quando a descrição contiver o texto, a categoria é aplicada sozinha — em tudo que entrar daqui pra frente e no que já existe.</p>
+    <p class="muted small" style="margin:0 0 10px">Quando a descrição contiver o texto, a categoria é aplicada sozinha no que já existe e em tudo que entrar.</p>
     <div class="row" style="gap:8px;align-items:flex-end">
       <label class="field" style="flex:1.4"><span>Contendo</span><input id="ruleTermo" type="text" placeholder="Ex.: UBER" /></label>
       <label class="field" style="flex:1.2"><span>Vira</span><select id="ruleCat"></select></label>
@@ -517,7 +505,7 @@
     <form id="accForm" method="dialog">
       <header class="modal-head">
         <h3 id="accDialogTitle">Nova conta</h3>
-        <button type="button" class="ghost" data-close-acc>✕</button>
+        <button type="button" class="ghost x-btn" data-close-acc aria-label="Fechar"><i class="ti ti-x" aria-hidden="true"></i></button>
       </header>
       <div class="seg">
         <label><input type="radio" name="kind" value="conta" checked /><span>Conta</span></label>
@@ -525,12 +513,12 @@
       </div>
       <label class="field"><span>Nome</span><input name="name" type="text" maxlength="40" required placeholder="Ex.: Nubank, Santander" /></label>
       <label class="field"><span>Cor</span><input name="color" type="color" value="#6366f1" /></label>
-      <label class="field"><span>Saldo inicial <small class="muted">— o que já tinha nela</small></span><input name="saldoInicial" type="number" step="0.01" /></label>
-      <label class="field"><span>Orçamento mensal <small class="muted">— teto de gasto nesta conta/cartão, opcional</small></span><input name="orcamento" type="number" step="0.01" min="0" placeholder="Ex.: 2000" /></label>
+      <label class="field"><span>Saldo inicial <small class="muted">(o que já tinha nela)</small></span><input name="saldoInicial" type="number" step="0.01" /></label>
+      <label class="field"><span>Orçamento mensal <small class="muted">(teto de gasto nesta conta ou cartão, opcional)</small></span><input name="orcamento" type="number" step="0.01" min="0" placeholder="Ex.: 2000" /></label>
       <div id="accCardFields" hidden>
         <label class="field"><span>Dia do fechamento da fatura</span><input name="fechamento" type="number" min="1" max="28" placeholder="Ex.: 3" /></label>
         <label class="field"><span>Dia do vencimento</span><input name="vencimento" type="number" min="1" max="28" placeholder="Ex.: 12" /></label>
-        <label class="field"><span>Limite <small class="muted">— opcional</small></span><input name="limite" type="number" step="0.01" min="0" /></label>
+        <label class="field"><span>Limite <small class="muted">(opcional)</small></span><input name="limite" type="number" step="0.01" min="0" /></label>
       </div>
       <footer class="modal-foot">
         <button type="button" id="accDelete" class="danger" hidden>Excluir</button>
@@ -544,7 +532,7 @@
     <form id="subBudgetForm" method="dialog">
       <header class="modal-head">
         <h3 id="subBudgetTitle">Orçamento por subcategoria</h3>
-        <button type="button" class="ghost" data-close-sb>✕</button>
+        <button type="button" class="ghost x-btn" data-close-sb aria-label="Fechar"><i class="ti ti-x" aria-hidden="true"></i></button>
       </header>
       <label class="field"><span>Categoria</span><select name="cat" required></select></label>
       <label class="field"><span>Subcategoria</span><input name="sub" type="text" maxlength="40" required list="subSugestoes" placeholder="Ex.: iFood" /></label>
@@ -561,7 +549,7 @@
     <form id="catForm" method="dialog">
       <header class="modal-head">
         <h3 id="catDialogTitle">Nova categoria</h3>
-        <button type="button" class="ghost" data-close>✕</button>
+        <button type="button" class="ghost x-btn" data-close aria-label="Fechar"><i class="ti ti-x" aria-hidden="true"></i></button>
       </header>
       <div class="seg">
         <label><input type="radio" name="type" value="expense" checked /><span>Despesa</span></label>
@@ -580,7 +568,7 @@
         <input name="color" type="color" value="#2563eb" />
       </label>
       <label class="field">
-        <span>Meta mensal (R$ — opcional, só p/ despesas)</span>
+        <span>Meta mensal em R$ <small class="muted">(opcional, só para despesas)</small></span>
         <input name="goal" type="number" inputmode="decimal" step="0.01" min="0" placeholder="Ex.: 800" />
       </label>
       <footer class="modal-foot">
@@ -595,7 +583,7 @@
     <form id="fixedForm" method="dialog">
       <header class="modal-head">
         <h3 id="fixedDialogTitle">Item fixo</h3>
-        <button type="button" class="ghost" data-close>✕</button>
+        <button type="button" class="ghost x-btn" data-close aria-label="Fechar"><i class="ti ti-x" aria-hidden="true"></i></button>
       </header>
       <div class="seg">
         <label><input type="radio" name="type" value="expense" checked /><span>Despesa</span></label>
@@ -646,9 +634,9 @@
     <form id="settingsForm" method="dialog">
       <header class="modal-head">
         <h3>Configurações</h3>
-        <button type="button" class="ghost" data-close>✕</button>
+        <button type="button" class="ghost x-btn" data-close aria-label="Fechar"><i class="ti ti-x" aria-hidden="true"></i></button>
       </header>
-      <p class="muted small" style="margin:2px 0 4px">Conta <strong>MedTech</strong> — a mesma de todos os apps. A IA já vem incluída, sem precisar de chave.</p>
+      <p class="muted small" style="margin:2px 0 4px">Conta <strong>MedTech</strong>, a mesma de todos os apps. A IA já vem incluída, sem precisar de chave.</p>
       <hr />
       <button type="button" id="wipeData" class="danger full">Apagar todos os dados</button>
       <hr />
@@ -663,7 +651,7 @@
   <dialog id="audioDialog" class="modal">
     <header class="modal-head">
       <h3>Gravar lançamento</h3>
-      <button type="button" class="ghost" data-close>✕</button>
+      <button type="button" class="ghost x-btn" data-close aria-label="Fechar"><i class="ti ti-x" aria-hidden="true"></i></button>
     </header>
     <div class="audio-body">
       <div id="audioVisual" class="audio-visual">
@@ -672,8 +660,8 @@
       </div>
       <p id="audioHint" class="muted small">Toque para começar. Diga, por exemplo: "gastei 35 reais no almoço hoje" ou "recebi 2500 de salário".</p>
       <div class="row center gap">
-        <button id="audioRecord" class="fab small">🎤</button>
-        <button id="audioStop" class="fab small danger" hidden>⏹</button>
+        <button id="audioRecord" class="fab small" aria-label="Gravar"><i class="ti ti-microphone" aria-hidden="true"></i></button>
+        <button id="audioStop" class="fab small danger" hidden aria-label="Parar"><i class="ti ti-player-stop" aria-hidden="true"></i></button>
       </div>
       <div id="audioResult" class="ai-output"></div>
     </div>
@@ -684,6 +672,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="granae.gemini.js?v=7"></script>
-  <script src="granae.app.js?v=33"></script>
+  <script src="granae.app.js?v=34"></script>
 </body>
 </html>

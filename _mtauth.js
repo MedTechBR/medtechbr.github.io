@@ -203,7 +203,7 @@ MT.openSwitcher = () => openSwitcher();
 function ensureTabler() {
   if (document.querySelector('link[href*="tabler-icons"]')) return;
   const l = document.createElement('link'); l.rel = 'stylesheet';
-  l.href = 'https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css';
+  l.href = '/vendor/tabler/tabler-icons.min.css?v=3.48.0';   // servida do próprio site (a CDN chegou a levar 5 s e segurava o app)
   document.head.appendChild(l);
 }
 function openSwitcher() {

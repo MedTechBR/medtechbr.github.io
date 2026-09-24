@@ -470,3 +470,328 @@ textarea:-webkit-autofill:focus {
 
 /* mt-a11y-16px */
 @media(max-width:680px){input,select,textarea{font-size:16px}}
+
+/* ============================================================
+   23/09/2026: camada "viva" (modelo aprovado do ClínicaMed, cm-v97).
+   Folha compartilhada: _mtviva.css (vem depois deste arquivo). Aqui só o que é do LaudAI,
+   com html[data-viva="laudai"] body para vencer a folha e o tema antigo.
+   Cobalto é a cor do app (--ac). Cabeçalho de uma linha com as abas Novo laudo e
+   Histórico em pílula; no celular elas viram barra inferior. Fluxo em 3 passos.
+   A impressão (@media print, acima) continua papel branco: tudo aqui está em @media screen.
+   ============================================================ */
+@media screen {
+html[data-viva="laudai"] body{font-size:14.5px;line-height:1.5}
+html[data-viva="laudai"] body .app{min-height:100vh}
+
+/* ---------- cabeçalho de uma linha ---------- */
+/* sem o backdrop-filter do tema antigo: ele prenderia a barra inferior (position:fixed) dentro do cabeçalho */
+html[data-viva="laudai"] body .topbar{-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-viva="laudai"] body .topbar{padding:10px 24px;padding-top:calc(10px + env(safe-area-inset-top));gap:16px;min-height:64px}
+html[data-viva="laudai"] body .brand{gap:10px;flex:0 0 auto}
+html[data-viva="laudai"] body .brand-mark{width:38px;height:38px;border-radius:50%;background:var(--ac);color:#fff;
+  box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 35%,transparent)}
+html[data-viva="laudai"] body .brand-name{font-size:17px;font-weight:700;letter-spacing:-.02em;color:var(--tinta)}
+html[data-viva="laudai"] body .brand-wordmark{background:none;-webkit-text-fill-color:currentColor;color:var(--tinta)}
+html[data-viva="laudai"] body .top-actions{align-items:center;gap:8px}
+html[data-viva="laudai"] body .icon-btn{width:40px;height:40px;border-radius:50%;background:var(--sup2);border:0;color:var(--tinta2);font-size:19px;
+  display:grid;place-items:center;transition:background .2s,color .2s,transform .18s var(--mola)}
+html[data-viva="laudai"] body .icon-btn:hover{background:var(--acSup);color:var(--acInk);transform:translateY(-1px)}
+html[data-viva="laudai"] body #btn-history{display:none}
+html[data-viva="laudai"] body .subscription-badge{border-radius:999px;border:0;min-height:36px;padding:6px 14px 6px 10px;font-size:13px;font-weight:600;gap:6px;
+  background:var(--sup2);color:var(--tinta2)}
+html[data-viva="laudai"] body .subscription-badge .ti{font-size:17px}
+html[data-viva="laudai"] body .subscription-badge.pro{background:var(--okSup);color:color-mix(in srgb,var(--okV) 60%,var(--tinta))}
+html[data-viva="laudai"] body .subscription-badge.trial{background:var(--acSup);color:var(--acInk)}
+html[data-viva="laudai"] body .subscription-badge.trial.empty{background:var(--avSup);color:color-mix(in srgb,var(--avV) 60%,var(--tinta))}
+html[data-viva="laudai"] body .subscription-badge.byok{background:var(--sup2);color:var(--tinta)}
+html[data-viva="laudai"] body .user-chip{border-radius:999px;border:0;background:var(--sup2);min-height:40px;padding:4px 14px 4px 4px;font-size:13px;font-weight:500;color:var(--tinta)}
+html[data-viva="laudai"] body .user-chip .avatar{width:32px;height:32px;background:var(--ac);color:#fff;font-size:13px;font-weight:700}
+html[data-viva="laudai"] body .user-chip .email{max-width:160px}
+
+/* abas: pílula colorida na ativa (cada seção com a sua cor, como a barra lateral do ClínicaMed) */
+html[data-viva="laudai"] body .la-abas{display:flex;gap:4px;padding:4px;margin:0 auto;background:var(--sup2);border-radius:999px}
+html[data-viva="laudai"] body .la-aba{display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:4px 16px 4px 5px;border-radius:999px;
+  font-size:14px;font-weight:500;color:var(--tinta2);position:relative;transition:background-color .2s,color .2s,transform .18s var(--mola)}
+html[data-viva="laudai"] body .la-aba .ab-ic{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:17px;
+  background:color-mix(in srgb,var(--c) 14%,transparent);color:color-mix(in srgb,var(--c) 80%,var(--tinta));transition:transform .25s var(--mola),background .2s,color .2s}
+html[data-viva="laudai"] body .la-aba:hover{color:var(--tinta);background:var(--sup)}
+html[data-viva="laudai"] body .la-aba:hover .ab-ic{transform:scale(1.08) rotate(-6deg)}
+html[data-viva="laudai"] body .la-aba[aria-current=page]{background:var(--sup);color:var(--tinta);font-weight:650;box-shadow:var(--sombraV)}
+html[data-viva="laudai"] body .la-aba[aria-current=page] .ab-ic{background:var(--c);color:#fff;box-shadow:0 6px 14px color-mix(in srgb,var(--c) 38%,transparent)}
+html[data-viva="laudai"] body .la-aba .ab-n{font-style:normal;font-size:12px;font-weight:700;min-width:22px;height:22px;padding:0 7px;border-radius:999px;
+  display:inline-grid;place-items:center;background:color-mix(in srgb,var(--c) 14%,var(--sup));color:color-mix(in srgb,var(--c) 80%,var(--tinta));font-variant-numeric:tabular-nums}
+html[data-viva="laudai"] body .la-aba .ab-n:empty{display:none}
+html[data-viva="laudai"] body .la-aba.so-cel{display:none}
+
+/* ---------- página ---------- */
+html[data-viva="laudai"] body .container{max-width:1240px;padding:26px 28px 72px}
+html[data-viva="laudai"] body .warn-ribbon{background:var(--avSup);border:0;border-radius:18px;padding:12px 16px;gap:12px;align-items:center;margin-bottom:20px}
+html[data-viva="laudai"] body .warn-ribbon .ic{width:34px;height:34px;flex:0 0 34px;border-radius:50%;display:grid;place-items:center;margin:0;font-size:18px;
+  background:color-mix(in srgb,var(--c-ambar) 22%,var(--sup));color:color-mix(in srgb,var(--avV) 70%,var(--tinta))}
+html[data-viva="laudai"] body .warn-ribbon .txt{font-size:13.5px;color:var(--tinta2)}
+html[data-viva="laudai"] body .warn-ribbon strong{color:var(--tinta);font-weight:650}
+html[data-viva="laudai"] body .grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}
+html[data-viva="laudai"] body .col-entrada{display:flex;flex-direction:column;gap:18px;min-width:0}
+html[data-viva="laudai"] body .col-laudo{position:sticky;top:84px;min-width:0}
+
+/* cartões dos passos: número em círculo na cor do passo */
+html[data-viva="laudai"] body .card{background:var(--sup);border:1px solid var(--fio);border-radius:var(--rG);padding:24px 24px 22px;box-shadow:var(--sombraV)}
+html[data-viva="laudai"] body .card-title{font-size:16px;font-weight:650;gap:12px;margin-bottom:18px;color:var(--tinta)}
+html[data-viva="laudai"] body .card-title .num{width:32px;height:32px;border-radius:50%;font-size:14px;font-weight:700;color:#fff;
+  background:color-mix(in srgb,var(--k,var(--ac)) 80%,#000);box-shadow:0 6px 14px color-mix(in srgb,var(--k,var(--ac)) 30%,transparent)}
+html[data-viva="laudai"] body .card-title .opt{font-size:12.5px;font-weight:500;color:var(--tinta2)}
+
+/* campos */
+html[data-viva="laudai"] body .field{margin-bottom:16px}
+html[data-viva="laudai"] body .field-label{font-size:13.5px;font-weight:600;color:var(--tinta);letter-spacing:0;margin-bottom:7px}
+html[data-viva="laudai"] body .field-label .req{color:var(--errFill)}
+html[data-viva="laudai"] body .field-label .opt-l{font-weight:500;font-size:12px;color:var(--tinta2);background:var(--sup2);padding:2px 9px;border-radius:999px;margin-left:6px}
+html[data-viva="laudai"] body :is(.input,.textarea,.select){font-size:14.5px;padding:11px 14px;min-height:46px;border-radius:14px}
+html[data-viva="laudai"] body .select{background-color:var(--sup)!important;padding-right:38px}
+html[data-viva="laudai"] body .row{gap:14px}
+
+/* tipos de exame mais usados: fichas em pílula (o seletor continua com a lista completa) */
+html[data-viva="laudai"] body .la-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+html[data-viva="laudai"] body .la-chips .chip{min-height:36px;padding:6px 15px;border-radius:999px;border:1.5px solid var(--fio);background:var(--sup);
+  color:var(--tinta);font-size:13.5px;font-weight:550;transition:background-color .2s,border-color .2s,color .2s,transform .18s var(--mola)}
+html[data-viva="laudai"] body .la-chips .chip:hover{border-color:color-mix(in srgb,var(--ac) 45%,var(--fio));background:var(--acSup);color:var(--acInk);transform:translateY(-1px)}
+html[data-viva="laudai"] body .la-chips .chip[aria-pressed=true]{box-shadow:0 6px 14px color-mix(in srgb,var(--ac) 28%,transparent)!important}
+
+/* anexos: ícone em círculo + texto numa linha */
+html[data-viva="laudai"] body .uploader{display:flex;align-items:center;gap:16px;text-align:left;padding:18px 20px;border:1.5px dashed var(--fioF);
+  border-radius:18px;background:var(--sup2);transition:border-color .2s,background-color .2s,transform .2s var(--mola)}
+html[data-viva="laudai"] body .uploader:hover,html[data-viva="laudai"] body .uploader.dragover{border-color:var(--ac);background:var(--acSup);transform:translateY(-1px)}
+html[data-viva="laudai"] body .uploader.dragover{border-style:solid}
+html[data-viva="laudai"] body .uploader-icon{width:50px;height:50px;flex:0 0 50px;margin:0;border-radius:50%;background:var(--ac);color:#fff;font-size:24px;
+  display:grid;place-items:center;box-shadow:0 8px 18px color-mix(in srgb,var(--ac) 30%,transparent);transition:transform .25s var(--mola)}
+html[data-viva="laudai"] body .uploader:hover .uploader-icon{transform:scale(1.06) rotate(-6deg)}
+html[data-viva="laudai"] body .uploader-txt{display:flex;flex-direction:column;gap:3px;min-width:0}
+html[data-viva="laudai"] body .uploader-title{font-size:15px;font-weight:650;color:var(--tinta)}
+html[data-viva="laudai"] body .uploader-hint{font-size:13px;color:var(--tinta2);margin:0}
+html[data-viva="laudai"] body .thumbs-cab{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;font-size:13px;color:var(--tinta2)}
+html[data-viva="laudai"] body .thumbs-cab b{color:var(--tinta);font-variant-numeric:tabular-nums}
+html[data-viva="laudai"] body .thumbs-cab b.demais{color:var(--errV)}
+html[data-viva="laudai"] body .link-btn{color:var(--acInk);font-size:13px;font-weight:600;text-decoration:none;min-height:32px}
+html[data-viva="laudai"] body .link-btn:hover{color:var(--tinta);text-decoration:underline}
+html[data-viva="laudai"] body .thumbs{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px;margin-top:10px}
+html[data-viva="laudai"] body .thumb{border-radius:16px;border:1px solid var(--fio);animation:vvPop .3s var(--mola) both}
+html[data-viva="laudai"] body .thumb .badge{border-radius:999px;font-size:11px;font-weight:600;padding:2px 8px;background:rgba(13,16,23,.72);letter-spacing:0}
+html[data-viva="laudai"] body .thumb .badge.dicom{background:var(--ac)}
+html[data-viva="laudai"] body .thumb .remove{width:30px;height:30px;display:grid;place-items:center;font-size:15px;background:rgba(13,16,23,.72)}
+html[data-viva="laudai"] body .thumb .remove:hover{background:var(--errV)}
+html[data-viva="laudai"] body .url-section{margin-top:12px}
+html[data-viva="laudai"] body .url-row{gap:8px;align-items:stretch}
+html[data-viva="laudai"] body .url-row .input{min-width:0}
+html[data-viva="laudai"] body .url-row .btn{min-height:46px;padding:10px 18px;font-size:14px}
+
+/* dicas recolhidas */
+html[data-viva="laudai"] body details.tip{margin-top:12px;padding:0;background:var(--sup2);border:0;border-radius:16px;font-size:13px;color:var(--tinta2);overflow:hidden}
+html[data-viva="laudai"] body details.tip summary{list-style:none;display:flex;align-items:center;gap:8px;padding:11px 14px;cursor:pointer;font-weight:600;color:var(--tinta);min-height:44px}
+html[data-viva="laudai"] body details.tip summary::-webkit-details-marker{display:none}
+html[data-viva="laudai"] body details.tip summary .ti:first-child{color:color-mix(in srgb,var(--c-ambar) 75%,var(--tinta));font-size:17px}
+html[data-viva="laudai"] body details.tip summary .seta{margin-left:auto;color:var(--tinta2);transition:transform .25s var(--mola)}
+html[data-viva="laudai"] body details.tip[open] summary .seta{transform:rotate(180deg)}
+html[data-viva="laudai"] body details.tip p{padding:0 14px 10px;line-height:1.6}
+html[data-viva="laudai"] body details.tip p:last-child{padding-bottom:14px}
+html[data-viva="laudai"] body details.tip strong{color:var(--tinta)}
+html[data-viva="laudai"] body details.tip .link-btn{font-size:13px;min-height:0}
+
+/* ação principal */
+html[data-viva="laudai"] body .btn{border-radius:999px;font-weight:600;font-size:14px;min-height:42px;padding:10px 20px}
+html[data-viva="laudai"] body .btn .ti{font-size:17px}
+html[data-viva="laudai"] body .btn-sm{min-height:36px;padding:6px 14px;font-size:13px}
+html[data-viva="laudai"] body .btn-gerar{min-height:54px;font-size:16px;margin-top:6px}
+html[data-viva="laudai"] body .btn-gerar .ti{font-size:20px}
+html[data-viva="laudai"] body .gerar-dica{text-align:center;font-size:12.5px;color:var(--tinta2);margin-top:10px}
+html[data-viva="laudai"] body .spin-mini{width:18px;height:18px;border-radius:50%;border:2.5px solid currentColor;border-top-color:transparent;display:inline-block;animation:spin .8s linear infinite}
+html[data-viva="laudai"] body .btn.feito{background:var(--okV)!important;border-color:var(--okV)!important;color:#fff!important}
+html[data-viva="laudai"] body .perigo{color:var(--errV)!important}
+html[data-viva="laudai"] body .perigo:hover{background:var(--errSup)!important;border-color:transparent!important}
+
+/* ---------- laudo ---------- */
+html[data-viva="laudai"] body .laudo-card{min-height:420px}
+html[data-viva="laudai"] body .output-empty{padding:34px 12px 18px;color:var(--tinta2)}
+html[data-viva="laudai"] body .output-empty .ic{width:64px;height:64px;border-radius:50%;background:var(--acSup);color:var(--acInk);font-size:30px;
+  display:grid;place-items:center;margin:0 auto 16px;animation:vvPop .5s var(--mola) both}
+html[data-viva="laudai"] body .output-empty h3{font-size:17px;font-weight:650;color:var(--tinta);margin-bottom:16px}
+html[data-viva="laudai"] body .passos-vazio{list-style:none;padding:0;margin:0 auto;max-width:360px;display:flex;flex-direction:column;gap:10px;text-align:left}
+html[data-viva="laudai"] body .passos-vazio li{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--tinta2);line-height:1.45;
+  background:var(--sup2);border-radius:16px;padding:10px 14px 10px 10px;animation:vvSobe .45s var(--suave) both}
+html[data-viva="laudai"] body .passos-vazio li:nth-child(2){animation-delay:.06s}
+html[data-viva="laudai"] body .passos-vazio li:nth-child(3){animation-delay:.12s}
+html[data-viva="laudai"] body .passos-vazio li b{flex:0 0 28px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:13px;color:#fff;
+  background:color-mix(in srgb,var(--c-cobalto) 86%,#000)}
+html[data-viva="laudai"] body .passos-vazio li:nth-child(2) b{background:color-mix(in srgb,var(--c-violeta) 86%,#000)}
+html[data-viva="laudai"] body .passos-vazio li:nth-child(3) b{background:color-mix(in srgb,var(--c-teal) 80%,#000)}
+html[data-viva="laudai"] body .loader{padding:44px 16px;gap:14px}
+html[data-viva="laudai"] body .loader .spinner{width:52px;height:52px;border-width:4px;border-color:var(--acSup);border-top-color:var(--ac)}
+html[data-viva="laudai"] body .loader-step{font-size:15px;font-weight:650;color:var(--acInk)}
+html[data-viva="laudai"] body .loader-text{font-size:13px;color:var(--tinta2)}
+html[data-viva="laudai"] body .loader-bar{height:8px;background:var(--sup3);max-width:340px}
+html[data-viva="laudai"] body .loader-bar-fill{background:var(--ac);transition:width 1.2s var(--suave)}
+html[data-viva="laudai"] body .output-error{display:flex;gap:14px;align-items:flex-start;background:var(--errSup);border-radius:18px;padding:18px;animation:vvTreme .4s both}
+html[data-viva="laudai"] body .output-error.hidden{display:none}
+html[data-viva="laudai"] body .output-error .oe-ic{width:38px;height:38px;flex:0 0 38px;border-radius:50%;display:grid;place-items:center;font-size:20px;
+  background:color-mix(in srgb,var(--errV) 18%,var(--sup));color:color-mix(in srgb,var(--errV) 75%,var(--tinta))}
+html[data-viva="laudai"] body .output-error .oe-t{font-weight:650;color:color-mix(in srgb,var(--errV) 65%,var(--tinta));margin-bottom:4px}
+html[data-viva="laudai"] body .output-error .oe-m{font-size:13.5px;color:var(--tinta);line-height:1.55;margin-bottom:12px}
+html[data-viva="laudai"] body .laudo{background:var(--sup2);border:0;border-radius:18px;padding:20px 22px;animation:vvSobe .45s var(--suave) both}
+html[data-viva="laudai"] body .laudo-meta{gap:8px;border-color:var(--fio)}
+html[data-viva="laudai"] body .tag{border-radius:999px;font-size:12px;font-weight:600;padding:4px 11px;background:var(--sup);color:var(--tinta2);letter-spacing:0}
+html[data-viva="laudai"] body .tag.ok{background:var(--okSup);color:color-mix(in srgb,var(--okV) 60%,var(--tinta))}
+html[data-viva="laudai"] body .tag.warn{background:var(--avSup);color:color-mix(in srgb,var(--avV) 60%,var(--tinta))}
+html[data-viva="laudai"] body .tag.crit{background:var(--errSup);color:color-mix(in srgb,var(--errV) 65%,var(--tinta))}
+/* títulos do laudo em frase normal (sem caixa alta espaçada) */
+html[data-viva="laudai"] body .laudo-content h2{font-size:15px;font-weight:650;text-transform:none;letter-spacing:-.01em;color:var(--acInk);margin:20px 0 8px}
+html[data-viva="laudai"] body .laudo-content h2:first-child{margin-top:0}
+html[data-viva="laudai"] body .laudo-content h3{font-size:14px;color:var(--tinta)}
+html[data-viva="laudai"] body .laudo-content :is(p,ul,ol){font-size:14.5px;line-height:1.7;color:var(--tinta)}
+html[data-viva="laudai"] body .laudo-content strong{color:var(--tinta)}
+html[data-viva="laudai"] body .laudo-content em{color:var(--tinta2)}
+html[data-viva="laudai"] body .laudo-edit{min-height:240px;font-size:14.5px;line-height:1.65;background:var(--sup)!important}
+html[data-viva="laudai"] body .output-actions{gap:8px;margin-top:16px}
+html[data-viva="laudai"] body .output-actions .btn{min-height:42px;padding:9px 18px;font-size:14px}
+html[data-viva="laudai"] body .fb-warn{border-radius:16px;background:var(--errSup);border:0}
+
+/* ---------- histórico ---------- */
+html[data-viva="laudai"] body #view-historico{max-width:860px;margin:0 auto}
+html[data-viva="laudai"] body .hist-topo{display:flex;gap:10px;align-items:center}
+html[data-viva="laudai"] body .hist-topo .btn{flex:0 0 auto}
+html[data-viva="laudai"] body .busca{flex:1 1 0;min-width:0;display:flex;align-items:center;gap:10px;min-height:48px;padding:0 8px 0 16px;background:var(--sup);border:1.5px solid var(--fio);
+  border-radius:999px;box-shadow:var(--sombraV);transition:border-color .15s,box-shadow .2s}
+html[data-viva="laudai"] body .busca:focus-within{border-color:var(--ac);box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 16%,transparent)}
+html[data-viva="laudai"] body .busca .ti{color:var(--tinta2);font-size:18px}
+html[data-viva="laudai"] body .busca input,html[data-viva="laudai"] body #histBusca,html[data-viva="laudai"] body #histBusca:focus{flex:1;min-width:0;border:0!important;background:transparent!important;box-shadow:none!important;padding:10px 0;font-size:15px;color:var(--tinta);border-radius:0}
+html[data-viva="laudai"] body .busca kbd{font:600 12px/1 'Inter',system-ui,sans-serif;color:var(--tinta2);background:var(--sup2);border:1px solid var(--fioF);border-radius:8px;padding:5px 8px}
+html[data-viva="laudai"] body .hist-sub{font-size:13px;color:var(--tinta2);margin:12px 4px 14px}
+html[data-viva="laudai"] body .hist-lista{display:flex;flex-direction:column;gap:10px}
+html[data-viva="laudai"] body .hist-item{display:flex;align-items:center;gap:14px;margin:0;padding:12px 12px 12px 14px;background:var(--sup);border:1px solid var(--fio);
+  border-radius:20px;box-shadow:var(--sombraV);cursor:pointer;transition:transform .2s var(--mola),box-shadow .2s,border-color .2s;animation:vvSobe .4s var(--suave) both}
+html[data-viva="laudai"] body .hist-item:nth-child(2){animation-delay:.04s}
+html[data-viva="laudai"] body .hist-item:nth-child(3){animation-delay:.08s}
+html[data-viva="laudai"] body .hist-item:nth-child(n+4){animation-delay:.12s}
+html[data-viva="laudai"] body .hist-item:hover{transform:translateY(-2px);box-shadow:var(--sombraM);border-color:color-mix(in srgb,var(--k) 35%,var(--fio))}
+html[data-viva="laudai"] body .hi-ic{width:44px;height:44px;flex:0 0 44px;border-radius:50%;display:grid;place-items:center;font-size:21px;
+  background:color-mix(in srgb,var(--k) 14%,var(--sup));color:color-mix(in srgb,var(--k) 80%,var(--tinta));transition:transform .25s var(--mola)}
+html[data-viva="laudai"] body .hist-item:hover .hi-ic{transform:scale(1.08) rotate(-6deg)}
+html[data-viva="laudai"] body .hi-txt{flex:1;min-width:0}
+html[data-viva="laudai"] body .hist-item .modal-list-item-title{font-size:15px;font-weight:650;color:var(--tinta);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-viva="laudai"] body .hist-item .modal-list-item-sub{font-size:13px;color:var(--tinta2);margin-top:2px}
+html[data-viva="laudai"] body .hist-item .modal-list-item-date{font-size:12.5px;color:var(--tinta2);white-space:nowrap;font-variant-numeric:tabular-nums}
+html[data-viva="laudai"] body .vazio{text-align:center;padding:40px 20px;background:var(--sup);border:1px dashed var(--fioF);border-radius:var(--rG);color:var(--tinta2);animation:vvSobe .45s var(--suave) both}
+html[data-viva="laudai"] body .vazio .v-ic{width:60px;height:60px;border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;font-size:28px;background:color-mix(in srgb,var(--c-violeta) 14%,var(--sup));color:color-mix(in srgb,var(--c-violeta) 80%,var(--tinta))}
+html[data-viva="laudai"] body .vazio b{display:block;font-size:16px;color:var(--tinta);margin-bottom:4px}
+html[data-viva="laudai"] body .vazio p{font-size:14px;margin-bottom:16px}
+
+/* ---------- janelas ---------- */
+html[data-viva="laudai"] body .modal-bg{background:rgba(20,24,39,.42);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+/* aqui .modal é o cartão (a folha trata .modal como o fundo escurecido): .modal-bg>.modal vence e volta a ser branco */
+html[data-viva="laudai"] body .modal-bg>.modal{background:var(--sup)!important;-webkit-backdrop-filter:none;backdrop-filter:none;border:1px solid var(--fio);border-radius:26px;box-shadow:var(--sombraM);color:var(--tinta);animation:vvPop .32s var(--mola) both}
+html[data-viva="laudai"] body .modal-header{padding:22px 22px 0}
+html[data-viva="laudai"] body .modal-body{padding:18px 22px 22px}
+html[data-viva="laudai"] body .modal-footer{padding:0 22px 22px}
+html[data-viva="laudai"] body .modal-title{font-size:19px;font-weight:700;letter-spacing:-.02em}
+html[data-viva="laudai"] body .modal-sub{color:var(--tinta2)}
+html[data-viva="laudai"] body .modal-close{width:40px;height:40px;flex:0 0 40px;border-radius:50%;display:grid;place-items:center;background:var(--sup2);color:var(--tinta);font-size:19px;padding:0}
+html[data-viva="laudai"] body .modal-close:hover{background:var(--sup3)}
+html[data-viva="laudai"] body .paywall-hero{background:var(--sup2);border:0;border-radius:18px}
+html[data-viva="laudai"] body .paywall-price{color:var(--acInk)}
+html[data-viva="laudai"] body .paywall-features .ti{color:var(--okV)}
+html[data-viva="laudai"] body .dv-section-title{text-transform:none;letter-spacing:0;font-size:13px;font-weight:650;color:var(--tinta)}
+html[data-viva="laudai"] body .dv-preset{border-radius:999px;background:var(--sup2);border:1.5px solid transparent;color:var(--tinta);min-height:36px}
+html[data-viva="laudai"] body .dv-preset:hover{background:var(--acSup);color:var(--acInk)}
+html[data-viva="laudai"] body .dv-preset.active{background:var(--ac);border-color:var(--ac);color:#fff}
+html[data-viva="laudai"] body .dv-canvas-wrap{border-radius:18px}
+html[data-viva="laudai"] body .dv-range input[type=number]{border-radius:10px;min-height:36px}
+
+/* ---------- avisos ---------- */
+/* div.toast vence a folha (a animação dela zera o translateX(-50%) que centraliza o aviso) */
+html[data-viva="laudai"] body div.toast{display:flex;align-items:center;gap:10px;padding:11px 18px 11px 12px;font-size:14px;font-weight:500;bottom:28px;
+  animation:toast-in .3s var(--suave) both;background:var(--tinta)!important;color:var(--sup)!important;width:max-content;max-width:calc(100vw - 32px)}
+html[data-viva="laudai"] body .toast .ti{width:26px;height:26px;flex:0 0 26px;border-radius:50%;display:grid;place-items:center;font-size:16px;background:rgba(255,255,255,.16)}
+html[data-viva="laudai"] body div.toast.success{background:var(--tinta)!important;color:var(--sup)!important}
+html[data-viva="laudai"] body div.toast.error{background:var(--errFill)!important;color:var(--fillTxt)!important}
+html[data-viva="laudai"] body .toast.success .ti{background:var(--okFill);color:var(--fillTxt)}
+html[data-viva="laudai"] body .toast.error .ti{background:var(--errFill);color:var(--fillTxt)}
+/* preenchimento de acerto/erro com letra legível (4,5:1) */
+html[data-viva="laudai"] body{--okFill:color-mix(in srgb,var(--okV) 78%,#000);--errFill:color-mix(in srgb,var(--errV) 84%,#000);--fillTxt:#fff}
+html[data-viva="laudai"] body .btn.feito{background:var(--okFill)!important;border-color:var(--okFill)!important;color:var(--fillTxt)!important}
+
+/* ---------- apresentação (antes do login; em produção fica sob a tela de login do MedTech) ---------- */
+html[data-viva="laudai"] body .landing{--land-bg:var(--papel);--land-bg-2:var(--sup2);--land-surface:var(--sup);--land-border:var(--fio);--land-text:var(--tinta);
+  --land-text-dim:var(--tinta2);--land-text-faint:var(--tinta2);--land-blue:var(--acInk);--land-blue-2:var(--ac);--land-blue-soft:var(--acSup);--land-grad:var(--ac)}
+html[data-viva="laudai"] body .land-brand-mark{border-radius:50%;background:var(--ac)}
+html[data-viva="laudai"] body .land-btn{border-radius:999px}
+html[data-viva="laudai"] body .land-btn-primary{background:var(--ac);color:#fff;box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 28%,transparent)}
+html[data-viva="laudai"] body .land-mock-content{font-family:'Inter',system-ui,sans-serif;border-radius:16px}
+html[data-viva="laudai"] body :is(.land-step,.land-exam-card,.land-price-card,.land-faq-item,.land-hero-mock){border-radius:var(--rG)}
+
+/* ---------- telas médias e celular ---------- */
+@media (max-width:1100px){
+  html[data-viva="laudai"] body .user-chip .email{display:none}
+  html[data-viva="laudai"] body .user-chip{padding:4px}
+}
+@media (max-width:960px){
+  html[data-viva="laudai"] body .grid{grid-template-columns:minmax(0,1fr)}
+  html[data-viva="laudai"] body .col-laudo{position:static}
+  html[data-viva="laudai"] body .laudo-card{min-height:0}
+}
+@media (max-width:760px){
+  /* barra inferior: 3 itens, o ícone ativo em pílula colorida */
+  html[data-viva="laudai"] body .la-abas{position:fixed;left:0;right:0;bottom:0;z-index:60;margin:0;border-radius:0;gap:0;justify-content:space-around;
+    padding:6px 8px calc(6px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--sup) 94%,transparent);
+    -webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px);border-top:1px solid var(--fio);box-shadow:0 -6px 20px rgba(20,24,39,.06)}
+  html[data-viva="laudai"] body .la-aba,html[data-viva="laudai"] body .la-aba.so-cel{display:flex;flex:1;flex-direction:column;gap:3px;min-height:56px;padding:2px 4px;
+    font-size:12px;font-weight:550;background:transparent!important;box-shadow:none!important;color:var(--tinta2)}
+  html[data-viva="laudai"] body .la-aba .ab-ic{width:auto;height:32px;padding:0 18px;border-radius:999px;background:transparent;color:inherit;font-size:21px;box-shadow:none!important}
+  html[data-viva="laudai"] body .la-aba:hover .ab-ic{transform:none}
+  html[data-viva="laudai"] body .la-aba[aria-current=page]{color:color-mix(in srgb,var(--c) 78%,var(--tinta));font-weight:700}
+  html[data-viva="laudai"] body .la-aba[aria-current=page] .ab-ic{background:var(--c);color:#fff;transform:translateY(-1px)}
+  html[data-viva="laudai"] body .la-aba .ab-n{position:absolute;top:0;left:calc(50% + 10px);min-width:18px;height:18px;padding:0 5px;font-size:11px;
+    background:color-mix(in srgb,var(--c-violeta) 84%,#000);color:#fff}
+  html[data-viva="laudai"] body .container{padding:16px 14px calc(96px + env(safe-area-inset-bottom))}
+  html[data-viva="laudai"] body .topbar{padding:8px 14px;padding-top:calc(8px + env(safe-area-inset-top));min-height:58px}
+  html[data-viva="laudai"] body #btn-settings,html[data-viva="laudai"] body .subscription-badge span{display:none}
+  html[data-viva="laudai"] body .subscription-badge{width:40px;height:40px;padding:0;justify-content:center}
+  html[data-viva="laudai"] body .subscription-badge .ti{font-size:20px}
+  html[data-viva="laudai"] body .card{padding:18px 16px;border-radius:20px}
+  html[data-viva="laudai"] body .warn-ribbon{padding:10px 12px;margin-bottom:14px}
+  html[data-viva="laudai"] body .warn-ribbon .txt{font-size:13px}
+  html[data-viva="laudai"] body .grid{gap:16px}
+  html[data-viva="laudai"] body .col-entrada{gap:16px}
+  html[data-viva="laudai"] body :is(.input,.textarea,.select){font-size:16px}
+  html[data-viva="laudai"] body .la-chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -16px 10px;padding:2px 16px 4px}
+  html[data-viva="laudai"] body .la-chips::-webkit-scrollbar{display:none}
+  html[data-viva="laudai"] body .la-chips .chip{flex:0 0 auto;min-height:40px}
+  html[data-viva="laudai"] body .uploader{padding:14px}
+  html[data-viva="laudai"] body .uploader-icon{width:44px;height:44px;flex-basis:44px;font-size:21px}
+  html[data-viva="laudai"] body .output-actions .btn{flex:1 1 calc(50% - 8px)}
+  html[data-viva="laudai"] body .output-actions #btn-copy{flex-basis:100%}
+  html[data-viva="laudai"] body .hist-item{padding:10px 10px 10px 12px;gap:12px}
+  html[data-viva="laudai"] body .hist-item{flex-wrap:wrap;row-gap:2px}
+  html[data-viva="laudai"] body .hist-item .hi-copiar{order:3}
+  html[data-viva="laudai"] body .hist-item .modal-list-item-date{order:4;flex:1 1 100%;padding-left:56px;font-size:12px}
+  html[data-viva="laudai"] body .busca kbd{display:none}
+  html[data-viva="laudai"] body .hist-topo .btn{padding:6px 12px;white-space:nowrap;min-height:44px}
+  html[data-viva="laudai"] body #histBusca{font-size:16px}
+  html[data-viva="laudai"] body .row{grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr)}
+  html[data-viva="laudai"] body .la-chips .chip[aria-pressed=true]{box-shadow:none!important}
+  html[data-viva="laudai"] body div.toast{bottom:calc(86px + env(safe-area-inset-bottom))}
+  html[data-viva="laudai"] body .modal-bg{align-items:flex-end;padding:10px}
+  html[data-viva="laudai"] body .modal{max-height:92vh}
+  html[data-viva="laudai"] body .icon-btn,html[data-viva="laudai"] body .modal-close{width:44px;height:44px}
+}
+@media (max-width:380px){
+  html[data-viva="laudai"] body .brand-name{font-size:16px}
+  html[data-viva="laudai"] body .row{grid-template-columns:1fr}
+}
+
+/* ---------- tema escuro (só com data-viva-escuro no <html>) ---------- */
+@media (prefers-color-scheme:dark){
+  html[data-viva="laudai"][data-viva-escuro] body{--okFill:var(--okV);--errFill:var(--errV);--fillTxt:#0D1017}
+  html[data-viva="laudai"][data-viva-escuro] body .warn-ribbon .ic{background:color-mix(in srgb,var(--c-ambar) 24%,var(--sup));color:var(--avV)}
+  html[data-viva="laudai"][data-viva-escuro] body .la-aba[aria-current=page] .ab-ic{color:#fff}
+  html[data-viva="laudai"][data-viva-escuro] body .thumb{border-color:var(--fioF)}
+  @media (max-width:760px){html[data-viva="laudai"][data-viva-escuro] body .la-aba[aria-current=page]{color:color-mix(in srgb,var(--c) 60%,var(--tinta))}}
+}
+} /* @media screen */
