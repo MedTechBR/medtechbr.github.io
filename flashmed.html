@@ -661,6 +661,51 @@ html[data-astra] .topic .kind,html[data-astra] .topic .n{color:var(--k)!importan
   .fm-anel .arco,#ringFill{transition:none!important}
   .opt,.topic,.btn,.tab,.fm-ind .ind{transition:none!important}
 }
+
+/* ---------- 24/09/2026: a questão inteira na tela do celular (PWA) ----------
+   Pedido do Matheus com print do iPhone: ao abrir a questão, só se viam o enunciado e duas
+   alternativas. O que empurrava (430 px): cabeçalho de 116 px (marca e abas em duas linhas),
+   placar de 94 px, ações em duas linhas (79 px), etiquetas em três linhas e alternativas de
+   57 a 79 px (letra de 32 px e paddings do cartão e da página comendo a largura). Só vale na
+   tela da questão (.fm-qtela: sessão em andamento ou simulado em prova); o montador não muda.
+   Receita do TráfegoTítulo (tt-v16). */
+@media(max-width:760px){
+  .fm-qtela .wrap{padding-left:calc(8px + env(safe-area-inset-left));padding-right:calc(8px + env(safe-area-inset-right))}
+  /* cabeçalho: marca e abas numa linha só */
+  .fm-qtela header{padding:calc(4px + env(safe-area-inset-top)) 0 4px!important;margin-bottom:8px}
+  .fm-qtela header .wrap{flex-wrap:nowrap;gap:8px}
+  .fm-qtela .brand h1{font-size:1.05rem!important;gap:8px;flex:none}
+  .fm-qtela .brand h1::before{width:28px;height:28px;font-size:.85rem}
+  .fm-qtela .brand .tag{display:none}
+  .fm-qtela header .tabs{width:auto;margin:0 0 0 auto!important;padding:3px;min-width:0}
+  .fm-qtela .tab{flex:0 1 auto!important;padding:4px 12px 4px 6px!important;font-size:.84rem!important;gap:7px!important}
+  .fm-qtela .tab::before{width:18px;height:18px}
+  /* placar numa pílula baixa e as três ações numa linha */
+  .fm-qtela #run .stats{margin-bottom:6px;border-radius:999px!important;padding:3px 14px 3px 4px!important;gap:10px}
+  .fm-qtela #run .ring{width:32px;height:32px}
+  .fm-qtela #run .metrics{gap:14px;flex-wrap:nowrap}
+  .fm-qtela #run .metric{display:flex;align-items:baseline;gap:5px}
+  .fm-qtela #run .metric .v{font-size:.95rem}
+  .fm-qtela #run .metric .l{margin:0;font-size:.62rem}
+  .fm-qtela #run .controls{flex-wrap:nowrap;gap:6px;margin-bottom:8px}
+  .fm-qtela #run .controls .ghost{flex:1 1 auto;min-width:0;min-height:36px;padding:0 8px;font-size:.8rem;overflow:hidden;text-overflow:ellipsis}
+  .fm-qtela .sim-topbar{flex-wrap:nowrap;gap:6px;margin-bottom:8px}
+  .fm-qtela .sim-topbar .vt{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.85rem}
+  .fm-qtela .sim-topbar .ghost,.fm-qtela .sim-topbar .btn{flex:none;min-height:36px;padding:0 11px;font-size:.8rem}
+  /* cartão: etiquetas numa linha só (as longas ganham reticências), dica de riscar logo abaixo */
+  .fm-qtela .card{padding:11px 10px 12px!important}
+  .fm-qtela .src-line,.fm-qtela .qhead{gap:5px 5px;margin-bottom:8px}
+  .fm-qtela .src-line>.src,.fm-qtela .qhead>.badge{flex:1 1 0;min-width:0;max-width:max-content;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    font-size:11.5px;padding:3px 9px!important}
+  .fm-qtela .src-line>.src.prova{flex:0 1 auto}   /* a prova e o ano são o que mais importa: só encolhe se não couber */
+  .fm-qtela .src-line>.num,.fm-qtela .qhead>.num{flex:none;font-size:11.5px;padding:3px 10px!important}
+  .fm-qtela .src-line .opts-hint,.fm-qtela .qhead .opts-hint{font-size:.72rem;line-height:1.25;margin:0!important}
+  .fm-qtela .enun{line-height:1.55;margin-bottom:10px}
+  /* alternativas mais baixas: letra menor, padding menor, texto com mais largura; toque segue em 44 px */
+  .fm-qtela .opts{gap:6px}
+  .fm-qtela .opt{padding:5px 8px!important;gap:9px;min-height:44px;font-size:14.5px;line-height:1.42}
+  .fm-qtela .opt .key{width:27px!important;height:27px!important;font-size:.78rem}
+}
 </style>
 </head>
 <body>
