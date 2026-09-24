@@ -8,7 +8,7 @@
 <title>CondutAI · condutas clínicas baseadas em diretrizes</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%232563EB'/%3E%3Crect x='42' y='24' width='16' height='52' rx='5' fill='white'/%3E%3Crect x='24' y='42' width='52' height='16' rx='5' fill='white'/%3E%3C/svg%3E">
 <script async src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
-<script defer src="condutai-banco.js?v=1"></script>
+<script defer src="condutai-banco.js?v=2"></script>
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"condutai",name:"CondutAI"};</script>
 <script type="module" src="_mtauth.js?v=26"></script>
@@ -1353,6 +1353,13 @@ html[data-viva="condutai"] body .mermaid-wrap{border-radius:18px;border:1px soli
 html[data-viva="condutai"] body .mermaid-label{border-left:0;background:var(--sup2);color:var(--tinta);font-size:13px;font-weight:600;padding:10px 14px}
 html[data-viva="condutai"] body .mermaid-label .ti{color:var(--acInk)}
 html[data-viva="condutai"] body .mermaid-scroll{background:#fff;color:#141827}
+/* o mermaid mede os rótulos FORA da conduta e desenha dentro dela: as regras de texto da conduta
+   (cor clara no escuro, 16px, entrelinha 1,72, margem do parágrafo) vazavam para dentro das caixas,
+   apagando o texto no tema escuro e cortando rótulos ("FV / TV sem puls"). Dentro do desenho, nada herda da conduta. */
+html[data-viva="condutai"] body .content .mermaid :is(p,span,div,li,b,strong,em){color:inherit;font-size:inherit;line-height:1.5;margin:0;letter-spacing:normal;max-width:none}
+html[data-viva="condutai"] body .content .mermaid .nodeLabel,html[data-viva="condutai"] body .content .mermaid .edgeLabel{color:#141827}
+html[data-viva="condutai"] body .content .mermaid .edgeLabel,html[data-viva="condutai"] body .content .mermaid .labelBkg{background:#fff}
+html[data-viva="condutai"] body .content .mermaid foreignObject{overflow:visible}
 /* fontes e relacionadas */
 html[data-viva="condutai"] body .sources{border-top:1px solid var(--fio)}
 html[data-viva="condutai"] body .sources-title,html[data-viva="condutai"] body .wb-related-title{font-size:14px;font-weight:650;color:var(--tinta);text-transform:none;letter-spacing:0;display:flex;align-items:center;gap:8px}
@@ -2930,6 +2937,9 @@ async function renderMermaidIn(container) {
   // mermaid carrega com defer; espera ate estar disponivel e inicializa lazy
   for (let i = 0; i < 60 && typeof mermaid === 'undefined'; i++) await new Promise(r => setTimeout(r, 40));
   if (!initMermaid()) return;
+  // o mermaid mede cada rótulo antes de desenhar: se a Inter ainda não carregou, mede com a fonte do sistema
+  // (mais estreita) e a caixa sai curta para o texto final ("Desfibrilar 200 J" cortado). Espera as 2 espessuras.
+  try { await Promise.race([Promise.all([document.fonts.load('15px Inter'), document.fonts.load('600 15px Inter')]), sleep(1500)]); } catch (e) {}
   for (const el of blocks) {
     const raw = el.getAttribute('data-source').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,'&');
     const code = sanitizeMermaid(raw);

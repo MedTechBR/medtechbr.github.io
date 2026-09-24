@@ -120,15 +120,15 @@ No Brasil, a doença de Wilson tem **Protocolo Clínico e Diretrizes Terapêutic
 
 \`\`\`mermaid
 flowchart TD
-    A["Jovem com hepatopatia inexplicada<br/>ou distonia/tremor + sintoma psiquiatrico"] --> B["Ceruloplasmina + cobre urinario 24h<br/>+ lampada de fenda"]
+    A["Jovem com hepatopatia inexplicada<br/>ou distonia/tremor + sintoma psiquiátrico"] --> B["Ceruloplasmina + cobre urinário 24h<br/>+ lâmpada de fenda"]
     B --> C["Achados sugestivos?<br/>Escore de Leipzig"]
-    C -->|"Escore maior ou igual a 4"| D["Diagnostico confirmado"]
-    C -->|"Escore 2 a 3"| E["Biopsia hepatica com cobre<br/>e/ou genetica ATP7B"]
+    C -->|"Escore maior ou igual a 4"| D["Diagnóstico confirmado"]
+    C -->|"Escore 2 a 3"| E["Biópsia hepática com cobre<br/>e/ou genética ATP7B"]
     C -->|"Escore 0 a 1"| F["Buscar outra causa"]
-    D --> G["Insuficiencia hepatica aguda<br/>com hemolise e coagulopatia?"]
-    G -->|Sim| H["Contatar centro transplantador<br/>com urgencia"]
-    G -->|Nao| I["Quelante (penicilamina ou trientina)<br/>ou zinco na manutencao"]
-    I --> J["Rastrear irmaos e parentes<br/>de primeiro grau"]
+    D --> G["Insuficiência hepática aguda<br/>com hemólise e coagulopatia?"]
+    G -->|Sim| H["Contatar centro transplantador<br/>com urgência"]
+    G -->|Não| I["Quelante (penicilamina ou trientina)<br/>ou zinco na manutenção"]
+    I --> J["Rastrear irmãos e parentes<br/>de primeiro grau"]
     class G critical;
     class H action;
     class J action;
@@ -280,15 +280,15 @@ Alternativas geralmente consideradas seguras incluem opioides para analgesia, on
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor abdominal intensa sem<br/>sinais peritoneais + neuro/psiquiatrico"] --> B["Urina escurece na luz?<br/>Hiponatremia? Gatilho recente?"]
-    B --> C["Dosar PBG e ALA urinarios<br/>amostra protegida da luz"]
+    A["Dor abdominal intensa sem<br/>sinais peritoneais + neuro/psiquiátrico"] --> B["Urina escurece na luz?<br/>Hiponatremia? Gatilho recente?"]
+    B --> C["Dosar PBG e ALA urinários<br/>amostra protegida da luz"]
     C --> D["PBG muito elevado?"]
-    D -->|Nao| E["Buscar outra causa<br/>considerar saturnismo"]
+    D -->|Não| E["Buscar outra causa<br/>considerar saturnismo"]
     D -->|Sim| F["Porfiria aguda confirmada"]
     F --> G["Suspender drogas porfirinogenicas<br/>e corrigir jejum"]
-    G --> H["Crise moderada ou grave?<br/>Fraqueza, convulsao, vomitos"]
-    H -->|Nao| I["Carga de carboidrato<br/>e analgesia segura"]
-    H -->|Sim| J["Hemina intravenosa precoce<br/>+ suporte e vigilancia respiratoria"]
+    G --> H["Crise moderada ou grave?<br/>Fraqueza, convulsão, vômitos"]
+    H -->|Não| I["Carga de carboidrato<br/>e analgesia segura"]
+    H -->|Sim| J["Hemina intravenosa precoce<br/>+ suporte e vigilância respiratória"]
     class H critical;
     class J action;
     class I action;
@@ -463,13 +463,13 @@ Uma decisão prática importante é **calibrar a intensidade ao gatilho**: SAM r
 
 \`\`\`mermaid
 flowchart TD
-    A["Febre persistente + citopenias<br/>sem resposta a antibiotico"] --> B["Dosar ferritina, trigliceridios,<br/>fibrinogenio, funcao hepatica"]
+    A["Febre persistente + citopenias<br/>sem resposta a antibiótico"] --> B["Dosar ferritina, trigliceridios,<br/>fibrinogênio, função hepática"]
     B --> C["Ferritina muito alta +<br/>esplenomegalia + citopenias?"]
-    C -->|Nao| D["Seguir investigacao de sepse<br/>e outras causas"]
+    C -->|Não| D["Seguir investigação de sepse<br/>e outras causas"]
     C -->|Sim| E["Aplicar criterios HLH-2004<br/>e HScore; mielograma"]
-    E --> F["HLH provavel"]
-    F --> G["Buscar gatilho em paralelo<br/>EBV, linfoma, reumatologica, calazar"]
-    F --> H["Iniciar imunossupressao sem atraso<br/>dexametasona +/- etoposideo ou anakinra"]
+    E --> F["HLH provável"]
+    F --> G["Buscar gatilho em paralelo<br/>EBV, linfoma, reumatológica, calazar"]
+    F --> H["Iniciar imunossupressão sem atraso<br/>dexametasona +/- etoposídeo ou anakinra"]
     H --> I["Suporte em UTI e<br/>acompanhar queda da ferritina"]
     class C critical;
     class F critical;
@@ -639,15 +639,15 @@ No Brasil, o acesso a C1-INH, icatibanto e lanadelumabe frequentemente depende d
 \`\`\`mermaid
 flowchart TD
     A["Angioedema recorrente<br/>sem urticaria e sem prurido"] --> B["Melhorou com anti-H1,<br/>corticoide e adrenalina?"]
-    B -->|Sim| C["Provavel angioedema<br/>histaminergico ou alergico"]
-    B -->|Nao| D["Dosar C4"]
+    B -->|Sim| C["Provável angioedema<br/>histaminérgico ou alérgico"]
+    B -->|Não| D["Dosar C4"]
     D --> E["C4 baixo?"]
-    E -->|Nao| F["Considerar AEH com C1-INH normal<br/>ou angioedema por IECA"]
-    E -->|Sim| G["Dosar C1-INH nivel e funcao + C1q"]
+    E -->|Não| F["Considerar AEH com C1-INH normal<br/>ou angioedema por IECA"]
+    E -->|Sim| G["Dosar C1-INH nível e função + C1q"]
     G --> H["AEH tipo I ou II confirmado"]
-    H --> I["Edema de laringe?<br/>Rouquidao, disfagia, estridor"]
-    I -->|Sim| J["Proteger via aerea +<br/>C1-INH ou icatibanto imediatos"]
-    I -->|Nao| K["Tratar crise sob demanda<br/>+ avaliar profilaxia e rastrear familia"]
+    H --> I["Edema de laringe?<br/>Rouquidão, disfagia, estridor"]
+    I -->|Sim| J["Proteger via aérea +<br/>C1-INH ou icatibanto imediatos"]
+    I -->|Não| K["Tratar crise sob demanda<br/>+ avaliar profilaxia e rastrear família"]
     class I critical;
     class J action;
     class K action;
@@ -820,15 +820,15 @@ Não há cura. O objetivo é **modificar modestamente a progressão e maximizar 
 
 \`\`\`mermaid
 flowchart TD
-    A["Fraqueza progressiva indolor<br/>com atrofia e fasciculacoes"] --> B["Exame com sinais de NMS e NMI<br/>sem alteracao sensitiva?"]
-    B -->|Nao| C["Investigar outra causa"]
-    B -->|Sim| D["ENMG + RM cranio e coluna<br/>+ laboratorio de exclusao"]
-    D --> E["Bloqueio de conducao ou causa<br/>tratavel identificada?"]
+    A["Fraqueza progressiva indolor<br/>com atrofia e fasciculações"] --> B["Exame com sinais de NMS e NMI<br/>sem alteração sensitiva?"]
+    B -->|Não| C["Investigar outra causa"]
+    B -->|Sim| D["ENMG + RM crânio e coluna<br/>+ laboratório de exclusão"]
+    D --> E["Bloqueio de condução ou causa<br/>tratável identificada?"]
     E -->|Sim| F["Tratar mimetizador<br/>ex. neuropatia motora multifocal"]
-    E -->|Nao| G["Diagnostico de ELA"]
+    E -->|Não| G["Diagnóstico de ELA"]
     G --> H["Riluzol 50 mg a cada 12 horas"]
-    G --> I["Avaliar funcao respiratoria<br/>e indicar VNI precoce"]
-    G --> J["Nutricao, gastrostomia oportuna,<br/>reabilitacao e comunicacao assistida"]
+    G --> I["Avaliar função respiratória<br/>e indicar VNI precoce"]
+    G --> J["Nutrição, gastrostomia oportuna,<br/>reabilitação e comunicação assistida"]
     G --> K["Cuidados paliativos precoces<br/>e diretivas antecipadas"]
     class E critical;
     class I action;
@@ -1008,13 +1008,13 @@ A conduta é **estratificada pelo órgão acometido e pela gravidade**: manifest
 
 \`\`\`mermaid
 flowchart TD
-    A["Aftas orais recorrentes"] --> B["Ha ulceras genitais, uveite,<br/>lesao cutanea ou patergia?"]
-    B -->|Nao| C["Aftose oral recorrente<br/>investigar outras causas"]
-    B -->|Sim| D["Doenca de Behcet provavel<br/>aplicar criterios"]
-    D --> E["Acometimento ocular, neurologico,<br/>vascular ou gastrointestinal?"]
-    E -->|Nao| F["Colchicina + corticoide topico<br/>e AINE se artrite"]
-    E -->|Sim| G["Corticoide sistemico +<br/>imunossupressor ou anti-TNF precoce"]
-    G --> H["Trombose: tratar com imunossupressao<br/>e excluir aneurisma pulmonar"]
+    A["Aftas orais recorrentes"] --> B["Há úlceras genitais, uveite,<br/>lesão cutânea ou patergia?"]
+    B -->|Não| C["Aftose oral recorrente<br/>investigar outras causas"]
+    B -->|Sim| D["Doenca de Behcet provável<br/>aplicar criterios"]
+    D --> E["Acometimento ocular, neurológico,<br/>vascular ou gastrointestinal?"]
+    E -->|Não| F["Colchicina + corticoide tópico<br/>e AINE se artrite"]
+    E -->|Sim| G["Corticoide sistêmico +<br/>imunossupressor ou anti-TNF precoce"]
+    G --> H["Trombose: tratar com imunossupressão<br/>e excluir aneurisma pulmonar"]
     class E critical;
     class G action;
     class F action;
@@ -1026,11 +1026,11 @@ A trombose da doença de Behçet é **inflamatória**: resulta da vasculite da p
 
 \`\`\`mermaid
 flowchart TD
-    A["Trombose venosa em paciente com Behcet"] --> B["Iniciar imunossupressao<br/>corticoide + azatioprina ou anti-TNF"]
-    B --> C["Ha hemoptise ou suspeita de<br/>aneurisma de arteria pulmonar?"]
-    C -->|Sim| D["Angio-TC de torax<br/>NAO anticoagular ate excluir"]
-    C -->|Nao| E["Considerar anticoagulacao<br/>apos excluir aneurisma"]
-    D --> F["Aneurisma confirmado: imunossupressao<br/>intensa, evitar anticoagulante isolado"]
+    A["Trombose venosa em paciente com Behcet"] --> B["Iniciar imunossupressão<br/>corticoide + azatioprina ou anti-TNF"]
+    B --> C["Há hemoptise ou suspeita de<br/>aneurisma de artéria pulmonar?"]
+    C -->|Sim| D["Angio-TC de tórax<br/>NAO anticoagular até excluir"]
+    C -->|Não| E["Considerar anticoagulação<br/>após excluir aneurisma"]
+    D --> F["Aneurisma confirmado: imunossupressão<br/>intensa, evitar anticoagulante isolado"]
     class C critical;
     class D critical;
     class B action;
@@ -1227,16 +1227,16 @@ O diagnóstico tem **três etapas obrigatórias** e pular qualquer uma delas pro
 
 \`\`\`mermaid
 flowchart TD
-    A["IC com paredes espessas e ECG de baixa voltagem<br/>ou proteinuria + neuropatia + tunel do carpo"] --> B["Cadeias leves livres +<br/>imunofixacao serica e urinaria"]
+    A["IC com paredes espessas e ECG de baixa voltagem<br/>ou proteinúria + neuropatia + túnel do carpo"] --> B["Cadeias leves livres +<br/>imunofixação sérica e urinária"]
     B --> C["Componente monoclonal presente?"]
-    C -->|Sim| D["Biopsia com vermelho Congo<br/>+ tipagem da fibrila"]
-    C -->|Nao| E["Cintilografia com pirofosfato"]
-    E --> F["Captacao miocardica<br/>Perugini 2 ou 3?"]
-    F -->|Sim| G["ATTR cardiaca sem biopsia<br/>fazer genetica TTR"]
-    F -->|Nao| H["Buscar outra causa"]
+    C -->|Sim| D["Biópsia com vermelho Congo<br/>+ tipagem da fibrila"]
+    C -->|Não| E["Cintilografia com pirofosfato"]
+    E --> F["Captação miocárdica<br/>Perugini 2 ou 3?"]
+    F -->|Sim| G["ATTR cardíaca sem biópsia<br/>fazer genética TTR"]
+    F -->|Não| H["Buscar outra causa"]
     D --> I["AL confirmada"]
-    I --> J["Hematologia com urgencia<br/>tratar o clone de plasmocitos"]
-    G --> K["Estabilizador ou silenciador<br/>e rastrear familia se hereditaria"]
+    I --> J["Hematologia com urgência<br/>tratar o clone de plasmócitos"]
+    G --> K["Estabilizador ou silenciador<br/>e rastrear família se hereditária"]
     class I critical;
     class J action;
     class K action;
@@ -1426,16 +1426,16 @@ Interpretar com cuidado: a **ferritina é reagente de fase aguda** e sobe em inf
 
 \`\`\`mermaid
 flowchart TD
-    A["Ferritina elevada, fadiga, artralgia<br/>ou hepatopatia inexplicada"] --> B["Saturacao de transferrina<br/>e ferritina em jejum"]
-    B --> C["Saturacao de transferrina maior que 45%<br/>com ferritina alta?"]
-    C -->|Nao| D["Provavel hiperferritinemia por inflamacao,<br/>alcool ou esteatose"]
+    A["Ferritina elevada, fadiga, artralgia<br/>ou hepatopatia inexplicada"] --> B["Saturação de transferrina<br/>e ferritina em jejum"]
+    B --> C["Saturação de transferrina maior que 45%<br/>com ferritina alta?"]
+    C -->|Não| D["Provável hiperferritinemia por inflamação,<br/>alcool ou esteatose"]
     C -->|Sim| E["Genotipagem HFE"]
     E --> F["Homozigose C282Y?"]
-    F -->|Nao| G["Investigar sobrecarga secundaria<br/>ou formas nao-HFE"]
-    F -->|Sim| H["Hemocromatose hereditaria confirmada"]
+    F -->|Não| G["Investigar sobrecarga secundária<br/>ou formas não-HFE"]
+    F -->|Sim| H["Hemocromatose hereditária confirmada"]
     H --> I["Ferritina muito alta ou<br/>transaminases altas: avaliar fibrose"]
-    H --> J["Flebotomia periodica ate<br/>ferritina baixo-normal e manutencao"]
-    J --> K["Abstinencia de alcool, sem ferro suplementar,<br/>rastrear CHC se cirrose e rastrear familiares"]
+    H --> J["Flebotomia periódica até<br/>ferritina baixo-normal e manutenção"]
+    J --> K["Abstinência de alcool, sem ferro suplementar,<br/>rastrear CHC se cirrose e rastrear familiares"]
     class I critical;
     class J action;
     class K action;
@@ -1628,17 +1628,17 @@ No Brasil, a terapia de reposição enzimática é de alto custo e o acesso cost
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor em queimacao em maos e pes desde jovem,<br/>angioqueratomas, proteinuria, HVE ou AVC precoce"] --> B["Paciente e homem ou mulher?"]
+    A["Dor em queimação em mãos e pés desde jovem,<br/>angioqueratomas, proteinúria, HVE ou AVC precoce"] --> B["Paciente e homem ou mulher?"]
     B -->|Homem| C["Dosar alfa-galactosidase A"]
     B -->|Mulher| D["Sequenciar gene GLA<br/>enzima pode ser normal"]
     C --> E["Enzima baixa ou ausente?"]
-    E -->|Sim| F["Confirmar com genetica GLA<br/>e lyso-Gb3"]
-    E -->|Nao| G["Se suspeita persiste,<br/>fazer genetica mesmo assim"]
+    E -->|Sim| F["Confirmar com genética GLA<br/>e lyso-Gb3"]
+    E -->|Não| G["Se suspeita persiste,<br/>fazer genética mesmo assim"]
     D --> F
     F --> H["Doenca de Fabry confirmada"]
-    H --> I["Avaliar orgao-alvo: proteinuria e TFG,<br/>ECG, eco e RM cardiaca, RM de cranio"]
-    H --> J["Terapia de reposicao enzimatica ou<br/>migalastate se mutacao amenavel"]
-    H --> K["IECA ou BRA para proteinuria, manejo da dor,<br/>prevencao de AVC e rastreio familiar"]
+    H --> I["Avaliar órgão-alvo: proteinúria e TFG,<br/>ECG, eco e RM cardíaca, RM de crânio"]
+    H --> J["Terapia de reposição enzimática ou<br/>migalastate se mutação amenável"]
+    H --> K["IECA ou BRA para proteinúria, manejo da dor,<br/>prevenção de AVC e rastreio familiar"]
     class E critical;
     class J action;
     class K action;
@@ -1835,18 +1835,18 @@ No Brasil, a acromegalia tem **Protocolo Clínico e Diretrizes Terapêuticas do 
 
 \`\`\`mermaid
 flowchart TD
-    A["Crescimento de extremidades, tracos faciais,<br/>tunel do carpo, apneia, diabetes"] --> B["Dosar IGF-1 ajustado para a idade"]
+    A["Crescimento de extremidades, traços faciais,<br/>túnel do carpo, apneia, diabetes"] --> B["Dosar IGF-1 ajustado para a idade"]
     B --> C["IGF-1 elevado?"]
-    C -->|Nao| D["Acromegalia improvavel<br/>buscar outra causa"]
-    C -->|"Sim, mas limitrofe"| E["GH no TOTG: nao suprime?"]
-    C -->|"Sim, inequivoco"| F["Diagnostico bioquimico estabelecido"]
+    C -->|Não| D["Acromegalia improvável<br/>buscar outra causa"]
+    C -->|"Sim, mas limítrofe"| E["GH no TOTG: não suprime?"]
+    C -->|"Sim, inequívoco"| F["Diagnóstico bioquímico estabelecido"]
     E -->|Sim| F
-    F --> G["RM de sela turcica com contraste<br/>+ campimetria + demais eixos"]
+    F --> G["RM de sela túrcica com contraste<br/>+ campimetria + demais eixos"]
     G --> H["Adenoma identificado"]
     H --> I["Cirurgia transesfenoidal<br/>em centro de alto volume"]
-    I --> J["IGF-1 ainda elevado no pos-operatorio?"]
-    J -->|Sim| K["Analogo de somatostatina, pegvisomanto<br/>ou cabergolina; radioterapia se refratario"]
-    J -->|Nao| L["Seguimento com IGF-1, RM<br/>e manejo das comorbidades"]
+    I --> J["IGF-1 ainda elevado no pos-operatório?"]
+    J -->|Sim| K["Análogo de somatostatina, pegvisomanto<br/>ou cabergolina; radioterapia se refratário"]
+    J -->|Não| L["Seguimento com IGF-1, RM<br/>e manejo das comorbidades"]
     class J critical;
     class I action;
     class K action;
@@ -2043,15 +2043,15 @@ No Brasil, a doença de Paget óssea conta com **Protocolo Clínico e Diretrizes
 
 \`\`\`mermaid
 flowchart TD
-    A["Fosfatase alcalina alta isolada em maior de 50 anos<br/>ou dor ossea e deformidade"] --> B["Calcio, fosforo e funcao hepatica normais?"]
-    B -->|Nao| C["Investigar hepatopatia, osteomalacia<br/>ou hiperparatireoidismo"]
+    A["Fosfatase alcalina alta isolada em maior de 50 anos<br/>ou dor óssea e deformidade"] --> B["Cálcio, fósforo e função hepática normais?"]
+    B -->|Não| C["Investigar hepatopatia, osteomalacia<br/>ou hiperparatireoidismo"]
     B -->|Sim| D["Radiografia do osso suspeito"]
-    D --> E["Padrao tipico: trabeculado grosseiro,<br/>cortical espessa, osso aumentado?"]
-    E -->|Nao| F["Considerar metastase ossea<br/>ou outra causa; investigar"]
-    E -->|Sim| G["Doenca de Paget confirmada<br/>cintilografia para mapear extensao"]
-    G --> H["Sintomatico ou sitio de risco<br/>cranio, coluna, periarticular, osso de carga?"]
-    H -->|Nao| I["Observar com fosfatase alcalina periodica"]
-    H -->|Sim| J["Corrigir vitamina D e calcio; entao<br/>acido zoledronico 5 mg IV em dose unica"]
+    D --> E["Padrão típico: trabeculado grosseiro,<br/>cortical espessa, osso aumentado?"]
+    E -->|Não| F["Considerar metástase óssea<br/>ou outra causa; investigar"]
+    E -->|Sim| G["Doenca de Paget confirmada<br/>cintilografia para mapear extensão"]
+    G --> H["Sintomático ou sítio de risco<br/>crânio, coluna, periarticular, osso de carga?"]
+    H -->|Não| I["Observar com fosfatase alcalina periódica"]
+    H -->|Sim| J["Corrigir vitamina D e cálcio; entao<br/>ácido zoledrônico 5 mg IV em dose única"]
     J --> K["Reavaliar fosfatase alcalina em 3 a 6 meses<br/>retratar se recidiva"]
     class H critical;
     class J action;
@@ -2242,15 +2242,15 @@ Vale detalhar o limiar do **KDIGO** para não iniciar o esquema imunossupressor 
 
 \`\`\`mermaid
 flowchart TD
-    A["Hemoptise ou infiltrado alveolar +<br/>creatinina subindo com hematuria"] --> B["Sindrome pulmao-rim: emergencia"]
-    B --> C["Solicitar anti-MBG e ANCA com urgencia<br/>+ biopsia renal + sedimento urinario"]
-    C --> D["Iniciar tratamento empirico<br/>sem esperar o resultado"]
-    D --> E["Corticoide em pulso + ciclofosfamida<br/>+ plasmaferese precoce"]
-    E --> F["Ha hemorragia alveolar?"]
-    F -->|Sim| G["Tratar sempre, mesmo em dialise;<br/>repor plasma fresco na aferese"]
-    F -->|Nao| H["Dialise a apresentacao com 100% de crescentes<br/>e esclerose extensa na biopsia?"]
-    H -->|Sim| I["Rim irrecuperavel: priorizar terapia renal<br/>substitutiva e evitar imunossupressao futil"]
-    H -->|Nao| J["Manter esquema ate negativar anti-MBG"]
+    A["Hemoptise ou infiltrado alveolar +<br/>creatinina subindo com hematuria"] --> B["Síndrome pulmao-rim: emergência"]
+    B --> C["Solicitar anti-MBG e ANCA com urgência<br/>+ biópsia renal + sedimento urinário"]
+    C --> D["Iniciar tratamento empírico<br/>sem esperar o resultado"]
+    D --> E["Corticoide em pulso + ciclofosfamida<br/>+ plasmaférese precoce"]
+    E --> F["Há hemorragia alveolar?"]
+    F -->|Sim| G["Tratar sempre, mesmo em diálise;<br/>repor plasma fresco na aférese"]
+    F -->|Não| H["Diálise a apresentação com 100% de crescentes<br/>e esclerose extensa na biópsia?"]
+    H -->|Sim| I["Rim irrecuperável: priorizar terapia renal<br/>substitutiva e evitar imunossupressão fútil"]
+    H -->|Não| J["Manter esquema até negativar anti-MBG"]
     class B critical;
     class F critical;
     class E action;
@@ -2440,17 +2440,17 @@ Regra de ouro: **revascularizar preferencialmente com a doença inflamatória co
 
 \`\`\`mermaid
 flowchart TD
-    A["Mulher jovem com sintomas constitucionais,<br/>VHS/PCR altos ou claudicacao de bracos"] --> B["Medir PA nos quatro membros<br/>e auscultar trajetos arteriais"]
-    B --> C["Assimetria de pulso ou PA, sopro<br/>ou hipertensao de dificil controle?"]
-    C -->|Nao| D["Investigar outras causas<br/>de inflamacao sistemica"]
-    C -->|Sim| E["Angio-TC ou angio-RM de aorta e ramos<br/>PET-CT se duvida de atividade"]
+    A["Mulher jovem com sintomas constitucionais,<br/>VHS/PCR altos ou claudicação de braços"] --> B["Medir PA nos quatro membros<br/>e auscultar trajetos arteriais"]
+    B --> C["Assimetria de pulso ou PA, sopro<br/>ou hipertensão de difícil controle?"]
+    C -->|Não| D["Investigar outras causas<br/>de inflamação sistêmica"]
+    C -->|Sim| E["Angio-TC ou angio-RM de aorta e ramos<br/>PET-CT se dúvida de atividade"]
     E --> F["Espessamento parietal, estenose<br/>ou aneurisma em grandes vasos?"]
-    F -->|Nao| G["Reavaliar diagnostico"]
+    F -->|Não| G["Reavaliar diagnóstico"]
     F -->|Sim| H["Arterite de Takayasu"]
-    H --> I["Corticoide em dose alta +<br/>imunossupressor poupador desde o inicio"]
-    I --> J["Refrataria ou recidivante?"]
-    J -->|Sim| K["Tocilizumabe ou anti-TNF;<br/>seguir por imagem, nao por PCR"]
-    J -->|Nao| L["Estenose critica sintomatica:<br/>revascularizar com doenca controlada"]
+    H --> I["Corticoide em dose alta +<br/>imunossupressor poupador desde o início"]
+    I --> J["Refratária ou recidivante?"]
+    J -->|Sim| K["Tocilizumabe ou anti-TNF;<br/>seguir por imagem, não por PCR"]
+    J -->|Não| L["Estenose crítica sintomática:<br/>revascularizar com doenca controlada"]
     class C critical;
     class I action;
     class L action;
@@ -4078,12 +4078,12 @@ Não usar dispositivos de restrição nem "proibir de andar": imobilizar aumenta
 
 \`\`\`mermaid
 flowchart TD
-    A["Idoso na consulta<br/>rastrear queda no ultimo ano"] --> B["Caiu, tem medo de cair<br/>ou marcha alterada?"]
-    B -->|Nao| C["Orientacao preventiva<br/>reavaliar anualmente"]
-    B -->|Sim| D["Avaliacao multifatorial<br/>historia, TUG, PA deitado e em pe"]
-    D --> E["Sinal de alarme?<br/>sincope, TCE, anticoagulado, nao levantou"]
-    E -->|Sim| F["Investigacao aguda<br/>e avaliacao hospitalar"]
-    E -->|Nao| G["Intervencao multicomponente<br/>exercicio, desprescricao, visao, ambiente"]
+    A["Idoso na consulta<br/>rastrear queda no último ano"] --> B["Caiu, tem medo de cair<br/>ou marcha alterada?"]
+    B -->|Não| C["Orientação preventiva<br/>reavaliar anualmente"]
+    B -->|Sim| D["Avaliação multifatorial<br/>história, TUG, PA deitado e em pe"]
+    D --> E["Sinal de alarme?<br/>sincope, TCE, anticoagulado, não levantou"]
+    E -->|Sim| F["Investigação aguda<br/>e avaliação hospitalar"]
+    E -->|Não| G["Intervenção multicomponente<br/>exercício, desprescrição, visão, ambiente"]
     class E critical;
     class F critical;
     class G action;
@@ -4220,14 +4220,14 @@ Registrar no prontuário o motivo da retirada e comunicar os outros prescritores
 
 \`\`\`mermaid
 flowchart TD
-    A["Idoso em uso de 5 ou mais medicamentos"] --> B["Reconciliacao: trazer todas as caixas<br/>incluir isentos e fitoterapicos"]
+    A["Idoso em uso de 5 ou mais medicamentos"] --> B["Reconciliação: trazer todas as caixas<br/>incluir isentos e fitoterápicos"]
     B --> C["Sintoma novo presente?"]
-    C -->|Sim| D["Suspeitar efeito adverso<br/>ou cascata iatrogenica"]
-    C -->|Nao| E["Revisao droga a droga<br/>Beers 2023 e STOPP-START v3"]
+    C -->|Sim| D["Suspeitar efeito adverso<br/>ou cascata iatrogênica"]
+    C -->|Não| E["Revisão droga a droga<br/>Beers 2023 e STOPP-START v3"]
     D --> E
-    E --> F["Droga de alto risco<br/>e baixo beneficio?"]
-    F -->|Sim| G["Desprescrever: 1 por vez<br/>reducao gradual e reavaliacao"]
-    F -->|Nao| H["Manter, ajustar dose<br/>a funcao renal"]
+    E --> F["Droga de alto risco<br/>e baixo benefício?"]
+    F -->|Sim| G["Desprescrever: 1 por vez<br/>redução gradual e reavaliação"]
+    F -->|Não| H["Manter, ajustar dose<br/>a função renal"]
     class D critical;
     class G action;
     class H action;
@@ -4369,13 +4369,13 @@ A reavaliação diária desses cuidados é parte da rotina: risco de lesão por 
 
 \`\`\`mermaid
 flowchart TD
-    A["Idoso restrito ao leito"] --> B["Rastrear causa reversivel<br/>dor, droga, delirium, depressao, deficit"]
-    B --> C["Avaliar risco de lesao por pressao<br/>escala de Braden e inspecao da pele"]
-    C --> D["Eritema nao branqueavel<br/>ou lesao ja instalada?"]
-    D -->|Sim| E["Alivio total da pressao<br/>curativo conforme estagio e suporte nutricional"]
-    D -->|Nao| F["Prevencao: mudanca de decubito a cada 2h<br/>superficie de alivio e cuidado da pele"]
-    B --> G["Mobilizacao precoce diaria<br/>sentar, transferir, deambular"]
-    G --> H["Profilaxia de TVP, higiene oral<br/>rotina intestinal e prevencao de delirium"]
+    A["Idoso restrito ao leito"] --> B["Rastrear causa reversível<br/>dor, droga, delirium, depressão, déficit"]
+    B --> C["Avaliar risco de lesão por pressão<br/>escala de Braden e inspeção da pele"]
+    C --> D["Eritema não branqueável<br/>ou lesão ja instalada?"]
+    D -->|Sim| E["Alívio total da pressão<br/>curativo conforme estágio e suporte nutricional"]
+    D -->|Não| F["Prevenção: mudança de decúbito a cada 2h<br/>superfície de alívio e cuidado da pele"]
+    B --> G["Mobilização precoce diária<br/>sentar, transferir, deambular"]
+    G --> H["Profilaxia de TVP, higiene oral<br/>rotina intestinal e prevenção de delirium"]
     class D critical;
     class E action;
     class G action;
@@ -4522,13 +4522,13 @@ Não há, até o momento, fármaco aprovado para tratar fragilidade ou sarcopeni
 
 \`\`\`mermaid
 flowchart TD
-    A["Idoso em avaliacao"] --> B["Rastrear fragilidade<br/>CFS, fenotipo de Fried ou SARC-F"]
-    B --> C["Frágil ou pre-fragil?"]
-    C -->|Nao| D["Manter prevencao<br/>atividade fisica e reavaliacao"]
-    C -->|Sim| E["Excluir causa tratavel<br/>depressao, neoplasia, tireoide, anemia, drogas"]
+    A["Idoso em avaliação"] --> B["Rastrear fragilidade<br/>CFS, fenótipo de Fried ou SARC-F"]
+    B --> C["Frágil ou pre-frágil?"]
+    C -->|Não| D["Manter prevenção<br/>atividade física e reavaliação"]
+    C -->|Sim| E["Excluir causa tratável<br/>depressão, neoplasia, tireoide, anemia, drogas"]
     E --> F["Fragilidade grave<br/>CFS 7 a 9?"]
-    F -->|Nao| G["Exercicio resistido e de equilibrio<br/>proteina, vitamina D, desprescricao"]
-    F -->|Sim| H["Foco em funcao e conforto<br/>metas de cuidado e evitar iatrogenia"]
+    F -->|Não| G["Exercício resistido e de equilíbrio<br/>proteína, vitamina D, desprescrição"]
+    F -->|Sim| H["Foco em função e conforto<br/>metas de cuidado e evitar iatrogenia"]
     class F critical;
     class G action;
     class H action;
@@ -4671,13 +4671,13 @@ Reposição de tiamina antes de glicose no etilista e na suspeita de desnutriç�
 
 \`\`\`mermaid
 flowchart TD
-    A["Idoso com confusao<br/>ou mudanca aguda do comportamento"] --> B["Aplicar CAM ou 4AT<br/>comparar com o basal informado pela familia"]
-    B --> C["Delirium provavel?"]
-    C -->|Nao| D["Considerar demencia<br/>depressao ou psicose"]
-    C -->|Sim| E["Buscar causa organica<br/>infeccao, drogas, eletrolitos, dor, bexigoma, fecaloma"]
-    E --> F["Medidas nao farmacologicas<br/>reorientacao, sono, mobilizacao, familiar, sem contencao"]
-    F --> G["Agitacao com risco<br/>apos medidas nao farmacologicas?"]
-    G -->|Nao| H["Manter medidas e tratar a causa"]
+    A["Idoso com confusão<br/>ou mudança aguda do comportamento"] --> B["Aplicar CAM ou 4AT<br/>comparar com o basal informado pela família"]
+    B --> C["Delirium provável?"]
+    C -->|Não| D["Considerar demencia<br/>depressão ou psicose"]
+    C -->|Sim| E["Buscar causa orgânica<br/>infecção, drogas, eletrólitos, dor, bexigoma, fecaloma"]
+    E --> F["Medidas não farmacológicas<br/>reorientação, sono, mobilização, familiar, sem contenção"]
+    F --> G["Agitação com risco<br/>após medidas não farmacológicas?"]
+    G -->|Não| H["Manter medidas e tratar a causa"]
     G -->|Sim| I["Haloperidol 0,25 a 0,5 mg<br/>menor dose e menor tempo"]
     class C critical;
     class G critical;
@@ -4802,12 +4802,12 @@ Comunicar isso é parte do tratamento. Vale nomear para a família que **parar d
 
 \`\`\`mermaid
 flowchart TD
-    A["Demencia avancada<br/>ingesta reduzida e perda de peso"] --> B["Buscar causa reversivel<br/>candidiase, dente, dor, constipacao, droga, depressao"]
-    B --> C["Causa reversivel encontrada?"]
-    C -->|Sim| D["Tratar a causa<br/>e reofertar alimentacao oral"]
-    C -->|Nao| E["Anorexia terminal da propria doenca"]
-    E --> F["Alimentacao oral assistida e confortavel<br/>comer por prazer, sem meta calorica"]
-    F --> G["Explicar a familia<br/>sonda nao prolonga vida nem evita aspiracao"]
+    A["Demencia avançada<br/>ingesta reduzida e perda de peso"] --> B["Buscar causa reversível<br/>candidíase, dente, dor, constipação, droga, depressão"]
+    B --> C["Causa reversível encontrada?"]
+    C -->|Sim| D["Tratar a causa<br/>e reofertar alimentação oral"]
+    C -->|Não| E["Anorexia terminal da própria doenca"]
+    E --> F["Alimentação oral assistida e confortável<br/>comer por prazer, sem meta calórica"]
+    F --> G["Explicar a família<br/>sonda não prolonga vida nem evita aspiração"]
     class E critical;
     class D action;
     class F action;
@@ -4832,14 +4832,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Demencia avancada<br/>dependencia total e disfagia"] --> B["Alinhar metas de cuidado<br/>com familia e diretivas previas"]
-    B --> C["Piora aguda ou agitacao nova?"]
-    C -->|Sim| D["Buscar causa reversivel<br/>dor, infeccao, bexigoma, fecaloma, droga"]
-    C -->|Nao| E["Plano de conforto<br/>higiene oral, pele, posicionamento, analgesia"]
+    A["Demencia avançada<br/>dependência total e disfagia"] --> B["Alinhar metas de cuidado<br/>com família e diretivas prévias"]
+    B --> C["Piora aguda ou agitação nova?"]
+    C -->|Sim| D["Buscar causa reversível<br/>dor, infecção, bexigoma, fecaloma, droga"]
+    C -->|Não| E["Plano de conforto<br/>higiene oral, pele, posicionamento, analgesia"]
     D --> F["Corrigir a causa<br/>e reavaliar proporcionalidade"]
     E --> G["Disfagia com perda de peso?"]
-    G -->|Sim| H["Alimentacao oral assistida cuidadosa<br/>nao indicar sonda ou gastrostomia"]
-    G -->|Nao| I["Manter cuidado e apoiar o cuidador"]
+    G -->|Sim| H["Alimentação oral assistida cuidadosa<br/>não indicar sonda ou gastrostomia"]
+    G -->|Não| I["Manter cuidado e apoiar o cuidador"]
     class C critical;
     class D critical;
     class H action;
@@ -5001,13 +5001,13 @@ A execução é **interdisciplinar** — médico, enfermagem, fisioterapia, tera
 
 \`\`\`mermaid
 flowchart TD
-    A["Pessoa idosa em consulta"] --> B["Rastreio breve<br/>quedas, memoria, funcao, peso, drogas, sentidos, suporte"]
+    A["Pessoa idosa em consulta"] --> B["Rastreio breve<br/>quedas, memória, função, peso, drogas, sentidos, suporte"]
     B --> C["Algum rastreio positivo<br/>ou idoso complexo?"]
-    C -->|Nao| D["Cuidado convencional<br/>e reavaliacao periodica"]
-    C -->|Sim| E["AGA completa por dominios<br/>Katz, Lawton, MEEM, Yesavage, TUG, MAN, Beers"]
-    E --> F["Listar e priorizar problemas<br/>com paciente e familia"]
-    F --> G["Plano interdisciplinar<br/>reabilitacao, desprescricao, nutricao, ambiente, cuidador"]
-    G --> H["Definir metas de cuidado<br/>e reavaliacao programada"]
+    C -->|Não| D["Cuidado convencional<br/>e reavaliação periódica"]
+    C -->|Sim| E["AGA completa por domínios<br/>Katz, Lawton, MEEM, Yesavage, TUG, MAN, Beers"]
+    E --> F["Listar e priorizar problemas<br/>com paciente e família"]
+    F --> G["Plano interdisciplinar<br/>reabilitação, desprescrição, nutrição, ambiente, cuidador"]
+    G --> H["Definir metas de cuidado<br/>e reavaliação programada"]
     class C critical;
     class G action;
     class H action;
@@ -5160,14 +5160,14 @@ Trate a dor e a náusea (analgésico e antiemético) — o vômito eleva a PIO e
 
 \`\`\`mermaid
 flowchart TD
-    A["Olho vermelho doloroso<br/>halos + nausea"] --> B["Pupila semi-midriase fixa<br/>olho duro?"]
+    A["Olho vermelho doloroso<br/>halos + nausea"] --> B["Pupila semi-midríase fixa<br/>olho duro?"]
     B -->|Sim| C["Tonometria<br/>PIO > 40-50 mmHg"]
-    B -->|Nao| D["Investigar uveite<br/>ceratite ou conjuntivite"]
-    C --> E["Deitar + colirios<br/>timolol brimonidina corticoide"]
-    E --> F["Acetazolamida 500 mg<br/>manitol se refrataria"]
-    F --> G["PIO comecou a cair?"]
+    B -->|Não| D["Investigar uveite<br/>ceratite ou conjuntivite"]
+    C --> E["Deitar + colírios<br/>timolol brimonidina corticoide"]
+    E --> F["Acetazolamida 500 mg<br/>manitol se refratária"]
+    F --> G["PIO começou a cair?"]
     G -->|Sim| H["Acrescentar pilocarpina 1-2%"]
-    G -->|Nao| I["Paracentese ou iridoplastia<br/>oftalmo agora"]
+    G -->|Não| I["Paracentese ou iridoplastia<br/>oftalmo agora"]
     H --> J["Iridotomia YAG em 24-48h<br/>+ profilaxia no outro olho"]
     class C critical;
     class J action;
@@ -5326,15 +5326,15 @@ Gravidade e prognóstico dependem de: tempo até a reperfusão, oclusão complet
 
 \`\`\`mermaid
 flowchart TD
-    A["Perda visual subita<br/>indolor monocular"] --> B["DPAR + retina palida<br/>com mancha cereja"]
-    B --> C["Acionar protocolo de AVC<br/>anotar horario de inicio"]
-    C --> D["Inicio ha menos de 4,5 h?"]
-    D -->|Sim| E["Discutir alteplase IV<br/>com servico de AVC"]
-    D -->|Nao| F["Suporte + investigacao<br/>sem trombolise"]
+    A["Perda visual súbita<br/>indolor monocular"] --> B["DPAR + retina pálida<br/>com mancha cereja"]
+    B --> C["Acionar protocolo de AVC<br/>anotar horário de início"]
+    C --> D["Início há menos de 4,5 h?"]
+    D -->|Sim| E["Discutir alteplase IV<br/>com serviço de AVC"]
+    D -->|Não| F["Suporte + investigação<br/>sem trombolise"]
     C --> G["Idade acima de 50 anos<br/>ou VHS/PCR altos?"]
-    G -->|Sim| H["Corticoide imediato<br/>antes da biopsia temporal"]
-    G -->|Nao| I["Seguir investigacao vascular"]
-    E --> J["Carotidas ECG/Holter eco<br/>+ AAS e estatina"]
+    G -->|Sim| H["Corticoide imediato<br/>antes da biópsia temporal"]
+    G -->|Não| I["Seguir investigação vascular"]
+    E --> J["Carótidas ECG/Holter eco<br/>+ AAS e estatina"]
     F --> J
     class B critical;
     class H critical;
@@ -5498,13 +5498,13 @@ O tamponamento com gás é temporário (o SF6 reabsorve em cerca de 2 semanas, o
 
 \`\`\`mermaid
 flowchart TD
-    A["Fotopsias + moscas volantes<br/>de inicio subito"] --> B["Mapeamento de retina<br/>sob midriase"]
+    A["Fotopsias + moscas volantes<br/>de início súbito"] --> B["Mapeamento de retina<br/>sob midríase"]
     B --> C["Retina descolada?"]
-    C -->|Nao, so rotura| D["Laser ou criopexia<br/>em 24-72 h"]
-    C -->|Sim| E["Cortina no campo<br/>visao central caiu?"]
-    E -->|Nao, macula ON| F["Cirurgia de urgencia<br/>ideal em ate 24 h"]
-    E -->|Sim, macula OFF| G["Cirurgia precoce<br/>em geral ate 1 semana"]
-    F --> H["Vitrectomia introflexao<br/>ou retinopexia pneumatica"]
+    C -->|Não, so rotura| D["Laser ou criopexia<br/>em 24-72 h"]
+    C -->|Sim| E["Cortina no campo<br/>visão central caiu?"]
+    E -->|Não, mácula ON| F["Cirurgia de urgência<br/>ideal em até 24 h"]
+    E -->|Sim, mácula OFF| G["Cirurgia precoce<br/>em geral até 1 semana"]
+    F --> H["Vitrectomia introflexão<br/>ou retinopexia pneumática"]
     G --> H
     class E critical;
     class H action;
@@ -5668,15 +5668,15 @@ Fatores prognósticos: acuidade visual inicial, presença de DPAR, mecanismo (ru
 
 \`\`\`mermaid
 flowchart TD
-    A["Trauma ocular<br/>medir acuidade visual"] --> B["Agente quimico envolvido?"]
-    B -->|Sim| C["Irrigar ja com SF ou Ringer<br/>15-30 min ate pH normal"]
-    C --> D["Everter palpebras<br/>retirar particulas"]
-    B -->|Nao| E["Pupila irregular Seidel +<br/>hipotonia conteudo extravasado?"]
+    A["Trauma ocular<br/>medir acuidade visual"] --> B["Agente químico envolvido?"]
+    B -->|Sim| C["Irrigar ja com SF ou Ringer<br/>15-30 min até pH normal"]
+    C --> D["Everter pálpebras<br/>retirar partículas"]
+    B -->|Não| E["Pupila irregular Seidel +<br/>hipotonia conteúdo extravasado?"]
     E -->|Sim| F["Suspeita de globo aberto"]
-    F --> G["Concha rigida sem compressao<br/>jejum antiemetico ATB e antitetanica"]
-    G --> H["TC de orbita<br/>cirurgia em ate 24 h"]
-    E -->|Nao| I["Fluoresceina everter palpebra<br/>tonometria e fundoscopia"]
-    I --> J["Abrasao corpo estranho<br/>hifema ou fratura conforme achado"]
+    F --> G["Concha rígida sem compressão<br/>jejum antiemético ATB e antitetânica"]
+    G --> H["TC de órbita<br/>cirurgia em até 24 h"]
+    E -->|Não| I["Fluoresceína everter pálpebra<br/>tonometria e fundoscopia"]
+    I --> J["Abrasão corpo estranho<br/>hifema ou fratura conforme achado"]
     D --> H
     class F critical;
     class C critical;
@@ -5850,11 +5850,11 @@ Reavaliação em **1 a 3 dias** no início e depois semanal, até controle. Resp
 
 \`\`\`mermaid
 flowchart TD
-    A["Olho vermelho doloroso<br/>com fotofobia"] --> B["Injecao ciliar + miose<br/>visao borrada"]
-    B --> C["Lampada de fenda<br/>celulas e flare"]
-    C --> D["Sinais de infeccao?<br/>herpes sifilis TB toxo<br/>PIO alta atrofia de iris"]
-    D -->|Sim| E["Nao iniciar corticoide isolado<br/>tratar agente + antiviral"]
-    D -->|Nao| F["Prednisolona acetato 1%<br/>ate 1/1h com desmame lento"]
+    A["Olho vermelho doloroso<br/>com fotofobia"] --> B["Injeção ciliar + miose<br/>visão borrada"]
+    B --> C["Lâmpada de fenda<br/>células e flare"]
+    C --> D["Sinais de infecção?<br/>herpes sifilis TB toxo<br/>PIO alta atrofia de iris"]
+    D -->|Sim| E["Não iniciar corticoide isolado<br/>tratar agente + antiviral"]
+    D -->|Não| F["Prednisolona acetato 1%<br/>até 1/1h com desmame lento"]
     F --> G["Ciclopentolato 1% 3x/dia<br/>ou atropina 1%"]
     G --> H["Reavaliar em 1-3 dias<br/>investigar se recorrente ou bilateral"]
     class D critical;
@@ -6020,15 +6020,15 @@ Marcadores de gravidade: instabilidade hemodinâmica, necessidade de transfusão
 flowchart TD
     A["Epistaxe ativa<br/>sentar e inclinar para frente"] --> B["Comprimir asas do nariz<br/>10-15 min sem soltar"]
     B --> C["Parou?"]
-    C -->|Sim| D["Orientar umidificacao<br/>e evitar trauma digital"]
-    C -->|Nao| E["Vasoconstritor + anestesico<br/>rinoscopia com fotoforo"]
-    E --> F["Ponto sangrante anterior visivel?"]
+    C -->|Sim| D["Orientar umidificação<br/>e evitar trauma digital"]
+    C -->|Não| E["Vasoconstritor + anestésico<br/>rinoscopia com fotóforo"]
+    E --> F["Ponto sangrante anterior visível?"]
     F -->|Sim| G["Cauterizar com nitrato de prata<br/>so um lado do septo"]
-    F -->|Nao| H["Tampao anterior<br/>24-72 h"]
+    F -->|Não| H["Tampão anterior<br/>24-72 h"]
     H --> I["Sangue escorrendo pela faringe<br/>ou bilateral e volumoso?"]
-    I -->|Sim| J["Epistaxe posterior<br/>balao + internar + via aerea"]
-    I -->|Nao| K["Observar e reavaliar"]
-    J --> L["Otorrino: cauterizacao endoscopica<br/>ligadura da esfenopalatina ou embolizacao"]
+    I -->|Sim| J["Epistaxe posterior<br/>balão + internar + via aérea"]
+    I -->|Não| K["Observar e reavaliar"]
+    J --> L["Otorrino: cauterização endoscópica<br/>ligadura da esfenopalatina ou embolização"]
     class J critical;
     class L action;
     class G action;
@@ -6181,14 +6181,14 @@ Complicações a temer: **obstrução de via aérea**, aspiração de pus com pn
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor de garganta unilateral<br/>febre e odinofagia"] --> B["Trismo + voz de batata quente<br/>+ desvio de uvula"]
+    A["Dor de garganta unilateral<br/>febre e odinofagia"] --> B["Trismo + voz de batata quente<br/>+ desvio de úvula"]
     B --> C["Estridor dispneia ou<br/>sialorreia com asfixia?"]
-    C -->|Sim| D["Via aerea primeiro<br/>otorrino e anestesia"]
-    C -->|Nao| E["Puncao aspirativa no polo superior<br/>dirigida medialmente"]
+    C -->|Sim| D["Via aérea primeiro<br/>otorrino e anestesia"]
+    C -->|Não| E["Punção aspirativa no polo superior<br/>dirigida medialmente"]
     E --> F["Saiu pus?"]
-    F -->|Sim| G["Drenagem + ATB anti-anaerobio<br/>+ dexametasona + hidratacao"]
-    F -->|Nao| H["Celulite peritonsilar<br/>ou coleta profunda"]
-    H --> I["TC cervical com contraste<br/>excluir para/retrofaringeo"]
+    F -->|Sim| G["Drenagem + ATB anti-anaeróbio<br/>+ dexametasona + hidratação"]
+    F -->|Não| H["Celulite peritonsilar<br/>ou coleta profunda"]
+    H --> I["TC cervical com contraste<br/>excluir para/retrofaríngeo"]
     G --> J["Reavaliar em 24-48 h<br/>sem melhora: TC e reintervir"]
     class C critical;
     class D critical;
@@ -6338,15 +6338,15 @@ Complicações: paralisia de nervos cranianos (VII, IX, X, XI, e V/VI no ápice 
 
 \`\`\`mermaid
 flowchart TD
-    A["Idoso diabetico ou imunossuprimido<br/>com otalgia intensa e noturna"] --> B["Dor desproporcional que nao<br/>melhora com gotas em 1-2 semanas"]
-    B --> C["Granulacao no assoalho do conduto<br/>ou paralisia facial?"]
-    C -->|Sim| D["Suspeita de otite externa necrosante<br/>= osteomielite de base de cranio"]
-    C -->|Nao| E["Tratar como otite externa comum<br/>e reavaliar em 48-72 h"]
-    D --> F["VHS PCR glicemia HbA1c<br/>cultura e biopsia da granulacao"]
-    F --> G["TC de osso temporal com contraste<br/>+ RM se suspeita de extensao"]
-    G --> H["Antipseudomonas sistemico<br/>cipro 750 mg VO 12/12h ou ceftazidima IV"]
-    H --> I["Manter no minimo 6 semanas<br/>guiado por VHS e cintilografia"]
-    I --> J["Controle glicemico + toalete otologica<br/>desbridamento se necrose"]
+    A["Idoso diabético ou imunossuprimido<br/>com otalgia intensa e noturna"] --> B["Dor desproporcional que não<br/>melhora com gotas em 1-2 semanas"]
+    B --> C["Granulação no assoalho do conduto<br/>ou paralisia facial?"]
+    C -->|Sim| D["Suspeita de otite externa necrosante<br/>= osteomielite de base de crânio"]
+    C -->|Não| E["Tratar como otite externa comum<br/>e reavaliar em 48-72 h"]
+    D --> F["VHS PCR glicemia HbA1c<br/>cultura e biópsia da granulação"]
+    F --> G["TC de osso temporal com contraste<br/>+ RM se suspeita de extensão"]
+    G --> H["Antipseudomonas sistêmico<br/>cipro 750 mg VO 12/12h ou ceftazidima IV"]
+    H --> I["Manter no mínimo 6 semanas<br/>guiado por VHS e cintilografia"]
+    I --> J["Controle glicêmico + toalete otológica<br/>desbridamento se necrose"]
     class D critical;
     class C critical;
     class I action;
@@ -6509,16 +6509,16 @@ Gravidade: a vertigem periférica é benigna quanto ao risco de vida, mas **grav
 
 \`\`\`mermaid
 flowchart TD
-    A["Vertigem aguda<br/>caracterizar tempo e gatilho"] --> B["Nistagmo vertical ou que muda de direcao<br/>deficit focal ou ataxia grave?"]
-    B -->|Sim| C["Suspeita central<br/>RM com difusao e neurologia"]
-    B -->|Nao| D["Episodica de segundos<br/>desencadeada por posicao?"]
+    A["Vertigem aguda<br/>caracterizar tempo e gatilho"] --> B["Nistagmo vertical ou que muda de direção<br/>déficit focal ou ataxia grave?"]
+    B -->|Sim| C["Suspeita central<br/>RM com difusão e neurologia"]
+    B -->|Não| D["Episódica de segundos<br/>desencadeada por posição?"]
     D -->|Sim| E["Dix-Hallpike<br/>e teste de rolamento"]
     E --> F["VPPB confirmada<br/>manobra de Epley na hora"]
-    D -->|Nao| G["Continua por dias<br/>com nistagmo espontaneo?"]
+    D -->|Não| G["Continua por dias<br/>com nistagmo espontâneo?"]
     G -->|Sim| H["Aplicar HINTS"]
-    H --> I["Padrao periferico: neurite<br/>corticoide + reabilitacao precoce"]
-    G -->|Nao| J["Crises de 20 min a horas<br/>com hipoacusia e zumbido"]
-    J --> K["Menière: audiometria<br/>dieta hipossodica e diuretico"]
+    H --> I["Padrão periférico: neurite<br/>corticoide + reabilitação precoce"]
+    G -->|Não| J["Crises de 20 min a horas<br/>com hipoacusia e zumbido"]
+    J --> K["Menière: audiometria<br/>dieta hipossódica e diurético"]
     class B critical;
     class C critical;
     class F action;
@@ -7503,14 +7503,14 @@ Discuta a escolha com dermatologia e intensivismo. O que não é opcional é sus
 
 \`\`\`mermaid
 flowchart TD
-    A["Descolamento cutaneo<br/>+ Nikolsky + 2 mucosas"] --> B["Suspender IMEDIATAMENTE<br/>todo farmaco suspeito"]
-    B --> C["Calcular SCORTEN<br/>e area destacada"]
+    A["Descolamento cutâneo<br/>+ Nikolsky + 2 mucosas"] --> B["Suspender IMEDIATAMENTE<br/>todo fármaco suspeito"]
+    B --> C["Calcular SCORTEN<br/>e área destacada"]
     C --> D["SCORTEN alto ou<br/>descolamento maior que 10%?"]
     D -->|Sim| E["UTI ou unidade de queimados<br/>suporte tipo grande queimado"]
-    D -->|Nao| F["Internacao com monitorizacao<br/>e reavaliacao diaria da area"]
-    E --> G["Oftalmologia no dia 1<br/>curativo nao aderente + analgesia"]
+    D -->|Não| F["Internação com monitorização<br/>e reavaliação diária da área"]
+    E --> G["Oftalmologia no dia 1<br/>curativo não aderente + analgesia"]
     F --> G
-    G --> H["Discutir imunomodulacao<br/>ciclosporina ou etanercepte"]
+    G --> H["Discutir imunomodulação<br/>ciclosporina ou etanercepte"]
     class A critical;
     class B critical;
     class E critical;
@@ -7682,14 +7682,14 @@ Monitorar órgãos por semanas: hemograma, função hepática e renal semanais a
 
 \`\`\`mermaid
 flowchart TD
-    A["Exantema extenso + febre<br/>2 a 8 semanas apos farmaco novo"] --> B["Suspender a droga culpada<br/>e as introduzidas na janela"]
-    B --> C["Hemograma com eosinofilos<br/>TGO TGP creatinina TSH<br/>ECG e troponina"]
-    C --> D["Ha orgao acometido?"]
-    D -->|Nao| E["Corticoide topico potente<br/>anti-H1 e labs semanais"]
+    A["Exantema extenso + febre<br/>2 a 8 semanas após fármaco novo"] --> B["Suspender a droga culpada<br/>e as introduzidas na janela"]
+    B --> C["Hemograma com eosinófilos<br/>TGO TGP creatinina TSH<br/>ECG e troponina"]
+    C --> D["Há órgão acometido?"]
+    D -->|Não| E["Corticoide tópico potente<br/>anti-H1 e labs semanais"]
     D -->|Sim| F["Prednisona 0,5 a 1 mg/kg/dia<br/>desmame lento em 8 a 12 semanas"]
-    F --> G["Disfuncao grave: hepatite<br/>miocardite ou pneumonite?"]
+    F --> G["Disfunção grave: hepatite<br/>miocardite ou pneumonite?"]
     G -->|Sim| H["Internar em UTI<br/>pulso de metilprednisolona"]
-    G -->|Nao| I["Enfermaria com monitorizacao"]
+    G -->|Não| I["Enfermaria com monitorização"]
     E --> J["Seguimento prolongado<br/>TSH aos 3 e 6 meses"]
     H --> J
     I --> J
@@ -7845,13 +7845,13 @@ Desde o primeiro dia, trate a doença **e** o tratamento: profilaxia de osteopor
 
 \`\`\`mermaid
 flowchart TD
-    A["Doenca bolhosa cronica<br/>sem gatilho agudo"] --> B["Duas biopsias:<br/>lesao para histologia<br/>perilesional para IFD"]
-    B --> C["Bolha flacida<br/>Nikolsky positivo<br/>erosao oral?"]
+    A["Doenca bolhosa cronica<br/>sem gatilho agudo"] --> B["Duas biópsias:<br/>lesão para histologia<br/>perilesional para IFD"]
+    B --> C["Bolha flácida<br/>Nikolsky positivo<br/>erosão oral?"]
     C -->|Sim| D["Penfigo vulgar<br/>IFD intercelular anti-Dsg"]
-    C -->|Nao| E["Bolha tensa no idoso<br/>prurido e mucosa poupada"]
+    C -->|Não| E["Bolha tensa no idoso<br/>prurido e mucosa poupada"]
     E --> F["Penfigoide bolhoso<br/>IFD linear anti-BP180"]
     D --> G["Prednisona + rituximabe<br/>cuidados de ferida e mucosa"]
-    F --> H["Clobetasol 0,05% topico<br/>ou sistemico se extenso<br/>suspender gliptina"]
+    F --> H["Clobetasol 0,05% tópico<br/>ou sistêmico se extenso<br/>suspender gliptina"]
     class D critical;
     class G action;
     class H action;
@@ -8015,14 +8015,14 @@ A ciclosporina é útil quando se precisa de controle rápido sem saber ainda a 
 
 \`\`\`mermaid
 flowchart TD
-    A["Eritema e descamacao<br/>em mais de 90% da superficie"] --> B["Internar<br/>emergencia dermatologica"]
-    B --> C["Suporte: controle termico<br/>hidratacao eletrolitos<br/>emolientes e nutricao"]
-    C --> D["Suspender todos os<br/>farmacos suspeitos"]
-    D --> E["Investigar causa:<br/>biopsias multiplas + hemograma<br/>com celulas de Sezary"]
-    E --> F["Ha toxemia ou<br/>instabilidade hemodinamica?"]
-    F -->|Sim| G["UTI + culturas<br/>antibiotico dirigido"]
-    F -->|Nao| H["Enfermaria com<br/>reavaliacao diaria"]
-    G --> I["Tratar a causa de base<br/>evitar corticoide sistemico<br/>se suspeita de psoriase"]
+    A["Eritema e descamação<br/>em mais de 90% da superfície"] --> B["Internar<br/>emergência dermatológica"]
+    B --> C["Suporte: controle térmico<br/>hidratação eletrólitos<br/>emolientes e nutrição"]
+    C --> D["Suspender todos os<br/>fármacos suspeitos"]
+    D --> E["Investigar causa:<br/>biópsias múltiplas + hemograma<br/>com células de Sézary"]
+    E --> F["Há toxemia ou<br/>instabilidade hemodinâmica?"]
+    F -->|Sim| G["UTI + culturas<br/>antibiótico dirigido"]
+    F -->|Não| H["Enfermaria com<br/>reavaliação diária"]
+    G --> I["Tratar a causa de base<br/>evitar corticoide sistêmico<br/>se suspeita de psoriase"]
     H --> I
     class A critical;
     class F critical;
@@ -8176,13 +8176,13 @@ Tratar comorbidades é parte do plano: rastrear obesidade, dislipidemia, diabete
 
 \`\`\`mermaid
 flowchart TD
-    A["Psoriase em placas"] --> B["PASI maior que 10 ou<br/>BSA maior que 10% ou DLQI maior que 10<br/>ou artrite ou area especial?"]
-    B -->|Nao| C["Topicos: corticoide +<br/>analogo de vitamina D<br/>e fototerapia"]
-    B -->|Sim| D["Sistemico: metotrexato<br/>acitretina ou ciclosporina<br/>+ rastreio de TB e hepatites"]
-    D --> E["Falha ou intolerancia<br/>ou artrite ativa?"]
-    E -->|Sim| F["Imunobiologico anti-TNF<br/>anti-IL-17 ou anti-IL-23<br/>via PCDT no SUS"]
-    A --> G["Febre + pustulas esteris<br/>difusas: von Zumbusch"]
-    G --> H["INTERNAR: suporte<br/>hidratacao e calcio<br/>+ sistemico de inicio rapido"]
+    A["Psoriase em placas"] --> B["PASI maior que 10 ou<br/>BSA maior que 10% ou DLQI maior que 10<br/>ou artrite ou área especial?"]
+    B -->|Não| C["Tópicos: corticoide +<br/>análogo de vitamina D<br/>e fototerapia"]
+    B -->|Sim| D["Sistêmico: metotrexato<br/>acitretina ou ciclosporina<br/>+ rastreio de TB e hepatites"]
+    D --> E["Falha ou intolerância<br/>ou artrite ativa?"]
+    E -->|Sim| F["Imunobiológico anti-TNF<br/>anti-IL-17 ou anti-IL-23<br/>via PCDT no SUS"]
+    A --> G["Febre + pústulas esteris<br/>difusas: von Zumbusch"]
+    G --> H["INTERNAR: suporte<br/>hidratação e cálcio<br/>+ sistêmico de início rápido"]
     class G critical;
     class H critical;
     class F action;
@@ -8381,14 +8381,14 @@ Para o angioedema hereditário, o acesso às terapias específicas dirigidas à 
 
 \`\`\`mermaid
 flowchart TD
-    A["Urticas migratorias<br/>cada lesao dura menos de 24h"] --> B["Ha estridor, dispneia<br/>hipotensao ou edema de glote?"]
+    A["Urticas migratórias<br/>cada lesão dura menos de 24h"] --> B["Há estridor, dispneia<br/>hipotensão ou edema de glote?"]
     B -->|Sim| C["ANAFILAXIA<br/>adrenalina IM imediata"]
-    B -->|Nao| D["Angioedema sem urticaria<br/>refratario a anti-H1?"]
-    D -->|Sim| E["Via bradicinina:<br/>suspender IECA<br/>proteger via aerea<br/>dosar C4 e C1-inibidor"]
-    D -->|Nao| F["Anti-H1 de 2a geracao<br/>em dose padrao"]
+    B -->|Não| D["Angioedema sem urticaria<br/>refratário a anti-H1?"]
+    D -->|Sim| E["Via bradicinina:<br/>suspender IECA<br/>proteger via aérea<br/>dosar C4 e C1-inibidor"]
+    D -->|Não| F["Anti-H1 de 2ª geração<br/>em dose padrão"]
     F --> G["Sem controle em 2 a 4 semanas?"]
-    G -->|Sim| H["Aumentar ate 4x a dose<br/>e reavaliar"]
-    H --> I["Refrataria: omalizumabe<br/>em servico especializado"]
+    G -->|Sim| H["Aumentar até 4x a dose<br/>e reavaliar"]
+    H --> I["Refratária: omalizumabe<br/>em serviço especializado"]
     class B critical;
     class C critical;
     class E critical;
@@ -8399,12 +8399,12 @@ Um segundo eixo de decisão ajuda quando o problema dominante é **angioedema**,
 
 \`\`\`mermaid
 flowchart TD
-    A["Angioedema"] --> B["Ha urticas associadas<br/>e prurido?"]
-    B -->|Sim| C["Via histaminergica<br/>tratar como urticaria<br/>anti-H1 responde"]
-    B -->|Nao| D["Uso de IECA<br/>ou historia familiar?"]
-    D -->|IECA| E["Angioedema por IECA<br/>suspender o IECA<br/>proteger via aerea"]
-    D -->|Historia familiar| F["Suspeitar angioedema hereditario<br/>dosar C4 e C1-inibidor<br/>encaminhar imunologia"]
-    D -->|Nao| G["Reavaliar gatilhos<br/>observar via aerea"]
+    A["Angioedema"] --> B["Há urticas associadas<br/>e prurido?"]
+    B -->|Sim| C["Via histaminérgica<br/>tratar como urticaria<br/>anti-H1 responde"]
+    B -->|Não| D["Uso de IECA<br/>ou história familiar?"]
+    D -->|IECA| E["Angioedema por IECA<br/>suspender o IECA<br/>proteger via aérea"]
+    D -->|História familiar| F["Suspeitar angioedema hereditário<br/>dosar C4 e C1-inibidor<br/>encaminhar imunologia"]
+    D -->|Não| G["Reavaliar gatilhos<br/>observar via aérea"]
     class E critical;
     class F critical;
     class C action;
@@ -8586,13 +8586,13 @@ O desafio brasileiro é menos de fármaco e mais de **acesso a cirurgia e imagem
 
 \`\`\`mermaid
 flowchart TD
-    A["Eritema, calor e dor na face"] --> B["Dor a movimentacao ocular<br/>proptose ou baixa visao?"]
-    B -->|Sim| C["Celulite orbitaria<br/>TC de orbita e seios<br/>internar + ATB IV"]
-    B -->|Nao| D["Assoalho da boca endurecido<br/>lingua elevada ou estridor?"]
+    A["Eritema, calor e dor na face"] --> B["Dor a movimentação ocular<br/>proptose ou baixa visão?"]
+    B -->|Sim| C["Celulite orbitária<br/>TC de órbita e seios<br/>internar + ATB IV"]
+    B -->|Não| D["Assoalho da boca endurecido<br/>língua elevada ou estridor?"]
     D -->|Sim| E["Angina de Ludwig<br/>VIA AEREA primeiro<br/>ATB IV + drenagem"]
-    D -->|Nao| F["Dor desproporcional, bolhas<br/>necrose ou crepitacao?"]
+    D -->|Não| F["Dor desproporcional, bolhas<br/>necrose ou crepitação?"]
     F -->|Sim| G["Suspeita de fasciite necrosante<br/>cirurgia urgente"]
-    F -->|Nao| H["Celulite nao complicada<br/>cefalexina ou amox-clav VO<br/>demarcar a borda"]
+    F -->|Não| H["Celulite não complicada<br/>cefalexina ou amox-clav VO<br/>demarcar a borda"]
     C --> I["Sinais bilaterais ou pares cranianos:<br/>investigar seio cavernoso"]
     class B critical;
     class C critical;
@@ -8763,14 +8763,14 @@ O ponto prático mais importante para orientar o paciente brasileiro é a **vaci
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor em faixa + vesiculas<br/>agrupadas unilaterais"] --> B["Acomete ramo oftalmico<br/>ou sinal de Hutchinson?"]
+    A["Dor em faixa + vesículas<br/>agrupadas unilaterais"] --> B["Acomete ramo oftálmico<br/>ou sinal de Hutchinson?"]
     B -->|Sim| C["Antiviral + oftalmologia<br/>no mesmo dia"]
-    B -->|Nao| D["Imunossuprimido<br/>disseminado ou visceral?"]
+    B -->|Não| D["Imunossuprimido<br/>disseminado ou visceral?"]
     D -->|Sim| E["Internar<br/>aciclovir intravenoso"]
-    D -->|Nao| F["Menos de 72h ou<br/>lesoes novas surgindo?"]
+    D -->|Não| F["Menos de 72h ou<br/>lesões novas surgindo?"]
     F -->|Sim| G["Aciclovir 800 mg 5x/dia<br/>por 7 dias + analgesia"]
-    F -->|Nao| H["Foco em analgesia<br/>e neuromodulador"]
-    G --> I["Dor apos cicatrizar:<br/>neuralgia pos-herpetica<br/>gabapentina ou amitriptilina"]
+    F -->|Não| H["Foco em analgesia<br/>e neuromodulador"]
+    G --> I["Dor após cicatrizar:<br/>neuralgia pos-herpética<br/>gabapentina ou amitriptilina"]
     H --> I
     class B critical;
     class C critical;
@@ -8908,16 +8908,16 @@ Da chegada à definição de conduta, o paciente de risco não pode ficar sem ob
 
 \`\`\`mermaid
 flowchart TD
-    A["Chegada apos tentativa<br/>ou ideacao"] --> B["Estabilizacao clinica<br/>ABCDE, antidoto, glicemia"]
-    B --> C["Ambiente seguro<br/>retirar meios, vigilancia"]
-    C --> D["Causa organica ou delirium?"]
-    D -->|Sim| E["Tratar causa clinica"]
-    D -->|Nao| F["Avaliar risco<br/>plano, acesso, intencao"]
+    A["Chegada após tentativa<br/>ou ideação"] --> B["Estabilização clínica<br/>ABCDE, antídoto, glicemia"]
+    B --> C["Ambiente seguro<br/>retirar meios, vigilância"]
+    C --> D["Causa orgânica ou delirium?"]
+    D -->|Sim| E["Tratar causa clínica"]
+    D -->|Não| F["Avaliar risco<br/>plano, acesso, intenção"]
     F --> G["Risco alto ou<br/>sem suporte?"]
-    G -->|Sim| H["Internacao, voluntaria ou<br/>involuntaria Lei 10.216"]
-    G -->|Nao| I["Plano de seguranca<br/>restricao de meios, familiar"]
+    G -->|Sim| H["Internação, voluntária ou<br/>involuntária Lei 10.216"]
+    G -->|Não| I["Plano de segurança<br/>restrição de meios, familiar"]
     I --> J["Seguimento agendado<br/>CAPS/UBS + contato precoce"]
-    H --> K["Notificar violencia<br/>autoprovocada em 24h"]
+    H --> K["Notificar violência<br/>autoprovocada em 24h"]
     J --> K
     class G critical;
     class H action;
@@ -9096,13 +9096,13 @@ O cuidado se organiza na RAPS: CAPS como serviço de referência (CAPS III com a
 
 \`\`\`mermaid
 flowchart TD
-    A["Psicose aguda"] --> B["Sinais vitais, glicemia<br/>nivel de consciencia"]
-    B --> C["Consciencia flutuante,<br/>febre ou deficit focal?"]
-    C -->|Sim| D["Investigar delirium<br/>ou causa neurologica"]
-    C -->|Nao| E["Ambiente seguro<br/>desescalada verbal"]
+    A["Psicose aguda"] --> B["Sinais vitais, glicemia<br/>nível de consciência"]
+    B --> C["Consciência flutuante,<br/>febre ou déficit focal?"]
+    C -->|Sim| D["Investigar delirium<br/>ou causa neurológica"]
+    C -->|Não| E["Ambiente seguro<br/>desescalada verbal"]
     E --> F["Aceita via oral?"]
-    F -->|Sim| G["Antipsicotico VO<br/>risperidona ou olanzapina"]
-    F -->|Nao| H["Haloperidol 2,5-5 mg IM<br/>+ prometazina 25-50 mg IM"]
+    F -->|Sim| G["Antipsicótico VO<br/>risperidona ou olanzapina"]
+    F -->|Não| H["Haloperidol 2,5-5 mg IM<br/>+ prometazina 25-50 mg IM"]
     G --> I["Reavaliar, tratar causa<br/>encaminhar a RAPS"]
     H --> I
     class C critical;
@@ -9244,18 +9244,18 @@ Depois da crise, faça o *debriefing* com o paciente e com a equipe: o que dispa
 
 \`\`\`mermaid
 flowchart TD
-    A["Paciente agitado"] --> B["Seguranca da equipe<br/>sinais vitais e glicemia"]
-    B --> C["Hipoglicemia, hipoxia<br/>ou delirium?"]
-    C -->|Sim| D["Tratar a causa clinica"]
-    C -->|Nao| E["Desescalada verbal<br/>ambiente calmo, escolhas"]
+    A["Paciente agitado"] --> B["Segurança da equipe<br/>sinais vitais e glicemia"]
+    B --> C["Hipoglicemia, hipóxia<br/>ou delirium?"]
+    C -->|Sim| D["Tratar a causa clínica"]
+    C -->|Não| E["Desescalada verbal<br/>ambiente calmo, escolhas"]
     E --> F["Acalmou?"]
     F -->|Sim| G["Avaliar e tratar causa base"]
-    F -->|Nao| H["Qual o contexto?"]
+    F -->|Não| H["Qual o contexto?"]
     H -->|Psicose ou mania| I["Haloperidol 2,5-5 mg IM<br/>+ prometazina 25-50 mg IM"]
-    H -->|Abstinencia alcoolica<br/>ou estimulante| J["Benzodiazepinico<br/>diazepam ou midazolam"]
+    H -->|Abstinência alcoólica<br/>ou estimulante| J["Benzodiazepínico<br/>diazepam ou midazolam"]
     I --> K["Reavaliar em 15-30 min<br/>monitorizar"]
     J --> K
-    K --> L["Contencao fisica so se<br/>risco iminente, tempo minimo"]
+    K --> L["Contenção física so se<br/>risco iminente, tempo mínimo"]
     class C critical;
     class L critical;
     class G action;
@@ -9430,15 +9430,15 @@ Confirmada a refratariedade, as estratégias de especialista são: **otimizar** 
 
 \`\`\`mermaid
 flowchart TD
-    A["Suspeita de depressao maior"] --> B["Avaliar risco de suicidio<br/>em todos"]
+    A["Suspeita de depressão maior"] --> B["Avaliar risco de suicídio<br/>em todos"]
     B --> C["Risco alto, psicose,<br/>catatonia ou recusa alimentar?"]
-    C -->|Sim| D["Internacao<br/>considerar ECT"]
-    C -->|Nao| E["Excluir causa organica<br/>TSH, B12, hemograma"]
-    E --> F["Historia de mania<br/>ou hipomania?"]
-    F -->|Sim| G["Nao usar antidepressivo isolado<br/>tratar como bipolar"]
-    F -->|Nao| H["ISRS: sertralina 50 mg/dia<br/>ou escitalopram 10 mg/dia"]
+    C -->|Sim| D["Internação<br/>considerar ECT"]
+    C -->|Não| E["Excluir causa orgânica<br/>TSH, B12, hemograma"]
+    E --> F["História de mania<br/>ou hipomania?"]
+    F -->|Sim| G["Não usar antidepressivo isolado<br/>tratar como bipolar"]
+    F -->|Não| H["ISRS: sertralina 50 mg/dia<br/>ou escitalopram 10 mg/dia"]
     H --> I["Associar psicoterapia<br/>reavaliar em 2 e 4 semanas"]
-    I --> J["Manter 6-12 meses<br/>apos remissao"]
+    I --> J["Manter 6-12 meses<br/>após remissão"]
     class C critical;
     class G critical;
     class D action;
@@ -9589,15 +9589,15 @@ Conduta: suspender o lítio, hidratar vigorosamente com salina para restaurar vo
 
 \`\`\`mermaid
 flowchart TD
-    A["Episodio maniaco"] --> B["Suspender antidepressivo<br/>e estimulantes"]
-    B --> C["Excluir causa secundaria<br/>TSH, corticoide, drogas"]
-    C --> D["Ha psicose, agitacao<br/>ou risco?"]
-    D -->|Sim| E["Antipsicotico de 2a geracao<br/>+ estabilizador; BZD se preciso"]
-    D -->|Nao| F["Estabilizador em monoterapia<br/>litio ou valproato"]
-    E --> G["Restaurar o sono<br/>ambiente com pouco estimulo"]
+    A["Episódio maníaco"] --> B["Suspender antidepressivo<br/>e estimulantes"]
+    B --> C["Excluir causa secundária<br/>TSH, corticoide, drogas"]
+    C --> D["Há psicose, agitação<br/>ou risco?"]
+    D -->|Sim| E["Antipsicótico de 2ª geração<br/>+ estabilizador; BZD se preciso"]
+    D -->|Não| F["Estabilizador em monoterapia<br/>lítio ou valproato"]
+    E --> G["Restaurar o sono<br/>ambiente com pouco estímulo"]
     F --> G
-    G --> H["Exames antes: TSH, funcao renal<br/>e hepatica, beta-hCG"]
-    H --> I["Manutencao e psicoeducacao<br/>prevenir recaida"]
+    G --> H["Exames antes: TSH, função renal<br/>e hepática, beta-hCG"]
+    H --> I["Manutenção e psicoeducação<br/>prevenir recaída"]
     class D critical;
     class I action;
     class G action;
@@ -9751,11 +9751,11 @@ Oriente também redução de cafeína, nicotina e álcool, e regularidade de son
 \`\`\`mermaid
 flowchart TD
     A["Crise de medo intenso<br/>pico em 10 min"] --> B["Sinais vitais, glicemia,<br/>ECG conforme risco"]
-    B --> C["Dor toracica tipica, dessaturacao,<br/>sincope ou sinal focal?"]
-    C -->|Sim| D["Investigar causa organica<br/>SCA, arritmia, TEP"]
-    C -->|Nao| E["Acolhimento, ambiente calmo<br/>respiracao lenta"]
+    B --> C["Dor torácica típica, dessaturação,<br/>sincope ou sinal focal?"]
+    C -->|Sim| D["Investigar causa orgânica<br/>SCA, arritmia, TEP"]
+    C -->|Não| E["Acolhimento, ambiente calmo<br/>respiração lenta"]
     E --> F["Cedeu?"]
-    F -->|Nao| G["Benzodiazepinico pontual<br/>dose unica"]
+    F -->|Não| G["Benzodiazepínico pontual<br/>dose única"]
     F -->|Sim| H["Explicar o quadro<br/>orientar sinais de alarme"]
     G --> H
     H --> I["Crises recorrentes?<br/>iniciar ISRS em dose baixa + TCC"]
@@ -9926,13 +9926,13 @@ Antes da alta, comece o tratamento do transtorno por uso de álcool: naltrexona 
 
 \`\`\`mermaid
 flowchart TD
-    A["Suspeita de abstinencia alcoolica"] --> B["Tiamina 100 mg parenteral<br/>ANTES da glicose"]
-    B --> C["Glicemia, eletrolitos, Mg<br/>buscar infeccao e TCE"]
+    A["Suspeita de abstinência alcoólica"] --> B["Tiamina 100 mg parenteral<br/>ANTES da glicose"]
+    B --> C["Glicemia, eletrólitos, Mg<br/>buscar infecção e TCE"]
     C --> D["Aplicar CIWA-Ar"]
     D --> E["CIWA-Ar maior ou igual a 19<br/>ou delirium tremens?"]
     E -->|Sim| F["Ambiente monitorizado ou UTI<br/>BZD em doses altas"]
-    E -->|Nao| G["BZD guiado por sintomas<br/>reavaliar com a escala"]
-    F --> H["Refratario ao BZD?<br/>fenobarbital adjuvante"]
+    E -->|Não| G["BZD guiado por sintomas<br/>reavaliar com a escala"]
+    F --> H["Refratário ao BZD?<br/>fenobarbital adjuvante"]
     G --> I["Repor Mg, K, folato<br/>hidratar conforme perdas"]
     H --> I
     I --> J["Encaminhar ao CAPS-AD<br/>tratar o transtorno de uso"]
@@ -10104,17 +10104,17 @@ No Brasil, a referência é o **CAPS-AD**, articulado com atenção primária, c
 
 \`\`\`mermaid
 flowchart TD
-    A["Suspeita de abstinencia<br/>de opioide"] --> B["Pupila midriatica e lucido?<br/>excluir infeccao e outras causas"]
+    A["Suspeita de abstinência<br/>de opioide"] --> B["Pupila midriática e lúcido?<br/>excluir infecção e outras causas"]
     B --> C["Aplicar COWS"]
-    C --> D["Ha agonista disponivel?"]
+    C --> D["Há agonista disponível?"]
     D -->|Sim| E["COWS 8-12 com sinais objetivos?"]
-    D -->|Nao| F["Clonidina + sintomaticos<br/>monitorar pressao arterial"]
+    D -->|Não| F["Clonidina + sintomáticos<br/>monitorar pressão arterial"]
     E -->|Sim| G["Iniciar buprenorfina<br/>titular no mesmo dia"]
-    E -->|Nao| H["Aguardar; risco de<br/>abstinencia precipitada"]
+    E -->|Não| H["Aguardar; risco de<br/>abstinência precipitada"]
     H --> E
-    G --> I["Manutencao com agonista<br/>vincular ao CAPS-AD"]
+    G --> I["Manutenção com agonista<br/>vincular ao CAPS-AD"]
     F --> I
-    I --> J["Orientar risco de overdose<br/>por perda de tolerancia"]
+    I --> J["Orientar risco de overdose<br/>por perda de tolerância"]
     class H critical;
     class J critical;
     class I action;
@@ -10164,12 +10164,12 @@ Reforce sistematicamente a mensagem sobre overdose: quem passou por abstinência
 
 \`\`\`mermaid
 flowchart TD
-    A["Paciente saindo de periodo<br/>sem uso: abstinencia, internacao, prisao"] --> B["Tolerancia reduzida:<br/>dose antiga agora e potencialmente fatal"]
-    B --> C["Manutencao com agonista disponivel?"]
-    C -->|Sim| D["Vincular e manter agonista<br/>maior protecao de mortalidade"]
-    C -->|Nao| E["Reducao de danos:<br/>naloxona, nao usar sozinho"]
-    E --> F["Nao associar benzodiazepinico<br/>nem alcool"]
-    D --> G["Testagem HIV/hepatites,<br/>vacinacao, material esteril"]
+    A["Paciente saindo de período<br/>sem uso: abstinência, internação, prisão"] --> B["Tolerância reduzida:<br/>dose antiga agora e potencialmente fatal"]
+    B --> C["Manutenção com agonista disponível?"]
+    C -->|Sim| D["Vincular e manter agonista<br/>maior proteção de mortalidade"]
+    C -->|Não| E["Redução de danos:<br/>naloxona, não usar sozinho"]
+    E --> F["Não associar benzodiazepínico<br/>nem alcool"]
+    D --> G["Testagem HIV/hepatites,<br/>vacinação, material estéril"]
     F --> G
     class B critical;
     class D action;
@@ -10298,16 +10298,16 @@ O componente não farmacológico é decisivo: psicoeducação (explicar que os s
 
 \`\`\`mermaid
 flowchart TD
-    A["Uso cronico de benzodiazepinico"] --> B["Nunca suspender de forma abrupta"]
-    B --> C["Ja em abstinencia sintomatica?"]
+    A["Uso crônico de benzodiazepínico"] --> B["Nunca suspender de forma abrupta"]
+    B --> C["Ja em abstinência sintomática?"]
     C -->|Sim| D["Reintroduzir dose suficiente<br/>para controlar sintomas"]
-    C -->|Nao| E["Converter para meia-vida longa<br/>ex.: diazepam"]
+    C -->|Não| E["Converter para meia-vida longa<br/>ex.: diazepam"]
     D --> E
-    E --> F["Reducao gradual programada<br/>semanas a meses"]
-    F --> G["Convulsao ou delirium?"]
-    G -->|Sim| H["Ambiente monitorizado<br/>BZD; fenobarbital se refratario"]
-    G -->|Nao| I["Manter calendario<br/>pausar se preciso, nao acelerar"]
-    I --> J["Tratar transtorno de base<br/>TCC e psicoeducacao"]
+    E --> F["Redução gradual programada<br/>semanas a meses"]
+    F --> G["Convulsão ou delirium?"]
+    G -->|Sim| H["Ambiente monitorizado<br/>BZD; fenobarbital se refratário"]
+    G -->|Não| I["Manter calendário<br/>pausar se preciso, não acelerar"]
+    I --> J["Tratar transtorno de base<br/>TCC e psicoeducação"]
     class G critical;
     class B critical;
     class J action;
@@ -10493,16 +10493,16 @@ Reintrodução de antipsicótico: só depois de resolução completa e, idealmen
 
 \`\`\`mermaid
 flowchart TD
-    A["Rigidez + febre em uso<br/>de antipsicotico"] --> B["Suspender o antipsicotico<br/>ou reintroduzir dopaminergico"]
-    B --> C["CK, funcao renal, eletrolitos<br/>excluir infeccao e sepse"]
-    C --> D["Suporte: UTI, hidratacao vigorosa<br/>resfriamento, profilaxia de TEV"]
-    D --> E["Ha clonus e hiperreflexia<br/>com inicio em horas?"]
-    E -->|Sim| F["Pensar em sindrome<br/>serotoninergica"]
-    E -->|Nao| G["Benzodiazepinico<br/>lorazepam ou diazepam"]
+    A["Rigidez + febre em uso<br/>de antipsicótico"] --> B["Suspender o antipsicótico<br/>ou reintroduzir dopaminérgico"]
+    B --> C["CK, função renal, eletrólitos<br/>excluir infecção e sepse"]
+    C --> D["Suporte: UTI, hidratação vigorosa<br/>resfriamento, profilaxia de TEV"]
+    D --> E["Há clonus e hiperreflexia<br/>com início em horas?"]
+    E -->|Sim| F["Pensar em síndrome<br/>serotoninérgica"]
+    E -->|Não| G["Benzodiazepínico<br/>lorazepam ou diazepam"]
     G --> H["Grave ou sem melhora?"]
     H -->|Sim| I["Dantroleno 1-2,5 mg/kg IV<br/>e/ou bromocriptina 2,5 mg 8/8h"]
-    H -->|Nao| J["Manter suporte<br/>monitorar CK e temperatura"]
-    I --> K["Refratario: considerar ECT"]
+    H -->|Não| J["Manter suporte<br/>monitorar CK e temperatura"]
+    I --> K["Refratário: considerar ECT"]
     class A critical;
     class E critical;
     class I action;
@@ -10757,15 +10757,15 @@ Erro comum: esquecer a erva-de-são-joão e as drogas recreativas na anamnese, e
 
 \`\`\`mermaid
 flowchart TD
-    A["Alteracao mental + autonomia<br/>+ clonus em horas"] --> B["Suspender TODOS os<br/>agentes serotoninergicos"]
+    A["Alteração mental + autonomia<br/>+ clonus em horas"] --> B["Suspender TODOS os<br/>agentes serotoninérgicos"]
     B --> C["Aplicar criterios de Hunter<br/>clonus, hiperreflexia, MMII"]
-    C --> D["Excluir infeccao, sepse<br/>e causa metabolica"]
-    D --> E["Benzodiazepinico<br/>resfriamento e hidratacao"]
+    C --> D["Excluir infecção, sepse<br/>e causa metabólica"]
+    D --> E["Benzodiazepínico<br/>resfriamento e hidratação"]
     E --> F["Hipertermia grave<br/>ou rigidez importante?"]
-    F -->|Sim| G["UTI: sedacao, bloqueio neuromuscular<br/>e intubacao; sem succinilcolina"]
-    F -->|Nao| H["Ciproeptadina 12 mg ataque<br/>2 mg 2/2h; manutencao 8 mg 6/6h"]
+    F -->|Sim| G["UTI: sedação, bloqueio neuromuscular<br/>e intubação; sem succinilcolina"]
+    F -->|Não| H["Ciproeptadina 12 mg ataque<br/>2 mg 2/2h; manutenção 8 mg 6/6h"]
     G --> H
-    H --> I["Observar 24-72h<br/>orientar interacao ao paciente"]
+    H --> I["Observar 24-72h<br/>orientar interação ao paciente"]
     class A critical;
     class F critical;
     class I action;
@@ -10947,15 +10947,15 @@ Erro comum: retirar o benzodiazepínico rápido demais e recidivar a catatonia.
 
 \`\`\`mermaid
 flowchart TD
-    A["Estupor, mutismo, imobilidade<br/>ou posturas mantidas"] --> B["Aplicar Bush-Francis<br/>e buscar causa clinica"]
+    A["Estupor, mutismo, imobilidade<br/>ou posturas mantidas"] --> B["Aplicar Bush-Francis<br/>e buscar causa clínica"]
     B --> C["Febre, disautonomia<br/>rigidez e CK alta?"]
     C -->|Sim| D["Catatonia maligna ou SNM<br/>UTI e ECT precoce"]
-    C -->|Nao| E["Teste do lorazepam<br/>1-2 mg IV/IM ou 2 mg VO"]
+    C -->|Não| E["Teste do lorazepam<br/>1-2 mg IV/IM ou 2 mg VO"]
     E --> F["Reduziu 50% da escala?"]
     F -->|Sim| G["Manter lorazepam em doses<br/>divididas e titular"]
-    F -->|Nao| H["Nao exclui catatonia<br/>titular dose e reavaliar"]
-    H --> I["Refrataria: encaminhar para ECT"]
-    G --> J["Suporte: hidratacao, nutricao<br/>profilaxia de TEV; evitar antipsicotico"]
+    F -->|Não| H["Não exclui catatonia<br/>titular dose e reavaliar"]
+    H --> I["Refratária: encaminhar para ECT"]
+    G --> J["Suporte: hidratação, nutrição<br/>profilaxia de TEV; evitar antipsicótico"]
     I --> J
     class C critical;
     class D action;
@@ -11140,16 +11140,16 @@ Erro comum: não medir a temperatura e perder uma hipotermia que rebaixa e causa
 
 \`\`\`mermaid
 flowchart TD
-    A["Rebaixamento com<br/>halito etilico"] --> B["ABCDE, protecao de via aerea<br/>glicemia capilar imediata"]
+    A["Rebaixamento com<br/>hálito etílico"] --> B["ABCDE, proteção de via aérea<br/>glicemia capilar imediata"]
     B --> C["Tiamina 100 mg parenteral<br/>ANTES da glicose"]
     C --> D["Corrigir hipoglicemia<br/>monitorizar e aquecer"]
     D --> E["Trauma, sinal focal, febre<br/>ou pupila anormal?"]
-    E -->|Sim| F["TC de cranio e investigacao<br/>de causa alternativa"]
-    E -->|Nao| G["Observacao seriada"]
+    E -->|Sim| F["TC de crânio e investigação<br/>de causa alternativa"]
+    E -->|Não| G["Observação seriada"]
     G --> H["Melhorou em 1-2 horas?"]
-    H -->|Nao| F
-    H -->|Sim| I["Alta com acompanhante<br/>orientar risco de abstinencia"]
-    I --> J["Triagem AUDIT, intervencao breve<br/>encaminhar ao CAPS-AD"]
+    H -->|Não| F
+    H -->|Sim| I["Alta com acompanhante<br/>orientar risco de abstinência"]
+    I --> J["Triagem AUDIT, intervenção breve<br/>encaminhar ao CAPS-AD"]
     class E critical;
     class H critical;
     class J action;
@@ -11333,11 +11333,11 @@ flowchart TD
     A["Gestante hipertensa"] --> B["PA ≥ 160/110 agora?"]
     B -->|Sim| C["Crise: hidralazina IV<br/>ou nifedipino 10 mg VO<br/>alvo 140-150/90-100"]
     B -->|Não| D["Manutenção: metildopa,<br/>nifedipino retard,<br/>labetalol ou metoprolol"]
-    C --> E["Sulfato de magnesio se<br/>pre-eclampsia grave"]
+    C --> E["Sulfato de magnésio se<br/>pre-eclampsia grave"]
     D --> F["Usava IECA ou BRA?"]
-    F -->|Sim| G["SUSPENDER - fetotoxico<br/>Trocar por classe permitida<br/>USG do rim fetal e liquido"]
+    F -->|Sim| G["SUSPENDER - fetotoxico<br/>Trocar por classe permitida<br/>USG do rim fetal e líquido"]
     F -->|Não| H["Manter e reavaliar<br/>a cada consulta"]
-    E --> I["Reavaliar interrupcao<br/>conforme idade gestacional"]
+    E --> I["Reavaliar interrupção<br/>conforme idade gestacional"]
     class B critical;
     class G critical;
     class C action;
@@ -11569,14 +11569,14 @@ O segundo eixo de decisão é o da vigilância do magnésio:
 
 \`\`\`mermaid
 flowchart TD
-    A["Paciente em sulfato<br/>de magnesio"] --> B["Checagem horaria:<br/>reflexo patelar, FR,<br/>diurese"]
+    A["Paciente em sulfato<br/>de magnésio"] --> B["Checagem horária:<br/>reflexo patelar, FR,<br/>diurese"]
     B --> C["Reflexo patelar ausente?"]
-    C -->|Nao| D["Diurese < 25 mL/h<br/>ou creatinina alta?"]
-    C -->|Sim| E["SUSPENDER infusao<br/>Gluconato de calcio 10%<br/>10 mL IV lento"]
-    D -->|Sim| F["Reduzir manutencao<br/>para 1 g/h<br/>Manter vigilancia"]
-    D -->|Nao| G["Manter esquema<br/>por 24 h apos parto<br/>ou ultima crise"]
+    C -->|Não| D["Diurese < 25 mL/h<br/>ou creatinina alta?"]
+    C -->|Sim| E["SUSPENDER infusão<br/>Gluconato de cálcio 10%<br/>10 mL IV lento"]
+    D -->|Sim| F["Reduzir manutenção<br/>para 1 g/h<br/>Manter vigilância"]
+    D -->|Não| G["Manter esquema<br/>por 24 h após parto<br/>ou última crise"]
     E --> H["FR < 12 ou apneia?"]
-    H -->|Sim| I["Ventilar e intubar<br/>Monitor cardiaco<br/>Dialise se anuria"]
+    H -->|Sim| I["Ventilar e intubar<br/>Monitor cardíaco<br/>Diálise se anúria"]
     class C critical;
     class E critical;
     class I critical;
@@ -11787,13 +11787,13 @@ Um segundo eixo de decisão, o da suspeita de hematoma hepático:
 
 \`\`\`mermaid
 flowchart TD
-    A["HELLP com dor intensa<br/>em hipocondrio direito<br/>ou ombro direito"] --> B["Queda do hematocrito<br/>ou hipotensao?"]
-    B -->|Nao| C["USG ou TC de abdome<br/>superior"]
-    B -->|Sim| D["Ruptura hepatica ate<br/>prova em contrario<br/>Sala cirurgica agora"]
-    C --> E["Hematoma subcapsular<br/>integro?"]
-    E -->|Sim| F["Conduta conservadora<br/>Repouso, nao palpar<br/>Corrigir coagulopatia<br/>Reserva de sangue"]
-    E -->|Nao| G["Seguir manejo da HELLP<br/>Reavaliar em 6-12 h"]
-    D --> H["Laparotomia com packing<br/>Embolizacao se disponivel<br/>Transfusao macica"]
+    A["HELLP com dor intensa<br/>em hipocôndrio direito<br/>ou ombro direito"] --> B["Queda do hematócrito<br/>ou hipotensão?"]
+    B -->|Não| C["USG ou TC de abdome<br/>superior"]
+    B -->|Sim| D["Ruptura hepática até<br/>prova em contrário<br/>Sala cirúrgica agora"]
+    C --> E["Hematoma subcapsular<br/>íntegro?"]
+    E -->|Sim| F["Conduta conservadora<br/>Repouso, não palpar<br/>Corrigir coagulopatia<br/>Reserva de sangue"]
+    E -->|Não| G["Seguir manejo da HELLP<br/>Reavaliar em 6-12 h"]
+    D --> H["Laparotomia com packing<br/>Embolização se disponível<br/>Transfusão maciça"]
     F --> I["Piora ou instabilidade?"]
     I -->|Sim| D
     class B critical;
@@ -12016,14 +12016,14 @@ Um segundo eixo de decisão, o da gestação de localização indeterminada:
 
 \`\`\`mermaid
 flowchart TD
-    A["Beta-hCG positivo<br/>USG sem gestacao topica<br/>nem massa anexial"] --> B["Paciente estavel<br/>e sem dor importante?"]
-    B -->|Nao| C["Internar e reavaliar<br/>Considerar cirurgia"]
+    A["Beta-hCG positivo<br/>USG sem gestação tópica<br/>nem massa anexial"] --> B["Paciente estável<br/>e sem dor importante?"]
+    B -->|Não| C["Internar e reavaliar<br/>Considerar cirurgia"]
     B -->|Sim| D["Repetir beta-hCG<br/>em 48 horas"]
     D --> E["Aumento maior<br/>que 35 a 50%?"]
-    E -->|Sim| F["Provavel gestacao topica<br/>Repetir USG quando<br/>passar da zona discriminatoria"]
-    E -->|Nao| G["Queda maior que 50%?"]
-    G -->|Sim| H["Provavel abortamento<br/>Seguir beta-hCG ate negativar"]
-    G -->|Nao| I["Plato ou queda lenta:<br/>ECTOPICA ate prova<br/>em contrario"]
+    E -->|Sim| F["Provável gestação tópica<br/>Repetir USG quando<br/>passar da zona discriminatória"]
+    E -->|Não| G["Queda maior que 50%?"]
+    G -->|Sim| H["Provável abortamento<br/>Seguir beta-hCG até negativar"]
+    G -->|Não| I["Platô ou queda lenta:<br/>ECTOPICA até prova<br/>em contrário"]
     I --> J["Metotrexato ou cirurgia<br/>conforme criterios"]
     class C critical;
     class I critical;
@@ -12243,16 +12243,16 @@ Um segundo eixo de decisão, o dos 4 Ts:
 
 \`\`\`mermaid
 flowchart TD
-    A["Hemorragia pos-parto<br/>diagnosticada"] --> B["TONUS: utero mole?"]
-    B -->|Sim| C["Atonia<br/>Massagem bimanual<br/>Uterotonicos escalonados<br/>Balao intrauterino"]
-    B -->|Nao| D["TRAUMA: revisar canal<br/>com valvas e boa luz"]
-    D --> E["Laceracao, hematoma<br/>ou rotura?"]
+    A["Hemorragia pos-parto<br/>diagnosticada"] --> B["TONUS: útero mole?"]
+    B -->|Sim| C["Atonia<br/>Massagem bimanual<br/>Uterotônicos escalonados<br/>Balão intrauterino"]
+    B -->|Não| D["TRAUMA: revisar canal<br/>com valvas e boa luz"]
+    D --> E["Laceração, hematoma<br/>ou rotura?"]
     E -->|Sim| F["Sutura do trajeto<br/>Drenagem do hematoma<br/>Laparotomia se rotura"]
-    E -->|Nao| G["TECIDO: revisar cavidade<br/>e placenta dequitada"]
+    E -->|Não| G["TECIDO: revisar cavidade<br/>e placenta dequitada"]
     G --> H["Restos ou acretismo?"]
     H -->|Sim| I["Curagem ou curetagem<br/>Manejo do acretismo"]
-    H -->|Nao| J["TROMBINA: coagulo nao forma<br/>Fibrinogenio, TP, TTPa"]
-    J --> K["Repor fibrinogenio e plasma<br/>Acido tranexamico<br/>Tratar a causa"]
+    H -->|Não| J["TROMBINA: coágulo não forma<br/>Fibrinogênio, TP, TTPa"]
+    J --> K["Repor fibrinogênio e plasma<br/>Ácido tranexâmico<br/>Tratar a causa"]
     class B critical;
     class E critical;
     class J critical;
@@ -14323,28 +14323,28 @@ O que a rede tem, e tem de forma confiável: **varfarina 5 mg comprimido**, **he
 
 \`\`\`mermaid
 flowchart TD
-    A["Suspeita de TVP<br/>edema assimetrico + dor"] --> B["Escore de Wells<br/>maior ou igual a 2?"]
-    B -->|Nao improvavel| C["D-dimero"]
-    B -->|Sim provavel| D["USG Doppler com compressao"]
-    C -->|Negativo| E["TVP excluida<br/>buscar diagnostico alternativo"]
+    A["Suspeita de TVP<br/>edema assimétrico + dor"] --> B["Escore de Wells<br/>maior ou igual a 2?"]
+    B -->|Não improvável| C["D-dímero"]
+    B -->|Sim provável| D["USG Doppler com compressão"]
+    C -->|Negativo| E["TVP excluída<br/>buscar diagnóstico alternativo"]
     C -->|Positivo| D
     D -->|Trombo confirmado| F["Anticoagular<br/>rivaroxabana ou apixabana"]
     D -->|Negativo com suspeita alta| G["Repetir USG em 5 a 7 dias"]
-    F --> H["Definir duracao<br/>3 meses se provocada"]
+    F --> H["Definir duração<br/>3 meses se provocada"]
     class B critical;
     class F action;
 \`\`\`
 
 \`\`\`mermaid
 flowchart TD
-    A["TVP confirmada<br/>definir duracao"] --> B["Fator transitorio maior?<br/>cirurgia trauma imobilizacao"]
+    A["TVP confirmada<br/>definir duração"] --> B["Fator transitório maior?<br/>cirurgia trauma imobilização"]
     B -->|Sim| C["Anticoagular 3 meses<br/>e suspender"]
-    B -->|Nao| D["Cancer ativo?"]
-    D -->|Sim| E["Anticoagulacao enquanto<br/>o cancer estiver ativo"]
-    D -->|Nao| F["Evento nao provocado<br/>ou recorrente"]
+    B -->|Não| D["Câncer ativo?"]
+    D -->|Sim| E["Anticoagulação enquanto<br/>o câncer estiver ativo"]
+    D -->|Não| F["Evento não provocado<br/>ou recorrente"]
     F --> G["Avaliar risco de sangramento<br/>idade renal quedas anemia"]
     G -->|Risco alto| H["Reavaliar periodicamente<br/>manter 3 a 6 meses"]
-    G -->|Risco aceitavel| I["Anticoagulacao estendida<br/>dose reduzida apos 6 meses"]
+    G -->|Risco aceitável| I["Anticoagulação estendida<br/>dose reduzida após 6 meses"]
     class F critical;
     class E action;
     class I action;
@@ -14570,16 +14570,16 @@ Para o parto, a referência prática é plaqueta acima de 50.000/mm³ para parto
 
 \`\`\`mermaid
 flowchart TD
-    A["Plaquetopenia<br/>confirmar com esfregaco"] --> B["Aglutinacao por EDTA?"]
+    A["Plaquetopenia<br/>confirmar com esfregaço"] --> B["Aglutinação por EDTA?"]
     B -->|Sim| C["Pseudoplaquetopenia<br/>recoletar em citrato"]
-    B -->|Nao| D["Esquizocitos + LDH alto?"]
-    D -->|Sim| E["Microangiopatia<br/>PTT ate prova em contrario"]
-    E --> F["Plasmaferese urgente<br/>NAO transfundir plaqueta"]
-    D -->|Nao| G["Uso de heparina 5 a 10 dias?"]
-    G -->|Sim escore 4T alto| H["Suspender heparina<br/>anticoagulante nao heparinico"]
-    G -->|Nao| I["Coagulograma alterado?"]
+    B -->|Não| D["Esquizócitos + LDH alto?"]
+    D -->|Sim| E["Microangiopatia<br/>PTT até prova em contrário"]
+    E --> F["Plasmaférese urgente<br/>NAO transfundir plaqueta"]
+    D -->|Não| G["Uso de heparina 5 a 10 dias?"]
+    G -->|Sim escore 4T alto| H["Suspender heparina<br/>anticoagulante não heparínico"]
+    G -->|Não| I["Coagulograma alterado?"]
     I -->|Sim| J["CIVD<br/>tratar causa de base"]
-    I -->|Nao| K["PTI<br/>corticoide se sangramento ou menor que 20 mil"]
+    I -->|Não| K["PTI<br/>corticoide se sangramento ou menor que 20 mil"]
     class E critical;
     class F action;
     class H action;
@@ -14588,15 +14588,15 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["PTI confirmada"] --> B["Sangramento em sitio critico<br/>ou parto ou cirurgia agora?"]
+    A["PTI confirmada"] --> B["Sangramento em sítio crítico<br/>ou parto ou cirurgia agora?"]
     B -->|Sim| C["Imunoglobulina 1 g/kg<br/>+ corticoide em dose alta"]
     C --> D["Transfundir plaqueta<br/>se sangramento ativo grave"]
-    B -->|Nao| E["Plaquetas menor que 20 a 30 mil<br/>ou sangramento umido?"]
-    E -->|Nao| F["Observar<br/>sem corticoide"]
+    B -->|Não| E["Plaquetas menor que 20 a 30 mil<br/>ou sangramento úmido?"]
+    E -->|Não| F["Observar<br/>sem corticoide"]
     E -->|Sim| G["Prednisona 1 mg/kg<br/>ou dexametasona 40 mg 4 dias"]
     G --> H["Resposta em 2 a 4 semanas?"]
-    H -->|Sim| I["Desmame do corticoide<br/>evitar uso cronico"]
-    H -->|Nao| J["Segunda linha<br/>agonista de TPO rituximabe esplenectomia"]
+    H -->|Sim| I["Desmame do corticoide<br/>evitar uso crônico"]
+    H -->|Não| J["Segunda linha<br/>agonista de TPO rituximabe esplenectomia"]
     class B critical;
     class C action;
     class G action;
@@ -14815,12 +14815,12 @@ Transfunda quando houver repercussão clínica ou sangramento com instabilidade,
 
 \`\`\`mermaid
 flowchart TD
-    A["Anemia confirmada<br/>hemograma + esfregaco"] --> B["Contagem de reticulocitos"]
-    B -->|Altos| C["Perda ou destruicao<br/>LDH BI haptoglobina Coombs"]
-    C --> D["Sangramento ativo ou hemolise<br/>tratar causa"]
+    A["Anemia confirmada<br/>hemograma + esfregaço"] --> B["Contagem de reticulócitos"]
+    B -->|Altos| C["Perda ou destruição<br/>LDH BI haptoglobina Coombs"]
+    C --> D["Sangramento ativo ou hemólise<br/>tratar causa"]
     B -->|Baixos| E["Avaliar o VCM"]
-    E -->|Menor que 80| F["Ferritina e saturacao<br/>ferropriva x inflamacao x talassemia"]
-    E -->|80 a 100| G["Funcao renal TSH PCR<br/>doenca cronica ou medular"]
+    E -->|Menor que 80| F["Ferritina e saturação<br/>ferropriva x inflamação x talassemia"]
+    E -->|80 a 100| G["Função renal TSH PCR<br/>doenca cronica ou medular"]
     E -->|Maior que 100| H["B12 e folato<br/>alcool hepatopatia mielodisplasia"]
     F --> I["Tratar a causa e repor o substrato"]
     G --> I
@@ -14831,14 +14831,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Reticulocitos altos<br/>anemia hiperproliferativa"] --> B["Sangramento identificado?"]
+    A["Reticulócitos altos<br/>anemia hiperproliferativa"] --> B["Sangramento identificado?"]
     B -->|Sim| C["Controlar o foco<br/>e repor ferro depois"]
-    B -->|Nao| D["Hemolise ate prova em contrario<br/>LDH BI haptoglobina"]
+    B -->|Não| D["Hemólise até prova em contrário<br/>LDH BI haptoglobina"]
     D --> E["Coombs direto"]
-    E -->|Positivo| F["Hemolise autoimune<br/>buscar lupus linfoma droga"]
-    E -->|Negativo| G["Olhar o esfregaco"]
-    G -->|Esquizocitos| H["Microangiopatia<br/>emergencia avaliar PTT"]
-    G -->|Esferocitos ou drepanocitos| I["Defeito de membrana<br/>ou hemoglobinopatia"]
+    E -->|Positivo| F["Hemólise autoimune<br/>buscar lupus linfoma droga"]
+    E -->|Negativo| G["Olhar o esfregaço"]
+    G -->|Esquizócitos| H["Microangiopatia<br/>emergência avaliar PTT"]
+    G -->|Esferócitos ou drepanócitos| I["Defeito de membrana<br/>ou hemoglobinopatia"]
     class H critical;
     class F action;
     class I action;
@@ -15027,16 +15027,16 @@ Efeitos adversos merecem antecipação e não apenas registro. Fezes escuras sã
 
 \`\`\`mermaid
 flowchart TD
-    A["Anemia microcitica<br/>hipocromica"] --> B["Ferritina baixa<br/>menor que 30?"]
+    A["Anemia microcítica<br/>hipocromica"] --> B["Ferritina baixa<br/>menor que 30?"]
     B -->|Sim| C["Anemia ferropriva confirmada"]
-    B -->|Nao e ha inflamacao| D["Saturacao de transferrina<br/>menor que 20 por cento?"]
+    B -->|Não e há inflamação| D["Saturação de transferrina<br/>menor que 20 por cento?"]
     D -->|Sim| C
-    D -->|Nao| E["Investigar talassemia<br/>ou anemia da inflamacao"]
+    D -->|Não| E["Investigar talassemia<br/>ou anemia da inflamação"]
     C --> F["Buscar a fonte de perda<br/>EDA colonoscopia celiaca urina"]
     C --> G["Ferro oral 40 a 60 mg<br/>de ferro elementar por dia"]
     G --> H["Sem resposta em 4 semanas?"]
-    H -->|Sim| I["Rever adesao absorcao e perda<br/>considerar ferro intravenoso"]
-    H -->|Nao| J["Manter 3 a 6 meses<br/>apos normalizar a hemoglobina"]
+    H -->|Sim| I["Rever adesão absorção e perda<br/>considerar ferro intravenoso"]
+    H -->|Não| J["Manter 3 a 6 meses<br/>após normalizar a hemoglobina"]
     class F critical;
     class G action;
     class J action;
@@ -15044,15 +15044,15 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Indicacao de ferro<br/>por via endovenosa?"] --> B["Ma absorcao ou perda<br/>maior que a absorcao?"]
+    A["Indicação de ferro<br/>por via endovenosa?"] --> B["Má absorção ou perda<br/>maior que a absorção?"]
     B -->|Sim| C["Ferro endovenoso indicado"]
-    B -->|Nao| D["Intolerancia ou falha<br/>da via oral bem feita?"]
+    B -->|Não| D["Intolerância ou falha<br/>da via oral bem feita?"]
     D -->|Sim| C
-    D -->|Nao| E["Manter via oral<br/>ajustar horario e frequencia"]
-    C --> F["Infeccao bacteriana ativa<br/>nao controlada?"]
-    F -->|Sim| G["Adiar ate controle<br/>do foco infeccioso"]
-    F -->|Nao| H["Calcular deficit<br/>e infundir em ambiente monitorado"]
-    H --> I["Reavaliar hemograma em 4 semanas<br/>ferritina apos 4 a 8 semanas"]
+    D -->|Não| E["Manter via oral<br/>ajustar horário e frequência"]
+    C --> F["Infecção bacteriana ativa<br/>não controlada?"]
+    F -->|Sim| G["Adiar até controle<br/>do foco infeccioso"]
+    F -->|Não| H["Calcular déficit<br/>e infundir em ambiente monitorado"]
+    H --> I["Reavaliar hemograma em 4 semanas<br/>ferritina após 4 a 8 semanas"]
     class F critical;
     class C action;
     class I action;
@@ -15292,16 +15292,16 @@ Há ainda uma versão silenciosa dessa armadilha no Brasil: como as farinhas sã
 
 \`\`\`mermaid
 flowchart TD
-    A["Anemia macrocitica<br/>VCM maior que 100"] --> B["Esfregaco com neutrofilos<br/>hipersegmentados?"]
-    B -->|Nao| C["Macrocitose nao megaloblastica<br/>alcool tireoide figado mielodisplasia"]
+    A["Anemia macrocítica<br/>VCM maior que 100"] --> B["Esfregaço com neutrófilos<br/>hipersegmentados?"]
+    B -->|Não| C["Macrocitose não megaloblástica<br/>alcool tireoide fígado mielodisplasia"]
     B -->|Sim| D["Dosar B12 e folato"]
-    D -->|B12 baixa| E["Sintomas neurologicos?"]
-    E -->|Sim| F["Degeneracao combinada da medula<br/>repor B12 sem demora"]
-    E -->|Nao| G["Cianocobalamina IM 1000 mcg"]
-    D -->|Folato baixo| H["Checar B12 antes<br/>acido folico 5 mg por dia"]
-    G --> I["Investigar causa<br/>anti fator intrinseco e EDA"]
+    D -->|B12 baixa| E["Sintomas neurológicos?"]
+    E -->|Sim| F["Degeneração combinada da medula<br/>repor B12 sem demora"]
+    E -->|Não| G["Cianocobalamina IM 1000 mcg"]
+    D -->|Folato baixo| H["Checar B12 antes<br/>ácido fólico 5 mg por dia"]
+    G --> I["Investigar causa<br/>anti fator intrínseco e EDA"]
     F --> I
-    I --> J["Monitorar potassio<br/>e reticulocitos"]
+    I --> J["Monitorar potássio<br/>e reticulócitos"]
     class F critical;
     class G action;
     class H action;
@@ -15309,14 +15309,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["B12 baixa confirmada<br/>procurar a causa"] --> B["Dieta vegana estrita<br/>sem suplementacao?"]
-    B -->|Sim| C["Causa dietetica<br/>reposicao oral em dose alta"]
-    B -->|Nao| D["Cirurgia gastrica ou ileal<br/>ou doenca de Crohn?"]
-    D -->|Sim| E["Ma absorcao estrutural<br/>reposicao vitalicia"]
-    D -->|Nao| F["Metformina IBP ou<br/>oxido nitroso?"]
+    A["B12 baixa confirmada<br/>procurar a causa"] --> B["Dieta vegana estrita<br/>sem suplementação?"]
+    B -->|Sim| C["Causa dietética<br/>reposição oral em dose alta"]
+    B -->|Não| D["Cirurgia gástrica ou ileal<br/>ou doenca de Crohn?"]
+    D -->|Sim| E["Má absorção estrutural<br/>reposição vitalícia"]
+    D -->|Não| F["Metformina IBP ou<br/>óxido nitroso?"]
     F -->|Sim| G["Causa medicamentosa<br/>rever a droga e repor"]
-    F -->|Nao| H["Anti fator intrinseco<br/>anti celula parietal gastrina"]
-    H -->|Positivo| I["Anemia perniciosa<br/>EDA e vigilancia gastrica"]
+    F -->|Não| H["Anti fator intrínseco<br/>anti célula parietal gastrina"]
+    H -->|Positivo| I["Anemia perniciosa<br/>EDA e vigilância gástrica"]
     H -->|Negativo| J["Investigar supercrescimento<br/>pancreatopatia e parasitose"]
     class I critical;
     class E action;
@@ -15558,15 +15558,15 @@ Combinações de rituximabe com bendamustina são usadas na doença por crioaglu
 
 \`\`\`mermaid
 flowchart TD
-    A["Anemia com reticulocitos altos<br/>sem sangramento"] --> B["LDH alta + BI alta<br/>+ haptoglobina baixa?"]
-    B -->|Nao| C["Rever sangramento oculto<br/>ou eritropoese ineficaz"]
-    B -->|Sim| D["Hemolise confirmada<br/>ver esfregaco"]
-    D -->|Esquizocitos| E["Microangiopatia<br/>PTT SHU CIVD"]
-    E --> F["Emergencia<br/>tratar causa e plasmaferese na PTT"]
-    D -->|Esferocitos ou nao| G["Coombs direto"]
+    A["Anemia com reticulócitos altos<br/>sem sangramento"] --> B["LDH alta + BI alta<br/>+ haptoglobina baixa?"]
+    B -->|Não| C["Rever sangramento oculto<br/>ou eritropoese ineficaz"]
+    B -->|Sim| D["Hemólise confirmada<br/>ver esfregaço"]
+    D -->|Esquizócitos| E["Microangiopatia<br/>PTT SHU CIVD"]
+    E --> F["Emergência<br/>tratar causa e plasmaférese na PTT"]
+    D -->|Esferócitos ou não| G["Coombs direto"]
     G -->|Positivo IgG| H["AHAI a quente<br/>prednisona 1 mg por kg por dia + folato"]
     G -->|Positivo C3d isolado| I["Crioaglutininas<br/>evitar frio e rituximabe"]
-    G -->|Negativo| J["Hemolise nao imune<br/>G6PD esferocitose HPN malaria"]
+    G -->|Negativo| J["Hemólise não imune<br/>G6PD esferocitose HPN malaria"]
     class E critical;
     class F action;
     class H action;
@@ -15575,15 +15575,15 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["AHAI a quente confirmada"] --> B["Prednisona 1 mg por kg por dia<br/>+ acido folico"]
+    A["AHAI a quente confirmada"] --> B["Prednisona 1 mg por kg por dia<br/>+ ácido fólico"]
     B --> C["Resposta em 1 a 3 semanas?"]
     C -->|Sim| D["Desmame lento<br/>ao longo de meses"]
-    D --> E["Recaida no desmame?"]
-    E -->|Nao| F["Manter seguimento<br/>Hb reticulocitos LDH"]
+    D --> E["Recaída no desmame?"]
+    E -->|Não| F["Manter seguimento<br/>Hb reticulócitos LDH"]
     E -->|Sim| G["Rituximabe<br/>rastrear hepatite B antes"]
-    C -->|Nao| G
-    G --> H["Refratario ou corticodependente"]
-    H --> I["Esplenectomia com vacinacao previa<br/>ou imunossupressor"]
+    C -->|Não| G
+    G --> H["Refratário ou corticodependente"]
+    H --> I["Esplenectomia com vacinação prévia<br/>ou imunossupressor"]
     class C critical;
     class B action;
     class G action;
@@ -15801,16 +15801,16 @@ Oriente ainda medidas simples e de alto rendimento: hidratação diária, evitar
 
 \`\`\`mermaid
 flowchart TD
-    A["Paciente falcemico com dor aguda"] --> B["Analgesia opioide<br/>em ate 30 a 60 minutos"]
+    A["Paciente falcêmico com dor aguda"] --> B["Analgesia opioide<br/>em até 30 a 60 minutos"]
     B --> C["Hidratar sem hiper hidratar<br/>O2 apenas se hipoxemia"]
-    C --> D["Febre dispneia ou dor toracica?"]
-    D -->|Sim| E["Radiografia de torax<br/>e hemoculturas"]
-    E -->|Novo infiltrado| F["Sindrome toracica aguda<br/>ATB tipico + atipico"]
+    C --> D["Febre dispneia ou dor torácica?"]
+    D -->|Sim| E["Radiografia de tórax<br/>e hemoculturas"]
+    E -->|Novo infiltrado| F["Síndrome torácica aguda<br/>ATB típico + atípico"]
     F --> G["Hipoxemia progressiva<br/>ou infiltrado multilobar?"]
-    G -->|Sim| H["Exsanguineotransfusao"]
-    G -->|Nao| I["Transfusao simples"]
-    D -->|Nao| J["Reavaliar dor<br/>espirometria de incentivo"]
-    J --> K["Alta com plano analgesico<br/>e hidroxiureia mantida"]
+    G -->|Sim| H["Exsanguineotransfusão"]
+    G -->|Não| I["Transfusão simples"]
+    D -->|Não| J["Reavaliar dor<br/>espirometria de incentivo"]
+    J --> K["Alta com plano analgésico<br/>e hidroxiureia mantida"]
     class F critical;
     class H action;
     class I action;
@@ -15819,14 +15819,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Indicacao de transfusao<br/>na doenca falciforme"] --> B["O problema e anemia<br/>ou carga de HbS?"]
-    B -->|Anemia| C["Hb muito abaixo do basal<br/>aplasica ou sequestro"]
-    C --> D["Transfusao simples<br/>nao ultrapassar Hb 10"]
-    B -->|Carga de HbS| E["AVC STA grave falencia<br/>colestase ou priapismo refratario"]
-    E --> F["Exsanguineotransfusao<br/>alvo HbS abaixo de 30 por cento"]
-    F --> G["Sem aferese disponivel?"]
-    G -->|Sim| H["Troca manual<br/>e acionar transferencia"]
-    A --> I["Pedir hemacias fenotipadas<br/>Rh e Kell desleucocitadas"]
+    A["Indicação de transfusão<br/>na doenca falciforme"] --> B["O problema e anemia<br/>ou carga de HbS?"]
+    B -->|Anemia| C["Hb muito abaixo do basal<br/>aplásica ou sequestro"]
+    C --> D["Transfusão simples<br/>não ultrapassar Hb 10"]
+    B -->|Carga de HbS| E["AVC STA grave falência<br/>colestase ou priapismo refratário"]
+    E --> F["Exsanguineotransfusão<br/>alvo HbS abaixo de 30 por cento"]
+    F --> G["Sem aférese disponível?"]
+    G -->|Sim| H["Troca manual<br/>e acionar transferência"]
+    A --> I["Pedir hemácias fenotipadas<br/>Rh e Kell desleucocitadas"]
     class E critical;
     class D action;
     class F action;
@@ -16081,16 +16081,16 @@ Sobre os **complexos protrombínicos**: são atraentes pelo pequeno volume, mas 
 
 \`\`\`mermaid
 flowchart TD
-    A["Sangramento em multiplos sitios<br/>ou trombose em doente grave"] --> B["Ha doenca de base<br/>associada a CIVD?"]
-    B -->|Nao| C["Reavaliar diagnostico<br/>hepatopatia PTT vitamina K"]
-    B -->|Sim| D["Plaquetas TP fibrinogenio<br/>D dimero seriados"]
+    A["Sangramento em múltiplos sítios<br/>ou trombose em doente grave"] --> B["Há doenca de base<br/>associada a CIVD?"]
+    B -->|Não| C["Reavaliar diagnóstico<br/>hepatopatia PTT vitamina K"]
+    B -->|Sim| D["Plaquetas TP fibrinogênio<br/>D dímero seriados"]
     D --> E["Escore ISTH maior ou igual a 5?"]
     E -->|Sim| F["CIVD manifesta"]
-    E -->|Nao| G["Repetir em 24 a 48 horas<br/>nao exclui CIVD"]
+    E -->|Não| G["Repetir em 24 a 48 horas<br/>não exclui CIVD"]
     F --> H["Tratar a causa de base<br/>pilar do tratamento"]
-    H --> I["Ha sangramento ativo?"]
-    I -->|Sim| J["Plaquetas plasma<br/>e crioprecipitado conforme deficit"]
-    I -->|Nao| K["Nao corrigir exames<br/>profilaxia de trombose"]
+    H --> I["Há sangramento ativo?"]
+    I -->|Sim| J["Plaquetas plasma<br/>e crioprecipitado conforme déficit"]
+    I -->|Não| K["Não corrigir exames<br/>profilaxia de trombose"]
     class F critical;
     class H action;
     class J action;
@@ -16098,16 +16098,16 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Plaquetopenia em doente grave"] --> B["Ha esquizocitos no esfregaco?"]
-    B -->|Sim| C["Coagulograma e fibrinogenio"]
-    C -->|Normais| D["Microangiopatia trombotica<br/>PTT ou SHU"]
-    D --> E["Emergencia<br/>acionar plasmaferese"]
-    C -->|Alterados com fibrinogenio caindo| F["CIVD<br/>procurar a causa"]
-    B -->|Nao| G["TP alargado?"]
+    A["Plaquetopenia em doente grave"] --> B["Há esquizócitos no esfregaço?"]
+    B -->|Sim| C["Coagulograma e fibrinogênio"]
+    C -->|Normais| D["Microangiopatia trombótica<br/>PTT ou SHU"]
+    D --> E["Emergência<br/>acionar plasmaférese"]
+    C -->|Alterados com fibrinogênio caindo| F["CIVD<br/>procurar a causa"]
+    B -->|Não| G["TP alargado?"]
     G -->|Sim| H["Dosar fator VIII"]
-    H -->|Normal ou alto| I["Coagulopatia hepatica"]
+    H -->|Normal ou alto| I["Coagulopatia hepática"]
     H -->|Baixo| F
-    G -->|Nao| J["Rever drogas HIT<br/>e plaquetopenia imune"]
+    G -->|Não| J["Rever drogas HIT<br/>e plaquetopenia imune"]
     class D critical;
     class E action;
     class F action;
@@ -16311,14 +16311,14 @@ Contate a hematologia com urgência e providencie transferência para serviço c
 
 \`\`\`mermaid
 flowchart TD
-    A["Citopenias + febre ou sangramento<br/>blastos no esfregaco"] --> B["Suspeita de leucemia aguda"]
-    B --> C["Coagulograma fibrinogenio D dimero<br/>e eletrolitos com urgencia"]
-    C --> D["Promielocitos hipergranulares<br/>com coagulopatia?"]
-    D -->|Sim| E["Suspeita de leucemia promielocitica"]
-    E --> F["Iniciar ATRA imediatamente<br/>sem esperar confirmacao"]
-    D -->|Nao| G["Leucometria muito alta<br/>com dispneia ou confusao?"]
+    A["Citopenias + febre ou sangramento<br/>blastos no esfregaço"] --> B["Suspeita de leucemia aguda"]
+    B --> C["Coagulograma fibrinogênio D dímero<br/>e eletrólitos com urgência"]
+    C --> D["Promielócitos hipergranulares<br/>com coagulopatia?"]
+    D -->|Sim| E["Suspeita de leucemia promielocítica"]
+    E --> F["Iniciar ATRA imediatamente<br/>sem esperar confirmação"]
+    D -->|Não| G["Leucometria muito alta<br/>com dispneia ou confusão?"]
     G -->|Sim| H["Leucostase<br/>hidratar e citorreduzir"]
-    G -->|Nao| I["Suporte transfusional<br/>e profilaxia de lise tumoral"]
+    G -->|Não| I["Suporte transfusional<br/>e profilaxia de lise tumoral"]
     C --> J["Febre com neutropenia?"]
     J -->|Sim| K["ATB de amplo espectro<br/>na primeira hora"]
     I --> L["Mielograma com imunofenotipagem<br/>e encaminhamento a hematologia"]
@@ -16331,15 +16331,15 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Leucemia aguda ao diagnostico"] --> B["Avaliar risco de lise tumoral<br/>LDH leucometria e funcao renal"]
-    B -->|Baixo risco| C["Hidratacao e monitorizacao"]
-    B -->|Risco intermediario| D["Hidratacao vigorosa<br/>+ alopurinol"]
-    B -->|Alto risco ou urato ja alto| E["Hidratacao vigorosa<br/>+ rasburicase"]
-    E --> F["Checar deficiencia de G6PD<br/>contraindicacao"]
+    A["Leucemia aguda ao diagnóstico"] --> B["Avaliar risco de lise tumoral<br/>LDH leucometria e função renal"]
+    B -->|Baixo risco| C["Hidratação e monitorização"]
+    B -->|Risco intermediário| D["Hidratação vigorosa<br/>+ alopurinol"]
+    B -->|Alto risco ou urato ja alto| E["Hidratação vigorosa<br/>+ rasburicase"]
+    E --> F["Checar deficiência de G6PD<br/>contraindicação"]
     D --> G["K P Ca urato e creatinina<br/>a cada 6 a 12 horas"]
     E --> G
-    G --> H["Hipercalemia ou anuria?"]
-    H -->|Sim| I["Emergencia dialitica<br/>acionar nefrologia"]
+    G --> H["Hipercalemia ou anúria?"]
+    H -->|Sim| I["Emergência dialítica<br/>acionar nefrologia"]
     class H critical;
     class I action;
     class D action;
@@ -16559,10 +16559,10 @@ Na prática, o conflito entre "não dar corticoide antes da biópsia" e "tratar 
 \`\`\`mermaid
 flowchart TD
     A["Linfonodo maior que 2 cm<br/>indolor e persistente"] --> B["Sinais de alarme<br/>supraclavicular sintomas B massa?"]
-    B -->|Nao e ha foco infeccioso| C["Reavaliar em 4 a 6 semanas"]
-    C -->|Persiste ou cresce| D["Biopsia excisional do linfonodo"]
+    B -->|Não e há foco infeccioso| C["Reavaliar em 4 a 6 semanas"]
+    C -->|Persiste ou cresce| D["Biópsia excisional do linfonodo"]
     B -->|Sim| D
-    D --> E["Histopatologia<br/>+ imuno histoquimica"]
+    D --> E["Histopatologia<br/>+ imuno histoquímica"]
     E --> F["Linfoma confirmado"]
     F --> G["Estadiar com PET TC<br/>LDH e sorologias"]
     G --> H["Tratamento pelo subtipo<br/>com hematologia ou oncologia"]
@@ -16576,12 +16576,12 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Paciente com linfoma<br/>ou massa suspeita"] --> B["Ha emergencia oncologica?"]
-    B -->|Estridor ou dispneia deitado| C["Obstrucao de via aerea<br/>nao sedar sem avaliacao"]
-    B -->|Dor dorsal ou deficit| D["Suspeita de compressao medular"]
-    D --> E["Ressonancia de urgencia<br/>e corticoide imediato"]
-    B -->|Edema de face e pletora| F["Sindrome de veia cava superior"]
-    B -->|Nao| G["Programar biopsia excisional<br/>sem corticoide previo"]
+    A["Paciente com linfoma<br/>ou massa suspeita"] --> B["Há emergência oncológica?"]
+    B -->|Estridor ou dispneia deitado| C["Obstrução de via aérea<br/>não sedar sem avaliação"]
+    B -->|Dor dorsal ou déficit| D["Suspeita de compressão medular"]
+    D --> E["Ressonância de urgência<br/>e corticoide imediato"]
+    B -->|Edema de face e pletora| F["Síndrome de veia cava superior"]
+    B -->|Não| G["Programar biópsia excisional<br/>sem corticoide prévio"]
     C --> H["Tratar primeiro<br/>biopsiar na primeira janela"]
     F --> H
     class C critical;
@@ -16780,16 +16780,16 @@ O suporte clínico é responsabilidade de toda a equipe e muda desfecho:
 
 \`\`\`mermaid
 flowchart TD
-    A["Adulto com dor ossea anemia<br/>ou insuficiencia renal inexplicada"] --> B["Eletroforese com imunofixacao<br/>e cadeias leves livres"]
-    B -->|Proteina monoclonal presente| C["Mielograma com biopsia<br/>e FISH + imagem"]
-    C --> D["Plasmocitos clonais<br/>maiores ou iguais a 10 por cento?"]
-    D -->|Nao| E["MGUS<br/>acompanhamento"]
-    D -->|Sim| F["Ha CRAB ou criterio SLiM?"]
-    F -->|Nao| G["Mieloma smoldering<br/>vigilancia proxima"]
-    F -->|Sim| H["Mieloma multiplo<br/>tratar"]
-    H --> I["Suporte: hidratar tratar calcio<br/>bisfosfonato evitar AINE"]
-    H --> J["Deficit neurologico agudo?"]
-    J -->|Sim| K["Compressao medular<br/>corticoide e radioterapia urgentes"]
+    A["Adulto com dor óssea anemia<br/>ou insuficiência renal inexplicada"] --> B["Eletroforese com imunofixação<br/>e cadeias leves livres"]
+    B -->|Proteína monoclonal presente| C["Mielograma com biópsia<br/>e FISH + imagem"]
+    C --> D["Plasmócitos clonais<br/>maiores ou iguais a 10 por cento?"]
+    D -->|Não| E["MGUS<br/>acompanhamento"]
+    D -->|Sim| F["Há CRAB ou critério SLiM?"]
+    F -->|Não| G["Mieloma smoldering<br/>vigilância próxima"]
+    F -->|Sim| H["Mieloma múltiplo<br/>tratar"]
+    H --> I["Suporte: hidratar tratar cálcio<br/>bisfosfonato evitar AINE"]
+    H --> J["Déficit neurológico agudo?"]
+    J -->|Sim| K["Compressão medular<br/>corticoide e radioterapia urgentes"]
     class K critical;
     class H action;
     class I action;
@@ -16840,15 +16840,15 @@ Oriente o paciente a procurar atendimento diante de dor óssea nova e progressiv
 \`\`\`mermaid
 flowchart TD
     A["Paciente com mieloma<br/>e piora aguda"] --> B["Qual o quadro?"]
-    B -->|Dor lombar com fraqueza<br/>ou retencao urinaria| C["Suspeita de compressao medular"]
+    B -->|Dor lombar com fraqueza<br/>ou retenção urinária| C["Suspeita de compressão medular"]
     C --> D["Corticoide em dose alta<br/>e RM no mesmo turno"]
-    B -->|Confusao poliuria<br/>calcio elevado| E["Hipercalcemia sintomatica"]
-    E --> F["Salina IV bisfosfonato<br/>corticoide e monitorizacao"]
-    B -->|Creatinina em ascensao<br/>ou oliguria| G["Injuria renal por cilindros"]
-    G --> H["Hidratar suspender AINE e contraste<br/>iniciar bortezomibe rapido"]
-    B -->|Cefaleia visao turva<br/>epistaxe e torpor| I["Hiperviscosidade"]
-    I --> J["Plasmaferese urgente"]
-    B -->|Febre em neutropenico| K["Antibiotico em ate 1 hora"]
+    B -->|Confusão poliúria<br/>cálcio elevado| E["Hipercalcemia sintomática"]
+    E --> F["Salina IV bisfosfonato<br/>corticoide e monitorização"]
+    B -->|Creatinina em ascensão<br/>ou oligúria| G["Injúria renal por cilindros"]
+    G --> H["Hidratar suspender AINE e contraste<br/>iniciar bortezomibe rápido"]
+    B -->|Cefaleia visão turva<br/>epistaxe e torpor| I["Hiperviscosidade"]
+    I --> J["Plasmaférese urgente"]
+    B -->|Febre em neutropênico| K["Antibiótico em até 1 hora"]
     class C critical;
     class I critical;
     class D action;
@@ -17034,18 +17034,18 @@ Nada disso remove potássio do corpo. Remoção é resina, quelante ou **diális
 
 \`\`\`mermaid
 flowchart TD
-    A["Tumor de alta carga<br/>ou inicio de quimioterapia"] --> B["Estratificar risco de lise<br/>LDH leucometria funcao renal"]
-    B -->|Baixo ou intermediario| C["Hidratacao IV vigorosa<br/>+ alopurinol"]
-    B -->|Alto ou acido urico elevado| D["Hidratacao IV vigorosa<br/>+ rasburicase 0,2 mg por kg"]
+    A["Tumor de alta carga<br/>ou início de quimioterapia"] --> B["Estratificar risco de lise<br/>LDH leucometria função renal"]
+    B -->|Baixo ou intermediário| C["Hidratação IV vigorosa<br/>+ alopurinol"]
+    B -->|Alto ou ácido úrico elevado| D["Hidratação IV vigorosa<br/>+ rasburicase 0,2 mg por kg"]
     D --> E["Checar G6PD<br/>contraindicada se deficiente"]
-    C --> F["Laboratorio seriado<br/>K P Ca acido urico creatinina"]
+    C --> F["Laboratório seriado<br/>K P Ca ácido úrico creatinina"]
     D --> F
-    F --> G["Potassio maior ou igual a 6<br/>ou alteracao no ECG?"]
-    G -->|Sim| H["Hipercalemia<br/>emergencia arritmica"]
-    H --> I["Calcio para estabilizar<br/>insulina glicose beta 2"]
-    G -->|Nao| J["Nao alcalinizar urina<br/>nao repor calcio se assintomatico"]
-    I --> K["Refratario ou oliguria?"]
-    K -->|Sim| L["Dialise urgente"]
+    F --> G["Potássio maior ou igual a 6<br/>ou alteração no ECG?"]
+    G -->|Sim| H["Hipercalemia<br/>emergência arrítmica"]
+    H --> I["Cálcio para estabilizar<br/>insulina glicose beta 2"]
+    G -->|Não| J["Não alcalinizar urina<br/>não repor cálcio se assintomático"]
+    I --> K["Refratário ou oligúria?"]
+    K -->|Sim| L["Diálise urgente"]
     class H critical;
     class D action;
     class I action;
@@ -17229,19 +17229,19 @@ Nem toda queda tardia de hemoglobina é sangramento: pense em **reação hemolí
 
 \`\`\`mermaid
 flowchart TD
-    A["Reacao durante a transfusao"] --> B["PARAR a transfusao<br/>manter acesso com SF"]
-    B --> C["Conferir identificacao<br/>paciente x bolsa"]
-    C --> D["Febre com dor lombar<br/>hipotensao e urina escura?"]
-    D -->|Sim| E["Hemolise ABO aguda<br/>emergencia"]
+    A["Reação durante a transfusão"] --> B["PARAR a transfusão<br/>manter acesso com SF"]
+    B --> C["Conferir identificação<br/>paciente x bolsa"]
+    C --> D["Febre com dor lombar<br/>hipotensão e urina escura?"]
+    D -->|Sim| E["Hemólise ABO aguda<br/>emergência"]
     E --> F["Volume vasopressor<br/>manter diurese e tratar CIVD"]
-    D -->|Nao| G["Urticaria ou broncoespasmo<br/>com hipotensao?"]
+    D -->|Não| G["Urticaria ou broncoespasmo<br/>com hipotensão?"]
     G -->|Anafilaxia| H["Adrenalina intramuscular"]
-    G -->|Urticaria isolada| I["Anti histaminico<br/>reiniciar com cautela"]
-    D -->|Nao| J["Dispneia com infiltrado bilateral"]
-    J -->|Sinais de sobrecarga e BNP alto| K["TACO<br/>diuretico e oxigenio"]
-    J -->|Sem sobrecarga ate 6 horas| L["TRALI<br/>suporte ventilatorio sem diuretico"]
-    D -->|Nao| M["Febre alta com choque"]
-    M --> N["Contaminacao bacteriana<br/>culturas e ATB amplo"]
+    G -->|Urticaria isolada| I["Anti histamínico<br/>reiniciar com cautela"]
+    D -->|Não| J["Dispneia com infiltrado bilateral"]
+    J -->|Sinais de sobrecarga e BNP alto| K["TACO<br/>diurético e oxigênio"]
+    J -->|Sem sobrecarga até 6 horas| L["TRALI<br/>suporte ventilatório sem diurético"]
+    D -->|Não| M["Febre alta com choque"]
+    M --> N["Contaminação bacteriana<br/>culturas e ATB amplo"]
     class E critical;
     class F action;
     class H action;
@@ -17460,15 +17460,15 @@ Vale notar que a comparação não é tão desfavorável quanto parece: no próp
 
 \`\`\`mermaid
 flowchart TD
-    A["Sangramento em paciente anticoagulado"] --> B["Sangramento maior<br/>ou sitio critico?"]
-    B -->|Nao| C["Suspender droga<br/>hemostasia local e suporte"]
-    B -->|Sim| D["Identificar a droga<br/>e a hora da ultima dose"]
+    A["Sangramento em paciente anticoagulado"] --> B["Sangramento maior<br/>ou sítio crítico?"]
+    B -->|Não| C["Suspender droga<br/>hemostasia local e suporte"]
+    B -->|Sim| D["Identificar a droga<br/>e a hora da última dose"]
     D -->|Varfarina| E["Vitamina K 5 a 10 mg IV<br/>+ CCP de 4 fatores"]
-    D -->|Dabigatrana| F["Idarucizumabe 5 g IV<br/>se indisponivel CCP ou dialise"]
-    D -->|Rivaroxabana ou apixabana| G["Andexanet alfa<br/>se indisponivel CCP 4 fatores"]
-    D -->|Heparina nao fracionada| H["Protamina IV lenta"]
+    D -->|Dabigatrana| F["Idarucizumabe 5 g IV<br/>se indisponível CCP ou diálise"]
+    D -->|Rivaroxabana ou apixabana| G["Andexanet alfa<br/>se indisponível CCP 4 fatores"]
+    D -->|Heparina não fracionada| H["Protamina IV lenta"]
     E --> I["Repetir INR<br/>vitamina K sustenta o efeito"]
-    F --> J["Definir quando<br/>reiniciar a anticoagulacao"]
+    F --> J["Definir quando<br/>reiniciar a anticoagulação"]
     G --> J
     H --> J
     I --> J
@@ -17658,18 +17658,18 @@ Complete a investigação com FAN e painel de autoanticorpos (para identificar l
 
 \`\`\`mermaid
 flowchart TD
-    A["Trombose em jovem ou sitio atipico<br/>ou perdas gestacionais"] --> B["Dosar LAC anticardiolipina<br/>e anti beta 2 GPI"]
-    B -->|Positivo| C["Repetir em 12 semanas<br/>confirmar persistencia"]
+    A["Trombose em jovem ou sítio atípico<br/>ou perdas gestacionais"] --> B["Dosar LAC anticardiolipina<br/>e anti beta 2 GPI"]
+    B -->|Positivo| C["Repetir em 12 semanas<br/>confirmar persistência"]
     C -->|Persistente| D["SAF confirmada"]
-    D --> E["Qual a manifestacao?"]
+    D --> E["Qual a manifestação?"]
     E -->|Trombose venosa| F["Varfarina INR 2 a 3<br/>por tempo indefinido"]
     E -->|Trombose arterial| G["Varfarina com ou sem AAS<br/>alvo individualizado"]
     E -->|Gestante| H["AAS baixa dose + HBPM<br/>nunca varfarina"]
     D --> I["Triplo positivo?"]
     I -->|Sim| J["Evitar DOAC"]
-    D --> K["Trombose em 3 ou mais orgaos<br/>em menos de uma semana?"]
-    K -->|Sim| L["SAF catastrofica"]
-    L --> M["Heparina + corticoide<br/>+ plasmaferese ou imunoglobulina"]
+    D --> K["Trombose em 3 ou mais órgãos<br/>em menos de uma semana?"]
+    K -->|Sim| L["SAF catastrófica"]
+    L --> M["Heparina + corticoide<br/>+ plasmaférese ou imunoglobulina"]
     class L critical;
     class F action;
     class H action;
@@ -17900,17 +17900,17 @@ Duas armadilhas de execução: **febre é um dos maiores amplificadores de lesã
 
 \`\`\`mermaid
 flowchart TD
-    A["TCE com Glasgow<br/>menor ou igual a 8"] --> B["Via aerea definitiva<br/>SatO2 maior ou igual a 94%"]
+    A["TCE com Glasgow<br/>menor ou igual a 8"] --> B["Via aérea definitiva<br/>SatO2 maior ou igual a 94%"]
     B --> C["PAS menor que 110 mmHg?"]
     C -->|Sim| D["Ressuscitar volume<br/>e buscar sangramento"]
-    C -->|Nao| E["TC de cranio<br/>+ neurocirurgia"]
+    C -->|Não| E["TC de crânio<br/>+ neurocirurgia"]
     E --> F["Hematoma com<br/>efeito de massa?"]
-    F -->|Sim| G["Drenagem cirurgica<br/>de urgencia"]
-    F -->|Nao| H["UTI: cabeceira 30 graus<br/>normocapnia, monitorizar PIC"]
+    F -->|Sim| G["Drenagem cirúrgica<br/>de urgência"]
+    F -->|Não| H["UTI: cabeceira 30 graus<br/>normocapnia, monitorizar PIC"]
     H --> I["Anisocoria ou<br/>queda do Glasgow?"]
-    I -->|Sim| J["Manitol 0,25-1 g/kg ou<br/>salina hipertonica + TC"]
-    I -->|Nao| K["Manter metas e<br/>evitar lesao secundaria"]
-    J --> L["HIC refrataria:<br/>craniectomia descompressiva"]
+    I -->|Sim| J["Manitol 0,25-1 g/kg ou<br/>salina hipertônica + TC"]
+    I -->|Não| K["Manter metas e<br/>evitar lesão secundária"]
+    J --> L["HIC refratária:<br/>craniectomia descompressiva"]
     class A critical;
     class I critical;
     class G action;
@@ -17920,15 +17920,15 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["PIC acima de 22 mmHg<br/>de forma sustentada"] --> B["Medidas basicas ja otimizadas?<br/>cabeceira, cabeca neutra, colar folgado"]
-    B -->|Nao| C["Corrigir posicionamento<br/>normocapnia e normotermia"]
-    B -->|Sim| D["Analgesia e sedacao<br/>adequadas?"]
-    D -->|Nao| E["Aprofundar analgesia<br/>e sedacao"]
-    D -->|Sim| F["Drenagem liquorica se<br/>cateter ventricular disponivel"]
-    F --> G["Terapia hiperosmolar<br/>salina hipertonica ou manitol"]
+    A["PIC acima de 22 mmHg<br/>de forma sustentada"] --> B["Medidas básicas ja otimizadas?<br/>cabeceira, cabeça neutra, colar folgado"]
+    B -->|Não| C["Corrigir posicionamento<br/>normocapnia e normotermia"]
+    B -->|Sim| D["Analgesia e sedação<br/>adequadas?"]
+    D -->|Não| E["Aprofundar analgesia<br/>e sedação"]
+    D -->|Sim| F["Drenagem liquórica se<br/>cateter ventricular disponível"]
+    F --> G["Terapia hiperosmolar<br/>salina hipertônica ou manitol"]
     G --> H["PIC ainda elevada?"]
-    H -->|Sim| I["Refratario: coma barbiturico<br/>ou craniectomia descompressiva"]
-    H -->|Nao| J["Manter metas<br/>PPC 60 a 70 mmHg"]
+    H -->|Sim| I["Refratário: coma barbitúrico<br/>ou craniectomia descompressiva"]
+    H -->|Não| J["Manter metas<br/>PPC 60 a 70 mmHg"]
     class A critical;
     class H critical;
     class G action;
@@ -18102,15 +18102,15 @@ Na mulher com epilepsia que planeja gestar, prescreva **ácido fólico** e discu
 
 \`\`\`mermaid
 flowchart TD
-    A["Crise convulsiva<br/>na emergencia"] --> B["Crise ainda ativa<br/>por mais de 5 min?"]
-    B -->|Sim| C["Benzodiazepinico<br/>protocolo de estado de mal"]
-    B -->|Nao| D["Glicemia capilar<br/>+ eletrolitos e toxicologico"]
+    A["Crise convulsiva<br/>na emergência"] --> B["Crise ainda ativa<br/>por mais de 5 min?"]
+    B -->|Sim| C["Benzodiazepínico<br/>protocolo de estado de mal"]
+    B -->|Não| D["Glicemia capilar<br/>+ eletrólitos e toxicológico"]
     D --> E["Causa aguda<br/>identificada?"]
-    E -->|Sim| F["Tratar a causa<br/>sem antiepileptico cronico"]
-    E -->|Nao| G["Primeira crise nao provocada<br/>TC/RM + EEG"]
-    G --> H["Lesao estrutural, EEG<br/>epileptiforme ou crise no sono?"]
-    H -->|Sim| I["Discutir inicio de<br/>antiepileptico"]
-    H -->|Nao| J["Conduta expectante<br/>+ orientacoes e seguimento"]
+    E -->|Sim| F["Tratar a causa<br/>sem antiepiléptico crônico"]
+    E -->|Não| G["Primeira crise não provocada<br/>TC/RM + EEG"]
+    G --> H["Lesão estrutural, EEG<br/>epileptiforme ou crise no sono?"]
+    H -->|Sim| I["Discutir início de<br/>antiepiléptico"]
+    H -->|Não| J["Conduta expectante<br/>+ orientações e seguimento"]
     class B critical;
     class H critical;
     class C action;
@@ -18121,12 +18121,12 @@ O segundo eixo de decisão é o do **paciente com epilepsia já conhecida** que 
 
 \`\`\`mermaid
 flowchart TD
-    A["Epilepsia conhecida<br/>com crise tipica"] --> B["Recuperou totalmente<br/>a consciencia?"]
-    B -->|Nao| C["Tratar como possivel<br/>estado de mal e pedir EEG"]
-    B -->|Sim| D["Checar adesao, dose<br/>e nivel serico do farmaco"]
+    A["Epilepsia conhecida<br/>com crise típica"] --> B["Recuperou totalmente<br/>a consciência?"]
+    B -->|Não| C["Tratar como possível<br/>estado de mal e pedir EEG"]
+    B -->|Sim| D["Checar adesão, dose<br/>e nível sérico do fármaco"]
     D --> E["Fator precipitante<br/>identificado?"]
-    E -->|Sim| F["Corrigir gatilho: sono, alcool<br/>infeccao, falta de medicacao"]
-    E -->|Nao| G["Rever diagnostico e esquema<br/>encaminhar a neurologia"]
+    E -->|Sim| F["Corrigir gatilho: sono, alcool<br/>infecção, falta de medicação"]
+    E -->|Não| G["Rever diagnóstico e esquema<br/>encaminhar a neurologia"]
     F --> H["Alta com receita garantida<br/>e retorno agendado"]
     class B critical;
     class C action;
@@ -18312,15 +18312,15 @@ Na **salvas**, o oxigênio deve ser oferecido a fluxo alto por 15 a 20 minutos c
 \`\`\`mermaid
 flowchart TD
     A["Cefaleia recorrente<br/>na consulta"] --> B["Bandeira vermelha<br/>presente?"]
-    B -->|Sim| C["Neuroimagem e<br/>investigacao dirigida"]
-    B -->|Nao| D["Caracterizar o padrao<br/>criterios ICHD"]
-    D --> E["Dor unilateral pulsatil<br/>com foto e fonofobia"]
-    E --> F["Enxaqueca: AINE ou triptano<br/>+ antiemetico na crise"]
-    D --> G["Dor periorbitaria excruciante<br/>com sinais autonomicos"]
+    B -->|Sim| C["Neuroimagem e<br/>investigação dirigida"]
+    B -->|Não| D["Caracterizar o padrão<br/>criterios ICHD"]
+    D --> E["Dor unilateral pulsátil<br/>com foto e fonofobia"]
+    E --> F["Enxaqueca: AINE ou triptano<br/>+ antiemético na crise"]
+    D --> G["Dor periorbitária excruciante<br/>com sinais autonômicos"]
     G --> H["Salvas: O2 100% 12-15 L/min<br/>+ sumatriptano SC"]
-    F --> I["Mais de 4 dias de dor<br/>por mes ou incapacidade?"]
-    I -->|Sim| J["Iniciar profilaxia e<br/>diario de cefaleia"]
-    I -->|Nao| K["Tratamento agudo<br/>com limite de dias por mes"]
+    F --> I["Mais de 4 dias de dor<br/>por mês ou incapacidade?"]
+    I -->|Sim| J["Iniciar profilaxia e<br/>diário de cefaleia"]
+    I -->|Não| K["Tratamento agudo<br/>com limite de dias por mês"]
     class B critical;
     class C action;
     class F action;
@@ -18332,14 +18332,14 @@ O segundo eixo de decisão é o do **paciente com dor quase diária**, em que a 
 
 \`\`\`mermaid
 flowchart TD
-    A["Cefaleia em 15 ou mais<br/>dias por mes"] --> B["Bandeira vermelha<br/>ou exame alterado?"]
-    B -->|Sim| C["Investigar causa secundaria<br/>antes de qualquer rotulo"]
-    B -->|Nao| D["Quantos dias por mes<br/>usa analgesico?"]
-    D --> E["Acima do limite<br/>10 ou 15 dias por mes"]
+    A["Cefaleia em 15 ou mais<br/>dias por mês"] --> B["Bandeira vermelha<br/>ou exame alterado?"]
+    B -->|Sim| C["Investigar causa secundária<br/>antes de qualquer rótulo"]
+    B -->|Não| D["Quantos dias por mês<br/>usa analgésico?"]
+    D --> E["Acima do limite<br/>10 ou 15 dias por mês"]
     E --> F["Cefaleia por uso excessivo<br/>retirar o agente"]
-    F --> G["Iniciar profilaxia eficaz<br/>e diario de cefaleia"]
+    F --> G["Iniciar profilaxia eficaz<br/>e diário de cefaleia"]
     D --> H["Dentro do limite"]
-    H --> I["Migranea cronica<br/>otimizar profilaxia"]
+    H --> I["Migrânea cronica<br/>otimizar profilaxia"]
     I --> J["Falha de 2 profilaxias adequadas<br/>encaminhar a neurologia"]
     class B critical;
     class E critical;
@@ -18508,16 +18508,16 @@ Não esqueça do cuidador: sobrecarga, depressão e exaustão do cuidador são d
 
 \`\`\`mermaid
 flowchart TD
-    A["Queixa de declinio cognitivo"] --> B["Quadro agudo e flutuante?"]
-    B -->|Sim| C["Delirium: buscar<br/>causa organica aguda"]
-    B -->|Nao| D["Historia com informante<br/>e avaliacao funcional"]
+    A["Queixa de declínio cognitivo"] --> B["Quadro agudo e flutuante?"]
+    B -->|Sim| C["Delirium: buscar<br/>causa orgânica aguda"]
+    B -->|Não| D["História com informante<br/>e avaliação funcional"]
     D --> E["Testes cognitivos<br/>MEEM ou MoCA ajustados<br/>pela escolaridade"]
-    E --> F["Laboratorio: TSH, B12,<br/>eletrolitos, funcao renal e<br/>hepatica, sorologias se indicado"]
-    F --> G["Neuroimagem estrutural<br/>RM ou TC de cranio"]
-    G --> H["Causa reversivel<br/>identificada?"]
-    H -->|Sim| I["Tratar a causa<br/>e reavaliar cognicao"]
-    H -->|Nao| J["Definir o subtipo pela<br/>sindrome clinica e imagem"]
-    J --> K["Tratamento sintomatico e<br/>controle de fatores vasculares"]
+    E --> F["Laboratório: TSH, B12,<br/>eletrólitos, função renal e<br/>hepática, sorologias se indicado"]
+    F --> G["Neuroimagem estrutural<br/>RM ou TC de crânio"]
+    G --> H["Causa reversível<br/>identificada?"]
+    H -->|Sim| I["Tratar a causa<br/>e reavaliar cognição"]
+    H -->|Não| J["Definir o subtipo pela<br/>síndrome clínica e imagem"]
+    J --> K["Tratamento sintomático e<br/>controle de fatores vasculares"]
     class C critical;
     class I action;
     class K action;
@@ -18539,15 +18539,15 @@ Na demência com corpos de Lewy e na demência da doença de Parkinson, a regra 
 
 \`\`\`mermaid
 flowchart TD
-    A["Agitacao ou agressividade<br/>em paciente com demencia"] --> B["Mudanca aguda<br/>nas ultimas horas ou dias?"]
-    B -->|Sim| C["Investigar delirium:<br/>dor, infeccao, retencao,<br/>fecaloma, droga nova"]
-    B -->|Nao| D["Descrever gatilho, horario<br/>e contexto do comportamento"]
-    D --> E["Medidas nao farmacologicas<br/>e orientacao do cuidador"]
-    E --> F["Persiste com risco a<br/>seguranca ou sofrimento?"]
-    F -->|Nao| G["Manter medidas<br/>e reavaliar"]
+    A["Agitação ou agressividade<br/>em paciente com demencia"] --> B["Mudança aguda<br/>nas últimas horas ou dias?"]
+    B -->|Sim| C["Investigar delirium:<br/>dor, infecção, retenção,<br/>fecaloma, droga nova"]
+    B -->|Não| D["Descrever gatilho, horário<br/>e contexto do comportamento"]
+    D --> E["Medidas não farmacológicas<br/>e orientação do cuidador"]
+    E --> F["Persiste com risco a<br/>segurança ou sofrimento?"]
+    F -->|Não| G["Manter medidas<br/>e reavaliar"]
     F -->|Sim| H["Suspeita de corpos<br/>de Lewy ou Parkinson?"]
     H -->|Sim| I["Quetiapina ou clozapina<br/>nunca haloperidol<br/>ou risperidona"]
-    H -->|Nao| J["Antipsicotico atipico em dose<br/>minima e por tempo definido"]
+    H -->|Não| J["Antipsicótico atípico em dose<br/>mínima e por tempo definido"]
     class B critical;
     class F critical;
     class C action;
@@ -18795,14 +18795,14 @@ Cuidados de suporte que definem qualidade de vida: cateterismo vesical intermite
 
 \`\`\`mermaid
 flowchart TD
-    A["Sindrome medular aguda:<br/>nivel sensitivo, paraparesia,<br/>disfuncao esfincteriana"] --> B["RM de medula com gadolinio<br/>em carater de urgencia"]
-    B --> C["Ha compressao medular?"]
-    C -->|Sim| D["Emergencia cirurgica:<br/>neurocirurgia imediata"]
-    C -->|Nao| E["Liquor, anti-AQP4, anti-MOG,<br/>sorologias, RM de cranio"]
+    A["Síndrome medular aguda:<br/>nível sensitivo, paraparesia,<br/>disfunção esfincteriana"] --> B["RM de medula com gadolínio<br/>em caráter de urgência"]
+    B --> C["Há compressão medular?"]
+    C -->|Sim| D["Emergência cirúrgica:<br/>neurocirurgia imediata"]
+    C -->|Não| E["Liquor, anti-AQP4, anti-MOG,<br/>sorologias, RM de crânio"]
     E --> F["Metilprednisolona<br/>1 g IV ao dia por 3-5 dias"]
     F --> G["Resposta em 48-72 horas?"]
-    G -->|Nao| H["Plasmaferese<br/>5 a 7 sessoes"]
-    G -->|Sim| I["Definir etiologia e<br/>terapia de manutencao"]
+    G -->|Não| H["Plasmaférese<br/>5 a 7 sessões"]
+    G -->|Sim| I["Definir etiologia e<br/>terapia de manutenção"]
     H --> I
     class C critical;
     class D critical;
@@ -18815,13 +18815,13 @@ Definida a ausência de compressão, o segundo eixo de decisão é o padrão da 
 
 \`\`\`mermaid
 flowchart TD
-    A["Mielite sem compressao:<br/>ver extensao e corte axial"] --> B["Lesao com 3 ou mais<br/>segmentos vertebrais?"]
+    A["Mielite sem compressão:<br/>ver extensão e corte axial"] --> B["Lesão com 3 ou mais<br/>segmentos vertebrais?"]
     B -->|Sim, central| C["Anti-AQP4 e anti-MOG<br/>por ensaio celular"]
-    C --> D["Anti-AQP4 positivo:<br/>NMOSD, manutencao vitalicia<br/>e nunca interferon"]
+    C --> D["Anti-AQP4 positivo:<br/>NMOSD, manutenção vitalícia<br/>e nunca interferon"]
     C --> E["Anti-MOG positivo:<br/>MOGAD, desmame lento<br/>do corticoide"]
-    C --> F["Ambos negativos:<br/>investigar infeccao, sarcoidose,<br/>lupus, esquistossomose, HTLV-1"]
-    B -->|Nao, curta e periferica| G["RM de cranio<br/>e bandas oligoclonais"]
-    G --> H["Padrao de esclerose multipla:<br/>encaminhar para terapia<br/>modificadora de doenca"]
+    C --> F["Ambos negativos:<br/>investigar infecção, sarcoidose,<br/>lupus, esquistossomose, HTLV-1"]
+    B -->|Não, curta e periférica| G["RM de crânio<br/>e bandas oligoclonais"]
+    G --> H["Padrão de esclerose múltipla:<br/>encaminhar para terapia<br/>modificadora de doenca"]
     class F critical;
     class D action;
     class E action;
@@ -19037,13 +19037,13 @@ Ponto que se esquece: **nem todo paciente que fez EHH sai de alta com insulina**
 
 \`\`\`mermaid
 flowchart TD
-    A["Glicemia >= 600 mg/dL<br/>rebaixamento + desidratacao"] --> B["Osmolalidade efetiva > 300<br/>pH >= 7,3 e beta-OHB < 3,0?"]
+    A["Glicemia >= 600 mg/dL<br/>rebaixamento + desidratação"] --> B["Osmolalidade efetiva > 300<br/>pH >= 7,3 e beta-OHB < 3,0?"]
     B -->|Sim| C["EHH confirmado"]
-    B -->|Nao| D["Investigar CAD ou forma mista"]
+    B -->|Não| D["Investigar CAD ou forma mista"]
     C --> E["Cristaloide 500-1000 mL/h<br/>ajustar pelo Na corrigido"]
-    E --> F["Potassio < 3,3 mEq/L?"]
+    E --> F["Potássio < 3,3 mEq/L?"]
     F -->|Sim| G["Repor K antes da insulina"]
-    F -->|Nao| H["Insulina IV 0,05-0,1 U/kg/h<br/>queda <= 90-120 mg/dL/h"]
+    F -->|Não| H["Insulina IV 0,05-0,1 U/kg/h<br/>queda <= 90-120 mg/dL/h"]
     H --> I["Tratar precipitante<br/>profilaxia de TEV"]
     class B critical;
     class F critical;
@@ -19054,11 +19054,11 @@ flowchart TD
 flowchart TD
     A["Rebaixamento no hiperosmolar"] --> B["Calcular osmolalidade efetiva<br/>2 x Na + glicose/18"]
     B --> C["Osmolalidade explica o coma?<br/>em geral acima de 320"]
-    C --> D["Sim: hidratar e reavaliar<br/>neurologico a cada hora"]
-    C --> E["Nao: procurar outra causa<br/>AVC, sepse, subdural, intoxicacao"]
-    D --> F["Melhorou com a correcao?"]
+    C --> D["Sim: hidratar e reavaliar<br/>neurológico a cada hora"]
+    C --> E["Não: procurar outra causa<br/>AVC, sepse, subdural, intoxicação"]
+    D --> F["Melhorou com a correção?"]
     F --> G["Sim: seguir tratamento"]
-    F --> H["Nao ou deficit focal persistente<br/>solicitar neuroimagem"]
+    F --> H["Não ou déficit focal persistente<br/>solicitar neuroimagem"]
     E --> H
     class E critical;
     class H critical;
@@ -19245,9 +19245,9 @@ Quanto à anticoagulação na fibrilação atrial da tireotoxicose: a decisão s
 
 \`\`\`mermaid
 flowchart TD
-    A["Tireotoxicose + descompensacao sistemica<br/>febre, taquiarritmia, disfuncao neurologica"] --> B["Burch-Wartofsky >= 45<br/>ou descompensacao evidente?"]
+    A["Tireotoxicose + descompensação sistêmica<br/>febre, taquiarritmia, disfunção neurológica"] --> B["Burch-Wartofsky >= 45<br/>ou descompensação evidente?"]
     B -->|Sim| C["Tratar sem esperar exames"]
-    B -->|Nao| D["Escore 25-44: julgamento clinico<br/>tireotoxicose grave sem tempestade"]
+    B -->|Não| D["Escore 25-44: julgamento clínico<br/>tireotoxicose grave sem tempestade"]
     C --> E["1 Betabloqueador<br/>propranolol 60-80 mg 4/4-6/6h ou esmolol IV"]
     E --> F["2 Tionamida<br/>PTU 500-1000 mg ataque, 250 mg 4/4h"]
     F --> G["Aguardar pelo menos 1 hora"]
@@ -19260,11 +19260,11 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Sem resposta em 24-48 h<br/>ou contraindicacao a tionamida"] --> B["Revisar o basico<br/>tionamida antes do iodo? precipitante tratado?"]
-    B --> C["Somar colestiramina<br/>bloqueia circulacao entero-hepatica"]
-    C --> D["Alergia ao iodo ou tireotoxicose<br/>por amiodarona: considerar litio"]
-    D --> E["Ainda refratario:<br/>plasmaferese de resgate"]
-    E --> F["Tireoidectomia de urgencia<br/>apos estabilizacao, casos excepcionais"]
+    A["Sem resposta em 24-48 h<br/>ou contraindicação a tionamida"] --> B["Revisar o básico<br/>tionamida antes do iodo? precipitante tratado?"]
+    B --> C["Somar colestiramina<br/>bloqueia circulação entero-hepática"]
+    C --> D["Alergia ao iodo ou tireotoxicose<br/>por amiodarona: considerar lítio"]
+    D --> E["Ainda refratário:<br/>plasmaférese de resgate"]
+    E --> F["Tireoidectomia de urgência<br/>após estabilização, casos excepcionais"]
     B --> G["Febre com odinofagia:<br/>hemograma imediato, suspender tionamida"]
     class A critical;
     class G critical;
@@ -19480,13 +19480,13 @@ Erros de dose a evitar: bolus de levotiroxina acima da faixa recomendada em idos
 
 \`\`\`mermaid
 flowchart TD
-    A["Hipotermia + rebaixamento + bradicardia<br/>historia de hipotireoidismo"] --> B["Suspeita de coma mixedematoso"]
+    A["Hipotermia + rebaixamento + bradicardia<br/>história de hipotireoidismo"] --> B["Suspeita de coma mixedematoso"]
     B --> C["Colher TSH, T4L e cortisol<br/>sem aguardar resultados"]
     C --> D["Hidrocortisona 100 mg IV 8/8h primeiro"]
     D --> E["Levotiroxina IV ataque 200-400 mcg<br/>depois 50-100 mcg/dia"]
     E --> F["Hipercapnia ou rebaixamento progressivo?"]
-    F -->|Sim| G["Ventilacao mecanica em UTI"]
-    F -->|Nao| H["Monitorizacao continua em UTI"]
+    F -->|Sim| G["Ventilação mecânica em UTI"]
+    F -->|Não| H["Monitorização continua em UTI"]
     G --> I["Aquecimento passivo, corrigir glicemia e Na<br/>tratar precipitante"]
     H --> I
     class B critical;
@@ -19498,11 +19498,11 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Tratamento iniciado ha 24h"] --> B["Temperatura, FC, nivel de consciencia<br/>diurese e sodio melhoraram?"]
-    B -->|Sim| C["Manter esquema<br/>planejar transicao para via oral"]
-    B -->|Nao| D["Reavaliar: precipitante nao tratado?<br/>insuficiencia adrenal? diagnostico errado?"]
-    D --> E["Considerar acrescentar T3 IV<br/>com monitorizacao de ritmo"]
-    E --> F["Rever cultura, antibiotico e sedativos em uso"]
+    A["Tratamento iniciado há 24h"] --> B["Temperatura, FC, nível de consciência<br/>diurese e sódio melhoraram?"]
+    B -->|Sim| C["Manter esquema<br/>planejar transição para via oral"]
+    B -->|Não| D["Reavaliar: precipitante não tratado?<br/>insuficiência adrenal? diagnóstico errado?"]
+    D --> E["Considerar acrescentar T3 IV<br/>com monitorização de ritmo"]
+    E --> F["Rever cultura, antibiótico e sedativos em uso"]
     C --> G["Alta com dose definida e TSH em 6-8 semanas"]
     class B critical;
     class D critical;
@@ -19707,12 +19707,12 @@ O que **não** fazer: prescrever tionamida, iodo radioativo ou cirurgia para tir
 flowchart TD
     A["Tireotoxicose confirmada<br/>TSH suprimido, T4L elevado"] --> B["Tireoide dolorosa?"]
     B -->|Sim| C["Subaguda de De Quervain<br/>VHS muito alto"]
-    B -->|Nao| D["Captacao de iodo em 24h"]
-    D -->|Captacao baixa| E["Tireoidite destrutiva<br/>indolor, pos-parto ou por farmaco"]
-    D -->|Captacao alta| F["Doenca de Graves ou bocio toxico<br/>tratar com tionamida"]
-    C --> G["AINE, prednisona se dor intensa<br/>betabloqueador sintomatico"]
+    B -->|Não| D["Captação de iodo em 24h"]
+    D -->|Captação baixa| E["Tireoidite destrutiva<br/>indolor, pos-parto ou por fármaco"]
+    D -->|Captação alta| F["Doenca de Graves ou bócio toxico<br/>tratar com tionamida"]
+    C --> G["AINE, prednisona se dor intensa<br/>betabloqueador sintomático"]
     E --> G
-    G --> H["Acompanhar TSH: fase hipotireoidea<br/>levotiroxina se sintomatico"]
+    G --> H["Acompanhar TSH: fase hipotireóidea<br/>levotiroxina se sintomático"]
     class B critical;
     class G action;
     class H action;
@@ -19722,13 +19722,13 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor cervical anterior sobre a tireoide"] --> B["Febre alta, eritema, flutuacao<br/>e toxemia?"]
-    B -->|Sim| C["Suspeitar tireoidite supurativa<br/>USG, culturas, antibiotico IV e drenagem"]
-    B -->|Nao| D["Funcao tireoidiana, VHS e PCR"]
+    A["Dor cervical anterior sobre a tireoide"] --> B["Febre alta, eritema, flutuação<br/>e toxemia?"]
+    B -->|Sim| C["Suspeitar tireoidite supurativa<br/>USG, culturas, antibiótico IV e drenagem"]
+    B -->|Não| D["Função tireoidiana, VHS e PCR"]
     D -->|VHS muito alto, TSH suprimido| E["Subaguda de De Quervain"]
-    D -->|Funcao normal, dor subita| F["Hemorragia intranodular<br/>confirmar por USG"]
-    D -->|Massa endurecida de crescimento rapido| G["Suspeita de neoplasia<br/>biopsia urgente"]
-    E --> H["AINE em dose plena; prednisona se refratario<br/>desmame lento"]
+    D -->|Função normal, dor súbita| F["Hemorragia intranodular<br/>confirmar por USG"]
+    D -->|Massa endurecida de crescimento rápido| G["Suspeita de neoplasia<br/>biópsia urgente"]
+    E --> H["AINE em dose plena; prednisona se refratário<br/>desmame lento"]
     class B critical;
     class G critical;
     class H action;
@@ -19927,14 +19927,14 @@ Frase que o paciente deve saber dizer, palavra por palavra, ao chegar a qualquer
 
 \`\`\`mermaid
 flowchart TD
-    A["Hipotensao refrataria a volume e vasopressor<br/>hiponatremia, hipercalemia, hipoglicemia"] --> B["Suspeita de crise adrenal"]
+    A["Hipotensão refratária a volume e vasopressor<br/>hiponatremia, hipercalemia, hipoglicemia"] --> B["Suspeita de crise adrenal"]
     B --> C["Colher cortisol e ACTH<br/>sem aguardar o resultado"]
     C --> D["Hidrocortisona 100 mg IV em bolus<br/>depois 50 mg 6/6h"]
     D --> E["SF 0,9% vigoroso<br/>corrigir hipoglicemia"]
-    E --> F["Tratar o precipitante<br/>antibiotico se suspeita de infeccao"]
-    F --> G["Estabilizado? Definir primaria x secundaria<br/>ACTH e teste de estimulo"]
-    G --> H["Manutencao: hidrocortisona 15-25 mg/dia<br/>fludrocortisona na primaria"]
-    H --> I["Cartao de alerta e dose de estresse"]
+    E --> F["Tratar o precipitante<br/>antibiótico se suspeita de infecção"]
+    F --> G["Estabilizado? Definir primária x secundária<br/>ACTH e teste de estímulo"]
+    G --> H["Manutenção: hidrocortisona 15-25 mg/dia<br/>fludrocortisona na primária"]
+    H --> I["Cartão de alerta e dose de estresse"]
     class B critical;
     class D action;
     class I action;
@@ -19944,14 +19944,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Paciente com insuficiencia adrenal adoeceu"] --> B["Esta vomitando ou com diarreia intensa?"]
+    A["Paciente com insuficiência adrenal adoeceu"] --> B["Esta vomitando ou com diarreia intensa?"]
     B -->|Sim| C["Hidrocortisona 100 mg intramuscular em casa<br/>e ir ao pronto-socorro agora"]
-    B -->|Nao| D["Tem febre ou infeccao?"]
-    D -->|Sim| E["Dobrar ou triplicar a dose oral<br/>ate 24-48h apos a melhora"]
-    D -->|Nao| F["Manter a dose habitual<br/>estresse emocional nao exige aumento"]
-    E --> G["Piora, tontura, confusao ou nao melhora?"]
+    B -->|Não| D["Tem febre ou infecção?"]
+    D -->|Sim| E["Dobrar ou triplicar a dose oral<br/>até 24-48h após a melhora"]
+    D -->|Não| F["Manter a dose habitual<br/>estresse emocional não exige aumento"]
+    E --> G["Piora, tontura, confusão ou não melhora?"]
     G -->|Sim| C
-    G -->|Nao| H["Retomar dose habitual e avisar o medico"]
+    G -->|Não| H["Retomar dose habitual e avisar o médico"]
     class B critical;
     class C critical;
     class H action;
@@ -20141,15 +20141,15 @@ No **pós-operatório imediato** da cirurgia curativa, espera-se cortisol muito 
 
 \`\`\`mermaid
 flowchart TD
-    A["Suspeita clinica de Cushing<br/>miopatia, estrias largas, equimoses"] --> B["Uso de corticoide exogeno?"]
-    B -->|Sim| C["Cushing iatrogenico<br/>desmame do corticoide"]
-    B -->|Nao| D["Rastreio: cortisol salivar noturno,<br/>cortisol urinario 24h ou 1 mg dexametasona"]
+    A["Suspeita clínica de Cushing<br/>miopatia, estrias largas, equimoses"] --> B["Uso de corticoide exógeno?"]
+    B -->|Sim| C["Cushing iatrogênico<br/>desmame do corticoide"]
+    B -->|Não| D["Rastreio: cortisol salivar noturno,<br/>cortisol urinário 24h ou 1 mg dexametasona"]
     D --> E["Dois testes alterados?"]
-    E -->|Nao| F["Reavaliar, considerar pseudo-Cushing<br/>ou forma ciclica"]
+    E -->|Não| F["Reavaliar, considerar pseudo-Cushing<br/>ou forma cíclica"]
     E -->|Sim| G["Dosar ACTH"]
     G -->|ACTH suprimido| H["Causa adrenal<br/>TC de adrenais"]
-    G -->|ACTH normal ou alto| I["RM de hipofise<br/>cateterismo de seios petrosos se duvida"]
-    H --> J["Cirurgia da causa<br/>inibidor da esteroidogenese como ponte"]
+    G -->|ACTH normal ou alto| I["RM de hipófise<br/>cateterismo de seios petrosos se dúvida"]
+    H --> J["Cirurgia da causa<br/>inibidor da esteroidogênese como ponte"]
     I --> J
     class E critical;
     class J action;
@@ -20159,14 +20159,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Hipercortisolismo com hipocalemia grave,<br/>psicose, infeccao ou trombose"] --> B["Instalacao rapida sem estigmas classicos?"]
-    B -->|Sim| C["Suspeitar ACTH ectopico<br/>ou carcinoma adrenal"]
-    B -->|Nao| D["Doenca de Cushing grave"]
-    C --> E["Bloqueio farmacologico rapido<br/>cetoconazol; etomidato em UTI se refratario"]
+    A["Hipercortisolismo com hipocalemia grave,<br/>psicose, infecção ou trombose"] --> B["Instalação rápida sem estigmas clássicos?"]
+    B -->|Sim| C["Suspeitar ACTH ectópico<br/>ou carcinoma adrenal"]
+    B -->|Não| D["Doenca de Cushing grave"]
+    C --> E["Bloqueio farmacológico rápido<br/>cetoconazol; etomidato em UTI se refratário"]
     D --> E
-    E --> F["Corrigir potassio, controlar glicemia e pressao"]
-    F --> G["Profilaxia de tromboembolismo<br/>e de infeccao oportunista"]
-    G --> H["Cirurgia em centro de referencia<br/>reposicao de glicocorticoide no pos-operatorio"]
+    E --> F["Corrigir potássio, controlar glicemia e pressão"]
+    F --> G["Profilaxia de tromboembolismo<br/>e de infecção oportunista"]
+    G --> H["Cirurgia em centro de referência<br/>reposição de glicocorticoide no pos-operatório"]
     class B critical;
     class E critical;
     class H action;
@@ -20363,14 +20363,14 @@ Complicações da doença não operada ou não diagnosticada: crise adrenérgica
 
 \`\`\`mermaid
 flowchart TD
-    A["Paroxismos de cefaleia, sudorese e palpitacao<br/>ou incidentaloma adrenal"] --> B["Metanefrinas plasmaticas livres<br/>ou urinarias de 24h"]
-    B -->|Normais| C["Feocromocitoma improvavel<br/>buscar outra causa"]
-    B -->|Elevadas| D["Revisar farmacos interferentes<br/>e condicoes de coleta"]
-    D --> E["Elevacao confirmada"]
-    E --> F["Localizar: TC ou RM de abdome<br/>imagem funcional se necessario"]
+    A["Paroxismos de cefaleia, sudorese e palpitação<br/>ou incidentaloma adrenal"] --> B["Metanefrinas plasmáticas livres<br/>ou urinárias de 24h"]
+    B -->|Normais| C["Feocromocitoma improvável<br/>buscar outra causa"]
+    B -->|Elevadas| D["Revisar fármacos interferentes<br/>e condições de coleta"]
+    D --> E["Elevação confirmada"]
+    E --> F["Localizar: TC ou RM de abdome<br/>imagem funcional se necessário"]
     F --> G["Alfabloqueio por 10-14 dias<br/>doxazosina + sal e volume"]
     G --> H["Somente depois: betabloqueador<br/>para taquicardia reflexa"]
-    H --> I["Cirurgia de ressecao<br/>teste genetico e seguimento"]
+    H --> I["Cirurgia de ressecção<br/>teste genético e seguimento"]
     class E critical;
     class G critical;
     class I action;
@@ -20383,9 +20383,9 @@ flowchart TD
     A["Crise hipertensiva grave com cefaleia,<br/>sudorese, palidez e taquicardia"] --> B["Suspeita de feocromocitoma"]
     B --> C["NAO administrar betabloqueador isolado<br/>nem metoclopramida"]
     C --> D["Alfabloqueio IV: fentolamina<br/>ou nitroprussiato titulado"]
-    D --> E["Taquicardia ou arritmia persistente<br/>apos alfabloqueio?"]
+    D --> E["Taquicardia ou arritmia persistente<br/>após alfabloqueio?"]
     E -->|Sim| F["Acrescentar betabloqueador em dose baixa"]
-    E -->|Nao| G["Manter apenas alfabloqueio"]
+    E -->|Não| G["Manter apenas alfabloqueio"]
     F --> H["Estabilizar, internar em UTI<br/>colher metanefrinas e planejar cirurgia"]
     G --> H
     class B critical;
@@ -20552,14 +20552,14 @@ Manter em paralelo o cuidado cardiovascular global: restrição de sódio, contr
 
 \`\`\`mermaid
 flowchart TD
-    A["Hipertensao - limiar baixo para rastrear<br/>resistente, hipocalemia, incidentaloma, FA"] --> B["Aldosterona + renina + potassio<br/>manha, sentado, sem restricao de sal"]
-    B --> C["Relacao aldosterona/renina elevada<br/>com aldosterona absoluta alta?"]
-    C -->|Nao| D["Revisar farmacos interferentes<br/>e repetir se suspeita alta"]
-    C -->|Sim| E["Confirmar com teste de supressao<br/>dispensavel se quadro inequivoco"]
+    A["Hipertensão - limiar baixo para rastrear<br/>resistente, hipocalemia, incidentaloma, FA"] --> B["Aldosterona + renina + potássio<br/>manhã, sentado, sem restrição de sal"]
+    B --> C["Relação aldosterona/renina elevada<br/>com aldosterona absoluta alta?"]
+    C -->|Não| D["Revisar fármacos interferentes<br/>e repetir se suspeita alta"]
+    C -->|Sim| E["Confirmar com teste de supressão<br/>dispensável se quadro inequívoco"]
     E --> F["Paciente candidato a cirurgia?"]
     F -->|Sim| G["TC de adrenais + cateterismo de veias adrenais"]
-    F -->|Nao| H["Espironolactona ou eplerenona<br/>corrigir potassio e controlar PA"]
-    G -->|Lateralizado| I["Adrenalectomia laparoscopica"]
+    F -->|Não| H["Espironolactona ou eplerenona<br/>corrigir potássio e controlar PA"]
+    G -->|Lateralizado| I["Adrenalectomia laparoscópica"]
     G -->|Bilateral| H
     class C critical;
     class I action;
@@ -20570,14 +20570,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Hipertensao com suspeita<br/>de causa secundaria"] --> B["Dosar renina e aldosterona juntas"]
+    A["Hipertensão com suspeita<br/>de causa secundária"] --> B["Dosar renina e aldosterona juntas"]
     B --> C["Renina alta e aldosterona alta"]
     B --> D["Renina suprimida e aldosterona alta"]
     B --> E["Renina e aldosterona suprimidas"]
-    C --> F["Hiperaldosteronismo secundario<br/>estenose renal, diuretico, IC, cirrose"]
-    D --> G["Hiperaldosteronismo primario<br/>seguir para confirmacao e subtipagem"]
-    E --> H["Excesso aparente de mineralocorticoide<br/>Liddle, Cushing, alcacuz, HAC"]
-    H --> I["Amilorida no Liddle<br/>suspender alcacuz"]
+    C --> F["Hiperaldosteronismo secundário<br/>estenose renal, diurético, IC, cirrose"]
+    D --> G["Hiperaldosteronismo primário<br/>seguir para confirmação e subtipagem"]
+    E --> H["Excesso aparente de mineralocorticoide<br/>Liddle, Cushing, alcaçuz, HAC"]
+    H --> I["Amilorida no Liddle<br/>suspender alcaçuz"]
     class A critical;
     class G action;
     class I action;
@@ -20743,16 +20743,16 @@ Na polidipsia primária, desmopressina é **contraindicada**: causa intoxicaçã
 
 \`\`\`mermaid
 flowchart TD
-    A["Poliuria > 3 L/dia com urina diluida"] --> B["Afastar diurese osmotica<br/>glicosuria, manitol, contraste, diuretico"]
-    B --> C["Sodio serico"]
-    C -->|Na elevado com urina diluida| D["AVP-deficiencia ou AVP-resistencia<br/>nao fazer privacao hidrica"]
-    C -->|Na baixo-normal| E["Teste dinamico<br/>copeptina estimulada ou privacao hidrica + DDAVP"]
-    E -->|Concentra com DDAVP| F["AVP-deficiencia (central)"]
-    E -->|Nao concentra com DDAVP| G["AVP-resistencia (nefrogenica)"]
-    E -->|Concentra com a privacao| H["Polidipsia primaria<br/>nao prescrever desmopressina"]
+    A["Poliúria > 3 L/dia com urina diluída"] --> B["Afastar diurese osmótica<br/>glicosúria, manitol, contraste, diurético"]
+    B --> C["Sódio sérico"]
+    C -->|Na elevado com urina diluída| D["AVP-deficiência ou AVP-resistência<br/>não fazer privação hídrica"]
+    C -->|Na baixo-normal| E["Teste dinâmico<br/>copeptina estimulada ou privação hídrica + DDAVP"]
+    E -->|Concentra com DDAVP| F["AVP-deficiência (central)"]
+    E -->|Não concentra com DDAVP| G["AVP-resistência (nefrogênica)"]
+    E -->|Concentra com a privação| H["Polidipsia primária<br/>não prescrever desmopressina"]
     D --> F
-    F --> I["Desmopressina titulada<br/>com janela diaria de escape"]
-    G --> J["Tratar a causa, dieta hipossodica<br/>tiazidico com ou sem amilorida"]
+    F --> I["Desmopressina titulada<br/>com janela diária de escape"]
+    G --> J["Tratar a causa, dieta hipossódica<br/>tiazídico com ou sem amilorida"]
     class D critical;
     class H critical;
     class I action;
@@ -20763,13 +20763,13 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Pos-operatorio de hipofise<br/>debito urinario horario e sodio 6/6h"] --> B["Poliuria com urina diluida<br/>e sodio subindo?"]
-    B -->|Sim| C["Fase 1: AVP-deficiencia<br/>desmopressina em dose baixa<br/>repor agua livre"]
-    B -->|Nao| D["Manter vigilancia"]
-    C --> E["Poliuria cessou de repente?"]
-    E -->|Sim| F["Fase 2 antidiuretica<br/>suspender desmopressina<br/>restringir liquidos"]
-    F --> G["Risco de hiponatremia<br/>ate a segunda semana"]
-    G --> H["Fase 3: deficiencia permanente<br/>retitular desmopressina"]
+    A["Pos-operatório de hipófise<br/>débito urinário horário e sódio 6/6h"] --> B["Poliúria com urina diluída<br/>e sódio subindo?"]
+    B -->|Sim| C["Fase 1: AVP-deficiência<br/>desmopressina em dose baixa<br/>repor água livre"]
+    B -->|Não| D["Manter vigilância"]
+    C --> E["Poliúria cessou de repente?"]
+    E -->|Sim| F["Fase 2 antidiurética<br/>suspender desmopressina<br/>restringir líquidos"]
+    F --> G["Risco de hiponatremia<br/>até a segunda semana"]
+    G --> H["Fase 3: deficiência permanente<br/>retitular desmopressina"]
     class B critical;
     class G critical;
     class C action;
@@ -20924,17 +20924,17 @@ Regra de bolso de conteúdo: **1 L de SG 5% ≈ 1 L de água livre**; 1 L de SF 
 
 \`\`\`mermaid
 flowchart TD
-    A["Na > 145<br/>avaliar volemia"] --> B["Choque ou ma perfusao?"]
-    B -->|Sim| C["SF 0,9% ate estabilizar<br/>depois agua livre"]
-    B -->|Nao| D["Osmolaridade urinaria"]
-    D --> E["Urina diluida com poliuria?"]
+    A["Na > 145<br/>avaliar volemia"] --> B["Choque ou má perfusão?"]
+    B -->|Sim| C["SF 0,9% até estabilizar<br/>depois água livre"]
+    B -->|Não| D["Osmolaridade urinária"]
+    D --> E["Urina diluída com poliúria?"]
     E -->|Sim| F["Diabetes insipidus<br/>testar resposta a DDAVP"]
-    E -->|Nao| G["Perda extrarrenal ou<br/>ingesta insuficiente"]
-    C --> H["Calcular deficit de agua livre<br/>+ perdas em curso"]
+    E -->|Não| G["Perda extrarrenal ou<br/>ingesta insuficiente"]
+    C --> H["Calcular déficit de água livre<br/>+ perdas em curso"]
     F --> H
     G --> H
-    H --> I["Agua VO/SNG ou SG 5%<br/>maximo 10 mEq/L em 24h"]
-    I --> J["Na de 4/4h<br/>queda rapida = edema cerebral"]
+    H --> I["Água VO/SNG ou SG 5%<br/>máximo 10 mEq/L em 24h"]
+    I --> J["Na de 4/4h<br/>queda rápida = edema cerebral"]
     class J critical;
     class I action;
 \`\`\`
@@ -20943,15 +20943,15 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Poliuria maior que 3 L/dia<br/>com Na alto"] --> B["Osm urinaria x volume 24h"]
+    A["Poliúria maior que 3 L/dia<br/>com Na alto"] --> B["Osm urinária x volume 24h"]
     B --> C["Carga osmolar maior que 1000 mOsm/dia?"]
-    C -->|Sim| D["Diurese osmotica<br/>glicose, ureia, manitol, sal"]
-    C -->|Nao| E["Diurese aquosa<br/>suspeitar diabetes insipidus"]
+    C -->|Sim| D["Diurese osmótica<br/>glicose, ureia, manitol, sal"]
+    C -->|Não| E["Diurese aquosa<br/>suspeitar diabetes insipidus"]
     E --> F["Testar resposta a DDAVP"]
     F --> G["Urina concentra: DI central"]
-    F --> H["Nao concentra: DI nefrogenico<br/>revisar litio, calcio, potassio"]
-    D --> I["Corrigir glicemia e carga proteica<br/>repor agua das perdas"]
-    G --> J["DDAVP + reposicao de agua"]
+    F --> H["Não concentra: DI nefrogênico<br/>revisar lítio, cálcio, potássio"]
+    D --> I["Corrigir glicemia e carga proteica<br/>repor água das perdas"]
+    G --> J["DDAVP + reposição de água"]
     H --> J
     class A critical;
     class J action;
@@ -21121,13 +21121,13 @@ Tratar a causa; suspender diurético espoliador se possível. Trocar por poupado
 \`\`\`mermaid
 flowchart TD
     A["K < 3,5"] --> B["Arritmia, paralisia,<br/>ECG alterado ou digital?"]
-    B -->|Sim| C["Monitor cardiaco<br/>KCl IV diluido em SF"]
-    C --> D["Periferico ate 10 mEq/h<br/>Central 20 mEq/h com monitor"]
-    B -->|Nao| E["KCl VO fracionado<br/>40-100 mEq/dia"]
-    A --> F["Dosar magnesio sempre"]
-    F --> G["Mg baixo ou K refratario?"]
-    G -->|Sim| H["Sulfato de magnesio 1-2 g IV<br/>antes de insistir no K"]
-    D --> I["Dosar K 1-2h apos infusao<br/>tratar a causa"]
+    B -->|Sim| C["Monitor cardíaco<br/>KCl IV diluído em SF"]
+    C --> D["Periférico até 10 mEq/h<br/>Central 20 mEq/h com monitor"]
+    B -->|Não| E["KCl VO fracionado<br/>40-100 mEq/dia"]
+    A --> F["Dosar magnésio sempre"]
+    F --> G["Mg baixo ou K refratário?"]
+    G -->|Sim| H["Sulfato de magnésio 1-2 g IV<br/>antes de insistir no K"]
+    D --> I["Dosar K 1-2h após infusão<br/>tratar a causa"]
     E --> I
     H --> I
     class B critical;
@@ -21139,15 +21139,15 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Hipocalemia detectada"] --> B["Ha causa aguda de shift?<br/>insulina, beta-agonista, alcalose"]
-    B -->|Sim| C["Provavel redistribuicao<br/>potassio corporal preservado"]
+    A["Hipocalemia detectada"] --> B["Há causa aguda de shift?<br/>insulina, beta-agonista, alcalose"]
+    B -->|Sim| C["Provável redistribuição<br/>potássio corporal preservado"]
     C --> D["Repor com cautela<br/>vigiar hipercalemia de rebote"]
-    B -->|Nao| E["Medir K urinario e cloro urinario"]
-    E --> F["K urinario baixo<br/>perda GI ou baixa ingesta"]
-    E --> G["K urinario alto<br/>perda renal"]
-    F --> H["Deplecao corporal total<br/>repor por dias apos normalizar"]
+    B -->|Não| E["Medir K urinário e cloro urinário"]
+    E --> F["K urinário baixo<br/>perda GI ou baixa ingesta"]
+    E --> G["K urinário alto<br/>perda renal"]
+    F --> H["Depleção corporal total<br/>repor por dias após normalizar"]
     G --> H
-    G --> I["Hipertensao associada?<br/>investigar aldosterona/renina"]
+    G --> I["Hipertensão associada?<br/>investigar aldosterona/renina"]
     class B critical;
     class D action;
     class H action;
@@ -21317,13 +21317,13 @@ No hipoparatireoidismo crônico, a meta **não** é normalizar o cálcio: manten
 
 \`\`\`mermaid
 flowchart TD
-    A["Calcio baixo<br/>confirmar ionico ou corrigido"] --> B["Tetania, laringoespasmo,<br/>convulsao ou QT longo?"]
-    B -->|Sim| C["Gluconato de calcio 1-2 g IV<br/>em 10-20 min, monitorizado"]
-    C --> D["Infusao continua<br/>Ca ionico de 4/4-6/6h"]
-    B -->|Nao| E["Dosar magnesio, PTH,<br/>fosforo, vitamina D"]
-    E --> F["Magnesio baixo?"]
-    F -->|Sim| G["Repor sulfato de magnesio<br/>senao fica refrataria"]
-    F -->|Nao| H["Calcio VO + calcitriol<br/>tratar a causa"]
+    A["Cálcio baixo<br/>confirmar iônico ou corrigido"] --> B["Tetania, laringoespasmo,<br/>convulsão ou QT longo?"]
+    B -->|Sim| C["Gluconato de cálcio 1-2 g IV<br/>em 10-20 min, monitorizado"]
+    C --> D["Infusão continua<br/>Ca iônico de 4/4-6/6h"]
+    B -->|Não| E["Dosar magnésio, PTH,<br/>fósforo, vitamina D"]
+    E --> F["Magnésio baixo?"]
+    F -->|Sim| G["Repor sulfato de magnésio<br/>senão fica refratária"]
+    F -->|Não| H["Cálcio VO + calcitriol<br/>tratar a causa"]
     D --> G
     class B critical;
     class C action;
@@ -21334,16 +21334,16 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Hipocalcemia confirmada"] --> B["Magnesio dosado e corrigido"]
+    A["Hipocalcemia confirmada"] --> B["Magnésio dosado e corrigido"]
     B --> C["Dosar PTH"]
     C --> D["PTH baixo ou normal-baixo"]
     C --> E["PTH alto"]
-    D --> F["Hipoparatireoidismo<br/>pos-cirurgico, autoimune<br/>ou hipomagnesemia"]
-    E --> G["Fosforo baixo"]
-    E --> H["Fosforo alto"]
-    G --> I["Deficiencia de vitamina D<br/>ou ma absorcao"]
+    D --> F["Hipoparatireoidismo<br/>pos-cirúrgico, autoimune<br/>ou hipomagnesemia"]
+    E --> G["Fósforo baixo"]
+    E --> H["Fósforo alto"]
+    G --> I["Deficiência de vitamina D<br/>ou má absorção"]
     H --> J["DRC, lise tumoral<br/>ou pseudo-hipoparatireoidismo"]
-    F --> K["Calcio VO + calcitriol<br/>meta na faixa baixa"]
+    F --> K["Cálcio VO + calcitriol<br/>meta na faixa baixa"]
     I --> K
     J --> K
     class A critical;
@@ -21514,16 +21514,16 @@ Em hipomagnesemia grave sintomática sem arritmia, uma abordagem consagrada é i
 
 \`\`\`mermaid
 flowchart TD
-    A["Suspeita de hipomagnesemia<br/>K ou Ca refratarios"] --> B["Torsades, arritmia,<br/>convulsao ou tetania?"]
-    B -->|Sim| C["Sulfato de magnesio IV<br/>1-2 g em 15 min; torsades 2 g em bolus"]
-    C --> D["Monitor cardiaco<br/>repetir se recorrer"]
-    B -->|Nao| E["Mg < 1,0 ou sintomas?"]
-    E -->|Sim| F["Reposicao IV lenta<br/>em infusao continua"]
-    E -->|Nao| G["Magnesio VO fracionado<br/>diarreia limita a dose"]
-    D --> H["Repor K e Ca junto<br/>suspender IBP, diuretico, droga culpada"]
+    A["Suspeita de hipomagnesemia<br/>K ou Ca refratários"] --> B["Torsades, arritmia,<br/>convulsão ou tetania?"]
+    B -->|Sim| C["Sulfato de magnésio IV<br/>1-2 g em 15 min; torsades 2 g em bolus"]
+    C --> D["Monitor cardíaco<br/>repetir se recorrer"]
+    B -->|Não| E["Mg < 1,0 ou sintomas?"]
+    E -->|Sim| F["Reposição IV lenta<br/>em infusão continua"]
+    E -->|Não| G["Magnésio VO fracionado<br/>diarreia limita a dose"]
+    D --> H["Repor K e Ca junto<br/>suspender IBP, diurético, droga culpada"]
     F --> H
     G --> H
-    H --> I["Ajustar dose na disfuncao renal<br/>checar reflexo patelar"]
+    H --> I["Ajustar dose na disfunção renal<br/>checar reflexo patelar"]
     class B critical;
     class C action;
     class I critical;
@@ -21533,15 +21533,15 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Potassio nao sobe<br/>apesar de reposicao adequada"] --> B["Magnesio ja foi dosado?"]
-    B -->|Nao| C["Dosar magnesio agora<br/>e repor empiricamente"]
-    B -->|Sim| D["Magnesio baixo ou normal-baixo?"]
-    D -->|Sim| E["Repor sulfato de magnesio IV<br/>antes de aumentar o KCl"]
-    D -->|Nao| F["Revisar perda ativa<br/>diuretico, diarreia, sonda"]
+    A["Potássio não sobe<br/>apesar de reposição adequada"] --> B["Magnésio ja foi dosado?"]
+    B -->|Não| C["Dosar magnésio agora<br/>e repor empiricamente"]
+    B -->|Sim| D["Magnésio baixo ou normal-baixo?"]
+    D -->|Sim| E["Repor sulfato de magnésio IV<br/>antes de aumentar o KCl"]
+    D -->|Não| F["Revisar perda ativa<br/>diurético, diarreia, sonda"]
     C --> E
     E --> G["Reavaliar K em 4-6h"]
     F --> G
-    G --> H["Ainda refratario?<br/>investigar tubulopatia e aldosterona"]
+    G --> H["Ainda refratário?<br/>investigar tubulopatia e aldosterona"]
     class A critical;
     class E action;
     class H action;
@@ -21709,14 +21709,14 @@ Nunca infunda fosfato na mesma via que **gluconato de cálcio, cloreto de cálci
 
 \`\`\`mermaid
 flowchart TD
-    A["Fosforo baixo"] --> B["P < 1,0 mg/dL ou<br/>fraqueza respiratoria, rabdomiolise?"]
-    B -->|Sim| C["Fosfato IV diluido<br/>0,16-0,5 mmol/kg em 4-6h"]
-    C --> D["Velocidade 1-3 mmol/h<br/>monitorar Ca, K e funcao renal"]
-    B -->|Nao| E["Fosfato VO fracionado<br/>+ dieta"]
-    A --> F["Contexto de realimentacao?"]
+    A["Fósforo baixo"] --> B["P < 1,0 mg/dL ou<br/>fraqueza respiratória, rabdomiólise?"]
+    B -->|Sim| C["Fosfato IV diluído<br/>0,16-0,5 mmol/kg em 4-6h"]
+    C --> D["Velocidade 1-3 mmol/h<br/>monitorar Ca, K e função renal"]
+    B -->|Não| E["Fosfato VO fracionado<br/>+ dieta"]
+    A --> F["Contexto de realimentação?"]
     F -->|Sim| G["Tiamina antes da dextrose<br/>repor P, K e Mg"]
-    G --> H["Avancar calorias devagar<br/>eletrolitos diarios por 3-5 dias"]
-    D --> I["Redosar P em 4-6h<br/>repetir ciclo se necessario"]
+    G --> H["Avançar calorias devagar<br/>eletrólitos diários por 3-5 dias"]
+    D --> I["Redosar P em 4-6h<br/>repetir ciclo se necessário"]
     E --> I
     class B critical;
     class C action;
@@ -21727,14 +21727,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Paciente vai iniciar nutricao"] --> B["Risco de realimentacao?<br/>jejum longo, IMC baixo, etilista"]
-    B -->|Nao| C["Nutricao plena habitual"]
+    A["Paciente vai iniciar nutrição"] --> B["Risco de realimentação?<br/>jejum longo, IMC baixo, etilista"]
+    B -->|Não| C["Nutrição plena habitual"]
     B -->|Sim| D["Dosar P, K, Mg basais<br/>antes da primeira dieta"]
     D --> E["Tiamina antes de qualquer dextrose"]
-    E --> F["Corrigir eletrolitos baixos primeiro"]
-    F --> G["Iniciar com fracao das calorias<br/>progredir em dias"]
-    G --> H["Eletrolitos diarios por 3-5 dias"]
-    H --> I["Queda maior que 30% ou disfuncao?<br/>repor e reduzir oferta, nao suspender"]
+    E --> F["Corrigir eletrólitos baixos primeiro"]
+    F --> G["Iniciar com fração das calorias<br/>progredir em dias"]
+    G --> H["Eletrólitos diários por 3-5 dias"]
+    H --> I["Queda maior que 30% ou disfunção?<br/>repor e reduzir oferta, não suspender"]
     class B critical;
     class E action;
     class I critical;
@@ -21945,16 +21945,16 @@ A evacuação cirúrgica **de rotina** de hematomas supratentoriais profundos n�
 
 \`\`\`mermaid
 flowchart TD
-    A["Deficit focal subito<br/>+ cefaleia/vomito"] --> B["TC de cranio<br/>sem contraste"]
+    A["Déficit focal súbito<br/>+ cefaleia/vômito"] --> B["TC de crânio<br/>sem contraste"]
     B --> C["Hemorragia<br/>intraparenquimatosa"]
     C --> D["PAS > 150 mmHg?"]
     D -->|Sim| E["Reduzir para ~140 mmHg<br/>em 1 hora, evitar < 130"]
-    D -->|Nao| F["Manter monitorizacao<br/>e reavaliacao horaria"]
+    D -->|Não| F["Manter monitorização<br/>e reavaliação horária"]
     C --> G["Usa anticoagulante?"]
     G -->|Sim| H["Reverter imediatamente<br/>vit K + CCP / idarucizumabe"]
-    C --> I["Cerebelar > 3 cm com<br/>deterioracao ou hidrocefalia?"]
-    I -->|Sim| J["Drenagem cirurgica<br/>de urgencia"]
-    I -->|Nao| K["UTI neurologica<br/>pacote de cuidados"]
+    C --> I["Cerebelar > 3 cm com<br/>deterioração ou hidrocefalia?"]
+    I -->|Sim| J["Drenagem cirúrgica<br/>de urgência"]
+    I -->|Não| K["UTI neurológica<br/>pacote de cuidados"]
     class C critical;
     class I critical;
     class E action;
@@ -21965,14 +21965,14 @@ flowchart TD
 \`\`\`mermaid
 flowchart TD
     A["HIP confirmada<br/>investigar causa"] --> B["Idoso, hipertenso,<br/>hematoma profundo?"]
-    B -->|Sim| C["Provavel arteriopatia<br/>hipertensiva"]
-    B -->|Nao| D["Jovem, normotenso,<br/>lobar ou atipico"]
-    D --> E["Angio-TC obrigatoria<br/>+ toxicologico urinario"]
-    E --> F["MAV, aneurisma<br/>ou fistula?"]
-    F -->|Sim| G["Arteriografia digital<br/>+ tratamento da lesao"]
-    F -->|Nao| H["Edema desproporcional<br/>ou fora de territorio arterial?"]
+    B -->|Sim| C["Provável arteriopatia<br/>hipertensiva"]
+    B -->|Não| D["Jovem, normotenso,<br/>lobar ou atípico"]
+    D --> E["Angio-TC obrigatória<br/>+ toxicológico urinário"]
+    E --> F["MAV, aneurisma<br/>ou fístula?"]
+    F -->|Sim| G["Arteriografia digital<br/>+ tratamento da lesão"]
+    F -->|Não| H["Edema desproporcional<br/>ou fora de território arterial?"]
     H -->|Sim| I["Veno-TC / RM com contraste<br/>trombose venosa ou tumor"]
-    H -->|Nao| J["Idoso com lobar recorrente:<br/>RM com SWI, angiopatia amiloide"]
+    H -->|Não| J["Idoso com lobar recorrente:<br/>RM com SWI, angiopatia amiloide"]
     class D critical;
     class F critical;
     class E action;
@@ -22139,17 +22139,17 @@ Causa importante em jovens, frequentemente após trauma banal, manipulação cer
 
 \`\`\`mermaid
 flowchart TD
-    A["Deficit focal transitorio<br/>ja resolvido"] --> B["Glicemia capilar<br/>+ TC/RM de cranio"]
+    A["Déficit focal transitório<br/>ja resolvido"] --> B["Glicemia capilar<br/>+ TC/RM de crânio"]
     B --> C["Hemorragia ou<br/>mimetizador?"]
-    C -->|Sim| D["Tratar a causa<br/>especifica"]
-    C -->|Nao| E["AIT confirmado<br/>estratificar ABCD2"]
-    E --> F["ABCD2 maior ou igual a 4<br/>ou lesao na difusao?"]
+    C -->|Sim| D["Tratar a causa<br/>específica"]
+    C -->|Não| E["AIT confirmado<br/>estratificar ABCD2"]
+    E --> F["ABCD2 maior ou igual a 4<br/>ou lesão na difusão?"]
     F -->|Sim| G["AAS + clopidogrel<br/>300 mg depois 75 mg/d 21 dias"]
-    F -->|Nao| H["Antiagregante unico<br/>+ investigacao completa"]
-    E --> I["Doppler de carotidas<br/>ECG / Holter / eco"]
-    I --> J["Estenose sintomatica<br/>maior ou igual a 70%?"]
+    F -->|Não| H["Antiagregante único<br/>+ investigação completa"]
+    E --> I["Doppler de carótidas<br/>ECG / Holter / eco"]
+    I --> J["Estenose sintomática<br/>maior ou igual a 70%?"]
     J -->|Sim| K["Endarterectomia ou stent<br/>precoce"]
-    J -->|Nao| L["Estatina alta potencia<br/>+ controle de PA e DM"]
+    J -->|Não| L["Estatina alta potencia<br/>+ controle de PA e DM"]
     class E critical;
     class J critical;
     class G action;
@@ -22158,14 +22158,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["AIT investigado<br/>definir antitrombotico"] --> B["Fibrilacao atrial ou<br/>fonte cardioembolica?"]
-    B -->|Nao| C["Antiagregante<br/>+ estatina alta potencia"]
-    B -->|Sim| D["Protese mecanica ou<br/>estenose mitral relevante?"]
-    D -->|Sim| E["Varfarina obrigatoria<br/>DOAC contraindicado"]
-    D -->|Nao| F["No SUS o disponivel<br/>e varfarina, INR 2 a 3"]
+    A["AIT investigado<br/>definir antitrombótico"] --> B["Fibrilação atrial ou<br/>fonte cardioembólica?"]
+    B -->|Não| C["Antiagregante<br/>+ estatina alta potencia"]
+    B -->|Sim| D["Prótese mecânica ou<br/>estenose mitral relevante?"]
+    D -->|Sim| E["Varfarina obrigatória<br/>DOAC contraindicado"]
+    D -->|Não| F["No SUS o disponível<br/>e varfarina, INR 2 a 3"]
     F --> G["Paciente consegue<br/>coletar INR regularmente?"]
     G -->|Sim| H["Varfarina com meta de<br/>tempo na faixa acima de 65%"]
-    G -->|Nao| I["Risco de INR fora da faixa<br/>pleitear DOAC ou rever plano"]
+    G -->|Não| I["Risco de INR fora da faixa<br/>pleitear DOAC ou rever plano"]
     class D critical;
     class G critical;
     class E action;
@@ -22350,16 +22350,16 @@ Na alta, oriente de forma explícita: **cessação do tabagismo** (o fator de ri
 
 \`\`\`mermaid
 flowchart TD
-    A["Cefaleia subita<br/>pior da vida"] --> B["TC de cranio<br/>sem contraste imediata"]
-    B --> C["Sangue no espaco<br/>subaracnoideo?"]
-    C -->|Nao, suspeita alta| D["Puncao lombar com<br/>xantocromia ou angio-TC"]
+    A["Cefaleia súbita<br/>pior da vida"] --> B["TC de crânio<br/>sem contraste imediata"]
+    B --> C["Sangue no espaço<br/>subaracnóideo?"]
+    C -->|Não, suspeita alta| D["Punção lombar com<br/>xantocromia ou angio-TC"]
     C -->|Sim| E["HSA confirmada<br/>Hunt-Hess e Fisher"]
     E --> F["Nimodipino 60 mg VO 4/4h<br/>por 21 dias + PA titulada"]
     F --> G["Angio-TC / arteriografia<br/>localizar aneurisma"]
-    G --> H["Ocluir o aneurisma<br/>em ate 24 horas"]
+    G --> H["Ocluir o aneurisma<br/>em até 24 horas"]
     H --> I["UTI: vigiar vasoespasmo<br/>dia 4 ao 14"]
-    I --> J["Deficit novo<br/>ou queda do Glasgow?"]
-    J -->|Sim| K["Euvolemia + hipertensao<br/>induzida e imagem"]
+    I --> J["Déficit novo<br/>ou queda do Glasgow?"]
+    J -->|Sim| K["Euvolemia + hipertensão<br/>induzida e imagem"]
     class C critical;
     class J critical;
     class F action;
@@ -22369,15 +22369,15 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["HSA no dia 4 ao 14<br/>deficit novo ou Glasgow caindo"] --> B["TC de cranio<br/>excluir ressangramento<br/>e hidrocefalia"]
+    A["HSA no dia 4 ao 14<br/>déficit novo ou Glasgow caindo"] --> B["TC de crânio<br/>excluir ressangramento<br/>e hidrocefalia"]
     B --> C["Hidrocefalia ou<br/>novo sangramento?"]
-    C -->|Sim| D["Derivacao ventricular<br/>ou neurocirurgia"]
-    C -->|Nao| E["Checar sodio, glicemia,<br/>febre, sedacao, hipoxia"]
-    E --> F["EEG se rebaixamento<br/>sem explicacao"]
+    C -->|Sim| D["Derivação ventricular<br/>ou neurocirurgia"]
+    C -->|Não| E["Checar sódio, glicemia,<br/>febre, sedação, hipóxia"]
+    E --> F["EEG se rebaixamento<br/>sem explicação"]
     F --> G["Persiste sem causa:<br/>suspeitar isquemia tardia"]
-    G --> H["Garantir euvolemia e<br/>hipertensao induzida"]
+    G --> H["Garantir euvolemia e<br/>hipertensão induzida"]
     H --> I["Melhora do exame?"]
-    I -->|Nao| J["Angiografia com angioplastia<br/>ou vasodilatador intra-arterial"]
+    I -->|Não| J["Angiografia com angioplastia<br/>ou vasodilatador intra-arterial"]
     class A critical;
     class C critical;
     class G critical;
@@ -22537,15 +22537,15 @@ Na **trombose venosa cerebral**, anticoagule mesmo com infarto venoso hemorrági
 
 \`\`\`mermaid
 flowchart TD
-    A["Cefaleia com pico<br/>em menos de 1 minuto"] --> B["TC de cranio sem contraste<br/>imediata"]
+    A["Cefaleia com pico<br/>em menos de 1 minuto"] --> B["TC de crânio sem contraste<br/>imediata"]
     B --> C["TC alterada?"]
     C -->|Sim| D["Tratar a causa<br/>HSA, TVC, AVC, tumor"]
-    C -->|Nao| E["Inicio ha menos<br/>de 6 horas?"]
-    E -->|Sim| F["HSA praticamente afastada<br/>reavaliar hipoteses"]
-    E -->|Nao| G["Puncao lombar com xantocromia<br/>ou angio-TC"]
+    C -->|Não| E["Início há menos<br/>de 6 horas?"]
+    E -->|Sim| F["HSA praticamente afastada<br/>reavaliar hipóteses"]
+    E -->|Não| G["Punção lombar com xantocromia<br/>ou angio-TC"]
     G --> H["Exame alterado?"]
-    H -->|Sim| I["Conduta especifica<br/>+ neurocirurgia ou neurologia"]
-    H -->|Nao| J["Angio/veno-TC dirigida<br/>TVC, disseccao, SVCR"]
+    H -->|Sim| I["Conduta específica<br/>+ neurocirurgia ou neurologia"]
+    H -->|Não| J["Angio/veno-TC dirigida<br/>TVC, dissecção, SVCR"]
     class A critical;
     class H critical;
     class D action;
@@ -22557,15 +22557,15 @@ Quando a investigação inicial é negativa, o segundo eixo de decisão é pelo 
 
 \`\`\`mermaid
 flowchart TD
-    A["TC e primeira investigacao<br/>negativas"] --> B["Dor recorrente em surtos<br/>com gatilho ou vasoconstritor?"]
+    A["TC e primeira investigação<br/>negativas"] --> B["Dor recorrente em surtos<br/>com gatilho ou vasoconstritor?"]
     B -->|Sim| C["Suspeitar SVCR<br/>repetir angio em 1 a 2 semanas"]
-    B -->|Nao| D["Papiledema, convulsao<br/>puerperio ou trombofilia?"]
+    B -->|Não| D["Papiledema, convulsão<br/>puerpério ou trombofilia?"]
     D -->|Sim| E["Veno-TC ou veno-RM<br/>para trombose venosa"]
-    D -->|Nao| F["Dor cervical, Horner<br/>ou trauma cervical?"]
-    F -->|Sim| G["Angio-RM cervical<br/>com supressao de gordura"]
-    F -->|Nao| H["Dor estritamente ortostatica?"]
-    H -->|Sim| I["RM com contraste<br/>para hipotensao liquorica"]
-    H -->|Nao| J["Reavaliar em 24 a 48 h<br/>com orientacao de retorno"]
+    D -->|Não| F["Dor cervical, Horner<br/>ou trauma cervical?"]
+    F -->|Sim| G["Angio-RM cervical<br/>com supressão de gordura"]
+    F -->|Não| H["Dor estritamente ortostática?"]
+    H -->|Sim| I["RM com contraste<br/>para hipotensão liquórica"]
+    H -->|Não| J["Reavaliar em 24 a 48 h<br/>com orientação de retorno"]
     class B critical;
     class D critical;
     class C action;
@@ -22764,15 +22764,15 @@ Após a alta da UTI, a vigilância continua: uma parcela relevante dos óbitos o
 
 \`\`\`mermaid
 flowchart TD
-    A["Fraqueza simetrica ascendente<br/>com arreflexia"] --> B["Excluir compressao medular<br/>nivel sensitivo, esfincter"]
-    B --> C["Puncao lombar + ENMG<br/>+ espirometria a beira do leito"]
+    A["Fraqueza simétrica ascendente<br/>com arreflexia"] --> B["Excluir compressão medular<br/>nível sensitivo, esfíncter"]
+    B --> C["Punção lombar + ENMG<br/>+ espirometria a beira do leito"]
     C --> D["Fraqueza bulbar, disautonomia<br/>ou queda da CVF?"]
-    D -->|Sim| E["UTI com vigilancia<br/>respiratoria continua"]
-    D -->|Nao| F["Enfermaria com CVF<br/>e forca seriadas"]
-    C --> G["Incapaz de deambular<br/>sem auxilio?"]
-    G -->|Sim| H["IGIV 0,4 g/kg/dia por 5 dias<br/>OU plasmaferese"]
-    G -->|Nao| I["Observacao e reavaliacao<br/>frequente da progressao"]
-    E --> J["Falencia respiratoria<br/>iminente: intubar"]
+    D -->|Sim| E["UTI com vigilância<br/>respiratória continua"]
+    D -->|Não| F["Enfermaria com CVF<br/>e força seriadas"]
+    C --> G["Incapaz de deambular<br/>sem auxílio?"]
+    G -->|Sim| H["IGIV 0,4 g/kg/dia por 5 dias<br/>OU plasmaférese"]
+    G -->|Não| I["Observação e reavaliação<br/>frequente da progressão"]
+    E --> J["Falência respiratória<br/>iminente: intubar"]
     class D critical;
     class J critical;
     class H action;
@@ -22783,15 +22783,15 @@ O segundo eixo de decisão é o da **vigilância respiratória**, que roda vári
 
 \`\`\`mermaid
 flowchart TD
-    A["Medir CVF e contagem<br/>em uma expiracao"] --> B["CVF menor ou igual<br/>a 20 mL/kg?"]
-    B -->|Sim| C["Transferir para UTI<br/>e preparar via aerea"]
-    B -->|Nao| D["Queda maior que 30%<br/>do basal ou contagem menor que 20?"]
+    A["Medir CVF e contagem<br/>em uma expiração"] --> B["CVF menor ou igual<br/>a 20 mL/kg?"]
+    B -->|Sim| C["Transferir para UTI<br/>e preparar via aérea"]
+    B -->|Não| D["Queda maior que 30%<br/>do basal ou contagem menor que 20?"]
     D -->|Sim| C
-    D -->|Nao| E["Disfagia, tosse ineficaz<br/>ou disautonomia?"]
+    D -->|Não| E["Disfagia, tosse ineficaz<br/>ou disautonomia?"]
     E -->|Sim| C
-    E -->|Nao| F["Manter enfermaria<br/>medir de 3 a 6 vezes ao dia"]
+    E -->|Não| F["Manter enfermaria<br/>medir de 3 a 6 vezes ao dia"]
     C --> G["CVF menor ou igual<br/>a 10 mL/kg?"]
-    G -->|Sim| H["Intubacao eletiva<br/>nao esperar dessaturar"]
+    G -->|Sim| H["Intubação eletiva<br/>não esperar dessaturar"]
     class B critical;
     class G critical;
     class C action;
@@ -22996,15 +22996,15 @@ Discuta timectomia com o neurologista: indicada sempre que houver timoma, e cons
 
 \`\`\`mermaid
 flowchart TD
-    A["Crise miastenica confirmada"] --> B["Ha instabilidade hemodinamica,<br/>sepse ou acesso vascular dificil?"]
+    A["Crise miastênica confirmada"] --> B["Há instabilidade hemodinâmica,<br/>sepse ou acesso vascular difícil?"]
     B -->|Sim| C["Preferir IGIV<br/>0,4 g/kg/dia por 5 dias"]
-    B -->|Nao| D["Quadro bulbar ou<br/>respiratorio muito grave?"]
-    D -->|Sim| E["Preferir plasmaferese<br/>5 sessoes em dias alternados"]
-    D -->|Nao| F["IGIV ou plasmaferese<br/>conforme disponibilidade"]
+    B -->|Não| D["Quadro bulbar ou<br/>respiratório muito grave?"]
+    D -->|Sim| E["Preferir plasmaférese<br/>5 sessões em dias alternados"]
+    D -->|Não| F["IGIV ou plasmaférese<br/>conforme disponibilidade"]
     C --> G["Iniciar ou ajustar corticoide<br/>sob suporte ja instalado"]
     E --> G
     F --> G
-    G --> H["Definir imunossupressor de<br/>manutencao e avaliar timectomia"]
+    G --> H["Definir imunossupressor de<br/>manutenção e avaliar timectomia"]
     class B critical;
     class D critical;
     class C action;
@@ -23014,14 +23014,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Miastenia com piora<br/>fraqueza bulbar ou dispneia"] --> B["Medir CVF e pressoes<br/>respiratorias seriadas"]
-    B --> C["Falencia ventilatoria?<br/>CVF menor que 15-20 mL/kg"]
-    C -->|Sim| D["Intubacao eletiva<br/>e ventilacao mecanica"]
-    C -->|Nao| E["VNI precoce e<br/>monitorizacao em UTI"]
-    D --> F["Terapia de resgate<br/>IGIV 0,4 g/kg/dia 5 dias<br/>ou plasmaferese"]
+    A["Miastenia com piora<br/>fraqueza bulbar ou dispneia"] --> B["Medir CVF e pressões<br/>respiratórias seriadas"]
+    B --> C["Falência ventilatória?<br/>CVF menor que 15-20 mL/kg"]
+    C -->|Sim| D["Intubação eletiva<br/>e ventilação mecânica"]
+    C -->|Não| E["VNI precoce e<br/>monitorização em UTI"]
+    D --> F["Terapia de resgate<br/>IGIV 0,4 g/kg/dia 5 dias<br/>ou plasmaférese"]
     E --> F
     F --> G["Tratar gatilho e retirar<br/>drogas que pioram"]
-    G --> H["Corticoide e imunossupressor<br/>de manutencao"]
+    G --> H["Corticoide e imunossupressor<br/>de manutenção"]
     class C critical;
     class D critical;
     class F action;
@@ -23159,14 +23159,14 @@ Fisioterapia motora e respiratória, terapia ocupacional e fonoaudiologia mudam 
 
 \`\`\`mermaid
 flowchart TD
-    A["Novo deficit neurologico<br/>maior que 24 horas"] --> B["Ha febre ou infeccao<br/>ou piora so com calor?"]
+    A["Novo déficit neurológico<br/>maior que 24 horas"] --> B["Há febre ou infecção<br/>ou piora so com calor?"]
     B -->|Sim| C["Pseudossurto<br/>tratar o gatilho e reavaliar"]
-    B -->|Nao| D["RM cranio e medula<br/>com gadolinio"]
+    B -->|Não| D["RM crânio e medula<br/>com gadolínio"]
     D --> E["Surto incapacitante?<br/>visual motor ou cerebelar"]
-    E -->|Nao| F["Observacao e<br/>reabilitacao"]
+    E -->|Não| F["Observação e<br/>reabilitação"]
     E -->|Sim| G["Metilprednisolona<br/>1 g IV ao dia por 3-5 dias"]
     G --> H["Resposta em 10-14 dias?"]
-    H -->|Nao| I["Plasmaferese"]
+    H -->|Não| I["Plasmaférese"]
     H -->|Sim| J["Revisar terapia<br/>modificadora com neurologia"]
     class E critical;
     class G action;
@@ -23338,15 +23338,15 @@ A estimulação cerebral profunda do núcleo subtalâmico ou do globo pálido in
 
 \`\`\`mermaid
 flowchart TD
-    A["Parkinsonismo:<br/>bradicinesia com tremor ou rigidez"] --> B["Usa bloqueador dopaminergico?<br/>metoclopramida flunarizina antipsicotico"]
+    A["Parkinsonismo:<br/>bradicinesia com tremor ou rigidez"] --> B["Usa bloqueador dopaminérgico?<br/>metoclopramida flunarizina antipsicótico"]
     B -->|Sim| C["Suspender a droga<br/>e reavaliar em semanas"]
-    B -->|Nao| D["Bandeiras vermelhas?<br/>queda precoce disautonomia<br/>paralisia do olhar"]
-    D -->|Sim| E["Investigar parkinsonismo atipico<br/>RM e referencia especializada"]
-    D -->|Nao| F["Sintomas incomodam<br/>ou limitam a funcao?"]
-    F -->|Nao| G["Acompanhar<br/>exercicio e reabilitacao"]
+    B -->|Não| D["Bandeiras vermelhas?<br/>queda precoce disautonomia<br/>paralisia do olhar"]
+    D -->|Sim| E["Investigar parkinsonismo atípico<br/>RM e referência especializada"]
+    D -->|Não| F["Sintomas incomodam<br/>ou limitam a função?"]
+    F -->|Não| G["Acompanhar<br/>exercício e reabilitação"]
     F -->|Sim| H["Iniciar levodopa/carbidopa<br/>titulada; agonista ou IMAO-B<br/>em jovem com sintoma leve"]
-    H --> I["Flutuacoes ou discinesia<br/>refratarias"]
-    I --> J["Fracionar dose, COMT,<br/>amantadina ou estimulacao<br/>cerebral profunda"]
+    H --> I["Flutuações ou discinesia<br/>refratárias"]
+    I --> J["Fracionar dose, COMT,<br/>amantadina ou estimulação<br/>cerebral profunda"]
     class D critical;
     class H action;
     class J action;
@@ -23377,17 +23377,17 @@ Disfagia é subestimada e mata: peça avaliação fonoaudiológica precoce em to
 
 \`\`\`mermaid
 flowchart TD
-    A["Parkinsoniano internado"] --> B["Prescrever levodopa nos<br/>horarios exatos do domicilio"]
+    A["Parkinsoniano internado"] --> B["Prescrever levodopa nos<br/>horários exatos do domicílio"]
     B --> C["Vai ficar em jejum<br/>ou sem via oral?"]
-    C -->|Sim| D["Manter por sonda ou<br/>usar rotigotina transdermica"]
-    C -->|Nao| E["Manter esquema domiciliar"]
-    D --> F["Precisa de antiemetico<br/>ou antipsicotico?"]
+    C -->|Sim| D["Manter por sonda ou<br/>usar rotigotina transdérmica"]
+    C -->|Não| E["Manter esquema domiciliar"]
+    D --> F["Precisa de antiemético<br/>ou antipsicótico?"]
     E --> F
-    F -->|Antiemetico| G["Domperidona<br/>nunca metoclopramida<br/>ou bromoprida"]
-    F -->|Antipsicotico| H["Quetiapina ou clozapina<br/>nunca haloperidol<br/>ou risperidona"]
+    F -->|Antiemético| G["Domperidona<br/>nunca metoclopramida<br/>ou bromoprida"]
+    F -->|Antipsicótico| H["Quetiapina ou clozapina<br/>nunca haloperidol<br/>ou risperidona"]
     G --> I["Febre, rigidez extrema<br/>e CK elevada?"]
     H --> I
-    I -->|Sim| J["Hiperpirexia-parkinsonismo:<br/>reintroduzir dopaminergico,<br/>hidratar e UTI"]
+    I -->|Sim| J["Hiperpirexia-parkinsonismo:<br/>reintroduzir dopaminérgico,<br/>hidratar e UTI"]
     class I critical;
     class J critical;
     class B action;
@@ -23599,15 +23599,15 @@ Nem toda agitação é delirium hiperativo: descarte dor, retenção urinária, 
 
 \`\`\`mermaid
 flowchart TD
-    A["Mudanca aguda do<br/>comportamento ou da cognicao"] --> B["Aplicar 4AT na enfermaria<br/>ou CAM-ICU na UTI"]
+    A["Mudança aguda do<br/>comportamento ou da cognição"] --> B["Aplicar 4AT na enfermaria<br/>ou CAM-ICU na UTI"]
     B --> C["Delirium confirmado"]
-    C --> D["Buscar precipitante: infeccao,<br/>drogas, dor, retencao urinaria,<br/>fecaloma, metabolico, hipoxia"]
-    D --> E["Tratar a causa e aplicar<br/>medidas nao farmacologicas"]
-    E --> F["Agitacao com risco para si<br/>ou para outros?"]
-    F -->|Nao| G["Manter medidas nao<br/>farmacologicas e reavaliar"]
-    F -->|Sim| H["Abstinencia de alcool<br/>ou benzodiazepinico?"]
-    H -->|Sim| I["Benzodiazepinico<br/>e tiamina"]
-    H -->|Nao| J["Haloperidol 0,5-1 mg<br/>ou quetiapina, dose baixa<br/>e por poucos dias"]
+    C --> D["Buscar precipitante: infecção,<br/>drogas, dor, retenção urinária,<br/>fecaloma, metabólico, hipóxia"]
+    D --> E["Tratar a causa e aplicar<br/>medidas não farmacológicas"]
+    E --> F["Agitação com risco para si<br/>ou para outros?"]
+    F -->|Não| G["Manter medidas não<br/>farmacológicas e reavaliar"]
+    F -->|Sim| H["Abstinência de alcool<br/>ou benzodiazepínico?"]
+    H -->|Sim| I["Benzodiazepínico<br/>e tiamina"]
+    H -->|Não| J["Haloperidol 0,5-1 mg<br/>ou quetiapina, dose baixa<br/>e por poucos dias"]
     class C critical;
     class F critical;
     class E action;
@@ -23850,15 +23850,15 @@ Nesse cenário, monitore nível de consciência, tamanho pupilar e padrão respi
 
 \`\`\`mermaid
 flowchart TD
-    A["Paciente com tontura aguda"] --> B["Sintomas continuos ha mais de 24h<br/>com nistagmo espontaneo agora?"]
-    B -->|Nao, crises curtas ao mudar de posicao| C["Dix-Hallpike"]
-    C --> D["Nistagmo tipico de VPPB"]
+    A["Paciente com tontura aguda"] --> B["Sintomas contínuos há mais de 24h<br/>com nistagmo espontâneo agora?"]
+    B -->|Não, crises curtas ao mudar de posição| C["Dix-Hallpike"]
+    C --> D["Nistagmo típico de VPPB"]
     D --> E["Manobra de Epley"]
-    B -->|Sim, sindrome vestibular aguda| F["Aplicar HINTS"]
-    F --> G["Head impulse normal ou<br/>nistagmo que muda de direcao<br/>ou skew presente?"]
-    G -->|Sim, padrao central| H["Conduzir como AVC de fossa<br/>posterior: protocolo de AVC<br/>e RM com difusao"]
-    G -->|Nao, padrao periferico| I["Neurite vestibular:<br/>reabilitacao vestibular precoce<br/>e sintomatico por poucos dias"]
-    A --> J["Nao consegue ficar em pe ou<br/>tem sinal neurologico focal"]
+    B -->|Sim, síndrome vestibular aguda| F["Aplicar HINTS"]
+    F --> G["Head impulse normal ou<br/>nistagmo que muda de direção<br/>ou skew presente?"]
+    G -->|Sim, padrão central| H["Conduzir como AVC de fossa<br/>posterior: protocolo de AVC<br/>e RM com difusão"]
+    G -->|Não, padrão periférico| I["Neurite vestibular:<br/>reabilitação vestibular precoce<br/>e sintomático por poucos dias"]
+    A --> J["Não consegue ficar em pe ou<br/>tem sinal neurológico focal"]
     J --> H
     class G critical;
     class J critical;
@@ -23871,15 +23871,15 @@ O segundo eixo de decisão, quando a apresentação é posicional, é descobrir 
 
 \`\`\`mermaid
 flowchart TD
-    A["Vertigem breve<br/>desencadeada por posicao"] --> B["Dix-Hallpike bilateral"]
+    A["Vertigem breve<br/>desencadeada por posição"] --> B["Dix-Hallpike bilateral"]
     B -->|Nistagmo para cima e torcional| C["VPPB de canal posterior"]
     C --> D["Manobra de Epley<br/>ou Semont"]
-    B -->|Negativo| E["Teste do rolamento<br/>em decubito dorsal"]
-    E -->|Nistagmo horizontal geotropico| F["Canal horizontal<br/>canalolitiase"]
-    E -->|Nistagmo horizontal apogeotropico| G["Canal horizontal<br/>cupulolitiase"]
+    B -->|Negativo| E["Teste do rolamento<br/>em decúbito dorsal"]
+    E -->|Nistagmo horizontal geotrópico| F["Canal horizontal<br/>canalolitíase"]
+    E -->|Nistagmo horizontal apogeotrópico| G["Canal horizontal<br/>cupulolitíase"]
     F --> H["Manobra de Lempert<br/>ou Gufoni"]
     G --> H
-    B -->|Nistagmo para baixo persistente<br/>sem latencia nem fatigabilidade| I["Suspeitar de causa central:<br/>lesao de fossa posterior<br/>ou juncao craniocervical"]
+    B -->|Nistagmo para baixo persistente<br/>sem latência nem fatigabilidade| I["Suspeitar de causa central:<br/>lesão de fossa posterior<br/>ou junção craniocervical"]
     class I critical;
     class D action;
     class H action;
@@ -24119,14 +24119,14 @@ Explique com honestidade o prognóstico: a dor e a força costumam melhorar bem;
 
 \`\`\`mermaid
 flowchart TD
-    A["Lombalgia com sintomas urinarios<br/>ou dormencia perineal"] --> B["Exame perineal obrigatorio:<br/>sensibilidade em sela, tonus anal,<br/>residuo pos-miccional"]
+    A["Lombalgia com sintomas urinários<br/>ou dormência perineal"] --> B["Exame perineal obrigatório:<br/>sensibilidade em sela, tônus anal,<br/>resíduo pos-miccional"]
     B --> C["Achado objetivo presente?"]
-    C -->|Nao| D["Radiculopatia comum:<br/>tratamento conservador<br/>e orientar sinais de alarme"]
-    C -->|Sim| E["Sindrome da cauda equina<br/>ate prova em contrario"]
+    C -->|Não| D["Radiculopatia comum:<br/>tratamento conservador<br/>e orientar sinais de alarme"]
+    C -->|Sim| E["Síndrome da cauda equina<br/>até prova em contrário"]
     E --> F["RM lombossacra imediata<br/>e acionar neurocirurgia<br/>em paralelo"]
-    F --> G["Compressao confirmada"]
-    G --> H["Descompressao cirurgica<br/>de emergencia"]
-    G --> I["Abscesso: antibiotico e drenagem<br/>Tumor: corticoide, RT ou cirurgia"]
+    F --> G["Compressão confirmada"]
+    G --> H["Descompressão cirúrgica<br/>de emergência"]
+    G --> I["Abscesso: antibiótico e drenagem<br/>Tumor: corticoide, RT ou cirurgia"]
     class C critical;
     class E critical;
     class H action;
@@ -24137,13 +24137,13 @@ O segundo eixo de decisão é o estágio funcional da bexiga, que determina o qu
 
 \`\`\`mermaid
 flowchart TD
-    A["Suspeita de cauda equina:<br/>classificar pela funcao vesical"] --> B["Ainda urina espontaneamente?"]
-    B -->|Sim, sem alteracao objetiva| C["CESS suspeita:<br/>investigar e reavaliar<br/>com exame registrado"]
-    B -->|Sim, mas perdeu sensacao<br/>de encher ou de urinar| D["CESI incompleta:<br/>maior beneficio da cirurgia<br/>precoce, nao esperar retencao"]
-    B -->|Nao, retencao com<br/>perda por transbordamento| E["CESR com retencao:<br/>prognostico pior,<br/>operar mesmo assim"]
-    D --> F["RM imediata e<br/>descompressao na primeira<br/>oportunidade segura"]
+    A["Suspeita de cauda equina:<br/>classificar pela função vesical"] --> B["Ainda urina espontaneamente?"]
+    B -->|Sim, sem alteração objetiva| C["CESS suspeita:<br/>investigar e reavaliar<br/>com exame registrado"]
+    B -->|Sim, mas perdeu sensação<br/>de encher ou de urinar| D["CESI incompleta:<br/>maior benefício da cirurgia<br/>precoce, não esperar retenção"]
+    B -->|Não, retenção com<br/>perda por transbordamento| E["CESR com retenção:<br/>prognóstico pior,<br/>operar mesmo assim"]
+    D --> F["RM imediata e<br/>descompressão na primeira<br/>oportunidade segura"]
     E --> F
-    C --> G["Alta apenas com sinais de<br/>alarme por escrito e<br/>reavaliacao garantida"]
+    C --> G["Alta apenas com sinais de<br/>alarme por escrito e<br/>reavaliação garantida"]
     class D critical;
     class E critical;
     class F action;
@@ -24355,13 +24355,13 @@ flowchart TD
 \`\`\`mermaid
 flowchart TD
     A["Suspeita de metanol"] --> B["pH < 7,3 ou HCO3 < 20<br/>ou gap osmolar >= 10"]
-    B --> C["Fomepizol disponivel?"]
+    B --> C["Fomepizol disponível?"]
     C -->|Sim| D["Fomepizol 15 mg/kg IV"]
-    C -->|Nao| E["Etanol 10%: ataque 8 mL/kg<br/>manutencao 0,8-1,3 mL/kg/h"]
-    D --> F["Alteracao visual, coma,<br/>pH <= 7,15 ou AG > 24"]
+    C -->|Não| E["Etanol 10%: ataque 8 mL/kg<br/>manutenção 0,8-1,3 mL/kg/h"]
+    D --> F["Alteração visual, coma,<br/>pH <= 7,15 ou AG > 24"]
     E --> F
-    F -->|Sim| G["Acionar nefrologia<br/>hemodialise de emergencia"]
-    F -->|Nao| H["Manter antidoto ate<br/>pH >= 7,3 / AG < 12 / GO < 10"]
+    F -->|Sim| G["Acionar nefrologia<br/>hemodiálise de emergência"]
+    F -->|Não| H["Manter antídoto até<br/>pH >= 7,3 / AG < 12 / GO < 10"]
     class F,G critical;
     class D,E,H action;
 \`\`\`
@@ -24562,13 +24562,13 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor toracica apos cocaina"] --> B["ECG + troponina<br/>+ benzodiazepinico"]
+    A["Dor torácica após cocaina"] --> B["ECG + troponina<br/>+ benzodiazepínico"]
     B --> C["Supra de ST ou<br/>instabilidade?"]
-    C -->|Sim| D["Protocolo de IAM<br/>reperfusao/cateterismo"]
-    C -->|Nao| E["Nitrato + AAS<br/>observacao 9-12h"]
+    C -->|Sim| D["Protocolo de IAM<br/>reperfusão/cateterismo"]
+    C -->|Não| E["Nitrato + AAS<br/>observação 9-12h"]
     E --> F["ECG e troponina<br/>seriados alterados?"]
-    F -->|Sim| G["Internar<br/>avaliacao cardiologica"]
-    F -->|Nao| H["Alta com encaminhamento<br/>para cessacao do uso"]
+    F -->|Sim| G["Internar<br/>avaliação cardiológica"]
+    F -->|Não| H["Alta com encaminhamento<br/>para cessação do uso"]
     class C,D critical;
     class E,H action;
 \`\`\`
@@ -24751,12 +24751,12 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Melhora da crise colinergica"] --> B["Observacao minima de 24-48h"]
+    A["Melhora da crise colinérgica"] --> B["Observação mínima de 24-48h"]
     B --> C["Fraqueza proximal, cervical<br/>ou de pares cranianos 24-96h?"]
-    C -->|Sim| D["Sindrome intermediaria:<br/>UTI e suporte ventilatorio"]
-    C -->|Nao| E["Parestesia e fraqueza distal<br/>em 1-3 semanas?"]
-    E -->|Sim| F["Neuropatia tardia (OPIDN):<br/>neurologia e reabilitacao"]
-    E -->|Nao| G["Alta com avaliacao psiquiatrica<br/>e retorno programado"]
+    C -->|Sim| D["Síndrome intermediária:<br/>UTI e suporte ventilatório"]
+    C -->|Não| E["Parestesia e fraqueza distal<br/>em 1-3 semanas?"]
+    E -->|Sim| F["Neuropatia tardia (OPIDN):<br/>neurologia e reabilitação"]
+    E -->|Não| G["Alta com avaliação psiquiátrica<br/>e retorno programado"]
     class C,D critical;
     class F,G action;
 \`\`\`
@@ -24936,12 +24936,12 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Vitima de incendio<br/>em ambiente fechado"] --> B["O2 100% + via aerea<br/>+ gasometria com co-oximetria"]
-    B --> C["Fuligem, estridor,<br/>rouquidao ou queimadura facial?"]
-    C -->|Sim| D["Intubacao precoce<br/>antes do edema de via aerea"]
-    B --> E["Lactato muito alto,<br/>coma ou choque refratario?"]
-    E -->|Sim| F["Hidroxocobalamina 5 g IV<br/>(70 mg/kg na crianca)"]
-    E -->|Nao| G["Manter O2 e reavaliar<br/>COHb, ECG e troponina"]
+    A["Vítima de incêndio<br/>em ambiente fechado"] --> B["O2 100% + via aérea<br/>+ gasometria com co-oximetria"]
+    B --> C["Fuligem, estridor,<br/>rouquidão ou queimadura facial?"]
+    C -->|Sim| D["Intubação precoce<br/>antes do edema de via aérea"]
+    B --> E["Lactato muito alto,<br/>coma ou choque refratário?"]
+    E -->|Sim| F["Hidroxocobalamina 5 g IV<br/>(70 mg/kg na criança)"]
+    E -->|Não| G["Manter O2 e reavaliar<br/>COHb, ECG e troponina"]
     class C,E critical;
     class D,F,G action;
 \`\`\`
@@ -25116,12 +25116,12 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Ferida por mordedura"] --> B["Lavagem, irrigacao<br/>e desbridamento"]
-    B --> C["Mao, punho, face proxima a osso,<br/>gato, imunossuprimido ou >8h?"]
+    A["Ferida por mordedura"] --> B["Lavagem, irrigação<br/>e desbridamento"]
+    B --> C["Mao, punho, face próxima a osso,<br/>gato, imunossuprimido ou >8h?"]
     C -->|Sim| D["Amoxicilina-clavulanato<br/>875/125 mg 12/12h por 3-5 dias"]
-    C -->|Nao| E["Sem antibiotico<br/>retorno em 24-48h"]
-    B --> F["Sobre articulacao MCF<br/>(soco fechado)?"]
-    F -->|Sim| G["Radiografia, nao suturar,<br/>cirurgia da mao"]
+    C -->|Não| E["Sem antibiótico<br/>retorno em 24-48h"]
+    B --> F["Sobre articulação MCF<br/>(soco fechado)?"]
+    F -->|Sim| G["Radiografia, não suturar,<br/>cirurgia da mao"]
     B --> H["Atualizar tetano<br/>e avaliar raiva"]
     class F,G critical;
     class D,E,H action;
@@ -25313,13 +25313,13 @@ Um segundo eixo, útil quando o paciente chega com **lesão necrótica sem picad
 
 \`\`\`mermaid
 flowchart TD
-    A["Lesao necrotica<br/>unica e dolorosa"] --> B["Toxemia grave,<br/>crepitacao ou<br/>progressao em horas?"]
-    B -->|Sim| C["Suspeitar fasciite<br/>Cirurgia de urgencia"]
-    B -->|Nao| D["Lesao quente,<br/>elevada, com febre?"]
+    A["Lesão necrótica<br/>única e dolorosa"] --> B["Toxemia grave,<br/>crepitação ou<br/>progressão em horas?"]
+    B -->|Sim| C["Suspeitar fasciite<br/>Cirurgia de urgência"]
+    B -->|Não| D["Lesão quente,<br/>elevada, com febre?"]
     D -->|Sim| E["Tratar como celulite<br/>e reavaliar em 48h"]
-    D -->|Nao| F["Lesao fria, deprimida,<br/>placa marmorea<br/>Suspeitar loxoscelismo"]
+    D -->|Não| F["Lesão fria, deprimida,<br/>placa marmórea<br/>Suspeitar loxoscelismo"]
     F --> G["Corticoide + soro<br/>conforme tamanho"]
-    G --> H["Hemograma, funcao renal<br/>e urina por 72h"]
+    G --> H["Hemograma, função renal<br/>e urina por 72h"]
     class B,C critical;
     class E,G,H action;
 \`\`\`
@@ -25469,13 +25469,13 @@ Um segundo eixo, agora pela classificação de Szpilman, para decidir destino:
 \`\`\`mermaid
 flowchart TD
     A["Classificar Szpilman<br/>na chegada"] --> B["Grau?"]
-    B -->|"Resgate / 1"| C["Observacao breve<br/>e alta orientada"]
-    B -->|"2"| D["O2 + observacao<br/>hospitalar 6-24h"]
+    B -->|"Resgate / 1"| C["Observação breve<br/>e alta orientada"]
+    B -->|"2"| D["O2 + observação<br/>hospitalar 6-24h"]
     B -->|"3"| E["VNI ou alto fluxo<br/>UTI"]
-    B -->|"4"| F["Intubacao + suporte<br/>hemodinamico - UTI"]
+    B -->|"4"| F["Intubação + suporte<br/>hemodinâmico - UTI"]
     B -->|"5"| G["Ventilar de imediato<br/>UTI"]
-    B -->|"6"| H["RCP com ventilacoes<br/>Cuidado pos-PCR"]
-    E --> I["Reclassificar<br/>a cada reavaliacao"]
+    B -->|"6"| H["RCP com ventilações<br/>Cuidado pos-PCR"]
+    E --> I["Reclassificar<br/>a cada reavaliação"]
     D --> I
     class G,H critical;
     class C,D,E,F,I action;
@@ -25675,10 +25675,10 @@ flowchart TD
     A["Hipertermia + rebaixamento"] --> B["Contexto de calor<br/>ou esforço?"]
     B -->|Sim| C["Heat stroke:<br/>resfriar já"]
     B -->|"Anestesia recente"| D["Hipertermia maligna:<br/>dantroleno"]
-    B -->|"Antipsicótico,<br/>rigidez"| E["Sd. neuroleptica<br/>maligna"]
-    B -->|"Serotoninergico,<br/>clonus"| F["Sd. serotoninergica"]
-    B -->|"Sem contexto claro"| G["Investigar infeccao<br/>do SNC e sepse"]
-    C --> H["Resfriamento fisico<br/>+ suporte"]
+    B -->|"Antipsicótico,<br/>rigidez"| E["Sd. neuroléptica<br/>maligna"]
+    B -->|"Serotoninérgico,<br/>clonus"| F["Sd. serotoninérgica"]
+    B -->|"Sem contexto claro"| G["Investigar infecção<br/>do SNC e sepse"]
+    C --> H["Resfriamento físico<br/>+ suporte"]
     G --> H
     class A critical;
     class C,H action;
@@ -26596,14 +26596,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Bolus inicial administrado<br/>(cristaloide e/ou sangue)"] --> B["Resposta hemodinamica<br/>apos o bolus?"]
+    A["Bolus inicial administrado<br/>(cristaloide e/ou sangue)"] --> B["Resposta hemodinâmica<br/>após o bolus?"]
     B -->|"Melhora e sustenta"| C["Respondedor:<br/>perda pequena, sangramento parado"]
     B -->|"Melhora e recai"| D["Respondedor transitório:<br/>sangramento ativo"]
-    B -->|"Sem melhora"| E["Nao respondedor:<br/>exsanguinacao ou dx errado"]
-    C --> F["Investigar com TC<br/>tipagem e observacao"]
+    B -->|"Sem melhora"| E["Não respondedor:<br/>exsanguinação ou dx errado"]
+    C --> F["Investigar com TC<br/>tipagem e observação"]
     D --> G["Hemocomponentes 1:1:1<br/>+ localizar fonte urgente"]
     E --> H["Rever e-FAST:<br/>tamponamento? pneumotorax?"]
-    H --> I["Centro cirurgico imediato<br/>+ transfusao macica"]
+    H --> I["Centro cirúrgico imediato<br/>+ transfusão maciça"]
     G --> I
     class E critical;
     class G,I action;
@@ -26857,17 +26857,17 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Coma sem historia"] --> B["Glicemia capilar<br/>+ oximetria + ECG"]
+    A["Coma sem história"] --> B["Glicemia capilar<br/>+ oximetria + ECG"]
     B --> C{"Hipoglicemia?"}
-    C -->|Sim| D["Glicose hipertonica<br/>+ tiamina se etilista"]
-    C -->|Não| E{"Sinal focal ou<br/>pupila assimetrica?"}
-    E -->|Sim| F["TC de cranio urgente<br/>causa estrutural"]
+    C -->|Sim| D["Glicose hipertônica<br/>+ tiamina se etilista"]
+    C -->|Não| E{"Sinal focal ou<br/>pupila assimétrica?"}
+    E -->|Sim| F["TC de crânio urgente<br/>causa estrutural"]
     E -->|Não| G{"Miose puntiforme<br/>+ bradipneia?"}
     G -->|Sim| H["Naloxona titulada"]
     G -->|Não| I["Gasometria, aniongap,<br/>gap osmolar, paracetamol"]
     I --> J{"Acidose com<br/>aniongap alto?"}
-    J -->|Sim| K["Alcool toxico, salicilato,<br/>metformina - considerar dialise"]
-    J -->|Não| L["Suporte + observacao<br/>+ EEG se coma inexplicado"]
+    J -->|Sim| K["Alcool toxico, salicilato,<br/>metformina - considerar diálise"]
+    J -->|Não| L["Suporte + observação<br/>+ EEG se coma inexplicado"]
     class F,K critical;
     class D,H action;
 \`\`\`
@@ -27092,8 +27092,8 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["NAC completou<br/>a dose programada"] --> B{"Paracetamol<br/>indetectavel?"}
-    B -->|Não| C["Manter manutencao"]
+    A["NAC completou<br/>a dose programada"] --> B{"Paracetamol<br/>indetectável?"}
+    B -->|Não| C["Manter manutenção"]
     B -->|Sim| D{"TGP normal<br/>ou em queda?"}
     D -->|Não| C
     D -->|Sim| E{"INR menor que 2,0<br/>e paciente bem?"}
@@ -27295,15 +27295,15 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Cogitando flumazenil"] --> B{"Uso cronico de<br/>benzodiazepinico?"}
+    A["Cogitando flumazenil"] --> B{"Uso crônico de<br/>benzodiazepínico?"}
     B -->|Sim| X["NAO USAR"]
     B -->|Não| C{"QRS ou QTc<br/>alargados no ECG?"}
     C -->|Sim| X
-    C -->|Não| D{"Historia de convulsao<br/>ou epilepsia?"}
+    C -->|Não| D{"História de convulsão<br/>ou epilepsia?"}
     D -->|Sim| X
-    D -->|Não| E{"Suspeita de coingestao<br/>pro-convulsivante?"}
+    D -->|Não| E{"Suspeita de coingestão<br/>pró-convulsivante?"}
     E -->|Sim| X
-    E -->|Não| F{"TCE ou lesao<br/>estrutural do SNC?"}
+    E -->|Não| F{"TCE ou lesão<br/>estrutural do SNC?"}
     F -->|Sim| X
     F -->|Não| G["Considerar 0,2 mg IV<br/>com anticonvulsivante a mao"]
     class X critical;
@@ -27506,12 +27506,12 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Sem resposta apos<br/>naloxona cumulativa alta"] --> B{"Dose cumulativa<br/>ja passou de 10 mg?"}
+    A["Sem resposta após<br/>naloxona cumulativa alta"] --> B{"Dose cumulativa<br/>ja passou de 10 mg?"}
     B -->|Não| C["Continuar titulando<br/>fentanil exige mais"]
-    B -->|Sim| D["Reconsiderar o diagnostico"]
-    D --> E["Glicemia, TC de cranio,<br/>gasometria, ECG"]
-    E --> F["Buscar clonidina, benzo,<br/>alcool, lesao pontina, sepse"]
-    F --> G["Suporte ventilatorio<br/>e investigacao ampla"]
+    B -->|Sim| D["Reconsiderar o diagnóstico"]
+    D --> E["Glicemia, TC de crânio,<br/>gasometria, ECG"]
+    E --> F["Buscar clonidina, benzo,<br/>alcool, lesão pontina, sepse"]
+    F --> G["Suporte ventilatório<br/>e investigação ampla"]
     class D critical;
     class C,G action;
 \`\`\`
@@ -27725,14 +27725,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["QRS largo persistente<br/>apos bicarbonato"] --> B{"pH arterial<br/>ja em 7,50-7,55?"}
-    B -->|Não| C["Mais bolus de bicarbonato<br/>e checar ventilacao"]
-    B -->|Sim| D{"Potassio e magnesio<br/>corrigidos?"}
+    A["QRS largo persistente<br/>após bicarbonato"] --> B{"pH arterial<br/>ja em 7,50-7,55?"}
+    B -->|Não| C["Mais bolus de bicarbonato<br/>e checar ventilação"]
+    B -->|Sim| D{"Potássio e magnésio<br/>corrigidos?"}
     D -->|Não| E["Repor K e Mg"]
-    D -->|Sim| F["Salina hipertonica 3%<br/>1-2 mL/kg"]
+    D -->|Sim| F["Salina hipertônica 3%<br/>1-2 mL/kg"]
     F --> G{"Choque persiste?"}
     G -->|Sim| H["Noradrenalina + lipidio 20%<br/>acionar ECMO"]
-    G -->|Não| I["Manter manutencao<br/>e ECG seriado"]
+    G -->|Não| I["Manter manutenção<br/>e ECG seriado"]
     class A,H critical;
     class C,F,I action;
 \`\`\`
@@ -28133,16 +28133,16 @@ Um segundo eixo de decisão, tão importante quanto o primeiro, é o do **acompa
 \`\`\`mermaid
 flowchart TD
     A["Suspeita de acidente<br/>por viperídeo"] --> B["Colher TC<br/>em tubo de vidro"]
-    B --> C["TC alterado ou<br/>incoagulavel?"]
+    B --> C["TC alterado ou<br/>incoagulável?"]
     C -->|Sim| D["Envenenamento confirmado<br/>Soro conforme gravidade"]
-    C -->|Nao| E["Observar 6-12h<br/>e repetir TC"]
+    C -->|Não| E["Observar 6-12h<br/>e repetir TC"]
     E --> F["TC alterou?"]
     F -->|Sim| D
-    F -->|Nao| G["Sem envenenamento<br/>Alta orientada"]
+    F -->|Não| G["Sem envenenamento<br/>Alta orientada"]
     D --> H["Repetir TC em<br/>6, 12 e 24h"]
-    H --> I["Ainda incoagulavel<br/>apos 24h?"]
-    I -->|Sim| J["Dose adicional de soro<br/>Rever genero e dose"]
-    I -->|Nao| K["Manter suporte<br/>e vigiar ferida/rim"]
+    H --> I["Ainda incoagulável<br/>após 24h?"]
+    I -->|Sim| J["Dose adicional de soro<br/>Rever gênero e dose"]
+    I -->|Não| K["Manter suporte<br/>e vigiar ferida/rim"]
     class C,I critical;
     class D,J,K action;
 \`\`\`
@@ -28331,13 +28331,13 @@ Um segundo eixo, para o paciente que já tem repercussão cardiorrespiratória:
 
 \`\`\`mermaid
 flowchart TD
-    A["Sinais sistemicos<br/>apos picada"] --> B["Soro imediato<br/>IV ou intraosseo"]
+    A["Sinais sistêmicos<br/>após picada"] --> B["Soro imediato<br/>IV ou intraósseo"]
     B --> C["Dispneia, estertores<br/>ou hipoxemia?"]
-    C -->|Nao| D["Monitorizar - ECG,<br/>troponina, reavaliar"]
-    C -->|Sim| E["O2 + pressao positiva<br/>VNI ou intubacao"]
-    E --> F["Hipotensao ou<br/>ma perfusao?"]
-    F -->|Sim| G["Inotropico<br/>Evitar volume liberal"]
-    F -->|Nao| H["Ecocardiograma<br/>e diuretico se congesto"]
+    C -->|Não| D["Monitorizar - ECG,<br/>troponina, reavaliar"]
+    C -->|Sim| E["O2 + pressão positiva<br/>VNI ou intubação"]
+    E --> F["Hipotensão ou<br/>má perfusão?"]
+    F -->|Sim| G["Inotrópico<br/>Evitar volume liberal"]
+    F -->|Não| H["Ecocardiograma<br/>e diurético se congesto"]
     G --> I["UTI - reavaliar FE<br/>e desescalonar"]
     H --> I
     class C,F critical;
@@ -28715,11 +28715,11 @@ Um segundo eixo, para a decisão de reaquecimento extracorpóreo na parada hipot
 flowchart TD
     A["Parada em paciente frio<br/>HT IV"] --> B["Checar pulso por<br/>cerca de 1 minuto"]
     B --> C["RCP continua<br/>Mobilizar na horizontal"]
-    C --> D["Criterio de futilidade?<br/>K acima de 12,<br/>lesao letal, torax rigido"]
-    D -->|Sim| E["Discutir cessacao<br/>de esforcos"]
-    D -->|Nao| F["Transferir a centro<br/>com ECMO/CEC"]
-    F --> G["Reaquecimento<br/>extracorporeo"]
-    G --> H["Reavaliar apos<br/>atingir 32-35 graus"]
+    C --> D["Critério de futilidade?<br/>K acima de 12,<br/>lesão letal, tórax rígido"]
+    D -->|Sim| E["Discutir cessação<br/>de esforços"]
+    D -->|Não| F["Transferir a centro<br/>com ECMO/CEC"]
+    F --> G["Reaquecimento<br/>extracorpóreo"]
+    G --> H["Reavaliar após<br/>atingir 32-35 graus"]
     class A,D critical;
     class C,F,G,H action;
 \`\`\`
@@ -28871,13 +28871,13 @@ O **acompanhamento psicossocial da família** é parte do tratamento, não um ex
 flowchart TD
     A["Exantema pruriginoso + conjuntivite<br/>febre baixa ou ausente"] --> B["Excluir dengue<br/>sinais de alarme presentes?"]
     B -->|Sim| C["Conduzir pelo fluxograma da dengue"]
-    B -->|Nao| D["RT-PCR sangue ate 5-7 dias<br/>e urina ate cerca de 14 dias"]
+    B -->|Não| D["RT-PCR sangue até 5-7 dias<br/>e urina até cerca de 14 dias"]
     D --> E["Paciente e gestante?"]
-    E -->|Sim| F["Notificacao + USG obstetrica seriada<br/>pre-natal de alto risco"]
-    E -->|Nao| G["Sintomaticos: paracetamol/dipirona<br/>anti-histaminico para prurido"]
+    E -->|Sim| F["Notificação + USG obstétrica seriada<br/>pre-natal de alto risco"]
+    E -->|Não| G["Sintomáticos: paracetamol/dipirona<br/>anti-histamínico para prurido"]
     G --> H["Fraqueza ascendente, arreflexia<br/>ou dispneia?"]
-    H -->|Sim| I["Internar: Guillain-Barre<br/>imunoglobulina IV ou plasmaferese"]
-    H -->|Nao| J["Ambulatorial + preservativo<br/>e controle do vetor"]
+    H -->|Sim| I["Internar: Guillain-Barré<br/>imunoglobulina IV ou plasmaférese"]
+    H -->|Não| J["Ambulatorial + preservativo<br/>e controle do vetor"]
     class B critical;
     class H critical;
     class C action;
@@ -28890,14 +28890,14 @@ O segundo eixo é a avaliação do recém-nascido exposto:
 
 \`\`\`mermaid
 flowchart TD
-    K["RN de mae com zika<br/>ou exantema na gestacao"] --> L["Medir PC com curva correta<br/>InterGrowth-21 ou OMS"]
+    K["RN de mãe com zika<br/>ou exantema na gestação"] --> L["Medir PC com curva correta<br/>InterGrowth-21 ou OMS"]
     L --> M["PC abaixo de -2 DP?"]
-    M -->|Sim| N["TC de cranio sem contraste<br/>+ fundoscopia + BERA"]
-    M -->|Nao| O["USG transfontanela<br/>enquanto fontanela aberta"]
+    M -->|Sim| N["TC de crânio sem contraste<br/>+ fundoscopia + BERA"]
+    M -->|Não| O["USG transfontanela<br/>enquanto fontanela aberta"]
     O --> P["Imagem alterada?"]
     P -->|Sim| N
-    P -->|Nao| Q["Seguimento do neurodesenvolvimento<br/>fundoscopia e triagem auditiva"]
-    N --> R["Investigar STORCH<br/>com atencao ao citomegalovirus"]
+    P -->|Não| Q["Seguimento do neurodesenvolvimento<br/>fundoscopia e triagem auditiva"]
+    N --> R["Investigar STORCH<br/>com atenção ao citomegalovírus"]
     R --> S["Notificar no RESP-Microcefalia<br/>equipe multiprofissional"]
     class M critical;
     class N action;
@@ -29078,14 +29078,14 @@ Complementam a prevenção o controle vetorial urbano, o uso de repelente e roup
 
 \`\`\`mermaid
 flowchart TD
-    A["Febre aguda + exposicao a area de mata<br/>sem vacina ou vacina recente"] --> B["Notificacao imediata em 24h<br/>RT-PCR ate 5o dia, IgM apos 6o dia"]
-    B --> C["Ictericia, sangramento, vomitos,<br/>oliguria ou torpor?"]
-    C -->|Nao| D["Observacao clinica<br/>sintomaticos sem AAS nem AINE"]
-    C -->|Sim| E["Periodo toxemico: internar<br/>TGO/TGP, bilirrubinas, INR, creatinina"]
-    E --> F["Encefalopatia, INR muito alargado,<br/>anuria, acidose ou choque?"]
-    F -->|Sim| G["UTI: dialise precoce, plasma fresco,<br/>vitamina K, discutir transplante"]
-    F -->|Nao| H["Enfermaria: hidratacao cuidadosa,<br/>glicemia seriada, IBP, reavaliar 2x/dia"]
-    A --> I["Vacinar contatos e populacao<br/>investigar epizootia em primatas"]
+    A["Febre aguda + exposição a área de mata<br/>sem vacina ou vacina recente"] --> B["Notificação imediata em 24h<br/>RT-PCR até 5º dia, IgM após 6º dia"]
+    B --> C["Icterícia, sangramento, vômitos,<br/>oligúria ou torpor?"]
+    C -->|Não| D["Observação clínica<br/>sintomáticos sem AAS nem AINE"]
+    C -->|Sim| E["Período toxêmico: internar<br/>TGO/TGP, bilirrubinas, INR, creatinina"]
+    E --> F["Encefalopatia, INR muito alargado,<br/>anúria, acidose ou choque?"]
+    F -->|Sim| G["UTI: diálise precoce, plasma fresco,<br/>vitamina K, discutir transplante"]
+    F -->|Não| H["Enfermaria: hidratação cuidadosa,<br/>glicemia seriada, IBP, reavaliar 2x/dia"]
+    A --> I["Vacinar contatos e população<br/>investigar epizootia em primatas"]
     class C critical;
     class F critical;
     class D action;
@@ -29099,11 +29099,11 @@ O segundo eixo é a classificação laboratorial que define o destino do pacient
 \`\`\`mermaid
 flowchart TD
     L["Caso suspeito: colher AST/ALT,<br/>creatinina, RNI, plaquetas"] --> M["AST ou ALT abaixo de 500<br/>creatinina abaixo de 1,3 e RNI abaixo de 1,5?"]
-    M -->|Sim| N["Forma leve: hidratacao oral 60 mL/kg/dia<br/>repetir exames a cada 24h ate 48h sem febre"]
-    M -->|Nao| O["AST ou ALT acima de 2000, creatinina acima de 2,<br/>RNI acima de 1,5 ou plaquetas abaixo de 50 mil?"]
-    O -->|Nao| P["Forma moderada: internar<br/>reavaliar 4/4h, laboratorio 12/12h"]
-    O -->|Sim| Q["Forma grave: UTI<br/>dialise se bicarbonato abaixo de 18"]
-    N --> R["Sem garantia de reavaliacao?<br/>tratar como forma moderada"]
+    M -->|Sim| N["Forma leve: hidratação oral 60 mL/kg/dia<br/>repetir exames a cada 24h até 48h sem febre"]
+    M -->|Não| O["AST ou ALT acima de 2000, creatinina acima de 2,<br/>RNI acima de 1,5 ou plaquetas abaixo de 50 mil?"]
+    O -->|Não| P["Forma moderada: internar<br/>reavaliar 4/4h, laboratório 12/12h"]
+    O -->|Sim| Q["Forma grave: UTI<br/>diálise se bicarbonato abaixo de 18"]
+    N --> R["Sem garantia de reavaliação?<br/>tratar como forma moderada"]
     class O critical;
     class N action;
     class P action;
@@ -29332,11 +29332,11 @@ Retorno ao trabalho e à escola pode ser precoce, conforme a disposição do pac
 
 \`\`\`mermaid
 flowchart TD
-    A["Faringite com adenopatia<br/>cervical posterior e fadiga"] --> B["Hemograma com linfocitos atipicos<br/>monoteste ou sorologia EBV"]
+    A["Faringite com adenopatia<br/>cervical posterior e fadiga"] --> B["Hemograma com linfócitos atípicos<br/>monoteste ou sorologia EBV"]
     B --> C["Testar HIV e estreptococo"]
-    C --> D["Obstrucao de via aerea, citopenia grave<br/>ou dor abdominal intensa?"]
-    D -->|Sim| E["Internar<br/>corticoide ou imagem de urgencia"]
-    D -->|Nao| F["Suporte: analgesia,<br/>hidratacao, repouso"]
+    C --> D["Obstrução de via aérea, citopenia grave<br/>ou dor abdominal intensa?"]
+    D -->|Sim| E["Internar<br/>corticoide ou imagem de urgência"]
+    D -->|Não| F["Suporte: analgesia,<br/>hidratação, repouso"]
     F --> G["Evitar aminopenicilinas<br/>e esporte de contato por 3 a 4 semanas"]
     class E critical;
     class G action;
@@ -29344,14 +29344,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Monoteste negativo<br/>mas quadro compativel"] --> B["Doenca com menos de 7 dias?"]
-    B -->|Sim| C["Repetir monoteste apos 5 a 7 dias"]
-    B -->|Nao| D["Pedir sorologia EBV: VCA IgM, VCA IgG, EBNA"]
-    D --> E["VCA IgM + e EBNA negativo<br/>= infeccao aguda por EBV"]
-    D --> F["EBNA reagente<br/>= infeccao passada, procurar outra causa"]
+    A["Monoteste negativo<br/>mas quadro compatível"] --> B["Doenca com menos de 7 dias?"]
+    B -->|Sim| C["Repetir monoteste após 5 a 7 dias"]
+    B -->|Não| D["Pedir sorologia EBV: VCA IgM, VCA IgG, EBNA"]
+    D --> E["VCA IgM + e EBNA negativo<br/>= infecção aguda por EBV"]
+    D --> F["EBNA reagente<br/>= infecção passada, procurar outra causa"]
     F --> G["Testar HIV com carga viral<br/>CMV e toxoplasmose"]
     A --> H["Adenomegalia endurecida, fixa<br/>ou persistente por mais de 6 semanas?"]
-    H -->|Sim| I["Encaminhar para biopsia<br/>afastar linfoma"]
+    H -->|Sim| I["Encaminhar para biópsia<br/>afastar linfoma"]
     class H critical;
     class E action;
     class G action;
@@ -29590,16 +29590,16 @@ O quadro de profilaxias primárias do PCDT detalha as opções: primeira escolha
 
 \`\`\`mermaid
 flowchart TD
-    A["HIV com sintoma neurologico novo<br/>checar CD4 e profilaxia com SMX-TMP"] --> B["RM ou TC com contraste"]
-    B --> C["Multiplas lesoes com realce anelar<br/>em ganglios da base?"]
-    C -->|Sim| D["IgG anti-toxo positivo<br/>iniciar tratamento empirico"]
-    D --> E["Sulfadiazina 1000-1500 mg 6/6h<br/>+ pirimetamina 200 mg ataque depois 50-75 mg/dia<br/>+ acido folinico 10-25 mg/dia"]
-    E --> F["Melhora clinica em 7-14 dias?"]
-    F -->|Sim| G["Completar 6 semanas<br/>depois profilaxia secundaria + TARV"]
-    F -->|Nao| H["Biopsia estereotaxica<br/>pensar linfoma primario do SNC"]
-    C -->|Lesao unica periventricular<br/>IgG negativo| H
-    A --> I["Rebaixamento, estado de mal<br/>ou desvio de linha media?"]
-    I -->|Sim| J["UTI + dexametasona<br/>avaliacao neurocirurgica"]
+    A["HIV com sintoma neurológico novo<br/>checar CD4 e profilaxia com SMX-TMP"] --> B["RM ou TC com contraste"]
+    B --> C["Múltiplas lesões com realce anelar<br/>em gânglios da base?"]
+    C -->|Sim| D["IgG anti-toxo positivo<br/>iniciar tratamento empírico"]
+    D --> E["Sulfadiazina 1000-1500 mg 6/6h<br/>+ pirimetamina 200 mg ataque depois 50-75 mg/dia<br/>+ ácido folínico 10-25 mg/dia"]
+    E --> F["Melhora clínica em 7-14 dias?"]
+    F -->|Sim| G["Completar 6 semanas<br/>depois profilaxia secundária + TARV"]
+    F -->|Não| H["Biópsia estereotáxica<br/>pensar linfoma primário do SNC"]
+    C -->|Lesão única periventricular<br/>IgG negativo| H
+    A --> I["Rebaixamento, estado de mal<br/>ou desvio de linha média?"]
+    I -->|Sim| J["UTI + dexametasona<br/>avaliação neurocirúrgica"]
     class C critical;
     class I critical;
     class E action;
@@ -29610,13 +29610,13 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Escolha do esquema de ataque"] --> B["Ha alergia ou intolerancia a sulfa?"]
-    B -->|Nao| C["SMX-TMP 25 mg/kg de SMX 2x/dia<br/>ou sulfadiazina + pirimetamina + ac. folinico"]
-    B -->|Sim| D["Reacao previa foi grave<br/>Stevens-Johnson, NET ou DRESS?"]
-    D -->|Nao| E["Considerar dessensibilizacao ao SMX-TMP"]
-    D -->|Sim| F["Clindamicina 600 mg 6/6h<br/>+ pirimetamina + acido folinico"]
-    F --> G["Atencao: esquema NAO cobre pneumocistose<br/>e no Brasil faltam dapsona, pentamidina e atovaquona"]
-    C --> H["Iniciar TARV em ate 7 dias<br/>individualizar se efeito de massa"]
+    A["Escolha do esquema de ataque"] --> B["Há alergia ou intolerância a sulfa?"]
+    B -->|Não| C["SMX-TMP 25 mg/kg de SMX 2x/dia<br/>ou sulfadiazina + pirimetamina + ac. folínico"]
+    B -->|Sim| D["Reação prévia foi grave<br/>Stevens-Johnson, NET ou DRESS?"]
+    D -->|Não| E["Considerar dessensibilização ao SMX-TMP"]
+    D -->|Sim| F["Clindamicina 600 mg 6/6h<br/>+ pirimetamina + ácido folínico"]
+    F --> G["Atenção: esquema NAO cobre pneumocistose<br/>e no Brasil faltam dapsona, pentamidina e atovaquona"]
+    C --> H["Iniciar TARV em até 7 dias<br/>individualizar se efeito de massa"]
     class D critical;
     class G critical;
     class C action;
@@ -29863,14 +29863,14 @@ Como diferenciar SIRI de recidiva: na **SIRI paradoxal as culturas são repetida
 
 \`\`\`mermaid
 flowchart TD
-    A["HIV com CD4 baixo<br/>cefaleia subaguda progressiva"] --> B["CrAg serico e puncao lombar<br/>MEDIR pressao de abertura"]
-    B --> C["Pressao de abertura maior ou igual a 25 cmH2O?"]
-    C -->|Sim| D["Puncao de alivio: retirar 20-30 mL<br/>repetir diariamente ate estabilizar"]
-    C -->|Nao| E["Reavaliar pressao se sintomas persistirem"]
+    A["HIV com CD4 baixo<br/>cefaleia subaguda progressiva"] --> B["CrAg sérico e punção lombar<br/>MEDIR pressão de abertura"]
+    B --> C["Pressão de abertura maior ou igual a 25 cmH2O?"]
+    C -->|Sim| D["Punção de alívio: retirar 20-30 mL<br/>repetir diariamente até estabilizar"]
+    C -->|Não| E["Reavaliar pressão se sintomas persistirem"]
     B --> F["CrAg, tinta da China ou cultura positivos"]
-    F --> G["Inducao por pelo menos 2 semanas<br/>Anfo B lipossomal 3 mg/kg/dia<br/>+ flucitosina 100 mg/kg/dia 6/6h"]
-    G --> H["Consolidacao: fluconazol 400-800 mg/dia por 8 semanas"]
-    H --> I["Manutencao: fluconazol 200 mg/dia<br/>TARV so apos 4-6 semanas"]
+    F --> G["Indução por pelo menos 2 semanas<br/>Anfo B lipossomal 3 mg/kg/dia<br/>+ flucitosina 100 mg/kg/dia 6/6h"]
+    G --> H["Consolidação: fluconazol 400-800 mg/dia por 8 semanas"]
+    H --> I["Manutenção: fluconazol 200 mg/dia<br/>TARV so após 4-6 semanas"]
     class C critical;
     class D action;
     class G action;
@@ -29880,12 +29880,12 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["PVHIV com CD4 menor ou igual a 200<br/>sem historico de criptococose"] --> B["LF-CrAg em plasma ou sangue total"]
-    B -->|Nao reagente| C["Sem tratamento antifungico<br/>otimizar TARV"]
-    B -->|Reagente| D["Puncao lombar mesmo sem sintoma<br/>+ hemocultura"]
-    D -->|Meningite confirmada| E["Tratar como meningite criptococica<br/>TARV so apos 4-6 semanas"]
+    A["PVHIV com CD4 menor ou igual a 200<br/>sem histórico de criptococose"] --> B["LF-CrAg em plasma ou sangue total"]
+    B -->|Não reagente| C["Sem tratamento antifúngico<br/>otimizar TARV"]
+    B -->|Reagente| D["Punção lombar mesmo sem sintoma<br/>+ hemocultura"]
+    D -->|Meningite confirmada| E["Tratar como meningite criptocócica<br/>TARV so após 4-6 semanas"]
     D -->|Sem meningite| F["Preemptivo: fluconazol 800 mg/dia 2 semanas<br/>depois 400 mg/dia por 8 semanas"]
-    F --> G["TARV pode iniciar apos<br/>as 2 primeiras semanas de antifungico"]
+    F --> G["TARV pode iniciar após<br/>as 2 primeiras semanas de antifúngico"]
     class D critical;
     class E action;
     class F action;
@@ -30139,16 +30139,16 @@ Um benefício adicional que vale registrar na alta: **essa mesma profilaxia cobr
 
 \`\`\`mermaid
 flowchart TD
-    A["Imunossuprimido com dispneia progressiva<br/>tosse seca e febre"] --> B["Oximetria em repouso e ao esforco<br/>gasometria arterial em ar ambiente"]
-    B --> C["TC de torax: vidro fosco difuso peri-hilar"]
-    C --> D["Escarro induzido ou LBA<br/>imunofluorescencia ou PCR + LDH"]
+    A["Imunossuprimido com dispneia progressiva<br/>tosse seca e febre"] --> B["Oximetria em repouso e ao esforço<br/>gasometria arterial em ar ambiente"]
+    B --> C["TC de tórax: vidro fosco difuso peri-hilar"]
+    C --> D["Escarro induzido ou LBA<br/>imunofluorescência ou PCR + LDH"]
     D --> E["Iniciar SMX-TMP 15-20 mg/kg/dia de TMP<br/>6/6h ou 8/8h por 21 dias"]
     E --> F["PaO2 menor que 70 mmHg<br/>ou gradiente A-a maior ou igual a 35?"]
     F -->|Sim| G["Prednisona 40 mg 12/12h D1-5<br/>40 mg/dia D6-10, 20 mg/dia D11-21"]
-    F -->|Nao| H["Sem corticoide<br/>reavaliar oximetria diariamente"]
-    G --> I["Insuficiencia respiratoria ou pneumotorax?"]
-    I -->|Sim| J["UTI com suporte ventilatorio"]
-    E --> K["Iniciar TARV em ate 2 semanas<br/>depois profilaxia com SMX-TMP 800/160 mg/dia"]
+    F -->|Não| H["Sem corticoide<br/>reavaliar oximetria diariamente"]
+    G --> I["Insuficiência respiratória ou pneumotorax?"]
+    I -->|Sim| J["UTI com suporte ventilatório"]
+    E --> K["Iniciar TARV em até 2 semanas<br/>depois profilaxia com SMX-TMP 800/160 mg/dia"]
     class F critical;
     class I critical;
     class E action;
@@ -30159,12 +30159,12 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Paciente piora entre o 4o e o 8o dia<br/>de SMX-TMP"] --> B["Ha piora nas primeiras 48-72h?"]
-    B -->|Sim| C["Esperado pela lise do agente<br/>nao trocar esquema, garantir corticoide"]
-    B -->|Nao| D["Revisar 4 causas de falha"]
-    D --> E["Dose insuficiente ou<br/>corticoide nao iniciado"]
-    D --> F["Diagnostico alternativo ou adicional<br/>tuberculose, bacteria, Kaposi"]
-    D --> G["Pneumotorax ou<br/>sobrecarga hidrica"]
+    A["Paciente piora entre o 4º e o 8º dia<br/>de SMX-TMP"] --> B["Há piora nas primeiras 48-72h?"]
+    B -->|Sim| C["Esperado pela lise do agente<br/>não trocar esquema, garantir corticoide"]
+    B -->|Não| D["Revisar 4 causas de falha"]
+    D --> E["Dose insuficiente ou<br/>corticoide não iniciado"]
+    D --> F["Diagnóstico alternativo ou adicional<br/>tuberculose, bactéria, Kaposi"]
+    D --> G["Pneumotorax ou<br/>sobrecarga hídrica"]
     D --> H["Toxicidade da droga:<br/>rash grave, hiperK, citopenia"]
     F --> I["Repetir imagem, culturas<br/>e teste molecular para TB"]
     E --> J["Corrigir dose e iniciar corticoide"]
@@ -30377,13 +30377,13 @@ A manutenção pode ser encurtada para **3 a 6 meses** em situações específic
 
 \`\`\`mermaid
 flowchart TD
-    A["HIV avancado com febre prolongada<br/>pancitopenia e hepatoesplenomegalia"] --> B["Lesoes cutaneas moluscoides?<br/>biopsiar - alto rendimento"]
-    A --> C["Antigeno de Histoplasma urina/soro<br/>+ mielograma/biopsia + culturas"]
-    C --> D["Doenca grave: instabilidade,<br/>IRpA, disfuncao organica ou SNC?"]
+    A["HIV avancado com febre prolongada<br/>pancitopenia e hepatoesplenomegalia"] --> B["Lesões cutâneas moluscoides?<br/>biopsiar - alto rendimento"]
+    A --> C["Antígeno de Histoplasma urina/soro<br/>+ mielograma/biópsia + culturas"]
+    C --> D["Doenca grave: instabilidade,<br/>IRpA, disfunção orgânica ou SNC?"]
     D -->|Sim| E["Internar: Anfo B lipossomal 3 mg/kg/dia<br/>5 mg/kg/dia se SNC, por 2 semanas"]
-    D -->|Nao| F["Itraconazol 200 mg 8/8h por 3 dias<br/>depois 200 mg 12/12h"]
-    E --> G["Consolidacao: itraconazol 200 mg 12/12h<br/>por pelo menos 12 meses"]
-    G --> H["TARV precoce + dosagem serica do itraconazol<br/>suspender se CD4 acima de 150 por 6 meses"]
+    D -->|Não| F["Itraconazol 200 mg 8/8h por 3 dias<br/>depois 200 mg 12/12h"]
+    E --> G["Consolidação: itraconazol 200 mg 12/12h<br/>por pelo menos 12 meses"]
+    G --> H["TARV precoce + dosagem sérica do itraconazol<br/>suspender se CD4 acima de 150 por 6 meses"]
     A --> I["Sempre pesquisar tuberculose<br/>e leishmaniose visceral em paralelo"]
     class D critical;
     class E action;
@@ -30605,14 +30605,14 @@ No SUS, os dois pilares do tratamento ambulatorial — **itraconazol e cotrimoxa
 
 \`\`\`mermaid
 flowchart TD
-    A["Trabalhador rural, tabagista<br/>tosse cronica + lesao mucosa"] --> B["Exame direto de escarro ou raspado<br/>procurar roda de leme"]
-    B --> C["Confirmado - avaliar extensao<br/>TC de torax, laringoscopia, sorologia"]
-    C --> D["Forma grave? desnutricao, IRpA,<br/>SNC, adrenal, sem via oral"]
+    A["Trabalhador rural, tabagista<br/>tosse cronica + lesão mucosa"] --> B["Exame direto de escarro ou raspado<br/>procurar roda de leme"]
+    B --> C["Confirmado - avaliar extensão<br/>TC de tórax, laringoscopia, sorologia"]
+    C --> D["Forma grave? desnutrição, IRpA,<br/>SNC, adrenal, sem via oral"]
     D -->|Sim| E["Internar: anfotericina B<br/>lipossomal 3 mg/kg/dia ou SMX-TMP IV"]
-    D -->|Nao| F["Forma leve: itraconazol 200 mg/dia<br/>9 a 12 meses"]
+    D -->|Não| F["Forma leve: itraconazol 200 mg/dia<br/>9 a 12 meses"]
     D -->|Moderada| G["Itraconazol 200 mg 12/12h<br/>12 a 18 meses"]
-    E --> H["Apos melhora: manutencao VO prolongada<br/>itraconazol ou SMX-TMP"]
-    F --> I["Criterios de cura: clinico, radiologico<br/>e sorologico em 2 amostras com 6 meses"]
+    E --> H["Após melhora: manutenção VO prolongada<br/>itraconazol ou SMX-TMP"]
+    F --> I["Criterios de cura: clínico, radiológico<br/>e sorológico em 2 amostras com 6 meses"]
     G --> I
     H --> I
     class D critical;
@@ -30628,15 +30628,15 @@ flowchart TD
 flowchart TD
     A["PCM confirmada - escolher droga"] --> B["Tratando tuberculose junto<br/>ou usando rifampicina?"]
     B -->|Sim| C["Preferir SMX-TMP<br/>evitar itraconazol"]
-    B -->|Nao| D["Consegue engolir e absorver<br/>via oral?"]
-    D -->|Nao| E["Via venosa: anfotericina B<br/>ou SMX-TMP IV"]
+    B -->|Não| D["Consegue engolir e absorver<br/>via oral?"]
+    D -->|Não| E["Via venosa: anfotericina B<br/>ou SMX-TMP IV"]
     D -->|Sim| F["Itraconazol - primeira escolha"]
     A --> G["Acometimento do SNC?"]
     G -->|Sim| H["SMX-TMP em dose alta<br/>alternativa fluconazol ou voriconazol"]
     A --> I["Gestante?"]
     I -->|Sim| J["Anfotericina B<br/>evitar azol e sulfametoxazol"]
     A --> K["HIV/aids?"]
-    K -->|Sim| L["Anfotericina B na fase inicial<br/>profilaxia secundaria ate CD4 recuperar"]
+    K -->|Sim| L["Anfotericina B na fase inicial<br/>profilaxia secundária até CD4 recuperar"]
     class G critical;
     class I critical;
     class C action;
@@ -30818,15 +30818,15 @@ Não há evidência suficiente de superioridade de uma droga sobre a outra, embo
 
 \`\`\`mermaid
 flowchart TD
-    A["Trismo, rigidez e espasmos<br/>com consciencia preservada"] --> B["Suspeita clinica de tetano"]
+    A["Trismo, rigidez e espasmos<br/>com consciência preservada"] --> B["Suspeita clínica de tetano"]
     B --> C["Internar em ambiente calmo<br/>e notificar no SINAN"]
-    C --> D["Imunoglobulina antitetanica<br/>para neutralizar a toxina"]
-    D --> E["Desbridar o ferimento<br/>apos a imunoglobulina"]
-    E --> F["Metronidazol<br/>+ benzodiazepinico em dose alta"]
-    F --> G["Ha espasmos refratarios<br/>ou disautonomia?"]
-    G -->|Sim| H["UTI: bloqueio neuromuscular,<br/>ventilacao e magnesio"]
-    G -->|Nao| I["Manter suporte e monitorizacao"]
-    H --> J["Iniciar ou completar vacinacao<br/>antes da alta"]
+    C --> D["Imunoglobulina antitetânica<br/>para neutralizar a toxina"]
+    D --> E["Desbridar o ferimento<br/>após a imunoglobulina"]
+    E --> F["Metronidazol<br/>+ benzodiazepínico em dose alta"]
+    F --> G["Há espasmos refratários<br/>ou disautonomia?"]
+    G -->|Sim| H["UTI: bloqueio neuromuscular,<br/>ventilação e magnésio"]
+    G -->|Não| I["Manter suporte e monitorização"]
+    H --> J["Iniciar ou completar vacinação<br/>antes da alta"]
     I --> J
     class B critical;
     class G critical;
@@ -30875,15 +30875,15 @@ Em todos os casos, a conduta local é a mesma: desinfectar, lavar com soro fisio
 
 \`\`\`mermaid
 flowchart TD
-    A["Ferimento no pronto-socorro"] --> B["Classificar: risco minimo<br/>ou alto risco"]
-    B --> C["Checar caderneta:<br/>numero de doses e data da ultima"]
+    A["Ferimento no pronto-socorro"] --> B["Classificar: risco mínimo<br/>ou alto risco"]
+    B --> C["Checar caderneta:<br/>número de doses e data da última"]
     C --> D["Menos de 3 doses ou incerta?"]
     D -->|Sim| E["Vacinar e agendar esquema<br/>IGHAT ou SAT se alto risco"]
-    D -->|Nao| F["Ultima dose ha menos de 5 anos?"]
+    D -->|Não| F["Última dose há menos de 5 anos?"]
     F -->|Sim| G["Apenas cuidados locais<br/>sem vacina e sem soro"]
-    F -->|Nao| H["Alto risco ou mais de 10 anos:<br/>aplicar um reforco"]
+    F -->|Não| H["Alto risco ou mais de 10 anos:<br/>aplicar um reforço"]
     H --> I["Imunodeprimido, desnutrido<br/>grave ou idoso?"]
-    I -->|Sim| J["Alem do reforco,<br/>indicar IGHAT ou SAT"]
+    I -->|Sim| J["Além do reforço,<br/>indicar IGHAT ou SAT"]
     class D critical;
     class I critical;
     class E action;
@@ -31052,9 +31052,9 @@ A duração padrão é de **7 dias** para a maioria dos pacientes com boa respos
 \`\`\`mermaid
 flowchart TD
     A["Suspeita de PAH/PAV<br/>infiltrado novo + sinais infecciosos"] --> B["Colher aspirado traqueal ou LBA<br/>+ hemoculturas"]
-    B --> C["Ha risco de MDR ou choque?"]
+    B --> C["Há risco de MDR ou choque?"]
     C -->|Sim| D["Amplo espectro antipseudomonas<br/>+ cobertura de MRSA"]
-    C -->|Nao| E["Espectro guiado pelo antibiograma local"]
+    C -->|Não| E["Espectro guiado pelo antibiograma local"]
     D --> F["Reavaliar em 48-72 h com a cultura"]
     E --> F
     F --> G["Descalonar e completar cerca de 7 dias"]
@@ -31064,13 +31064,13 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Cultura respiratoria em 48-72 h"] --> B["Cultura negativa e paciente melhorou?"]
-    B -->|Sim| C["Suspender antibiotico<br/>procurar foco alternativo"]
-    B -->|Nao| D["Germe identificado com antibiograma"]
-    D --> E["Sensivel a droga de espectro estreito?"]
+    A["Cultura respiratória em 48-72 h"] --> B["Cultura negativa e paciente melhorou?"]
+    B -->|Sim| C["Suspender antibiótico<br/>procurar foco alternativo"]
+    B -->|Não| D["Germe identificado com antibiograma"]
+    D --> E["Sensível a droga de espectro estreito?"]
     E -->|Sim| F["Descalonar para monoterapia dirigida"]
-    E -->|Nao| G["Carbapenemase ou nao fermentador resistente"]
-    G --> H["Definir esquema com infectologia<br/>conforme mecanismo de resistencia"]
+    E -->|Não| G["Carbapenemase ou não fermentador resistente"]
+    G --> H["Definir esquema com infectologia<br/>conforme mecanismo de resistência"]
     F --> I["Completar cerca de 7 dias"]
     H --> I
     class G critical;
@@ -31281,14 +31281,14 @@ Não esqueça do suporte não antimicrobiano: proteção de via aérea quando o 
 
 \`\`\`mermaid
 flowchart TD
-    A["Febre alta, exantema difuso<br/>e hipotensao"] --> B["Suspeitar de choque toxico"]
-    B --> C["Buscar o foco<br/>tampao, ferida, partes moles"]
-    C --> D["Ressuscitacao volemica<br/>noradrenalina e UTI"]
-    D --> E["Betalactamico + clindamicina<br/>vancomicina se MRSA"]
-    E --> F["Ha infeccao necrosante<br/>de partes moles?"]
-    F -->|Sim| G["Desbridamento cirurgico urgente"]
-    F -->|Nao| H["Remover corpo estranho<br/>e drenar o foco"]
-    G --> I["Considerar IVIG no TSS estreptococico grave"]
+    A["Febre alta, exantema difuso<br/>e hipotensão"] --> B["Suspeitar de choque toxico"]
+    B --> C["Buscar o foco<br/>tampão, ferida, partes moles"]
+    C --> D["Ressuscitação volêmica<br/>noradrenalina e UTI"]
+    D --> E["Betalactâmico + clindamicina<br/>vancomicina se MRSA"]
+    E --> F["Há infecção necrosante<br/>de partes moles?"]
+    F -->|Sim| G["Desbridamento cirúrgico urgente"]
+    F -->|Não| H["Remover corpo estranho<br/>e drenar o foco"]
+    G --> I["Considerar IVIG no TSS estreptocócico grave"]
     H --> I
     class B critical;
     class F critical;
@@ -31299,14 +31299,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Febre + exantema + hipotensao"] --> B["Ha foco bacteriano<br/>ferida, tampao, partes moles?"]
+    A["Febre + exantema + hipotensão"] --> B["Há foco bacteriano<br/>ferida, tampão, partes moles?"]
     B -->|Sim| C["Tratar como TSS<br/>ATB + antitoxina + controle do foco"]
-    B -->|Nao| D["Exantema petequial<br/>ou purpurico?"]
+    B -->|Não| D["Exantema petequial<br/>ou purpúrico?"]
     D -->|Sim| E["Cobrir meningococcemia<br/>ceftriaxona imediata"]
-    D -->|Nao| F["Historia epidemiologica"]
-    F -->|Carrapato, palmas e plantas| G["Doxiciclina empirica<br/>febre maculosa"]
-    F -->|Enchente, mialgia, ictericia| H["Investigar leptospirose"]
-    F -->|Area endemica, plaquetopenia| I["Investigar dengue grave"]
+    D -->|Não| F["História epidemiológica"]
+    F -->|Carrapato, palmas e plantas| G["Doxiciclina empírica<br/>febre maculosa"]
+    F -->|Enchente, mialgia, icterícia| H["Investigar leptospirose"]
+    F -->|Área endêmica, plaquetopenia| I["Investigar dengue grave"]
     class E critical;
     class G critical;
     class C action;
@@ -31549,12 +31549,12 @@ Oriente o paciente com clareza sobre três pontos que sustentam a adesão: o tra
 
 \`\`\`mermaid
 flowchart TD
-    A["Suspeita de TB<br/>fora do pulmao"] --> B["Coletar material do sitio<br/>TRM + cultura + histopatologia + ADA"]
-    A --> C["RX de torax e escarro<br/>sempre"]
-    B --> D["Sitio meningeo ou pericardico?"]
-    D -->|Sim| E["RHZE + corticoide<br/>nao aguardar confirmacao"]
-    D -->|Nao| F["RHZE por 2 meses<br/>+ RH por 4 meses"]
-    E --> G["Meningea ou ossea:<br/>manutencao ate 12 meses"]
+    A["Suspeita de TB<br/>fora do pulmao"] --> B["Coletar material do sítio<br/>TRM + cultura + histopatologia + ADA"]
+    A --> C["RX de tórax e escarro<br/>sempre"]
+    B --> D["Sítio meníngeo ou pericárdico?"]
+    D -->|Sim| E["RHZE + corticoide<br/>não aguardar confirmação"]
+    D -->|Não| F["RHZE por 2 meses<br/>+ RH por 4 meses"]
+    E --> G["Meníngea ou óssea:<br/>manutenção até 12 meses"]
     G --> H["Notificar, TDO, testar HIV"]
     F --> H
     class E critical;
@@ -31565,12 +31565,12 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Piora clinica em<br/>vigencia do tratamento"] --> B["Ictericia ou transaminases<br/>muito elevadas?"]
+    A["Piora clínica em<br/>vigência do tratamento"] --> B["Icterícia ou transaminases<br/>muito elevadas?"]
     B -->|Sim| C["Suspender o esquema<br/>e reintroduzir escalonado"]
-    B -->|Nao| D["TARV iniciada ha poucas<br/>semanas ou linfonodo crescendo?"]
-    D -->|Sim| E["Reacao paradoxal ou SIRI:<br/>manter esquema e considerar corticoide"]
-    D -->|Nao| F["Rever adesao e<br/>solicitar cultura com sensibilidade"]
-    F --> G["Suspeita de resistencia:<br/>encaminhar a referencia"]
+    B -->|Não| D["TARV iniciada há poucas<br/>semanas ou linfonodo crescendo?"]
+    D -->|Sim| E["Reação paradoxal ou SIRI:<br/>manter esquema e considerar corticoide"]
+    D -->|Não| F["Rever adesão e<br/>solicitar cultura com sensibilidade"]
+    F --> G["Suspeita de resistência:<br/>encaminhar a referência"]
     class C critical;
     class G critical;
     class E action;
@@ -31774,14 +31774,14 @@ O prognóstico melhora dramaticamente com dois fatores sob controle do serviço:
 
 \`\`\`mermaid
 flowchart TD
-    A["CD4 baixo com sintomas"] --> B["Sintoma neurologico?"]
-    B -->|Sim| C["TC de cranio e puncao lombar<br/>com pressao de abertura"]
-    B -->|Nao| D["Hipoxemia ou dispneia<br/>progressiva?"]
-    C --> E["Antigeno criptococico positivo<br/>ou lesoes com realce anelar"]
+    A["CD4 baixo com sintomas"] --> B["Sintoma neurológico?"]
+    B -->|Sim| C["TC de crânio e punção lombar<br/>com pressão de abertura"]
+    B -->|Não| D["Hipoxemia ou dispneia<br/>progressiva?"]
+    C --> E["Antígeno criptocócico positivo<br/>ou lesões com realce anelar"]
     E --> F["Tratar criptococose ou toxoplasmose<br/>adiar TARV se meningite"]
     D -->|Sim| G["Tratar pneumocistose<br/>SMX-TMP 21 dias"]
     G --> H["Hipoxemia significativa:<br/>associar corticoide"]
-    D -->|Nao| I["Investigar TB, MAC, CMV"]
+    D -->|Não| I["Investigar TB, MAC, CMV"]
     F --> J["Iniciar ou otimizar TARV<br/>e profilaxias conforme CD4"]
     H --> J
     I --> J
@@ -31794,12 +31794,12 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Piora apos inicio<br/>da TARV"] --> B["Carga viral em queda<br/>e boa adesao?"]
-    B -->|Nao| C["Investigar falha, ma adesao<br/>ou nova infeccao"]
-    B -->|Sim| D["Sintomas da mesma<br/>infeccao ja tratada?"]
-    D -->|Sim| E["SIRI paradoxal:<br/>manter TARV e tratar inflamacao"]
-    D -->|Nao| F["SIRI desmascarada:<br/>procurar infeccao oculta"]
-    E --> G["Sinal de compressao<br/>ou risco de vida?"]
+    A["Piora após início<br/>da TARV"] --> B["Carga viral em queda<br/>e boa adesão?"]
+    B -->|Não| C["Investigar falha, má adesão<br/>ou nova infecção"]
+    B -->|Sim| D["Sintomas da mesma<br/>infecção ja tratada?"]
+    D -->|Sim| E["SIRI paradoxal:<br/>manter TARV e tratar inflamação"]
+    D -->|Não| F["SIRI desmascarada:<br/>procurar infecção oculta"]
+    E --> G["Sinal de compressão<br/>ou risco de vida?"]
     G -->|Sim| H["Associar corticoide<br/>e internar"]
     class C critical;
     class H critical;
@@ -31971,10 +31971,10 @@ Medidas de controle são tão importantes quanto: higiene das mãos com água e 
 
 \`\`\`mermaid
 flowchart TD
-    A["Ictericia aguda com<br/>transaminases muito altas"] --> B["Anti-HAV IgM reagente"]
+    A["Icterícia aguda com<br/>transaminases muito altas"] --> B["Anti-HAV IgM reagente"]
     B --> C["Encefalopatia ou<br/>INR alargado?"]
     C -->|Sim| D["Internar e acionar<br/>centro de transplante"]
-    C -->|Nao| E["Suporte domiciliar<br/>suspender alcool e hepatotoxicos"]
+    C -->|Não| E["Suporte domiciliar<br/>suspender alcool e hepatotóxicos"]
     E --> F["Reavaliar em dias<br/>com INR e bilirrubinas"]
     F --> G["Notificar, vacinar contatos<br/>orientar higiene"]
     class D critical;
@@ -31986,12 +31986,12 @@ flowchart TD
 \`\`\`mermaid
 flowchart TD
     A["Contato de caso confirmado<br/>de hepatite A"] --> B["Ja teve hepatite A<br/>ou tem esquema vacinal?"]
-    B -->|Sim| C["Imune: apenas orientar<br/>higiene e reforcar saneamento"]
-    B -->|Nao ou desconhecido| D["Suscetivel"]
+    B -->|Sim| C["Imune: apenas orientar<br/>higiene e reforçar saneamento"]
+    B -->|Não ou desconhecido| D["Suscetível"]
     D --> E["Lactente muito pequeno,<br/>imunossuprimido ou hepatopata?"]
-    E -->|Nao| F["Vacinar o mais precoce<br/>possivel apos a exposicao"]
-    E -->|Sim| G["Avaliar imunoglobulina<br/>alem da vacina"]
-    F --> H["Afastar manipulador de alimentos<br/>e crianca de creche se sintomatico"]
+    E -->|Não| F["Vacinar o mais precoce<br/>possível após a exposição"]
+    E -->|Sim| G["Avaliar imunoglobulina<br/>além da vacina"]
+    F --> H["Afastar manipulador de alimentos<br/>e criança de creche se sintomático"]
     G --> H
     class E critical;
     class F action;
@@ -32221,10 +32221,10 @@ Manifestações extra-hepáticas mediadas por imunocomplexos: poliarterite nodos
 
 \`\`\`mermaid
 flowchart TD
-    A["Ictericia e transaminases<br/>muito elevadas"] --> B["HBsAg e anti-HBc IgM<br/>reagentes"]
+    A["Icterícia e transaminases<br/>muito elevadas"] --> B["HBsAg e anti-HBc IgM<br/>reagentes"]
     B --> C["INR alargado ou<br/>encefalopatia?"]
     C -->|Sim| D["Internar e acionar<br/>centro de transplante"]
-    C -->|Nao| E["Suporte ambulatorial<br/>suspender hepatotoxicos"]
+    C -->|Não| E["Suporte ambulatorial<br/>suspender hepatotóxicos"]
     D --> F["Considerar antiviral<br/>tenofovir ou entecavir"]
     E --> G["Repetir HBsAg em 6 meses"]
     G --> H["HBsAg ainda reagente:<br/>hepatite B cronica"]
@@ -32237,11 +32237,11 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Exposicao sexual ou<br/>percutanea a fonte HBsAg positiva"] --> B["Pessoa exposta ja tem<br/>anti-HBs reagente?"]
-    B -->|Sim| C["Nenhuma profilaxia<br/>necessaria"]
-    B -->|Nao| D["Aplicar vacina e<br/>imunoglobulina o quanto antes"]
-    D --> E["Completar o esquema<br/>vacinal de tres doses"]
-    E --> F["Dosar anti-HBs apos<br/>o esquema completo"]
+    A["Exposição sexual ou<br/>percutânea a fonte HBsAg positiva"] --> B["Pessoa exposta ja tem<br/>anti-HBs reagente?"]
+    B -->|Sim| C["Nenhuma profilaxia<br/>necessária"]
+    B -->|Não| D["Aplicar vacina e<br/>imunoglobulina o quanto antes"]
+    D --> E["Completar o esquema<br/>vacinal de três doses"]
+    E --> F["Dosar anti-HBs após<br/>o esquema completo"]
     F --> G["Sem resposta:<br/>revacinar e reavaliar"]
     class D critical;
     class C action;
@@ -32442,10 +32442,10 @@ flowchart TD
     A["HBsAg reagente<br/>por mais de 6 meses"] --> B["HBeAg, HBV-DNA, ALT<br/>elastografia ou APRI"]
     B --> C["Cirrose presente?"]
     C -->|Sim| D["Tratar sempre<br/>rastreio de varizes e CHC"]
-    C -->|Nao| E["HBV-DNA elevado com ALT alta<br/>ou fibrose significativa?"]
+    C -->|Não| E["HBV-DNA elevado com ALT alta<br/>ou fibrose significativa?"]
     E -->|Sim| F["Iniciar tenofovir<br/>ou entecavir"]
-    E -->|Nao| G["Seguimento periodico<br/>ALT e HBV-DNA"]
-    G --> H["Imunossupressao programada<br/>ou gestante com carga alta?"]
+    E -->|Não| G["Seguimento periódico<br/>ALT e HBV-DNA"]
+    G --> H["Imunossupressão programada<br/>ou gestante com carga alta?"]
     H -->|Sim| F
     F --> I["USG e AFP semestrais<br/>vacinar contatos"]
     D --> I
@@ -32457,15 +32457,15 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Candidato a quimioterapia,<br/>biologico ou transplante"] --> B["Pedir HBsAg, anti-HBc total<br/>e anti-HBs"]
-    B -->|Todos negativos| C["Suscetivel: vacinar<br/>4 doses em dobro antes do inicio"]
-    B -->|HBsAg reagente| D["Avaliar criterio de tratamento"]
+    A["Candidato a quimioterapia,<br/>biológico ou transplante"] --> B["Pedir HBsAg, anti-HBc total<br/>e anti-HBs"]
+    B -->|Todos negativos| C["Suscetível: vacinar<br/>4 doses em dobro antes do início"]
+    B -->|HBsAg reagente| D["Avaliar critério de tratamento"]
     B -->|Apenas anti-HBc reagente| E["Dosar ALT e HBV-DNA"]
-    D -->|Preenche| F["Tratar com analogo<br/>TDF ou entecavir"]
-    D -->|Nao preenche| G["Risco alto ou moderado?"]
+    D -->|Preenche| F["Tratar com análogo<br/>TDF ou entecavir"]
+    D -->|Não preenche| G["Risco alto ou moderado?"]
     E --> G
-    G -->|Sim| H["Profilaxia antiviral<br/>durante e apos a terapia"]
-    G -->|Nao| I["Monitorar durante e por<br/>12 meses apos o termino"]
+    G -->|Sim| H["Profilaxia antiviral<br/>durante e após a terapia"]
+    G -->|Não| I["Monitorar durante e por<br/>12 meses após o término"]
     class D critical;
     class G critical;
     class F action;
@@ -32641,14 +32641,14 @@ Antes de retratar, refaça a conta básica: o paciente tomou todos os comprimido
 \`\`\`mermaid
 flowchart TD
     A["Anti-HCV reagente"] --> B["Solicitar HCV-RNA"]
-    B --> C["RNA detectavel?"]
-    C -->|Nao| D["Infeccao passada<br/>ou resolvida"]
+    B --> C["RNA detectável?"]
+    C -->|Não| D["Infecção passada<br/>ou resolvida"]
     C -->|Sim| E["Estadiar fibrose<br/>elastografia, APRI ou FIB-4"]
-    E --> F["Rastrear HBsAg, anti-HBc, HIV<br/>revisar interacoes"]
+    E --> F["Rastrear HBsAg, anti-HBc, HIV<br/>revisar interações"]
     F --> G["Cirrose descompensada?"]
     G -->|Sim| H["Evitar inibidor de protease<br/>conduzir com especialista"]
-    G -->|Nao| I["DAA pangenotipico<br/>por 8 a 12 semanas"]
-    I --> J["HCV-RNA 12 semanas apos:<br/>confirmar cura"]
+    G -->|Não| I["DAA pangenotípico<br/>por 8 a 12 semanas"]
+    I --> J["HCV-RNA 12 semanas após:<br/>confirmar cura"]
     H --> J
     class H critical;
     class J action;
@@ -32659,12 +32659,12 @@ flowchart TD
 \`\`\`mermaid
 flowchart TD
     A["RVS12 confirmada"] --> B["Qual o estadiamento<br/>de fibrose?"]
-    B -->|F0 a F1| C["Alta com aconselhamento<br/>prevenir reinfeccao"]
+    B -->|F0 a F1| C["Alta com aconselhamento<br/>prevenir reinfecção"]
     B -->|F2 com fator de risco| D["Seguimento ambulatorial<br/>alcool, HIV, HBV, obesidade, diabetes"]
     B -->|F3 ou F4| E["NAO dar alta"]
     E --> F["USG semestral para CHC<br/>por tempo indefinido"]
     E -->|Se F4| G["Rastreio de varizes<br/>por endoscopia"]
-    C --> H["Retestar se exposicao<br/>continuada"]
+    C --> H["Retestar se exposição<br/>continuada"]
     class E critical;
     class F action;
     class G action;
@@ -32879,14 +32879,14 @@ Formas graves são frequentes nessa faixa: meningoencefalite, edema cerebral, he
 
 \`\`\`mermaid
 flowchart TD
-    A["Febre + poliartralgia intensa<br/>area com Aedes"] --> B["Dengue excluida?"]
-    B -->|Nao| C["Tratar pelo fluxograma da dengue<br/>paracetamol/dipirona, sem AINE nem AAS"]
+    A["Febre + poliartralgia intensa<br/>área com Aedes"] --> B["Dengue excluída?"]
+    B -->|Não| C["Tratar pelo fluxograma da dengue<br/>paracetamol/dipirona, sem AINE nem AAS"]
     B -->|Sim| D["Fase da doenca?"]
-    D -->|Aguda ate 14 dias| E["Analgesia escalonada<br/>opioide fraco se dor intensa"]
-    D -->|Subaguda 15 dias a 3 meses| F["AINE + fisioterapia<br/>prednisona 0,5 mg/kg/dia se refratario"]
+    D -->|Aguda até 14 dias| E["Analgesia escalonada<br/>opioide fraco se dor intensa"]
+    D -->|Subaguda 15 dias a 3 meses| F["AINE + fisioterapia<br/>prednisona 0,5 mg/kg/dia se refratário"]
     D -->|Cronica acima de 3 meses| G["Reumatologia<br/>hidroxicloroquina ou metotrexato"]
-    A --> H["Sinal neurologico, cardiaco,<br/>neonato ou comorbidade grave?"]
-    H -->|Sim| I["Internar e investigar forma atipica"]
+    A --> H["Sinal neurológico, cardíaco,<br/>neonato ou comorbidade grave?"]
+    H -->|Sim| I["Internar e investigar forma atípica"]
     class H critical;
     class C action;
     class E action;
@@ -32899,12 +32899,12 @@ O segundo eixo de decisão, na fase pós-aguda, é o padrão da dor:
 
 \`\`\`mermaid
 flowchart TD
-    P["Dor persistente apos 14 dias<br/>definir o padrao"] --> Q["Ha edema articular<br/>ou tenossinovite?"]
-    Q -->|Sim| R["Padrao inflamatorio<br/>prednisona 0,5 mg/kg/dia max 40 mg<br/>desmame 1/4 a cada 7 dias"]
-    Q -->|Nao| S["Padrao mecanico<br/>AINE por ate 4 semanas<br/>reavaliar em 10 dias"]
+    P["Dor persistente após 14 dias<br/>definir o padrão"] --> Q["Há edema articular<br/>ou tenossinovite?"]
+    Q -->|Sim| R["Padrão inflamatório<br/>prednisona 0,5 mg/kg/dia max 40 mg<br/>desmame 1/4 a cada 7 dias"]
+    Q -->|Não| S["Padrão mecânico<br/>AINE por até 4 semanas<br/>reavaliar em 10 dias"]
     P --> T["Aplicar DN4<br/>4 ou mais respostas positivas?"]
     T -->|Sim| U["Associar amitriptilina<br/>ou gabapentina"]
-    P --> V["Sintomas alem de 90 dias?"]
+    P --> V["Sintomas além de 90 dias?"]
     V -->|Sim| W["Hidroxicloroquina 6 mg/kg/dia<br/>reavaliar em 8 semanas"]
     W --> X["Falha: metotrexato 7,5-25 mg/semana<br/>rastrear HBV, HCV, HIV, TB"]
     class T critical;
@@ -33129,14 +33129,14 @@ Piora neurológica após 48 a 72 horas de tratamento adequado pede nova imagem: 
 
 \`\`\`mermaid
 flowchart TD
-    A["Febre, cefaleia<br/>rigidez de nuca ou confusao"] --> B["Ha rebaixamento, deficit focal,<br/>papiledema ou convulsao?"]
+    A["Febre, cefaleia<br/>rigidez de nuca ou confusão"] --> B["Há rebaixamento, déficit focal,<br/>papiledema ou convulsão?"]
     B -->|Sim| C["Colher hemoculturas<br/>dexametasona + ATB imediatos<br/>e depois TC antes da PL"]
-    B -->|Nao| D["Puncao lombar imediata<br/>apos hemoculturas"]
-    C --> E["Puncao lombar apos TC sem contraindicacao"]
+    B -->|Não| D["Punção lombar imediata<br/>após hemoculturas"]
+    C --> E["Punção lombar após TC sem contraindicação"]
     D --> F["Dexametasona 10 mg IV<br/>+ ceftriaxona 2 g IV 12/12h"]
     E --> F
     F --> G["Adicionar ampicilina se >50 anos,<br/>imunossuprimido ou gestante"]
-    G --> H["Isolamento, notificacao<br/>e quimioprofilaxia de contatos"]
+    G --> H["Isolamento, notificação<br/>e quimioprofilaxia de contatos"]
     class B critical;
     class C critical;
     class H action;
@@ -33146,14 +33146,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Liquor coletado"] --> B["Predominio de neutrofilos<br/>com glicose baixa?"]
+    A["Liquor coletado"] --> B["Predomínio de neutrófilos<br/>com glicose baixa?"]
     B -->|Sim| C["Manter esquema bacteriano<br/>e aguardar cultura"]
-    B -->|Nao| D["Predominio linfocitario"]
+    B -->|Não| D["Predomínio linfocitário"]
     D --> E["Glicose normal e bom estado geral"]
     D --> F["Glicose baixa e curso subagudo"]
-    E --> G["Provavel viral<br/>reavaliar em 48 h"]
+    E --> G["Provável viral<br/>reavaliar em 48 h"]
     F --> H["Investigar tuberculose<br/>e criptococo"]
-    C --> I["Ajustar ATB e duracao<br/>pelo agente identificado"]
+    C --> I["Ajustar ATB e duração<br/>pelo agente identificado"]
     H --> I
     class F critical;
     class I action;
@@ -33357,13 +33357,13 @@ A elevação do membro não é conselho genérico: ela reduz o edema que perpetu
 
 \`\`\`mermaid
 flowchart TD
-    A["Eritema, calor, edema e dor"] --> B["Dor desproporcional, necrose,<br/>bolha hemorragica ou crepitacao?"]
-    B -->|Sim| C["Suspeita de fascite necrosante<br/>avaliacao cirurgica imediata"]
-    B -->|Nao| D["Ha colecao ou abscesso?"]
-    D -->|Sim| E["Drenagem cirurgica<br/>+ cobertura de S. aureus"]
-    D -->|Nao| F["Sinais sistemicos ou falha oral?"]
+    A["Eritema, calor, edema e dor"] --> B["Dor desproporcional, necrose,<br/>bolha hemorrágica ou crepitação?"]
+    B -->|Sim| C["Suspeita de fascite necrosante<br/>avaliação cirúrgica imediata"]
+    B -->|Não| D["Há coleção ou abscesso?"]
+    D -->|Sim| E["Drenagem cirúrgica<br/>+ cobertura de S. aureus"]
+    D -->|Não| F["Sinais sistêmicos ou falha oral?"]
     F -->|Sim| G["Internar<br/>oxacilina ou cefazolina IV"]
-    F -->|Nao| H["Cefalexina 500 mg 6/6h ambulatorial<br/>elevar o membro"]
+    F -->|Não| H["Cefalexina 500 mg 6/6h ambulatorial<br/>elevar o membro"]
     class C critical;
     class H action;
     class G action;
@@ -33371,11 +33371,11 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Eritema em membro inferior"] --> B["E bilateral e simetrico?"]
+    A["Eritema em membro inferior"] --> B["E bilateral e simétrico?"]
     B -->|Sim| C["Pensar dermatite de estase<br/>elevar, comprimir, reavaliar"]
-    B -->|Nao| D["Ha febre ou porta de entrada?"]
-    D -->|Nao| E["Considerar TVP, gota,<br/>lipodermatoesclerose, contato"]
-    D -->|Sim| F["Celulite ou erisipela provavel"]
+    B -->|Não| D["Há febre ou porta de entrada?"]
+    D -->|Não| E["Considerar TVP, gota,<br/>lipodermatoesclerose, contato"]
+    D -->|Sim| F["Celulite ou erisipela provável"]
     F --> G["Marcar o limite do eritema com data"]
     G --> H["Reavaliar em 48-72 h"]
     class E critical;
@@ -33592,12 +33592,12 @@ Não esqueça de: profilaxia antitrombótica assim que o sangramento permitir, c
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor desproporcional, edema tenso<br/>toxemia ou bolha hemorragica"] --> B["Suspeita de fascite necrosante"]
-    B --> C["Acionar cirurgia imediatamente<br/>nao aguardar imagem"]
-    C --> D["Ressuscitacao e UTI<br/>+ ATB amplo espectro com antitoxina"]
+    A["Dor desproporcional, edema tenso<br/>toxemia ou bolha hemorrágica"] --> B["Suspeita de fascite necrosante"]
+    B --> C["Acionar cirurgia imediatamente<br/>não aguardar imagem"]
+    C --> D["Ressuscitação e UTI<br/>+ ATB amplo espectro com antitoxina"]
     D --> E["Desbridamento amplo e precoce"]
-    E --> F["Reoperacao programada em 12-24 h<br/>ate tecido viavel"]
-    F --> G["Ajustar ATB pela cultura<br/>e planejar reconstrucao"]
+    E --> F["Reoperação programada em 12-24 h<br/>até tecido viável"]
+    F --> G["Ajustar ATB pela cultura<br/>e planejar reconstrução"]
     class B critical;
     class E critical;
     class G action;
@@ -33607,11 +33607,11 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Infeccao necrosante confirmada ou suspeita"] --> B["Qual o contexto?"]
-    B -->|Diabetico, perineo, pos-operatorio| C["Tipo I polimicrobiano<br/>pipe-tazo + clinda + vanco"]
-    B -->|Jovem, trauma minimo, varicela| D["Tipo II estreptococico<br/>penicilina + clinda + vanco"]
-    B -->|Agua salgada ou cirrose| E["Tipo III Vibrio<br/>ceftriaxona + doxiciclina"]
-    B -->|Trauma sujo, gas abundante| F["Mionecrose clostridiana<br/>penicilina + clindamicina"]
+    A["Infecção necrosante confirmada ou suspeita"] --> B["Qual o contexto?"]
+    B -->|Diabético, períneo, pos-operatório| C["Tipo I polimicrobiano<br/>pipe-tazo + clinda + vanco"]
+    B -->|Jovem, trauma mínimo, varicela| D["Tipo II estreptocócico<br/>penicilina + clinda + vanco"]
+    B -->|Água salgada ou cirrose| E["Tipo III Vibrio<br/>ceftriaxona + doxiciclina"]
+    B -->|Trauma sujo, gás abundante| F["Mionecrose clostridiana<br/>penicilina + clindamicina"]
     C --> G["Cultura em 48-72 h<br/>descalonar"]
     D --> G
     E --> G
@@ -33814,12 +33814,12 @@ Na gestante, a bacteriúria assintomática **deve** ser rastreada e tratada, e a
 
 \`\`\`mermaid
 flowchart TD
-    A["Disuria, polaciuria<br/>dor suprapubica"] --> B["Ha febre, calafrio<br/>ou dor lombar?"]
+    A["Disúria, polaciúria<br/>dor suprapúbica"] --> B["Há febre, calafrio<br/>ou dor lombar?"]
     B -->|Sim| C["Pielonefrite<br/>tratar como ITU complicada"]
-    B -->|Nao| D["Ha gestacao, sonda<br/>ou imunossupressao?"]
+    B -->|Não| D["Há gestação, sonda<br/>ou imunossupressão?"]
     D -->|Sim| C
-    D -->|Nao| E["Cistite nao complicada"]
-    E --> F["Nitrofurantoina 100 mg 6/6h por 5 dias<br/>ou fosfomicina 3 g dose unica"]
+    D -->|Não| E["Cistite não complicada"]
+    E --> F["Nitrofurantoína 100 mg 6/6h por 5 dias<br/>ou fosfomicina 3 g dose única"]
     F --> G["Sem melhora em 48-72 h<br/>colher urocultura e reavaliar"]
     class C critical;
     class F action;
@@ -33827,12 +33827,12 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Tres ou mais episodios em 12 meses"] --> B["Documentar com urocultura<br/>em ao menos um episodio"]
-    B --> C["Cultura negativa e sintomas cronicos?"]
-    C -->|Sim| D["Reavaliar diagnostico<br/>cistite intersticial, atrofia, IST"]
-    C -->|Nao| E["Mesmo germe em ate 2 semanas?"]
-    E -->|Sim| F["Recidiva: investigar foco<br/>calculo, residuo, anomalia"]
-    E -->|Nao| G["Reinfeccao: medidas comportamentais<br/>estrogenio topico se pos-menopausa"]
+    A["Três ou mais episódios em 12 meses"] --> B["Documentar com urocultura<br/>em ao menos um episódio"]
+    B --> C["Cultura negativa e sintomas crônicos?"]
+    C -->|Sim| D["Reavaliar diagnóstico<br/>cistite intersticial, atrofia, IST"]
+    C -->|Não| E["Mesmo germe em até 2 semanas?"]
+    E -->|Sim| F["Recidiva: investigar foco<br/>cálculo, resíduo, anomalia"]
+    E -->|Não| G["Reinfecção: medidas comportamentais<br/>estrogênio tópico se pos-menopausa"]
     G --> H["Persistindo, discutir profilaxia<br/>pos-coital ou continua"]
     class F critical;
     class H action;
@@ -34050,16 +34050,16 @@ Na descarga de pressão da úlcera plantar, o padrão-ouro é o **gesso de conta
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor ossea persistente<br/>ou ulcera que sonda osso"] --> B["RM e marcadores inflamatorios"]
-    B --> C["Ha sepse ou deficit neurologico?"]
+    A["Dor óssea persistente<br/>ou ulcera que sonda osso"] --> B["RM e marcadores inflamatórios"]
+    B --> C["Há sepse ou déficit neurológico?"]
     C -->|Sim| D["ATB imediato e cirurgia urgente<br/>drenar abscesso epidural"]
-    C -->|Nao| E["Biopsia ossea com cultura<br/>antes do antibiotico"]
+    C -->|Não| E["Biópsia óssea com cultura<br/>antes do antibiótico"]
     E --> F["ATB guiado pela cultura"]
     D --> F
-    F --> G["Ha osso necrotico, sequestro<br/>ou material de sintese?"]
-    G -->|Sim| H["Desbridamento cirurgico<br/>e remocao do material"]
-    G -->|Nao| I["Tratamento clinico prolongado"]
-    H --> J["Completar 4-6 semanas<br/>e considerar transicao oral"]
+    F --> G["Há osso necrótico, sequestro<br/>ou material de síntese?"]
+    G -->|Sim| H["Desbridamento cirúrgico<br/>e remoção do material"]
+    G -->|Não| I["Tratamento clínico prolongado"]
+    H --> J["Completar 4-6 semanas<br/>e considerar transição oral"]
     I --> J
     class C critical;
     class J action;
@@ -34069,14 +34069,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Osteomielite do pe diabetico"] --> B["Houve ressecao cirurgica do osso?"]
-    B -->|Nao| C["6 semanas de antibiotico<br/>guiado por biopsia ossea"]
-    B -->|Sim, com margem infectada| D["Ate 3 semanas apos a cirurgia"]
-    B -->|Sim, margem livre| E["Curta duracao<br/>como infeccao de partes moles"]
-    C --> F["Avaliar perfusao e revascularizar"]
+    A["Osteomielite do pe diabético"] --> B["Houve ressecção cirúrgica do osso?"]
+    B -->|Não| C["6 semanas de antibiótico<br/>guiado por biópsia óssea"]
+    B -->|Sim, com margem infectada| D["Até 3 semanas após a cirurgia"]
+    B -->|Sim, margem livre| E["Curta duração<br/>como infecção de partes moles"]
+    C --> F["Avaliar perfusão e revascularizar"]
     D --> F
     E --> F
-    F --> G["Descarga de pressao<br/>e controle glicemico"]
+    F --> G["Descarga de pressão<br/>e controle glicêmico"]
     class B critical;
     class G action;
 \`\`\`
@@ -34316,10 +34316,10 @@ Não esqueça de duas peças do cuidado que não são medicamentosas: **investig
 flowchart TD
     A["Tosse > 2-3 semanas<br/>ou risco aumentado"] --> B["TRM-TB no escarro<br/>+ baciloscopia + cultura"]
     B --> C["TRM detecta M. tuberculosis?"]
-    C -->|Nao| D["Cultura, imagem<br/>e outros diagnosticos"]
-    C -->|Sim| E["Resistencia a rifampicina?"]
-    E -->|Sim| F["Referencia terciaria<br/>esquema para TB resistente"]
-    E -->|Nao| G["2 RHZE + 4 RH<br/>dose por peso"]
+    C -->|Não| D["Cultura, imagem<br/>e outros diagnósticos"]
+    C -->|Sim| E["Resistência a rifampicina?"]
+    E -->|Sim| F["Referência terciária<br/>esquema para TB resistente"]
+    E -->|Não| G["2 RHZE + 4 RH<br/>dose por peso"]
     G --> H["Notificar, TDO<br/>testar HIV, BAAR mensal"]
     class F critical;
     class H action;
@@ -34329,12 +34329,12 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Contato de caso de TB<br/>ou grupo de risco"] --> B["Investigar TB ativa<br/>clinica + RX + TRM se sintomatico"]
+    A["Contato de caso de TB<br/>ou grupo de risco"] --> B["Investigar TB ativa<br/>clínica + RX + TRM se sintomático"]
     B -->|TB ativa| C["Tratar como doenca<br/>2 RHZE + 4 RH"]
-    B -->|Sem doenca ativa| D["PT ou IGRA conforme populacao"]
-    D -->|Indicacao de TPT| E["Preferencial 3HP<br/>12 doses semanais"]
-    D -->|Sem indicacao| F["Orientar e reavaliar se sintomas"]
-    E --> G["Checar interacao com TARV<br/>e registrar no sistema IL-TB"]
+    B -->|Sem doenca ativa| D["PT ou IGRA conforme população"]
+    D -->|Indicação de TPT| E["Preferencial 3HP<br/>12 doses semanais"]
+    D -->|Sem indicação| F["Orientar e reavaliar se sintomas"]
+    E --> G["Checar interação com TARV<br/>e registrar no sistema IL-TB"]
     class C critical;
     class G action;
 \`\`\`
@@ -34568,13 +34568,13 @@ Coinfecção com tuberculose: trate a tuberculose imediatamente e inicie a TARV 
 \`\`\`mermaid
 flowchart TD
     A["Teste reagente<br/>fluxograma confirmado"] --> B["Avaliar sintomas de<br/>doenca oportunista ativa"]
-    B --> C["Meningite criptococica<br/>ou tuberculosa?"]
+    B --> C["Meningite criptocócica<br/>ou tuberculosa?"]
     C -->|Sim| D["Tratar a oportunista<br/>e adiar a TARV"]
-    C -->|Nao| E["Iniciar TARV no mesmo dia<br/>TDF + 3TC + DTG"]
+    C -->|Não| E["Iniciar TARV no mesmo dia<br/>TDF + 3TC + DTG"]
     E --> F["Coletar CD4 e carga viral<br/>rastrear TB, sifilis, hepatites"]
     F --> G["CD4 abaixo de 200?"]
     G -->|Sim| H["Profilaxia com SMX-TMP"]
-    G -->|Nao| I["Vacinas, adesao<br/>reavaliar em 8 semanas"]
+    G -->|Não| I["Vacinas, adesão<br/>reavaliar em 8 semanas"]
     class D critical;
     class H action;
     class I action;
@@ -34584,13 +34584,13 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Carga viral apos<br/>6 meses de TARV"] --> B["Indetectavel?"]
-    B -->|Sim| C["Manter esquema<br/>reforcar I igual a I"]
-    B -->|Nao| D["Repetir em nova amostra<br/>e revisar adesao e interacoes"]
-    D --> E["Adesao inadequada<br/>ou interacao identificada?"]
+    A["Carga viral após<br/>6 meses de TARV"] --> B["Indetectável?"]
+    B -->|Sim| C["Manter esquema<br/>reforçar I igual a I"]
+    B -->|Não| D["Repetir em nova amostra<br/>e revisar adesão e interações"]
+    D --> E["Adesão inadequada<br/>ou interação identificada?"]
     E -->|Sim| F["Corrigir a causa e<br/>repetir carga viral"]
-    E -->|Nao| G["Falha virologica:<br/>genotipar em uso do esquema"]
-    G --> H["Trocar esquema<br/>em servico especializado"]
+    E -->|Não| G["Falha virológica:<br/>genotipar em uso do esquema"]
+    G --> H["Trocar esquema<br/>em serviço especializado"]
     class G critical;
     class C action;
     class H action;
@@ -34780,11 +34780,11 @@ A sífilis também aumenta o risco de aquisição e de transmissão do HIV, porq
 
 \`\`\`mermaid
 flowchart TD
-    A["Suspeita de sifilis<br/>ou teste rapido reagente"] --> B["Colher VDRL/RPR com titulo<br/>testar HIV e outras IST"]
-    B --> C["Sinal neurologico, ocular<br/>ou auditivo?"]
-    C -->|Sim| D["Puncao lombar<br/>penicilina cristalina IV"]
-    C -->|Nao| E["Definir a fase pelo tempo<br/>de infeccao"]
-    E --> F["Recente ate 1 ano:<br/>benzatina dose unica"]
+    A["Suspeita de sifilis<br/>ou teste rápido reagente"] --> B["Colher VDRL/RPR com título<br/>testar HIV e outras IST"]
+    B --> C["Sinal neurológico, ocular<br/>ou auditivo?"]
+    C -->|Sim| D["Punção lombar<br/>penicilina cristalina IV"]
+    C -->|Não| E["Definir a fase pelo tempo<br/>de infecção"]
+    E --> F["Recente até 1 ano:<br/>benzatina dose única"]
     E --> G["Tardia ou ignorada:<br/>benzatina 3 doses semanais"]
     F --> H["Tratar parcerias, notificar<br/>VDRL trimestral"]
     G --> H
@@ -34796,13 +34796,13 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Gestante com teste<br/>rapido treponemico reagente"] --> B["Tratar no mesmo atendimento<br/>e colher VDRL com titulo"]
+    A["Gestante com teste<br/>rápido treponêmico reagente"] --> B["Tratar no mesmo atendimento<br/>e colher VDRL com título"]
     B --> C["Alergia verdadeira<br/>a penicilina?"]
     C -->|Sim| D["Dessensibilizar em ambiente<br/>hospitalar e tratar com penicilina"]
-    C -->|Nao| E["Penicilina benzatina conforme<br/>o estagio, intervalo de 7 a 9 dias"]
+    C -->|Não| E["Penicilina benzatina conforme<br/>o estágio, intervalo de 7 a 9 dias"]
     E --> F["Notificar sifilis em gestante<br/>e tratar a parceria"]
     D --> F
-    F --> G["VDRL mensal ate o parto<br/>e avaliar o recem-nascido"]
+    F --> G["VDRL mensal até o parto<br/>e avaliar o recém-nascido"]
     class D critical;
     class F action;
     class G action;
@@ -34962,14 +34962,14 @@ A ventilação protetora usa **volume corrente de 6 mL/kg de peso predito e pres
 
 \`\`\`mermaid
 flowchart TD
-    A["Febre + mialgia<br/>exposicao a enchente/esgoto"] --> B["Ictericia, oliguria, dispneia,<br/>hemoptise ou hipotensao?"]
-    B -->|Nao| C["Forma leve<br/>Doxiciclina 100 mg 12/12h 5-7 dias"]
+    A["Febre + mialgia<br/>exposição a enchente/esgoto"] --> B["Icterícia, oligúria, dispneia,<br/>hemoptise ou hipotensão?"]
+    B -->|Não| C["Forma leve<br/>Doxiciclina 100 mg 12/12h 5-7 dias"]
     B -->|Sim| D["Forma grave / Weil<br/>internar"]
     D --> E["Penicilina cristalina 1,5 MUI IV 6/6h<br/>ou Ceftriaxona 1-2 g IV/dia"]
-    E --> F["RX de torax + funcao renal + K + CPK"]
-    F --> G["Infiltrado alveolar, IRpA<br/>choque ou anuria?"]
-    G -->|Sim| H["UTI: ventilacao protetora<br/>dialise precoce diaria"]
-    G -->|Nao| I["Enfermaria: hidratacao, repor K,<br/>reavaliar funcao renal diaria"]
+    E --> F["RX de tórax + função renal + K + CPK"]
+    F --> G["Infiltrado alveolar, IRpA<br/>choque ou anúria?"]
+    G -->|Sim| H["UTI: ventilação protetora<br/>diálise precoce diária"]
+    G -->|Não| I["Enfermaria: hidratação, repor K,<br/>reavaliar função renal diária"]
     class B critical;
     class G critical;
     class C action;
@@ -34982,14 +34982,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Leptospirose grave internada"] --> B["Dispneia, tosse, hemoptise<br/>ou queda do hematocrito?"]
-    B -->|Sim| C["Radiografia de torax<br/>e gasometria arterial"]
-    B -->|Nao| D["Vigiar saturacao<br/>e hematocrito seriado"]
-    C --> E["IRpA, hemorragia evidente<br/>ou padrao alveolar/SARA?"]
+    A["Leptospirose grave internada"] --> B["Dispneia, tosse, hemoptise<br/>ou queda do hematócrito?"]
+    B -->|Sim| C["Radiografia de tórax<br/>e gasometria arterial"]
+    B -->|Não| D["Vigiar saturação<br/>e hematócrito seriado"]
+    C --> E["IRpA, hemorragia evidente<br/>ou padrão alveolar/SARA?"]
     E -->|Sim| F["Intubar: VM protetora<br/>6 mL/kg e platô abaixo de 30"]
-    E -->|Nao| G["PaO2 menor que 60 mmHg<br/>em ar ambiente?"]
+    E -->|Não| G["PaO2 menor que 60 mmHg<br/>em ar ambiente?"]
     G -->|Sim| H["O2 2-15 L/min ou CPAP<br/>repetir gasometria"]
-    G -->|Nao| D
+    G -->|Não| D
     H --> I["Ainda PaO2 menor que 60?<br/>intubar"]
     class B critical;
     class E critical;
@@ -35166,14 +35166,14 @@ Notificar qualquer reação adversa a antimalárico à Anvisa pelo **VigiMed** �
 
 \`\`\`mermaid
 flowchart TD
-    A["Febre + procedencia da Amazonia<br/>gota espessa imediata"] --> B["Sinal de gravidade?<br/>coma, convulsao, choque, anuria, acidose"]
-    B -->|Sim| C["Malaria grave: emergencia<br/>Artesunato IV 2,4 mg/kg dose<br/>3,0 mg/kg se menos de 20 kg"]
-    C --> D["UTI: glicemia, dialise, transfusao,<br/>ventilacao protetora"]
-    B -->|Nao| E["Qual especie na gota espessa?"]
-    E -->|P. vivax| F["Testar G6PD<br/>obrigatorio se 10 kg e 2 anos ou mais"]
-    F --> G["Cloroquina 3 dias 10-7,5-7,5 mg/kg<br/>+ tafenoquina 300 mg dose unica se G6PD alta"]
-    F --> H["G6PD intermediaria ou baixa<br/>cloroquina + primaquina 7 dias ou semanal"]
-    E -->|P. falciparum| I["ACT 3 dias ASMQ ou AL<br/>+ primaquina 0,5 mg/kg dose unica"]
+    A["Febre + procedência da Amazônia<br/>gota espessa imediata"] --> B["Sinal de gravidade?<br/>coma, convulsão, choque, anúria, acidose"]
+    B -->|Sim| C["Malaria grave: emergência<br/>Artesunato IV 2,4 mg/kg dose<br/>3,0 mg/kg se menos de 20 kg"]
+    C --> D["UTI: glicemia, diálise, transfusão,<br/>ventilação protetora"]
+    B -->|Não| E["Qual espécie na gota espessa?"]
+    E -->|P. vivax| F["Testar G6PD<br/>obrigatório se 10 kg e 2 anos ou mais"]
+    F --> G["Cloroquina 3 dias 10-7,5-7,5 mg/kg<br/>+ tafenoquina 300 mg dose única se G6PD alta"]
+    F --> H["G6PD intermediária ou baixa<br/>cloroquina + primaquina 7 dias ou semanal"]
+    E -->|P. falciparum| I["ACT 3 dias ASMQ ou AL<br/>+ primaquina 0,5 mg/kg dose única"]
     class B critical;
     class C action;
     class D action;
@@ -35186,14 +35186,14 @@ O segundo eixo de decisão é o do paciente que volta com parasitemia:
 
 \`\`\`mermaid
 flowchart TD
-    R["Recorrencia de P. vivax"] --> S["Quantos dias apos o inicio<br/>do tratamento?"]
-    S -->|Ate 28 dias| T["Recrudescencia<br/>checar peso, adesao, vomito, estoque"]
-    S -->|29 a 60 dias| U["Recaida por hipnozoito"]
-    S -->|Acima de 60 dias| V["Reinfeccao: tratar como caso novo"]
+    R["Recorrência de P. vivax"] --> S["Quantos dias após o início<br/>do tratamento?"]
+    S -->|Até 28 dias| T["Recrudescência<br/>checar peso, adesão, vômito, estoque"]
+    S -->|29 a 60 dias| U["Recaída por hipnozoíto"]
+    S -->|Acima de 60 dias| V["Reinfecção: tratar como caso novo"]
     T --> W["Tratar com ACT 3 dias<br/>+ primaquina 0,5 mg/kg/dia por 14 dias<br/>nunca tafenoquina"]
     U --> W
     R --> X["Urina escura em uso de<br/>primaquina ou tafenoquina?"]
-    X -->|Sim| Y["Suspender e avaliar hemolise<br/>emergencia, notificar VigiMed"]
+    X -->|Sim| Y["Suspender e avaliar hemólise<br/>emergência, notificar VigiMed"]
     class X critical;
     class W action;
     class V action;
@@ -35422,13 +35422,13 @@ Sobre efeitos adversos do oseltamivir: náusea e vômito são os mais frequentes
 
 \`\`\`mermaid
 flowchart TD
-    A["Sindrome gripal<br/>febre + tosse ou dor de garganta"] --> B["Ha dispneia, SatO2 < 95%<br/>ou desconforto respiratorio?"]
+    A["Síndrome gripal<br/>febre + tosse ou dor de garganta"] --> B["Há dispneia, SatO2 < 95%<br/>ou desconforto respiratório?"]
     B -->|Sim| C["SRAG: internar, notificar<br/>e colher RT-PCR"]
-    B -->|Nao| D["Pertence a grupo de risco?"]
+    B -->|Não| D["Pertence a grupo de risco?"]
     D -->|Sim| E["Oseltamivir 75 mg 12/12h por 5 dias<br/>o quanto antes"]
-    D -->|Nao| F["Sintomaticos e orientacao<br/>de sinais de alarme"]
-    C --> G["Oseltamivir imediato<br/>+ oxigenio e suporte"]
-    G --> H["Piora apos melhora inicial?<br/>investigar pneumonia bacteriana"]
+    D -->|Não| F["Sintomáticos e orientação<br/>de sinais de alarme"]
+    C --> G["Oseltamivir imediato<br/>+ oxigênio e suporte"]
+    G --> H["Piora após melhora inicial?<br/>investigar pneumonia bacteriana"]
     class C critical;
     class E action;
     class G action;
@@ -35444,14 +35444,14 @@ Precauções para gotículas em todos os casos suspeitos, com precaução de aer
 
 \`\`\`mermaid
 flowchart TD
-    A["Contato com caso suspeito<br/>ou confirmado de influenza"] --> B["Exposicao ha mais de 48 horas?"]
-    B -->|Sim| C["Nao indicar quimioprofilaxia"]
-    B -->|Nao| D["Imunossupressao grave ou<br/>residente de ILP com comorbidade em surto?"]
-    D -->|Nao| E["Sem quimioprofilaxia<br/>orientar vacina e sinais de alarme"]
+    A["Contato com caso suspeito<br/>ou confirmado de influenza"] --> B["Exposição há mais de 48 horas?"]
+    B -->|Sim| C["Não indicar quimioprofilaxia"]
+    B -->|Não| D["Imunossupressão grave ou<br/>residente de ILP com comorbidade em surto?"]
+    D -->|Não| E["Sem quimioprofilaxia<br/>orientar vacina e sinais de alarme"]
     D -->|Sim| F["Oseltamivir 75 mg/dia por 10 dias<br/>ajustar por clearance"]
-    F --> G["Manter ate 7 dias apos<br/>a ultima exposicao conhecida"]
-    A --> H["Surto em ILP: 2 casos com vinculo<br/>em ate 72 horas"]
-    H --> I["Profilaxia institucional por no minimo<br/>2 semanas e ate 7 dias apos o ultimo caso"]
+    F --> G["Manter até 7 dias após<br/>a última exposição conhecida"]
+    A --> H["Surto em ILP: 2 casos com vínculo<br/>em até 72 horas"]
+    H --> I["Profilaxia institucional por no mínimo<br/>2 semanas e até 7 dias após o último caso"]
     class D critical;
     class F action;
     class I action;
@@ -35628,14 +35628,14 @@ Não esqueça do básico que salva: controle glicêmico (corticoide descompensa 
 
 \`\`\`mermaid
 flowchart TD
-    A["COVID-19 confirmada<br/>em paciente internado"] --> B["Necessita de oxigenio<br/>suplementar?"]
-    B -->|Nao| C["Suporte clinico<br/>sem corticoide"]
-    B -->|Sim| D["Dexametasona 6 mg/dia<br/>por ate 10 dias"]
+    A["COVID-19 confirmada<br/>em paciente internado"] --> B["Necessita de oxigênio<br/>suplementar?"]
+    B -->|Não| C["Suporte clínico<br/>sem corticoide"]
+    B -->|Sim| D["Dexametasona 6 mg/dia<br/>por até 10 dias"]
     D --> E["Profilaxia de<br/>tromboembolismo venoso"]
-    E --> F["Piora com escalonamento<br/>de suporte e inflamacao alta?"]
+    E --> F["Piora com escalonamento<br/>de suporte e inflamação alta?"]
     F -->|Sim| G["Considerar imunomodulador<br/>tocilizumabe ou baricitinibe"]
-    F -->|Nao| H["Manter suporte e reavaliar"]
-    G --> I["Insuficiencia respiratoria refrataria:<br/>UTI, ventilacao protetora, prona"]
+    F -->|Não| H["Manter suporte e reavaliar"]
+    G --> I["Insuficiência respiratória refratária:<br/>UTI, ventilação protetora, prona"]
     class I critical;
     class D action;
     class E action;
@@ -35645,13 +35645,13 @@ O segundo eixo de decisão é o tempo de doença, que escolhe entre antiviral e 
 
 \`\`\`mermaid
 flowchart TD
-    T["Quantos dias de sintomas?"] --> U["Ate cerca de 7 dias<br/>fase viral"]
-    T --> V["Apos 7 a 10 dias<br/>fase inflamatoria"]
+    T["Quantos dias de sintomas?"] --> U["Até cerca de 7 dias<br/>fase viral"]
+    T --> V["Após 7 a 10 dias<br/>fase inflamatória"]
     U --> W["Sem hipoxemia e alto risco:<br/>antiviral oral precoce"]
     U --> X["Com hipoxemia sem VNI ou VMI:<br/>corticoide + considerar remdesivir"]
-    V --> Y["Corticoide + profilaxia de TEV<br/>antiviral isolado nao ajuda"]
-    Y --> Z["Inflamacao alta ou piora:<br/>tocilizumabe 8 mg/kg max 800 mg<br/>ou baricitinibe 4 mg/dia"]
-    T --> AA["Imunossuprimido com<br/>replicacao viral prolongada?"]
+    V --> Y["Corticoide + profilaxia de TEV<br/>antiviral isolado não ajuda"]
+    Y --> Z["Inflamação alta ou piora:<br/>tocilizumabe 8 mg/kg max 800 mg<br/>ou baricitinibe 4 mg/dia"]
+    T --> AA["Imunossuprimido com<br/>replicação viral prolongada?"]
     AA -->|Sim| AB["Janela do antiviral se estende<br/>discutir com infectologia"]
     class AA critical;
     class W action;
@@ -35865,15 +35865,15 @@ Sobre viagem aérea, a orientação prática habitual é aguardar a resolução 
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor pleuritica subita + dispneia<br/>murmurio reduzido, timpanismo"] --> B["Instavel: hipotensao, turgencia jugular<br/>desvio de traqueia?"]
-    B -->|Sim| C["Pneumotorax hipertensivo<br/>puncao imediata sem esperar RX"]
-    C --> D["Dreno de torax"]
-    B -->|Nao| E["RX de torax ou USG pulmonar<br/>TC se duvida ou bolha"]
-    E --> F["Secundario, bilateral, hemopneumotorax<br/>trauma ou ventilacao mecanica?"]
+    A["Dor pleurítica súbita + dispneia<br/>murmúrio reduzido, timpanismo"] --> B["Instável: hipotensão, turgência jugular<br/>desvio de traqueia?"]
+    B -->|Sim| C["Pneumotorax hipertensivo<br/>punção imediata sem esperar RX"]
+    C --> D["Dreno de tórax"]
+    B -->|Não| E["RX de tórax ou USG pulmonar<br/>TC se dúvida ou bolha"]
+    E --> F["Secundário, bilateral, hemopneumotórax<br/>trauma ou ventilação mecânica?"]
     F -->|Sim| D
-    F -->|Nao| G["Primario: sintomatico?"]
-    G -->|Nao ou pouco| H["Observacao mesmo se grande<br/>O2, analgesia, reavaliacao programada"]
-    G -->|Sim| I["Aspiracao ou dispositivo ambulatorial<br/>com valvula unidirecional"]
+    F -->|Não| G["Primário: sintomático?"]
+    G -->|Não ou pouco| H["Observação mesmo se grande<br/>O2, analgesia, reavaliação programada"]
+    G -->|Sim| I["Aspiração ou dispositivo ambulatorial<br/>com válvula unidirecional"]
     I --> J["Falha: dreno de pequeno calibre"]
     class B critical;
     class C critical;
@@ -36128,16 +36128,16 @@ Atenção à consequência nutricional e imunológica: a drenagem prolongada de 
 
 \`\`\`mermaid
 flowchart TD
-    A["Dispneia + macicez<br/>e murmurio reduzido"] --> B["RX e USG de torax<br/>confirmar e medir"]
+    A["Dispneia + macicez<br/>e murmúrio reduzido"] --> B["RX e USG de tórax<br/>confirmar e medir"]
     B --> C["Causa incerta ou lamina puncionavel?"]
-    C -->|Nao, IC tipica bilateral| D["Tratar a causa<br/>diuretico e otimizar IC"]
-    C -->|Sim| E["Toracocentese guiada por USG<br/>proteina, LDH, pH, glicose, citologia, ADA, cultura"]
+    C -->|Não, IC típica bilateral| D["Tratar a causa<br/>diurético e otimizar IC"]
+    C -->|Sim| E["Toracocentese guiada por USG<br/>proteína, LDH, pH, glicose, citologia, ADA, cultura"]
     E --> F["Criterios de Light<br/>exsudato?"]
-    F -->|Nao| D
+    F -->|Não| D
     F -->|Sim| G["Aspecto purulento, pH menor que 7,20<br/>ou Gram/cultura positivos?"]
-    G -->|Sim| H["Parapneumonico complicado/empiema<br/>antibiotico + drenagem toracica"]
-    G -->|Nao| I["Investigar etiologia<br/>TC, ADA/BAAR, citologia seriada"]
-    I --> J["Sem diagnostico: biopsia pleural<br/>ou toracoscopia"]
+    G -->|Sim| H["Parapneumônico complicado/empiema<br/>antibiótico + drenagem torácica"]
+    G -->|Não| I["Investigar etiologia<br/>TC, ADA/BAAR, citologia seriada"]
+    I --> J["Sem diagnóstico: biópsia pleural<br/>ou toracoscopia"]
     class G critical;
     class H action;
     class D action;
@@ -36145,13 +36145,13 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Exsudato linfocitario<br/>sem diagnostico inicial"] --> B["ADA maior que 40 U/L?"]
+    A["Exsudato linfocitário<br/>sem diagnóstico inicial"] --> B["ADA maior que 40 U/L?"]
     B -->|Sim| C["Alta probabilidade de TB pleural<br/>no Brasil: tratar RIPE e notificar"]
-    B -->|Nao| D["Citologia oncotica<br/>e TC de torax com contraste"]
+    B -->|Não| D["Citologia oncótica<br/>e TC de tórax com contraste"]
     D --> E["Espessamento nodular ou<br/>citologia positiva?"]
-    E -->|Sim| F["Derrame neoplasico<br/>estadiar e definir paliacao pleural"]
-    E -->|Nao| G["Biopsia pleural guiada<br/>ou toracoscopia medica"]
-    G --> H["Ainda sem diagnostico:<br/>acompanhar e reinvestigar se progride"]
+    E -->|Sim| F["Derrame neoplásico<br/>estadiar e definir paliação pleural"]
+    E -->|Não| G["Biópsia pleural guiada<br/>ou toracoscopia médica"]
+    G --> H["Ainda sem diagnóstico:<br/>acompanhar e reinvestigar se progride"]
     class E critical;
     class C action;
     class F action;
@@ -36398,17 +36398,17 @@ Efeitos adversos da terapia intrapleural: **dor** (comum, previna com analgesia 
 
 \`\`\`mermaid
 flowchart TD
-    A["Pneumonia que nao melhora<br/>febre persistente + derrame"] --> B["USG de torax<br/>e toracocentese diagnostica"]
+    A["Pneumonia que não melhora<br/>febre persistente + derrame"] --> B["USG de tórax<br/>e toracocentese diagnostica"]
     B --> C["Pus franco, pH menor que 7,20<br/>ou Gram/cultura positivos?"]
-    C -->|Nao| D["Parapneumonico simples<br/>antibiotico e reavaliar em 24-48 h"]
-    C -->|Sim| E["Empiema/derrame complicado<br/>antibiotico com cobertura de anaerobios"]
-    E --> F["Dreno de pequeno calibre<br/>guiado por USG + irrigacao"]
+    C -->|Não| D["Parapneumônico simples<br/>antibiótico e reavaliar em 24-48 h"]
+    C -->|Sim| E["Empiema/derrame complicado<br/>antibiótico com cobertura de anaeróbios"]
+    E --> F["Dreno de pequeno calibre<br/>guiado por USG + irrigação"]
     F --> G["Loculado ou drenagem inadequada?"]
     G -->|Sim| H["Alteplase 10 mg + DNase 5 mg<br/>2x/dia por 3 dias pelo dreno"]
-    G -->|Nao| I["Manter antibiotico prolongado<br/>acompanhar PCR e imagem"]
+    G -->|Não| I["Manter antibiótico prolongado<br/>acompanhar PCR e imagem"]
     H --> J["Falha em 5-7 dias ou pulmao encarcerado?"]
-    J -->|Sim| K["VATS/decorticacao<br/>avaliacao cirurgica precoce"]
-    J -->|Nao| I
+    J -->|Sim| K["VATS/decorticação<br/>avaliação cirúrgica precoce"]
+    J -->|Não| I
     class C critical;
     class K critical;
     class F action;
@@ -36421,13 +36421,13 @@ O segundo eixo — mais útil do que o volume do derrame — é o **tempo de evo
 
 \`\`\`mermaid
 flowchart TD
-    A["Quanto tempo de sintomas?"] --> B["Ate 1 semana<br/>liquido livre, fino, pH normal"]
-    A --> C["1 a 3 semanas<br/>liquido espesso, septacoes ao USG"]
-    A --> D["Mais de 3-4 semanas<br/>espessamento pleural, pulmao que nao expande"]
-    B --> E["Antibiotico e reavaliacao<br/>puncao se derrame nao minimo"]
+    A["Quanto tempo de sintomas?"] --> B["Até 1 semana<br/>líquido livre, fino, pH normal"]
+    A --> C["1 a 3 semanas<br/>líquido espesso, septações ao USG"]
+    A --> D["Mais de 3-4 semanas<br/>espessamento pleural, pulmao que não expande"]
+    B --> E["Antibiótico e reavaliação<br/>punção se derrame não mínimo"]
     C --> F["Drenar sempre<br/>janela dos agentes intrapleurais"]
-    D --> G["Fase organizada<br/>encaminhar para decorticacao"]
-    C --> H["Discutir VATS precoce<br/>com cirurgia toracica"]
+    D --> G["Fase organizada<br/>encaminhar para decorticação"]
+    C --> H["Discutir VATS precoce<br/>com cirurgia torácica"]
     class D critical;
     class F action;
     class G action;
@@ -36659,18 +36659,18 @@ Saber o que não fazer, aqui, vale tanto quanto saber o que fazer — várias in
 
 \`\`\`mermaid
 flowchart TD
-    A["Hipoxemia aguda + opacidades bilaterais<br/>ate 1 semana de um insulto"] --> B["Edema explicado por causa cardiaca<br/>ou sobrecarga? Eco/BNP"]
-    B -->|Sim| C["Tratar como edema cardiogenico"]
-    B -->|Nao| D["SDRA: classificar por P/F<br/>ou SpO2/FiO2 se SpO2 ate 97%"]
-    D --> E["Ventilacao protetora<br/>VT 4-6 mL/kg de peso predito<br/>plato menor que 30, driving pressure menor que 15"]
+    A["Hipoxemia aguda + opacidades bilaterais<br/>até 1 semana de um insulto"] --> B["Edema explicado por causa cardíaca<br/>ou sobrecarga? Eco/BNP"]
+    B -->|Sim| C["Tratar como edema cardiogênico"]
+    B -->|Não| D["SDRA: classificar por P/F<br/>ou SpO2/FiO2 se SpO2 até 97%"]
+    D --> E["Ventilação protetora<br/>VT 4-6 mL/kg de peso predito<br/>platô menor que 30, driving pressure menor que 15"]
     E --> F["PEEP titulada a FiO2<br/>alvo SpO2 88-95%, hipercapnia permissiva"]
     F --> G["P/F menor que 150?"]
-    G -->|Sim| H["Posicao prona precoce<br/>mais de 12 h por sessao"]
-    G -->|Nao| I["Manter protecao<br/>estrategia conservadora de fluidos"]
-    H --> J["Assincronia ou esforco excessivo:<br/>bloqueio neuromuscular por ate 48 h"]
-    J --> K["Hipoxemia refrataria?"]
-    K -->|Sim| L["Oxido nitrico como ponte<br/>e avaliar ECMO VV em centro de referencia"]
-    K -->|Nao| I
+    G -->|Sim| H["Posição prona precoce<br/>mais de 12 h por sessão"]
+    G -->|Não| I["Manter proteção<br/>estratégia conservadora de fluidos"]
+    H --> J["Assincronia ou esforço excessivo:<br/>bloqueio neuromuscular por até 48 h"]
+    J --> K["Hipoxemia refratária?"]
+    K -->|Sim| L["Óxido nítrico como ponte<br/>e avaliar ECMO VV em centro de referência"]
+    K -->|Não| I
     class K critical;
     class E action;
     class H action;
@@ -36683,13 +36683,13 @@ Deterioração súbita em paciente já ventilado tem lista curta e ordem fixa de
 
 \`\`\`mermaid
 flowchart TD
-    A["Piora subita: queda de SpO2<br/>ou hipotensao no ventilado"] --> B["Desconectar do ventilador<br/>e ventilar com bolsa"]
+    A["Piora súbita: queda de SpO2<br/>ou hipotensão no ventilado"] --> B["Desconectar do ventilador<br/>e ventilar com bolsa"]
     B --> C["Melhorou ao desconectar?"]
-    C -->|Sim| D["Auto-PEEP ou problema do ventilador<br/>reduzir FR, prolongar expiracao"]
-    C -->|Nao| E["Checar tubo: obstrucao,<br/>deslocamento, aspirar"]
-    E --> F["Torax assimetrico, hipotensao,<br/>enfisema subcutaneo?"]
-    F -->|Sim| G["Pneumotorax hipertensivo<br/>descompressao imediata"]
-    F -->|Nao| H["USG a beira do leito:<br/>VD dilatado, derrame, atelectasia"]
+    C -->|Sim| D["Auto-PEEP ou problema do ventilador<br/>reduzir FR, prolongar expiração"]
+    C -->|Não| E["Checar tubo: obstrução,<br/>deslocamento, aspirar"]
+    E --> F["Tórax assimétrico, hipotensão,<br/>enfisema subcutâneo?"]
+    F -->|Sim| G["Pneumotorax hipertensivo<br/>descompressão imediata"]
+    F -->|Não| H["USG a beira do leito:<br/>VD dilatado, derrame, atelectasia"]
     H --> I["Cor pulmonale agudo:<br/>reduzir driving pressure e pCO2, pronar"]
     class A critical;
     class G critical;
@@ -36893,16 +36893,16 @@ Após a alta, o encaminhamento importa: hipoventilação da obesidade, DPOC com 
 
 \`\`\`mermaid
 flowchart TD
-    A["Insuficiencia respiratoria aguda<br/>gasometria, RX, monitorizacao"] --> B["Contraindicacao: parada, rebaixamento,<br/>vomito, pneumotorax nao drenado?"]
-    B -->|Sim| C["Nao usar VNI<br/>considerar intubacao imediata"]
-    B -->|Nao| D["Indicacao forte?<br/>DPOC com pH menor que 7,35, EAP cardiogenico<br/>ou imunossuprimido"]
-    D -->|Nao| E["Oxigenio convencional ou alto fluxo<br/>reavaliar de perto"]
+    A["Insuficiência respiratória aguda<br/>gasometria, RX, monitorização"] --> B["Contraindicação: parada, rebaixamento,<br/>vômito, pneumotorax não drenado?"]
+    B -->|Sim| C["Não usar VNI<br/>considerar intubação imediata"]
+    B -->|Não| D["Indicação forte?<br/>DPOC com pH menor que 7,35, EAP cardiogênico<br/>ou imunossuprimido"]
+    D -->|Não| E["Oxigênio convencional ou alto fluxo<br/>reavaliar de perto"]
     D -->|Sim| F["Iniciar VNI<br/>EPAP 5-8, IPAP 8-12 cmH2O<br/>FiO2 para alvo 88-92% no DPOC"]
     F --> G["Titular IPAP pelo conforto,<br/>volume corrente e pCO2"]
-    G --> H["Reavaliar em 1-2 h<br/>clinica + gasometria"]
+    G --> H["Reavaliar em 1-2 h<br/>clínica + gasometria"]
     H --> I["pH e pCO2 melhorando<br/>e FR caindo?"]
     I -->|Sim| J["Manter VNI e iniciar desmame"]
-    I -->|Nao| K["Falha de VNI: intubar<br/>nao insistir"]
+    I -->|Não| K["Falha de VNI: intubar<br/>não insistir"]
     class B critical;
     class K critical;
     class F action;
@@ -36915,16 +36915,16 @@ O segundo eixo de decisão é o mecanismo da insuficiência respiratória — é
 
 \`\`\`mermaid
 flowchart TD
-    A["Qual o problema dominante<br/>na gasometria?"] --> B["Hipercapnia com pH baixo<br/>falencia de bomba"]
-    A --> C["Hipoxemia com pCO2 normal ou baixa<br/>falencia de troca"]
-    B --> D["VNI com dois niveis<br/>titular pressao de suporte"]
+    A["Qual o problema dominante<br/>na gasometria?"] --> B["Hipercapnia com pH baixo<br/>falência de bomba"]
+    A --> C["Hipoxemia com pCO2 normal ou baixa<br/>falência de troca"]
+    B --> D["VNI com dois níveis<br/>titular pressão de suporte"]
     C --> E["Alto fluxo em ambiente monitorizado"]
     D --> F["HACOR maior que 5 em 1 h<br/>ou pH piorando?"]
-    E --> G["ROX que nao sobe<br/>ou esforco intenso?"]
+    E --> G["ROX que não sobe<br/>ou esforço intenso?"]
     F -->|Sim| H["Intubar"]
     G -->|Sim| H
-    F -->|Nao| I["Manter e desmamar"]
-    G -->|Nao| I
+    F -->|Não| I["Manter e desmamar"]
+    G -->|Não| I
     class H critical;
     class D action;
     class E action;
@@ -37101,14 +37101,14 @@ Duas medidas de baixo custo e alto impacto fecham essa frente: **suspender imedi
 
 \`\`\`mermaid
 flowchart TD
-    A["Hemoptise<br/>≥200 mL/24h ou repercussao"] --> B["Via aerea ameacada?<br/>hipoxemia, rebaixamento"]
-    B -->|Sim| C["Decubito lateral lado que sangra<br/>IOT tubo 8,0 / selecionar pulmao sadio"]
-    B -->|Nao| D["O2, jejum, 2 acessos<br/>reverter coagulopatia"]
-    C --> E["Angio-TC de torax<br/>localizar e mapear arterias"]
+    A["Hemoptise<br/>≥200 mL/24h ou repercussão"] --> B["Via aérea ameaçada?<br/>hipoxemia, rebaixamento"]
+    B -->|Sim| C["Decúbito lateral lado que sangra<br/>IOT tubo 8,0 / selecionar pulmao sadio"]
+    B -->|Não| D["O2, jejum, 2 acessos<br/>reverter coagulopatia"]
+    C --> E["Angio-TC de tórax<br/>localizar e mapear artérias"]
     D --> E
-    E --> F["Arteriografia com embolizacao<br/>de arteria bronquica"]
+    E --> F["Arteriografia com embolização<br/>de artéria brônquica"]
     F --> G["Sangramento controlado?"]
-    G -->|Nao| H["Broncoscopia rigida ou<br/>cirurgia de resgate"]
+    G -->|Não| H["Broncoscopia rígida ou<br/>cirurgia de resgate"]
     G -->|Sim| I["Tratar a causa<br/>TB, bronquiectasia, tumor"]
     class B critical;
     class C critical;
@@ -37120,17 +37120,17 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Hemoptise em paciente<br/>anticoagulado"] --> B["Qual droga? Ultima dose?<br/>INR, plaquetas, funcao renal"]
+    A["Hemoptise em paciente<br/>anticoagulado"] --> B["Qual droga? Última dose?<br/>INR, plaquetas, função renal"]
     B --> C["Varfarina"]
     B --> D["Heparina"]
     B --> E["DOAC"]
-    C --> F["Vitamina K IV +<br/>complexo protrombinico ou plasma"]
+    C --> F["Vitamina K IV +<br/>complexo protrombínico ou plasma"]
     D --> G["Protamina"]
-    E --> H["Antidoto especifico raramente<br/>disponivel no SUS<br/>usar CCP e suporte"]
-    F --> I["Suspender antiagregante<br/>corrigir plaqueta, calcio, temperatura"]
+    E --> H["Antídoto específico raramente<br/>disponível no SUS<br/>usar CCP e suporte"]
+    F --> I["Suspender antiagregante<br/>corrigir plaqueta, cálcio, temperatura"]
     G --> I
     H --> I
-    I --> J["Seguir o fluxo da hemoptise:<br/>via aerea e embolizacao"]
+    I --> J["Seguir o fluxo da hemoptise:<br/>via aérea e embolização"]
     class A critical;
     class H critical;
     class J action;
@@ -37327,16 +37327,16 @@ Terceiro, o **acesso ao diagnóstico etiológico é possível**: imunoglobulinas
 
 \`\`\`mermaid
 flowchart TD
-    A["Tosse produtiva cronica<br/>infeccoes de repeticao"] --> B["TCAR: anel de sinete<br/>brônquio sem afilamento"]
+    A["Tosse produtiva cronica<br/>infecções de repetição"] --> B["TCAR: anel de sinete<br/>brônquio sem afilamento"]
     B --> C["Investigar etiologia<br/>Ig, IgE Aspergillus, escarro, suor"]
-    C --> D["Base: fisioterapia diaria<br/>exercicio + vacinas"]
+    C --> D["Base: fisioterapia diária<br/>exercício + vacinas"]
     D --> E["Cultura mostra<br/>Pseudomonas?"]
-    E -->|Primeiro isolamento| F["Tentar erradicacao"]
-    E -->|Cronica| G["ATB antipseudomonas na exacerbacao<br/>considerar ATB inalado"]
-    E -->|Nao| H["ATB 14 dias guiado por cultura<br/>na exacerbacao"]
-    G --> I["3 ou mais exacerbacoes/ano?"]
+    E -->|Primeiro isolamento| F["Tentar erradicação"]
+    E -->|Cronica| G["ATB antipseudomonas na exacerbação<br/>considerar ATB inalado"]
+    E -->|Não| H["ATB 14 dias guiado por cultura<br/>na exacerbação"]
+    G --> I["3 ou mais exacerbações/ano?"]
     H --> I
-    I -->|Sim| J["Azitromicina profilatica<br/>apos excluir micobacteria e checar QT"]
+    I -->|Sim| J["Azitromicina profilática<br/>após excluir micobactéria e checar QT"]
     class E critical;
     class F action;
     class J action;
@@ -37346,15 +37346,15 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Bronquiectasia com historia<br/>de tuberculose tratada"] --> B["Escarro: baciloscopia,<br/>teste molecular e cultura"]
+    A["Bronquiectasia com história<br/>de tuberculose tratada"] --> B["Escarro: baciloscopia,<br/>teste molecular e cultura"]
     B --> C["Positivo para M. tuberculosis?"]
-    C -->|Sim| D["Tratar TB ativa<br/>nao chamar de exacerbacao"]
-    C -->|Nao| E["Cultura para micobacteria<br/>nao tuberculosa"]
-    E -->|Positiva| F["Encaminhar: esquema proprio,<br/>nao usar macrolideo isolado"]
-    E -->|Negativa| G["Sequela: higiene bronquica,<br/>cultura bacteriana e vacinas"]
-    G --> H["Cavidade residual<br/>com bola fungica na TC?"]
-    H -->|Sim| I["Aspergiloma: risco de hemoptise<br/>avaliar antifungico ou cirurgia"]
-    H -->|Nao| J["Seguimento com escore<br/>BSI ou FACED"]
+    C -->|Sim| D["Tratar TB ativa<br/>não chamar de exacerbação"]
+    C -->|Não| E["Cultura para micobactéria<br/>não tuberculosa"]
+    E -->|Positiva| F["Encaminhar: esquema próprio,<br/>não usar macrolídeo isolado"]
+    E -->|Negativa| G["Sequela: higiene brônquica,<br/>cultura bacteriana e vacinas"]
+    G --> H["Cavidade residual<br/>com bola fúngica na TC?"]
+    H -->|Sim| I["Aspergiloma: risco de hemoptise<br/>avaliar antifúngico ou cirurgia"]
+    H -->|Não| J["Seguimento com escore<br/>BSI ou FACED"]
     class C critical;
     class D action;
     class I action;
@@ -37533,15 +37533,15 @@ Um relatório bem escrito muda o desfecho administrativo: descreva o padrão tom
 
 \`\`\`mermaid
 flowchart TD
-    A["Dispneia progressiva + tosse seca<br/>estertor em velcro, >60 anos"] --> B["TCAR de torax<br/>cortes finos, expiracao e prona"]
-    B --> C["Excluir colagenose, exposicao,<br/>droga e ICC"]
-    C --> D["Padrao UIP ou UIP provavel?"]
-    D -->|Sim| E["Diagnostico de FPI<br/>sem biopsia"]
-    D -->|Nao| F["Discussao multidisciplinar<br/>considerar biopsia"]
-    E --> G["Antifibrotico: nintedanibe ou pirfenidona<br/>+ reabilitacao, O2, vacinas"]
+    A["Dispneia progressiva + tosse seca<br/>estertor em velcro, >60 anos"] --> B["TCAR de tórax<br/>cortes finos, expiração e prona"]
+    B --> C["Excluir colagenose, exposição,<br/>droga e ICC"]
+    C --> D["Padrão UIP ou UIP provável?"]
+    D -->|Sim| E["Diagnóstico de FPI<br/>sem biópsia"]
+    D -->|Não| F["Discussão multidisciplinar<br/>considerar biópsia"]
+    E --> G["Antifibrótico: nintedanibe ou pirfenidona<br/>+ reabilitação, O2, vacinas"]
     F --> G
     G --> H["Encaminhar a transplante<br/>se candidato"]
-    G --> I["Piora aguda com novo vidro fosco<br/>= exacerbacao aguda"]
+    G --> I["Piora aguda com novo vidro fosco<br/>= exacerbação aguda"]
     class D critical;
     class I critical;
     class G action;
@@ -37552,13 +37552,13 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["FPI confirmada em discussao multidisciplinar"] --> B["Hepatopatia moderada ou grave?"]
-    B -->|Sim| C["Evitar nintedanibe<br/>reavaliar risco-beneficio"]
-    B -->|Nao| D["Anticoagulado, alto risco de sangramento<br/>ou cirurgia proxima?"]
+    A["FPI confirmada em discussão multidisciplinar"] --> B["Hepatopatia moderada ou grave?"]
+    B -->|Sim| C["Evitar nintedanibe<br/>reavaliar risco-benefício"]
+    B -->|Não| D["Anticoagulado, alto risco de sangramento<br/>ou cirurgia próxima?"]
     D -->|Sim| E["Preferir pirfenidona"]
-    D -->|Nao| F["Trabalho ao sol ou fotossensibilidade?"]
+    D -->|Não| F["Trabalho ao sol ou fotossensibilidade?"]
     F -->|Sim| G["Preferir nintedanibe"]
-    F -->|Nao| H["Escolha conforme tolerancia<br/>e preferencia do paciente"]
+    F -->|Não| H["Escolha conforme tolerância<br/>e preferência do paciente"]
     E --> I["Titular dose, transaminases mensais<br/>nos primeiros meses"]
     G --> I
     H --> I
@@ -37765,16 +37765,16 @@ Situações especiais: na **gestação**, a sarcoidose costuma melhorar e predni
 
 \`\`\`mermaid
 flowchart TD
-    A["Adenopatia hilar bilateral<br/>com ou sem infiltrado"] --> B["Sindrome de Lofgren<br/>ou Heerfordt tipica?"]
-    B -->|Sim| C["Diagnostico clinico<br/>dispensa biopsia"]
-    B -->|Nao| D["Biopsia do sitio mais acessivel<br/>EBUS-TBNA no mediastino"]
-    D --> E["Granuloma nao caseoso +<br/>TB, fungo e linfoma excluidos"]
-    C --> F["Avaliar orgaos: oftalmo, ECG,<br/>calcio, funcao pulmonar"]
+    A["Adenopatia hilar bilateral<br/>com ou sem infiltrado"] --> B["Síndrome de Löfgren<br/>ou Heerfordt típica?"]
+    B -->|Sim| C["Diagnóstico clínico<br/>dispensa biópsia"]
+    B -->|Não| D["Biópsia do sítio mais acessível<br/>EBUS-TBNA no mediastino"]
+    D --> E["Granuloma não caseoso +<br/>TB, fungo e linfoma excluidos"]
+    C --> F["Avaliar órgãos: oftalmo, ECG,<br/>cálcio, função pulmonar"]
     E --> F
-    F --> G["Coracao, SNC, olho, hipercalcemia<br/>ou pulmao progressivo?"]
-    G -->|Nao| H["Observacao com reavaliacao<br/>clinica e funcional"]
+    F --> G["Coração, SNC, olho, hipercalcemia<br/>ou pulmao progressivo?"]
+    G -->|Não| H["Observação com reavaliação<br/>clínica e funcional"]
     G -->|Sim| I["Prednisona 20-40 mg/dia<br/>com desmame lento"]
-    I --> J["Refratario ou dependente:<br/>metotrexato, depois anti-TNF"]
+    I --> J["Refratário ou dependente:<br/>metotrexato, depois anti-TNF"]
     class G critical;
     class I action;
     class J action;
@@ -37784,14 +37784,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Granuloma na biopsia"] --> B["Ha necrose caseosa?"]
-    B -->|Sim| C["Tratar como tuberculose<br/>ate prova em contrario"]
-    B -->|Nao| D["BAAR, cultura e teste molecular<br/>no material e no escarro"]
-    D --> E["Micobacteria ou fungo identificado?"]
-    E -->|Sim| F["Tratar a infeccao<br/>nao usar corticoide isolado"]
-    E -->|Nao| G["Quadro clinico-radiologico<br/>compativel com sarcoidose?"]
-    G -->|Nao| H["Reavaliar: linfoma, micose,<br/>reacao sarcoide peritumoral"]
-    G -->|Sim| I["Sarcoidose provavel<br/>aguardar cultura antes do corticoide"]
+    A["Granuloma na biópsia"] --> B["Há necrose caseosa?"]
+    B -->|Sim| C["Tratar como tuberculose<br/>até prova em contrário"]
+    B -->|Não| D["BAAR, cultura e teste molecular<br/>no material e no escarro"]
+    D --> E["Micobactéria ou fungo identificado?"]
+    E -->|Sim| F["Tratar a infecção<br/>não usar corticoide isolado"]
+    E -->|Não| G["Quadro clínico-radiológico<br/>compatível com sarcoidose?"]
+    G -->|Não| H["Reavaliar: linfoma, micose,<br/>reação sarcoide peritumoral"]
+    G -->|Sim| I["Sarcoidose provável<br/>aguardar cultura antes do corticoide"]
     I --> J["Piora com corticoide<br/>= reavaliar tuberculose"]
     class B critical;
     class J critical;
@@ -37990,12 +37990,12 @@ Nota sobre **resistência**: o uso agrícola de fungicidas azólicos selecionou 
 \`\`\`mermaid
 flowchart TD
     A["Suspeita de aspergilose pulmonar"] --> B["Qual o hospedeiro?"]
-    B -->|Asma ou fibrose cistica| C["IgE total alta + IgE/IgG especificas<br/>eosinofilia, bronquiectasia central"]
-    B -->|Cavidade previa de TB| D["Bola fungica na TC<br/>IgG anti-Aspergillus"]
-    B -->|Neutropenico ou imunossuprimido| E["Febre refrataria + nodulo com halo<br/>galactomanana soro/LBA"]
+    B -->|Asma ou fibrose cística| C["IgE total alta + IgE/IgG específicas<br/>eosinofilia, bronquiectasia central"]
+    B -->|Cavidade prévia de TB| D["Bola fúngica na TC<br/>IgG anti-Aspergillus"]
+    B -->|Neutropênico ou imunossuprimido| E["Febre refratária + nódulo com halo<br/>galactomanana soro/LBA"]
     C --> F["ABPA: corticoide oral<br/>+ itraconazol ou voriconazol"]
-    D --> G["Assintomatico: observar<br/>Hemoptise: embolizacao e cirurgia"]
-    E --> H["Iniciar voriconazol imediatamente<br/>ou isavuconazol; reduzir imunossupressao"]
+    D --> G["Assintomático: observar<br/>Hemoptise: embolização e cirurgia"]
+    E --> H["Iniciar voriconazol imediatamente<br/>ou isavuconazol; reduzir imunossupressão"]
     class E critical;
     class F action;
     class G action;
@@ -38006,14 +38006,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Asma, fibrose cistica ou bronquiectasia<br/>com controle ruim"] --> B["IgE especifica anti-A. fumigatus"]
-    B -->|Menor que 0,35 kUA/L| C["ABPA improvavel<br/>rever diagnostico da asma"]
-    B -->|Maior ou igual a 0,35| D["IgE total serica"]
-    D -->|Menor que 500 UI/mL| E["Reavaliar apos reduzir corticoide<br/>considerar outras causas"]
-    D -->|Maior ou igual a 500| F["IgG anti-Aspergillus, eosinofilos<br/>e TC de torax"]
+    A["Asma, fibrose cística ou bronquiectasia<br/>com controle ruim"] --> B["IgE específica anti-A. fumigatus"]
+    B -->|Menor que 0,35 kUA/L| C["ABPA improvável<br/>rever diagnóstico da asma"]
+    B -->|Maior ou igual a 0,35| D["IgE total sérica"]
+    D -->|Menor que 500 UI/mL| E["Reavaliar após reduzir corticoide<br/>considerar outras causas"]
+    D -->|Maior ou igual a 500| F["IgG anti-Aspergillus, eosinófilos<br/>e TC de tórax"]
     F --> G["Dois ou mais criterios presentes?"]
-    G -->|Nao| H["Sensibilizacao sem ABPA<br/>acompanhar"]
-    G -->|Sim| I["ABPA: corticoide oral em dose media<br/>+ itraconazol se recidiva ou dependencia"]
+    G -->|Não| H["Sensibilização sem ABPA<br/>acompanhar"]
+    G -->|Sim| I["ABPA: corticoide oral em dose média<br/>+ itraconazol se recidiva ou dependência"]
     I --> J["IgE total seriada<br/>alta sustentada = recidiva"]
     class G critical;
     class I action;
@@ -38193,15 +38193,15 @@ Some a isso a chamada **Lei dos 60 dias**, que assegura início do primeiro trat
 
 \`\`\`mermaid
 flowchart TD
-    A["Sintoma respiratorio persistente<br/>em tabagista ou nodulo suspeito"] --> B["TC de torax com contraste"]
-    B --> C["Biopsiar o sitio mais avancado<br/>material amplo para molecular"]
-    C --> D["Estadiar: PET-TC + RM de cranio<br/>TNM 9a edicao"]
-    D --> E["Pequenas celulas?"]
-    E -->|Sim| F["Limitado: quimio + RT toracica<br/>Extenso: quimio + imunoterapia"]
-    E -->|Nao| G["Doenca ressecavel?"]
-    G -->|Sim| H["Cirurgia com linfadenectomia<br/>+ terapia perioperatoria"]
-    G -->|Nao, estadio III| I["Quimiorradioterapia<br/>+ consolidacao com imunoterapia"]
-    G -->|Nao, metastatico| J["Painel molecular e PD-L1<br/>alvo especifico ou imuno +/- quimio"]
+    A["Sintoma respiratório persistente<br/>em tabagista ou nódulo suspeito"] --> B["TC de tórax com contraste"]
+    B --> C["Biopsiar o sítio mais avancado<br/>material amplo para molecular"]
+    C --> D["Estadiar: PET-TC + RM de crânio<br/>TNM 9ª edição"]
+    D --> E["Pequenas células?"]
+    E -->|Sim| F["Limitado: quimio + RT torácica<br/>Extenso: quimio + imunoterapia"]
+    E -->|Não| G["Doenca ressecável?"]
+    G -->|Sim| H["Cirurgia com linfadenectomia<br/>+ terapia perioperatória"]
+    G -->|Não, estádio III| I["Quimiorradioterapia<br/>+ consolidação com imunoterapia"]
+    G -->|Não, metastático| J["Painel molecular e PD-L1<br/>alvo específico ou imuno +/- quimio"]
     class E critical;
     class H action;
     class I action;
@@ -38212,13 +38212,13 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Nodulo pulmonar em tomografia"] --> B["Comparar com exames antigos"]
-    B -->|Estavel ha 2 anos, solido| C["Encerrar seguimento"]
-    B -->|Sem exame previo ou em crescimento| D["Calcificacao benigna ou gordura?"]
-    D -->|Sim| E["Provavel granuloma ou hamartoma<br/>seguimento"]
-    D -->|Nao| F["Risco do paciente e do nodulo"]
-    F -->|Baixo risco, nodulo pequeno| G["Vigilancia tomografica programada"]
-    F -->|Alto risco, espiculado ou crescendo| H["PET-TC e biopsia"]
+    A["Nódulo pulmonar em tomografia"] --> B["Comparar com exames antigos"]
+    B -->|Estável há 2 anos, sólido| C["Encerrar seguimento"]
+    B -->|Sem exame prévio ou em crescimento| D["Calcificação benigna ou gordura?"]
+    D -->|Sim| E["Provável granuloma ou hamartoma<br/>seguimento"]
+    D -->|Não| F["Risco do paciente e do nódulo"]
+    F -->|Baixo risco, nódulo pequeno| G["Vigilância tomográfica programada"]
+    F -->|Alto risco, espiculado ou crescendo| H["PET-TC e biópsia"]
     H --> I["Confirmado: estadiar e tratar"]
     class F critical;
     class H action;
@@ -38427,19 +38427,19 @@ Sobre antitrombóticos: em sangramento com risco de vida, suspender e considerar
 
 \`\`\`mermaid
 flowchart TD
-    A["Hematoquezia"] --> B["Instabilidade hemodinamica?"]
+    A["Hematoquezia"] --> B["Instabilidade hemodinâmica?"]
     B -->|Sim| C["Ressuscitar e excluir HDA<br/>considerar EDA"]
-    B -->|Nao| D["Toque retal e anuscopia<br/>estratificar risco"]
+    B -->|Não| D["Toque retal e anuscopia<br/>estratificar risco"]
     C --> E["Sangramento ativo intenso?"]
-    E -->|Sim| F["Angio-TC e arteriografia<br/>com embolizacao"]
-    E -->|Nao| G["Colonoscopia em ate 24h<br/>apos preparo"]
+    E -->|Sim| F["Angio-TC e arteriografia<br/>com embolização"]
+    E -->|Não| G["Colonoscopia em até 24h<br/>após preparo"]
     D --> H["Baixo risco?"]
     H -->|Sim| I["Alta com colonoscopia ambulatorial"]
-    H -->|Nao| G
-    G --> J["Hemostasia endoscopica<br/>clipe ou termica"]
+    H -->|Não| G
+    G --> J["Hemostasia endoscópica<br/>clipe ou térmica"]
     J --> K["Persiste?"]
     K -->|Sim| F
-    K -->|Nao| L["Observacao e investigacao etiologica"]
+    K -->|Não| L["Observação e investigação etiológica"]
     class B critical;
     class E critical;
     class F action;
@@ -38507,13 +38507,13 @@ Na doença diverticular, orientar dieta rica em fibras e evitar anti-inflamatór
 \`\`\`mermaid
 flowchart TD
     A["Sangramento cessou"] --> B["Colonoscopia ja realizada?"]
-    B -->|Nao| C["Agendar colonoscopia<br/>antes da alta"]
+    B -->|Não| C["Agendar colonoscopia<br/>antes da alta"]
     B -->|Sim| D["Etiologia identificada?"]
     C --> D
-    D -->|Sim| E["Tratar a causa<br/>e orientar prevencao"]
-    D -->|Nao| F["Sangramento persistente<br/>ou anemia sem causa?"]
-    F -->|Sim| G["Investigar delgado<br/>capsula ou enteroscopia"]
-    F -->|Nao| H["Seguimento ambulatorial"]
+    D -->|Sim| E["Tratar a causa<br/>e orientar prevenção"]
+    D -->|Não| F["Sangramento persistente<br/>ou anemia sem causa?"]
+    F -->|Sim| G["Investigar delgado<br/>cápsula ou enteroscopia"]
+    F -->|Não| H["Seguimento ambulatorial"]
     E --> I["Repor ferro e definir<br/>retorno do anticoagulante"]
     G --> I
     H --> I
@@ -38690,16 +38690,16 @@ Nos raros pacientes que não são candidatos a nenhuma intervenção, por progn�
 
 \`\`\`mermaid
 flowchart TD
-    A["Suspeita de coledocolitiase<br/>dor, ictericia, colestase"] --> B["Febre ou sinais de sepse?"]
-    B -->|Sim| C["Tratar como colangite<br/>antibiotico e drenagem urgente"]
-    B -->|Nao| D["Estratificar probabilidade<br/>com USG e provas hepaticas"]
+    A["Suspeita de coledocolitíase<br/>dor, icterícia, colestase"] --> B["Febre ou sinais de sepse?"]
+    B -->|Sim| C["Tratar como colangite<br/>antibiótico e drenagem urgente"]
+    B -->|Não| D["Estratificar probabilidade<br/>com USG e provas hepáticas"]
     D --> E["Alta probabilidade?"]
-    E -->|Sim| F["CPRE com papilotomia<br/>e retirada do calculo"]
-    E -->|Nao| G["ColangioRM ou ecoendoscopia"]
-    G --> H["Calculo confirmado?"]
+    E -->|Sim| F["CPRE com papilotomia<br/>e retirada do cálculo"]
+    E -->|Não| G["ColangioRM ou ecoendoscopia"]
+    G --> H["Cálculo confirmado?"]
     H -->|Sim| F
-    H -->|Nao| I["Colecistectomia sem<br/>investigacao adicional"]
-    F --> J["Colecistectomia na<br/>mesma internacao"]
+    H -->|Não| I["Colecistectomia sem<br/>investigação adicional"]
+    F --> J["Colecistectomia na<br/>mesma internação"]
     class B critical;
     class C action;
     class J action;
@@ -38945,14 +38945,14 @@ Uma nota realista: em serviço sem hemodinâmica e sem cirurgia vascular, a embo
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor abdominal intensa<br/>desproporcional ao exame"] --> B["Fator de risco vascular?<br/>FA, aterosclerose, baixo debito"]
+    A["Dor abdominal intensa<br/>desproporcional ao exame"] --> B["Fator de risco vascular?<br/>FA, aterosclerose, baixo débito"]
     B -->|Sim| C["Angio-TC imediata<br/>sem contraste oral positivo"]
-    B -->|Nao| D["Investigar outras causas<br/>manter suspeicao"]
-    C --> E["Isquemia mesenterica confirmada"]
-    E --> F["Heparina, antibiotico<br/>ressuscitacao volemica"]
+    B -->|Não| D["Investigar outras causas<br/>manter suspeição"]
+    C --> E["Isquemia mesentérica confirmada"]
+    E --> F["Heparina, antibiótico<br/>ressuscitação volêmica"]
     F --> G["Peritonite ou<br/>instabilidade?"]
     G -->|Sim| H["Laparotomia com ressecção<br/>e second look em 24-48h"]
-    G -->|Nao| I["Revascularizacao endovascular<br/>ou tratamento da causa"]
+    G -->|Não| I["Revascularização endovascular<br/>ou tratamento da causa"]
     class B critical;
     class G critical;
     class H action;
@@ -38966,14 +38966,14 @@ O fluxograma abaixo organiza a decisão pelo achado tomográfico, que é o que m
 \`\`\`mermaid
 flowchart TD
     A["Angio-TC define<br/>o mecanismo"] --> B["Embolia arterial<br/>falha abrupta na AMS"]
-    A --> C["Trombose arterial<br/>oclusao ostial com placa"]
-    A --> D["Nao oclusiva<br/>vasos perveis, afilados"]
-    A --> E["Trombose venosa<br/>trombo na veia mesenterica"]
+    A --> C["Trombose arterial<br/>oclusão ostial com placa"]
+    A --> D["Não oclusiva<br/>vasos perveis, afilados"]
+    A --> E["Trombose venosa<br/>trombo na veia mesentérica"]
     B --> F["Embolectomia aberta ou<br/>trombectomia endovascular"]
     C --> G["Angioplastia com stent<br/>ou bypass"]
-    D --> H["Otimizar debito, retirar<br/>vasopressor, suspender dieta"]
+    D --> H["Otimizar débito, retirar<br/>vasopressor, suspender dieta"]
     H --> I["Vasodilatador intra-arterial<br/>se espasmo persistente"]
-    E --> J["Anticoagulacao plena<br/>investigar trombofilia e neoplasia"]
+    E --> J["Anticoagulação plena<br/>investigar trombofilia e neoplasia"]
     A --> K["Peritonite ou pneumatose<br/>= laparotomia primeiro"]
     class K critical;
     class F action;
@@ -39203,17 +39203,17 @@ O tratamento do transtorno por uso de álcool é parte do tratamento hepático, 
 
 \`\`\`mermaid
 flowchart TD
-    A["Ictericia recente<br/>etilismo intenso"] --> B["AST maior que ALT<br/>AST e ALT abaixo de 300"]
-    B --> C["Excluir outras causas<br/>e rastrear infeccao"]
+    A["Icterícia recente<br/>etilismo intenso"] --> B["AST maior que ALT<br/>AST e ALT abaixo de 300"]
+    B --> C["Excluir outras causas<br/>e rastrear infecção"]
     C --> D["Maddrey maior ou igual a 32<br/>ou encefalopatia?"]
-    D -->|Nao| E["Abstinencia, nutricao<br/>tiamina e suporte"]
-    D -->|Sim| F["Infeccao ativa, HDA<br/>ou sepse?"]
+    D -->|Não| E["Abstinência, nutrição<br/>tiamina e suporte"]
+    D -->|Sim| F["Infecção ativa, HDA<br/>ou sepse?"]
     F -->|Sim| G["Tratar primeiro<br/>adiar corticoide"]
-    F -->|Nao| H["Prednisolona 40 mg/dia"]
+    F -->|Não| H["Prednisolona 40 mg/dia"]
     H --> I["Escore de Lille no D7"]
     I --> J["Respondedor?"]
     J -->|Sim| K["Completar 28 dias"]
-    J -->|Nao| L["Suspender corticoide<br/>avaliar transplante"]
+    J -->|Não| L["Suspender corticoide<br/>avaliar transplante"]
     class D critical;
     class F critical;
     class K action;
@@ -39432,15 +39432,15 @@ Após o transplante, a maioria dos pacientes recupera função renal, mas a SHR 
 
 \`\`\`mermaid
 flowchart TD
-    A["Cirrotico com ascite<br/>e creatinina subindo"] --> B["Suspender diuretico<br/>e nefrotoxicos"]
+    A["Cirrótico com ascite<br/>e creatinina subindo"] --> B["Suspender diurético<br/>e nefrotóxicos"]
     B --> C["Albumina 1 g/kg/dia<br/>por 2 dias"]
-    C --> D["Excluir PBE, obstrucao,<br/>NTA, doenca glomerular"]
+    C --> D["Excluir PBE, obstrução,<br/>NTA, doenca glomerular"]
     D --> E["Creatinina melhorou?"]
-    E -->|Sim| F["Era pre-renal<br/>reajustar diuretico"]
-    E -->|Nao| G["SHR-LRA"]
+    E -->|Sim| F["Era pre-renal<br/>reajustar diurético"]
+    E -->|Não| G["SHR-LRA"]
     G --> H["Terlipressina 0,5-2 mg 4-6/6h<br/>+ albumina"]
-    H --> I["Vigiar isquemia e<br/>insuficiencia respiratoria"]
-    G --> J["Encaminhar transplante<br/>dialise como ponte"]
+    H --> I["Vigiar isquemia e<br/>insuficiência respiratória"]
+    G --> J["Encaminhar transplante<br/>diálise como ponte"]
     class G critical;
     class I critical;
     class H action;
@@ -39453,14 +39453,14 @@ O segundo fluxograma organiza a resposta pela gravidade da lesão renal, que é 
 
 \`\`\`mermaid
 flowchart TD
-    A["Creatinina subiu 0,3 mg/dL em 48h<br/>ou 50% sobre a basal"] --> B["Retirar nefrotoxico e diuretico<br/>tratar infeccao, rever volemia"]
-    B --> C["Estagio 1A<br/>creatinina abaixo de 1,5"]
-    B --> D["Estagio 1B, 2 ou 3"]
+    A["Creatinina subiu 0,3 mg/dL em 48h<br/>ou 50% sobre a basal"] --> B["Retirar nefrotóxico e diurético<br/>tratar infecção, rever volemia"]
+    B --> C["Estágio 1A<br/>creatinina abaixo de 1,5"]
+    B --> D["Estágio 1B, 2 ou 3"]
     C --> E["Reavaliar em 48h<br/>maioria resolve"]
     D --> F["Albumina 1 g/kg/dia<br/>por 2 dias"]
     F --> G["Persiste elevada e<br/>criterios de SHR?"]
     G -->|Sim| H["Vasoconstritor sem demora<br/>terlipressina ou noradrenalina"]
-    G -->|Nao| I["Tratar a causa identificada"]
+    G -->|Não| I["Tratar a causa identificada"]
     H --> J["Encaminhar transplante<br/>em paralelo"]
     class D critical;
     class G critical;
@@ -39675,15 +39675,15 @@ Complementos práticos de prescrição: metformina pode ser mantida na cirrose c
 
 \`\`\`mermaid
 flowchart TD
-    A["Suspeita de cirrose<br/>plaquetopenia, USG, clinica"] --> B["Confirmar e definir<br/>etiologia"]
+    A["Suspeita de cirrose<br/>plaquetopenia, USG, clínica"] --> B["Confirmar e definir<br/>etiologia"]
     B --> C["Estadiar: Child-Pugh,<br/>MELD, elastografia"]
-    C --> D["Tratar a causa<br/>abstinencia, antiviral, metabolico"]
+    C --> D["Tratar a causa<br/>abstinência, antiviral, metabólico"]
     D --> E["EDA de rastreio<br/>de varizes"]
     E --> F["Varizes de risco?"]
-    F -->|Sim| G["Betabloqueador nao seletivo<br/>ou ligadura"]
-    F -->|Nao| H["Repetir EDA<br/>conforme protocolo"]
+    F -->|Sim| G["Betabloqueador não seletivo<br/>ou ligadura"]
+    F -->|Não| H["Repetir EDA<br/>conforme protocolo"]
     D --> I["USG + AFP a cada<br/>6 meses para CHC"]
-    C --> J["Descompensou?<br/>ascite, HDA, EH, ictericia"]
+    C --> J["Descompensou?<br/>ascite, HDA, EH, icterícia"]
     J --> K["Encaminhar a<br/>centro de transplante"]
     class J critical;
     class G action;
@@ -39695,13 +39695,13 @@ Um segundo eixo de decisão, agora não invasivo, orienta quem precisa de endosc
 
 \`\`\`mermaid
 flowchart TD
-    A["Doenca hepatica cronica<br/>suspeita de fibrose avancada"] --> B["Elastografia + plaquetas<br/>em jejum"]
+    A["Doenca hepática cronica<br/>suspeita de fibrose avançada"] --> B["Elastografia + plaquetas<br/>em jejum"]
     B --> C["Rigidez menor que 10 kPa?"]
-    C -->|Sim| D["cACLD improvavel<br/>reavaliar periodicamente"]
-    C -->|Nao| E["cACLD provavel<br/>rigidez acima de 15 kPa"]
+    C -->|Sim| D["cACLD improvável<br/>reavaliar periodicamente"]
+    C -->|Não| E["cACLD provável<br/>rigidez acima de 15 kPa"]
     E --> F["Rigidez menor que 15 kPa<br/>e plaquetas acima de 150 mil?"]
     F -->|Sim| G["HPCS afastada<br/>dispensa EDA imediata"]
-    F -->|Nao| H["Rigidez acima de 25 kPa<br/>HPCS estabelecida"]
+    F -->|Não| H["Rigidez acima de 25 kPa<br/>HPCS estabelecida"]
     H --> I["Carvedilol em dose<br/>tolerada"]
     E --> J["Entrar em rastreio de CHC<br/>USG + AFP semestral"]
     class H critical;
@@ -39938,16 +39938,16 @@ Rastrear fibrose/cirrose e complicações: quem já tem doença avançada entra 
 
 \`\`\`mermaid
 flowchart TD
-    A["Esteatose + criterio<br/>cardiometabolico = MASLD"] --> B["Quantificar alcool<br/>faixa intermediaria = MetALD"]
+    A["Esteatose + critério<br/>cardiometabólico = MASLD"] --> B["Quantificar alcool<br/>faixa intermediária = MetALD"]
     B --> C["Calcular FIB-4"]
     C --> D["FIB-4 baixo?"]
     D -->|Sim| E["Baixo risco<br/>reavaliar periodicamente"]
-    D -->|Nao| F["Elastografia hepatica"]
-    F --> G["Fibrose avancada?"]
-    G -->|Nao| H["Estilo de vida +<br/>controle metabolico"]
-    G -->|Sim| I["Doenca hepatica avancada<br/>rastrear CHC e varizes"]
+    D -->|Não| F["Elastografia hepática"]
+    F --> G["Fibrose avançada?"]
+    G -->|Não| H["Estilo de vida +<br/>controle metabólico"]
+    G -->|Sim| I["Doenca hepática avançada<br/>rastrear CHC e varizes"]
     H --> J["Perda de 7-10% do peso<br/>GLP-1, iSGLT2, pioglitazona"]
-    I --> K["Encaminhar hepatologia<br/>avaliar terapia especifica F2-F3"]
+    I --> K["Encaminhar hepatologia<br/>avaliar terapia específica F2-F3"]
     class I critical;
     class J action;
     class K action;
@@ -40190,16 +40190,16 @@ Todos os casos devem ser discutidos em equipe multidisciplinar — hepatologia, 
 
 \`\`\`mermaid
 flowchart TD
-    A["Cirrotico: USG + AFP<br/>a cada 6 meses"] --> B["Nodulo maior<br/>que 1 cm?"]
-    B -->|Nao| C["Repetir USG em<br/>intervalo curto"]
+    A["Cirrótico: USG + AFP<br/>a cada 6 meses"] --> B["Nódulo maior<br/>que 1 cm?"]
+    B -->|Não| C["Repetir USG em<br/>intervalo curto"]
     B -->|Sim| D["TC ou RM com<br/>contraste - LI-RADS"]
     D --> E["Wash-in arterial +<br/>wash-out?"]
-    E -->|Sim| F["Diagnostico de CHC<br/>sem biopsia"]
-    E -->|Nao| G["Lesao indeterminada<br/>considerar biopsia"]
+    E -->|Sim| F["Diagnóstico de CHC<br/>sem biópsia"]
+    E -->|Não| G["Lesão indeterminada<br/>considerar biópsia"]
     F --> H["Estadiar por BCLC<br/>tumor + Child + ECOG"]
-    H --> I["Precoce: ressecar,<br/>ablacao ou transplante"]
-    H --> J["Intermediario: TACE"]
-    H --> K["Avancado: terapia<br/>sistemica"]
+    H --> I["Precoce: ressecar,<br/>ablação ou transplante"]
+    H --> J["Intermediário: TACE"]
+    H --> K["Avancado: terapia<br/>sistêmica"]
     class E critical;
     class I action;
     class J action;
@@ -40212,12 +40212,12 @@ O segundo eixo de decisão é o da reserva hepática e do desempenho, que freque
 flowchart TD
     A["CHC confirmado"] --> B["Avaliar Child-Pugh<br/>e ECOG"]
     B --> C["Child C fora de fila<br/>ou ECOG 3-4?"]
-    C -->|Sim| D["Estagio terminal<br/>cuidados paliativos"]
-    C -->|Nao| E["Invasao vascular ou<br/>metastase a distancia?"]
-    E -->|Sim| F["Estagio avancado<br/>terapia sistemica"]
-    E -->|Nao| G["Dentro dos criterios<br/>de Milao?"]
+    C -->|Sim| D["Estágio terminal<br/>cuidados paliativos"]
+    C -->|Não| E["Invasão vascular ou<br/>metástase a distância?"]
+    E -->|Sim| F["Estágio avancado<br/>terapia sistêmica"]
+    E -->|Não| G["Dentro dos criterios<br/>de Milão?"]
     G -->|Sim| H["Encaminhar a centro<br/>de transplante"]
-    G -->|Nao| I["Multinodular: TACE<br/>e avaliar downstaging"]
+    G -->|Não| I["Multinodular: TACE<br/>e avaliar downstaging"]
     class C critical;
     class D action;
     class H action;
@@ -40452,16 +40452,16 @@ A refratária divide-se em dois tipos conforme a população de linfócitos intr
 
 \`\`\`mermaid
 flowchart TD
-    A["Suspeita clinica ou<br/>grupo de risco"] --> B["Anti-tTG IgA +<br/>IgA total, com gluten na dieta"]
+    A["Suspeita clínica ou<br/>grupo de risco"] --> B["Anti-tTG IgA +<br/>IgA total, com glúten na dieta"]
     B --> C["IgA total normal?"]
-    C -->|Nao| D["Usar testes IgG<br/>anti-tTG IgG, anti-DGP IgG"]
+    C -->|Não| D["Usar testes IgG<br/>anti-tTG IgG, anti-DGP IgG"]
     C -->|Sim| E["Anti-tTG positivo?"]
-    E -->|Nao| F["Baixa probabilidade<br/>buscar outro diagnostico"]
-    E -->|Sim| G["EDA com multiplas<br/>biopsias duodenais"]
-    G --> H["Atrofia vilositaria<br/>Marsh"]
-    H --> I["Dieta sem gluten<br/>por toda a vida"]
-    I --> J["Repor ferro, B12,<br/>vitamina D e calcio"]
-    I --> K["Seguimento clinico e<br/>sorologico; densitometria"]
+    E -->|Não| F["Baixa probabilidade<br/>buscar outro diagnóstico"]
+    E -->|Sim| G["EDA com múltiplas<br/>biópsias duodenais"]
+    G --> H["Atrofia vilositária<br/>Marsh"]
+    H --> I["Dieta sem glúten<br/>por toda a vida"]
+    I --> J["Repor ferro, B12,<br/>vitamina D e cálcio"]
+    I --> K["Seguimento clínico e<br/>sorológico; densitometria"]
     class G critical;
     class I action;
     class J action;
@@ -40472,14 +40472,14 @@ Um segundo eixo de decisão resolve o cenário mais comum do consultório — o 
 
 \`\`\`mermaid
 flowchart TD
-    A["Sintomas persistem<br/>apesar da dieta"] --> B["Revisar diagnostico<br/>original com nutricionista"]
+    A["Sintomas persistem<br/>apesar da dieta"] --> B["Revisar diagnóstico<br/>original com nutricionista"]
     B --> C["Sorologia ainda<br/>positiva?"]
-    C -->|Sim| D["Transgressao ate prova<br/>em contrario: buscar fontes ocultas"]
-    C -->|Nao| E["Investigar causas<br/>associadas"]
-    E --> F["Lactose, FODMAPs,<br/>supercrescimento, pancreatica"]
-    F --> G["Persistiu: repetir EDA<br/>com biopsias"]
+    C -->|Sim| D["Transgressão até prova<br/>em contrário: buscar fontes ocultas"]
+    C -->|Não| E["Investigar causas<br/>associadas"]
+    E --> F["Lactose, FODMAPs,<br/>supercrescimento, pancreática"]
+    F --> G["Persistiu: repetir EDA<br/>com biópsias"]
     G --> H["Atrofia mantida com<br/>dieta rigorosa"]
-    H --> I["Doenca refrataria: centro<br/>especializado, excluir linfoma"]
+    H --> I["Doenca refratária: centro<br/>especializado, excluir linfoma"]
     class H critical;
     class D action;
     class F action;
@@ -40723,11 +40723,11 @@ flowchart TD
     B -->|Não| D["Acesso venoso e monitorização"]
     C --> E["Terlipressina 2 mg IV 4/4h<br/>+ ceftriaxona 1 g/dia"]
     D --> E
-    E --> F["EDA em ate 12h"]
-    F --> G["Ligadura elastica ou<br/>cianoacrilato se gastrica"]
+    E --> F["EDA em até 12h"]
+    F --> G["Ligadura elástica ou<br/>cianoacrilato se gástrica"]
     G --> H["Sangramento controlado?"]
-    H -->|Sim| I["Profilaxia secundaria<br/>betabloqueador + ligadura"]
-    H -->|Nao| J["Balao como ponte<br/>encaminhar para TIPS"]
+    H -->|Sim| I["Profilaxia secundária<br/>betabloqueador + ligadura"]
+    H -->|Não| J["Balão como ponte<br/>encaminhar para TIPS"]
     class B critical;
     class H critical;
     class I action;
@@ -40803,16 +40803,16 @@ Oriente o paciente e a família a reconhecer sinais de novo sangramento (fezes p
 \`\`\`mermaid
 flowchart TD
     A["Sangramento varicoso controlado"] --> B["Child C 10-13 ou<br/>Child B com sangramento ativo?"]
-    B -->|Sim| C["TIPS pre-emptivo em ate 72h<br/>idealmente em 24h"]
-    B -->|Nao| D["Betabloqueador nao seletivo<br/>+ programa de ligadura"]
-    C --> E["Encefalopatia nova<br/>ou disfuncao do stent?"]
+    B -->|Sim| C["TIPS pre-emptivo em até 72h<br/>idealmente em 24h"]
+    B -->|Não| D["Betabloqueador não seletivo<br/>+ programa de ligadura"]
+    C --> E["Encefalopatia nova<br/>ou disfunção do stent?"]
     E -->|Sim| F["Reavaliar shunt<br/>tratar encefalopatia"]
-    E -->|Nao| G["Seguimento hepatologico"]
-    D --> H["Ascite refrataria ou<br/>PAM abaixo de 65?"]
+    E -->|Não| G["Seguimento hepatológico"]
+    D --> H["Ascite refratária ou<br/>PAM abaixo de 65?"]
     H -->|Sim| I["Reduzir ou suspender<br/>betabloqueador e reavaliar"]
-    H -->|Nao| J["Ligadura a cada 2-4 semanas<br/>ate erradicar"]
+    H -->|Não| J["Ligadura a cada 2-4 semanas<br/>até erradicar"]
     J --> G
-    G --> K["Rastreio de CHC, vacinas,<br/>abstinencia, avaliar transplante"]
+    G --> K["Rastreio de CHC, vacinas,<br/>abstinência, avaliar transplante"]
     class B critical;
     class H critical;
     class C action;
@@ -40979,16 +40979,16 @@ Profilaxia de úlcera de estresse na UTI se justifica principalmente em ventila�
 
 \`\`\`mermaid
 flowchart TD
-    A["Hematemese ou melena<br/>suspeita de HDA"] --> B["Instavel apos ressuscitacao?"]
-    B -->|Sim| C["EDA em ate 12h<br/>UTI"]
-    B -->|Nao| D["Glasgow-Blatchford"]
+    A["Hematêmese ou melena<br/>suspeita de HDA"] --> B["Instável após ressuscitação?"]
+    B -->|Sim| C["EDA em até 12h<br/>UTI"]
+    B -->|Não| D["Glasgow-Blatchford"]
     D --> E["Muito baixo risco?"]
     E -->|Sim| F["Alta com EDA ambulatorial"]
-    E -->|Nao| G["Internar e EDA em ate 24h"]
+    E -->|Não| G["Internar e EDA em até 24h"]
     C --> H["Forrest de alto risco?"]
     G --> H
     H -->|Sim| I["Hemostasia dupla<br/>IBP 80 mg bolus e 8 mg/h"]
-    H -->|Nao| J["IBP oral e dieta precoce"]
+    H -->|Não| J["IBP oral e dieta precoce"]
     I --> K["Erradicar H. pylori<br/>e revisar AINE"]
     J --> K
     class B critical;
@@ -41057,16 +41057,16 @@ Reavaliação ambulatorial em 2–4 semanas, com hemograma e revisão da adesão
 
 \`\`\`mermaid
 flowchart TD
-    A["Hemostasia endoscopica realizada"] --> B["Sinal de ressangramento<br/>nas primeiras 72h?"]
+    A["Hemostasia endoscópica realizada"] --> B["Sinal de ressangramento<br/>nas primeiras 72h?"]
     B -->|Sim| C["Repetir EDA<br/>com nova hemostasia"]
-    B -->|Nao| D["IBP oral e dieta<br/>progressiva"]
+    B -->|Não| D["IBP oral e dieta<br/>progressiva"]
     C --> E["Falha da segunda EDA?"]
-    E -->|Sim| F["Embolizacao arterial<br/>ou cirurgia"]
-    E -->|Nao| D
+    E -->|Sim| F["Embolização arterial<br/>ou cirurgia"]
+    E -->|Não| D
     D --> G["Causa identificada?"]
     G -->|H. pylori| H["Erradicar e confirmar<br/>com teste de controle"]
-    G -->|AINE| I["Suspender ou associar IBP<br/>revisar indicacao"]
-    H --> J["Alta com ferro, IBP<br/>e plano antitrombotico"]
+    G -->|AINE| I["Suspender ou associar IBP<br/>revisar indicação"]
+    H --> J["Alta com ferro, IBP<br/>e plano antitrombótico"]
     I --> J
     class B critical;
     class E critical;
@@ -41243,17 +41243,17 @@ Vale conhecer a recomendação explícita de transferência: pacientes com colan
 
 \`\`\`mermaid
 flowchart TD
-    A["Febre, ictericia e dor<br/>suspeita de colangite"] --> B["Criterios de Toquio<br/>inflamacao, colestase, imagem"]
-    B --> C["Hemocultura e antibiotico IV<br/>ressuscitacao volemica"]
-    C --> D["Disfuncao organica<br/>ou hipotensao?"]
+    A["Febre, icterícia e dor<br/>suspeita de colangite"] --> B["Criterios de Tóquio<br/>inflamação, colestase, imagem"]
+    B --> C["Hemocultura e antibiótico IV<br/>ressuscitação volêmica"]
+    C --> D["Disfunção orgânica<br/>ou hipotensão?"]
     D -->|Sim| E["Grau III: UTI e<br/>drenagem urgente"]
-    D -->|Nao| F["Grau I ou II"]
-    F --> G["Responde ao tratamento<br/>clinico inicial?"]
-    G -->|Nao| H["Drenagem biliar precoce<br/>por CPRE"]
-    G -->|Sim| I["Drenagem programada<br/>na mesma internacao"]
-    E --> J["CPRE indisponivel?"]
-    J -->|Sim| K["Drenagem percutanea<br/>ou transferencia"]
-    J -->|Nao| H
+    D -->|Não| F["Grau I ou II"]
+    F --> G["Responde ao tratamento<br/>clínico inicial?"]
+    G -->|Não| H["Drenagem biliar precoce<br/>por CPRE"]
+    G -->|Sim| I["Drenagem programada<br/>na mesma internação"]
+    E --> J["CPRE indisponível?"]
+    J -->|Sim| K["Drenagem percutânea<br/>ou transferência"]
+    J -->|Não| H
     class D critical;
     class E critical;
     class H action;
@@ -41321,13 +41321,13 @@ Orientar o paciente e a família a procurar atendimento imediato diante de febre
 
 \`\`\`mermaid
 flowchart TD
-    A["Colangite drenada e estavel"] --> B["Causa da obstrucao?"]
-    B -->|Coledocolitiase| C["Calculo totalmente removido?"]
-    B -->|Estenose benigna| D["Programar troca de protese<br/>e reavaliacao"]
-    B -->|Neoplasia| E["Estadiamento e discussao<br/>com oncologia"]
-    C -->|Nao| F["Segunda CPRE programada"]
-    C -->|Sim| G["Colecistectomia na<br/>mesma internacao"]
-    G --> H["Alta com orientacao<br/>de sinais de recorrencia"]
+    A["Colangite drenada e estável"] --> B["Causa da obstrução?"]
+    B -->|Coledocolitíase| C["Cálculo totalmente removido?"]
+    B -->|Estenose benigna| D["Programar troca de prótese<br/>e reavaliação"]
+    B -->|Neoplasia| E["Estadiamento e discussão<br/>com oncologia"]
+    C -->|Não| F["Segunda CPRE programada"]
+    C -->|Sim| G["Colecistectomia na<br/>mesma internação"]
+    G --> H["Alta com orientação<br/>de sinais de recorrência"]
     D --> H
     E --> H
     F --> G
@@ -41505,18 +41505,18 @@ Sobre a **drenagem percutânea**: costuma trazer melhora clínica em 24 a 72 hor
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor em HD prolongada<br/>Murphy positivo"] --> B["USG: calculo, parede<br/>espessada, liquido"]
-    B --> C["Jejum, hidratacao, analgesia<br/>antibiotico IV"]
-    C --> D["Disfuncao organica?"]
+    A["Dor em HD prolongada<br/>Murphy positivo"] --> B["USG: cálculo, parede<br/>espessada, líquido"]
+    B --> C["Jejum, hidratação, analgesia<br/>antibiótico IV"]
+    C --> D["Disfunção orgânica?"]
     D -->|Sim| E["Grau III: UTI"]
-    D -->|Nao| F["Grau I ou II"]
-    E --> G["Alto risco cirurgico?"]
+    D -->|Não| F["Grau I ou II"]
+    E --> G["Alto risco cirúrgico?"]
     F --> G
-    G -->|Sim| H["Colecistostomia percutanea<br/>cirurgia programada depois"]
-    G -->|Nao| I["Colecistectomia laparoscopica<br/>precoce em ate 72h"]
+    G -->|Sim| H["Colecistostomia percutânea<br/>cirurgia programada depois"]
+    G -->|Não| I["Colecistectomia laparoscópica<br/>precoce em até 72h"]
     I --> J["Colestase ou via biliar<br/>dilatada?"]
-    J -->|Sim| K["Investigar coledocolitiase<br/>colangioRM, eco ou CPRE"]
-    J -->|Nao| L["Alta apos recuperacao"]
+    J -->|Sim| K["Investigar coledocolitíase<br/>colangioRM, eco ou CPRE"]
+    J -->|Não| L["Alta após recuperação"]
     class D critical;
     class I action;
     class H action;
@@ -41777,17 +41777,17 @@ A orientação mais recente é objetiva quanto a isso: a apendicectomia de inter
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor migratoria para FID<br/>anorexia e nausea"] --> B["Beta-HCG e escore<br/>Alvarado ou AIR"]
+    A["Dor migratória para FID<br/>anorexia e nausea"] --> B["Beta-HCG e escore<br/>Alvarado ou AIR"]
     B --> C["Risco baixo?"]
-    C -->|Sim| D["Observacao clinica<br/>e reavaliacao seriada"]
-    C -->|Nao| E["Imagem: USG em jovem<br/>e gestante, TC em adulto"]
-    E --> F["Apendicite complicada?<br/>abscesso ou perfuracao"]
-    F -->|Sim| G["Antibiotico IV e drenagem<br/>percutanea se abscesso"]
-    F -->|Nao| H["Apendicectomia laparoscopica<br/>em ate 24h"]
-    H --> I["Antibiotico apenas<br/>perioperatorio"]
-    G --> J["Peritonite difusa<br/>ou piora clinica?"]
-    J -->|Sim| K["Cirurgia de urgencia"]
-    J -->|Nao| L["Seguimento e colonoscopia<br/>apos resolucao"]
+    C -->|Sim| D["Observação clínica<br/>e reavaliação seriada"]
+    C -->|Não| E["Imagem: USG em jovem<br/>e gestante, TC em adulto"]
+    E --> F["Apendicite complicada?<br/>abscesso ou perfuração"]
+    F -->|Sim| G["Antibiótico IV e drenagem<br/>percutânea se abscesso"]
+    F -->|Não| H["Apendicectomia laparoscópica<br/>em até 24h"]
+    H --> I["Antibiótico apenas<br/>perioperatório"]
+    G --> J["Peritonite difusa<br/>ou piora clínica?"]
+    J -->|Sim| K["Cirurgia de urgência"]
+    J -->|Não| L["Seguimento e colonoscopia<br/>após resolução"]
     class F critical;
     class J critical;
     class H action;
@@ -42040,15 +42040,15 @@ Sobre medicações propostas para prevenção de recorrência — mesalazina, ri
 flowchart TD
     A["Dor em FIE, febre<br/>suspeita de diverticulite"] --> B["TC de abdome<br/>com contraste"]
     B --> C["Complicada?<br/>abscesso, ar livre, peritonite"]
-    C -->|Nao| D["Estavel, imunocompetente<br/>tolera via oral?"]
-    D -->|Sim| E["Tratamento ambulatorial<br/>sem antibiotico e reavaliar"]
-    D -->|Nao| F["Internar com antibiotico"]
+    C -->|Não| D["Estável, imunocompetente<br/>tolera via oral?"]
+    D -->|Sim| E["Tratamento ambulatorial<br/>sem antibiótico e reavaliar"]
+    D -->|Não| F["Internar com antibiótico"]
     C -->|Sim| G["Peritonite difusa?"]
-    G -->|Sim| H["Cirurgia de urgencia"]
-    G -->|Nao| I["Abscesso maior que 4 cm?"]
-    I -->|Sim| J["Drenagem percutanea<br/>e antibiotico IV"]
-    I -->|Nao| F
-    E --> K["Colonoscopia apos 6 semanas"]
+    G -->|Sim| H["Cirurgia de urgência"]
+    G -->|Não| I["Abscesso maior que 4 cm?"]
+    I -->|Sim| J["Drenagem percutânea<br/>e antibiótico IV"]
+    I -->|Não| F
+    E --> K["Colonoscopia após 6 semanas"]
     J --> K
     class C critical;
     class G critical;
@@ -42321,17 +42321,17 @@ Sem cirurgia prévia e com obstrução de delgado, a chance de causa que exige o
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor em colica, distensao<br/>parada de fezes e flatos"] --> B["Jejum, SNG, hidratacao<br/>corrigir eletrolitos"]
-    B --> C["TC de abdome:<br/>nivel, causa, isquemia"]
+    A["Dor em colica, distensão<br/>parada de fezes e flatos"] --> B["Jejum, SNG, hidratação<br/>corrigir eletrólitos"]
+    B --> C["TC de abdome:<br/>nível, causa, isquemia"]
     C --> D["Sinais de estrangulamento<br/>ou peritonite?"]
-    D -->|Sim| E["Cirurgia de urgencia"]
-    D -->|Nao| F["Hernia encarcerada<br/>ou volvo?"]
-    F -->|Sim| G["Cirurgia ou desvolvulacao<br/>endoscopica no sigmoide"]
-    F -->|Nao| H["Obstrucao por aderencia<br/>parcial"]
-    H --> I["Contraste hidrossoluvel<br/>e observacao ate 48-72h"]
+    D -->|Sim| E["Cirurgia de urgência"]
+    D -->|Não| F["Hérnia encarcerada<br/>ou volvo?"]
+    F -->|Sim| G["Cirurgia ou desvolvulação<br/>endoscópica no sigmoide"]
+    F -->|Não| H["Obstrução por aderência<br/>parcial"]
+    H --> I["Contraste hidrossolúvel<br/>e observação até 48-72h"]
     I --> J["Resolveu?"]
     J -->|Sim| K["Dieta progressiva e alta"]
-    J -->|Nao| E
+    J -->|Não| E
     class D critical;
     class E action;
     class K action;
@@ -42339,18 +42339,18 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Distensao abdominal<br/>sem melhora"] --> B["Ha ponto de transicao<br/>na TC?"]
-    B -->|Sim| C["Obstrucao mecanica<br/>seguir fluxo cirurgico"]
-    B -->|Nao| D["Distensao predominante<br/>no colon?"]
-    D -->|Nao| E["Ileo paralitico:<br/>corrigir causa e eletrolitos"]
-    D -->|Sim| F["Pseudo-obstrucao colonica<br/>Ogilvie"]
+    A["Distensão abdominal<br/>sem melhora"] --> B["Há ponto de transição<br/>na TC?"]
+    B -->|Sim| C["Obstrução mecânica<br/>seguir fluxo cirúrgico"]
+    B -->|Não| D["Distensão predominante<br/>no cólon?"]
+    D -->|Não| E["Íleo paralítico:<br/>corrigir causa e eletrólitos"]
+    D -->|Sim| F["Pseudo-obstrução colônica<br/>Ogilvie"]
     F --> G["Suspender opioide<br/>corrigir K e Mg, sonda retal"]
     G --> H["Ceco maior que 12 cm<br/>ou sem melhora em 48h?"]
-    H -->|Nao| I["Manter manejo clinico"]
+    H -->|Não| I["Manter manejo clínico"]
     H -->|Sim| J["Neostigmina 2 mg IV<br/>monitorizado com atropina"]
-    J --> K["Falha ou contraindicacao?"]
-    K -->|Sim| L["Descompressao colonoscopica"]
-    L --> M["Perfuracao ou isquemia?"]
+    J --> K["Falha ou contraindicação?"]
+    K -->|Sim| L["Descompressão colonoscópica"]
+    L --> M["Perfuração ou isquemia?"]
     M -->|Sim| N["Cirurgia"]
     class B critical;
     class H critical;
@@ -42569,15 +42569,15 @@ Onde não há norfloxacino disponível, o ciprofloxacino oral é a alternativa m
 
 \`\`\`mermaid
 flowchart TD
-    A["Cirrotico com ascite<br/>internado ou piorando"] --> B["Paracentese<br/>diagnostica sempre"]
+    A["Cirrótico com ascite<br/>internado ou piorando"] --> B["Paracentese<br/>diagnostica sempre"]
     B --> C["PMN maior ou igual<br/>a 250/mm3?"]
-    C -->|Sim| D["Antibiotico IV imediato<br/>ceftriaxona 1 g 12/12h"]
-    C -->|Nao| E["Cultura positiva?<br/>bacterascite"]
+    C -->|Sim| D["Antibiótico IV imediato<br/>ceftriaxona 1 g 12/12h"]
+    C -->|Não| E["Cultura positiva?<br/>bacterascite"]
     D --> F["Albumina 1,5 g/kg D1<br/>e 1 g/kg D3"]
-    F --> G["Suspender betabloqueador<br/>se hipotensao ou LRA"]
-    D --> H["Sem melhora em 48h<br/>pensar peritonite secundaria"]
-    H --> I["TC de abdome<br/>avaliacao cirurgica"]
-    G --> J["Alta: profilaxia secundaria<br/>norfloxacino continuo"]
+    F --> G["Suspender betabloqueador<br/>se hipotensão ou LRA"]
+    D --> H["Sem melhora em 48h<br/>pensar peritonite secundária"]
+    H --> I["TC de abdome<br/>avaliação cirúrgica"]
+    G --> J["Alta: profilaxia secundária<br/>norfloxacino contínuo"]
     class C critical;
     class H critical;
     class F action;
@@ -42590,15 +42590,15 @@ O segundo fluxograma organiza a decisão que mais erra na prática: qual espectr
 
 \`\`\`mermaid
 flowchart TD
-    A["PBE confirmada<br/>PMN maior ou igual a 250"] --> B["Infeccao comunitaria<br/>sem antibiotico recente?"]
-    B -->|Sim| C["Cefalosporina de 3a geracao<br/>ceftriaxona 1 g 12/12h"]
-    B -->|Nao| D["Nosocomial, quinolona previa<br/>ou internacao recente"]
-    D --> E["Ampliar espectro conforme<br/>perfil local de resistencia"]
-    C --> F["Repuncao em 48h se<br/>duvida de resposta"]
+    A["PBE confirmada<br/>PMN maior ou igual a 250"] --> B["Infecção comunitária<br/>sem antibiótico recente?"]
+    B -->|Sim| C["Cefalosporina de 3ª geração<br/>ceftriaxona 1 g 12/12h"]
+    B -->|Não| D["Nosocomial, quinolona prévia<br/>ou internação recente"]
+    D --> E["Ampliar espectro conforme<br/>perfil local de resistência"]
+    C --> F["Repunção em 48h se<br/>dúvida de resposta"]
     E --> F
     F --> G["Queda de PMN<br/>menor que 25%?"]
-    G -->|Sim| H["Falha ou peritonite<br/>secundaria: TC de abdome"]
-    G -->|Nao| I["Manter e descalonar<br/>pela cultura"]
+    G -->|Sim| H["Falha ou peritonite<br/>secundária: TC de abdome"]
+    G -->|Não| I["Manter e descalonar<br/>pela cultura"]
     class D critical;
     class H critical;
     class C action;
@@ -42813,13 +42813,13 @@ Em ascite por outra causa, o tratamento é o da doença de base: diurético tem 
 flowchart TD
     A["Ascite nova<br/>ou em piora"] --> B["Paracentese diagnostica<br/>albumina, PMN, cultura"]
     B --> C["PMN maior ou igual<br/>a 250/mm3?"]
-    C -->|Sim| D["Tratar como PBE<br/>antibiotico + albumina"]
-    C -->|Nao| E["Calcular GASA"]
+    C -->|Sim| D["Tratar como PBE<br/>antibiótico + albumina"]
+    C -->|Não| E["Calcular GASA"]
     E --> F["GASA maior ou igual a 1,1?"]
-    F -->|Sim| G["Hipertensao portal<br/>cirrose ou cardiaca"]
-    F -->|Nao| H["Investigar neoplasia,<br/>TB, nefrotica"]
-    G --> I["Sodio 2 g/dia +<br/>espironolactona 100 +<br/>furosemida 40"]
-    I --> J["Refrataria: paracenteses<br/>+ albumina, TIPS, transplante"]
+    F -->|Sim| G["Hipertensão portal<br/>cirrose ou cardíaca"]
+    F -->|Não| H["Investigar neoplasia,<br/>TB, nefrótica"]
+    G --> I["Sódio 2 g/dia +<br/>espironolactona 100 +<br/>furosemida 40"]
+    I --> J["Refratária: paracenteses<br/>+ albumina, TIPS, transplante"]
     class C critical;
     class D action;
     class I action;
@@ -43084,14 +43084,14 @@ Outras medidas discutidas em cenários selecionados incluem aminoácidos de cade
 
 \`\`\`mermaid
 flowchart TD
-    A["Cirrótico com<br/>rebaixamento"] --> B["Glicemia, eletrolitos,<br/>excluir AVC/trauma"]
+    A["Cirrótico com<br/>rebaixamento"] --> B["Glicemia, eletrólitos,<br/>excluir AVC/trauma"]
     B --> C["Procurar precipitante<br/>PBE, HDA, K baixo, sedativo"]
-    C --> D["Lactulose ate<br/>2-3 evacuacoes/dia"]
+    C --> D["Lactulose até<br/>2-3 evacuações/dia"]
     D --> E["Melhora em 24-48h?"]
-    E -->|Sim| F["Manter lactulose<br/>+ nutricao 1,2-1,5 g/kg"]
-    E -->|Nao| G["Rever precipitante<br/>e diagnostico<br/>TC de cranio"]
+    E -->|Sim| F["Manter lactulose<br/>+ nutrição 1,2-1,5 g/kg"]
+    E -->|Não| G["Rever precipitante<br/>e diagnóstico<br/>TC de crânio"]
     G --> H["Associar rifaximina<br/>550 mg 12/12h"]
-    A --> I["Grau III-IV: risco<br/>de aspiracao / via aerea"]
+    A --> I["Grau III-IV: risco<br/>de aspiração / via aérea"]
     class I critical;
     class E critical;
     class F action;
@@ -43104,18 +43104,18 @@ O fluxograma a seguir organiza a busca sistemática, que é a intervenção de m
 
 \`\`\`mermaid
 flowchart TD
-    A["EH manifesta<br/>no cirrotico"] --> B["Infeccao?<br/>paracentese, urina, torax"]
+    A["EH manifesta<br/>no cirrótico"] --> B["Infecção?<br/>paracentese, urina, tórax"]
     A --> C["Sangramento?<br/>toque retal, Hb, melena"]
-    A --> D["Eletrolitos?<br/>K, Na, gasometria"]
-    A --> E["Medicamentos?<br/>sedativo, opioide, diuretico"]
-    A --> F["Constipacao ou<br/>desidratacao?"]
+    A --> D["Eletrólitos?<br/>K, Na, gasometria"]
+    A --> E["Medicamentos?<br/>sedativo, opioide, diurético"]
+    A --> F["Constipação ou<br/>desidratação?"]
     B --> G["Tratar foco e<br/>manter lactulose"]
-    C --> H["Suporte, EDA e<br/>profilaxia antibiotica"]
-    D --> I["Repor potassio<br/>corrigir alcalose"]
-    E --> J["Suspender o agente<br/>rever prescricao"]
-    F --> K["Lactulose ate<br/>2-3 evacuacoes/dia"]
+    C --> H["Suporte, EDA e<br/>profilaxia antibiótica"]
+    D --> I["Repor potássio<br/>corrigir alcalose"]
+    E --> J["Suspender o agente<br/>rever prescrição"]
+    F --> K["Lactulose até<br/>2-3 evacuações/dia"]
     A --> L["Sem precipitante e<br/>sem melhora em 48h"]
-    L --> M["TC de cranio e TC de abdome<br/>procurar shunt e subdural"]
+    L --> M["TC de crânio e TC de abdome<br/>procurar shunt e subdural"]
     class L critical;
     class G action;
     class I action;
@@ -43342,13 +43342,13 @@ Segurança dos IBP: as associações relatadas com nefrite intersticial, infecç
 
 \`\`\`mermaid
 flowchart TD
-    A["Pirose e/ou<br/>regurgitacao"] --> B["Sinais de alarme?<br/>disfagia, perda de peso, anemia"]
-    B -->|Sim| C["EDA obrigatoria"]
-    B -->|Nao| D["Medidas + IBP 20-40 mg/dia<br/>30-60 min antes do cafe"]
+    A["Pirose e/ou<br/>regurgitação"] --> B["Sinais de alarme?<br/>disfagia, perda de peso, anemia"]
+    B -->|Sim| C["EDA obrigatória"]
+    B -->|Não| D["Medidas + IBP 20-40 mg/dia<br/>30-60 min antes do café"]
     D --> E["Melhorou em<br/>4-8 semanas?"]
     E -->|Sim| F["Reduzir para menor dose<br/>eficaz ou sob demanda"]
-    E -->|Nao| G["Checar adesao e horario<br/>IBP 2x/dia"]
-    G --> H["Persiste: EDA com biopsias<br/>e pHmetria/impedancia"]
+    E -->|Não| G["Checar adesão e horário<br/>IBP 2x/dia"]
+    G --> H["Persiste: EDA com biópsias<br/>e pHmetria/impedância"]
     H --> I["Refluxo confirmado:<br/>considerar cirurgia"]
     class B critical;
     class C action;
@@ -43590,17 +43590,17 @@ Complicações: hemorragia digestiva alta é manejada com ressuscitação, IBP e
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor epigastrica<br/>ou dispepsia"] --> B["Sinais de alarme ou<br/>idade de risco?"]
-    B -->|Sim| C["EDA com biopsia"]
-    B -->|Nao| D["Testar e tratar<br/>H. pylori"]
-    C --> E["Ulcera gastrica:<br/>biopsiar sempre"]
+    A["Dor epigástrica<br/>ou dispepsia"] --> B["Sinais de alarme ou<br/>idade de risco?"]
+    B -->|Sim| C["EDA com biópsia"]
+    B -->|Não| D["Testar e tratar<br/>H. pylori"]
+    C --> E["Ulcera gástrica:<br/>biopsiar sempre"]
     E --> F["IBP 20-40 mg/dia<br/>por 4-8 semanas"]
-    D --> G["Quadrupla com bismuto<br/>14 dias - 1a linha"]
+    D --> G["Quádrupla com bismuto<br/>14 dias - 1ª linha"]
     F --> G
     G --> H["Suspender AINE<br/>ou associar IBP"]
-    H --> I["Confirmar erradicacao<br/>4 semanas apos, sem IBP"]
-    A --> J["Hematemese, melena<br/>ou abdome em tabua"]
-    J --> K["Emergencia: EDA<br/>ou cirurgia"]
+    H --> I["Confirmar erradicação<br/>4 semanas após, sem IBP"]
+    A --> J["Hematêmese, melena<br/>ou abdome em tábua"]
+    J --> K["Emergência: EDA<br/>ou cirurgia"]
     class J critical;
     class E critical;
     class G action;
@@ -43865,14 +43865,14 @@ No Brasil, os biológicos para doença de Crohn são fornecidos pelo SUS via **C
 
 \`\`\`mermaid
 flowchart TD
-    A["Suspeita de surto<br/>de Crohn"] --> B["Excluir infeccao<br/>C. difficile, coprocultura, CMV"]
+    A["Suspeita de surto<br/>de Crohn"] --> B["Excluir infecção<br/>C. difficile, coprocultura, CMV"]
     B --> C["Avaliar atividade<br/>calprotectina, PCR, imagem"]
-    C --> D["Abscesso ou<br/>obstrucao?"]
-    D -->|Sim| E["Drenagem + antibiotico<br/>ou cirurgia"]
-    D -->|Nao| F["Corticoide para induzir<br/>prednisona 40 mg/dia"]
-    F --> G["Programar poupador:<br/>imunomodulador e/ou biologico"]
+    C --> D["Abscesso ou<br/>obstrução?"]
+    D -->|Sim| E["Drenagem + antibiótico<br/>ou cirurgia"]
+    D -->|Não| F["Corticoide para induzir<br/>prednisona 40 mg/dia"]
+    F --> G["Programar poupador:<br/>imunomodulador e/ou biológico"]
     G --> H["Rastrear TB latente,<br/>hepatites e HIV antes"]
-    H --> I["Biologico via CEAF<br/>alvo: remissao clinica e mucosa"]
+    H --> I["Biológico via CEAF<br/>alvo: remissão clínica e mucosa"]
     class D critical;
     class E action;
     class G action;
@@ -43883,14 +43883,14 @@ O segundo eixo de decisão trata da doença perianal, onde a ordem dos passos im
 
 \`\`\`mermaid
 flowchart TD
-    A["Doenca perianal:<br/>dor, secrecao, fistula"] --> B["Exame proctologico<br/>e RM de pelve"]
-    B --> C["Colecao ou abscesso?"]
-    C -->|Sim| D["Drenagem cirurgica<br/>antes de imunossuprimir"]
-    C -->|Nao| E["Mapear trajeto:<br/>simples ou complexo"]
-    D --> F["Seton quando indicado<br/>+ antibiotico"]
-    E --> G["Anti-TNF como classe<br/>de escolha no fenotipo"]
+    A["Doenca perianal:<br/>dor, secreção, fístula"] --> B["Exame proctológico<br/>e RM de pelve"]
+    B --> C["Coleção ou abscesso?"]
+    C -->|Sim| D["Drenagem cirúrgica<br/>antes de imunossuprimir"]
+    C -->|Não| E["Mapear trajeto:<br/>simples ou complexo"]
+    D --> F["Seton quando indicado<br/>+ antibiótico"]
+    E --> G["Anti-TNF como classe<br/>de escolha no fenótipo"]
     F --> G
-    G --> H["Reavaliar com RM<br/>e resposta clinica"]
+    G --> H["Reavaliar com RM<br/>e resposta clínica"]
     class C critical;
     class D action;
     class G action;
@@ -44159,12 +44159,12 @@ flowchart TD
     A["Diarreia com sangue<br/>e muco"] --> B["Retossigmoidoscopia +<br/>calprotectina, PCR"]
     B --> C["Excluir C. difficile<br/>e CMV"]
     C --> D["Truelove-Witts:<br/>colite aguda grave?"]
-    D -->|Nao| E["Mesalazina oral<br/>+ topica"]
+    D -->|Não| E["Mesalazina oral<br/>+ tópica"]
     E --> F["Sem resposta:<br/>prednisona 40 mg/dia"]
     D -->|Sim| G["Internar: corticoide IV<br/>+ profilaxia de TEV"]
     G --> H["Reavaliar em<br/>3-5 dias"]
     H --> I["Resposta insuficiente:<br/>infliximabe ou ciclosporina"]
-    I --> J["Colectomia se refratario,<br/>megacolon ou perfuracao"]
+    I --> J["Colectomia se refratário,<br/>megacólon ou perfuração"]
     class D critical;
     class H critical;
     class G action;
@@ -44176,17 +44176,17 @@ O segundo eixo de decisão é a escolha da via na doença leve a moderada, onde 
 
 \`\`\`mermaid
 flowchart TD
-    A["Doenca leve a moderada"] --> B["Definir extensao<br/>na endoscopia"]
+    A["Doenca leve a moderada"] --> B["Definir extensão<br/>na endoscopia"]
     B --> C["Proctite (so reto)"]
     B --> D["Colite esquerda"]
     B --> E["Colite extensa"]
-    C --> F["Supositorio de mesalazina<br/>pode bastar"]
+    C --> F["Supositório de mesalazina<br/>pode bastar"]
     D --> G["Enema ou espuma<br/>+ mesalazina oral"]
-    E --> H["Mesalazina oral em dose<br/>otimizada + topica"]
-    F --> I["Sem resposta: otimizar dose<br/>e checar tecnica de uso"]
+    E --> H["Mesalazina oral em dose<br/>otimizada + tópica"]
+    F --> I["Sem resposta: otimizar dose<br/>e checar técnica de uso"]
     G --> I
     H --> I
-    I --> J["Persistiu: corticoide e<br/>programar terapia avancada"]
+    I --> J["Persistiu: corticoide e<br/>programar terapia avançada"]
     class I critical;
     class F action;
     class H action;
@@ -44402,14 +44402,14 @@ Reforce a **prevenção da recidiva**: além da orientação escrita sobre o fá
 
 \`\`\`mermaid
 flowchart TD
-    A["LRA sem hipovolemia,<br/>sem choque e sem obstrucao"] --> B["Revisar prescricao:<br/>AINE, antibiotico, IBP, alopurinol"]
-    B --> C["Urina com leucocituria esteril<br/>e cilindros leucocitarios?"]
+    A["LRA sem hipovolemia,<br/>sem choque e sem obstrução"] --> B["Revisar prescrição:<br/>AINE, antibiótico, IBP, alopurinol"]
+    B --> C["Urina com leucocitúria estéril<br/>e cilindros leucocitários?"]
     C -->|Sim| D["Suspeita de nefrite intersticial aguda"]
-    C -->|Nao| E["Reconsiderar NTA, GN ou pielonefrite"]
-    D --> F["Suspender o farmaco suspeito<br/>e substituir por classe nao relacionada"]
+    C -->|Não| E["Reconsiderar NTA, GN ou pielonefrite"]
+    D --> F["Suspender o fármaco suspeito<br/>e substituir por classe não relacionada"]
     F --> G["Creatinina melhora em 3 a 7 dias?"]
-    G -->|Sim| H["Manter suporte e seguimento<br/>evitar reexposicao"]
-    G -->|Nao| I["Biopsia renal e corticoide:<br/>prednisona 0,5-1 mg/kg/dia"]
+    G -->|Sim| H["Manter suporte e seguimento<br/>evitar reexposição"]
+    G -->|Não| I["Biópsia renal e corticoide:<br/>prednisona 0,5-1 mg/kg/dia"]
     I --> J["Desmame em 4 a 6 semanas<br/>com profilaxias"]
     class G critical;
     class I action;
@@ -44549,16 +44549,16 @@ A conduta prática, portanto, é dupla: **maximizar o que está disponível de g
 
 \`\`\`mermaid
 flowchart TD
-    A["Diabetico: rastrear anualmente<br/>RAC urinaria + TFG CKD-EPI 2021"] --> B["RAC maior ou igual a 30 mg/g<br/>confirmada em 2 de 3 amostras?"]
-    B -->|Sim| C["Achados atipicos?<br/>sem retinopatia, hematuria, queda rapida"]
-    B -->|Nao| D["Manter rastreio anual<br/>e controle de glicemia e PA"]
-    C -->|Sim| E["Investigar outra causa<br/>considerar biopsia renal"]
-    C -->|Nao| F["Doenca renal do diabetes:<br/>IECA ou BRA em dose maxima tolerada"]
+    A["Diabético: rastrear anualmente<br/>RAC urinária + TFG CKD-EPI 2021"] --> B["RAC maior ou igual a 30 mg/g<br/>confirmada em 2 de 3 amostras?"]
+    B -->|Sim| C["Achados atípicos?<br/>sem retinopatia, hematuria, queda rápida"]
+    B -->|Não| D["Manter rastreio anual<br/>e controle de glicemia e PA"]
+    C -->|Sim| E["Investigar outra causa<br/>considerar biópsia renal"]
+    C -->|Não| F["Doenca renal do diabetes:<br/>IECA ou BRA em dose máxima tolerada"]
     F --> G["Rechecar creatinina e K em 1-2 semanas"]
     G --> H["Associar iSGLT2<br/>dapagliflozina 10 mg/dia"]
-    H --> I["Albuminuria persistente com K normal?"]
+    H --> I["Albuminúria persistente com K normal?"]
     I -->|Sim| J["Acrescentar finerenona"]
-    I -->|Nao| K["Manter alvos: HbA1c ~7% e PA < 130/80<br/>estatina e restricao de sodio"]
+    I -->|Não| K["Manter alvos: HbA1c ~7% e PA < 130/80<br/>estatina e restrição de sódio"]
     class C critical;
     class I critical;
     class J action;
@@ -44711,15 +44711,15 @@ Medidas gerais: perda de peso, redução de álcool (sobretudo cerveja e destila
 \`\`\`mermaid
 flowchart TD
     A["Monoartrite aguda<br/>quente e dolorosa"] --> B["Artrocentese possível?"]
-    B -->|Sim| C["Liquido sinovial:<br/>cristais + Gram + cultura"]
-    B -->|Nao| D["Quadro tipico de podagra<br/>+ fatores de risco"]
-    C --> E["Leucocitos altos ou Gram positivo?"]
-    E -->|Sim| F["Tratar como artrite septica"]
-    E -->|Nao| G["Cristais de urato:<br/>crise de gota"]
+    B -->|Sim| C["Líquido sinovial:<br/>cristais + Gram + cultura"]
+    B -->|Não| D["Quadro típico de podagra<br/>+ fatores de risco"]
+    C --> E["Leucócitos altos ou Gram positivo?"]
+    E -->|Sim| F["Tratar como artrite séptica"]
+    E -->|Não| G["Cristais de urato:<br/>crise de gota"]
     D --> G
-    G --> H["Anti-inflamatorio precoce:<br/>AINE ou colchicina ou corticoide"]
+    G --> H["Anti-inflamatório precoce:<br/>AINE ou colchicina ou corticoide"]
     H --> I["Manter hipouricemiante se em uso"]
-    I --> J["Apos a crise: alopurinol 100 mg/dia<br/>titular ate urato menor que 6"]
+    I --> J["Após a crise: alopurinol 100 mg/dia<br/>titular até urato menor que 6"]
     class F critical;
     class J action;
 \`\`\`
@@ -44886,13 +44886,13 @@ Complementos: analgesia adequada, imobilização breve em posição funcional ap
 
 \`\`\`mermaid
 flowchart TD
-    A["Monoartrite aguda<br/>dor a mobilizacao passiva"] --> B["Suspeita de artrite septica"]
-    B --> C["Artrocentese IMEDIATA<br/>antes do antibiotico"]
+    A["Monoartrite aguda<br/>dor a mobilização passiva"] --> B["Suspeita de artrite séptica"]
+    B --> C["Artrocentese IMEDIATA<br/>antes do antibiótico"]
     C --> D["Coletar: celularidade, Gram,<br/>cultura, cristais + hemoculturas"]
-    D --> E["Iniciar ATB IV empirico<br/>logo apos a coleta"]
+    D --> E["Iniciar ATB IV empírico<br/>logo após a coleta"]
     E --> F["Drenagem articular"]
     F --> G["Melhora em 48-72h?"]
-    G -->|Nao| H["Lavagem artroscopica<br/>ou artrotomia"]
+    G -->|Não| H["Lavagem artroscópica<br/>ou artrotomia"]
     G -->|Sim| I["Descalonar pela cultura<br/>e completar 2-4 semanas"]
     class B critical;
     class C critical;
@@ -45064,10 +45064,10 @@ No Brasil, hidroxicloroquina, azatioprina, ciclofosfamida, micofenolato e ciclos
 
 \`\`\`mermaid
 flowchart TD
-    A["LES com manifestacao grave"] --> B["Excluir infeccao<br/>e causa nao lupica"]
-    B --> C["Manifestacao renal?"]
-    C -->|Sim| D["Biopsia renal<br/>define a classe"]
-    C -->|Nao| E["Neuro, hematologica<br/>ou serosite grave"]
+    A["LES com manifestação grave"] --> B["Excluir infecção<br/>e causa não lúpica"]
+    B --> C["Manifestação renal?"]
+    C -->|Sim| D["Biópsia renal<br/>define a classe"]
+    C -->|Não| E["Neuro, hematológica<br/>ou serosite grave"]
     D --> F["Classe proliferativa III ou IV"]
     F --> G["Pulso de metilprednisolona<br/>500-1000 mg/dia por 3 dias"]
     E --> G
@@ -45237,14 +45237,14 @@ No Brasil, metotrexato, leflunomida, sulfassalazina, hidroxicloroquina, ciclospo
 
 \`\`\`mermaid
 flowchart TD
-    A["Poliartrite simetrica de<br/>maos por mais de 6 semanas"] --> B["Sinovite ao exame<br/>+ FR/anti-CCP + PCR/VHS + RX"]
-    B --> C["Diagnostico de AR"]
-    C --> D["Metotrexato 7,5-25 mg/semana<br/>+ acido folico"]
-    D --> E["Corticoide baixo como ponte<br/>prednisona ate 7,5 mg/dia"]
+    A["Poliartrite simétrica de<br/>mãos por mais de 6 semanas"] --> B["Sinovite ao exame<br/>+ FR/anti-CCP + PCR/VHS + RX"]
+    B --> C["Diagnóstico de AR"]
+    C --> D["Metotrexato 7,5-25 mg/semana<br/>+ ácido fólico"]
+    D --> E["Corticoide baixo como ponte<br/>prednisona até 7,5 mg/dia"]
     E --> F["Reavaliar atividade<br/>em 3 a 6 meses"]
-    F --> G["Alvo atingido: remissao<br/>ou baixa atividade?"]
+    F --> G["Alvo atingido: remissão<br/>ou baixa atividade?"]
     G -->|Sim| H["Manter e retirar o corticoide"]
-    G -->|Nao| I["Associar biologico<br/>ou inibidor de JAK"]
+    G -->|Não| I["Associar biológico<br/>ou inibidor de JAK"]
     class I critical;
     class H action;
 \`\`\`
@@ -45405,14 +45405,14 @@ No Brasil, AINEs, sulfassalazina, metotrexato e os biológicos previstos no **PC
 
 \`\`\`mermaid
 flowchart TD
-    A["Lombalgia cronica com<br/>inicio antes dos 45 anos"] --> B["Padrao inflamatorio?<br/>melhora com exercicio, dor noturna"]
-    B -->|Nao| C["Investigar lombalgia mecanica"]
-    B -->|Sim| D["RM de sacroiliacas<br/>+ RX de bacia + HLA-B27 + PCR"]
+    A["Lombalgia cronica com<br/>início antes dos 45 anos"] --> B["Padrão inflamatório?<br/>melhora com exercício, dor noturna"]
+    B -->|Não| C["Investigar lombalgia mecânica"]
+    B -->|Sim| D["RM de sacroilíacas<br/>+ RX de bacia + HLA-B27 + PCR"]
     D --> E["Criterios ASAS preenchidos"]
-    E --> F["AINE em dose plena e continua<br/>+ exercicio e fisioterapia"]
-    F --> G["Resposta apos 2 AINEs<br/>por 2 a 4 semanas cada?"]
+    E --> F["AINE em dose plena e continua<br/>+ exercício e fisioterapia"]
+    F --> G["Resposta após 2 AINEs<br/>por 2 a 4 semanas cada?"]
     G -->|Sim| H["Manter e reavaliar atividade"]
-    G -->|Nao| I["Biologico anti-TNF ou anti-IL-17<br/>guiado por uveite, DII ou psoriase"]
+    G -->|Não| I["Biológico anti-TNF ou anti-IL-17<br/>guiado por uveite, DII ou psoriase"]
     class G critical;
     class I action;
 \`\`\`
@@ -45594,14 +45594,14 @@ No SUS, ciclofosfamida, azatioprina, micofenolato e rituximabe podem ser obtidos
 
 \`\`\`mermaid
 flowchart TD
-    A["Sintomas constitucionais<br/>+ via aerea, pulmao ou rim"] --> B["ANCA PR3/MPO + urina I<br/>+ creatinina + TC de torax"]
+    A["Sintomas constitucionais<br/>+ via aérea, pulmao ou rim"] --> B["ANCA PR3/MPO + urina I<br/>+ creatinina + TC de tórax"]
     B --> C["Excluir endocardite,<br/>tuberculose e anti-MBG"]
-    C --> D["Biopsia sempre que possivel"]
-    D --> E["Doenca ameacadora de vida<br/>ou de orgao?"]
+    C --> D["Biópsia sempre que possível"]
+    D --> E["Doenca ameaçadora de vida<br/>ou de órgão?"]
     E -->|Sim| F["Corticoide em pulso<br/>+ rituximabe ou ciclofosfamida"]
-    E -->|Nao| G["Corticoide + metotrexato<br/>ou micofenolato"]
-    F --> H["Plasmaferese so em casos<br/>selecionados apos PEXIVAS"]
-    H --> I["Manutencao com rituximabe<br/>ou azatioprina + profilaxia de PCP"]
+    E -->|Não| G["Corticoide + metotrexato<br/>ou micofenolato"]
+    F --> H["Plasmaférese so em casos<br/>selecionados após PEXIVAS"]
+    H --> I["Manutenção com rituximabe<br/>ou azatioprina + profilaxia de PCP"]
     G --> I
     class E critical;
     class I action;
@@ -45761,11 +45761,11 @@ Seguimento de longo prazo inclui **vigilância de aneurisma de aorta** por image
 
 \`\`\`mermaid
 flowchart TD
-    A["Maior de 50 anos com cefaleia nova,<br/>claudicacao de mandibula ou queixa visual"] --> B["Colher VHS e PCR<br/>e avaliar fundo de olho"]
-    B --> C["Ha sintoma visual ou isquemico?"]
+    A["Maior de 50 anos com cefaleia nova,<br/>claudicação de mandíbula ou queixa visual"] --> B["Colher VHS e PCR<br/>e avaliar fundo de olho"]
+    B --> C["Há sintoma visual ou isquêmico?"]
     C -->|Sim| D["Pulso de metilprednisolona<br/>500-1000 mg/dia por 3 dias"]
-    C -->|Nao| E["Prednisona 40-60 mg/dia<br/>imediatamente"]
-    D --> F["Biopsia de arteria temporal<br/>ou USG com sinal do halo<br/>sem atrasar o corticoide"]
+    C -->|Não| E["Prednisona 40-60 mg/dia<br/>imediatamente"]
+    D --> F["Biópsia de artéria temporal<br/>ou USG com sinal do halo<br/>sem atrasar o corticoide"]
     E --> F
     F --> G["Associar tocilizumabe<br/>como poupador de corticoide"]
     G --> H["Desmame lento por meses<br/>+ profilaxia de osteoporose"]
@@ -45927,13 +45927,13 @@ Cuidados obrigatórios desde o primeiro dia de corticoide: **cálcio e vitamina 
 
 \`\`\`mermaid
 flowchart TD
-    A["Maior de 50 anos com dor e rigidez<br/>de ombros e quadris"] --> B["VHS/PCR + CK + TSH + FR/anti-CCP<br/>+ eletroforese de proteinas"]
-    B --> C["Ha cefaleia, claudicacao de mandibula<br/>ou sintoma visual?"]
-    C -->|Sim| D["Tratar como arterite de<br/>celulas gigantes: dose alta"]
-    C -->|Nao| E["Prednisona 15 mg/dia"]
+    A["Maior de 50 anos com dor e rigidez<br/>de ombros e quadris"] --> B["VHS/PCR + CK + TSH + FR/anti-CCP<br/>+ eletroforese de proteínas"]
+    B --> C["Há cefaleia, claudicação de mandíbula<br/>ou sintoma visual?"]
+    C -->|Sim| D["Tratar como arterite de<br/>células gigantes: dose alta"]
+    C -->|Não| E["Prednisona 15 mg/dia"]
     E --> F["Melhora marcante em poucos dias?"]
-    F -->|Nao| G["Rever o diagnostico:<br/>neoplasia, infeccao, miopatia, AR"]
-    F -->|Sim| H["Desmame lento por meses<br/>+ calcio, vitamina D e profilaxia ossea"]
+    F -->|Não| G["Rever o diagnóstico:<br/>neoplasia, infecção, miopatia, AR"]
+    F -->|Sim| H["Desmame lento por meses<br/>+ cálcio, vitamina D e profilaxia óssea"]
     class D critical;
     class G critical;
     class H action;
@@ -46101,12 +46101,12 @@ flowchart TD
     A["Queixa de olho e boca secos"] --> B["Excluir medicamentos,<br/>hepatite C, HIV, sarcoidose e IgG4"]
     B --> C["Anti-Ro/SSA + Schirmer<br/>+ fluxo salivar"]
     C --> D["Sorologia negativa com<br/>suspeita persistente?"]
-    D -->|Sim| E["Biopsia de glandula salivar menor"]
-    D -->|Nao| F["Diagnostico de Sjogren"]
+    D -->|Sim| E["Biópsia de glândula salivar menor"]
+    D -->|Não| F["Diagnóstico de Sjogren"]
     E --> F
-    F --> G["Ha manifestacao sistemica grave?<br/>pulmao, rim, vasculite, neuropatia"]
+    F --> G["Há manifestação sistêmica grave?<br/>pulmao, rim, vasculite, neuropatia"]
     G -->|Sim| H["Corticoide + imunossupressor<br/>ou rituximabe"]
-    G -->|Nao| I["Tratamento sintomatico da secura<br/>+ higiene oral + hidroxicloroquina"]
+    G -->|Não| I["Tratamento sintomático da secura<br/>+ higiene oral + hidroxicloroquina"]
     class G critical;
     class I action;
 \`\`\`
@@ -46269,13 +46269,13 @@ No Brasil, micofenolato, ciclofosfamida, metotrexato e as terapias específicas 
 
 \`\`\`mermaid
 flowchart TD
-    A["Raynaud + espessamento cutaneo"] --> B["FAN, anticentromero, anti-Scl-70,<br/>anti-RNA pol III + capilaroscopia"]
-    B --> C["Rastreio de orgao ao diagnostico:<br/>TC de torax, DLCO, eco, creatinina"]
-    C --> D["Hipertensao nova com<br/>creatinina subindo?"]
-    D -->|Sim| E["Crise renal esclerodermica:<br/>IECA captopril imediatamente"]
-    D -->|Nao| F["Tratamento por dominio de orgao"]
+    A["Raynaud + espessamento cutâneo"] --> B["FAN, anticentrômero, anti-Scl-70,<br/>anti-RNA pol III + capilaroscopia"]
+    B --> C["Rastreio de órgão ao diagnóstico:<br/>TC de tórax, DLCO, eco, creatinina"]
+    C --> D["Hipertensão nova com<br/>creatinina subindo?"]
+    D -->|Sim| E["Crise renal esclerodérmica:<br/>IECA captopril imediatamente"]
+    D -->|Não| F["Tratamento por domínio de órgão"]
     F --> G["Pulmao: micofenolato<br/>ou nintedanibe"]
-    F --> H["Raynaud: bloqueador de canal de calcio<br/>Refluxo: IBP"]
+    F --> H["Raynaud: bloqueador de canal de cálcio<br/>Refluxo: IBP"]
     G --> I["Evitar corticoide em dose alta<br/>e rastrear HAP anualmente"]
     H --> I
     class E critical;
@@ -46448,14 +46448,14 @@ Como funciona cada droga, para prescrever com lógica e não por hábito: a **am
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor difusa por mais de 3 meses<br/>+ fadiga e sono nao reparador"] --> B["Exame fisico e triagem<br/>laboratorial minima"]
-    B --> C["Ha sinal de alarme?<br/>febre, perda de peso, sinovite,<br/>fraqueza, PCR/VHS alterados"]
+    A["Dor difusa por mais de 3 meses<br/>+ fadiga e sono não reparador"] --> B["Exame físico e triagem<br/>laboratorial mínima"]
+    B --> C["Há sinal de alarme?<br/>febre, perda de peso, sinovite,<br/>fraqueza, PCR/VHS alterados"]
     C -->|Sim| D["Investigar outra doenca"]
-    C -->|Nao| E["Diagnostico positivo de fibromialgia"]
-    E --> F["Educacao + exercicio aerobico progressivo<br/>+ higiene do sono + TCC"]
+    C -->|Não| E["Diagnóstico positivo de fibromialgia"]
+    E --> F["Educação + exercício aeróbico progressivo<br/>+ higiene do sono + TCC"]
     F --> G["Sintoma residual predominante?"]
-    G -->|Dor e insonia| H["Amitriptilina 12,5-25 mg a noite"]
-    G -->|Dor com depressao| I["Duloxetina 30-60 mg/dia"]
+    G -->|Dor e insônia| H["Amitriptilina 12,5-25 mg a noite"]
+    G -->|Dor com depressão| I["Duloxetina 30-60 mg/dia"]
     G -->|Dor e sono ruim| J["Pregabalina 75-150 mg"]
     class C critical;
     class F action;
@@ -46628,14 +46628,14 @@ Em todo paciente de risco, evite hipotensão prolongada no intraoperatório e no
 flowchart TD
     A["Creatinina em alta<br/>ou diurese < 0,5 mL/kg/h"] --> B["USG: hidronefrose ou globo vesical?"]
     B -->|Sim| C["Desobstruir: sonda vesical<br/>ou nefrostomia"]
-    B -->|Nao| D["Avaliar volemia e revisar drogas<br/>suspender AINE, IECA/BRA, nefrotoxico"]
-    D --> E["Hipovolemico?"]
+    B -->|Não| D["Avaliar volemia e revisar drogas<br/>suspender AINE, IECA/BRA, nefrotóxico"]
+    D --> E["Hipovolêmico?"]
     E -->|Sim| F["Cristaloide balanceado<br/>reavaliar a cada etapa"]
-    E -->|Nao| G["Sedimento urinario e sorologias"]
-    G --> H["Cilindros hematicos ou dismorfismo?<br/>suspeita de GNRP"]
-    H -->|Sim| I["Nefrologia urgente<br/>biopsia e imunossupressao"]
-    H -->|Nao| J["NTA provavel: suporte<br/>controle de volume, K e acidose"]
-    J --> K["Criterios AEIOU refratarios?"]
+    E -->|Não| G["Sedimento urinário e sorologias"]
+    G --> H["Cilindros hemáticos ou dismorfismo?<br/>suspeita de GNRP"]
+    H -->|Sim| I["Nefrologia urgente<br/>biópsia e imunossupressão"]
+    H -->|Não| J["NTA provável: suporte<br/>controle de volume, K e acidose"]
+    J --> K["Criterios AEIOU refratários?"]
     K -->|Sim| L["Terapia renal substitutiva"]
     class H critical;
     class K critical;
@@ -46784,14 +46784,14 @@ A **diálise peritoneal** é opção domiciliar que preserva função residual e
 
 \`\`\`mermaid
 flowchart TD
-    A["TFG < 60 ou albuminuria<br/>por mais de 3 meses"] --> B["Estadiar: CKD-EPI 2021 sem raca<br/>+ RAC urinaria"]
-    B --> C["Excluir LRA e obstrucao<br/>USG de rins e vias"]
-    C --> D["Base do tratamento:<br/>IECA ou BRA em dose maxima tolerada"]
-    D --> E["Rechecar creatinina e K em 1-2 semanas<br/>alta de creatinina ate 30% e aceitavel"]
-    E --> F["Associar iSGLT2 se TFG >= 20<br/>com albuminuria ou IC"]
-    F --> G["DM2 com albuminuria persistente e K normal?"]
+    A["TFG < 60 ou albuminúria<br/>por mais de 3 meses"] --> B["Estadiar: CKD-EPI 2021 sem raça<br/>+ RAC urinária"]
+    B --> C["Excluir LRA e obstrução<br/>USG de rins e vias"]
+    C --> D["Base do tratamento:<br/>IECA ou BRA em dose máxima tolerada"]
+    D --> E["Rechecar creatinina e K em 1-2 semanas<br/>alta de creatinina até 30% e aceitável"]
+    E --> F["Associar iSGLT2 se TFG >= 20<br/>com albuminúria ou IC"]
+    F --> G["DM2 com albuminúria persistente e K normal?"]
     G -->|Sim| H["Acrescentar finerenona"]
-    G -->|Nao| I["Manter controle de PA, glicemia e sodio"]
+    G -->|Não| I["Manter controle de PA, glicemia e sódio"]
     I --> J["TFG < 30, RAC >= 300 ou KFRE alto?"]
     J -->|Sim| K["Encaminhar a nefrologia<br/>preparar acesso e TRS"]
     class J critical;
@@ -46946,16 +46946,16 @@ Se a intubação for inevitável, planeje volume-minuto elevado para reproduzir 
 
 \`\`\`mermaid
 flowchart TD
-    A["pH < 7,35 com HCO3 baixo"] --> B["Calcular anion-gap<br/>corrigido pela albumina"]
+    A["pH < 7,35 com HCO3 baixo"] --> B["Calcular ânion-gap<br/>corrigido pela albumina"]
     B --> C["AG aumentado?"]
-    C -->|Sim| D["Lactato, cetonas, funcao renal<br/>gap osmolar"]
-    C -->|Nao| E["AG normal: perdas digestivas<br/>ou acidose tubular renal"]
+    C -->|Sim| D["Lactato, cetonas, função renal<br/>gap osmolar"]
+    C -->|Não| E["AG normal: perdas digestivas<br/>ou acidose tubular renal"]
     D --> F["Gap osmolar alto?<br/>suspeita de alcool toxico"]
-    F -->|Sim| G["Antidoto e hemodialise"]
-    F -->|Nao| H["Tratar a causa: volume e ATB na sepse<br/>insulina na CAD"]
+    F -->|Sim| G["Antídoto e hemodiálise"]
+    F -->|Não| H["Tratar a causa: volume e ATB na sepse<br/>insulina na CAD"]
     H --> I["pH < 7,1 ou instabilidade?"]
-    I -->|Sim| J["Bicarbonato de sodio IV<br/>monitorar Na, K e calcio ionico"]
-    I -->|Nao| K["Corrigir K e reavaliar gasometria"]
+    I -->|Sim| J["Bicarbonato de sódio IV<br/>monitorar Na, K e cálcio iônico"]
+    I -->|Não| K["Corrigir K e reavaliar gasometria"]
     class F critical;
     class I critical;
     class G action;
@@ -47096,15 +47096,15 @@ O ponto de segurança é simples de memorizar: febre com cálculo obstrutivo é 
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor lombar em colica<br/>com irradiacao inguinal"] --> B["Febre, sepse, rim unico,<br/>anuria ou LRA?"]
-    B -->|Sim| C["Emergencia: drenagem urgente<br/>duplo J ou nefrostomia + antibiotico"]
-    B -->|Nao| D["Analgesia: AINE 1a linha<br/>cetoprofeno 100 mg IV ou diclofenaco 75 mg IM"]
+    A["Dor lombar em colica<br/>com irradiação inguinal"] --> B["Febre, sepse, rim único,<br/>anúria ou LRA?"]
+    B -->|Sim| C["Emergência: drenagem urgente<br/>duplo J ou nefrostomia + antibiótico"]
+    B -->|Não| D["Analgesia: AINE 1ª linha<br/>cetoprofeno 100 mg IV ou diclofenaco 75 mg IM"]
     D --> E["TC de abdome sem contraste<br/>USG se gestante ou jovem"]
-    E --> F["Calculo menor que 10 mm e distal?"]
-    F -->|Sim| G["Terapia expulsiva:<br/>tamsulosina 0,4 mg/dia por ate 4 semanas"]
-    F -->|Nao| H["Encaminhar a urologia<br/>ureteroscopia, LECO ou percutanea"]
+    E --> F["Cálculo menor que 10 mm e distal?"]
+    F -->|Sim| G["Terapia expulsiva:<br/>tamsulosina 0,4 mg/dia por até 4 semanas"]
+    F -->|Não| H["Encaminhar a urologia<br/>ureteroscopia, LECO ou percutânea"]
     G --> I["Dor controlada e sem febre?"]
-    I -->|Nao| H
+    I -->|Não| H
     I -->|Sim| J["Alta com retorno programado<br/>coar urina e reavaliar"]
     class B critical;
     class C action;
@@ -47241,17 +47241,17 @@ Quando a investigação inicial é negativa em paciente de risco intermediário 
 
 \`\`\`mermaid
 flowchart TD
-    A["Urina avermelhada ou fita positiva"] --> B["Microscopia confirma hemacias?"]
-    B -->|Nao| C["Pseudo-hematuria:<br/>mioglobina, hemoglobina, farmacos"]
-    B -->|Sim| D["Excluir causas transitorias<br/>ITU, menstruacao, exercicio"]
-    D --> E["Dismorfismo, cilindros hematicos<br/>ou proteinuria?"]
+    A["Urina avermelhada ou fita positiva"] --> B["Microscopia confirma hemácias?"]
+    B -->|Não| C["Pseudo-hematuria:<br/>mioglobina, hemoglobina, fármacos"]
+    B -->|Sim| D["Excluir causas transitórias<br/>ITU, menstruação, exercício"]
+    D --> E["Dismorfismo, cilindros hemáticos<br/>ou proteinúria?"]
     E -->|Sim| F["Origem glomerular:<br/>nefrologia e sorologias"]
-    E -->|Nao| G["Estratificar risco de neoplasia<br/>idade, tabagismo, macroscopica"]
-    F --> H["Creatinina em ascensao rapida?<br/>suspeita de GNRP"]
-    H -->|Sim| I["Nefrologia urgente e biopsia"]
-    G --> J["Risco intermediario ou alto?"]
+    E -->|Não| G["Estratificar risco de neoplasia<br/>idade, tabagismo, macroscópica"]
+    F --> H["Creatinina em ascensão rápida?<br/>suspeita de GNRP"]
+    H -->|Sim| I["Nefrologia urgente e biópsia"]
+    G --> J["Risco intermediário ou alto?"]
     J -->|Sim| K["Cistoscopia + imagem do trato superior<br/>uro-TC no alto risco"]
-    J -->|Nao| L["Repetir urina em ate 6 meses"]
+    J -->|Não| L["Repetir urina em até 6 meses"]
     class H critical;
     class I action;
     class K action;
@@ -47398,16 +47398,16 @@ Sobre a **anticoagulação profilática**, não há consenso rígido: a decisão
 
 \`\`\`mermaid
 flowchart TD
-    A["Edema + proteinuria acima de 3,5 g/24h<br/>com albumina baixa"] --> B["Investigar causa: HbA1c, FAN, complemento,<br/>sorologias, anti-PLA2R, eletroforese"]
-    B --> C["Causa obvia como diabetes tipico?"]
-    C -->|Nao| D["Biopsia renal para definir histologia"]
+    A["Edema + proteinúria acima de 3,5 g/24h<br/>com albumina baixa"] --> B["Investigar causa: HbA1c, FAN, complemento,<br/>sorologias, anti-PLA2R, eletroforese"]
+    B --> C["Causa óbvia como diabetes típico?"]
+    C -->|Não| D["Biópsia renal para definir histologia"]
     C -->|Sim| E["Tratar a causa de base"]
-    D --> F["Suporte para todos:<br/>IECA/BRA, restricao de sodio, diuretico, estatina"]
+    D --> F["Suporte para todos:<br/>IECA/BRA, restrição de sódio, diurético, estatina"]
     E --> F
-    F --> G["Albumina muito baixa ou membranosa?<br/>risco trombotico alto"]
-    G -->|Sim| H["Avaliar anticoagulacao profilatica"]
-    G -->|Nao| I["Vacinar e monitorar proteinuria"]
-    F --> J["Terapia especifica conforme histologia:<br/>corticoide, rituximabe ou ciclofosfamida"]
+    F --> G["Albumina muito baixa ou membranosa?<br/>risco trombótico alto"]
+    G -->|Sim| H["Avaliar anticoagulação profilática"]
+    G -->|Não| I["Vacinar e monitorar proteinúria"]
+    F --> J["Terapia específica conforme histologia:<br/>corticoide, rituximabe ou ciclofosfamida"]
     class G critical;
     class H action;
     class J action;
@@ -47555,17 +47555,17 @@ Sobre a **emergência hipertensiva** da fase nefrítica: a encefalopatia hiperte
 
 \`\`\`mermaid
 flowchart TD
-    A["Hematuria + HAS + edema + LRA<br/>proteinuria sub-nefrotica"] --> B["Sedimento: cilindros hematicos<br/>e hemacias dismorficas"]
+    A["Hematuria + HAS + edema + LRA<br/>proteinúria sub-nefrótica"] --> B["Sedimento: cilindros hemáticos<br/>e hemácias dismórficas"]
     B --> C["Dosar C3 e C4"]
     C --> D["Complemento baixo?"]
     D -->|Sim| E["Pos-infecciosa, lupus,<br/>membranoproliferativa ou crioglobulinemia"]
-    D -->|Nao| F["IgA, vasculite ANCA<br/>ou anti-MBG"]
+    D -->|Não| F["IgA, vasculite ANCA<br/>ou anti-MBG"]
     E --> G["Colher hemoculturas e ecocardiograma<br/>excluir endocardite"]
     F --> G
-    G --> H["Creatinina dobrando em dias<br/>ou sinais sistemicos?"]
-    H -->|Sim| I["GNRP: nefrologia urgente,<br/>biopsia e imunossupressao"]
-    H -->|Nao| J["Suporte: restricao de sal,<br/>diuretico de alca e controle da PA"]
-    J --> K["Tratar a infeccao e monitorar<br/>K, bicarbonato e creatinina"]
+    G --> H["Creatinina dobrando em dias<br/>ou sinais sistêmicos?"]
+    H -->|Sim| I["GNRP: nefrologia urgente,<br/>biópsia e imunossupressão"]
+    H -->|Não| J["Suporte: restrição de sal,<br/>diurético de alça e controle da PA"]
+    J --> K["Tratar a infecção e monitorar<br/>K, bicarbonato e creatinina"]
     class H critical;
     class I action;
     class J action;
@@ -47703,16 +47703,16 @@ Um ponto que muda desfecho e é sistematicamente esquecido: no anti-MBG, o rim q
 
 \`\`\`mermaid
 flowchart TD
-    A["LRA rapidamente progressiva<br/>com sedimento nefritico"] --> B["Cilindros hematicos, dismorfismo<br/>e creatinina subindo em dias?"]
+    A["LRA rapidamente progressiva<br/>com sedimento nefrítico"] --> B["Cilindros hemáticos, dismorfismo<br/>e creatinina subindo em dias?"]
     B -->|Sim| C["Suspeita de GNRP:<br/>acionar nefrologia imediatamente"]
     C --> D["Colher ANCA, anti-MBG, FAN, C3/C4<br/>hemoculturas e ecocardiograma"]
-    D --> E["Endocardite ou microangiopatia excluidas?"]
-    E -->|Nao| F["Tratar a causa infecciosa ou a MAT<br/>nao imunossuprimir as cegas"]
+    D --> E["Endocardite ou microangiopatia excluídas?"]
+    E -->|Não| F["Tratar a causa infecciosa ou a MAT<br/>não imunossuprimir as cegas"]
     E -->|Sim| G["Pulso de metilprednisolona<br/>500-1000 mg IV/dia por 3 dias"]
-    G --> H["Associar ciclofosfamida ou rituximabe<br/>+ biopsia renal urgente"]
-    H --> I["Anti-MBG, hemorragia alveolar<br/>ou dialise-dependente?"]
-    I -->|Sim| J["Plasmaferese"]
-    I -->|Nao| K["Manutencao e profilaxias<br/>SMX-TMP, calcio e vitamina D"]
+    G --> H["Associar ciclofosfamida ou rituximabe<br/>+ biópsia renal urgente"]
+    H --> I["Anti-MBG, hemorragia alveolar<br/>ou diálise-dependente?"]
+    I -->|Sim| J["Plasmaférese"]
+    I -->|Não| K["Manutenção e profilaxias<br/>SMX-TMP, cálcio e vitamina D"]
     class B critical;
     class I critical;
     class G action;
@@ -47875,16 +47875,16 @@ Complicações a antecipar: a miectomia pode cursar com bloqueio de ramo esquerd
 \`\`\`mermaid
 flowchart TD
     A["Hipertrofia do VE<br/>não explicada"] --> B["Eco: gradiente<br/>na via de saída?"]
-    B -->|"Nao em repouso"| C["Provocar<br/>Valsalva, ortostase, esforco"]
+    B -->|"Não em repouso"| C["Provocar<br/>Valsalva, ortostase, esforço"]
     C --> B
-    B -->|"Sim, 50 mmHg ou mais"| D["Betabloqueador<br/>nao vasodilatador"]
-    B -->|"Nao obstrutiva"| E["Controle de sintomas<br/>e rastreio de risco"]
+    B -->|"Sim, 50 mmHg ou mais"| D["Betabloqueador<br/>não vasodilatador"]
+    B -->|"Não obstrutiva"| E["Controle de sintomas<br/>e rastreio de risco"]
     D --> F["Sintomas persistem?"]
-    F -->|Nao| G["Manter e reavaliar<br/>risco a cada 1-2 anos"]
+    F -->|Não| G["Manter e reavaliar<br/>risco a cada 1-2 anos"]
     F -->|Sim| H["Verapamil, disopiramida<br/>ou mavacamteno"]
-    H --> I["Refratario com<br/>gradiente 50 mmHg"]
-    I --> J["Miectomia ou ablacao septal<br/>em centro experiente"]
-    A --> K["Parada previa, TV sustentada,<br/>sincope, 30 mm, TVNS, aneurisma apical"]
+    H --> I["Refratário com<br/>gradiente 50 mmHg"]
+    I --> J["Miectomia ou ablação septal<br/>em centro experiente"]
+    A --> K["Parada prévia, TV sustentada,<br/>sincope, 30 mm, TVNS, aneurisma apical"]
     K --> L["Discutir CDI"]
     class K critical;
     class J action;
@@ -47895,13 +47895,13 @@ Segundo eixo — o paciente com CMH obstrutiva que chega hipotenso ao pronto-soc
 
 \`\`\`mermaid
 flowchart TD
-    A["CMH obstrutiva<br/>hipotensao ou sincope"] --> B["Suspender nitrato, diuretico<br/>vasodilatador e inotropico"]
+    A["CMH obstrutiva<br/>hipotensão ou sincope"] --> B["Suspender nitrato, diurético<br/>vasodilatador e inotrópico"]
     B --> C["Ritmo sinusal?"]
-    C -->|"Nao, FA rapida"| D["Cardioversao ou controle de FC<br/>e anticoagular"]
+    C -->|"Não, FA rápida"| D["Cardioversão ou controle de FC<br/>e anticoagular"]
     C -->|Sim| E["Expandir volume<br/>com cristaloide"]
     E --> F["Ainda hipotenso?"]
     F -->|Sim| G["Fenilefrina<br/>vasoconstritor puro"]
-    F -->|Nao| H["Reavaliar gradiente ao eco<br/>e ajustar betabloqueador"]
+    F -->|Não| H["Reavaliar gradiente ao eco<br/>e ajustar betabloqueador"]
     class A,C critical;
     class G action;
     class D action;
@@ -48165,18 +48165,18 @@ Betabloqueador **não se inicia no paciente congesto e instável**: primeiro des
 
 \`\`\`mermaid
 flowchart TD
-    A["VE dilatado com FE reduzida<br/>ao ecocardiograma"] --> B["Coronariopatia excluida?<br/>cate ou angio-TC"]
-    B -->|Nao| C["Tratar como<br/>cardiopatia isquemica"]
-    B -->|Sim| D["Buscar causa reversivel<br/>alcool, taquicardia, tireoide, Chagas, tiamina, ferro"]
+    A["VE dilatado com FE reduzida<br/>ao ecocardiograma"] --> B["Coronariopatia excluída?<br/>cate ou angio-TC"]
+    B -->|Não| C["Tratar como<br/>cardiopatia isquêmica"]
+    B -->|Sim| D["Buscar causa reversível<br/>alcool, taquicardia, tireoide, Chagas, tiamina, ferro"]
     D --> E["Causa identificada?"]
     E -->|Sim| F["Tratar a causa<br/>e manter os 4 pilares"]
-    E -->|Nao| G["RM cardiaca<br/>e teste genetico com aconselhamento"]
+    E -->|Não| G["RM cardíaca<br/>e teste genético com aconselhamento"]
     G --> H["4 pilares da ICFEr<br/>ARNI ou IECA, BB, MRA, iSGLT2"]
-    F --> I["Reavaliar FE apos<br/>3 a 6 meses otimizado"]
+    F --> I["Reavaliar FE após<br/>3 a 6 meses otimizado"]
     H --> I
     I --> J["FE ainda 35 por cento ou menos?"]
     J -->|Sim| K["Discutir CDI, mais TRC<br/>se QRS largo com BRE"]
-    J -->|Nao| L["Manter terapia<br/>e rastrear familiares"]
+    J -->|Não| L["Manter terapia<br/>e rastrear familiares"]
     A --> M["TV sustentada, sincope<br/>ou LMNA e FLNC truncante"]
     M --> N["CDI com limiar mais baixo"]
     class M critical;
@@ -48408,19 +48408,19 @@ Em ambos os cenários, evite vasodilatadores arteriais potentes e nitrato na pre
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor toracica com<br/>alteracao de ST e troponina"] --> B["Tratar como sindrome<br/>coronariana aguda"]
+    A["Dor torácica com<br/>alteração de ST e troponina"] --> B["Tratar como síndrome<br/>coronariana aguda"]
     B --> C["Coronariografia com<br/>ventriculografia"]
-    C -->|"Obstrucao presente"| D["Conduzir como IAM"]
-    C -->|"Coronarias sem obstrucao"| E["Balonamento alem de<br/>um territorio coronariano?"]
-    E -->|Nao| F["Investigar miocardite,<br/>dissecao, embolia, TEP"]
-    E -->|Sim| G["Takotsubo provavel<br/>RM se duvida"]
+    C -->|"Obstrução presente"| D["Conduzir como IAM"]
+    C -->|"Coronárias sem obstrução"| E["Balonamento além de<br/>um território coronariano?"]
+    E -->|Não| F["Investigar miocardite,<br/>dissecção, embolia, TEP"]
+    E -->|Sim| G["Takotsubo provável<br/>RM se dúvida"]
     G --> H["Instabilidade<br/>ou choque?"]
-    H -->|Nao| I["Suporte, BB e IECA,<br/>UCO com telemetria por QT longo"]
-    H -->|Sim| J["Eco: obstrucao da<br/>via de saida do VE?"]
-    J -->|Sim| K["Sem inotropico<br/>volume, BB venoso, vasopressor puro"]
-    J -->|Nao| L["Suporte mecanico precoce<br/>evitar catecolaminas"]
-    G --> M["Anticoagular se trombo apical<br/>ou fibrilacao atrial"]
-    I --> N["Eco de controle em 3 a 6 semanas<br/>documentar recuperacao"]
+    H -->|Não| I["Suporte, BB e IECA,<br/>UCO com telemetria por QT longo"]
+    H -->|Sim| J["Eco: obstrução da<br/>via de saída do VE?"]
+    J -->|Sim| K["Sem inotrópico<br/>volume, BB venoso, vasopressor puro"]
+    J -->|Não| L["Suporte mecânico precoce<br/>evitar catecolaminas"]
+    G --> M["Anticoagular se trombo apical<br/>ou fibrilação atrial"]
+    I --> N["Eco de controle em 3 a 6 semanas<br/>documentar recuperação"]
     class J critical;
     class K action;
     class N action;
@@ -48428,14 +48428,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Takotsubo com hipotensao<br/>ou baixo debito"] --> B["Ecocardiograma imediato<br/>medir gradiente na via de saida"]
-    B -->|"Gradiente presente<br/>com SAM da mitral"| C["Proibido inotropico<br/>e vasodilatador"]
-    C --> D["Volume cauteloso<br/>betabloqueador venoso de curta acao"]
+    A["Takotsubo com hipotensão<br/>ou baixo débito"] --> B["Ecocardiograma imediato<br/>medir gradiente na via de saída"]
+    B -->|"Gradiente presente<br/>com SAM da mitral"| C["Proibido inotrópico<br/>e vasodilatador"]
+    C --> D["Volume cauteloso<br/>betabloqueador venoso de curta ação"]
     D --> E["Vasopressor puro<br/>fenilefrina ou noradrenalina"]
     E --> F["Persiste em choque?"]
-    F -->|Sim| G["Suporte circulatorio mecanico<br/>evitar balao intra-aortico"]
-    B -->|"Sem gradiente"| H["Falencia de bomba pura"]
-    H --> I["Minimizar catecolaminas<br/>considerar suporte mecanico precoce"]
+    F -->|Sim| G["Suporte circulatório mecânico<br/>evitar balão intra-aórtico"]
+    B -->|"Sem gradiente"| H["Falência de bomba pura"]
+    H --> I["Minimizar catecolaminas<br/>considerar suporte mecânico precoce"]
     class C critical;
     class D action;
     class G action;
@@ -48703,14 +48703,14 @@ O segundo eixo de decisão é o da descompensação aguda de ventrículo direito
 
 \`\`\`mermaid
 flowchart TD
-    A["HP conhecida com piora aguda<br/>dispneia, edema, hipotensao"] --> B["Procurar o gatilho<br/>infeccao, arritmia, anemia<br/>suspensao de droga, TEP"]
-    B --> C["Avaliar congestao e perfusao"]
-    C -->|"Congesto e hipotenso"| D["Falencia de VD descompensada<br/>UTI"]
-    C -->|"Congesto e perfundido"| E["Diuretico endovenoso<br/>corrigir gatilho"]
+    A["HP conhecida com piora aguda<br/>dispneia, edema, hipotensão"] --> B["Procurar o gatilho<br/>infecção, arritmia, anemia<br/>suspensão de droga, TEP"]
+    B --> C["Avaliar congestão e perfusão"]
+    C -->|"Congesto e hipotenso"| D["Falência de VD descompensada<br/>UTI"]
+    C -->|"Congesto e perfundido"| E["Diurético endovenoso<br/>corrigir gatilho"]
     D --> F["Evitar volume<br/>manter PA com noradrenalina"]
-    F --> G["Inotropico: dobutamina<br/>ou milrinona"]
+    F --> G["Inotrópico: dobutamina<br/>ou milrinona"]
     G --> H["Reverter arritmia<br/>manter ritmo sinusal"]
-    H --> I["Refratario:<br/>centro de referencia<br/>transplante, ECMO"]
+    H --> I["Refratário:<br/>centro de referência<br/>transplante, ECMO"]
     class D critical;
     class F action;
     class G action;
@@ -48972,13 +48972,13 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Sintomas persistem<br/>com CPAP prescrito"] --> B["Ler o cartao de adesao<br/>horas por noite e indice residual"]
-    B -->|"Uso menor que 4 h"| C["Investigar a barreira<br/>mascara, nariz, pressao, claustrofobia"]
+    A["Sintomas persistem<br/>com CPAP prescrito"] --> B["Ler o cartão de adesão<br/>horas por noite e índice residual"]
+    B -->|"Uso menor que 4 h"| C["Investigar a barreira<br/>mascara, nariz, pressão, claustrofobia"]
     C --> D["Trocar mascara, umidificar,<br/>tratar rinite, ajustar rampa"]
-    B -->|"Boa adesao mas indice residual alto"| E["Vazamento, pressao insuficiente<br/>ou apneia central emergente"]
+    B -->|"Boa adesão mas índice residual alto"| E["Vazamento, pressão insuficiente<br/>ou apneia central emergente"]
     E --> F["Retitular ou repetir polissonografia"]
-    B -->|"Boa adesao e indice controlado"| G["Sonolencia residual"]
-    G --> H["Sono insuficiente, narcolepsia,<br/>depressao, medicamento, hipotireoidismo"]
+    B -->|"Boa adesão e índice controlado"| G["Sonolência residual"]
+    G --> H["Sono insuficiente, narcolepsia,<br/>depressão, medicamento, hipotireoidismo"]
     class G critical;
     class D action;
     class F action;
@@ -49172,15 +49172,15 @@ Sobre **ajuste renal**, lembre-se de estimar a função com a fórmula **CKD-EPI
 
 \`\`\`mermaid
 flowchart TD
-    A["Bradicardia FC menor que 50<br/>com sintomas"] --> B["Instabilidade?<br/>hipotensao, rebaixamento, isquemia, IC"]
-    B -->|Nao| C["Monitorizar<br/>suspender drogas culpadas<br/>corrigir disturbios"]
+    A["Bradicardia FC menor que 50<br/>com sintomas"] --> B["Instabilidade?<br/>hipotensão, rebaixamento, isquemia, IC"]
+    B -->|Não| C["Monitorizar<br/>suspender drogas culpadas<br/>corrigir distúrbios"]
     B -->|Sim| D["Atropina 1 mg IV<br/>a cada 3-5 min, max 3 mg"]
-    D -->|Sem resposta| E["Marca-passo transcutaneo<br/>com analgesia e sedacao"]
+    D -->|Sem resposta| E["Marca-passo transcutâneo<br/>com analgesia e sedação"]
     D -->|Sem resposta| F["Dopamina 5-20 mcg/kg/min<br/>ou adrenalina 2-10 mcg/min"]
     E --> G["Marca-passo transvenoso<br/>e avaliar definitivo"]
     F --> G
-    C --> H["Causa reversivel?<br/>drogas, potassio, isquemia"]
-    H -->|Nao, e Mobitz II ou BAVT| G
+    C --> H["Causa reversível?<br/>drogas, potássio, isquemia"]
+    H -->|Não, e Mobitz II ou BAVT| G
     class B critical;
     class D,E,F,G,C action;
 \`\`\`
@@ -49189,15 +49189,15 @@ O segundo eixo de decisão é o do **nível do bloqueio**, que determina se vale
 
 \`\`\`mermaid
 flowchart TD
-    A["Bradiarritmia documentada<br/>no ECG de 12 derivacoes"] --> B["Potassio, T apiculada<br/>QRS bizarro?"]
-    B -->|Sim| C["Hipercalemia<br/>gluconato de calcio ja"]
-    B -->|Nao| D["Droga bradicardizante<br/>ou intoxicacao?"]
-    D -->|Sim| E["Suspender e usar antidoto<br/>glucagon, calcio, antidigoxina"]
-    D -->|Nao| F["QRS do escape"]
-    F -->|"Estreito, 40-60 bpm"| G["Provavel bloqueio nodal<br/>tentar atropina, observar"]
-    F -->|"Largo, 20-40 bpm"| H["Provavel bloqueio infranodal<br/>atropina ineficaz"]
-    H --> I["Preparar marca-passo<br/>transcutaneo e transvenoso"]
-    G --> J["Persiste sintomatico<br/>sem causa reversivel?"]
+    A["Bradiarritmia documentada<br/>no ECG de 12 derivações"] --> B["Potássio, T apiculada<br/>QRS bizarro?"]
+    B -->|Sim| C["Hipercalemia<br/>gluconato de cálcio ja"]
+    B -->|Não| D["Droga bradicardizante<br/>ou intoxicação?"]
+    D -->|Sim| E["Suspender e usar antídoto<br/>glucagon, cálcio, antidigoxina"]
+    D -->|Não| F["QRS do escape"]
+    F -->|"Estreito, 40-60 bpm"| G["Provável bloqueio nodal<br/>tentar atropina, observar"]
+    F -->|"Largo, 20-40 bpm"| H["Provável bloqueio infranodal<br/>atropina ineficaz"]
+    H --> I["Preparar marca-passo<br/>transcutâneo e transvenoso"]
+    G --> J["Persiste sintomático<br/>sem causa reversível?"]
     J -->|Sim| I
     I --> K["Avaliar marca-passo definitivo"]
     class B,C,H critical;
@@ -49367,14 +49367,14 @@ Para a **profilaxia crônica**, betabloqueadores e bloqueadores de canal de cál
 
 \`\`\`mermaid
 flowchart TD
-    A["Taquicardia regular<br/>QRS estreito"] --> B["Instabilidade hemodinamica?"]
-    B -->|Sim| C["Cardioversao eletrica<br/>sincronizada 50-100 J"]
-    B -->|Nao| D["Manobra vagal<br/>Valsalva modificada"]
-    D -->|Reverteu| E["Observar e investigar<br/>ECG pos-reversao"]
-    D -->|Nao reverteu| F["Adenosina 6 mg IV bolus<br/>rapido + flush"]
-    F -->|Nao reverteu| G["Adenosina 12 mg<br/>repetir 12 mg"]
-    G -->|Nao reverteu| H["Diltiazem ou verapamil IV<br/>ou betabloqueador"]
-    E --> I["Recorrentes: ablacao<br/>por cateter curativa"]
+    A["Taquicardia regular<br/>QRS estreito"] --> B["Instabilidade hemodinâmica?"]
+    B -->|Sim| C["Cardioversão elétrica<br/>sincronizada 50-100 J"]
+    B -->|Não| D["Manobra vagal<br/>Valsalva modificada"]
+    D -->|Reverteu| E["Observar e investigar<br/>ECG pos-reversão"]
+    D -->|Não reverteu| F["Adenosina 6 mg IV bolus<br/>rápido + flush"]
+    F -->|Não reverteu| G["Adenosina 12 mg<br/>repetir 12 mg"]
+    G -->|Não reverteu| H["Diltiazem ou verapamil IV<br/>ou betabloqueador"]
+    E --> I["Recorrentes: ablação<br/>por cateter curativa"]
     class B critical;
     class C,F,G,H,I action;
 \`\`\`
@@ -49383,14 +49383,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Adenosina em bolus<br/>com ECG 12 derivacoes rodando"] --> B["QRS largo e irregular?<br/>suspeita de pre-excitacao"]
-    B -->|Sim| C["Nao administrar adenosina<br/>risco de fibrilacao ventricular"]
-    B -->|Nao| D["Observar os segundos<br/>seguintes ao bolus"]
+    A["Adenosina em bolus<br/>com ECG 12 derivações rodando"] --> B["QRS largo e irregular?<br/>suspeita de pre-excitação"]
+    B -->|Sim| C["Não administrar adenosina<br/>risco de fibrilação ventricular"]
+    B -->|Não| D["Observar os segundos<br/>seguintes ao bolus"]
     D -->|Taquicardia terminou| E["Circuito dependente do no AV<br/>TRN ou TRAV"]
     D -->|Desacelerou e surgiram ondas F| F["Flutter atrial 2 para 1"]
-    D -->|Desacelerou e surgiram ondas P nao sinusais| G["Taquicardia atrial focal"]
+    D -->|Desacelerou e surgiram ondas P não sinusais| G["Taquicardia atrial focal"]
     D -->|Sem qualquer efeito| H["Reavaliar: pode ser TV<br/>ou bolus lento demais"]
-    E --> I["Investigar onda delta<br/>no ECG pos-reversao"]
+    E --> I["Investigar onda delta<br/>no ECG pos-reversão"]
     class B,H critical;
     class C,E,F,G,I action;
 \`\`\`
@@ -49569,14 +49569,14 @@ Detalhando o manejo do *torsades*: administre magnésio mesmo com magnesemia nor
 
 \`\`\`mermaid
 flowchart TD
-    A["Taquicardia QRS largo<br/>com pulso"] --> B["Instabilidade?<br/>hipotensao, IC, isquemia, rebaixamento"]
-    B -->|Sim| C["Cardioversao eletrica<br/>sincronizada 100 J, escalar"]
-    B -->|Nao| D["Monomorfica ou polimorfica?"]
-    D -->|Monomorfica| E["Amiodarona 150 mg IV em 10 min<br/>ou procainamida"]
-    D -->|Polimorfica com QT longo| F["Sulfato de magnesio 1-2 g IV<br/>corrigir K e Mg"]
-    E --> G["Sem resposta:<br/>cardioversao eletrica"]
+    A["Taquicardia QRS largo<br/>com pulso"] --> B["Instabilidade?<br/>hipotensão, IC, isquemia, rebaixamento"]
+    B -->|Sim| C["Cardioversão elétrica<br/>sincronizada 100 J, escalar"]
+    B -->|Não| D["Monomórfica ou polimórfica?"]
+    D -->|Monomórfica| E["Amiodarona 150 mg IV em 10 min<br/>ou procainamida"]
+    D -->|Polimórfica com QT longo| F["Sulfato de magnésio 1-2 g IV<br/>corrigir K e Mg"]
+    E --> G["Sem resposta:<br/>cardioversão elétrica"]
     A --> H["Sem pulso:<br/>desfibrilar - ACLS"]
-    C --> I["Corrigir isquemia e eletrolitos<br/>avaliar CDI"]
+    C --> I["Corrigir isquemia e eletrólitos<br/>avaliar CDI"]
     E --> I
     F --> I
     class B,H critical;
@@ -49587,15 +49587,15 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["TV sustentada revertida"] --> B["Havia causa totalmente<br/>reversivel?"]
-    B -->|Isquemia aguda| C["Reperfusao e revascularizacao<br/>reavaliar risco depois"]
-    B -->|Disturbio eletrolitico ou droga| D["Corrigir e suspender<br/>reavaliar QT e ECG"]
-    B -->|Nao| E["Ecocardiograma obrigatorio<br/>avaliar funcao ventricular"]
-    E --> F["Cardiopatia estrutural<br/>ou fracao de ejecao reduzida?"]
-    F -->|Sim| G["Indicacao de CDI<br/>em prevencao secundaria"]
-    F -->|Nao| H["Investigar canalopatia<br/>e TV idiopatica"]
-    G --> I["Discutir ablacao de substrato<br/>com eletrofisiologia"]
-    C --> J["Reavaliar funcao ventricular<br/>apos periodo de recuperacao"]
+    A["TV sustentada revertida"] --> B["Havia causa totalmente<br/>reversível?"]
+    B -->|Isquemia aguda| C["Reperfusão e revascularização<br/>reavaliar risco depois"]
+    B -->|Distúrbio eletrolítico ou droga| D["Corrigir e suspender<br/>reavaliar QT e ECG"]
+    B -->|Não| E["Ecocardiograma obrigatório<br/>avaliar função ventricular"]
+    E --> F["Cardiopatia estrutural<br/>ou fração de ejeção reduzida?"]
+    F -->|Sim| G["Indicação de CDI<br/>em prevenção secundária"]
+    F -->|Não| H["Investigar canalopatia<br/>e TV idiopática"]
+    G --> I["Discutir ablação de substrato<br/>com eletrofisiologia"]
+    C --> J["Reavaliar função ventricular<br/>após período de recuperação"]
     class B,F critical;
     class C,D,G,I,J action;
 \`\`\`
@@ -49774,15 +49774,15 @@ Detalhes técnicos da cardioversão elétrica que aumentam a taxa de sucesso: se
 
 \`\`\`mermaid
 flowchart TD
-    A["Taquicardia regular<br/>ondas F em dente de serra"] --> B["Instabilidade hemodinamica?"]
-    B -->|Sim| C["Cardioversao eletrica<br/>sincronizada baixa energia ~50 J"]
-    B -->|Nao| D["Avaliar duracao e<br/>risco tromboembolico CHA2DS2-VA"]
+    A["Taquicardia regular<br/>ondas F em dente de serra"] --> B["Instabilidade hemodinâmica?"]
+    B -->|Sim| C["Cardioversão elétrica<br/>sincronizada baixa energia ~50 J"]
+    B -->|Não| D["Avaliar duração e<br/>risco tromboembólico CHA2DS2-VA"]
     D --> E["Controle de FC:<br/>diltiazem, verapamil ou betabloqueador"]
-    D --> F["Reversao: cardioversao eletrica<br/>ou ibutilida"]
-    F --> G["Sem anticoagulacao previa<br/>so se menos de 24h"]
-    E --> H["Anticoagulacao pelas<br/>mesmas regras da FA"]
+    D --> F["Reversão: cardioversão elétrica<br/>ou ibutilida"]
+    F --> G["Sem anticoagulação prévia<br/>so se menos de 24h"]
+    E --> H["Anticoagulação pelas<br/>mesmas regras da FA"]
     F --> H
-    H --> I["Ablacao do istmo cavotricuspideo<br/>tratamento definitivo"]
+    H --> I["Ablação do istmo cavotricuspídeo<br/>tratamento definitivo"]
     class B,G critical;
     class C,E,F,H,I action;
 \`\`\`
@@ -49791,13 +49791,13 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Taquicardia regular<br/>QRS estreito cerca de 150 bpm"] --> B["QRS largo e irregular?<br/>suspeita de pre-excitacao"]
-    B -->|Sim| C["Nao usar adenosina<br/>tratar como FA pre-excitada"]
-    B -->|Nao| D["Manobra vagal ou adenosina<br/>com ECG 12 derivacoes rodando"]
-    D -->|Terminou a taquicardia| E["Circuito dependente do no AV<br/>TPSV: reentrada nodal ou via acessoria"]
+    A["Taquicardia regular<br/>QRS estreito cerca de 150 bpm"] --> B["QRS largo e irregular?<br/>suspeita de pre-excitação"]
+    B -->|Sim| C["Não usar adenosina<br/>tratar como FA pre-excitada"]
+    B -->|Não| D["Manobra vagal ou adenosina<br/>com ECG 12 derivações rodando"]
+    D -->|Terminou a taquicardia| E["Circuito dependente do no AV<br/>TPSV: reentrada nodal ou via acessória"]
     D -->|Desacelerou e apareceram ondas F| F["Flutter atrial<br/>confirmar sentido do circuito"]
     D -->|Desacelerou e apareceram ondas P| G["Taquicardia atrial focal<br/>ou taquicardia sinusal"]
-    F --> H["Aplicar CHA2DS2-VA<br/>e decidir ritmo ou frequencia"]
+    F --> H["Aplicar CHA2DS2-VA<br/>e decidir ritmo ou frequência"]
     class B critical;
     class C,E,F,G,H action;
 \`\`\`
@@ -49990,19 +49990,19 @@ Duas consequências práticas. Primeira: suporte mecânico não é "quanto mais,
 
 \`\`\`mermaid
 flowchart TD
-    A["Hipotensao + hipoperfusao<br/>lactato elevado"] --> B["Ecocardiograma<br/>a beira-leito"]
-    B --> C["Confirmar falencia de bomba<br/>excluir tamponamento e TEP"]
+    A["Hipotensão + hipoperfusão<br/>lactato elevado"] --> B["Ecocardiograma<br/>a beira-leito"]
+    B --> C["Confirmar falência de bomba<br/>excluir tamponamento e TEP"]
     C --> D["Sopro novo?"]
-    D -->|Sim| E["Complicacao mecanica<br/>avaliacao cirurgica"]
-    D -->|Nao| F["Noradrenalina<br/>PAM >= 65"]
-    F --> G["Debito ainda baixo?"]
+    D -->|Sim| E["Complicação mecânica<br/>avaliação cirúrgica"]
+    D -->|Não| F["Noradrenalina<br/>PAM >= 65"]
+    F --> G["Débito ainda baixo?"]
     G -->|Sim| H["Dobutamina<br/>2-20 mcg/kg/min"]
-    G -->|Nao| I["Reavaliar lactato<br/>e perfusao"]
+    G -->|Não| I["Reavaliar lactato<br/>e perfusão"]
     C --> J["IAM como causa?"]
-    J -->|Sim| K["Revascularizacao imediata<br/>angioplastia"]
-    H --> L["Refratario?"]
-    L -->|Sim| M["Suporte circulatorio mecanico<br/>UTI e centro de referencia"]
-    L -->|Nao| I
+    J -->|Sim| K["Revascularização imediata<br/>angioplastia"]
+    H --> L["Refratário?"]
+    L -->|Sim| M["Suporte circulatório mecânico<br/>UTI e centro de referência"]
+    L -->|Não| I
     class A,D,L critical;
     class E,F,H,K,M action;
 \`\`\`
@@ -50011,14 +50011,14 @@ O segundo eixo de decisão é o do **fenótipo ventricular**, que muda o que se 
 
 \`\`\`mermaid
 flowchart TD
-    A["Choque cardiogenico confirmado<br/>ao ecocardiograma"] --> B["Qual ventriculo falha?"]
-    B -->|"VE hipocontratil<br/>congestao pulmonar"| C["Vasopressor para PAM<br/>depois inotropico"]
-    B -->|"VD dilatado<br/>pulmoes limpos"| D["Manter pre-carga adequada<br/>e ritmo sinusal"]
-    D --> E["Evitar vasodilatador<br/>cuidado com pressao positiva"]
+    A["Choque cardiogênico confirmado<br/>ao ecocardiograma"] --> B["Qual ventrículo falha?"]
+    B -->|"VE hipocontrátil<br/>congestão pulmonar"| C["Vasopressor para PAM<br/>depois inotrópico"]
+    B -->|"VD dilatado<br/>pulmões limpos"| D["Manter pre-carga adequada<br/>e ritmo sinusal"]
+    D --> E["Evitar vasodilatador<br/>cuidado com pressão positiva"]
     E --> F["Reduzir pos-carga pulmonar<br/>corrigir hipoxemia e acidose"]
-    C --> G["Metas em 60 a 120 min<br/>lactato, diurese, perfusao"]
+    C --> G["Metas em 60 a 120 min<br/>lactato, diurese, perfusão"]
     F --> G
-    G -->|"Nao atingidas"| H["Falha da estrategia<br/>escalonar ou transferir"]
+    G -->|"Não atingidas"| H["Falha da estratégia<br/>escalonar ou transferir"]
     G -->|"Atingidas"| I["Desmame progressivo<br/>e tratar a causa de base"]
     class B,H critical;
     class C,D,F,H,I action;
@@ -50206,14 +50206,14 @@ Todo caso deve ser conduzido por **equipe multidisciplinar** — infectologia, c
 
 \`\`\`mermaid
 flowchart TD
-    A["Suspeita de endocardite<br/>febre com sopro ou embolia"] --> B["Colher 3 pares de hemocultura<br/>antes do antibiotico"]
-    B --> C["ETT e depois ETE<br/>ETT negativo nao exclui"]
-    C --> D["Criterios de Duke<br/>definitiva ou possivel?"]
-    D -->|Sim| E["Antibiotico IV prolongado<br/>guiado por cultura"]
-    D -->|Nao| F["Buscar diagnostico alternativo<br/>e reavaliar imagem"]
-    E --> G["IC por disfuncao valvar, abscesso<br/>ou vegetacao maior ou igual a 10 mm com embolia?"]
+    A["Suspeita de endocardite<br/>febre com sopro ou embolia"] --> B["Colher 3 pares de hemocultura<br/>antes do antibiótico"]
+    B --> C["ETT e depois ETE<br/>ETT negativo não exclui"]
+    C --> D["Criterios de Duke<br/>definitiva ou possível?"]
+    D -->|Sim| E["Antibiótico IV prolongado<br/>guiado por cultura"]
+    D -->|Não| F["Buscar diagnóstico alternativo<br/>e reavaliar imagem"]
+    E --> G["IC por disfunção valvar, abscesso<br/>ou vegetação maior ou igual a 10 mm com embolia?"]
     G -->|Sim| H["Cirurgia precoce<br/>discutir com equipe multidisciplinar"]
-    G -->|Nao| I["Manter ATB e reavaliar<br/>eco e clinica seriados"]
+    G -->|Não| I["Manter ATB e reavaliar<br/>eco e clínica seriados"]
     class G critical;
     class H action;
     class E action;
@@ -50223,13 +50223,13 @@ Segundo eixo de decisão — o que fazer quando as hemoculturas voltam negativas
 
 \`\`\`mermaid
 flowchart TD
-    A["Suspeita clinica mantida<br/>hemoculturas negativas"] --> B["Recebeu antibiotico<br/>nos dias anteriores?"]
-    B -->|Sim| C["Suspender se estavel<br/>e recolher apos 48 a 72 h"]
-    B -->|Nao| D["Pedir incubacao prolongada<br/>e avisar o laboratorio"]
+    A["Suspeita clínica mantida<br/>hemoculturas negativas"] --> B["Recebeu antibiótico<br/>nos dias anteriores?"]
+    B -->|Sim| C["Suspender se estável<br/>e recolher após 48 a 72 h"]
+    B -->|Não| D["Pedir incubação prolongada<br/>e avisar o laboratório"]
     D --> E["Sorologia e PCR<br/>Coxiella, Bartonella, Brucella"]
     E --> F["Ainda sem agente<br/>e criterios de imagem presentes?"]
     F -->|Sim| G["Tratar empiricamente e enviar<br/>a valva para cultura e PCR na cirurgia"]
-    F -->|Nao| H["Reavaliar diagnostico<br/>marantica, autoimune, neoplasia"]
+    F -->|Não| H["Reavaliar diagnóstico<br/>marântica, autoimune, neoplasia"]
     class F critical;
     class G action;
     class C action;
@@ -50432,15 +50432,15 @@ Para as **arritmias ventriculares** da fase aguda, prefira corrigir o que é cor
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor toracica com troponina elevada<br/>ou IC de inicio recente em jovem"] --> B["ECG, eco, troponina<br/>excluir doenca coronariana"]
+    A["Dor torácica com troponina elevada<br/>ou IC de início recente em jovem"] --> B["ECG, eco, troponina<br/>excluir doenca coronariana"]
     B --> C["Choque, arritmia sustentada<br/>ou bloqueio AV avancado?"]
-    C -->|Sim| D["UTI, monitorizacao continua<br/>suporte mecanico e biopsia"]
-    C -->|Nao| E["RM cardiaca<br/>criterios de Lake Louise"]
-    E --> F["Disfuncao ventricular presente?"]
-    F -->|Sim| G["Tratar IC com os 4 pilares<br/>e restringir esforco"]
-    F -->|Nao| H["Suporte clinico e restricao de esforco<br/>reavaliar com eco e Holter"]
-    D --> I["Forma especifica na biopsia?<br/>celulas gigantes, sarcoidose, eosinofilica"]
-    I -->|Sim| J["Imunossupressao dirigida"]
+    C -->|Sim| D["UTI, monitorização continua<br/>suporte mecânico e biópsia"]
+    C -->|Não| E["RM cardíaca<br/>criterios de Lake Louise"]
+    E --> F["Disfunção ventricular presente?"]
+    F -->|Sim| G["Tratar IC com os 4 pilares<br/>e restringir esforço"]
+    F -->|Não| H["Suporte clínico e restrição de esforço<br/>reavaliar com eco e Holter"]
+    D --> I["Forma específica na biópsia?<br/>células gigantes, sarcoidose, eosinofílica"]
+    I -->|Sim| J["Imunossupressão dirigida"]
     class C critical;
     class I critical;
     class D action;
@@ -50451,13 +50451,13 @@ Segundo eixo — quando liberar o retorno ao esforço:
 
 \`\`\`mermaid
 flowchart TD
-    A["Miocardite em remissao clinica"] --> B["Sintomas resolvidos e<br/>troponina e PCR normais?"]
-    B -->|Nao| C["Manter restricao<br/>e reavaliar em 4 semanas"]
-    B -->|Sim| D["Eco com funcao normal<br/>e Holter sem arritmia?"]
-    D -->|Nao| E["Manter restricao<br/>e avaliar risco arritmico"]
-    D -->|Sim| F["Realce tardio extenso<br/>na ressonancia?"]
-    F -->|Sim| G["Liberacao conservadora<br/>e seguimento prolongado"]
-    F -->|Nao| H["Liberar esforco progressivo"]
+    A["Miocardite em remissão clínica"] --> B["Sintomas resolvidos e<br/>troponina e PCR normais?"]
+    B -->|Não| C["Manter restrição<br/>e reavaliar em 4 semanas"]
+    B -->|Sim| D["Eco com função normal<br/>e Holter sem arritmia?"]
+    D -->|Não| E["Manter restrição<br/>e avaliar risco arrítmico"]
+    D -->|Sim| F["Realce tardio extenso<br/>na ressonância?"]
+    F -->|Sim| G["Liberação conservadora<br/>e seguimento prolongado"]
+    F -->|Não| H["Liberar esforço progressivo"]
     class E critical;
     class H action;
     class G action;
@@ -50669,17 +50669,17 @@ Quando a espironolactona não é possível ou não basta, a escolha da próxima 
 
 \`\`\`mermaid
 flowchart TD
-    A["Resistente verdadeira<br/>apos otimizar a tripla"] --> B["Potassio maior que 5,0<br/>ou TFG menor que 30?"]
-    B -->|Sim| C["Evitar espironolactona<br/>otimizar diuretico de alca"]
-    B -->|Nao| D["Espironolactona<br/>25 a 50 mg por dia"]
+    A["Resistente verdadeira<br/>após otimizar a tripla"] --> B["Potássio maior que 5,0<br/>ou TFG menor que 30?"]
+    B -->|Sim| C["Evitar espironolactona<br/>otimizar diurético de alça"]
+    B -->|Não| D["Espironolactona<br/>25 a 50 mg por dia"]
     D --> E["Efeito adverso hormonal<br/>ginecomastia ou mastalgia?"]
     E -->|Sim| F["Trocar por eplerenona<br/>ou amilorida"]
-    E -->|Nao| G["Reavaliar em 4 semanas<br/>com MAPA ou MRPA"]
-    C --> H["Fenotipo predominante"]
-    H -->|"Edema e volume"| I["Ajustar diuretico<br/>alca em duas tomadas"]
+    E -->|Não| G["Reavaliar em 4 semanas<br/>com MAPA ou MRPA"]
+    C --> H["Fenótipo predominante"]
+    H -->|"Edema e volume"| I["Ajustar diurético<br/>alça em duas tomadas"]
     H -->|"FC alta, coronariopatia, IC"| J["Betabloqueador"]
     H -->|"Prostatismo associado"| K["Doxazosina"]
-    H -->|"Refrataria, 5 ou mais drogas"| L["Encaminhar a centro<br/>de referencia"]
+    H -->|"Refratária, 5 ou mais drogas"| L["Encaminhar a centro<br/>de referência"]
     class L critical;
     class D,F,I,J,K,L action;
 \`\`\`
@@ -50961,21 +50961,21 @@ Na prática do pós-transplante, o esquema de imunossupressão é habitualmente 
 
 \`\`\`mermaid
 flowchart TD
-    A["Sorologia positiva<br/>2 metodos diferentes"] --> B["ECG, RX de torax<br/>e ecocardiograma"]
+    A["Sorologia positiva<br/>2 métodos diferentes"] --> B["ECG, RX de tórax<br/>e ecocardiograma"]
     B -->|"Tudo normal"| C["Forma indeterminada<br/>seguimento anual com ECG"]
-    B -->|"Alteracao de ECG<br/>com FE preservada"| D["Estagio B1<br/>Holter e estratificacao"]
+    B -->|"Alteração de ECG<br/>com FE preservada"| D["Estágio B1<br/>Holter e estratificação"]
     B -->|"FE reduzida"| E["Sintomas de IC?"]
-    E -->|Nao| F["Estagio B2<br/>iniciar os 4 pilares"]
-    E -->|Sim| G["Estagio C ou D<br/>4 pilares mais diuretico"]
-    D --> H["Aplicar escore de Rassi<br/>e considerar RM cardiaca"]
+    E -->|Não| F["Estágio B2<br/>iniciar os 4 pilares"]
+    E -->|Sim| G["Estágio C ou D<br/>4 pilares mais diurético"]
+    D --> H["Aplicar escore de Rassi<br/>e considerar RM cardíaca"]
     G --> H
-    H --> I["TV sustentada, parada previa<br/>ou sincope arritmogenica"]
+    H --> I["TV sustentada, parada prévia<br/>ou sincope arritmogênica"]
     I --> J["Amiodarona e discutir CDI"]
     H --> K["BAV avancado, pausas<br/>ou bradicardia limitante"]
     K --> L["Marca-passo ou ressincronizador"]
-    H --> M["FA, trombo ou embolia previa"]
+    H --> M["FA, trombo ou embolia prévia"]
     M --> N["Anticoagular"]
-    A --> O["Fase aguda, reativacao, congenito<br/>ou jovem na forma indeterminada"]
+    A --> O["Fase aguda, reativação, congênito<br/>ou jovem na forma indeterminada"]
     O --> P["Benznidazol 5 mg por kg ao dia<br/>por 60 dias"]
     class I critical;
     class J action;
@@ -50989,12 +50989,12 @@ flowchart TD
 \`\`\`mermaid
 flowchart TD
     A["Sorologia positiva<br/>na fase cronica"] --> B["Gestante, hepatopatia<br/>ou DRC graves?"]
-    B -->|Sim| C["Nao tratar agora<br/>reavaliar apos o parto"]
-    B -->|Nao| D["Cardiopatia avancada<br/>com FE reduzida?"]
-    D -->|Sim| E["Nao ha beneficio clinico<br/>focar em IC e arritmia"]
-    D -->|Nao| F["Criança, jovem, forma indeterminada<br/>ou imunossuprimido?"]
+    B -->|Sim| C["Não tratar agora<br/>reavaliar após o parto"]
+    B -->|Não| D["Cardiopatia avançada<br/>com FE reduzida?"]
+    D -->|Sim| E["Não há benefício clínico<br/>focar em IC e arritmia"]
+    D -->|Não| F["Criança, jovem, forma indeterminada<br/>ou imunossuprimido?"]
     F -->|Sim| G["Benznidazol 5 mg por kg ao dia<br/>por 60 dias"]
-    F -->|Nao| H["Decisao individualizada<br/>com o paciente"]
+    F -->|Não| H["Decisão individualizada<br/>com o paciente"]
     G --> I["Hemograma e transaminases<br/>antes e durante"]
     I --> J["Rash extenso, neuropatia<br/>ou leucopenia"]
     J --> K["Suspender o benznidazol"]
@@ -51217,15 +51217,15 @@ Essa estratégia de **titulação rápida com reavaliação frequente** logo ap�
 
 \`\`\`mermaid
 flowchart TD
-    A["Dispneia + suspeita<br/>de IC aguda"] --> B["Definir perfil<br/>congestao x perfusao"]
-    B -->|"Quente-umido"| C["Furosemida IV<br/>1-2,5x a dose oral"]
+    A["Dispneia + suspeita<br/>de IC aguda"] --> B["Definir perfil<br/>congestão x perfusão"]
+    B -->|"Quente-úmido"| C["Furosemida IV<br/>1-2,5x a dose oral"]
     C --> D["PAS > 110?"]
     D -->|Sim| E["Nitroglicerina IV<br/>10-20 mcg/min"]
-    D -->|Nao| F["Reavaliar diurese<br/>em 2-6 h"]
-    B -->|"Frio-umido"| G["Dobutamina<br/>2-20 mcg/kg/min"]
-    G --> H["Choque cardiogenico?"]
+    D -->|Não| F["Reavaliar diurese<br/>em 2-6 h"]
+    B -->|"Frio-úmido"| G["Dobutamina<br/>2-20 mcg/kg/min"]
+    G --> H["Choque cardiogênico?"]
     H -->|Sim| I["Noradrenalina<br/>PAM >= 65 + UTI"]
-    H -->|Nao| J["Diuretico apos<br/>melhorar perfusao"]
+    H -->|Não| J["Diurético após<br/>melhorar perfusão"]
     B -->|"Frio-seco"| K["Prova de volume<br/>cautelosa"]
     E --> L["Tratar o precipitante<br/>CHAMPIT"]
     F --> L
@@ -51240,15 +51240,15 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Diuretico IV iniciado<br/>reavaliar em 2-6 h"] --> B["Diurese e sintomas<br/>melhoraram?"]
-    B -->|"Sim"| C["Manter dose<br/>peso diario e eletrolitos"]
-    B -->|"Nao"| D["Dobrar a dose do<br/>diuretico de alca"]
+    A["Diurético IV iniciado<br/>reavaliar em 2-6 h"] --> B["Diurese e sintomas<br/>melhoraram?"]
+    B -->|"Sim"| C["Manter dose<br/>peso diário e eletrólitos"]
+    B -->|"Não"| D["Dobrar a dose do<br/>diurético de alça"]
     D --> E["Resposta ainda<br/>insuficiente?"]
-    E -->|"Sim"| F["Bloqueio sequencial<br/>tiazidico ou acetazolamida"]
-    E -->|"Nao"| C
-    F --> G["Revisar: AINE, sal,<br/>perfil frio, DRC avancada"]
-    G --> H["Perfil frio?<br/>corrigir debito primeiro"]
-    G --> I["DRC avancada sem resposta<br/>avaliar dialise"]
+    E -->|"Sim"| F["Bloqueio sequencial<br/>tiazídico ou acetazolamida"]
+    E -->|"Não"| C
+    F --> G["Revisar: AINE, sal,<br/>perfil frio, DRC avançada"]
+    G --> H["Perfil frio?<br/>corrigir débito primeiro"]
+    G --> I["DRC avançada sem resposta<br/>avaliar diálise"]
     class E critical;
     class I critical;
     class D action;
@@ -51601,15 +51601,15 @@ Nas etiologias específicas, o tratamento é o da causa: **pericardite purulenta
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor toracica pleuritica<br/>suspeita de pericardite"] --> B["ECG, eco, troponina e PCR<br/>2 de 4 criterios"]
-    B --> C["Tamponamento?<br/>hipotensao, jugular, pulso paradoxal"]
-    C -->|Sim| D["Pericardiocentese de urgencia"]
-    C -->|Nao| E["Preditor de alto risco?<br/>febre, troponina, derrame volumoso"]
+    A["Dor torácica pleurítica<br/>suspeita de pericardite"] --> B["ECG, eco, troponina e PCR<br/>2 de 4 criterios"]
+    B --> C["Tamponamento?<br/>hipotensão, jugular, pulso paradoxal"]
+    C -->|Sim| D["Pericardiocentese de urgência"]
+    C -->|Não| E["Preditor de alto risco?<br/>febre, troponina, derrame volumoso"]
     E -->|Sim| F["Internar e investigar etiologia"]
-    E -->|Nao| G["Tratamento ambulatorial<br/>AINE mais colchicina 3 meses"]
+    E -->|Não| G["Tratamento ambulatorial<br/>AINE mais colchicina 3 meses"]
     F --> G
-    G --> H["Recorrencia?<br/>novo episodio apos intervalo livre"]
-    H -->|Sim| I["Colchicina por 6 meses ou mais<br/>considerar anti IL 1 se refratario"]
+    G --> H["Recorrência?<br/>novo episódio após intervalo livre"]
+    H -->|Sim| I["Colchicina por 6 meses ou mais<br/>considerar anti IL 1 se refratário"]
     class C critical;
     class D action;
     class G action;
@@ -51619,13 +51619,13 @@ Segundo eixo — conduta diante do derrame pericárdico isolado, sem dor típica
 
 \`\`\`mermaid
 flowchart TD
-    A["Derrame pericardico ao eco"] --> B["Repercussao hemodinamica?<br/>colapso de camaras, cava pletorica"]
+    A["Derrame pericárdico ao eco"] --> B["Repercussão hemodinâmica?<br/>colapso de câmaras, cava pletórica"]
     B -->|Sim| C["Drenagem imediata"]
-    B -->|Nao| D["Sinais inflamatorios?<br/>dor, atrito, PCR alta"]
+    B -->|Não| D["Sinais inflamatórios?<br/>dor, atrito, PCR alta"]
     D -->|Sim| E["Tratar como pericardite aguda<br/>AINE e colchicina"]
-    D -->|Nao| F["Derrame grande ou cronico<br/>maior que 20 mm?"]
+    D -->|Não| F["Derrame grande ou crônico<br/>maior que 20 mm?"]
     F -->|Sim| G["Investigar causa<br/>tuberculose, neoplasia, tireoide, uremia"]
-    F -->|Nao| H["Acompanhar com eco seriado<br/>sem puncionar"]
+    F -->|Não| H["Acompanhar com eco seriado<br/>sem puncionar"]
     class B critical;
     class C action;
     class G action;
@@ -51878,17 +51878,17 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Sincope recorrente<br/>sem diagnostico apos avaliacao inicial"] --> B["Suspeita de causa arritmica<br/>ou cardiopatia estrutural?"]
-    B -->|Nao| C["Reflexa provavel<br/>orientar e considerar tilt"]
-    B -->|Sim| D["Com que frequencia<br/>ocorrem os episodios?"]
-    D -->|"Quase diarios"| E["Holter de 24 a 48 h"]
+    A["Sincope recorrente<br/>sem diagnóstico após avaliação inicial"] --> B["Suspeita de causa arrítmica<br/>ou cardiopatia estrutural?"]
+    B -->|Não| C["Reflexa provável<br/>orientar e considerar tilt"]
+    B -->|Sim| D["Com que frequência<br/>ocorrem os episódios?"]
+    D -->|"Quase diários"| E["Holter de 24 a 48 h"]
     D -->|"Semanais a mensais"| F["Monitor externo de eventos<br/>ou Holter de 7 a 14 dias"]
-    D -->|"Espacados por meses"| G["Monitor implantavel"]
-    E --> H["Correlacao sintoma e ritmo"]
+    D -->|"Espaçados por meses"| G["Monitor implantável"]
+    E --> H["Correlação sintoma e ritmo"]
     F --> H
     G --> H
     H --> I["Pausa, BAV avancado ou TV<br/>durante o sintoma"]
-    I --> J["Marca-passo, CDI ou ablacao<br/>conforme o achado"]
+    I --> J["Marca-passo, CDI ou ablação<br/>conforme o achado"]
     class I critical;
     class G action;
     class J action;
@@ -52078,20 +52078,20 @@ Uma armadilha do controle pressórico é a **má-perfusão**: se ao baixar a pre
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor toracica ou dorsal subita<br/>rasgando ou migratoria"] --> B["Assimetria de pulsos ou PA<br/>sopro diastolico novo<br/>deficit neurologico"]
-    B --> C["Estavel para tomografia?"]
+    A["Dor torácica ou dorsal súbita<br/>rasgando ou migratória"] --> B["Assimetria de pulsos ou PA<br/>sopro diastólico novo<br/>déficit neurológico"]
+    B --> C["Estável para tomografia?"]
     C -->|Sim| D["Angio-TC de aorta"]
-    C -->|Nao| E["Eco transesofagico<br/>a beira do leito"]
+    C -->|Não| E["Eco transesofágico<br/>a beira do leito"]
     D --> F["Iniciar controle anti-impulso<br/>betabloqueador IV primeiro<br/>FC menor que 60"]
     E --> F
     F --> G["PAS ainda elevada?"]
     G -->|Sim| H["Nitroprussiato IV<br/>PAS 100 a 120 mmHg"]
-    G -->|Nao| I["Manter e classificar"]
+    G -->|Não| I["Manter e classificar"]
     H --> I
     I --> J["Acomete aorta ascendente?"]
-    J -->|Tipo A| K["Cirurgia cardiaca<br/>de emergencia"]
+    J -->|Tipo A| K["Cirurgia cardíaca<br/>de emergência"]
     J -->|Tipo B complicada| L["TEVAR ou cirurgia"]
-    J -->|Tipo B nao complicada| M["Manejo clinico em UTI"]
+    J -->|Tipo B não complicada| M["Manejo clínico em UTI"]
     class B,J critical;
     class K,L,M action;
 \`\`\`
@@ -52100,14 +52100,14 @@ Um segundo eixo de decisão, útil quando a dor torácica ainda não tem diagnó
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor toracica aguda<br/>sem diagnostico definido"] --> B["Somar os 3 blocos do ADD-RS<br/>predisposicao, dor, exame"]
+    A["Dor torácica aguda<br/>sem diagnóstico definido"] --> B["Somar os 3 blocos do ADD-RS<br/>predisposição, dor, exame"]
     B -->|"Escore 2 ou 3"| C["Alto risco<br/>angio-TC imediata"]
-    B -->|"Escore 0 ou 1"| D["Dosar D-dimero"]
+    B -->|"Escore 0 ou 1"| D["Dosar D-dímero"]
     D -->|"Maior ou igual a 500"| C
-    D -->|"Menor que 500"| E["Sindrome aortica improvavel<br/>investigar causa alternativa"]
-    C --> F["Instabilidade, hipotensao<br/>ou sinal de tamponamento?"]
+    D -->|"Menor que 500"| E["Síndrome aórtica improvável<br/>investigar causa alternativa"]
+    C --> F["Instabilidade, hipotensão<br/>ou sinal de tamponamento?"]
     F -->|Sim| G["Eco a beira do leito<br/>e cirurgia imediata"]
-    F -->|Nao| H["Classificar Stanford<br/>e definir conduta"]
+    F -->|Não| H["Classificar Stanford<br/>e definir conduta"]
     class C,F critical;
     class G,H action;
 \`\`\`
@@ -52341,15 +52341,15 @@ O motivo mais comum de subdosagem não é intolerância verdadeira, é receio. V
 
 \`\`\`mermaid
 flowchart TD
-    A["IC com FE menor ou igual a 40%<br/>diagnostico confirmado"] --> B["Congestao presente?<br/>jugular, edema, ortopneia"]
-    B -->|Sim| C["Diuretico de alca<br/>furosemida, titular"]
-    B -->|Nao| D["Iniciar os 4 pilares<br/>doses baixas simultaneas"]
+    A["IC com FE menor ou igual a 40%<br/>diagnóstico confirmado"] --> B["Congestão presente?<br/>jugular, edema, ortopneia"]
+    B -->|Sim| C["Diurético de alça<br/>furosemida, titular"]
+    B -->|Não| D["Iniciar os 4 pilares<br/>doses baixas simultâneas"]
     C --> D
     D --> E["Titular a cada 2 a 4 semanas<br/>vigiar PA, FC, K e creatinina"]
-    E --> F["Apos 3 meses otimizado<br/>FE ainda menor ou igual a 35%?"]
+    E --> F["Após 3 meses otimizado<br/>FE ainda menor ou igual a 35%?"]
     F -->|Sim| G["Avaliar CDI e TRC<br/>TRC se BRE com QRS largo"]
-    F -->|Nao| H["Manter terapia e seguimento<br/>reavaliar FE periodicamente"]
-    G --> I["Sintomas refratarios ou estagio D<br/>encaminhar a IC avancada"]
+    F -->|Não| H["Manter terapia e seguimento<br/>reavaliar FE periodicamente"]
+    G --> I["Sintomas refratários ou estágio D<br/>encaminhar a IC avançada"]
     class F critical;
     class I critical;
     class D action;
@@ -52529,14 +52529,14 @@ Na prática, a restrição hídrica falha em perfil previsível: **osmolalidade 
 
 \`\`\`mermaid
 flowchart TD
-    A["Na < 135<br/>avaliar sintomas"] --> B["Sintoma grave?<br/>convulsao, coma, vomito"]
-    B -->|Sim| C["NaCl 3% 100-150 mL IV em 10 min<br/>repetir ate 2-3x"]
+    A["Na < 135<br/>avaliar sintomas"] --> B["Sintoma grave?<br/>convulsão, coma, vômito"]
+    B -->|Sim| C["NaCl 3% 100-150 mL IV em 10 min<br/>repetir até 2-3x"]
     C --> D["Subir Na 4-6 mEq/L<br/>nas primeiras horas"]
-    B -->|Nao| E["Osmolalidade serica"]
-    E --> F["Hipotonica < 275?"]
-    F -->|Nao| G["Pseudo ou translocacional<br/>lipides, glicose, manitol"]
-    F -->|Sim| H["Osm urinaria e volemia<br/>Na urinario"]
-    H --> I["Hipovolemia: SF 0,9%<br/>SIADH: restricao hidrica<br/>Hipervolemia: restricao + alca"]
+    B -->|Não| E["Osmolalidade sérica"]
+    E --> F["Hipotônica < 275?"]
+    F -->|Não| G["Pseudo ou translocacional<br/>lípides, glicose, manitol"]
+    F -->|Sim| H["Osm urinária e volemia<br/>Na urinário"]
+    H --> I["Hipovolemia: SF 0,9%<br/>SIADH: restrição hídrica<br/>Hipervolemia: restrição + alça"]
     D --> J["Teto 8 mEq/L em 24h<br/>Na de 2/2h"]
     I --> J
     J --> K["Subiu demais?"]
@@ -52550,15 +52550,15 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Definiu meta do dia<br/>maximo 8 mEq/L"] --> B["Causa removivel presente?<br/>hipovolemia, tiazidico, adrenal"]
-    B -->|Sim| C["Risco alto de autocorrecao<br/>considerar DDAVP proativo"]
-    B -->|Nao| D["Correcao guiada por infusao"]
+    A["Definiu meta do dia<br/>máximo 8 mEq/L"] --> B["Causa removível presente?<br/>hipovolemia, tiazídico, adrenal"]
+    B -->|Sim| C["Risco alto de autocorreção<br/>considerar DDAVP proativo"]
+    B -->|Não| D["Correção guiada por infusão"]
     C --> E["DDAVP 2 mcg IV 6/6h<br/>+ NaCl 3% titulado"]
     D --> F["Na de 2/2h nas 6h iniciais"]
     E --> F
-    F --> G["Debito urinario alto e claro?"]
-    G -->|Sim| H["Alerta de autocorrecao<br/>suspender salina, medir Na agora"]
-    G -->|Nao| I["Manter plano e reavaliar"]
+    F --> G["Débito urinário alto e claro?"]
+    G -->|Sim| H["Alerta de autocorreção<br/>suspender salina, medir Na agora"]
+    G -->|Não| I["Manter plano e reavaliar"]
     H --> J["Passou de 8 mEq/L?<br/>SG 5% 6 mL/kg + DDAVP"]
     class G critical;
     class H critical;
@@ -52757,12 +52757,12 @@ Vacinação faz parte do cuidado: influenza anual, pneumocócica, hepatite B, CO
 \`\`\`mermaid
 flowchart TD
     A["DM2 confirmado<br/>HbA1c, TFG, RAC, risco CV"] --> B["Doenca CV, IC ou renal?"]
-    B -->|Sim| C["iSGLT2 e/ou GLP-1 com beneficio<br/>independente da HbA1c"]
-    B -->|Nao| D["Metformina 500 mg/dia<br/>ate 850 mg 2-3x/dia"]
+    B -->|Sim| C["iSGLT2 e/ou GLP-1 com benefício<br/>independente da HbA1c"]
+    B -->|Não| D["Metformina 500 mg/dia<br/>até 850 mg 2-3x/dia"]
     D --> E["HbA1c acima da meta em 3 meses?"]
-    E -->|Sim| F["Associar 2o agente pelo perfil<br/>peso, custo, hipoglicemia"]
-    E -->|Nao| G["Manter e reavaliar a cada 3-6 meses"]
-    F --> H["HbA1c > 10% ou sintomas catabolicos?"]
+    E -->|Sim| F["Associar 2º agente pelo perfil<br/>peso, custo, hipoglicemia"]
+    E -->|Não| G["Manter e reavaliar a cada 3-6 meses"]
+    F --> H["HbA1c > 10% ou sintomas catabólicos?"]
     H -->|Sim| I["Insulina basal 10 U ou 0,1-0,2 U/kg<br/>a noite, titular"]
     class H critical;
     class C action;
@@ -52771,14 +52771,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Paciente dependente do SUS"] --> B["Metformina ate 2 g/dia<br/>iniciar baixo e titular"]
+    A["Paciente dependente do SUS"] --> B["Metformina até 2 g/dia<br/>iniciar baixo e titular"]
     B --> C["Sintomas de hiperglicemia aguda<br/>ou HbA1c muito alta?"]
     C --> D["Sim: iniciar insulina NPH<br/>10 U ou 0,2 U/kg a noite"]
-    C --> E["Nao: associar gliclazida MR<br/>30 a 120 mg/dia"]
-    E --> F["Preencheu criterio de dispensacao<br/>da dapagliflozina?"]
+    C --> E["Não: associar gliclazida MR<br/>30 a 120 mg/dia"]
+    E --> F["Preencheu critério de dispensação<br/>da dapagliflozina?"]
     F --> G["Sim: associar dapagliflozina 10 mg/dia"]
-    F --> H["Nao: otimizar metformina<br/>+ sulfonilureia + insulina"]
-    D --> I["Jejum na meta e HbA1c fora?<br/>acrescentar regular na maior refeicao"]
+    F --> H["Não: otimizar metformina<br/>+ sulfonilureia + insulina"]
+    D --> I["Jejum na meta e HbA1c fora?<br/>acrescentar regular na maior refeição"]
     class C critical;
     class G action;
     class I action;
@@ -52961,17 +52961,17 @@ A **propafenona** exige coração estruturalmente normal — é contraindicada n
 
 \`\`\`mermaid
 flowchart TD
-    A["FA confirmada<br/>manejo cronico"] --> B["Tratar comorbidades<br/>HAS, obesidade, apneia,<br/>diabetes, alcool"]
+    A["FA confirmada<br/>manejo crônico"] --> B["Tratar comorbidades<br/>HAS, obesidade, apneia,<br/>diabetes, alcool"]
     B --> C["Calcular CHA2DS2-VA<br/>escore sexo-neutro"]
     C -->|Maior ou igual a 2| D["Anticoagular<br/>DOAC preferencial"]
-    C -->|Igual a 1| E["Considerar anticoagulacao<br/>decisao compartilhada"]
-    C -->|Zero| F["Nao anticoagular<br/>reavaliar periodicamente"]
-    D --> G["Estenose mitral mod-grave<br/>ou protese mecanica?"]
+    C -->|Igual a 1| E["Considerar anticoagulação<br/>decisão compartilhada"]
+    C -->|Zero| F["Não anticoagular<br/>reavaliar periodicamente"]
+    D --> G["Estenose mitral mod-grave<br/>ou prótese mecânica?"]
     G -->|Sim| H["Varfarina com INR 2 a 3"]
-    G -->|Nao| I["Rivaroxabana, apixabana<br/>ou dabigatrana"]
-    B --> J["Paciente sintomatico?"]
-    J -->|Sim| K["Controle de ritmo<br/>antiarritmico ou ablacao"]
-    J -->|Nao| L["Controle de frequencia<br/>alvo FC menor que 110"]
+    G -->|Não| I["Rivaroxabana, apixabana<br/>ou dabigatrana"]
+    B --> J["Paciente sintomático?"]
+    J -->|Sim| K["Controle de ritmo<br/>antiarrítmico ou ablação"]
+    J -->|Não| L["Controle de frequência<br/>alvo FC menor que 110"]
     class C critical;
     class H,I,K,L action;
 \`\`\`
@@ -52980,17 +52980,17 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Decisao: ritmo ou frequencia"] --> B["Sintomatico apesar da<br/>frequencia controlada?"]
-    B -->|Nao| C["Controle de frequencia<br/>e reavaliacao periodica"]
-    B -->|Sim| D["Diagnostico ha menos<br/>de 1 ano?"]
-    D -->|Sim| E["Janela favoravel<br/>priorizar controle de ritmo"]
-    D -->|Nao| F["Atrio muito dilatado e<br/>FA de longa duracao"]
-    F --> G["Beneficio menor<br/>decisao compartilhada"]
+    A["Decisão: ritmo ou frequência"] --> B["Sintomático apesar da<br/>frequência controlada?"]
+    B -->|Não| C["Controle de frequência<br/>e reavaliação periódica"]
+    B -->|Sim| D["Diagnóstico há menos<br/>de 1 ano?"]
+    D -->|Sim| E["Janela favorável<br/>priorizar controle de ritmo"]
+    D -->|Não| F["Átrio muito dilatado e<br/>FA de longa duração"]
+    F --> G["Benefício menor<br/>decisão compartilhada"]
     E --> H["Cardiopatia estrutural?"]
-    H -->|Nao| I["Propafenona<br/>sempre com bloqueador do no AV"]
-    H -->|Sim| J["Amiodarona ou ablacao<br/>discutir com eletrofisiologia"]
-    E --> K["FA paroxistica sintomatica<br/>ou FA com ICFEr"]
-    K --> L["Ablacao por cateter<br/>primeira linha em selecionados"]
+    H -->|Não| I["Propafenona<br/>sempre com bloqueador do no AV"]
+    H -->|Sim| J["Amiodarona ou ablação<br/>discutir com eletrofisiologia"]
+    E --> K["FA paroxística sintomática<br/>ou FA com ICFEr"]
+    K --> L["Ablação por cateter<br/>primeira linha em selecionados"]
     class B,D critical;
     class C,I,J,L action;
 \`\`\`
@@ -53246,14 +53246,14 @@ Em sangramento moderado ou grave, suspender tudo. Na dupla antiagregação com s
 \`\`\`mermaid
 flowchart TD
     A["Caso suspeito de dengue<br/>notificar"] --> B["Tem sinal de alarme<br/>ou de gravidade?"]
-    B -->|Nao| C["Sangramento de pele, prova do laco,<br/>comorbidade ou risco social?"]
-    C -->|Nao| D["GRUPO A<br/>VO 60 mL/kg/dia adulto, 1/3 com SRO"]
-    C -->|Sim| E["GRUPO B<br/>hemograma obrigatorio + VO como grupo A"]
-    B -->|Sinal de alarme| F["GRUPO C<br/>SF 0,9% 10 mL/kg na 1a hora"]
-    B -->|Sinal de gravidade| G["GRUPO D<br/>SF 0,9% 20 mL/kg em ate 20 min"]
-    F --> H["Reavaliar em 1h e Ht em 2h<br/>repetir expansao ate 3x"]
-    H --> I["Melhorou? manutencao 25 mL/kg/6h<br/>depois 25 mL/kg/8h"]
-    G --> J["UTI minimo 48h<br/>albumina 0,5-1 g/kg se refratario"]
+    B -->|Não| C["Sangramento de pele, prova do laço,<br/>comorbidade ou risco social?"]
+    C -->|Não| D["GRUPO A<br/>VO 60 mL/kg/dia adulto, 1/3 com SRO"]
+    C -->|Sim| E["GRUPO B<br/>hemograma obrigatório + VO como grupo A"]
+    B -->|Sinal de alarme| F["GRUPO C<br/>SF 0,9% 10 mL/kg na 1ª hora"]
+    B -->|Sinal de gravidade| G["GRUPO D<br/>SF 0,9% 20 mL/kg em até 20 min"]
+    F --> H["Reavaliar em 1h e Ht em 2h<br/>repetir expansão até 3x"]
+    H --> I["Melhorou? manutenção 25 mL/kg/6h<br/>depois 25 mL/kg/8h"]
+    G --> J["UTI mínimo 48h<br/>albumina 0,5-1 g/kg se refratário"]
     class B critical;
     class F critical;
     class G critical;
@@ -53267,13 +53267,13 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Choque apos expansoes<br/>do grupo D"] --> B["Avaliar hematocrito"]
-    B -->|Hematocrito subindo| C["Extravasamento persistente"]
+    A["Choque após expansões<br/>do grupo D"] --> B["Avaliar hematócrito"]
+    B -->|Hematócrito subindo| C["Extravasamento persistente"]
     C --> D["Albumina 0,5-1 g/kg<br/>ou coloide 10 mL/kg/h"]
-    B -->|Hematocrito caindo| E["Suspeitar hemorragia<br/>e coagulopatia"]
-    E --> F["Concentrado de hemacias 10-15 mL/kg/dia<br/>plasma 10 mL/kg + vitamina K"]
-    B -->|Hematocrito caindo sem sangramento| G["Choque resolvido porem<br/>dispneia e estertores?"]
-    G -->|Sim| H["Hiper-hidratacao<br/>reduzir infusao, diuretico, inotropico"]
+    B -->|Hematócrito caindo| E["Suspeitar hemorragia<br/>e coagulopatia"]
+    E --> F["Concentrado de hemácias 10-15 mL/kg/dia<br/>plasma 10 mL/kg + vitamina K"]
+    B -->|Hematócrito caindo sem sangramento| G["Choque resolvido porém<br/>dispneia e estertores?"]
+    G -->|Sim| H["Hiper-hidratação<br/>reduzir infusão, diurético, inotrópico"]
     D --> I["Reavaliar a cada 15-30 min<br/>Ht a cada 2h"]
     F --> I
     H --> I
@@ -53431,14 +53431,14 @@ Medidas gerais: suspender tiazídico, lítio, cálcio e vitamina D; mobilizar o 
 
 \`\`\`mermaid
 flowchart TD
-    A["Ca corrigido ou ionico alto"] --> B["Ca > 14 mg/dL ou sintomatico?"]
-    B -->|Nao| C["Investigar ambulatorial<br/>PTH, suspender tiazidico"]
+    A["Ca corrigido ou iônico alto"] --> B["Ca > 14 mg/dL ou sintomático?"]
+    B -->|Não| C["Investigar ambulatorial<br/>PTH, suspender tiazídico"]
     B -->|Sim| D["SF 0,9% 200-300 mL/h<br/>diurese 100-150 mL/h"]
     D --> E["Calcitonina 4 UI/kg SC 12/12h<br/>por 48-72h"]
-    E --> F["Acido zoledronico 4 mg IV<br/>pico em 2-4 dias"]
-    F --> G["Refrataria ou disfuncao renal?"]
-    G -->|Sim| H["Denosumabe 120 mg SC<br/>ou dialise"]
-    G -->|Nao| I["Linfoma ou granulomatose?<br/>prednisona 20-40 mg/dia"]
+    E --> F["Ácido zoledrônico 4 mg IV<br/>pico em 2-4 dias"]
+    F --> G["Refratária ou disfunção renal?"]
+    G -->|Sim| H["Denosumabe 120 mg SC<br/>ou diálise"]
+    G -->|Não| I["Linfoma ou granulomatose?<br/>prednisona 20-40 mg/dia"]
     class B critical;
     class D action;
     class H action;
@@ -53448,16 +53448,16 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Hipercalcemia confirmada<br/>calcio ionico ou corrigido"] --> B["Dosar PTH"]
+    A["Hipercalcemia confirmada<br/>cálcio iônico ou corrigido"] --> B["Dosar PTH"]
     B --> C["PTH alto ou normal-alto"]
     B --> D["PTH suprimido"]
-    C --> E["Calcio urinario 24h"]
-    E --> F["Calciuria baixa<br/>hipercalcemia hipocalciurica familiar<br/>nao operar"]
-    E --> G["Hiperparatireoidismo primario<br/>avaliar cirurgia"]
-    D --> H["Fosforo, PTHrP, eletroforese<br/>vitamina D 1,25 e 25-OH"]
-    H --> I["Malignidade<br/>PTHrP ou osteolise"]
+    C --> E["Cálcio urinário 24h"]
+    E --> F["Calciúria baixa<br/>hipercalcemia hipocalciúrica familiar<br/>não operar"]
+    E --> G["Hiperparatireoidismo primário<br/>avaliar cirurgia"]
+    D --> H["Fósforo, PTHrP, eletroforese<br/>vitamina D 1,25 e 25-OH"]
+    H --> I["Malignidade<br/>PTHrP ou osteólise"]
     H --> J["Granulomatose ou linfoma<br/>calcitriol alto: corticoide"]
-    H --> K["Intoxicacao por vitamina D<br/>ou drogas: suspender"]
+    H --> K["Intoxicação por vitamina D<br/>ou drogas: suspender"]
     class A critical;
     class G action;
     class I action;
@@ -53800,17 +53800,17 @@ Do outro lado, a PCR pode ser a apresentação de um evento não cardíaco: trau
 flowchart TD
     A["Irresponsivo<br/>sem pulso em 10 s"] --> B["Iniciar RCP<br/>100-120/min, 5-6 cm"]
     B --> C["Monitor / pas<br/>checar ritmo"]
-    C -->|"FV / TV sem pulso"| D["Desfibrilar 200 J<br/>bifasico"]
-    C -->|"AESP / assistolia"| E["Adrenalina 1 mg IV/IO<br/>assim que possivel"]
-    D --> F["RCP 2 min<br/>adrenalina 1 mg apos 2o choque"]
-    F --> G["FV persiste apos 3o choque?"]
-    G -->|Sim| H["Amiodarona 300 mg IV<br/>2a dose 150 mg"]
-    G -->|Nao| I["Seguir ciclos de 2 min"]
+    C -->|"FV / TV sem pulso"| D["Desfibrilar 200 J<br/>bifásico"]
+    C -->|"AESP / assistolia"| E["Adrenalina 1 mg IV/IO<br/>assim que possível"]
+    D --> F["RCP 2 min<br/>adrenalina 1 mg após 2º choque"]
+    F --> G["FV persiste após 3º choque?"]
+    G -->|Sim| H["Amiodarona 300 mg IV<br/>2ª dose 150 mg"]
+    G -->|Não| I["Seguir ciclos de 2 min"]
     E --> J["Procurar causa<br/>5H / 5T + POCUS"]
     H --> K["Reavaliar ritmo<br/>a cada 2 min"]
     J --> K
     I --> K
-    K --> L["Retorno da circulacao<br/>espontanea"]
+    K --> L["Retorno da circulação<br/>espontânea"]
     L --> M["Cuidados pos-PCR<br/>PAM >= 65, SpO2 92-98%"]
     class A,G critical;
     class D,E,H,M action;
@@ -54291,8 +54291,8 @@ flowchart TD
     C --> D["Acidose + cetonemia alta<br/>com glicemia < 200"]
     D --> E["Suspender iSGLT2"]
     E --> F["Hidratar + insulina IV<br/>JUNTO com glicose IV"]
-    F --> G["Alvo: fechar o anion-gap<br/>nao a glicemia"]
-    G --> H["Manter iSGLT2 suspenso<br/>reintroduzir so apos ingesta plena"]
+    F --> G["Alvo: fechar o ânion-gap<br/>não a glicemia"]
+    G --> H["Manter iSGLT2 suspenso<br/>reintroduzir so após ingesta plena"]
     class D critical;
     class F action;
     class H action;
@@ -54455,13 +54455,13 @@ Estratégias que reduzem o risco: em glicemia pré-tratamento mais baixa, consid
 \`\`\`mermaid
 flowchart TD
     A["K > 5,5 mEq/L<br/>ECG imediato"] --> B["ECG alterado ou K >= 6,5?<br/>T apiculada, QRS largo"]
-    B -->|Sim| C["Gluconato de calcio 10%<br/>10-20 mL IV em 2-3 min"]
-    B -->|Nao| D["Suspender fontes de K<br/>reavaliar K e ECG"]
+    B -->|Sim| C["Gluconato de cálcio 10%<br/>10-20 mL IV em 2-3 min"]
+    B -->|Não| D["Suspender fontes de K<br/>reavaliar K e ECG"]
     C --> E["Shift: insulina 10 U IV + 25 g glicose<br/>+ salbutamol 10-20 mg NBZ"]
     E --> F["Remover K: furosemida se diurese<br/>+ resina de poliestireno"]
-    F --> G["Refratario, anuria ou LRA/DRC oligurica?"]
-    G -->|Sim| H["Hemodialise de urgencia"]
-    G -->|Nao| I["Monitorizar, repetir K em 1-2 h<br/>tratar a causa"]
+    F --> G["Refratário, anúria ou LRA/DRC oligúrica?"]
+    G -->|Sim| H["Hemodiálise de urgência"]
+    G -->|Não| I["Monitorizar, repetir K em 1-2 h<br/>tratar a causa"]
     class B critical;
     class C action;
     class H action;
@@ -54615,14 +54615,14 @@ Ajustar o esquema antidiabético antes da alta é parte do tratamento, não uma 
 \`\`\`mermaid
 flowchart TD
     A["Rebaixamento ou sintomas<br/>glicemia capilar imediata"] --> B["Glicemia < 70 mg/dL?"]
-    B -->|Nao| C["Buscar outra causa<br/>do rebaixamento"]
-    B -->|Sim| D["Consegue engolir com seguranca?"]
+    B -->|Não| C["Buscar outra causa<br/>do rebaixamento"]
+    B -->|Sim| D["Consegue engolir com segurança?"]
     D -->|Sim| E["15 g de carboidrato VO<br/>repetir em 15 min se < 70"]
-    D -->|Nao| F["SG 50% 40-60 mL IV em bolus<br/>ou glucagon 1 mg IM/SC"]
-    F --> G["Causa de acao prolongada?<br/>sulfonilureia ou insulina basal"]
+    D -->|Não| F["SG 50% 40-60 mL IV em bolus<br/>ou glucagon 1 mg IM/SC"]
+    F --> G["Causa de ação prolongada?<br/>sulfonilureia ou insulina basal"]
     E --> G
-    G -->|Sim| H["SG 10% em infusao<br/>internar e considerar octreotida"]
-    G -->|Nao| I["Observar, alimentar<br/>ajustar esquema antes da alta"]
+    G -->|Sim| H["SG 10% em infusão<br/>internar e considerar octreotida"]
+    G -->|Não| I["Observar, alimentar<br/>ajustar esquema antes da alta"]
     class B critical;
     class H action;
     class I action;
@@ -54630,14 +54630,14 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Hipoglicemia em paciente SEM diabetes"] --> B["Colher amostra critica ANTES da glicose<br/>insulina, peptideo C, beta-OHB, sulfonilureia, cortisol"]
-    B --> C["Insulina alta com peptideo C alto"]
-    B --> D["Insulina alta com peptideo C suprimido"]
+    A["Hipoglicemia em paciente SEM diabetes"] --> B["Colher amostra crítica ANTES da glicose<br/>insulina, peptídeo C, beta-OHB, sulfonilureia, cortisol"]
+    B --> C["Insulina alta com peptídeo C alto"]
+    B --> D["Insulina alta com peptídeo C suprimido"]
     B --> E["Insulina baixa com beta-OHB alto"]
-    C --> F["Rastreio de sulfonilureia positivo:<br/>secretagogo acidental ou facticio"]
+    C --> F["Rastreio de sulfonilureia positivo:<br/>secretagogo acidental ou factício"]
     C --> G["Rastreio negativo:<br/>investigar insulinoma"]
-    D --> H["Insulina exogena facticia"]
-    E --> I["Jejum, etilismo, hepatopatia<br/>ou insuficiencia adrenal"]
+    D --> H["Insulina exógena factícia"]
+    E --> I["Jejum, etilismo, hepatopatia<br/>ou insuficiência adrenal"]
     class B critical;
     class G action;
     class H action;
@@ -54878,16 +54878,16 @@ Fármacos titaláveis por via intravenosa (labetalol, nicardipina, esmolol) são
 
 \`\`\`mermaid
 flowchart TD
-    A["AVC isquemico agudo<br/>medir PA"] --> B["Vai receber trombolitico?"]
+    A["AVC isquêmico agudo<br/>medir PA"] --> B["Vai receber trombolítico?"]
     B -->|Sim| C["PA menor que 185/110<br/>antes de infundir"]
     C --> D["Primeiras 24h:<br/>manter menor que 180/105"]
     D --> E["NAO mirar PAS<br/>menor que 140 mmHg"]
-    B -->|Nao| F["Fez trombectomia<br/>com mTICI 2b a 3?"]
+    B -->|Não| F["Fez trombectomia<br/>com mTICI 2b a 3?"]
     F -->|Sim| G["Evitar PAS menor que 140<br/>por 72 horas"]
-    F -->|Nao| H["Tolerar ate 220/120<br/>por 24 a 48 horas"]
-    H --> I["Tratar so se emergencia<br/>hipertensiva associada"]
+    F -->|Não| H["Tolerar até 220/120<br/>por 24 a 48 horas"]
+    H --> I["Tratar so se emergência<br/>hipertensiva associada"]
     A --> J["PAS baixa ou queda<br/>abrupta?"]
-    J -->|Sim| K["Corrigir volemia e<br/>buscar causa sistemica"]
+    J -->|Sim| K["Corrigir volemia e<br/>buscar causa sistêmica"]
     class E critical;
     class G critical;
     class J critical;
@@ -55137,16 +55137,16 @@ No **superrefratário** — persistência ou recorrência após 24 horas de anes
 
 \`\`\`mermaid
 flowchart TD
-    A["Crise maior ou igual a 5 min<br/>marcar o horario"] --> B["ABC, O2, monitor<br/>glicemia capilar"]
+    A["Crise maior ou igual a 5 min<br/>marcar o horário"] --> B["ABC, O2, monitor<br/>glicemia capilar"]
     B --> C["Hipoglicemia?"]
     C -->|Sim| D["Glicose IV<br/>+ tiamina se risco"]
-    C -->|Nao| E["Benzodiazepinico dose plena<br/>diazepam 0,15-0,2 mg/kg IV"]
+    C -->|Não| E["Benzodiazepínico dose plena<br/>diazepam 0,15-0,2 mg/kg IV"]
     E --> F["Crise cessou?"]
-    F -->|Nao| G["Segunda linha IV: levetiracetam<br/>fenitoina ou valproato"]
-    F -->|Sim| H["Investigar causa<br/>e manter vigilancia"]
-    G --> I["Crise persiste<br/>apos 40 min?"]
-    I -->|Sim| J["IOT + anestesico em BIC<br/>com EEG continuo em UTI"]
-    I -->|Nao| K["UTI ou leito monitorizado<br/>+ EEG se nao acordar"]
+    F -->|Não| G["Segunda linha IV: levetiracetam<br/>fenitoína ou valproato"]
+    F -->|Sim| H["Investigar causa<br/>e manter vigilância"]
+    G --> I["Crise persiste<br/>após 40 min?"]
+    I -->|Sim| J["IOT + anestésico em BIC<br/>com EEG contínuo em UTI"]
+    I -->|Não| K["UTI ou leito monitorizado<br/>+ EEG se não acordar"]
     class A critical;
     class I critical;
     class E action;
@@ -55158,13 +55158,13 @@ O segundo eixo de decisão é o do paciente que **não acorda depois que a crise
 
 \`\`\`mermaid
 flowchart TD
-    A["Crise motora cessou<br/>paciente nao acorda"] --> B["Mais de 20 a 30 min<br/>sem recuperar?"]
-    B -->|Nao| C["Observar com reavaliacao<br/>neurologica seriada"]
-    B -->|Sim| D["Nao chamar de pos-ictal<br/>solicitar EEG urgente"]
-    D --> E["Rever glicemia, sodio<br/>sedativos e temperatura"]
+    A["Crise motora cessou<br/>paciente não acorda"] --> B["Mais de 20 a 30 min<br/>sem recuperar?"]
+    B -->|Não| C["Observar com reavaliação<br/>neurológica seriada"]
+    B -->|Sim| D["Não chamar de pos-ictal<br/>solicitar EEG urgente"]
+    D --> E["Rever glicemia, sódio<br/>sedativos e temperatura"]
     E --> F["EEG mostra crise<br/>eletrografica?"]
-    F -->|Sim| G["Estado de mal nao convulsivo<br/>tratar como EME"]
-    F -->|Nao| H["Investigar causa estrutural<br/>TC ou RM e liquor"]
+    F -->|Sim| G["Estado de mal não convulsivo<br/>tratar como EME"]
+    F -->|Não| H["Investigar causa estrutural<br/>TC ou RM e liquor"]
     class B critical;
     class F critical;
     class D action;
@@ -55357,17 +55357,17 @@ Nesse cenário, outras opções de resgate ocasionalmente usadas em terapia inte
 
 \`\`\`mermaid
 flowchart TD
-    A["Crise de asma<br/>avaliar fala, FR, SpO2, PFE"] --> B["Sonolencia, torax silencioso<br/>ou bradicardia?"]
+    A["Crise de asma<br/>avaliar fala, FR, SpO2, PFE"] --> B["Sonolência, tórax silencioso<br/>ou bradicardia?"]
     B -->|Sim| C["Pre-parada: preparar IOT<br/>chamar UTI"]
-    B -->|Nao| D["O2 alvo SpO2 93-95%<br/>SABA 4-10 jatos ou neb 2,5-5 mg<br/>a cada 20 min na 1a hora"]
-    D --> E["Corticoide sistemico na 1a hora<br/>prednisolona 40-50 mg VO"]
+    B -->|Não| D["O2 alvo SpO2 93-95%<br/>SABA 4-10 jatos ou neb 2,5-5 mg<br/>a cada 20 min na 1ª hora"]
+    D --> E["Corticoide sistêmico na 1ª hora<br/>prednisolona 40-50 mg VO"]
     E --> F["Crise moderada/grave?"]
-    F -->|Sim| G["Associar ipratropio 0,5 mg neb"]
-    F -->|Nao| H["Reavaliar em 1 hora<br/>clinica + PFE"]
+    F -->|Sim| G["Associar ipratrópio 0,5 mg neb"]
+    F -->|Não| H["Reavaliar em 1 hora<br/>clínica + PFE"]
     G --> H
     H --> I["Sem melhora ou PFE menor que 50%?"]
-    I -->|Sim| J["Sulfato de magnesio 2 g IV<br/>em 20 min + internar"]
-    I -->|Nao| K["Observar, alta com corticoide VO 5-7 dias<br/>e CI-formoterol de manutencao"]
+    I -->|Sim| J["Sulfato de magnésio 2 g IV<br/>em 20 min + internar"]
+    I -->|Não| K["Observar, alta com corticoide VO 5-7 dias<br/>e CI-formoterol de manutenção"]
     class B critical;
     class C critical;
     class J action;
@@ -55462,14 +55462,14 @@ Os imunobiológicos para asma grave (omalizumabe, mepolizumabe, benralizumabe, d
 
 \`\`\`mermaid
 flowchart TD
-    A["Crise controlada na emergencia"] --> B["Reavaliar em 1 h apos<br/>a ultima dose de broncodilatador"]
-    B --> C["PFE maior que 60-80% e<br/>SpO2 estavel em ar ambiente?"]
-    C -->|Nao| D["Internar"]
-    C -->|Sim| E["Historico de crise quase fatal<br/>ou ma adesao ou sem suporte?"]
+    A["Crise controlada na emergência"] --> B["Reavaliar em 1 h após<br/>a última dose de broncodilatador"]
+    B --> C["PFE maior que 60-80% e<br/>SpO2 estável em ar ambiente?"]
+    C -->|Não| D["Internar"]
+    C -->|Sim| E["Histórico de crise quase fatal<br/>ou má adesão ou sem suporte?"]
     E -->|Sim| D
-    E -->|Nao| F["Alta com corticoide VO 5-7 dias<br/>+ CI-formoterol de manutencao e resgate"]
-    F --> G["Revisar tecnica inalatoria<br/>entregar plano de acao escrito"]
-    G --> H["Retorno em 2-7 dias<br/>vacinas e remocao de gatilhos"]
+    E -->|Não| F["Alta com corticoide VO 5-7 dias<br/>+ CI-formoterol de manutenção e resgate"]
+    F --> G["Revisar técnica inalatória<br/>entregar plano de ação escrito"]
+    G --> H["Retorno em 2-7 dias<br/>vacinas e remoção de gatilhos"]
     class D critical;
     class F action;
     class H action;
@@ -55641,15 +55641,15 @@ Sobre a intensificação lipídica: iniciar ezetimiba junto com a estatina de al
 
 \`\`\`mermaid
 flowchart TD
-    A["Pos-STEMI: hipotensao<br/>ou piora subita"] --> B["Ausculta: sopro novo?"]
-    B -->|"Sim"| C["Ecocardiograma urgente<br/>CIV ou insuficiencia mitral aguda"]
-    B -->|"Nao"| D["Pulmao limpo com<br/>jugular alta?"]
-    D -->|"Sim, IAM inferior"| E["Infarto de VD<br/>volume, sem nitrato nem diuretico"]
-    D -->|"Nao, congestao"| F["Choque cardiogenico<br/>de VE"]
-    C --> G["Acionar cirurgia cardiaca<br/>e suporte circulatorio"]
-    F --> H["Noradrenalina e inotropico<br/>UTI e revascularizar a culpada"]
-    E --> I["Se persistir hipotenso<br/>inotropico e marcapasso se BAV"]
-    A --> J["Dissociacao eletromecanica<br/>subita"]
+    A["Pos-STEMI: hipotensão<br/>ou piora súbita"] --> B["Ausculta: sopro novo?"]
+    B -->|"Sim"| C["Ecocardiograma urgente<br/>CIV ou insuficiência mitral aguda"]
+    B -->|"Não"| D["Pulmao limpo com<br/>jugular alta?"]
+    D -->|"Sim, IAM inferior"| E["Infarto de VD<br/>volume, sem nitrato nem diurético"]
+    D -->|"Não, congestão"| F["Choque cardiogênico<br/>de VE"]
+    C --> G["Acionar cirurgia cardíaca<br/>e suporte circulatório"]
+    F --> H["Noradrenalina e inotrópico<br/>UTI e revascularizar a culpada"]
+    E --> I["Se persistir hipotenso<br/>inotrópico e marcapasso se BAV"]
+    A --> J["Dissociação eletromecânica<br/>súbita"]
     J --> K["Ruptura de parede livre<br/>pericardiocentese e cirurgia"]
     class J critical;
     class K critical;
@@ -55818,15 +55818,15 @@ Tratar o gatilho é parte do tratamento, não um passo posterior: **fibrilação
 
 \`\`\`mermaid
 flowchart TD
-    A["Dispneia subita + ortopneia<br/>estertores + hipoxemia"] --> B["Sentar o paciente<br/>monitorizar, O2"]
+    A["Dispneia súbita + ortopneia<br/>estertores + hipoxemia"] --> B["Sentar o paciente<br/>monitorizar, O2"]
     B --> C["Desconforto ou hipoxemia?"]
     C -->|Sim| D["VNI precoce<br/>CPAP ou BiPAP"]
-    C -->|Nao| E["O2 suplementar<br/>e reavaliar"]
+    C -->|Não| E["O2 suplementar<br/>e reavaliar"]
     D --> F["PAS >= 110?"]
     E --> F
     F -->|Sim| G["Nitroglicerina IV<br/>titular"]
-    F -->|"Nao - hipotenso"| H["Pensar choque cardiogenico<br/>inotropico / vasopressor"]
-    G --> I["Furosemida IV<br/>40 mg se virgem de diuretico"]
+    F -->|"Não - hipotenso"| H["Pensar choque cardiogênico<br/>inotrópico / vasopressor"]
+    G --> I["Furosemida IV<br/>40 mg se virgem de diurético"]
     I --> J["Tratar o gatilho<br/>isquemia, FA, crise hipertensiva"]
     H --> J
     class A,C,H critical;
@@ -55837,14 +55837,14 @@ Passada a fase de resgate, o segundo eixo de decisão é o da **descongestão** 
 
 \`\`\`mermaid
 flowchart TD
-    A["Paciente estabilizado<br/>apos VNI e vasodilatador"] --> B["Diurese e sodio urinario<br/>2 h apos a dose"]
+    A["Paciente estabilizado<br/>após VNI e vasodilatador"] --> B["Diurese e sódio urinário<br/>2 h após a dose"]
     B -->|"Resposta adequada"| C["Manter dose<br/>reavaliar a cada 12 h"]
-    B -->|"Resposta insuficiente"| D["Dobrar a dose do<br/>diuretico de alca"]
+    B -->|"Resposta insuficiente"| D["Dobrar a dose do<br/>diurético de alça"]
     D --> E["Ainda insuficiente?"]
-    E -->|Sim| F["Bloqueio sequencial<br/>acetazolamida ou tiazidico"]
-    F --> G["Persiste congesto com<br/>piora renal ou anuria?"]
-    G -->|Sim| H["Avaliar ultrafiltracao<br/>ou dialise"]
-    C --> I["Sem congestao em repouso<br/>passar para VO e otimizar IC"]
+    E -->|Sim| F["Bloqueio sequencial<br/>acetazolamida ou tiazídico"]
+    F --> G["Persiste congesto com<br/>piora renal ou anúria?"]
+    G -->|Sim| H["Avaliar ultrafiltração<br/>ou diálise"]
+    C --> I["Sem congestão em repouso<br/>passar para VO e otimizar IC"]
     class G,H critical;
     class D,F,H,I action;
 \`\`\`
@@ -56073,13 +56073,13 @@ Na escolha do suporte, o cateter nasal de alto fluxo é preferível à VNI na hi
 
 \`\`\`mermaid
 flowchart TD
-    A["PAC confirmada<br/>clinica + imagem"] --> B["CURB-65 e criterios ATS/IDSA"]
-    B -->|"0-1, sem hipoxemia"| C["Ambulatorial<br/>amoxicilina ou macrolideo"]
-    B -->|"2 ou hipoxemia"| D["Enfermaria<br/>betalactamico + macrolideo"]
-    B -->|"criterio maior ou 3 menores"| E["PAC grave - UTI"]
-    E --> F["Betalactamico + macrolideo<br/>+ cobrir MRSA/Pseudomonas se risco"]
-    F --> G["Hidrocortisona 200 mg/dia IV<br/>nao usar se influenza ou choque septico"]
-    C --> H["Reavaliar em 48-72 h<br/>descalonar e minimo 5 dias"]
+    A["PAC confirmada<br/>clínica + imagem"] --> B["CURB-65 e criterios ATS/IDSA"]
+    B -->|"0-1, sem hipoxemia"| C["Ambulatorial<br/>amoxicilina ou macrolídeo"]
+    B -->|"2 ou hipoxemia"| D["Enfermaria<br/>betalactâmico + macrolídeo"]
+    B -->|"critério maior ou 3 menores"| E["PAC grave - UTI"]
+    E --> F["Betalactâmico + macrolídeo<br/>+ cobrir MRSA/Pseudomonas se risco"]
+    F --> G["Hidrocortisona 200 mg/dia IV<br/>não usar se influenza ou choque séptico"]
+    C --> H["Reavaliar em 48-72 h<br/>descalonar e mínimo 5 dias"]
     D --> H
     G --> H
     class E critical;
@@ -56271,16 +56271,16 @@ Sobre ajuste de dose: salbutamol, ipratrópio e corticoide não exigem correçã
 
 \`\`\`mermaid
 flowchart TD
-    A["Piora de dispneia, volume<br/>e purulencia do escarro"] --> B["RX, gasometria, ECG<br/>afastar TEP, pneumonia, ICC, pneumotorax"]
+    A["Piora de dispneia, volume<br/>e purulência do escarro"] --> B["RX, gasometria, ECG<br/>afastar TEP, pneumonia, ICC, pneumotorax"]
     B --> C["O2 controlado<br/>alvo SpO2 88-92%"]
-    C --> D["Salbutamol + ipratropio inalados<br/>+ prednisona 40 mg/dia VO por 5 dias"]
-    D --> E["Criterios de Anthonisen<br/>2 de 3 com purulencia, ou em ventilacao?"]
-    E -->|Sim| F["Antibiotico 5-7 dias<br/>amox-clav, macrolideo ou doxiciclina"]
-    E -->|Nao| G["Sem antibiotico<br/>reavaliar"]
+    C --> D["Salbutamol + ipratrópio inalados<br/>+ prednisona 40 mg/dia VO por 5 dias"]
+    D --> E["Criterios de Anthonisen<br/>2 de 3 com purulência, ou em ventilação?"]
+    E -->|Sim| F["Antibiótico 5-7 dias<br/>amox-clav, macrolídeo ou doxiciclina"]
+    E -->|Não| G["Sem antibiótico<br/>reavaliar"]
     F --> H["Gasometria: pH menor que 7,35<br/>com pCO2 elevada?"]
     G --> H
-    H -->|Sim| I["VNI imediata<br/>reduz intubacao e mortalidade"]
-    H -->|Nao| J["Manter tratamento<br/>reavaliar em 1-2 h"]
+    H -->|Sim| I["VNI imediata<br/>reduz intubação e mortalidade"]
+    H -->|Não| J["Manter tratamento<br/>reavaliar em 1-2 h"]
     I --> K["Sem melhora em 1-2 h<br/>ou rebaixamento: intubar"]
     class H critical;
     class K critical;
@@ -56453,13 +56453,13 @@ Erros frequentes no uso desses escores: aplicar **PERC em paciente de probabilid
 
 \`\`\`mermaid
 flowchart TD
-  A["Suspeita clinica de TEP"] --> B["Paciente instavel?"]
+  A["Suspeita clínica de TEP"] --> B["Paciente instável?"]
   B -->|Sim| C["ALTO RISCO<br/>eco a beira do leito"]
-  C --> C2["Sobrecarga de VD<br/>reperfusao de emergencia"]
-  B -->|Nao| D["Probabilidade pre-teste<br/>Wells ou Geneva"]
-  D -->|Provavel| E["AngioTC de torax"]
-  D -->|Improvavel| F["D-dimero ajustado a idade<br/>ou algoritmo YEARS"]
-  F -->|Negativo| G["TEP excluido"]
+  C --> C2["Sobrecarga de VD<br/>reperfusão de emergência"]
+  B -->|Não| D["Probabilidade pre-teste<br/>Wells ou Geneva"]
+  D -->|Provável| E["AngioTC de tórax"]
+  D -->|Improvável| F["D-dímero ajustado a idade<br/>ou algoritmo YEARS"]
+  F -->|Negativo| G["TEP excluído"]
   F -->|Positivo| E
   E -->|Positivo| H["Confirmado<br/>estratificar sPESI, VD e troponina"]
   E -->|Negativo| G
@@ -56810,14 +56810,14 @@ A transição para via oral guiada por antibiograma, assim que houver afebrilida
 
 \`\`\`mermaid
 flowchart TD
-    A["Febre + dor lombar<br/>ou sinais sistemicos"] --> B["Urocultura antes do ATB<br/>hemocultura se grave"]
+    A["Febre + dor lombar<br/>ou sinais sistêmicos"] --> B["Urocultura antes do ATB<br/>hemocultura se grave"]
     B --> C["Sinais de sepse ou choque?"]
     C -->|Sim| D["Internar, ressuscitar<br/>ATB IV amplo imediato"]
-    C -->|Nao| E["ATB IV ou VO conforme risco<br/>ceftriaxona empirica usual"]
-    D --> F["Imagem urgente<br/>ha obstrucao ou abscesso?"]
+    C -->|Não| E["ATB IV ou VO conforme risco<br/>ceftriaxona empírica usual"]
+    D --> F["Imagem urgente<br/>há obstrução ou abscesso?"]
     E --> F
     F -->|Sim| G["Drenagem urgente<br/>duplo-J ou nefrostomia"]
-    F -->|Nao| H["Ajustar pela cultura e descalonar"]
+    F -->|Não| H["Ajustar pela cultura e descalonar"]
     G --> H
     H --> I["Completar cerca de 7 dias"]
     class C critical;
@@ -56827,12 +56827,12 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["Febre persiste apos 72 h de ATB adequado"] --> B["Rever antibiograma<br/>o germe e sensivel ao esquema?"]
-    B -->|Nao| C["Trocar para droga guiada pela cultura"]
+    A["Febre persiste após 72 h de ATB adequado"] --> B["Rever antibiograma<br/>o germe e sensível ao esquema?"]
+    B -->|Não| C["Trocar para droga guiada pela cultura"]
     B -->|Sim| D["Imagem: tomografia de abdome"]
-    D --> E["Ha abscesso, gas ou obstrucao?"]
-    E -->|Sim| F["Drenagem ou nefrostomia<br/>avaliacao urologica urgente"]
-    E -->|Nao| G["Rever foco alternativo<br/>prostatite, endocardite, cateter"]
+    D --> E["Há abscesso, gás ou obstrução?"]
+    E -->|Sim| F["Drenagem ou nefrostomia<br/>avaliação urológica urgente"]
+    E -->|Não| G["Rever foco alternativo<br/>prostatite, endocardite, cateter"]
     class E critical;
     class F critical;
     class G action;
@@ -57033,18 +57033,18 @@ Para a cardioversão química em pacientes elegíveis e sem cardiopatia estrutur
 
 \`\`\`mermaid
 flowchart TD
-    A["FA com resposta<br/>ventricular rapida"] --> B["Instavel?<br/>hipotensao, isquemia,<br/>IC, choque"]
-    B -->|Sim| C["Cardioversao eletrica<br/>sincronizada imediata"]
-    B -->|Nao| D["QRS largo e irregular<br/>suspeita de WPW?"]
-    D -->|Sim| E["Nao usar bloqueadores do no AV<br/>estavel: procainamida ou ibutilida"]
-    D -->|Nao| F["Controle de frequencia<br/>alvo FC menor que 110"]
-    F --> G["Funcao ventricular<br/>reduzida?"]
+    A["FA com resposta<br/>ventricular rápida"] --> B["Instável?<br/>hipotensão, isquemia,<br/>IC, choque"]
+    B -->|Sim| C["Cardioversão elétrica<br/>sincronizada imediata"]
+    B -->|Não| D["QRS largo e irregular<br/>suspeita de WPW?"]
+    D -->|Sim| E["Não usar bloqueadores do no AV<br/>estável: procainamida ou ibutilida"]
+    D -->|Não| F["Controle de frequência<br/>alvo FC menor que 110"]
+    F --> G["Função ventricular<br/>reduzida?"]
     G -->|Sim| H["Betabloqueador<br/>evitar diltiazem e verapamil<br/>amiodarona ou digoxina se hipotenso"]
-    G -->|Nao| I["Betabloqueador ou<br/>diltiazem e verapamil"]
-    H --> J["Inicio ha menos de 24 h?"]
+    G -->|Não| I["Betabloqueador ou<br/>diltiazem e verapamil"]
+    H --> J["Início há menos de 24 h?"]
     I --> J
-    J -->|Sim| K["Pode cardioverter<br/>sem anticoagulacao previa"]
-    J -->|Nao| L["3 semanas de anticoagulacao<br/>ou eco transesofagico antes"]
+    J -->|Sim| K["Pode cardioverter<br/>sem anticoagulação prévia"]
+    J -->|Não| L["3 semanas de anticoagulação<br/>ou eco transesofágico antes"]
     class B,E critical;
     class C,K,L action;
 \`\`\`
@@ -57053,13 +57053,13 @@ flowchart TD
 
 \`\`\`mermaid
 flowchart TD
-    A["FA rapida com<br/>hipotensao"] --> B["Existe outro foco<br/>que explique o choque?<br/>sepse, sangramento, TEP"]
-    B -->|Sim| C["Tratar a causa primeiro<br/>volume, antibiotico, reperfusao"]
-    C --> D["Controle de frequencia<br/>cauteloso e monitorizado"]
-    B -->|Nao| E["A queda de pressao coincidiu<br/>com o inicio da arritmia?"]
-    E -->|Sim| F["Instabilidade atribuivel a FA<br/>cardioversao eletrica sincronizada"]
-    E -->|Nao| G["Reavaliar em minutos<br/>corrigir K, Mg, dor, febre, volume"]
-    G --> H["Persiste instavel:<br/>tratar como FA instavel"]
+    A["FA rápida com<br/>hipotensão"] --> B["Existe outro foco<br/>que explique o choque?<br/>sepse, sangramento, TEP"]
+    B -->|Sim| C["Tratar a causa primeiro<br/>volume, antibiótico, reperfusão"]
+    C --> D["Controle de frequência<br/>cauteloso e monitorizado"]
+    B -->|Não| E["A queda de pressão coincidiu<br/>com o início da arritmia?"]
+    E -->|Sim| F["Instabilidade atribuível a FA<br/>cardioversão elétrica sincronizada"]
+    E -->|Não| G["Reavaliar em minutos<br/>corrigir K, Mg, dor, febre, volume"]
+    G --> H["Persiste instável:<br/>tratar como FA instável"]
     class B,E critical;
     class C,D,F,H action;
 \`\`\`
@@ -57225,14 +57225,14 @@ Uma nota sobre a **clonidina**: útil no controle oral, mas sua suspensão abrup
 
 \`\`\`mermaid
 flowchart TD
-    A["PA muito elevada<br/>no pronto-socorro"] --> B["Lesao aguda de<br/>orgao-alvo?"]
-    B -->|Nao| C["Elevacao sem lesao<br/>de orgao-alvo"]
+    A["PA muito elevada<br/>no pronto-socorro"] --> B["Lesão aguda de<br/>órgão-alvo?"]
+    B -->|Não| C["Elevação sem lesão<br/>de órgão-alvo"]
     C --> D["Anti-hipertensivo VO<br/>reduzir em horas ou dias<br/>seguimento ambulatorial"]
-    B -->|Sim| E["Emergencia hipertensiva<br/>droga IV titulavel + UTI"]
-    E --> F["Qual orgao acometido?"]
-    F -->|Dissecao de aorta| G["Betabloqueador primeiro<br/>PAS menor 120 e FC menor 60"]
+    B -->|Sim| E["Emergência hipertensiva<br/>droga IV titulável + UTI"]
+    E --> F["Qual órgão acometido?"]
+    F -->|Dissecção de aorta| G["Betabloqueador primeiro<br/>PAS menor 120 e FC menor 60"]
     F -->|Isquemia ou EAP| H["Nitroglicerina IV<br/>5 a 100 mcg/min"]
-    F -->|AVC| I["Metas do protocolo<br/>especifico de AVC"]
+    F -->|AVC| I["Metas do protocolo<br/>específico de AVC"]
     F -->|Encefalopatia, IRA, outros| J["Reduzir PAM 10 a 20%<br/>na primeira hora"]
     class B,E critical;
     class D,G,H,J action;
@@ -57242,15 +57242,15 @@ Antes de rotular o quadro como crise, vale um segundo eixo de decisão — o da 
 
 \`\`\`mermaid
 flowchart TD
-    A["PA elevada na triagem"] --> B["Repetir apos 15 min<br/>de repouso, manguito correto"]
-    B --> C["Ha dor, ansiedade, bexiga cheia<br/>hipoxia ou abstinencia?"]
-    C -->|Sim| D["Tratar a causa<br/>analgesia, sondagem, oxigenio"]
-    D --> E["Remedir a pressao"]
-    C -->|Nao| F["Sintoma ou sinal<br/>de lesao de orgao?"]
-    F -->|Sim| G["Investigar e tratar como<br/>emergencia hipertensiva"]
-    F -->|Nao| H["Elevacao sem lesao<br/>de orgao-alvo"]
+    A["PA elevada na triagem"] --> B["Repetir após 15 min<br/>de repouso, manguito correto"]
+    B --> C["Há dor, ansiedade, bexiga cheia<br/>hipóxia ou abstinência?"]
+    C -->|Sim| D["Tratar a causa<br/>analgesia, sondagem, oxigênio"]
+    D --> E["Remedir a pressão"]
+    C -->|Não| F["Sintoma ou sinal<br/>de lesão de órgão?"]
+    F -->|Sim| G["Investigar e tratar como<br/>emergência hipertensiva"]
+    F -->|Não| H["Elevação sem lesão<br/>de órgão-alvo"]
     E --> H
-    H --> I["Ajustar terapia oral<br/>retorno em ate 7 dias"]
+    H --> I["Ajustar terapia oral<br/>retorno em até 7 dias"]
     class G critical;
     class D,I,G action;
 \`\`\`
@@ -57487,18 +57487,18 @@ Na necrose estável, aguardar **4 a 6 semanas** antes de qualquer intervenção 
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor tipica e lipase 3x<br/>diagnostico feito"] --> B["USG e etiologia<br/>avaliar gravidade BISAP"]
+    A["Dor típica e lipase 3x<br/>diagnóstico feito"] --> B["USG e etiologia<br/>avaliar gravidade BISAP"]
     B --> C["Ringer lactato moderado<br/>guiado por metas"]
     C --> D["Analgesia e dieta oral<br/>assim que tolerar"]
-    D --> E["Falencia organica<br/>persistente alem de 48h?"]
+    D --> E["Falência orgânica<br/>persistente além de 48h?"]
     E -->|Sim| F["UTI e suporte<br/>pancreatite grave"]
-    E -->|Nao| G["Enfermaria<br/>reavaliacao seriada"]
-    F --> H["Piora apos 2 semanas<br/>ou gas na TC?"]
-    H -->|Sim| I["Antibiotico e drenagem<br/>escalonada apos 4 semanas"]
-    H -->|Nao| J["Manter suporte"]
+    E -->|Não| G["Enfermaria<br/>reavaliação seriada"]
+    F --> H["Piora após 2 semanas<br/>ou gás na TC?"]
+    H -->|Sim| I["Antibiótico e drenagem<br/>escalonada após 4 semanas"]
+    H -->|Não| J["Manter suporte"]
     G --> K["Etiologia biliar leve?"]
-    K -->|Sim| L["Colecistectomia na<br/>mesma internacao"]
-    K -->|Nao| M["Tratar causa especifica"]
+    K -->|Sim| L["Colecistectomia na<br/>mesma internação"]
+    K -->|Não| M["Tratar causa específica"]
     class E critical;
     class H critical;
     class I action;
@@ -57572,13 +57572,13 @@ Orientações ao paciente: procurar atendimento em caso de retorno da dor intens
 flowchart TD
     A["Pancreatite aguda diagnosticada"] --> B["Etiologia identificada?"]
     B -->|Biliar| C["Forma leve?"]
-    B -->|Alcool| D["Abstinencia e suporte<br/>tiamina e nutricao"]
-    B -->|Trigliceride alto| E["Jejum, insulina<br/>e controle metabolico"]
-    B -->|Sem causa| F["Segundo episodio<br/>ou idade acima de 40?"]
-    C -->|Sim| G["Colecistectomia na<br/>mesma internacao"]
-    C -->|Nao| H["Adiar cirurgia ate<br/>resolver inflamacao"]
-    F -->|Sim| I["Ecoendoscopia e colangio-RM<br/>excluir neoplasia e microlitiase"]
-    F -->|Nao| J["Repetir USG e reavaliar"]
+    B -->|Alcool| D["Abstinência e suporte<br/>tiamina e nutrição"]
+    B -->|Trigliceride alto| E["Jejum, insulina<br/>e controle metabólico"]
+    B -->|Sem causa| F["Segundo episódio<br/>ou idade acima de 40?"]
+    C -->|Sim| G["Colecistectomia na<br/>mesma internação"]
+    C -->|Não| H["Adiar cirurgia até<br/>resolver inflamação"]
+    F -->|Sim| I["Ecoendoscopia e colangio-RM<br/>excluir neoplasia e microlitíase"]
+    F -->|Não| J["Repetir USG e reavaliar"]
     class C critical;
     class F critical;
     class G action;
