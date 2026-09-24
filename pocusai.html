@@ -1,15 +1,13 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-astra="pocusai">
+<html lang="pt-BR" data-viva="pocusai" data-viva-escuro>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>PocusAI — Guia de POCUS por região | MedTech</title>
+<title>PocusAI · POCUS por região | MedTech</title>
 <meta name="description" content="PocusAI: guia prático de ultrassom point-of-care (POCUS) por região — sonda, posição, cortes, técnica, achados normais e patológicos, com IA integrada.">
-<meta name="theme-color" content="#000000">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
+<meta name="theme-color" content="#F5F6FB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1017" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="vendor/tabler/tabler-icons.min.css?v=3.48.0">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="manifest" href="pocusai.webmanifest">
 <link rel="apple-touch-icon" href="icone-pocusai-180.png">
@@ -20,7 +18,7 @@
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"pocusai",name:"PocusAI"};</script>
-<script type="module" src="_mtauth.js?v=25"></script>
+<script type="module" src="_mtauth.js?v=26"></script>
 <style>
 :root{--petrol:#2456B8;--petrol-dark:#1C4493;--ink:#23272E;--mint:#2456B8;--mint-dark:#1C4493;--bg:#FAFAF8;--surface:#FFFFFF;--panel2:#F1F1EC;--soft:rgba(36,86,184,.12);--line:#E8E8E2;--line-strong:#DDDDD5;--muted:#5E646B;--dim:#767C84;--green:#1D7A46;--green-bg:rgba(29,122,70,.12);--amber:#A3730A;--amber-bg:rgba(163,115,10,.12);--red:#C6453D;--red-bg:rgba(198,69,61,.12);--blue:#2456B8;--blue-bg:rgba(36,86,184,.12);--violet:#a78bfa;--violet-bg:rgba(167,139,250,.14);--card:#FFFFFF;--glow:rgba(36,86,184,.42);--disp:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -125,22 +123,240 @@ footer a{color:var(--petrol);font-weight:600;text-decoration:none}
 @media(max-width:680px){.grid{grid-template-columns:repeat(auto-fill,minmax(135px,1fr))}}
 </style>
 <style>/* mt-a11y-16px */@media(max-width:680px){input,select,textarea{font-size:16px}}</style>
+<!-- viva:pocusai -->
+<style>
+/* ============================================================
+   23/09/2026: camada "viva" (modelo aprovado do ClínicaMed, cm-v97).
+   Cor do app: teal (--ac vem do _mtviva.css). Os seletores levam
+   :root para vencer a folha compartilhada, que entra DEPOIS deste bloco.
+   Cada região tem a sua cor (mesma região, mesma cor, do filtro ao exame).
+   Diagramas e fluxogramas são figuras: ficam em papel claro nos dois temas.
+   ============================================================ */
+@media screen{
+html:root[data-viva="pocusai"] body{font-size:14.5px}
+/* cabeçalho de uma linha: marca, busca, conta */
+html:root[data-viva="pocusai"] body header{padding:calc(10px + env(safe-area-inset-top)) 0 10px}
+html:root[data-viva="pocusai"] body header .top{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:20px;align-items:center}
+html:root[data-viva="pocusai"] body .logo{font-size:19px;letter-spacing:-.02em;gap:11px}
+html:root[data-viva="pocusai"] body .logo .mark{width:36px;height:36px;font-size:19px}
+html:root[data-viva="pocusai"] body .logo b{color:var(--acInk)}
+html:root[data-viva="pocusai"] body .search-wrap{margin:0;position:relative;display:block;width:100%;max-width:520px;justify-self:center}
+html:root[data-viva="pocusai"] body .search-wrap input{width:100%;min-height:44px;padding:10px 44px!important;border-radius:999px!important;font-size:15px;background:var(--sup2)!important;border-color:transparent!important}
+html:root[data-viva="pocusai"] body .search-wrap input:focus{background:var(--sup)!important;border-color:var(--ac)!important}
+html:root[data-viva="pocusai"] body .search-wrap .ic{left:16px;opacity:1;color:var(--tinta2);font-size:18px;pointer-events:none;display:flex}
+html:root[data-viva="pocusai"] body .search-wrap kbd{position:absolute;right:12px;top:50%;transform:translateY(-50%);min-width:24px;height:24px;display:grid;place-items:center;border-radius:8px;
+  background:var(--sup);border:1px solid var(--fioF);color:var(--tinta2);font:600 12px/1 inherit;pointer-events:none}
+html:root[data-viva="pocusai"] body .search-wrap input:focus~kbd,html:root[data-viva="pocusai"] body .search-wrap input:not(:placeholder-shown)~kbd{display:none}
+html:root[data-viva="pocusai"] body .usr .who{color:var(--tinta2)}
+html:root[data-viva="pocusai"] body .usr a,html:root[data-viva="pocusai"] body .usr button{display:inline-flex;align-items:center;gap:6px;padding:8px 14px}
+
+/* navegação: pílula colorida na aba ativa, ícone em círculo */
+html:root[data-viva="pocusai"] body .pc-nav{display:flex;gap:2px;width:max-content;max-width:calc(100% - 36px);margin:18px 0 0 max(18px,calc((100% - 964px)/2))}
+html:root[data-viva="pocusai"] body .pc-nav button{display:inline-flex;align-items:center;gap:8px;padding:5px 16px 5px 5px;font-size:14px;font-weight:600;white-space:nowrap;border:0;background:transparent;cursor:pointer;font-family:inherit}
+html:root[data-viva="pocusai"] body .pc-nav button>i{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:17px;background:var(--acSup);color:var(--acInk);transition:transform .25s var(--mola),background .2s,color .2s}
+html:root[data-viva="pocusai"] body .pc-nav button:hover>i{transform:scale(1.08) rotate(-6deg)}
+html:root[data-viva="pocusai"] body .pc-nav button{color:var(--tinta2);border-radius:999px;min-height:42px}
+html:root[data-viva="pocusai"] body .pc-nav button:hover{background:var(--sup2);color:var(--tinta)}
+html:root[data-viva="pocusai"] body .pc-nav button.on{background:var(--ac);color:var(--acTxt);box-shadow:0 6px 14px color-mix(in srgb,var(--ac) 30%,transparent)}
+html:root[data-viva="pocusai"] body .pc-nav button.on>i{background:rgba(0,0,0,.16);color:var(--acTxt)}
+html:root[data-viva="pocusai"] body main{max-width:1000px;padding:20px 18px 70px}
+html:root[data-viva="pocusai"] body main#view:not(.anima)>*{animation:none}
+html:root[data-viva="pocusai"] body main#view.anima #homeCorpo>*{animation:vvSobe .5s var(--suave) both}
+html:root[data-viva="pocusai"] body main#view.anima #homeCorpo>*:nth-child(2){animation-delay:.06s}html:root[data-viva="pocusai"] body main#view.anima #homeCorpo>*:nth-child(3){animation-delay:.12s}html:root[data-viva="pocusai"] body main#view.anima #homeCorpo>*:nth-child(n+4){animation-delay:.18s}
+
+/* carregando */
+html:root[data-viva="pocusai"] body .esq{display:flex;flex-direction:column;gap:10px}
+html:root[data-viva="pocusai"] body .esq-t{display:flex;align-items:center;gap:9px;color:var(--tinta2);font-size:14px;margin:4px 2px}
+html:root[data-viva="pocusai"] body .esq i{display:block;height:120px;border-radius:24px;background:var(--sup3);animation:pcPulsa 1.3s ease-in-out infinite}
+html:root[data-viva="pocusai"] body .esq i:nth-child(3){height:80px;animation-delay:.15s}html:root[data-viva="pocusai"] body .esq i:nth-child(4){height:80px;animation-delay:.3s}
+html:root[data-viva="pocusai"] body .spin{border-color:currentColor;border-top-color:transparent}
+
+/* início: destaque, regiões (filtram a grade), grade */
+html:root[data-viva="pocusai"] body .busca-home{display:none}
+html:root[data-viva="pocusai"] body .pc-hero{position:relative;overflow:hidden;border-radius:28px;padding:28px 30px;background:var(--ac);color:var(--acTxt);display:flex;gap:24px;align-items:center;
+  box-shadow:0 18px 40px color-mix(in srgb,var(--ac) 28%,transparent);margin-bottom:16px}
+html:root[data-viva="pocusai"] body .pc-hero .bola{position:absolute;border-radius:50%;background:#fff;opacity:.12;pointer-events:none}
+html:root[data-viva="pocusai"] body .pc-hero .b1{width:260px;height:260px;right:-70px;top:-100px;animation:pcFlutua 9s ease-in-out infinite}
+html:root[data-viva="pocusai"] body .pc-hero .b2{width:120px;height:120px;right:190px;bottom:-60px;opacity:.08;animation:pcFlutua 7s ease-in-out infinite reverse}
+html:root[data-viva="pocusai"] body .pc-hero .txt{flex:1;min-width:0;position:relative}
+html:root[data-viva="pocusai"] body .pc-hero small{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;background:rgba(0,0,0,.18);padding:5px 12px;border-radius:999px}
+html:root[data-viva="pocusai"] body .pc-hero h2{font-size:28px;line-height:1.15;margin:14px 0 8px;font-weight:750;letter-spacing:-.03em;color:var(--acTxt)}
+html:root[data-viva="pocusai"] body .pc-hero p{margin:0 0 18px;font-size:14.5px;max-width:52ch;line-height:1.5}
+html:root[data-viva="pocusai"] body .pc-hero .acoes{display:flex;gap:10px;flex-wrap:wrap}
+html:root[data-viva="pocusai"] body .bt-hero{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;min-height:44px;padding:10px 20px;font:600 14px/1.1 inherit;cursor:pointer;
+  background:#fff;color:#141827;box-shadow:0 8px 20px rgba(0,0,0,.14)}
+html:root[data-viva="pocusai"] body .bt-hero:hover{transform:translateY(-1px)}
+html:root[data-viva="pocusai"] body .bt-hero.sec{background:rgba(0,0,0,.16);color:var(--acTxt);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35)}
+html:root[data-viva="pocusai"] body .bt-hero.sec:hover{background:rgba(0,0,0,.24)}
+html:root[data-viva="pocusai"] body .hero-ic{position:relative;width:112px;height:112px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;font-size:54px;background:rgba(0,0,0,.14);color:var(--acTxt);animation:pcPop .6s var(--mola) both}
+html:root[data-viva="pocusai"] body .note{display:flex;align-items:flex-start;gap:10px;background:var(--sup2);border:0;box-shadow:none;border-radius:18px;color:var(--tinta2);font-size:13.5px;padding:12px 16px;margin:0 0 16px}
+html:root[data-viva="pocusai"] body .note>i{font-size:18px;color:var(--acInk);flex:0 0 auto;margin-top:1px}
+html:root[data-viva="pocusai"] body .note b{color:var(--tinta)}
+html:root[data-viva="pocusai"] body .pc-cats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:6px}
+html:root[data-viva="pocusai"] body .pc-cat{--k:var(--ac);display:flex;align-items:center;gap:12px;text-align:left;border-radius:20px;padding:12px 14px;min-width:0;cursor:pointer;font:inherit;color:var(--tinta);
+  background:color-mix(in srgb,var(--k) 10%,var(--sup));border:1.5px solid color-mix(in srgb,var(--k) 16%,transparent);transition:transform .2s var(--mola),box-shadow .2s,border-color .2s}
+html:root[data-viva="pocusai"] body .pc-cat:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 12px 26px color-mix(in srgb,var(--k) 20%,transparent)}
+html:root[data-viva="pocusai"] body .pc-cat:active:not(:disabled){transform:scale(.97)}
+html:root[data-viva="pocusai"] body .pc-cat.on{border-color:var(--k);box-shadow:0 0 0 3px color-mix(in srgb,var(--k) 22%,transparent)}
+html:root[data-viva="pocusai"] body .pc-cat:disabled{opacity:.45;cursor:default}
+html:root[data-viva="pocusai"] body .pc-cat .ic{width:40px;height:40px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;font-size:19px;color:#fff;background:color-mix(in srgb,var(--k) 80%,#141827);box-shadow:0 8px 18px color-mix(in srgb,var(--k) 28%,transparent)}
+html:root[data-viva="pocusai"] body .pc-cat .tx{display:flex;flex-direction:column;min-width:0}
+html:root[data-viva="pocusai"] body .pc-cat b{font-size:14px;font-weight:650;color:color-mix(in srgb,var(--k) 58%,var(--tinta));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html:root[data-viva="pocusai"] body .pc-cat small{font-size:12.5px;color:var(--tinta2);font-variant-numeric:tabular-nums}
+html:root[data-viva="pocusai"] body .filtro-info{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0 0;padding:8px 8px 8px 14px;border-radius:999px;width:fit-content;max-width:100%;background:var(--acSup);color:var(--acInk);font-size:13.5px;font-weight:500}
+html:root[data-viva="pocusai"] body .filtro-info>i{font-size:16px}
+html:root[data-viva="pocusai"] body .filtro-info button{display:inline-flex;align-items:center;gap:5px;border:0;border-radius:999px;background:var(--sup);color:var(--tinta);font:600 12.5px inherit;padding:6px 12px;cursor:pointer;min-height:32px}
+html:root[data-viva="pocusai"] body .asec{margin-top:8px}
+html:root[data-viva="pocusai"] body .sec-title{display:flex;align-items:center;gap:10px;font-family:inherit;font-size:16px;font-weight:700;text-transform:none;letter-spacing:-.01em;color:var(--tinta);margin:22px 2px 12px}
+html:root[data-viva="pocusai"] body .sec-title .dot{--k:var(--ac);width:10px;height:10px;border-radius:50%;background:var(--k);flex:0 0 auto}
+html:root[data-viva="pocusai"] body .sec-title .n{background:var(--sup2);color:var(--tinta2);border-radius:999px;padding:2px 9px;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+html:root[data-viva="pocusai"] body .agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+html:root[data-viva="pocusai"] body .acard{--k:var(--ac);display:flex;flex-direction:column;align-items:flex-start;gap:5px;text-align:left;min-width:0;padding:15px 16px 16px;border-radius:20px;cursor:pointer;
+  background:var(--sup);border:1px solid var(--fio);box-shadow:var(--sombraV);color:var(--tinta);font:inherit;position:relative;overflow:hidden;transition:transform .2s var(--mola),box-shadow .2s,border-color .2s}
+html:root[data-viva="pocusai"] body .acard::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--k);opacity:.85}
+html:root[data-viva="pocusai"] body .acard:hover{transform:translateY(-3px);box-shadow:var(--sombraM);border-color:color-mix(in srgb,var(--k) 35%,var(--fio))}
+html:root[data-viva="pocusai"] body .acard .ic{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:20px;margin:4px 0 5px;
+  background:color-mix(in srgb,var(--k) 14%,var(--sup));color:color-mix(in srgb,var(--k) 70%,var(--tinta));transition:transform .25s var(--mola)}
+html:root[data-viva="pocusai"] body .acard:hover .ic{transform:scale(1.08) rotate(-6deg)}
+html:root[data-viva="pocusai"] body .acard .nm{font-weight:650;font-size:14.5px;line-height:1.3}
+html:root[data-viva="pocusai"] body .acard .sb{font-size:12.5px;color:var(--tinta2);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+html:root[data-viva="pocusai"] body div.empty{display:flex;flex-direction:column;align-items:center;gap:10px;padding:38px 22px;margin-top:10px;border-radius:24px;border:1.5px dashed var(--fioF);background:var(--sup);box-shadow:none;color:var(--tinta2);text-align:center}
+html:root[data-viva="pocusai"] body .empty .ei{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;background:var(--acSup);color:var(--acInk);font-size:29px;animation:pcPop .45s var(--mola) both}
+html:root[data-viva="pocusai"] body .empty h3{font-size:17px;margin:4px 0 0;color:var(--tinta)}
+html:root[data-viva="pocusai"] body .empty p{margin:0;max-width:48ch;line-height:1.55;font-size:14px}
+html:root[data-viva="pocusai"] body .acoes-v{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+
+/* exame */
+html:root[data-viva="pocusai"] body .back{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:8px 16px 8px 12px;border-radius:999px;border:0;background:var(--sup2);color:var(--tinta);font-weight:600;font-size:13.5px;margin-bottom:16px;cursor:pointer}
+html:root[data-viva="pocusai"] body .back:hover{background:var(--acSup);color:var(--acInk)}
+html:root[data-viva="pocusai"] body .exam-head{align-items:center;gap:16px;margin-bottom:12px}
+html:root[data-viva="pocusai"] body .exam-head .ei{--k:var(--ac);width:52px;height:52px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;font-size:25px;line-height:1;
+  background:color-mix(in srgb,var(--k) 80%,#141827);color:#fff;box-shadow:0 10px 24px color-mix(in srgb,var(--k) 32%,transparent);animation:pcPop .5s var(--mola) both}
+html:root[data-viva="pocusai"] body .exam-head h1{font-family:inherit;font-size:25px;font-weight:700;letter-spacing:-.03em;line-height:1.15}
+html:root[data-viva="pocusai"] body .exam-head .tags{font-size:13.5px;color:var(--tinta2);margin-top:4px}
+html:root[data-viva="pocusai"] body .layout{gap:22px}
+html:root[data-viva="pocusai"] body .content{font-size:14.5px;line-height:1.65}
+html:root[data-viva="pocusai"] body .content h2{font-family:inherit;font-size:16.5px;font-weight:700;color:var(--tinta);border:0;padding:0;margin:24px 0 8px;gap:10px;letter-spacing:-.01em}
+html:root[data-viva="pocusai"] body .content h2::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--ac);flex:0 0 auto}
+html:root[data-viva="pocusai"] body .content h3{color:var(--acInk);font-size:14.5px}
+html:root[data-viva="pocusai"] body .content b,html:root[data-viva="pocusai"] body .content strong{color:var(--tinta);font-weight:650}
+html:root[data-viva="pocusai"] body .perla,html:root[data-viva="pocusai"] body .alarme{display:flex;gap:10px;align-items:flex-start;border:0!important;border-radius:16px!important;padding:11px 14px!important;font-size:14px!important;line-height:1.55;color:var(--tinta)!important;margin:10px 0}
+html:root[data-viva="pocusai"] body .perla{background:var(--okSup)!important}
+html:root[data-viva="pocusai"] body .alarme{background:var(--errSup)!important}
+html:root[data-viva="pocusai"] body .perla>i,html:root[data-viva="pocusai"] body .alarme>i{font-size:19px;flex:0 0 auto;margin-top:1px}
+html:root[data-viva="pocusai"] body .perla>i{color:color-mix(in srgb,var(--okV) 75%,var(--tinta))}
+html:root[data-viva="pocusai"] body .alarme>i{color:color-mix(in srgb,var(--errV) 80%,var(--tinta))}
+html:root[data-viva="pocusai"] body .perla b{color:color-mix(in srgb,var(--okV) 65%,var(--tinta))!important}
+html:root[data-viva="pocusai"] body .alarme b{color:color-mix(in srgb,var(--errV) 72%,var(--tinta))!important}
+html:root[data-viva="pocusai"] body .panel{border-radius:22px;padding:18px;border:1px solid var(--fio);box-shadow:var(--sombraV);background:var(--sup)}
+html:root[data-viva="pocusai"] body .panel h4{display:flex;align-items:center;gap:9px;font-family:inherit;font-size:14.5px;font-weight:700;text-transform:none;letter-spacing:-.01em;color:var(--tinta);margin-bottom:12px}
+html:root[data-viva="pocusai"] body .panel h4>i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:16px;background:var(--acSup);color:var(--acInk);flex:0 0 auto}
+html:root[data-viva="pocusai"] body .pocus-svg{border-radius:16px;background:#f3f9f9}
+html:root[data-viva="pocusai"] body .diag-leg{color:var(--tinta2);font-size:12.5px;margin-top:10px}
+html:root[data-viva="pocusai"] body .diag-leg b{color:var(--tinta)}
+html:root[data-viva="pocusai"] body .bf{border-radius:16px!important;border:1px solid #e3eded}
+html:root[data-viva="pocusai"] body .img-slot{display:flex;flex-direction:column;align-items:center;gap:6px;border-radius:16px;border:1.5px dashed var(--fioF);color:var(--tinta2);padding:20px 14px;font-size:13px}
+html:root[data-viva="pocusai"] body .img-slot>i{font-size:24px;color:var(--tinta2)}
+html:root[data-viva="pocusai"] body .ig img{border-radius:14px;border-color:var(--fio)}
+html:root[data-viva="pocusai"] body .ig figcaption,html:root[data-viva="pocusai"] body .img-cred,html:root[data-viva="pocusai"] body .img-cred a,html:root[data-viva="pocusai"] body .img-note{color:var(--tinta2)}
+html:root[data-viva="pocusai"] body .img-note{border-top-color:var(--fio)}
+html:root[data-viva="pocusai"] body .btn{border-radius:999px;min-height:44px;padding:11px 20px;font-weight:600;gap:8px}
+html:root[data-viva="pocusai"] body .ai-out{border-radius:20px;background:var(--sup);border:1px solid color-mix(in srgb,var(--c-verde) 30%,var(--fio));padding:14px 18px;animation:vvSobe .4s var(--suave) both}
+html:root[data-viva="pocusai"] body .ai-out h2,html:root[data-viva="pocusai"] body .ai-out h3,html:root[data-viva="pocusai"] body .ai-out b{color:var(--tinta)}
+html:root[data-viva="pocusai"] body .ai-out.erro{background:var(--errSup);border-color:color-mix(in srgb,var(--errV) 25%,transparent);color:color-mix(in srgb,var(--errV) 72%,var(--tinta));animation:vvTreme .4s}
+html:root[data-viva="pocusai"] body .disc{color:var(--tinta2);border-top-color:var(--fio)}
+html:root[data-viva="pocusai"] body .pc-mais{margin-top:26px}
+/* assistente */
+html:root[data-viva="pocusai"] body .suggs{gap:8px}
+html:root[data-viva="pocusai"] body .suggs-h{font-size:13px;font-weight:600;color:var(--tinta2);margin:4px 2px 8px}
+html:root[data-viva="pocusai"] body .sugg{min-height:38px;padding:7px 14px;border-radius:999px;border:1.5px solid var(--fioF);background:var(--sup);color:var(--tinta);font-size:13.5px;font-weight:500}
+html:root[data-viva="pocusai"] body .sugg:hover{border-color:var(--ac);color:var(--acInk)}
+html:root[data-viva="pocusai"] body .chat{gap:14px}
+html:root[data-viva="pocusai"] body .msg{gap:10px;animation:vvSobe .35s var(--suave) both}
+html:root[data-viva="pocusai"] body .av{width:34px;height:34px;border-radius:50%;font-size:17px}
+html:root[data-viva="pocusai"] body .msg.u .av{background:var(--ac);color:var(--acTxt)}
+html:root[data-viva="pocusai"] body .msg.a .av{background:color-mix(in srgb,var(--c-violeta) 14%,var(--sup));color:color-mix(in srgb,var(--c-violeta) 72%,var(--tinta))}
+html:root[data-viva="pocusai"] body .msg.erro .av{background:var(--errSup);color:color-mix(in srgb,var(--errV) 80%,var(--tinta))}
+html:root[data-viva="pocusai"] body .bub{border-radius:6px 20px 20px 20px;border:1px solid var(--fio);background:var(--sup);padding:12px 16px;box-shadow:var(--sombraV);min-width:0}
+html:root[data-viva="pocusai"] body .msg.u .bub{background:var(--acSup);border-color:transparent;box-shadow:none}
+html:root[data-viva="pocusai"] body .msg.erro .bub{background:var(--errSup);border-color:transparent;color:color-mix(in srgb,var(--errV) 72%,var(--tinta))}
+html:root[data-viva="pocusai"] body .bub h2,html:root[data-viva="pocusai"] body .bub h3,html:root[data-viva="pocusai"] body .bub b{color:var(--tinta)}
+html:root[data-viva="pocusai"] body .typing span{background:color-mix(in srgb,var(--c-violeta) 72%,var(--tinta))}
+html:root[data-viva="pocusai"] body .ask{background:var(--papel);padding:10px 0 12px;gap:10px;align-items:flex-end}
+html:root[data-viva="pocusai"] body .ask textarea{border-radius:24px!important;padding:12px 18px;min-height:48px;font-size:15px}
+html:root[data-viva="pocusai"] body .ask button{width:48px;height:48px;border-radius:50%;background:var(--ac);color:var(--acTxt);font-size:20px;display:grid;place-items:center;box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 30%,transparent)}
+html:root[data-viva="pocusai"] body .ask button:hover{filter:brightness(1.06);transform:translateY(-1px)}
+html:root[data-viva="pocusai"] body footer{padding-bottom:30px}
+
+@keyframes pcPulsa{0%,100%{opacity:1}50%{opacity:.55}}
+@keyframes pcPop{0%{transform:scale(.5);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes pcFlutua{0%,100%{transform:translate(0,0)}50%{transform:translate(-14px,12px)}}
+
+@media(min-width:641px) and (max-width:900px){html:root[data-viva="pocusai"] body .pc-cats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* celular: busca no Início e barra inferior com as três seções */
+@media(max-width:640px){
+  html:root[data-viva="pocusai"] body header .top{grid-template-columns:minmax(0,1fr) auto;gap:10px}
+  html:root[data-viva="pocusai"] body header .search-wrap{display:none}
+  html:root[data-viva="pocusai"] body .logo{font-size:18px}
+  html:root[data-viva="pocusai"] body .usr .who{display:none}
+  html:root[data-viva="pocusai"] body main{padding:14px 14px calc(96px + env(safe-area-inset-bottom))}
+  html:root[data-viva="pocusai"] body footer{padding-bottom:calc(100px + env(safe-area-inset-bottom))}
+  html:root[data-viva="pocusai"] body .pc-nav{position:fixed;left:0;right:0;bottom:0;z-index:40;margin:0;width:auto;max-width:none;display:grid;grid-template-columns:repeat(3,1fr);gap:0;padding:6px 14px calc(8px + env(safe-area-inset-bottom))!important}
+  html:root[data-viva="pocusai"] body .pc-nav button{flex-direction:column;justify-content:flex-end;gap:3px;padding:4px 2px 2px!important;min-height:56px;font-size:11.5px;font-weight:600;background:transparent!important;box-shadow:none!important;color:var(--tinta2)!important}
+  html:root[data-viva="pocusai"] body .pc-nav button>i{width:52px;height:30px;border-radius:999px;background:transparent;color:inherit;font-size:21px}
+  html:root[data-viva="pocusai"] body .pc-nav button:hover>i{transform:none}
+  html:root[data-viva="pocusai"] body .pc-nav button.on{color:var(--acInk)!important;background:transparent!important}
+  html:root[data-viva="pocusai"] body .pc-nav button.on>i{background:var(--ac);color:var(--acTxt);transform:translateY(-1px)}
+  html:root[data-viva="pocusai"] body .busca-home{display:block;position:relative;margin-bottom:14px}
+  html:root[data-viva="pocusai"] body .busca-home>i{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--tinta2);font-size:19px;pointer-events:none}
+  html:root[data-viva="pocusai"] body .busca-home input{width:100%;min-height:48px;padding:11px 16px 11px 46px!important;border-radius:999px!important;font-size:16px}
+  html:root[data-viva="pocusai"] body .pc-hero{flex-direction:column-reverse;align-items:flex-start;padding:22px 20px;border-radius:24px;gap:14px}
+  html:root[data-viva="pocusai"] body .pc-hero h2{font-size:22px;margin-top:10px}
+  html:root[data-viva="pocusai"] body .pc-hero p{font-size:14px}
+  html:root[data-viva="pocusai"] body .hero-ic{display:none}
+  html:root[data-viva="pocusai"] body .pc-hero .acoes{width:100%}
+  html:root[data-viva="pocusai"] body .bt-hero{flex:1;justify-content:center;white-space:nowrap;padding:10px 14px}
+  html:root[data-viva="pocusai"] body .pc-cats{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  html:root[data-viva="pocusai"] body .pc-cat{flex-direction:column;align-items:center;text-align:center;gap:5px;padding:10px 3px 9px;border-radius:18px}
+  html:root[data-viva="pocusai"] body .pc-cat .ic{width:34px;height:34px;font-size:17px;box-shadow:none}
+  html:root[data-viva="pocusai"] body .pc-cat .tx{align-items:center;max-width:100%}
+  html:root[data-viva="pocusai"] body .pc-cat b{font-size:11px;max-width:100%}
+  html:root[data-viva="pocusai"] body .pc-cat small{font-size:10.5px}
+  html:root[data-viva="pocusai"] body .agrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  html:root[data-viva="pocusai"] body .acard{padding:13px 13px 14px;border-radius:18px}
+  html:root[data-viva="pocusai"] body .acard .ic{width:36px;height:36px;font-size:18px}
+  html:root[data-viva="pocusai"] body .acard .nm{font-size:14px}
+  html:root[data-viva="pocusai"] body .acard .sb{font-size:12px}
+  html:root[data-viva="pocusai"] body .exam-head h1{font-size:21px}
+  html:root[data-viva="pocusai"] body .exam-head .ei{width:46px;height:46px;font-size:22px}
+  html:root[data-viva="pocusai"] body .ask{position:sticky;bottom:calc(72px + env(safe-area-inset-bottom))}
+  html:root[data-viva="pocusai"] body footer a{display:inline-block;padding:12px 4px}
+  html:root[data-viva="pocusai"] body .ask textarea{font-size:16px}
+  html:root[data-viva="pocusai"] body .sugg{min-height:44px}
+}
+@media(prefers-reduced-motion:reduce){html:root[data-viva="pocusai"] body main#view.anima #homeCorpo>*,html:root[data-viva="pocusai"] body .pc-hero .bola,html:root[data-viva="pocusai"] body .hero-ic,html:root[data-viva="pocusai"] body .esq i,html:root[data-viva="pocusai"] body .empty .ei,html:root[data-viva="pocusai"] body .exam-head .ei,html:root[data-viva="pocusai"] body .msg,html:root[data-viva="pocusai"] body .ai-out{animation:none!important}}
+}
+</style>
+<!-- /viva:pocusai -->
 <link rel="stylesheet" href="_mttokens.css?v=3">
-<link rel="stylesheet" href="_mtastra.css?v=5">
+<link rel="stylesheet" href="_mtviva.css?v=1">
 </head>
 <body>
 <header>
   <div class="wrap top">
-    <div>
-      <div class="logo"><span class="mark"><i class="ti ti-zoom-scan"></i></span><span>Pocus<b>AI</b></span></div>
-      <div class="subtitle">Guia prático de POCUS por região · com IA · por MedTech</div>
-    </div>
+    <div class="logo" title="Guia prático de POCUS por região, com IA"><span class="mark" aria-hidden="true"><i class="ti ti-zoom-scan"></i></span><span>Pocus<b>AI</b></span></div>
+    <label class="search-wrap"><span class="ic" aria-hidden="true"><i class="ti ti-search"></i></span><input id="busca" type="search" name="filtro-pocus" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" data-1p-ignore data-lpignore="true" aria-label="Buscar exame ou região" placeholder="Buscar região ou exame: pulmão, FAST, TVP" oninput="onBusca(this.value)"><kbd aria-hidden="true">/</kbd></label>
     <div class="usr" id="usr"></div>
   </div>
-  <div class="wrap"><div class="search-wrap"><span class="ic"><i class="ti ti-search"></i></span><input id="busca" placeholder="Buscar região/exame: pulmão, FAST, aorta, TVP, acesso..." oninput="onBusca(this.value)" autocomplete="off"></div></div>
 </header>
 
-<main id="view"></main>
+<nav class="tabs pc-nav" id="pcNav" aria-label="Seções">
+  <button type="button" data-v="home" onclick="navIr('home')"><i class="ti ti-layout-grid" aria-hidden="true"></i><span>Exames</span></button>
+  <button type="button" data-v="proto" onclick="navIr('proto')"><i class="ti ti-bolt" aria-hidden="true"></i><span>Protocolos</span></button>
+  <button type="button" data-v="ai" onclick="navIr('ai')"><i class="ti ti-message-chatbot" aria-hidden="true"></i><span>Assistente</span></button>
+</nav>
+
+<main id="view"><div class="esq" role="status" aria-label="Carregando"><span class="esq-t"><span class="spin"></span> Carregando o guia</span><i></i><i></i><i></i></div></main>
 
 <footer>© 2026 <a href="index.html">MedTech</a> · <a href="app.html">Portal</a> · <a href="privacidade.html">Privacidade</a>
   <div class="disc" style="max-width:760px;margin:14px auto 0">PocusAI é uma ferramenta de <b>apoio à decisão e ensino</b>. Não substitui treinamento prático supervisionado em ultrassonografia nem o julgamento clínico. Sempre correlacione com a clínica e confirme achados com profissional habilitado.</div>
@@ -743,7 +959,7 @@ function galeriaHtml(e){
     return arr.map(im=>`<figure class="ig"><a href="${im.src}" target="_blank" rel="noopener"><img src="${im.src}" alt="${esc(im.leg)}" loading="lazy"></a><figcaption>${esc(im.leg)}<span class="img-cred">${esc(im.autor)} · ${esc(im.lic)} · <a href="${im.url}" target="_blank" rel="noopener">fonte</a></span></figcaption></figure>`).join('')
      +'<div class="img-note">Imagens sob licença aberta (crédito em cada uma). Envie suas próprias captações para complementar.</div>';
   }
-  return '<div class="img-slot">📷 Sem imagens ainda neste exame.<br>Envie materiais de referência com direito de uso que eu integro aqui.</div>';
+  return '<div class="img-slot"><i class="ti ti-photo-off" aria-hidden="true"></i><span>Ainda sem imagens de referência neste exame.</span></div>';
 }
 
 /* ===================== MARKDOWN ===================== */
@@ -756,8 +972,8 @@ function md(t){
     if(!l){closeUl();continue;}
     if(/^## /.test(l)){closeUl();html+='<h2>'+inl(l.slice(3))+'</h2>';}
     else if(/^### /.test(l)){closeUl();html+='<h3>'+inl(l.slice(4))+'</h3>';}
-    else if(/^> Perla[:：]?/i.test(l)){closeUl();html+='<div class="perla">💡 <b>Pérola:</b> '+inl(l.replace(/^> Perla[:：]?\s*/i,''))+'</div>';}
-    else if(/^> Alarme[:：]?/i.test(l)){closeUl();html+='<div class="alarme">⚠️ <b>Atenção:</b> '+inl(l.replace(/^> Alarme[:：]?\s*/i,''))+'</div>';}
+    else if(/^> Perla[:：]?/i.test(l)){closeUl();html+='<div class="perla"><i class="ti ti-bulb" aria-hidden="true"></i><span><b>Pérola:</b> '+inl(l.replace(/^> Perla[:：]?\s*/i,''))+'</span></div>';}
+    else if(/^> Alarme[:：]?/i.test(l)){closeUl();html+='<div class="alarme"><i class="ti ti-alert-triangle" aria-hidden="true"></i><span><b>Atenção:</b> '+inl(l.replace(/^> Alarme[:：]?\s*/i,''))+'</span></div>';}
     else if(/^[-*] /.test(l)){if(!inUl){html+='<ul>';inUl=true;}html+='<li>'+inl(l.slice(2))+'</li>';}
     else {closeUl();html+='<p>'+inl(l)+'</p>';}
   }
@@ -765,51 +981,108 @@ function md(t){
 }
 
 /* ===================== ESTADO / NAV ===================== */
-let busca='';
+let busca='', catFiltro='', ultimaTela='';
 function whenMT(cb){if(window.MT){cb();}else{setTimeout(()=>whenMT(cb),30);}}
 whenMT(()=>{renderUser();if(window.MT&&MT.onData)MT.onData(()=>renderUser());routeHome();});
 function renderUser(){const el=document.getElementById('usr');if(!el)return;
-  if(MT.mode==='demo'){el.innerHTML='<span class="who">Modo demo</span><a href="index.html">← MedTech</a>';return;}
+  if(MT.mode==='demo'){el.innerHTML='<span class="who">Modo demo</span><a href="index.html"><i class="ti ti-arrow-left" aria-hidden="true"></i> MedTech</a>';return;}
   const u=MT.user;const nm=u?(u.displayName||u.email||'Conta'):'';
   el.innerHTML=`<span class="who">${esc(nm)}</span><button onclick="MT.signOut()">Sair</button>`;}
-
-function onBusca(v){busca=v;if(curView==='home')renderHome();}
-let curView='home';
+/* O Chrome trata campo de texto solto como login e injeta o e-mail da conta: valor com "@" nunca é busca. */
+function buscaSuja(q){return String(q||'').indexOf('@')>=0;}
+function camposBusca(){return ['busca','buscaHome'].map(i=>document.getElementById(i)).filter(Boolean);}
+function onBusca(v){
+  if(buscaSuja(v))v='';
+  busca=v;camposBusca().forEach(i=>{if(i.value!==v)i.value=v;});
+  if(curView!=='home'){curView='home';renderHome();window.scrollTo(0,0);}else renderHomeCorpo();
+}
+function limparBusca(foca){busca='';camposBusca().forEach(i=>i.value='');if(curView==='home')renderHomeCorpo();
+  if(foca!==false){const i=camposBusca().find(x=>x.offsetParent);if(i)i.focus();}}
+function perguntarBusca(){const q=busca.trim();limparBusca(false);abrirAssistente();const t=document.getElementById('ask');if(t){t.value=q;growAsk(t);t.focus();}}
+let curView='home', exameAtual=null;
 function routeHome(){curView='home';renderHome();window.scrollTo(0,0);}
-function abrirExame(id){const e=EXAMES.find(x=>x.id===id);if(!e)return;curView='exam';renderExam(e);window.scrollTo(0,0);}
+function abrirExame(id){const e=EXAMES.find(x=>x.id===id);if(!e)return;curView='exam';exameAtual=e;renderExam(e);window.scrollTo(0,0);}
+function navIr(v){if(v==='ai'){abrirAssistente();return;}catFiltro=(v==='proto')?'Protocolos':'';routeHome();
+  /* aba Protocolos: abre já na grade filtrada, logo abaixo do cabeçalho */
+  if(v==='proto'){const t=document.querySelector('.pc-cats');if(t)window.scrollTo(0,Math.max(0,t.getBoundingClientRect().top+window.scrollY-(document.querySelector('header').offsetHeight+14)));}}
+function marcaNav(){const at=curView==='ai'?'ai':((curView==='home'&&catFiltro==='Protocolos')||(curView==='exam'&&exameAtual&&exameAtual.cat==='Protocolos'))?'proto':'home';
+  document.querySelectorAll('#pcNav button').forEach(b=>{const on=b.dataset.v===at;b.classList.toggle('on',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});}
+const MOV_REDUZIDO=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+function contaNumeros(root){if(MOV_REDUZIDO)return;root.querySelectorAll('[data-conta]').forEach(el=>{const n=+el.getAttribute('data-conta')||0;if(n<3)return;const t0=performance.now();
+  const f=t=>{const k=Math.min(1,(t-t0)/700);el.textContent=Math.round(n*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(f);};requestAnimationFrame(f);});}
+/* cada troca de tela: marca a aba e faz a entrada escalonada (só quando a tela muda, não a cada tecla) */
+new MutationObserver(()=>{marcaNav();const tela=curView+(curView==='exam'&&exameAtual?exameAtual.id:'');if(ultimaTela===tela)return;ultimaTela=tela;const v=document.getElementById('view');contaNumeros(v);
+  if(MOV_REDUZIDO)return;v.classList.remove('anima');void v.offsetWidth;v.classList.add('anima');clearTimeout(v._an);v._an=setTimeout(()=>v.classList.remove('anima'),900);
+}).observe(document.getElementById('view'),{childList:true});
+document.addEventListener('keydown',e=>{
+  const tg=e.target;const dig=tg&&(/^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName)||tg.isContentEditable);
+  if(e.key==='Escape'){
+    if(dig&&(tg.id==='busca'||tg.id==='buscaHome')){if(busca)limparBusca();else tg.blur();return;}
+    if(!dig&&curView!=='home')routeHome();
+    return;}
+  if(e.key==='/'&&!dig&&!e.metaKey&&!e.ctrlKey){const i=camposBusca().find(x=>x.offsetParent);if(i){e.preventDefault();i.focus();i.select();}}
+});
+
+/* cor e ícone de cada região: a cor carrega a informação (mesma região, mesma cor) */
+const CAT_VIVA={'Tórax':['--c-azul','ti-lungs'],'Cardíaco':['--c-rosa','ti-heart'],'Abdome':['--c-laranja','ti-bowl'],'Vascular':['--c-violeta','ti-droplet'],
+  'Procedimentos':['--c-verde','ti-vaccine'],'Outros':['--c-ciano','ti-eye'],'Protocolos':['--c-ambar','ti-bolt'],'Fundamentos':['--c-cinza','ti-adjustments']};
+const corCat=c=>(CAT_VIVA[c]||['--ac'])[0];
+function acard(e){return `<button type="button" class="acard" style="--k:var(${corCat(e.cat)})" onclick="abrirExame('${e.id}')"><span class="ic" aria-hidden="true">${e.icon}</span><span class="nm">${esc(e.nome)}</span><span class="sb">${esc(e.tags)}</span></button>`;}
+function setCat(c){catFiltro=(catFiltro===c)?'':c;renderHomeCorpo();marcaNav();}
 
 function renderHome(){
-  const q=busca.trim().toLowerCase();
+  document.getElementById('view').innerHTML=`<label class="busca-home"><i class="ti ti-search" aria-hidden="true"></i><input id="buscaHome" type="search" name="filtro-pocus-2" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" data-1p-ignore data-lpignore="true" aria-label="Buscar exame ou região" placeholder="Buscar região ou exame" value="${esc(busca)}" oninput="onBusca(this.value)"></label><div id="homeCorpo"></div>`;
+  renderHomeCorpo();
+}
+function renderHomeCorpo(){
+  const box=document.getElementById('homeCorpo');if(!box)return;
+  const q=buscaSuja(busca)?'':busca.trim().toLowerCase();
   const filt=EXAMES.filter(e=>!q||(e.nome+' '+e.tags+' '+e.cat).toLowerCase().includes(q));
-  let html=`<div class="note"><i class="ti ti-info-circle"></i> <b>Como usar:</b> escolha a região/exame para um guia prático — <b>sonda, posição, cortes, técnica e achados</b> — ou use o <b>Assistente POCUS</b> para perguntar qualquer coisa. ${MT.mode==='demo'?'<b>Entre na conta MedTech para a IA.</b>':''}</div>`;
-  html+=`<div class="grid"><div class="card ai" onclick="abrirAssistente()"><div class="ci"><i class="ti ti-sparkles"></i></div><div class="cn">Assistente POCUS</div><div class="ct">Pergunte como avaliar qualquer região, dúvidas de técnica, achados…</div></div></div>`;
-  if(!filt.length){html+='<div class="empty">Nada encontrado para "'+esc(busca)+'". Tente o Assistente POCUS acima.</div>';}
-  else{
-    ORDEM_CAT.forEach(cat=>{
-      const list=filt.filter(e=>e.cat===cat);if(!list.length)return;
-      html+=`<div class="sec-title">${esc(cat)}</div><div class="grid">`+list.map(e=>`<div class="card${cat==='Protocolos'?' proto':''}" onclick="abrirExame('${e.id}')"><div class="ci">${e.icon}</div><div class="cn">${esc(e.nome)}</div><div class="ct">${esc(e.tags)}</div></div>`).join('')+`</div>`;
-    });
+  let html='';
+  if(!q){
+    html+=`<section class="pc-hero"><span class="bola b1"></span><span class="bola b2"></span>
+      <div class="txt"><small><i class="ti ti-zoom-scan" aria-hidden="true"></i> Guia prático de POCUS</small>
+      <h2>Da sonda ao achado, região por região</h2>
+      <p>Cada exame traz sonda, posição, cortes, técnica e achados. Na dúvida, pergunte ao assistente.</p>
+      <div class="acoes"><button type="button" class="bt-hero" onclick="navIr('proto')"><i class="ti ti-bolt" aria-hidden="true"></i> Protocolos de emergência</button><button type="button" class="bt-hero sec" onclick="abrirAssistente()"><i class="ti ti-message-chatbot" aria-hidden="true"></i> Perguntar ao assistente</button></div></div>
+      <span class="hero-ic" aria-hidden="true"><i class="ti ti-zoom-scan"></i></span></section>`;
+    if(MT.mode==='demo')html+=`<div class="note"><i class="ti ti-info-circle" aria-hidden="true"></i><span>Os guias funcionam sem conta. <b>Entre na conta MedTech para usar a IA.</b></span></div>`;
   }
-  document.getElementById('view').innerHTML=html;
+  const cats=ORDEM_CAT.map(c=>[c,filt.filter(e=>e.cat===c).length]);
+  if(filt.length){
+    html+=`<div class="pc-cats" role="group" aria-label="Filtrar por região">${cats.map(([c,n])=>`<button type="button" class="pc-cat${catFiltro===c?' on':''}" style="--k:var(${corCat(c)})" aria-pressed="${catFiltro===c}" onclick="setCat('${c}')" ${n?'':'disabled'}><span class="ic" aria-hidden="true"><i class="ti ${CAT_VIVA[c][1]}"></i></span><span class="tx"><b>${c}</b><small><span data-conta="${n}">${n}</span> ${n===1?'exame':'exames'}</small></span></button>`).join('')}</div>`;
+    if(catFiltro)html+=`<div class="filtro-info"><i class="ti ti-filter" aria-hidden="true"></i><span>${esc(catFiltro)}: <b>${cats.find(c=>c[0]===catFiltro)[1]}</b></span><button type="button" onclick="setCat('${catFiltro}')"><i class="ti ti-x" aria-hidden="true"></i> Mostrar todos</button></div>`;
+    ORDEM_CAT.forEach(cat=>{
+      if(catFiltro&&cat!==catFiltro)return;
+      const list=filt.filter(e=>e.cat===cat);if(!list.length)return;
+      html+=`<section class="asec"><h2 class="sec-title"><span class="dot" style="--k:var(${corCat(cat)})"></span>${esc(cat)}<span class="n">${list.length}</span></h2><div class="agrid">${list.map(acard).join('')}</div></section>`;
+    });
+    if(catFiltro&&!cats.find(c=>c[0]===catFiltro)[1])html+=`<div class="empty"><span class="ei"><i class="ti ti-filter" aria-hidden="true"></i></span><h3>Nada em ${esc(catFiltro)} para esta busca</h3><button class="btn btn-g" onclick="setCat('${catFiltro}')">Mostrar todas as regiões</button></div>`;
+  } else {
+    html+=`<div class="empty"><span class="ei"><i class="ti ti-search" aria-hidden="true"></i></span><h3>Nada encontrado para "${esc(busca.trim())}"</h3><p>Busque pela região, pelo exame ou pelo achado. Ou leve a dúvida ao assistente.</p><div class="acoes-v"><button class="btn btn-p" onclick="perguntarBusca()"><i class="ti ti-message-chatbot" aria-hidden="true"></i> Perguntar ao assistente</button><button class="btn btn-g" onclick="limparBusca()"><i class="ti ti-x" aria-hidden="true"></i> Limpar busca</button></div></div>`;
+  }
+  box.innerHTML=html;
 }
 
 function renderExam(e){
+  const mais=EXAMES.filter(x=>x.cat===e.cat&&x.id!==e.id);
   document.getElementById('view').innerHTML=`
-   <button class="back" onclick="routeHome()">← Voltar</button>
-   <div class="exam-head"><div class="ei">${e.icon}</div><div><h1>${esc(e.nome)}</h1><div class="tags">${esc(e.cat)} · ${esc(e.tags)}</div></div></div>
+   <button class="back" onclick="routeHome()"><i class="ti ti-arrow-left" aria-hidden="true"></i> Voltar</button>
+   <div class="exam-head"><div class="ei" style="--k:var(${corCat(e.cat)})">${e.icon}</div><div><h1>${esc(e.nome)}</h1><div class="tags">${esc(e.cat)} · ${esc(e.tags)}</div></div></div>
    <div class="layout">
      <div><div class="content">${md(e.md)}</div>
-       <div class="panel" style="margin-top:18px"><h4>Aprofundar com IA</h4>
-         <button class="btn btn-ai" id="aprBtn" onclick="aprofundar('${e.id}')"><i class="ti ti-sparkles"></i> Pedir mais detalhes / casos à IA</button>
+       <div class="panel" style="margin-top:18px"><h4><i class="ti ti-sparkles" aria-hidden="true"></i> Aprofundar com IA</h4>
+         <button class="btn btn-ai" id="aprBtn" onclick="aprofundar('${e.id}')"><i class="ti ti-sparkles"></i> Pedir casos e detalhes à IA</button>
          <div id="aprOut"></div>
        </div>
      </div>
      <div class="aside">
-       ${e.diag?`<div class="panel"><h4>Posição da sonda</h4>${e.diag}<div class="diag-leg">${e.leg||''}</div></div>`:''}
-       ${e.flow?`<div class="panel"><h4>Fluxograma de decisão</h4>${e.flow}</div>`:''}
-       <div class="panel"><h4>Imagens de ultrassom</h4>${galeriaHtml(e)}</div>
+       ${e.diag?`<div class="panel"><h4><i class="ti ti-map-pin" aria-hidden="true"></i> Posição da sonda</h4>${e.diag}<div class="diag-leg">${e.leg||''}</div></div>`:''}
+       ${e.flow?`<div class="panel"><h4><i class="ti ti-git-branch" aria-hidden="true"></i> Fluxograma de decisão</h4>${e.flow}</div>`:''}
+       <div class="panel"><h4><i class="ti ti-photo" aria-hidden="true"></i> Imagens de ultrassom</h4>${galeriaHtml(e)}</div>
      </div>
-   </div>`;
+   </div>
+   ${mais.length?`<section class="asec pc-mais"><h2 class="sec-title"><span class="dot" style="--k:var(${corCat(e.cat)})"></span>Mais em ${esc(e.cat)}<span class="n">${mais.length}</span></h2><div class="agrid">${mais.map(acard).join('')}</div></section>`:''}`;
 }
 
 /* ===================== IA ===================== */
@@ -822,25 +1095,25 @@ const SYS_POCUS='Você é um instrutor experiente de POCUS (ultrassom point-of-c
 async function aprofundar(id){
   const e=EXAMES.find(x=>x.id===id);if(!e)return;
   const b=document.getElementById('aprBtn'),out=document.getElementById('aprOut');
-  b.disabled=true;b.innerHTML='<span class="spin"></span> Gerando…';
+  b.disabled=true;b.innerHTML='<span class="spin"></span> Gerando';
   try{
     const prompt=SYS_POCUS+`\n\nO médico está vendo o guia de "${e.nome}" (POCUS). Aprofunde com: dicas avançadas de técnica e otimização de imagem, erros/armadilhas comuns, 2-3 cenários clínicos com a interpretação esperada, e como integrar com outros pontos do exame. Não repita o básico já óbvio; agregue valor.`;
     const txt=await callIA(prompt);
     out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
-  }catch(err){out.innerHTML='<div class="ai-out" style="background:rgba(198,69,61,.12);border-color:rgba(198,69,61,.3);color:#C6453D">⚠️ '+esc(err.message||'Falha na IA')+'</div>';}
-  b.disabled=false;b.innerHTML='<i class="ti ti-sparkles"></i> Pedir mais detalhes / casos à IA';
+  }catch(err){out.innerHTML='<div class="ai-out erro"><i class="ti ti-alert-triangle" aria-hidden="true"></i> '+esc(err.message||'Falha na IA')+'</div>';}
+  b.disabled=false;b.innerHTML='<i class="ti ti-sparkles"></i> Pedir casos e detalhes à IA';
 }
 
 let chat=[];
 function abrirAssistente(){curView='ai';chat=[];renderAssistente();window.scrollTo(0,0);}
 function renderAssistente(){
   const suggs=['Como faço POCUS pulmonar na dispneia?','Diferenciar EAP de pneumonia no US','Como avalio volemia com VCI?','Protocolo para parada (FoCUS)','Acesso venoso periférico difícil guiado'];
-  let html=`<button class="back" onclick="routeHome()">← Voltar</button>
-   <div class="exam-head"><div class="ei"><i class="ti ti-sparkles"></i></div><div><h1>Assistente POCUS</h1><div class="tags">Pergunte sobre qualquer região, técnica ou achado</div></div></div>`;
-  if(!chat.length){html+=`<div class="suggs">`+suggs.map(s=>`<button class="sugg" onclick="enviarSug(this)">${esc(s)}</button>`).join('')+`</div>`;}
-  html+=`<div class="chat" id="chat">`+chat.map(m=>`<div class="msg ${m.role==='user'?'u':'a'}"><div class="av"><i class="ti ${m.role==='user'?'ti-user':'ti-scan'}"></i></div><div class="bub">${m.role==='user'?'<p>'+esc(m.text).replace(/\n/g,'<br>')+'</p>':md(m.text)}</div></div>`).join('')+`</div>
-   <div class="ask"><textarea id="ask" rows="1" placeholder="Ex.: como diferencio derrame de espessamento pleural?" oninput="growAsk(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviar();}"></textarea><button onclick="enviar()" aria-label="Enviar"><i class="ti ti-send-2"></i></button></div>
-   ${MT.mode==='demo'?'<div class="note" style="margin-top:12px">Entre na conta MedTech para usar a IA.</div>':''}`;
+  let html=`<button class="back" onclick="routeHome()"><i class="ti ti-arrow-left" aria-hidden="true"></i> Voltar</button>
+   <div class="exam-head"><div class="ei"><i class="ti ti-message-chatbot"></i></div><div><h1>Assistente POCUS</h1><div class="tags">Pergunte sobre qualquer região, técnica ou achado</div></div></div>`;
+  if(!chat.length){html+=`<div class="suggs-h">Comece por uma pergunta</div><div class="suggs">`+suggs.map(s=>`<button class="sugg" onclick="enviarSug(this)">${esc(s)}</button>`).join('')+`</div>`;}
+  html+=`<div class="chat" id="chat">`+chat.map(m=>`<div class="msg ${m.role==='user'?'u':'a'}${m.err?' erro':''}"><div class="av" aria-hidden="true"><i class="ti ${m.role==='user'?'ti-user':(m.err?'ti-alert-triangle':'ti-scan')}"></i></div><div class="bub">${m.role==='user'?'<p>'+esc(m.text).replace(/\n/g,'<br>')+'</p>':md(m.text)}</div></div>`).join('')+`</div>
+   <div class="ask"><textarea id="ask" rows="1" placeholder="Sua pergunta sobre POCUS" aria-label="Sua pergunta" oninput="growAsk(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviar();}"></textarea><button id="askBtn" onclick="enviar()" aria-label="Enviar pergunta"><i class="ti ti-send" aria-hidden="true"></i></button></div>
+   ${MT.mode==='demo'?'<div class="note" style="margin-top:12px"><i class="ti ti-lock" aria-hidden="true"></i><span>Entre na conta MedTech para usar a IA.</span></div>':''}`;
   document.getElementById('view').innerHTML=html;
   scrollChat();
 }
@@ -850,16 +1123,17 @@ function scrollChat(){const c=document.getElementById('chat');if(c&&c.lastElemen
 async function enviar(){
   const t=document.getElementById('ask');const q=(t.value||'').trim();if(!q)return;
   chat.push({role:'user',text:q});renderAssistente();
+  const bt=document.getElementById('askBtn');if(bt)bt.disabled=true;
   const c=document.getElementById('chat');
-  const typ=document.createElement('div');typ.className='msg a';typ.innerHTML='<div class="av">🔎</div><div class="bub"><span class="typing"><span></span><span></span><span></span></span></div>';c.appendChild(typ);typ.scrollIntoView({block:'end'});
+  const typ=document.createElement('div');typ.className='msg a';typ.innerHTML='<div class="av" aria-hidden="true"><i class="ti ti-scan"></i></div><div class="bub" aria-label="Escrevendo a resposta"><span class="typing"><span></span><span></span><span></span></span></div>';c.appendChild(typ);typ.scrollIntoView({block:'end'});
   try{
-    const hist=chat.slice(-8).map(m=>(m.role==='user'?'MÉDICO: ':'POCUSAI: ')+m.text).join('\n\n');
+    const hist=chat.filter(m=>!m.err).slice(-8).map(m=>(m.role==='user'?'MÉDICO: ':'POCUSAI: ')+m.text).join('\n\n');
     const prompt=SYS_POCUS+'\n\nConversa até aqui:\n'+hist+'\n\nResponda à última pergunta do médico de forma prática.';
     const txt=await callIA(prompt);
     chat.push({role:'ai',text:txt});renderAssistente();
   }catch(err){
     typ.remove();
-    chat.push({role:'ai',text:'⚠️ '+(err.message||'Falha na IA. Tente novamente.')});renderAssistente();
+    chat.push({role:'ai',err:true,text:(err.message||'Falha na IA. Tente novamente.')});renderAssistente();
   }
 }
 </script>

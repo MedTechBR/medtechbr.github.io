@@ -41,6 +41,7 @@ let _mtEnteredUid = null;
     }
     state._tomb = (d && d._tomb) || {};
     state.laudos = (d && Array.isArray(d.laudos) ? d.laudos : []).slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    if (typeof onLaudosAtualizados === 'function') onLaudosAtualizados();
   });
 })();
 
@@ -217,6 +218,8 @@ function enterApp(user) {
 
   initMainApp();
   refreshSubscriptionBadge();
+  showView('novo');
+  onLaudosAtualizados();
 }
 
 // ===== Assinatura (badge no header) =====
@@ -228,7 +231,7 @@ async function refreshSubscriptionBadge() {
 
   // BYOK: sem assinatura, badge mostra "Chave própria"
   if (Gemini.isByokMode()) {
-    badge.innerHTML = '<span class="sub-icon">🔑</span><span>Chave própria</span>';
+    badge.innerHTML = '<i class="ti ti-key"></i><span>Chave própria</span>';
     badge.className = 'subscription-badge byok';
     badge.title = 'Usando sua API Key Gemini diretamente';
     return;
@@ -239,22 +242,22 @@ async function refreshSubscriptionBadge() {
   const sub = await Gemini.getSubscriptionStatus();
   state.subscription = sub;
   if (!sub) {
-    badge.innerHTML = '<span class="sub-icon">⚠</span><span>—</span>';
+    badge.innerHTML = '<i class="ti ti-alert-circle"></i><span>Sem conexão</span>';
     badge.className = 'subscription-badge';
     return;
   }
   if (sub.ecosystem) {
-    badge.innerHTML = `<span class="sub-icon">⭐</span><span>MedTech</span>`;
+    badge.innerHTML = `<i class="ti ti-circle-check"></i><span>IA incluída</span>`;
     badge.className = 'subscription-badge pro';
     badge.title = 'IA incluída na sua conta MedTech';
   } else if (sub.isPaid) {
     const days = Math.ceil((sub.paidUntil - Date.now()) / 86400000);
-    badge.innerHTML = `<span class="sub-icon">⭐</span><span>Pro · ${days}d</span>`;
+    badge.innerHTML = `<i class="ti ti-circle-check"></i><span>Pro · ${days} dias</span>`;
     badge.className = 'subscription-badge pro';
     badge.title = `Pro ativo · expira em ${days} dias`;
   } else {
     const left = sub.freeRemaining;
-    badge.innerHTML = `<span class="sub-icon">🎁</span><span>${left} grátis</span>`;
+    badge.innerHTML = `<i class="ti ti-gift"></i><span>${left} grátis</span>`;
     badge.className = 'subscription-badge trial' + (left === 0 ? ' empty' : '');
     badge.title = left > 0 ? `${left} laudo(s) gratuito(s) restante(s)` : 'Você usou todos os laudos grátis';
   }
@@ -315,19 +318,50 @@ function initMainApp() {
 
   $('#btn-generate').addEventListener('click', generate);
   $('#btn-copy').addEventListener('click', copyLaudo);
+  $('#btn-edit').addEventListener('click', toggleRevisao);
   $('#btn-print').addEventListener('click', () => window.print());
   $('#btn-new').addEventListener('click', resetForm);
+  $('#btn-retry').addEventListener('click', generate);
+  $('#btn-limpar-midia').addEventListener('click', () => { state.media = []; renderThumbs(); toast('Anexos retirados.'); });
 
   $('#btn-settings').addEventListener('click', openSettings);
   $('#settings-cancel').addEventListener('click', closeSettings);
   $('#settings-save').addEventListener('click', saveSettings);
 
   $('#btn-history').addEventListener('click', openHistory);
-  $('#history-close').addEventListener('click', closeHistory);
   $('#history-clear').addEventListener('click', clearHistoryAll);
+  $('#histBusca').addEventListener('input', renderHistory);
 
-  // Paywall
-  const pb = $('#subscription-badge'); if (pb) pb.addEventListener('click', () => { if (!Gemini.isByokMode()) openPaywall(); });
+  // abas: Novo laudo, Histórico (e Ajustes na barra do celular)
+  $$('#laAbas .la-aba').forEach(b => b.addEventListener('click', () => {
+    if (b.dataset.view === 'ajustes') openSettings(); else showView(b.dataset.view);
+  }));
+
+  // tipos de exame mais usados em um toque (o seletor continua com a lista completa)
+  montarChips();
+  $('#modality').addEventListener('change', marcarChip);
+
+  // atalhos: Ctrl/Cmd+Enter gera; "/" busca no histórico; Esc fecha a janela aberta
+  document.addEventListener('keydown', (e) => {
+    if ($('#mainApp').classList.contains('hidden')) return;
+    const alvo = e.target, digitando = alvo && /^(INPUT|TEXTAREA|SELECT)$/.test(alvo.tagName);
+    if (e.key === 'Escape') {
+      const aberto = [...$$('.modal-bg')].reverse().find(m => !m.classList.contains('hidden'));
+      if (aberto && aberto.id) { aberto.classList.add('hidden'); e.preventDefault(); }
+      return;
+    }
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && state.view === 'novo') { e.preventDefault(); generate(); return; }
+    if (e.key === '/' && !digitando && state.view === 'historico') { e.preventDefault(); $('#histBusca').focus(); }
+  });
+  if (!/Mac|Win|Linux/.test(navigator.platform || '') || matchMedia('(pointer:coarse)').matches) { const d = $('#gerarDica'); if (d) d.classList.add('hidden'); }
+  else if (/Mac/.test(navigator.platform || '')) { const d = $('#gerarDica'); if (d) d.textContent = 'Atalho: ⌘ + Enter'; }
+
+  // Paywall: com a IA incluída na conta MedTech o selo só informa (o checkout da assinatura avulsa não existe)
+  const pb = $('#subscription-badge'); if (pb) pb.addEventListener('click', () => {
+    if (Gemini.isByokMode()) return;
+    if (state.subscription && (state.subscription.ecosystem || state.subscription.isPaid)) { toast('A IA vem incluída na sua conta MedTech.'); return; }
+    openPaywall();
+  });
   const pc = $('#paywall-close'); if (pc) pc.addEventListener('click', closePaywall);
   const pbyok = $('#paywall-byok'); if (pbyok) pbyok.addEventListener('click', () => { closePaywall(); openSettings(); });
   const vc = $('#video-byok-close'); if (vc) vc.addEventListener('click', closeVideoByokModal);
@@ -522,32 +556,40 @@ function fmtBytes(n) {
   return (n / 1024 / 1024 / 1024).toFixed(2) + 'GB';
 }
 
+const MAX_IMAGENS = 6; // teto do backend central (laudai.gemini.js recusa acima disso)
 function renderThumbs() {
   const wrap = $('#thumbs');
   wrap.innerHTML = '';
+  const n = state.media.length;
+  const cab = $('#thumbsCab');
+  if (cab) {
+    cab.classList.toggle('hidden', !n);
+    const nImg = state.media.filter(m => m.kind !== 'video').length;
+    $('#thumbsConta').innerHTML = `<b class="${nImg > MAX_IMAGENS ? 'demais' : ''}">${nImg} de ${MAX_IMAGENS}</b> imagens por laudo${nImg > MAX_IMAGENS ? ': tire ' + (nImg - MAX_IMAGENS) + ' antes de gerar' : ''}`;
+  }
   state.media.forEach((m, i) => {
     const div = document.createElement('div');
     div.className = 'thumb';
     if (m.kind === 'image') {
       div.innerHTML = `
         <img src="${m.dataUrl}" alt="${escapeHtml(m.name)}">
-        <span class="badge">#${i + 1}</span>
-        <button class="remove" data-id="${m.id}" title="Remover">×</button>
+        <span class="badge">${i + 1}</span>
+        <button class="remove" data-id="${m.id}" title="Tirar esta imagem" aria-label="Tirar esta imagem"><i class="ti ti-x"></i></button>
       `;
     } else if (m.kind === 'dicom') {
       div.innerHTML = `
         <img src="${m.dataUrl}" alt="${escapeHtml(m.name)}">
-        <span class="badge dicom">DCM</span>
-        <button class="remove" data-id="${m.id}" title="Remover">×</button>
+        <span class="badge dicom">DICOM</span>
+        <button class="remove" data-id="${m.id}" title="Tirar este corte" aria-label="Tirar este corte"><i class="ti ti-x"></i></button>
         <div class="footer">${escapeHtml(m.label || ('Corte ' + (i + 1)))}</div>
       `;
     } else {
       div.innerHTML = `
         ${m.thumbUrl ? `<img src="${m.thumbUrl}" alt="${escapeHtml(m.name)}">` : ''}
-        <span class="badge video">VÍDEO</span>
+        <span class="badge video">Vídeo</span>
         <span class="play-ic"><svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
         <span class="size">${fmtBytes(m.size)}</span>
-        <button class="remove" data-id="${m.id}" title="Remover">×</button>
+        <button class="remove" data-id="${m.id}" title="Tirar este vídeo" aria-label="Tirar este vídeo"><i class="ti ti-x"></i></button>
       `;
     }
     wrap.appendChild(div);
@@ -568,15 +610,27 @@ async function generate() {
   // Sem chave própria o fluxo segue no plano Pro (proxy generateLaudo);
   // exigir chave aqui mataria o modo assinatura.
   const examText = $('#exam-text').value.trim();
-  if (!state.media.length && !examText) {
-    toast('Anexe um arquivo OU cole o texto/resultados do exame.', 'error'); return;
+  if (!state.media.some(m => m.kind !== 'video') && !examText) {
+    toast('Anexe uma imagem ou cole os resultados do exame em texto.', 'error'); return;
   }
   const region = $('#region').value.trim();
-  if (!region) { toast('Informe os detalhes / região do exame.', 'error'); return; }
+  if (!region) { toast('Informe os detalhes ou a região do exame.', 'error'); $('#region').focus(); return; }
+  const nImg = state.media.filter(m => m.kind !== 'video').length;
+  if (nImg > MAX_IMAGENS) { toast(`Até ${MAX_IMAGENS} imagens por laudo. Tire ${nImg - MAX_IMAGENS} e tente de novo.`, 'error'); $('#thumbs').scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
 
   state.generating = true;
-  $('#btn-generate').disabled = true;
+  const btnG = $('#btn-generate');
+  const btnGHtml = btnG.innerHTML;
+  btnG.disabled = true;
+  btnG.innerHTML = '<span class="spin-mini"></span> Gerando laudo';
   showOutput('loading');
+  // no celular o laudo fica abaixo do formulário: leva a pessoa até ele
+  if (matchMedia('(max-width: 960px)').matches) $('#laudoCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const etapas = [['Enviando o material', 18], ['Lendo as imagens e os dados', 42], ['Descrevendo os achados', 64], ['Montando a impressão diagnóstica', 82], ['Revisando o texto', 92]];
+  let iEt = 0;
+  setLoader(etapas[0][0], 8);
+  const relogio = setInterval(() => { if (iEt < etapas.length) { setLoader(etapas[iEt][0], etapas[iEt][1]); iEt++; } }, 6000);
+  setTimeout(() => { if (state.generating && iEt === 0) { setLoader(etapas[0][0], etapas[0][1]); iEt = 1; } }, 600);
 
   const ctx = {
     modality: $('#modality').value,
@@ -615,18 +669,20 @@ async function generate() {
       state.media = state.media.filter(m => m.kind !== 'video');
     }
 
-    setLoader('Analisando achados…', 90);
     const result = await Gemini.generateLaudo({ media: state.media, ctx, model });
     const laudo = typeof result === 'string' ? result : result.text;
 
-    setLoader('Salvando…', 98);
+    clearInterval(relogio);
+    setLoader('Salvando no histórico', 98);
     renderLaudo(laudo, ctx);
     try {
       await saveLaudoToFirestore(laudo, ctx);
+      toast('Laudo pronto e salvo no histórico. Revise antes de usar.', 'success');
     } catch (saveErr) {
       console.warn('Falha ao salvar no Firestore:', saveErr);
       toast('Laudo gerado, mas não foi salvo na nuvem: ' + (saveErr.message || 'erro desconhecido'), 'error');
     }
+    onLaudosAtualizados();
     refreshSubscriptionBadge();
   } catch (err) {
     console.error(err);
@@ -644,8 +700,10 @@ async function generate() {
       showError(err.message || 'Falha na comunicação com a API.');
     }
   } finally {
+    clearInterval(relogio);
     state.generating = false;
-    $('#btn-generate').disabled = false;
+    btnG.disabled = false;
+    btnG.innerHTML = btnGHtml;
   }
 }
 
@@ -676,6 +734,7 @@ function renderLaudo(markdown, ctx) {
   if (severity) metaEl.appendChild(makeTag(severity.label, severity.cls));
 
   $('#laudo-content').innerHTML = html;
+  sairRevisao();
   const counts = {
     img: state.media.filter(m => m.kind === 'image').length,
     dcm: state.media.filter(m => m.kind === 'dicom').length,
@@ -698,7 +757,7 @@ function makeTag(text, cls = '') {
 
 function detectSeverity(text) {
   const upper = text.toUpperCase();
-  if (/ACHADO CRÍTICO|CRÍTICO\/URGENTE|URGENTE/.test(upper)) return { label: '⚠ Crítico', cls: 'crit' };
+  if (/ACHADO CRÍTICO|CRÍTICO\/URGENTE|URGENTE/.test(upper)) return { label: 'Crítico', cls: 'crit' };
   if (/ALTERAÇÕES SIGNIFICATIVAS|SIGNIFICATIVAS/.test(upper)) return { label: 'Alterações significativas', cls: 'warn' };
   if (/ALTERAÇÕES MENORES|MENORES/.test(upper)) return { label: 'Alterações menores', cls: 'warn' };
   if (/NORMAL/.test(upper)) return { label: 'Normal', cls: 'ok' };
@@ -741,8 +800,41 @@ function showError(msg) {
 }
 
 async function copyLaudo() {
-  try { await navigator.clipboard.writeText(state.laudoText); toast('Laudo copiado.', 'success'); }
-  catch { toast('Não foi possível copiar.', 'error'); }
+  if (!$('#laudo-edit').classList.contains('hidden')) aplicarRevisao(true);
+  const b = $('#btn-copy');
+  try {
+    await navigator.clipboard.writeText(state.laudoText);
+    toast('Laudo copiado. Cole no prontuário.', 'success');
+    const h = b.innerHTML; b.innerHTML = '<i class="ti ti-check"></i> Copiado'; b.classList.add('feito');
+    setTimeout(() => { b.innerHTML = h; b.classList.remove('feito'); }, 1800);
+  }
+  catch { toast('Não foi possível copiar. Selecione o texto e use Ctrl+C.', 'error'); }
+}
+
+// Revisar: o médico ajusta o texto antes de copiar ou imprimir. O histórico guarda a versão da IA.
+function toggleRevisao() {
+  const ed = $('#laudo-edit');
+  if (ed.classList.contains('hidden')) {
+    ed.value = state.laudoText;
+    ed.classList.remove('hidden');
+    $('#laudo-content').classList.add('hidden');
+    ed.style.height = Math.max(240, $('#laudo-content').scrollHeight || 0) + 'px';
+    ed.focus();
+    $('#btn-edit').innerHTML = '<i class="ti ti-check"></i> Aplicar revisão';
+  } else aplicarRevisao();
+}
+function aplicarRevisao(silencioso) {
+  const ed = $('#laudo-edit');
+  state.laudoText = ed.value;
+  $('#laudo-content').innerHTML = mdToHtml(state.laudoText);
+  sairRevisao();
+  if (!silencioso) toast('Revisão aplicada. Copie ou imprima; o histórico guarda a versão original.', 'success');
+}
+function sairRevisao() {
+  const ed = $('#laudo-edit'); if (!ed) return;
+  ed.classList.add('hidden');
+  $('#laudo-content').classList.remove('hidden');
+  $('#btn-edit').innerHTML = '<i class="ti ti-pencil"></i> Revisar texto';
 }
 
 function resetForm() {
@@ -754,7 +846,12 @@ function resetForm() {
   $('#sex').value = '';
   $('#history').value = '';
   $('#exam-text').value = '';
+  $('#output-meta').textContent = '';
+  sairRevisao();
   showOutput('empty');
+  showView('novo');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setTimeout(() => $('#region').focus({ preventScroll: true }), 350);
 }
 
 // ===== Fetch URL externa (PACS, link de imagem) =====
@@ -771,7 +868,7 @@ async function fetchExternalUrl(rawUrl) {
     // Detecta padrão OHIF (Clinux, Horos etc.) com ?json=<manifesto>
     const jsonParam = url.searchParams.get('json') || url.searchParams.get('url');
     if (jsonParam) {
-      toast('Detectado link OHIF — tentando carregar manifesto…');
+      toast('Link OHIF reconhecido. Carregando a série.');
       try {
         const ohifResult = await fetchOhifManifest(jsonParam);
         if (ohifResult > 0) {
@@ -828,7 +925,7 @@ async function fetchExternalUrl(rawUrl) {
     console.error(err);
     let msg = err.message || 'Falha ao baixar.';
     if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('CORS')) {
-      msg = 'O servidor do PACS bloqueou o acesso direto (CORS). Use o bookmarklet — ele captura a imagem de dentro da página do PACS.';
+      msg = 'O servidor do PACS bloqueou o acesso direto (CORS). Use o favorito de exportação: ele captura a imagem de dentro da página do PACS.';
       // Auto-abre o modal do bookmarklet
       openBookmarklet();
     }
@@ -1006,37 +1103,106 @@ function saveSettings() {
   toast('Configurações salvas.', 'success');
 }
 
-// ===== History (Firestore-backed) =====
-function openHistory() {
-  const wrap = $('#history-list');
-  const list = state.laudos;
-  if (!list.length) {
-    wrap.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-faint); font-size: 13px;">Nenhum laudo salvo ainda.</div>';
-  } else {
-    wrap.innerHTML = list.map(item => `
-      <div class="modal-list-item" data-id="${item.id}">
-        <div class="modal-list-item-top">
-          <span class="modal-list-item-title">${escapeHtml(item.region)}</span>
-          <span class="modal-list-item-date">${new Date(item.date).toLocaleString('pt-BR')}</span>
-        </div>
-        <div class="modal-list-item-sub">${escapeHtml(item.modality)}${item.age || item.sex ? ' • ' + escapeHtml([item.age, item.sex].filter(Boolean).join(', ')) : ''}</div>
-      </div>
-    `).join('');
-    wrap.querySelectorAll('.modal-list-item').forEach(el => {
-      el.addEventListener('click', () => {
-        const id = parseInt(el.dataset.id);
-        const item = state.laudos.find(x => x.id === id);
-        if (item) {
-          renderLaudo(item.text, { modality: item.modality, region: item.region, age: item.age || '', sex: item.sex || '' });
-          closeHistory();
-        }
-      });
-    });
-  }
-  $('#modal-history').classList.remove('hidden');
+// ===== Navegação: Novo laudo | Histórico =====
+state.view = 'novo';
+function showView(v) {
+  if (v !== 'novo' && v !== 'historico') v = 'novo';
+  state.view = v;
+  $$('.la-view').forEach(el => el.classList.toggle('hidden', el.id !== 'view-' + v));
+  $$('#laAbas .la-aba').forEach(b => { if (b.dataset.view === v) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  const el = $('#view-' + v);
+  if (el) { el.classList.remove('anima'); void el.offsetWidth; el.classList.add('anima'); }
+  if (v === 'historico') renderHistory();
+  window.scrollTo(0, 0);
 }
 
-function closeHistory() { $('#modal-history').classList.add('hidden'); }
+function onLaudosAtualizados() {
+  const n = (state.laudos || []).length;
+  const c = $('#histCount'); if (c) c.textContent = n ? String(n) : '';
+  if (state.view === 'historico') renderHistory();
+}
+
+// ===== Tipos de exame mais usados (atalho para o seletor) =====
+const CHIPS_EXAME = [
+  ['Radiografia (RX)', 'RX'], ['Tomografia Computadorizada (TC)', 'TC'], ['Ressonância Magnética (RM)', 'RM'],
+  ['Ultrassonografia (US)', 'US'], ['Eletrocardiograma (ECG)', 'ECG'], ['Hemograma', 'Hemograma'],
+  ['Gasometria arterial', 'Gasometria'], ['Dermatoscopia / Lesão de pele', 'Pele']
+];
+function montarChips() {
+  const box = $('#laChips'); if (!box) return;
+  box.innerHTML = CHIPS_EXAME.map(([v, r]) => `<button type="button" class="chip" data-v="${escapeHtml(v)}">${escapeHtml(r)}</button>`).join('');
+  box.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => {
+    $('#modality').value = b.dataset.v; marcarChip();
+    $('#region').focus();
+  }));
+  marcarChip();
+}
+function marcarChip() {
+  const v = $('#modality').value;
+  $$('#laChips .chip').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v ? 'true' : 'false'));
+}
+
+// ===== Histórico (nuvem da conta MedTech) =====
+function iconeExame(mod) {
+  const m = (mod || '').toLowerCase();
+  if (/eletrocardio|holter|mapa/.test(m)) return ['ti-heartbeat', 'var(--c-rosa)'];
+  if (/hemograma|bioquím|gasometria|coagulo|urina|marcador|hormôn|sorolog/.test(m)) return ['ti-droplet', 'var(--c-violeta)'];
+  if (/pele|dermato|endoscop|fundoscop|patológ|histopat/.test(m)) return ['ti-microscope', 'var(--c-teal)'];
+  if (/eletroencef|espirom/.test(m)) return ['ti-wave-sine', 'var(--c-indigo)'];
+  return ['ti-scan', 'var(--c-cobalto)'];
+}
+function openHistory() { showView('historico'); }
+function closeHistory() { showView('novo'); }
+
+function renderHistory() {
+  const wrap = $('#history-list');
+  const list = state.laudos || [];
+  const q = ($('#histBusca').value || '').trim().toLowerCase();
+  $('#history-clear').classList.toggle('hidden', !list.length);
+  if (!list.length) {
+    wrap.innerHTML = `<div class="vazio"><div class="v-ic"><i class="ti ti-history"></i></div><b>Nenhum laudo ainda</b><p>Os laudos que você gerar ficam aqui para abrir e copiar de novo.</p><button class="btn btn-primary" id="hist-novo"><i class="ti ti-file-plus"></i> Fazer o primeiro laudo</button></div>`;
+    $('#hist-novo').addEventListener('click', () => showView('novo'));
+    return;
+  }
+  const achados = list.filter(it => !q || [it.modality, it.region, it.age, it.sex, it.text].join(' ').toLowerCase().includes(q));
+  if (!achados.length) {
+    wrap.innerHTML = `<div class="vazio"><div class="v-ic"><i class="ti ti-search"></i></div><b>Nada encontrado</b><p>Nenhum laudo com "${escapeHtml(q)}".</p></div>`;
+    return;
+  }
+  wrap.innerHTML = achados.map(item => {
+    const [ic, cor] = iconeExame(item.modality);
+    const quando = item.date ? new Date(item.date).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+    const pac = [item.age, item.sex].filter(Boolean).join(', ');
+    return `
+      <div class="modal-list-item hist-item" data-id="${item.id}" style="--k:${cor}" role="button" tabindex="0">
+        <span class="hi-ic"><i class="ti ${ic}"></i></span>
+        <div class="hi-txt">
+          <div class="modal-list-item-title">${escapeHtml(item.region || 'Sem região')}</div>
+          <div class="modal-list-item-sub">${escapeHtml(item.modality || '')}${pac ? ' · ' + escapeHtml(pac) : ''}</div>
+        </div>
+        <span class="modal-list-item-date">${quando}</span>
+        <button class="icon-btn hi-copiar" title="Copiar laudo" aria-label="Copiar laudo"><i class="ti ti-copy"></i></button>
+      </div>`;
+  }).join('');
+  wrap.querySelectorAll('.hist-item').forEach(el => {
+    const item = state.laudos.find(x => String(x.id) === el.dataset.id);
+    if (!item) return;
+    const abrir = () => {
+      showView('novo');
+      renderLaudo(item.text, { modality: item.modality, region: item.region, age: item.age || '', sex: item.sex || '' });
+      if (matchMedia('(max-width: 960px)').matches) $('#laudoCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('.hi-copiar')) {
+        e.stopPropagation();
+        navigator.clipboard.writeText(item.text || '').then(() => toast('Laudo copiado.', 'success'), () => toast('Não foi possível copiar.', 'error'));
+        return;
+      }
+      abrir();
+    });
+    el.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target === el) abrir(); });
+  });
+}
 
 async function clearHistoryAll() {
   if (!confirm('Apagar todos os laudos do seu histórico? Esta ação não pode ser desfeita.')) return;
@@ -1046,7 +1212,8 @@ async function clearHistoryAll() {
   state.laudos = [];
   if (window.MT && window.MT.save) await window.MT.save({ laudos: [], _tomb: state._tomb });
   toast('Histórico apagado.', 'success');
-  openHistory();
+  onLaudosAtualizados();
+  renderHistory();
 }
 
 // ===== Helpers =====
@@ -1055,11 +1222,15 @@ function escapeHtml(s) {
 }
 
 function toast(msg, type = '') {
+  document.querySelectorAll('.toast').forEach((t, i, all) => { if (all.length - i > 1) t.remove(); });
   const el = document.createElement('div');
   el.className = 'toast ' + type;
-  el.textContent = msg;
+  el.setAttribute('role', type === 'error' ? 'alert' : 'status');
+  const ic = type === 'success' ? 'ti-check' : type === 'error' ? 'ti-alert-circle' : 'ti-info-circle';
+  el.innerHTML = `<i class="ti ${ic}"></i><span></span>`;
+  el.querySelector('span').textContent = msg;
   document.body.appendChild(el);
-  setTimeout(() => el.remove(), 2800);
+  setTimeout(() => el.remove(), type === 'error' ? 5000 : 2800);
 }
 
 // PWA: o service worker é do portal MedTech (não registramos um próprio aqui).

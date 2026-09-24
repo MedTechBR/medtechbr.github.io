@@ -1,90 +1,188 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-astra="calcmed">
+<html lang="pt-BR" data-viva="calcmed" data-viva-escuro>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CalcMed — Calculadoras e escores clínicos | MedTech</title>
+<title>CalcMed · Calculadoras e escores clínicos | MedTech</title>
 <meta name="description" content="CalcMed: dezenas de calculadoras e escores clínicos num só lugar — nefrologia, cardiologia, emergência, hepatologia, obstetrícia, pediatria e mais.">
-<meta name="theme-color" content="#000000">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
+<meta name="theme-color" content="#F5F6FB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1017" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="vendor/tabler/tabler-icons.min.css?v=3.48.0">
 <link rel="icon" type="image/png" href="favicon.png">
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"calcmed",name:"CalcMed"};</script>
-<script type="module" src="_mtauth.js?v=25"></script>
-<style>
-:root{--petrol:#4C7A99;--petrol-dark:#3D617A;--ink:#23272E;--mint:#4C7A99;--mint-dark:#3D617A;--bg:#FAFAF8;--soft:rgba(76,122,153,.12);--line:#E8E8E2;--muted:#5E646B;--surface:#FFFFFF;--card:#FFFFFF;--panel2:#F1F1EC;--line-strong:#DDDDD5;--teal:#0E8A63;--glow:rgba(76,122,153,.42);--disp:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:-.011em;color:var(--ink);background-color:#FAFAF8}
-input:-webkit-autofill,input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 100px #FFFFFF inset;-webkit-text-fill-color:#23272E;caret-color:#23272E;transition:background-color 99999s}
-header{background:rgba(255,255,255,.85);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:var(--ink);border-bottom:1px solid var(--line);padding:16px 0;position:sticky;top:0;z-index:20}
-.wrap{max-width:1120px;margin:0 auto;padding:0 18px}
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;letter-spacing:-.5px;font-family:var(--disp)}
-.logo .mark{width:34px;height:34px;border-radius:10px;background:var(--petrol);display:grid;place-items:center;flex:0 0 auto;box-shadow:0 0 0 1px rgba(76,122,153,.4),0 2px 8px rgba(76,122,153,.28)}
-.logo .mark svg{width:22px;height:22px}
-.logo b{color:var(--petrol)}
-.top a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:600}
-.subtitle{color:var(--muted);font-size:12.5px;margin-top:3px}
-.count{font-size:12px;color:var(--muted)}
-.layout{display:grid;grid-template-columns:288px 1fr;gap:22px;padding:22px 0;align-items:start}
-.list{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px;position:sticky;top:84px;max-height:calc(100vh - 104px);overflow:auto}
-.list .search{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;font-size:16px}
-.list button{display:block;width:100%;text-align:left;background:none;border:none;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:14px;color:var(--ink);font-weight:600;line-height:1.3}
-.list button:hover{background:var(--soft)}
-.list button.active{background:var(--petrol);color:#fff}
-.list .cat{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:12px 12px 4px;font-weight:800}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px;min-height:420px}
-.panel h1{font-size:23px;margin-bottom:4px;font-family:var(--disp)}
-.panel .desc{color:var(--muted);font-size:14px;margin-bottom:20px}
-.field{margin-bottom:14px}
-.field label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
-.field input,.field select{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-size:16px;font-family:inherit;background:var(--panel2);color:var(--ink)}
-.field input:focus,.field select:focus{outline:none;border-color:var(--mint);box-shadow:0 0 0 3px var(--soft)}
-.checks{display:grid;gap:8px}
-.check{display:flex;align-items:flex-start;gap:10px;padding:10px 13px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:14px}
-.check:hover{border-color:var(--mint)}
-.check input{margin-top:3px;flex:0 0 auto}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-.result{margin-top:18px;background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:20px;text-align:center}
-.result .val{font-size:36px;font-weight:800;color:var(--petrol);font-family:var(--mono)}
-.result .unit{font-size:15px;color:var(--muted);font-weight:600}
-.result .interp{margin-top:8px;font-size:15px;font-weight:700}
-.result .note{margin-top:6px;font-size:13px;color:var(--muted)}
-.badge{display:inline-block;padding:4px 12px;border-radius:999px;font-weight:800;font-size:13px;margin-top:6px;font-family:var(--mono)}
-.b-green{background:rgba(29,122,70,.12);color:#1D7A46}.b-amber{background:rgba(163,115,10,.12);color:#A3730A}.b-red{background:rgba(198,69,61,.12);color:#C6453D}.b-blue{background:rgba(76,122,153,.12);color:#4C7A99}
-.disclaimer{background:rgba(163,115,10,.12);border:1px solid rgba(163,115,10,.28);color:#8A6009;border-radius:12px;padding:13px 16px;font-size:13px;margin-top:18px}
-footer{text-align:center;color:var(--muted);font-size:13px;padding:24px}
-footer a{color:var(--petrol-dark);font-weight:600;text-decoration:none}
-@media(max-width:860px){.layout{grid-template-columns:1fr}.list{position:static;max-height:none}.grid2,.grid3{grid-template-columns:1fr}}
-</style>
+<script type="module" src="_mtauth.js?v=26"></script>
 <link rel="stylesheet" href="_mttokens.css?v=3">
-<link rel="stylesheet" href="_mtastra.css?v=5">
+<link rel="stylesheet" href="_mtviva.css?v=1">
+<style id="viva-calcmed">
+/* ============================================================
+   CalcMed, camada viva (23/09/2026). Modelo: ClínicaMed cm-v97.
+   Fica DEPOIS do _mtviva.css de propósito: é a camada do próprio app e
+   sobrescreve a folha compartilhada onde precisa (mesma especificidade,
+   vence pela ordem). Fluxo: buscar → calcular → resultado colorido pela faixa.
+   Laranja com texto escuro (cor e --acTxt vêm do _mtviva.css).
+   ============================================================ */
+html[data-viva="calcmed"] body{--acInk:color-mix(in srgb,var(--ac) 68%,var(--tinta));--sobre:#fff}
+@media (prefers-color-scheme:dark){html[data-viva="calcmed"][data-viva-escuro] body{--sobre:var(--papel)}}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{font-size:15px;line-height:1.5;color:var(--tinta);min-height:100vh;display:flex;flex-direction:column}
+.wrap{width:100%;max-width:1280px;margin:0 auto;padding:0 24px}
+
+/* cabeçalho de uma linha */
+header{position:sticky;top:0;z-index:30}
+.top{display:flex;align-items:center;gap:14px;min-height:64px}
+.logo{display:flex;align-items:center;gap:11px;font-weight:700;font-size:19px;letter-spacing:-.02em;color:var(--tinta);text-decoration:none;flex:0 0 auto}
+.logo .mark{width:36px;height:36px;display:grid;place-items:center;flex:0 0 auto}
+.logo .mark svg{width:22px;height:22px}
+.logo b{color:var(--acInk);font-weight:700}
+.tagline{color:var(--tinta2);font-size:13.5px;padding-left:14px;border-left:1px solid var(--fio);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sair{margin-left:auto;display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 16px;border-radius:999px;background:var(--sup2);color:var(--tinta);
+  font-weight:600;font-size:14px;text-decoration:none;flex:0 0 auto;transition:background-color .2s,color .2s,transform .18s var(--mola)}
+.sair:hover{background:var(--acSup);color:var(--acInk)}
+.sair:active{transform:scale(.96)}
+
+/* grade: lista à esquerda, calculadora à direita */
+.layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:24px;padding-top:24px;padding-bottom:36px;align-items:start;flex:1}
+.list{background:var(--sup);border:1px solid var(--fio);border-radius:var(--rG);box-shadow:var(--sombraV);padding:0 10px 12px;
+  position:sticky;top:84px;max-height:calc(100vh - 104px);overflow:auto;overscroll-behavior:contain}
+.busca{position:sticky;top:0;z-index:2;background:var(--sup);padding:12px 2px 8px}
+.busca label{position:relative;display:block}
+.busca .ti-search{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--tinta2);font-size:18px;pointer-events:none}
+html[data-viva="calcmed"] body .busca input{width:100%;height:46px;padding:0 44px 0 42px;font-size:16px;border-radius:999px}
+.busca input::-webkit-search-cancel-button{-webkit-appearance:none}
+.busca kbd{position:absolute;right:12px;top:50%;transform:translateY(-50%);font:600 12px/1 'Inter',system-ui,sans-serif;color:var(--tinta2);
+  background:var(--sup2);border:1px solid var(--fioF);border-radius:7px;padding:4px 7px;pointer-events:none}
+.busca input:focus~kbd,.busca input:not(:placeholder-shown)~kbd{display:none}
+.buscaInfo{font-size:12.5px;color:var(--tinta2);padding:8px 8px 0}
+.cat{display:flex;align-items:center;gap:10px;padding:14px 8px 6px;font-size:13px;font-weight:600;color:var(--tinta2)}
+.cat .ci{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;font-size:15px;
+  background:color-mix(in srgb,var(--c) 14%,var(--sup));color:color-mix(in srgb,var(--c) 82%,var(--tinta))}
+.cat small{margin-left:auto;font-weight:500;font-size:12px;color:var(--tinta2);font-variant-numeric:tabular-nums}
+#menu button{display:block;width:100%;text-align:left;background:none;border:0;min-height:40px;padding:9px 14px;border-radius:999px;cursor:pointer;
+  font:inherit;font-size:14px;font-weight:500;color:var(--tinta);line-height:1.3;transition:background-color .15s,color .15s,transform .18s var(--mola)}
+#menu button:hover{background:var(--sup2)}
+#menu button.active{background:var(--ac);color:var(--acTxt);font-weight:600;box-shadow:0 6px 14px color-mix(in srgb,var(--ac) 30%,transparent)}
+#menu mark{background:color-mix(in srgb,var(--ac) 26%,transparent);color:inherit;border-radius:4px;padding:0 1px}
+#menu button.active mark{background:rgba(255,255,255,.35)}
+.semRes{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:26px 14px;color:var(--tinta2);font-size:13.5px}
+.semRes .ti{font-size:30px;color:var(--tinta2)}
+.semRes b{color:var(--tinta);font-size:15px}
+#menu .semRes button{display:inline-flex;align-items:center;width:auto;margin-top:8px;min-height:44px;padding:0 20px;border-radius:999px;border:1.5px solid var(--fioF);background:var(--sup);color:var(--tinta);font:inherit;font-weight:600;font-size:14px;cursor:pointer}
+#menu .semRes button:hover{background:var(--acSup);border-color:var(--ac);color:var(--acInk)}
+
+/* a calculadora */
+html[data-viva="calcmed"] body .panel{background:var(--sup);border:1px solid var(--fio);border-radius:28px;box-shadow:var(--sombraV);padding:30px 34px 28px;min-height:420px;min-width:0}
+.voltarLista{display:none}
+.calcTopo{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:14px 16px;margin-bottom:24px}
+.calcTit{grid-column:1;grid-row:1;display:flex;gap:16px;align-items:center;min-width:0}
+.limpar{grid-column:2;grid-row:1}
+.selo{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;background:var(--c);color:#fff;font-size:26px;
+  box-shadow:0 10px 24px color-mix(in srgb,var(--c) 35%,transparent);animation:cmPop .5s var(--mola) both}
+.calcTit small{display:block;font-size:13px;font-weight:600;color:color-mix(in srgb,var(--c) 66%,var(--tinta));margin-bottom:2px}
+.calcTit h1{font-size:26px;font-weight:700;letter-spacing:-.03em;line-height:1.15}
+.calcTit .desc{color:var(--tinta2);font-size:14.5px;margin-top:4px}
+.limpar{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 16px;border-radius:999px;border:1.5px solid var(--fioF);background:var(--sup);
+  color:var(--tinta);font:inherit;font-size:14px;font-weight:600;cursor:pointer;flex:0 0 auto}
+.limpar:hover{background:var(--acSup);border-color:color-mix(in srgb,var(--ac) 45%,var(--fio));color:var(--acInk)}
+.field{margin-bottom:14px}
+.field label{display:block;font-weight:600;font-size:13.5px;margin-bottom:6px;color:var(--tinta)}
+html[data-viva="calcmed"] body .field input,html[data-viva="calcmed"] body .field select{width:100%;min-height:48px;padding:10px 14px;font-size:16px;font-family:inherit;font-variant-numeric:tabular-nums}
+.field input[type=number]::-webkit-inner-spin-button{opacity:.4}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 14px}
+.checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin-bottom:14px}
+.check{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;min-height:48px;border:1.5px solid var(--fio);border-radius:16px;cursor:pointer;font-size:14.5px;
+  background:var(--sup);color:var(--tinta);transition:border-color .15s,background-color .15s,transform .18s var(--mola)}
+.check:hover{border-color:color-mix(in srgb,var(--ac) 45%,var(--fio))}
+.check:active{transform:scale(.985)}
+.check:has(input:checked){border-color:var(--ac);background:var(--acSup)}
+.check input{width:20px;height:20px;margin-top:1px;flex:0 0 auto;cursor:pointer}
+
+/* resultado: bloco tingido pela faixa da interpretação */
+.result{--f:var(--c-azul);--fT:var(--sobre);margin-top:8px;border-radius:24px;padding:20px 22px;background:color-mix(in srgb,var(--f) 11%,var(--sup));
+  border:1.5px solid color-mix(in srgb,var(--f) 34%,transparent);display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 18px;align-items:center;
+  transition:background-color .3s,border-color .3s}
+.result.f-ok{--f:var(--okV)}.result.f-av{--f:var(--avV)}.result.f-err{--f:var(--errV)}.result.f-info{--f:var(--c-azul)}
+.result.f-neutro{--f:var(--ac);--fT:var(--acTxt)}
+.result.pula{animation:cmPop .45s var(--mola)}
+.result .resIc{grid-row:1/span 3;width:58px;height:58px;border-radius:50%;background:var(--f);color:var(--fT);display:grid;place-items:center;font-size:29px;
+  box-shadow:0 8px 20px color-mix(in srgb,var(--f) 32%,transparent)}
+.result .resRot{font-size:13px;font-weight:600;color:var(--tinta2)}
+.result .val{font-size:40px;font-weight:750;letter-spacing:-.03em;line-height:1.08;color:color-mix(in srgb,var(--f) 72%,var(--tinta));font-variant-numeric:tabular-nums;min-width:0;overflow-wrap:anywhere}
+.result .unit{font-size:15px;font-weight:600;letter-spacing:0;color:var(--tinta2)}
+.result .interp{font-size:15.5px;font-weight:650;color:color-mix(in srgb,var(--f) 60%,var(--tinta));line-height:1.4}
+.result .copiar{grid-column:3;grid-row:1/span 3;align-self:center;display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 16px;border-radius:999px;
+  border:1.5px solid color-mix(in srgb,var(--f) 30%,var(--fio));background:var(--sup);color:var(--tinta);font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.result .copiar:hover{border-color:var(--f)}
+.result.vazio{background:var(--sup2);border:1.5px dashed var(--fioF);grid-template-columns:auto minmax(0,1fr)}
+.result.vazio .resIc{grid-row:auto;background:var(--sup3);color:var(--tinta2);box-shadow:none}
+.vzTxt b{display:block;font-size:16px}
+.vzTxt span{color:var(--tinta2);font-size:14px}
+.disclaimer{display:flex;gap:10px;align-items:flex-start;margin-top:18px;padding:12px 16px;border-radius:16px;background:var(--sup2);color:var(--tinta2);font-size:13px;line-height:1.5}
+.disclaimer .ti{font-size:17px;margin-top:1px;flex:0 0 auto}
+
+footer{text-align:center;font-size:13px;padding:22px 24px 30px;line-height:1.7}
+footer a{font-weight:600;text-decoration:none}
+
+/* avisos curtos */
+.avisos{position:fixed;left:0;right:0;bottom:24px;z-index:60;display:flex;justify-content:center;pointer-events:none;padding:0 16px}
+html[data-viva="calcmed"] body .toast{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;font-size:14px;font-weight:600;max-width:100%}
+
+@keyframes cmPop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+
+@media (hover:none),(pointer:coarse){.busca kbd{display:none}}
+@media (max-width:1100px){.tagline{display:none}}
+/* celular e tablet estreito: duas telas (lista → calculadora), com voltar */
+@media (max-width:860px){
+  .wrap{padding:0 16px}
+  .layout{grid-template-columns:minmax(0,1fr);padding-top:16px;gap:16px}
+  .list{position:static;max-height:none;overflow:visible;border-radius:24px;padding:0 8px 10px}
+  .busca{top:64px;border-radius:24px 24px 0 0}
+  body.ver-calc .list{display:none}
+  body:not(.ver-calc) main.panel{display:none}
+  html[data-viva="calcmed"] body .panel{padding:18px 18px 22px;border-radius:24px;min-height:0}
+  .voltarLista{grid-column:1;grid-row:1;justify-self:start;display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:0 16px 0 12px;margin:-4px 0 0 -6px;border-radius:999px;border:0;
+    background:var(--sup2);color:var(--tinta);font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+  .calcTopo{grid-template-columns:auto minmax(0,1fr);margin-bottom:18px}
+  .limpar{grid-column:2;grid-row:1;justify-self:end;margin-top:-4px;min-height:44px}
+  .calcTit{grid-column:1/-1;grid-row:2}
+  .selo{width:46px;height:46px;font-size:22px}
+  .calcTit h1{font-size:22px}
+  .grid2,.grid3{grid-template-columns:minmax(0,1fr)}
+  .checks{grid-template-columns:minmax(0,1fr)}
+  #menu button{min-height:44px}
+  .result{grid-template-columns:auto minmax(0,1fr);padding:18px}
+  .result .resIc{width:50px;height:50px;font-size:25px;grid-row:1/span 3}
+  .result .val{font-size:34px}
+  .result .copiar{grid-column:1/-1;grid-row:auto;justify-self:start;margin-top:10px}
+}
+@media (prefers-reduced-motion:reduce){.selo,.result.pula{animation:none!important}}
+</style>
 </head>
 <body>
 <header>
   <div class="wrap top">
-    <div>
-      <div class="logo"><span class="mark"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Calc<b>Med</b></span></div>
-      <div class="subtitle">Calculadoras e escores clínicos · por MedTech <span class="count" id="count"></span></div>
-    </div>
-    <a href="index.html">← MedTech</a>
+    <a class="logo" href="#" onclick="irLista(true);return false" aria-label="CalcMed: todas as calculadoras"><span class="mark"><svg viewBox="0 0 96 96" aria-hidden="true"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Calc<b>Med</b></span></a>
+    <span class="tagline">Calculadoras e escores clínicos</span>
+    <a class="sair" href="index.html" title="Voltar ao MedTech"><i class="ti ti-arrow-left" aria-hidden="true"></i><span>MedTech</span></a>
   </div>
 </header>
 
 <div class="wrap layout">
-  <nav class="list">
-    <input class="search" id="search" placeholder="Buscar calculadora…" oninput="filterList()">
+  <nav class="list" aria-label="Calculadoras">
+    <div class="busca">
+      <label><i class="ti ti-search" aria-hidden="true"></i><input class="search" id="search" type="search" placeholder="Buscar calculadora" oninput="filterList()" autocomplete="off" spellcheck="false" enterkeyhint="go" aria-label="Buscar calculadora"><kbd>/</kbd></label>
+      <div class="buscaInfo" id="count" aria-live="polite"></div>
+    </div>
     <div id="menu"></div>
   </nav>
   <main class="panel" id="panel"></main>
 </div>
+<div class="avisos" id="avisos" aria-live="polite"></div>
 
 <footer>
-  CalcMed é uma ferramenta de apoio. Confira os valores e use o julgamento clínico — a decisão é do profissional.<br>
+  CalcMed é uma ferramenta de apoio. Confira os valores e use o julgamento clínico: a decisão é do profissional.<br>
   © 2026 <a href="index.html">MedTech</a> · <a href="privacidade.html">Privacidade</a>
 </footer>
 
@@ -95,7 +193,7 @@ const checked=id=>{const e=document.getElementById(id);return e?e.checked:false}
 function chk(id,label){return `<label class="check"><input type="checkbox" id="${id}" onchange="run()"><span>${label}</span></label>`}
 function sel(id,opts){return `<select id="${id}" onchange="run()">${opts.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('')}</select>`}
 function fld(label,inner){return `<div class="field"><label>${label}</label>${inner}</div>`}
-function inp(id,ph='',step=''){return `<input id="${id}" type="number" ${step?'step="'+step+'"':''} placeholder="${ph}" oninput="run()">`}
+function inp(id,ph='',step=''){return `<input id="${id}" type="number" inputmode="decimal" ${step?'step="'+step+'"':''} placeholder="${ph}" oninput="run()">`}
 
 /* ---- Drogas vasoativas: dados + helpers (dropdowns dependentes) ---- */
 const VASO=[
@@ -117,7 +215,7 @@ const CALCS=[
 {cat:'Antropometria',id:'imc',name:'IMC',desc:'Índice de massa corporal (OMS).',
  fields:`<div class="grid2">${fld('Peso (kg)',inp('p'))}${fld('Altura (cm)',inp('a'))}</div>`,
  calc(){const p=num('p'),a=num('a')/100;if(!p||!a)return null;const v=p/(a*a);let c='Peso normal',b='b-green';if(v<18.5){c='Abaixo do peso';b='b-amber'}else if(v<25){c='Peso normal';b='b-green'}else if(v<30){c='Sobrepeso';b='b-amber'}else if(v<35){c='Obesidade grau I';b='b-red'}else if(v<40){c='Obesidade grau II';b='b-red'}else{c='Obesidade grau III';b='b-red'}return{val:fmt(v),unit:'kg/m²',interp:c,badge:b}}},
-{cat:'Antropometria',id:'bsa',name:'Superfície corporal (Mosteller)',desc:'Área de superfície corporal — Mosteller.',
+{cat:'Antropometria',id:'bsa',name:'Superfície corporal (Mosteller)',desc:'Área de superfície corporal pela fórmula de Mosteller.',
  fields:`<div class="grid2">${fld('Peso (kg)',inp('p'))}${fld('Altura (cm)',inp('a'))}</div>`,
  calc(){const p=num('p'),a=num('a');if(!p||!a)return null;return{val:fmt(Math.sqrt(a*p/3600),2),unit:'m²',interp:'Superfície corporal',badge:''}}},
 {cat:'Antropometria',id:'bsadb',name:'Superfície corporal (DuBois)',desc:'BSA pela fórmula de DuBois & DuBois.',
@@ -143,7 +241,7 @@ const CALCS=[
 {cat:'Sinais vitais / ECG',id:'pam',name:'Pressão arterial média',desc:'PAM = (PAS + 2×PAD)/3.',
  fields:`<div class="grid2">${fld('PAS (mmHg)',inp('s'))}${fld('PAD (mmHg)',inp('d'))}</div>`,
  calc(){const s=num('s'),d=num('d');if(!s||!d)return null;const v=(s+2*d)/3;let c='—',b='b-blue';if(v<65){c='PAM baixa (<65) — alerta';b='b-red'}return{val:fmt(v,0),unit:'mmHg',interp:c,badge:b}}},
-{cat:'Sinais vitais / ECG',id:'pafi',name:'Relação PaO₂/FiO₂',desc:'Avaliação de oxigenação (SDRA — Berlim).',
+{cat:'Sinais vitais / ECG',id:'pafi',name:'Relação PaO₂/FiO₂',desc:'Avaliação de oxigenação (SDRA, Berlim).',
  fields:`<div class="grid2">${fld('PaO₂ (mmHg)',inp('pao'))}${fld('FiO₂ (%)',inp('fio'))}</div>`,
  calc(){const pao=num('pao'),fio=num('fio');if(!pao||!fio)return null;const v=pao/(fio/100);let c='Normal',b='b-green';if(v<=100){c='SDRA grave';b='b-red'}else if(v<=200){c='SDRA moderada';b='b-red'}else if(v<=300){c='SDRA leve';b='b-amber'}return{val:fmt(v,0),unit:'',interp:c,badge:b}}},
 {cat:'Sinais vitais / ECG',id:'qtc',name:'QTc (Bazett e Fridericia)',desc:'Intervalo QT corrigido pela frequência.',
@@ -154,10 +252,10 @@ const CALCS=[
 {cat:'Nefrologia / Eletrólitos',id:'cg',name:'Clearance de creatinina (Cockcroft-Gault)',desc:'Estimativa do clearance de creatinina.',
  fields:`<div class="grid2">${fld('Idade (anos)',inp('i'))}${fld('Peso (kg)',inp('p'))}</div><div class="grid2">${fld('Creatinina (mg/dL)',inp('cr','','0.01'))}${fld('Sexo',sel('s',[['m','Masculino'],['f','Feminino']]))}</div>`,
  calc(){const i=num('i'),p=num('p'),cr=num('cr');if(!i||!p||!cr)return null;let v=((140-i)*p)/(72*cr);if(document.getElementById('s').value==='f')v*=0.85;let c='Normal',b='b-green';if(v<15){c='Falência renal';b='b-red'}else if(v<30){c='Muito reduzido';b='b-red'}else if(v<60){c='Reduzido';b='b-amber'}else if(v<90){c='Leve redução';b='b-amber'}return{val:fmt(v),unit:'mL/min',interp:c,badge:b}}},
-{cat:'Nefrologia / Eletrólitos',id:'ckdepi',name:'TFG — CKD-EPI 2021',desc:'Filtração glomerular estimada (sem raça, 2021).',
+{cat:'Nefrologia / Eletrólitos',id:'ckdepi',name:'TFG (CKD-EPI 2021)',desc:'Filtração glomerular estimada (sem raça, 2021).',
  fields:`<div class="grid2">${fld('Idade (anos)',inp('i'))}${fld('Creatinina (mg/dL)',inp('cr','','0.01'))}</div>${fld('Sexo',sel('s',[['m','Masculino'],['f','Feminino']]))}`,
  calc(){const i=num('i'),cr=num('cr');if(!i||!cr)return null;const f=document.getElementById('s').value==='f';const k=f?0.7:0.9,al=f?-0.241:-0.302;const v=142*Math.pow(Math.min(cr/k,1),al)*Math.pow(Math.max(cr/k,1),-1.200)*Math.pow(0.9938,i)*(f?1.012:1);let c='G1',b='b-green';if(v<15){c='G5 — falência';b='b-red'}else if(v<30){c='G4';b='b-red'}else if(v<45){c='G3b';b='b-amber'}else if(v<60){c='G3a';b='b-amber'}else if(v<90){c='G2';b='b-green'}return{val:fmt(v),unit:'mL/min/1,73m²',interp:'Estágio '+c,badge:b}}},
-{cat:'Nefrologia / Eletrólitos',id:'mdrd',name:'TFG — MDRD',desc:'Filtração glomerular (MDRD, sem raça).',
+{cat:'Nefrologia / Eletrólitos',id:'mdrd',name:'TFG (MDRD)',desc:'Filtração glomerular (MDRD, sem raça).',
  fields:`<div class="grid2">${fld('Idade (anos)',inp('i'))}${fld('Creatinina (mg/dL)',inp('cr','','0.01'))}</div>${fld('Sexo',sel('s',[['m','Masculino'],['f','Feminino']]))}`,
  calc(){const i=num('i'),cr=num('cr');if(!i||!cr)return null;let v=175*Math.pow(cr,-1.154)*Math.pow(i,-0.203);if(document.getElementById('s').value==='f')v*=0.742;return{val:fmt(v),unit:'mL/min/1,73m²',interp:'TFG estimada (MDRD)',badge:'b-blue'}}},
 {cat:'Nefrologia / Eletrólitos',id:'fena',name:'Fração de excreção de sódio (FENa)',desc:'Diferencia IRA pré-renal de NTA.',
@@ -181,7 +279,7 @@ const CALCS=[
 {cat:'Nefrologia / Eletrólitos',id:'nacorr',name:'Sódio corrigido (hiperglicemia)',desc:'Correção do sódio para glicemia elevada (fator 1,6).',
  fields:`<div class="grid2">${fld('Na⁺ medido (mEq/L)',inp('na'))}${fld('Glicemia (mg/dL)',inp('g'))}</div>`,
  calc(){const na=num('na'),g=num('g');if(!na||!g)return null;return{val:fmt(na+1.6*((g-100)/100)),unit:'mEq/L',interp:'Sódio corrigido',badge:'b-blue'}}},
-{cat:'Nefrologia / Eletrólitos',id:'defagua',name:'Déficit de água livre',desc:'Hipernatremia — água a repor.',
+{cat:'Nefrologia / Eletrólitos',id:'defagua',name:'Déficit de água livre',desc:'Hipernatremia: água a repor.',
  fields:`<div class="grid2">${fld('Peso (kg)',inp('p'))}${fld('Na⁺ atual (mEq/L)',inp('na'))}</div><div class="grid2">${fld('Na⁺ alvo (mEq/L)',inp('alvo'))}${fld('Sexo',sel('s',[['m','Masculino'],['f','Feminino']]))}</div>`,
  calc(){const p=num('p'),na=num('na'),alvo=num('alvo')||140;if(!p||!na)return null;const act=document.getElementById('s').value==='f'?0.5:0.6;const v=act*p*((na/alvo)-1);return{val:fmt(v,1),unit:'L',interp:'Déficit de água livre (repor lentamente)',badge:'b-blue'}}},
 {cat:'Nefrologia / Eletrólitos',id:'defbic',name:'Déficit de bicarbonato',desc:'HCO₃ a repor na acidose metabólica.',
@@ -189,7 +287,7 @@ const CALCS=[
  calc(){const p=num('p'),a=num('a'),alvo=num('alvo')||15;if(!p||isNaN(a))return null;const v=0.5*p*(alvo-a);return{val:fmt(v,0),unit:'mEq',interp:'Déficit estimado (repor parcial e reavaliar)',badge:'b-blue'}}},
 
 /* ---------------- CARDIOLOGIA & TEV ---------------- */
-{cat:'Cardiologia / TEV',id:'chads',name:'CHA₂DS₂-VA',desc:'Risco tromboembólico na fibrilação atrial (ESC 2024 — sem o ponto por sexo).',
+{cat:'Cardiologia / TEV',id:'chads',name:'CHA₂DS₂-VA',desc:'Risco tromboembólico na fibrilação atrial (ESC 2024, sem o ponto por sexo).',
  fields:`<div class="checks">${chk('c1','ICC / disfunção de VE')}${chk('c2','Hipertensão')}${chk('c3','Idade ≥ 75 anos (2 pts)')}${chk('c4','Diabetes')}${chk('c5','AVC/AIT/TE prévio (2 pts)')}${chk('c6','Doença vascular')}${chk('c7','Idade 65–74 anos')}</div>`,
  calc(){const idade=checked('c3')?2:(checked('c7')?1:0);/* faixas etárias são excludentes */let s=(checked('c1')?1:0)+(checked('c2')?1:0)+idade+(checked('c4')?1:0)+(checked('c5')?2:0)+(checked('c6')?1:0);let c='Baixo — anticoagulação não indicada',b='b-green';if(s>=2){c='Anticoagulação recomendada (ESC 2024, classe I)';b='b-red'}else if(s===1){c='Anticoagulação deve ser considerada (ESC 2024, classe IIa)';b='b-amber'}return{val:s,unit:'/ 8 pontos',interp:c,badge:b}}},
 {cat:'Cardiologia / TEV',id:'hasbled',name:'HAS-BLED',desc:'Risco de sangramento em anticoagulação.',
@@ -201,13 +299,13 @@ const CALCS=[
 {cat:'Cardiologia / TEV',id:'rcri',name:'RCRI (índice de Lee)',desc:'Risco cardíaco em cirurgia não cardíaca.',
  fields:`<div class="checks">${chk('r1','Cirurgia de alto risco')}${chk('r2','Doença arterial coronariana')}${chk('r3','Insuficiência cardíaca')}${chk('r4','Doença cerebrovascular (AVC/AIT)')}${chk('r5','Diabetes em insulina')}${chk('r6','Creatinina > 2,0 mg/dL')}</div>`,
  calc(){let s=0;for(let i=1;i<=6;i++)s+=checked('r'+i)?1:0;let c='Baixo risco',b='b-green';if(s>=3){c='Alto risco de evento cardíaco';b='b-red'}else if(s>=1){c='Risco aumentado';b='b-amber'}return{val:s,unit:'fatores',interp:c,badge:b}}},
-{cat:'Cardiologia / TEV',id:'wellstvp',name:'Wells — TVP',desc:'Probabilidade clínica de trombose venosa profunda.',
+{cat:'Cardiologia / TEV',id:'wellstvp',name:'Wells para TVP',desc:'Probabilidade clínica de trombose venosa profunda.',
  fields:`<div class="checks">${chk('w1','Câncer ativo')}${chk('w2','Paralisia/imobilização de MMII')}${chk('w3','Acamado >3d ou cirurgia <12 sem')}${chk('w4','Dor à palpação no trajeto venoso')}${chk('w5','Edema de todo o membro')}${chk('w6','Panturrilha >3 cm vs contralateral')}${chk('w7','Edema depressível (membro sintomático)')}${chk('w8','Veias colaterais superficiais')}${chk('w9','TVP prévia documentada')}${chk('w0','Diagnóstico alternativo provável (−2)')}</div>`,
  calc(){let s=0;['w1','w2','w3','w4','w5','w6','w7','w8','w9'].forEach(i=>s+=checked(i)?1:0);s+=checked('w0')?-2:0;let c='Provável (≥2)',b='b-amber';if(s<2){c='Pouco provável (<2)';b='b-green'}else{b='b-red'}return{val:s,unit:'pontos',interp:c,badge:b}}},
-{cat:'Cardiologia / TEV',id:'wellstep',name:'Wells — TEP',desc:'Probabilidade clínica de tromboembolismo pulmonar.',
+{cat:'Cardiologia / TEV',id:'wellstep',name:'Wells para TEP',desc:'Probabilidade clínica de tromboembolismo pulmonar.',
  fields:`<div class="checks">${chk('p1','Sinais clínicos de TVP (3)')}${chk('p2','TEP é o diagnóstico mais provável (3)')}${chk('p3','FC > 100 bpm (1,5)')}${chk('p4','Imobilização/cirurgia <4 sem (1,5)')}${chk('p5','TVP/TEP prévio (1,5)')}${chk('p6','Hemoptise (1)')}${chk('p7','Malignidade (1)')}</div>`,
  calc(){let s=(checked('p1')?3:0)+(checked('p2')?3:0)+(checked('p3')?1.5:0)+(checked('p4')?1.5:0)+(checked('p5')?1.5:0)+(checked('p6')?1:0)+(checked('p7')?1:0);let c='Improvável (≤4)',b='b-green';if(s>4){c='Provável (>4)';b='b-red'}return{val:fmt(s,1),unit:'pontos',interp:c+' · dois níveis: ≥5 provável',badge:b}}},
-{cat:'Cardiologia / TEV',id:'genebra',name:'Escore de Genebra revisado (TEP)',desc:'Probabilidade de TEP — variáveis objetivas.',
+{cat:'Cardiologia / TEV',id:'genebra',name:'Escore de Genebra revisado (TEP)',desc:'Probabilidade de TEP por variáveis objetivas.',
  fields:`${fld('Idade > 65 anos',sel('g1',[['0','Não'],['1','Sim (1)']]))}${fld('TVP/TEP prévio',sel('g2',[['0','Não'],['3','Sim (3)']]))}${fld('Cirurgia/fratura <1 mês',sel('g3',[['0','Não'],['2','Sim (2)']]))}${fld('Malignidade ativa',sel('g4',[['0','Não'],['2','Sim (2)']]))}${fld('Dor unilateral em MI',sel('g5',[['0','Não'],['3','Sim (3)']]))}${fld('Hemoptise',sel('g6',[['0','Não'],['2','Sim (2)']]))}${fld('Frequência cardíaca',sel('g7',[['0','<75'],['3','75–94 (3)'],['5','≥95 (5)']]))}${fld('Dor à palpação + edema unilateral',sel('g8',[['0','Não'],['4','Sim (4)']]))}`,
  calc(){let s=0;for(let i=1;i<=8;i++)s+=num('g'+i)||0;let c='Baixa (0–3)',b='b-green';if(s>=11){c='Alta (≥11)';b='b-red'}else if(s>=4){c='Intermediária (4–10)';b='b-amber'}return{val:s,unit:'pontos',interp:c,badge:b}}},
 {cat:'Cardiologia / TEV',id:'perc',name:'PERC (descartar TEP)',desc:'Em baixa probabilidade, se TODOS negativos, descarta TEP.',
@@ -319,7 +417,7 @@ const CALCS=[
  calc(){let s=(num('g')||0)+(num('v')||0)+(checked('a')?1:0)+(checked('b')?1:0)+(checked('c')?1:0);let b='b-green';if(s>=3)b='b-red';else if(s>=2)b='b-amber';return{val:s,unit:'/ 6',interp:'Maior = maior mortalidade',badge:b}}},
 
 /* ---------------- TERAPIA INTENSIVA ---------------- */
-{cat:'Terapia intensiva',id:'shock',name:'Índice de choque',desc:'FC ÷ PAS — triagem de instabilidade.',
+{cat:'Terapia intensiva',id:'shock',name:'Índice de choque',desc:'FC ÷ PAS: triagem de instabilidade.',
  fields:`<div class="grid2">${fld('FC (bpm)',inp('fc'))}${fld('PAS (mmHg)',inp('pas'))}</div>`,
  calc(){const fc=num('fc'),pas=num('pas');if(!fc||!pas)return null;const v=fc/pas;let c='Normal (0,5–0,7)',b='b-green';if(v>=0.9){c='Elevado (≥0,9) — possível choque';b='b-red'}else if(v>0.7){c='Limítrofe';b='b-amber'}return{val:fmt(v,2),unit:'',interp:c,badge:b}}},
 {cat:'Terapia intensiva',id:'apache',name:'APACHE II',desc:'Gravidade em UTI (12 variáveis + idade + doença crônica).',
@@ -360,29 +458,138 @@ const CALCS=[
  calc(){const s=(num('a1')||0)+(num('a2')||0)+(num('a3')||0)+(num('a4')||0);let c,b;if(s<=3){c='Baixa probabilidade de HIT (≈ 1%) — suspende anticoagulação não é necessária só por isso';b='b-green'}else if(s<=5){c='Probabilidade intermediária (≈ 10–14%)';b='b-amber'}else{c='Alta probabilidade de HIT (≈ 64%) — suspender heparina e anticoagular com não-heparínico';b='b-red'}return{val:s,unit:'pontos',interp:c,badge:b}}},
 ];
 
-let current=CALCS[0].id;
-document.getElementById('count').textContent='· '+CALCS.length+' calculadoras';
-function renderMenu(filter=''){
-  const m=document.getElementById('menu');m.innerHTML='';let lastCat='';
-  CALCS.filter(c=>(c.name+c.desc+c.cat).toLowerCase().includes(filter.toLowerCase())).forEach(c=>{
-    if(c.cat!==lastCat){const d=document.createElement('div');d.className='cat';d.textContent=c.cat;m.appendChild(d);lastCat=c.cat;}
-    const b=document.createElement('button');b.textContent=c.name;b.className=(c.id===current?'active':'');b.onclick=()=>{current=c.id;renderMenu(filter);renderPanel();if(window.innerWidth<=860){const el=document.getElementById('panel');window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-64,behavior:'smooth'});}else{window.scrollTo({top:0,behavior:'smooth'});}};m.appendChild(b);
-  });
+/* ---------------- interface (camada viva, 23/09/2026) ---------------- */
+/* cor e ícone de cada categoria: a cor carrega informação (de que área é a conta) */
+const CAT_VIS={
+  'Antropometria':['verde','ti-weight'],'Sinais vitais / ECG':['vermelho','ti-heart-rate-monitor'],
+  'Nefrologia / Eletrólitos':['azul','ti-droplet'],'Cardiologia / TEV':['rosa','ti-heart'],'Cardiologia avançada':['rosa','ti-heartbeat'],
+  'Emergência / Infecto':['indigo','ti-urgent'],'Gastro / Hepato':['teal','ti-salad'],'Hepatologia':['teal','ti-salad'],
+  'Hematologia':['vermelho','ti-droplet-half-2'],'Neurologia':['violeta','ti-brain'],'Neurologia / AVC':['violeta','ti-brain'],
+  'Obstetrícia / Pediatria':['cobalto','ti-baby-carriage'],'Pediatria':['cobalto','ti-baby-bottle'],
+  'TEV / Embolia':['indigo','ti-lungs'],'Terapia intensiva':['teal','ti-activity-heartbeat']};
+const catVis=cat=>CAT_VIS[cat]||['azul','ti-calculator'];
+const FAIXA={'b-green':['f-ok','ti-circle-check'],'b-amber':['f-av','ti-alert-triangle'],'b-red':['f-err','ti-alert-octagon'],'b-blue':['f-info','ti-info-circle']};
+const $id=id=>document.getElementById(id);
+const semAcento=s=>String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+const soTexto=s=>{const d=document.createElement('div');d.innerHTML=String(s==null?'':s);return d.textContent.trim();};
+const ehCelular=()=>window.matchMedia('(max-width:860px)').matches;
+function marca(txt,termo){
+  if(!termo)return txt;const n=semAcento(txt),i=n.indexOf(termo);
+  if(i<0)return txt;return txt.slice(0,i)+'<mark>'+txt.slice(i,i+termo.length)+'</mark>'+txt.slice(i+termo.length);
 }
-function filterList(){renderMenu(document.getElementById('search').value)}
+function aviso(msg,tipo){
+  const box=$id('avisos');box.innerHTML='';const t=document.createElement('div');
+  t.className='toast'+(tipo==='erro'?' erro':'');t.innerHTML='<i class="ti '+(tipo==='erro'?'ti-alert-triangle':'ti-check')+'" aria-hidden="true"></i>'+msg;
+  box.appendChild(t);clearTimeout(aviso._t);aviso._t=setTimeout(()=>{t.remove()},2600);
+}
+
+const hashId=()=>{const h=decodeURIComponent(location.hash.slice(1));return CALCS.some(c=>c.id===h)?h:null;};
+let current=hashId()||CALCS[0].id;
+let ultimoRes=null, ultimaFaixa='';
+let aberto=!!hashId();   /* no celular a lista só marca a conta depois que ela foi aberta */
+const dica=()=>window.matchMedia('(pointer:fine)').matches?' · Enter abre a primeira':'';
+
+function renderMenu(filter=''){
+  const m=$id('menu');const termo=semAcento(filter.trim());
+  const lista=CALCS.filter(c=>semAcento(c.name+' '+c.desc+' '+c.cat).includes(termo));
+  $id('count').textContent=termo?(lista.length?lista.length+(lista.length===1?' calculadora encontrada':' calculadoras encontradas')+dica():''):CALCS.length+' calculadoras em '+Object.keys(CAT_VIS).length+' áreas';
+  if(!lista.length){
+    m.innerHTML='<div class="semRes"><i class="ti ti-search-off" aria-hidden="true"></i><b>Nada encontrado</b><span>Tente outro termo, como “renal”, “sepse” ou “AVC”.</span><button type="button" onclick="limparBusca()">Limpar busca</button></div>';
+    return;
+  }
+  const porCat={};lista.forEach(c=>{porCat[c.cat]=(porCat[c.cat]||0)+1;});
+  let html='',lastCat='';
+  lista.forEach(c=>{
+    if(c.cat!==lastCat){const v=catVis(c.cat);html+=`<div class="cat" style="--c:var(--c-${v[0]})"><span class="ci"><i class="ti ${v[1]}" aria-hidden="true"></i></span>${c.cat}<small>${porCat[c.cat]}</small></div>`;lastCat=c.cat;}
+    const at=c.id===current&&(aberto||!ehCelular());
+    html+=`<button type="button" data-id="${c.id}" class="${at?'active':''}"${at?' aria-current="true"':''}>${marca(c.name,termo)}</button>`;
+  });
+  m.innerHTML=html;
+}
+function filterList(){renderMenu($id('search').value)}
+function limparBusca(){const s=$id('search');s.value='';renderMenu('');s.focus();}
+$id('menu').addEventListener('click',e=>{const b=e.target.closest('button[data-id]');if(b)abrir(b.dataset.id);});
+$id('menu').addEventListener('keydown',e=>{
+  if(e.key!=='ArrowDown'&&e.key!=='ArrowUp')return;
+  const bs=[...$id('menu').querySelectorAll('button[data-id]')];const i=bs.indexOf(document.activeElement);if(i<0)return;
+  e.preventDefault();const alvo=e.key==='ArrowDown'?bs[i+1]:bs[i-1];if(alvo)alvo.focus();else if(e.key==='ArrowUp')$id('search').focus();
+});
+$id('search').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){const b=$id('menu').querySelector('button[data-id]');if(b){e.preventDefault();abrir(b.dataset.id);}}
+  else if(e.key==='ArrowDown'){const b=$id('menu').querySelector('button[data-id]');if(b){e.preventDefault();b.focus();}}
+  else if(e.key==='Escape'){if(e.target.value){e.preventDefault();limparBusca();}else e.target.blur();}
+});
+
+function abrir(id,{empilha=true}={}){
+  current=id;aberto=true;renderMenu($id('search').value);renderPanel();
+  if(ehCelular()){
+    document.body.classList.add('ver-calc');
+    try{empilha?history.pushState({calc:id},'','#'+id):history.replaceState({calc:id},'','#'+id);}catch(e){}
+    window.scrollTo(0,0);
+  }else{
+    try{history.replaceState(null,'','#'+id);}catch(e){}
+    window.scrollTo({top:0,behavior:'smooth'});
+    const f=$id('panel').querySelector('input,select');if(f)f.focus({preventScroll:true});
+  }
+}
+function irLista(focar){
+  if(ehCelular()&&history.state&&history.state.calc){history.back();return;}
+  document.body.classList.remove('ver-calc');
+  try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
+  if(focar){window.scrollTo(0,0);if(!ehCelular())$id('search').focus();}
+}
+window.addEventListener('popstate',()=>{
+  const id=hashId();
+  if(id){current=id;renderMenu($id('search').value);renderPanel();document.body.classList.add('ver-calc');}
+  else{document.body.classList.remove('ver-calc');renderMenu($id('search').value);}
+  window.scrollTo(0,0);
+});
+
 function renderPanel(){
-  const c=CALCS.find(x=>x.id===current);const p=document.getElementById('panel');
-  p.innerHTML=`<h1>${c.name}</h1><div class="desc">${c.desc}</div>${c.fields}<div id="res"></div>
-   <div class="disclaimer"><i class="ti ti-alert-triangle"></i> Ferramenta de apoio à decisão. Confira os valores e use o julgamento clínico — a responsabilidade pela conduta é do profissional.</div>`;
+  const c=CALCS.find(x=>x.id===current);const p=$id('panel');const v=catVis(c.cat);
+  ultimoRes=null;ultimaFaixa='';
+  p.innerHTML=`<div class="calcTopo" style="--c:var(--c-${v[0]})">
+     <button type="button" class="voltarLista" onclick="irLista()"><i class="ti ti-arrow-left" aria-hidden="true"></i> Calculadoras</button>
+     <button type="button" class="limpar" onclick="limparCampos()" title="Apagar os valores digitados"><i class="ti ti-eraser" aria-hidden="true"></i> Limpar</button>
+     <div class="calcTit"><span class="selo"><i class="ti ${v[1]}" aria-hidden="true"></i></span><div><small>${c.cat}</small><h1>${c.name}</h1><div class="desc">${c.desc}</div></div></div>
+   </div>
+   <div class="campos">${c.fields}</div>
+   <div id="res" aria-live="polite"></div>
+   <div class="disclaimer"><i class="ti ti-info-circle" aria-hidden="true"></i><span>Ferramenta de apoio à decisão. Confira os valores e use o julgamento clínico: a responsabilidade pela conduta é do profissional.</span></div>`;
   run();
 }
+function limparCampos(){renderPanel();const f=$id('panel').querySelector('input,select');if(f)f.focus();aviso('Campos limpos');}
 function run(){
   const c=CALCS.find(x=>x.id===current);let r=null;try{r=c.calc();}catch(e){r=null;}
-  const res=document.getElementById('res');if(!res)return;
-  if(!r){res.innerHTML='<div class="result"><div class="val">—</div><div class="note">Preencha os campos acima.</div></div>';return;}
-  res.innerHTML=`<div class="result"><div class="val">${r.val} <span class="unit">${r.unit}</span></div>${r.badge?`<div><span class="badge ${r.badge}">${r.interp}</span></div>`:`<div class="interp">${r.interp}</div>`}</div>`;
+  const res=$id('res');if(!res)return;
+  if(!r){ultimoRes=null;ultimaFaixa='';res.innerHTML='<div class="result vazio"><span class="resIc"><i class="ti ti-calculator" aria-hidden="true"></i></span><div class="vzTxt"><b>Resultado</b><span>Preencha os campos acima para calcular.</span></div></div>';return;}
+  ultimoRes=r;
+  const fx=FAIXA[r.badge]||['f-neutro','ti-calculator'];
+  const pula=fx[0]!==ultimaFaixa;ultimaFaixa=fx[0];
+  res.innerHTML=`<div class="result ${fx[0]}${pula?' pula':''}">
+    <span class="resIc"><i class="ti ${fx[1]}" aria-hidden="true"></i></span>
+    <span class="resRot">Resultado</span>
+    <div class="val">${r.val} <span class="unit">${r.unit}</span></div>
+    ${r.interp?`<div class="interp">${r.interp}</div>`:''}
+    <button type="button" class="copiar" onclick="copiarRes()" title="Copiar para colar na evolução"><i class="ti ti-copy" aria-hidden="true"></i> Copiar</button>
+  </div>`;
 }
+function copiarRes(){
+  if(!ultimoRes)return;const c=CALCS.find(x=>x.id===current);
+  const txt=(c.name+': '+soTexto(ultimoRes.val)+' '+soTexto(ultimoRes.unit)).trim()+(ultimoRes.interp?' ('+soTexto(ultimoRes.interp)+')':'');
+  const ok=()=>aviso('Resultado copiado'),falha=()=>aviso('Não consegui copiar. Selecione o texto e copie.','erro');
+  const reserva=()=>{try{const t=document.createElement('textarea');t.value=txt;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();const r=document.execCommand('copy');t.remove();r?ok():falha();}catch(e){falha();}};
+  if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(txt).then(ok,reserva);else reserva();
+}
+/* atalhos: "/" busca, Esc volta à lista no celular */
+document.addEventListener('keydown',e=>{
+  const t=e.target,digitando=t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable);
+  if(e.key==='/'&&!digitando&&!e.metaKey&&!e.ctrlKey&&!e.altKey){e.preventDefault();if(ehCelular()&&document.body.classList.contains('ver-calc'))irLista();$id('search').focus();}
+  else if(e.key==='Escape'&&!digitando&&ehCelular()&&document.body.classList.contains('ver-calc'))irLista();
+});
 renderMenu();renderPanel();
+if(hashId()&&ehCelular())document.body.classList.add('ver-calc');
+{const a=$id('menu').querySelector('button.active'),l=document.querySelector('.list');if(a&&hashId()&&!ehCelular())l.scrollTop=a.offsetTop-l.clientHeight/2;}
 </script>
 </body>
 </html>

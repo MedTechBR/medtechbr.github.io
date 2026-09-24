@@ -1,91 +1,206 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-astra="guiainterno">
+<html lang="pt-BR" data-viva="guiainterno" data-viva-escuro>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Guia do Interno — sobrevivência prática na enfermaria e no plantão | MedTech</title>
+<title>Guia do Interno · Sobrevivência prática na enfermaria e no plantão | MedTech</title>
 <meta name="description" content="Guia do Interno: handbook prático para internos e R1 — admissão, evolução SOAP, prescrição segura, plantão e intercorrências, passagem de plantão (SBAR), procedimentos, interpretação rápida de exames e comunicação. Com mentor por IA.">
-<meta name="theme-color" content="#000000">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
+<meta name="theme-color" content="#F5F6FB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1017" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="vendor/tabler/tabler-icons.min.css?v=3.48.0">
 <link rel="icon" type="image/png" href="favicon.png">
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"guiainterno",name:"Guia do Interno"};</script>
-<script type="module" src="_mtauth.js?v=25"></script>
-<style>
-:root{--primary:#8A5E0C;--primary-dark:#6E4B09;--ink:#23272E;--bg:#FAFAF8;--soft:rgba(168,115,15,.12);--surface:#FFFFFF;--panel2:#F1F1EC;--line:#E8E8E2;--line-strong:#DDDDD5;--muted:#5E646B;--dim:#767C84;--glow:rgba(168,115,15,.42);--disp:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace;--shadow:0 1px 3px rgba(20,24,30,.07)}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:-.011em;color:var(--ink);background-color:#FAFAF8;line-height:1.55}
-input:-webkit-autofill,input:-webkit-autofill:focus,textarea:-webkit-autofill{-webkit-box-shadow:0 0 0 100px #FFFFFF inset;-webkit-text-fill-color:#23272E;caret-color:#23272E;transition:background-color 99999s}
-header{background:rgba(255,255,255,.85);backdrop-filter:blur(12px) saturate(140%);-webkit-backdrop-filter:blur(12px) saturate(140%);color:var(--ink);border-bottom:1px solid var(--line);padding:14px 0;position:sticky;top:0;z-index:20}
-.wrap{max-width:880px;margin:0 auto;padding:0 18px}
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.logo{display:flex;align-items:center;gap:11px;font-weight:700;font-size:20px;cursor:pointer;font-family:var(--disp)}
-.logo .mark{width:36px;height:36px;border-radius:10px;background:var(--primary);color:#fff;display:grid;place-items:center;flex:0 0 auto;font-size:20px}
-.logo small{display:block;font-weight:400;font-size:12px;color:var(--muted);letter-spacing:0}
-.search{margin-top:12px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;display:flex;align-items:center;gap:8px;padding:11px 14px;color:var(--muted)}
-.search input{border:none;outline:none;font-family:inherit;font-size:15px;width:100%;color:var(--ink)}
-main{padding:20px 0 70px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:13px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px;cursor:pointer;text-align:left;display:flex;gap:13px;align-items:flex-start;transition:.15s}
-.card:hover{border-color:var(--primary);transform:translateY(-1px)}
-.card .ic{width:40px;height:40px;border-radius:11px;background:var(--soft);color:var(--primary);display:grid;place-items:center;font-size:21px;flex:0 0 auto}
-.card .ttl{display:block;font-weight:600;font-size:15px}
-.card .sub{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
-.sec-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:18px 2px 10px;font-family:var(--mono)}
-.hero{background:var(--soft);border:1px solid rgba(168,115,15,.25);border-radius:16px;padding:18px;margin-bottom:18px;display:flex;gap:13px;align-items:flex-start}
-.hero .ic{font-size:24px;color:var(--primary)}
-.hero b{font-size:15px}.hero p{color:var(--muted);font-size:13px;margin-top:3px}
-/* content view */
-.view{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:26px}
-.back{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--primary);font-weight:600;font-family:inherit;font-size:14px;cursor:pointer;margin-bottom:14px}
-.view h1{font-size:22px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-family:var(--disp)}
-.view h1 .ti{color:var(--primary)}
-.view h3{font-size:15px;margin:18px 0 7px;color:var(--primary);font-family:var(--disp)}
-.view p{font-size:14.5px;margin-bottom:8px}
-.view ul,.view ol{margin:4px 0 10px 20px;font-size:14.5px}
-.view li{margin-bottom:5px}
-.view b{color:var(--ink)}
-.tip{background:rgba(29,122,70,.12);border:1px solid rgba(29,122,70,.25);border-radius:11px;padding:12px 15px;font-size:13.5px;margin:12px 0;color:#1D7A46}
-.warn{background:rgba(163,115,10,.12);border:1px solid rgba(163,115,10,.25);border-radius:11px;padding:12px 15px;font-size:13.5px;margin:12px 0;color:#A3730A}
-.xref{background:var(--soft);border:1px solid rgba(168,115,15,.25);border-radius:11px;padding:12px 15px;font-size:13.5px;margin:12px 0}
-.xref a{color:var(--primary);font-weight:600;text-decoration:none}
-/* IA */
-.iabox{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:22px;margin-top:18px}
-.iabox h2{font-size:16px;display:flex;align-items:center;gap:9px;margin-bottom:4px;font-family:var(--disp)}
-.iabox h2 .ti{color:var(--primary)}
-.iabox .hint{color:var(--muted);font-size:13px;margin-bottom:12px}
-textarea{width:100%;padding:12px 14px;border:1px solid var(--line-strong);border-radius:11px;font-size:15px;font-family:inherit;min-height:70px;resize:vertical;background:var(--panel2);color:var(--ink)}
-textarea:focus{outline:none;border-color:var(--primary)}
-.btn{display:inline-flex;align-items:center;gap:7px;border:none;border-radius:10px;font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;padding:11px 17px;background:var(--primary);color:#fff;margin-top:10px}
-.btn:hover{background:var(--primary-dark)}.btn:disabled{opacity:.55}
-.btn-light{background:var(--soft);color:var(--primary-dark);padding:9px 14px}
-.iaout{white-space:pre-wrap;font-size:14px;line-height:1.6;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:16px;margin-top:13px}
-.spin{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
-@keyframes sp{to{transform:rotate(360deg)}}
-.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
-.chip{background:var(--soft);border:1px solid rgba(168,115,15,.25);color:var(--primary-dark);border-radius:999px;padding:6px 12px;font-size:12.5px;cursor:pointer}
-.disclaimer{background:rgba(163,115,10,.12);border:1px solid rgba(163,115,10,.25);color:#A3730A;border-radius:12px;padding:12px 16px;font-size:12.5px;margin-top:16px}
-footer{text-align:center;color:var(--muted);font-size:13px;padding:14px 18px 30px}
-footer a{color:var(--primary-dark);font-weight:600;text-decoration:none}
-</style>
+<script type="module" src="_mtauth.js?v=26"></script>
 <style>/* mt-a11y-16px */@media(max-width:680px){input,select,textarea{font-size:16px}}</style>
 <link rel="stylesheet" href="_mttokens.css?v=3">
-<link rel="stylesheet" href="_mtastra.css?v=5">
+<link rel="stylesheet" href="_mtviva.css?v=1">
+<style id="viva-guiainterno">
+/* ============================================================
+   Guia do Interno, camada viva (23/09/2026). Modelo: ClínicaMed cm-v97.
+   Fica DEPOIS do _mtviva.css: é a camada do próprio app (vence pela ordem).
+   Duas seções: Capítulos (buscar → ler → próximo) e Mentor (perguntar à IA).
+   Âmbar com texto escuro por cima; a tinta âmbar escurece para passar AA no branco.
+   ============================================================ */
+html[data-viva="guiainterno"] body{--acInk:color-mix(in srgb,var(--ac) 55%,var(--tinta))}
+@media (prefers-color-scheme:dark){html[data-viva="guiainterno"][data-viva-escuro] body{--acInk:color-mix(in srgb,var(--ac) 72%,#fff)}}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:84px}
+body{font-size:15px;line-height:1.55;color:var(--tinta);min-height:100vh;display:flex;flex-direction:column}
+.wrap{width:100%;max-width:920px;margin:0 auto;padding:0 20px}
+[hidden]{display:none!important}
+
+/* cabeçalho de uma linha: marca, abas, portal */
+header{position:sticky;top:0;z-index:30}
+.top{display:flex;align-items:center;gap:14px;min-height:64px;max-width:1120px}
+.logo{display:flex;align-items:center;gap:11px;font-weight:700;font-size:19px;letter-spacing:-.02em;color:var(--tinta);text-decoration:none;flex:0 0 auto}
+.logo .mark{width:36px;height:36px;display:grid;place-items:center;font-size:20px;flex:0 0 auto}
+.navtabs{display:flex;gap:4px;margin-left:auto;background:var(--sup2);border-radius:999px;padding:4px}
+.navtab{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 18px;border:0;border-radius:999px;background:none;
+  font:inherit;font-size:14px;font-weight:600;color:var(--tinta2);cursor:pointer;text-decoration:none;transition:background-color .2s,color .2s,transform .18s var(--mola)}
+.navtab:hover{color:var(--tinta);background:var(--sup)}
+.navtab.on{background:var(--ac);color:var(--acTxt);box-shadow:0 6px 14px color-mix(in srgb,var(--ac) 30%,transparent)}
+.navtab .ti{font-size:18px}
+.sair{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 16px;border-radius:999px;background:var(--sup2);color:var(--tinta);
+  font-weight:600;font-size:14px;text-decoration:none;flex:0 0 auto;transition:background-color .2s,color .2s,transform .18s var(--mola)}
+.sair:hover{background:var(--acSup);color:var(--acInk)}
+.sair:active{transform:scale(.96)}
+
+main{padding:24px 0 64px;flex:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 20px;border:0;border-radius:999px;font:inherit;font-weight:600;font-size:14.5px;cursor:pointer;text-decoration:none}
+.btn-light{background:var(--sup);color:var(--tinta);border:1.5px solid var(--fioF)}
+.btn-light:hover{background:var(--acSup);border-color:color-mix(in srgb,var(--ac) 45%,var(--fio));color:var(--acInk)}
+.btn:disabled{cursor:default}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* abertura dos capítulos */
+.abre{position:relative;overflow:hidden;border-radius:28px;padding:26px 28px;margin-bottom:18px;background:var(--ac);color:var(--acTxt);
+  box-shadow:0 18px 40px color-mix(in srgb,var(--ac) 26%,transparent)}
+.abre .bola{position:absolute;border-radius:50%;background:#fff;opacity:.16;pointer-events:none}
+.abre .b1{width:220px;height:220px;right:-60px;top:-90px;animation:flutua 9s ease-in-out infinite}
+.abre .b2{width:110px;height:110px;right:150px;bottom:-60px;opacity:.12;animation:flutua 7s ease-in-out infinite reverse}
+.abre small{position:relative;display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;background:rgba(35,21,0,.1);padding:5px 12px;border-radius:999px}
+.abre h1{position:relative;font-size:24px;line-height:1.2;margin:12px 0 6px;font-weight:750;letter-spacing:-.03em;color:var(--acTxt);max-width:30ch}
+/* a folha compartilhada pinta h1 com --tinta (mais específica): no escuro isso dava texto claro sobre a cor */
+html[data-viva="guiainterno"] body .abre h1{color:var(--acTxt)}
+.abre p{position:relative;font-size:14.5px;max-width:56ch}
+.abre .abreAcoes{position:relative;display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.abre .btn{background:var(--acTxt);color:var(--ac);box-shadow:0 8px 18px rgba(35,21,0,.22)}
+.abre .btn:hover{transform:translateY(-1px)}
+.abre .btn.fantasma{background:rgba(35,21,0,.1);color:var(--acTxt);box-shadow:none}
+
+/* busca */
+.bsearch{position:relative;display:block;margin:0 0 6px}
+.bsearch .ti-search{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:19px;color:var(--tinta2);pointer-events:none}
+html[data-viva="guiainterno"] body .bsearch input{width:100%;height:50px;padding:0 48px 0 46px;font-size:16px;border-radius:999px;box-shadow:var(--sombraV)!important}
+.bsearch input::-webkit-search-cancel-button{-webkit-appearance:none}
+.bsearch kbd{position:absolute;right:14px;top:50%;transform:translateY(-50%);font:600 12px/1 'Inter',system-ui,sans-serif;color:var(--tinta2);background:var(--sup2);border:1px solid var(--fioF);border-radius:7px;padding:4px 7px;pointer-events:none}
+.bsearch input:focus~kbd,.bsearch input:not(:placeholder-shown)~kbd{display:none}
+.bInfo{font-size:13px;color:var(--tinta2);padding:4px 8px 14px}
+
+/* capítulos */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.cap{--c:var(--ac);display:flex;gap:14px;align-items:flex-start;text-align:left;background:var(--sup);border:1px solid var(--fio);border-radius:22px;box-shadow:var(--sombraV);padding:16px;cursor:pointer;
+  font:inherit;color:var(--tinta);transition:transform .2s var(--mola),box-shadow .2s,border-color .2s}
+.cap:hover{transform:translateY(-4px);box-shadow:var(--sombraM);border-color:color-mix(in srgb,var(--c) 35%,var(--fio))}
+.cap:active{transform:scale(.98)}
+.cap .ic{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;font-size:22px;
+  background:color-mix(in srgb,var(--c) 14%,var(--sup));color:color-mix(in srgb,var(--c) 80%,var(--tinta));transition:transform .25s var(--mola)}
+.cap:hover .ic{transform:scale(1.08) rotate(-6deg)}
+.cap .ttl{display:block;font-weight:650;font-size:15.5px;line-height:1.3}
+.cap .sub{display:block;color:var(--tinta2);font-size:13.5px;margin-top:3px;line-height:1.4}
+.vazio{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:36px 16px;color:var(--tinta2);
+  background:var(--sup);border:1px dashed var(--fioF);border-radius:22px}
+.vazio .ti{font-size:32px}
+.vazio b{color:var(--tinta);font-size:15.5px}
+.vazio .btn{margin-top:8px}
+
+/* leitura de um capítulo */
+.voltar{display:inline-flex;align-items:center;gap:7px;min-height:42px;padding:0 16px 0 12px;border-radius:999px;border:0;background:var(--sup2);color:var(--tinta);font:inherit;font-weight:600;font-size:14px;cursor:pointer;margin-bottom:14px}
+.voltar:hover{background:var(--acSup);color:var(--acInk)}
+.view{--c:var(--ac);--primary:var(--acInk);background:var(--sup);border:1px solid var(--fio);border-radius:26px;box-shadow:var(--sombraV);padding:28px 30px}
+.vTopo{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.vTopo .selo{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;background:var(--c);color:#fff;font-size:26px;
+  box-shadow:0 10px 22px color-mix(in srgb,var(--c) 32%,transparent);animation:pop .5s var(--mola) both}
+.vTopo small{display:block;font-size:13px;font-weight:600;color:color-mix(in srgb,var(--c) 70%,var(--tinta))}
+.view h1{font-size:24px;line-height:1.2;letter-spacing:-.025em}
+.view h3{font-size:16.5px;margin:22px 0 8px;color:color-mix(in srgb,var(--c) 72%,var(--tinta));letter-spacing:-.01em}
+.view p{font-size:15px;margin-bottom:10px;line-height:1.65}
+.view ul,.view ol{margin:4px 0 12px 22px;font-size:15px;line-height:1.6}
+.view li{margin-bottom:5px}
+.view b{color:var(--tinta)}
+.view a{color:var(--acInk);font-weight:600;text-decoration:none;border-bottom:1.5px solid color-mix(in srgb,var(--ac) 45%,transparent)}
+.view a:hover{border-bottom-color:var(--ac)}
+.view table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;display:block;overflow-x:auto}
+.view th,.view td{border:1px solid var(--fio);padding:8px 10px;text-align:left;vertical-align:top}
+.view th{background:var(--acSup);color:var(--acInk)}
+.tip,.warn,.xref{border-radius:16px;padding:12px 16px;font-size:14px;margin:14px 0;color:var(--tinta);line-height:1.55}
+.tip{background:var(--okSup);border-left:4px solid var(--okV)}
+.warn{background:var(--avSup);border-left:4px solid var(--avV)}
+.xref{background:var(--acSup);border-left:4px solid var(--ac)}
+.xref .ti{color:var(--acInk)}
+.aviso{display:flex;gap:10px;align-items:flex-start;margin-top:20px;padding:12px 16px;border-radius:16px;background:var(--sup2);color:var(--tinta2);font-size:13.5px;line-height:1.5}
+.aviso .ti{font-size:18px;flex:0 0 auto;margin-top:1px}
+.vAcoes{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.navCap{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.navCap button{display:flex;flex-direction:column;gap:2px;text-align:left;padding:14px 16px;border-radius:18px;border:1px solid var(--fio);background:var(--sup);font:inherit;color:var(--tinta);cursor:pointer;
+  box-shadow:var(--sombraV);transition:transform .2s var(--mola),border-color .2s}
+.navCap button:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--ac) 40%,var(--fio))}
+.navCap small{font-size:12.5px;color:var(--tinta2);display:flex;align-items:center;gap:5px}
+.navCap b{font-size:14.5px;font-weight:650}
+.navCap .prox{text-align:right;align-items:flex-end;grid-column:2}
+
+/* mentor */
+.mentor{background:var(--sup);border:1px solid var(--fio);border-radius:26px;box-shadow:var(--sombraV);padding:26px 28px}
+.mTopo{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+.mTopo .selo{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;background:var(--ac);color:var(--acTxt);font-size:26px;
+  box-shadow:0 10px 22px color-mix(in srgb,var(--ac) 30%,transparent)}
+.mTopo h1{font-size:22px;letter-spacing:-.025em;line-height:1.2}
+.mTopo p{color:var(--tinta2);font-size:14px;margin-top:2px}
+.rotulo{display:block;font-weight:600;font-size:14px;margin:18px 0 8px}
+html[data-viva="guiainterno"] body #iaq{width:100%;min-height:96px;padding:12px 14px;font-size:16px;line-height:1.5;resize:vertical;border-radius:18px}
+.sugs{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.sugs button{min-height:40px;padding:0 15px;border-radius:999px;border:1.5px solid var(--fioF);background:var(--sup);font:inherit;font-size:13.5px;font-weight:500;color:var(--tinta);cursor:pointer;
+  transition:background-color .15s,border-color .15s,color .15s,transform .18s var(--mola)}
+.sugs button:hover{border-color:var(--ac);background:var(--acSup);color:var(--acInk)}
+.sugs button:active{transform:scale(.96)}
+.linhaBt{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:16px}
+.linhaBt .dica{font-size:12.5px;color:var(--tinta2)}
+.iaErro{display:flex;gap:10px;align-items:flex-start;margin-top:14px;padding:12px 14px;border-radius:14px;background:var(--errSup);color:color-mix(in srgb,var(--errV) 66%,var(--tinta));font-size:14px}
+.iaErro .ti{font-size:18px;flex:0 0 auto;margin-top:1px}
+.iaout{white-space:pre-wrap;font-size:15px;line-height:1.65;background:var(--sup2);border-radius:18px;padding:18px;margin-top:16px;color:var(--tinta);animation:sobeP .45s var(--suave) both}
+.iaAcoes{display:flex;gap:10px;margin-top:10px}
+
+footer{text-align:center;font-size:13px;padding:10px 20px 34px;line-height:1.7}
+footer a{font-weight:600;text-decoration:none}
+.avisos{position:fixed;left:0;right:0;bottom:24px;z-index:60;display:flex;justify-content:center;pointer-events:none;padding:0 16px}
+html[data-viva="guiainterno"] body .toast{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;font-size:14px;font-weight:600}
+
+@keyframes pop{0%{transform:scale(.5)}100%{transform:scale(1)}}
+@keyframes sobeP{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes flutua{0%,100%{transform:translate(0,0)}50%{transform:translate(-14px,12px)}}
+
+@media (hover:none),(pointer:coarse){.bsearch kbd,.linhaBt .dica{display:none}html[data-viva="guiainterno"] body .bsearch input{padding-right:16px}}
+/* celular: abas na barra inferior, ícone ativo em pílula */
+@media (max-width:640px){
+  /* sem desfoque no cabeçalho: ele prenderia a barra inferior (position:fixed) dentro dele */
+  html[data-viva="guiainterno"] body header{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--sup)!important}
+  .wrap{padding:0 16px}
+  .top{gap:10px}
+  .sair{margin-left:auto;min-height:44px}
+  .navtabs{position:fixed;left:0;right:0;bottom:0;z-index:40;margin:0;border-radius:0;padding:6px 12px calc(6px + env(safe-area-inset-bottom));gap:6px;
+    background:color-mix(in srgb,var(--sup) 96%,transparent);border-top:1px solid var(--fio);box-shadow:0 -6px 20px rgba(20,24,39,.06)}
+  .navtab{flex:1;flex-direction:column;gap:3px;min-height:54px;padding:4px 0;font-size:12px;background:none!important;box-shadow:none!important;color:var(--tinta2)}
+  .navtab .ti{width:52px;height:30px;border-radius:999px;display:grid;place-items:center;font-size:20px;transition:background-color .2s,color .2s,transform .25s var(--mola)}
+  .navtab.on{color:var(--acInk)}
+  .navtab.on .ti{background:var(--ac);color:var(--acTxt);transform:translateY(-1px)}
+  main{padding:16px 0 24px}
+  .abre{padding:22px 20px;border-radius:24px}
+  .abre h1{font-size:21px}
+  .view,.mentor{padding:20px 18px;border-radius:22px}
+  .view h1{font-size:21px}
+  .navCap{grid-template-columns:1fr}
+  .navCap .prox{grid-column:1}
+  .avisos{bottom:calc(84px + env(safe-area-inset-bottom))}
+  footer{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+}
+@media (prefers-reduced-motion:reduce){.abre .bola,.vTopo .selo,.iaout{animation:none!important}}
+</style>
 </head>
 <body>
-<header><div class="wrap">
-  <div class="top">
-    <div class="logo" onclick="home()"><span class="mark"><i class="ti ti-school" aria-hidden="true"></i></span><div>Guia do Interno<small>Sobrevivência na enfermaria e no plantão · MedTech</small></div></div>
-    <a href="app.html" class="btn btn-light"><i class="ti ti-apps"></i> Portal</a>
-  </div>
-  <div class="search"><i class="ti ti-search"></i><input id="q" placeholder="Buscar tema: prescrição, gasometria, febre, SBAR…" oninput="filter(this.value)"></div>
+<header><div class="wrap top">
+  <a class="logo" href="#" onclick="ir('capitulos');return false" aria-label="Guia do Interno: capítulos"><span class="mark"><i class="ti ti-school" aria-hidden="true"></i></span><span>Guia do Interno</span></a>
+  <nav class="navtabs" aria-label="Seções">
+    <a class="navtab on" id="ntCap" href="#" onclick="ir('capitulos');return false" aria-current="page"><i class="ti ti-book-2" aria-hidden="true"></i><span>Capítulos</span></a>
+    <a class="navtab" id="ntMen" href="#mentor" onclick="ir('mentor');return false"><i class="ti ti-message-chatbot" aria-hidden="true"></i><span>Mentor</span></a>
+  </nav>
+  <a class="sair" href="app.html" title="Voltar ao portal MedTech"><i class="ti ti-arrow-left" aria-hidden="true"></i><span>Portal</span></a>
 </div></header>
 
 <main class="wrap" id="main"></main>
-<footer>Guia do Interno · <a href="app.html">Portal MedTech</a> — conteúdo educacional e de apoio; sempre sob supervisão. Para condutas/doses atuais, use o CondutAI/ATBguia.</footer>
+<div class="avisos" id="avisos" aria-live="polite"></div>
+<footer>Guia do Interno · <a href="app.html">Portal MedTech</a>. Conteúdo educacional e de apoio, sempre sob supervisão. Para condutas e doses atuais, use o <a href="condutai.html">CondutAI</a> e o <a href="atbguia.html">ATBguia</a>.</footer>
 
 <script>
 const SEC=[
@@ -204,51 +319,118 @@ const SEC=[
 <div class="tip">Use o <a href="foco.html" style="color:var(--primary);font-weight:600">Foco</a> para organizar tarefas/agenda do dia.</div>`},
 ];
 
+/* ---------------- interface (camada viva, 23/09/2026) ---------------- */
 const main=document.getElementById('main');
+const CORES=['azul','verde','violeta','laranja','ciano','rosa','indigo','teal','cobalto','terracota'];
+const corDe=i=>'var(--c-'+CORES[i%CORES.length]+')';
+const semAc=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+const _txt=new Map();
+function textoDe(s){if(!_txt.has(s.id)){const d=document.createElement('div');d.innerHTML=s.html;_txt.set(s.id,d.textContent);}return _txt.get(s.id);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function aviso(msg,tipo){const box=document.getElementById('avisos');box.innerHTML='';const t=document.createElement('div');t.className='toast'+(tipo==='erro'?' erro':'');
+  t.innerHTML='<i class="ti '+(tipo==='erro'?'ti-alert-triangle':'ti-check')+'" aria-hidden="true"></i>'+msg;box.appendChild(t);clearTimeout(aviso._t);aviso._t=setTimeout(()=>t.remove(),2800);}
+/* o que o mentor já tem (pergunta e resposta) sobrevive à troca de tela */
+const mentorEstado={q:'',out:''};
+let busca='';
+
+function marcarAba(v){
+  [['ntCap','capitulos'],['ntMen','mentor']].forEach(([id,nome])=>{const a=document.getElementById(id);const on=(v===nome);a.classList.toggle('on',on);
+    if(on)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+}
+/* rotas pelo endereço (#cap-admissao, #mentor): o voltar do celular funciona */
+function ir(v,id){
+  guardarMentor();
+  const h=v==='mentor'?'#mentor':(v==='cap'&&id?'#cap-'+id:'');
+  if(location.hash!==h){if(h)location.hash=h;else{history.pushState(null,'',location.pathname+location.search);rota();}}
+  else rota();
+}
+function rota(){
+  const h=decodeURIComponent(location.hash.slice(1));
+  if(h==='mentor'){renderMentor();marcarAba('mentor');}
+  else if(h.indexOf('cap-')===0&&SEC.some(s=>s.id===h.slice(4))){renderCap(h.slice(4));marcarAba('capitulos');}
+  else{home(busca);marcarAba('capitulos');}
+  window.scrollTo(0,0);
+}
+window.addEventListener('hashchange',()=>{guardarMentor();rota();});
+window.addEventListener('popstate',()=>{if(!location.hash)rota();});
+
 function home(q){
-  const list = q ? SEC.filter(s=>(s.t+' '+s.s+' '+s.html).toLowerCase().includes(q.toLowerCase())) : SEC;
-  const _iaq=(document.getElementById('iaq')||{}).value, _iaOut=(document.getElementById('iaOut')||{}).innerHTML;
-  main.innerHTML=`
-   <div class="hero"><span class="ic"><i class="ti ti-book-2"></i></span><div><b>Seu manual de bolso do internato</b><p>Como admitir, evoluir, prescrever com segurança, virar o plantão e interpretar o básico — e um mentor por IA para tirar dúvidas. Para condutas e doses atualizadas, o guia aponta para o CondutAI/ATBguia.</p></div></div>
-   <div class="sec-title">Temas</div>
-   <div class="grid">${list.map(s=>`<button class="card" onclick="open_('${s.id}')"><span class="ic"><i class="ti ${s.ic}"></i></span><span><span class="ttl">${s.t}</span><span class="sub">${s.s}</span></span></button>`).join('')||'<p style="color:var(--muted)">Nada encontrado.</p>'}</div>
-   ${iaHTML()}`;
-  if(_iaq!==undefined){const _t=document.getElementById('iaq');if(_t)_t.value=_iaq;}
-  if(_iaOut){const _o=document.getElementById('iaOut');if(_o)_o.innerHTML=_iaOut;}
-  bindIA();
+  busca=q||'';const termo=semAc(busca.trim());
+  const lista=termo?SEC.filter(s=>semAc(s.t+' '+s.s).includes(termo)).concat(SEC.filter(s=>!semAc(s.t+' '+s.s).includes(termo)&&semAc(textoDe(s)).includes(termo))):SEC;
+  const primeira=!document.getElementById('q');
+  if(primeira){
+    main.innerHTML=`<section class="abre"><span class="bola b1"></span><span class="bola b2"></span>
+      <small><i class="ti ti-book-2" aria-hidden="true"></i> ${SEC.length} capítulos</small>
+      <h1>Seu manual de bolso do internato</h1>
+      <p>Admitir, evoluir, prescrever com segurança, virar o plantão e interpretar o básico. Para condutas e doses atualizadas, o guia aponta para o CondutAI e o ATBguia.</p>
+      <div class="abreAcoes"><button type="button" class="btn" onclick="ir('cap','${SEC[0].id}')"><i class="ti ti-player-play" aria-hidden="true"></i> Começar pelo capítulo 1</button><button type="button" class="btn fantasma" onclick="ir('mentor')"><i class="ti ti-message-chatbot" aria-hidden="true"></i> Perguntar ao mentor</button></div></section>
+      <label class="bsearch"><i class="ti ti-search" aria-hidden="true"></i><input id="q" type="search" placeholder="Buscar: prescrição, gasometria, SBAR" autocomplete="off" spellcheck="false" enterkeyhint="go" aria-label="Buscar tema"><kbd>/</kbd></label>
+      <div class="bInfo" id="bInfo" aria-live="polite"></div>
+      <div class="grid" id="grade"></div>`;
+    const inp=document.getElementById('q');inp.value=busca;
+    inp.addEventListener('input',()=>home(inp.value));
+    inp.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){const b=document.querySelector('#grade .cap');if(b){e.preventDefault();b.click();}}
+      else if(e.key==='Escape'){if(inp.value){e.preventDefault();limparBusca();}else inp.blur();}
+    });
+  }
+  document.getElementById('bInfo').textContent=termo?(lista.length?lista.length+(lista.length===1?' capítulo encontrado':' capítulos encontrados'):''):(matchMedia('(pointer:fine)').matches?'Escolha um capítulo. Tecle / para buscar.':'Toque num capítulo para ler.');
+  document.getElementById('grade').innerHTML=lista.length?lista.map(s=>{const i=SEC.indexOf(s);
+    return `<button type="button" class="cap" style="--c:${corDe(i)}" onclick="ir('cap','${s.id}')"><span class="ic"><i class="ti ${s.ic}" aria-hidden="true"></i></span><span><span class="ttl">${s.t}</span><span class="sub">${s.s}</span></span></button>`;}).join('')
+    :`<div class="vazio"><i class="ti ti-search-off" aria-hidden="true"></i><b>Nada encontrado para “${esc(busca.trim())}”</b><span>Tente outro termo ou pergunte ao mentor.</span><button type="button" class="btn btn-light" onclick="limparBusca()">Limpar busca</button></div>`;
 }
-function open_(id){
-  const s=SEC.find(x=>x.id===id);if(!s)return;
-  main.innerHTML=`<div class="view"><button class="back" onclick="home()"><i class="ti ti-arrow-left"></i> Voltar aos temas</button>
-   <h1><i class="ti ${s.ic}"></i> ${s.t}</h1>${s.html}
-   <div class="disclaimer">⚠️ Conteúdo educacional e de apoio — não substitui a supervisão nem o protocolo do seu serviço. Doses/condutas específicas: confirme no CondutAI/ATBguia.</div></div>
-   ${iaHTML()}`;
-  bindIA();window.scrollTo(0,0);
+function limparBusca(){busca='';const i=document.getElementById('q');if(i){i.value='';home('');i.focus();}}
+function open_(id){ir('cap',id);}
+function renderCap(id){
+  const i=SEC.findIndex(x=>x.id===id),s=SEC[i],ant=SEC[i-1],prox=SEC[i+1];
+  main.innerHTML=`<button type="button" class="voltar" onclick="ir('capitulos')"><i class="ti ti-arrow-left" aria-hidden="true"></i> Capítulos</button>
+   <article class="view" style="--c:${corDe(i)}"><div class="vTopo"><span class="selo"><i class="ti ${s.ic}" aria-hidden="true"></i></span><div><small>Capítulo ${i+1} de ${SEC.length}</small><h1>${s.t}</h1></div></div>
+   ${s.html}
+   <div class="aviso"><i class="ti ti-info-circle" aria-hidden="true"></i><span>Conteúdo educacional e de apoio. Não substitui a supervisão nem o protocolo do seu serviço. Doses e condutas específicas: confirme no CondutAI ou no ATBguia.</span></div>
+   <div class="vAcoes"><button type="button" class="btn btn-p" onclick="perguntarSobre('${s.id}')"><i class="ti ti-message-chatbot" aria-hidden="true"></i> Tirar dúvida sobre este tema</button></div></article>
+   <nav class="navCap" aria-label="Outros capítulos">${ant?`<button type="button" onclick="ir('cap','${ant.id}')"><small><i class="ti ti-arrow-left" aria-hidden="true"></i> Anterior</small><b>${ant.t}</b></button>`:''}${prox?`<button type="button" class="prox" onclick="ir('cap','${prox.id}')"><small>Próximo <i class="ti ti-arrow-right" aria-hidden="true"></i></small><b>${prox.t}</b></button>`:''}</nav>`;
 }
-function filter(v){home(v);}
-function iaHTML(){return `<div class="iabox"><h2><i class="ti ti-sparkles"></i> Pergunte ao Guia</h2>
-   <div class="hint">Dúvidas práticas do dia a dia (mentor estilo residente sênior). Para conduta de doença específica, ele te direciona ao app certo.</div>
+function perguntarSobre(id){const s=SEC.find(x=>x.id===id);mentorEstado.q=s?s.t+': ':'';mentorEstado.out='';ir('mentor');
+  setTimeout(()=>{const t=document.getElementById('iaq');if(t){t.focus();t.setSelectionRange(t.value.length,t.value.length);}},60);}
+
+const SUGESTOES=['Como estruturo uma evolução SOAP?','O que não pode faltar numa prescrição?','Passo a passo para ler uma gasometria','Como dar uma má notícia?'];
+function renderMentor(){
+  main.innerHTML=`<section class="mentor"><div class="mTopo"><span class="selo"><i class="ti ti-message-chatbot" aria-hidden="true"></i></span><div><h1>Pergunte ao mentor</h1><p>Dúvidas práticas do dia a dia, respondidas como um residente sênior.</p></div></div>
+   <label class="rotulo" for="iaq">Sua dúvida</label>
    <textarea id="iaq" placeholder="Ex.: Como faço a prescrição de profilaxia de TEV? Como organizo a passagem de um paciente instável?"></textarea>
-   <div class="chips">
-     <span class="chip" onclick="askChip(this)">Como estruturo uma evolução SOAP?</span>
-     <span class="chip" onclick="askChip(this)">O que não pode faltar numa prescrição?</span>
-     <span class="chip" onclick="askChip(this)">Passo a passo para ler uma gasometria</span>
-     <span class="chip" onclick="askChip(this)">Como dar uma má notícia?</span>
-   </div>
-   <button class="btn" id="iaBtn" onclick="ask()"><i class="ti ti-send"></i> Perguntar</button>
-   <div id="iaOut"></div></div>`;}
+   <div class="sugs" aria-label="Sugestões">${SUGESTOES.map(t=>`<button type="button" onclick="askChip(this)">${t}</button>`).join('')}</div>
+   <div class="linhaBt"><button type="button" class="btn btn-p" id="iaBtn" onclick="ask()"><i class="ti ti-send" aria-hidden="true"></i> Perguntar</button><span class="dica">Ctrl + Enter envia</span></div>
+   <div id="iaOut">${mentorEstado.out}</div>
+   <div class="aviso"><i class="ti ti-info-circle" aria-hidden="true"></i><span>Para conduta de uma doença específica, o mentor explica o raciocínio e indica o app certo. Revise sempre: é apoio, não substitui a supervisão.</span></div></section>`;
+  const t=document.getElementById('iaq');t.value=mentorEstado.q;
+  t.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();ask();}});
+}
+function guardarMentor(){const t=document.getElementById('iaq'),o=document.getElementById('iaOut');if(t)mentorEstado.q=t.value;if(o)mentorEstado.out=o.innerHTML;}
 function bindIA(){}
 function askChip(el){document.getElementById('iaq').value=el.textContent;ask();}
+function iaErro(msg){document.getElementById('iaOut').innerHTML='<div class="iaErro" role="alert"><i class="ti ti-alert-triangle" aria-hidden="true"></i><span>'+msg+'</span></div>';guardarMentor();}
+function copiarResposta(){const el=document.getElementById('iaTexto');if(!el)return;const txt=el.textContent;
+  const ok=()=>aviso('Resposta copiada'),ruim=()=>aviso('Não consegui copiar. Selecione o texto e copie.','erro');
+  const reserva=()=>{try{const a=document.createElement('textarea');a.value=txt;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();const r=document.execCommand('copy');a.remove();r?ok():ruim();}catch(e){ruim();}};
+  if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(txt).then(ok,reserva);else reserva();}
 async function ask(){
-  if(!window.MT||!MT.user){alert('Entre na sua conta MedTech para usar a IA.');return;}
-  const q=document.getElementById('iaq').value.trim();if(!q){document.getElementById('iaq').focus();return;}
-  const b=document.getElementById('iaBtn');b.innerHTML='<span class="spin"></span> Pensando…';b.disabled=true;
+  if(!window.MT||!MT.user){iaErro('Entre na sua conta MedTech para usar o mentor. Os capítulos funcionam sem conta.');return;}
+  const q=document.getElementById('iaq').value.trim();if(!q){document.getElementById('iaq').focus();aviso('Escreva a dúvida ou toque numa sugestão.');return;}
+  const b=document.getElementById('iaBtn');b.innerHTML='<span class="spin" aria-hidden="true"></span> Pensando';b.disabled=true;document.getElementById('iaOut').innerHTML='';
   const prompt='Você é um RESIDENTE SÊNIOR / preceptor experiente orientando um INTERNO de medicina (ou R1) no Brasil. Responda à dúvida de forma PRÁTICA, objetiva e didática, com passos acionáveis para o dia a dia da enfermaria/plantão. Tom de mentor: encorajador e seguro. REGRAS: priorize segurança do paciente; quando a pergunta envolver DOSE ou CONDUTA de uma doença específica, dê o raciocínio geral mas oriente confirmar a dose/conduta atual no app CondutAI ou ATBguia (não invente doses específicas); reforce "faça sob supervisão" quando for procedimento; use português do Brasil. FORMATAÇÃO: texto limpo, sem markdown (sem # nem *); títulos curtos em maiúsculas seguidos de dois-pontos quando ajudar.\n\nDÚVIDA DO INTERNO: '+q;
-  try{const t=await MT.ai(prompt,'gemini-2.5-pro');document.getElementById('iaOut').innerHTML='<div class="iaout">'+(t||'').replace(/[<>]/g,s=>({'<':'&lt;','>':'&gt;'}[s]))+'</div>';}
-  catch(e){alert('⚠️ '+(e.message||'Falha na IA.'));}
-  b.innerHTML='<i class="ti ti-send"></i> Perguntar';b.disabled=false;
+  try{const t=await MT.ai(prompt,'gemini-2.5-pro');const o=document.getElementById('iaOut');
+    if(o){o.innerHTML='<div class="iaout" id="iaTexto">'+(t||'').replace(/[<>]/g,s=>({'<':'&lt;','>':'&gt;'}[s]))+'</div><div class="iaAcoes"><button type="button" class="btn btn-light" onclick="copiarResposta()"><i class="ti ti-copy" aria-hidden="true"></i> Copiar resposta</button></div>';guardarMentor();}
+    else{mentorEstado.out='<div class="iaout" id="iaTexto">'+(t||'').replace(/[<>]/g,s=>({'<':'&lt;','>':'&gt;'}[s]))+'</div>';aviso('O mentor respondeu. Abra a aba Mentor.');}}
+  catch(e){if(document.getElementById('iaOut'))iaErro((e.message||'O mentor não respondeu.')+' Tente de novo em alguns segundos.');else aviso('O mentor não respondeu. Tente de novo.','erro');}
+  const b2=document.getElementById('iaBtn');if(b2){b2.innerHTML='<i class="ti ti-send" aria-hidden="true"></i> Perguntar';b2.disabled=false;}
 }
-home();
+/* atalhos: "/" busca, Esc volta */
+document.addEventListener('keydown',e=>{
+  const t=e.target,dig=t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable);
+  if(e.key==='/'&&!dig&&!e.metaKey&&!e.ctrlKey&&!e.altKey){e.preventDefault();if(location.hash)ir('capitulos');setTimeout(()=>{const q=document.getElementById('q');if(q)q.focus();},0);}
+  else if(e.key==='Escape'&&!dig&&location.hash.indexOf('#cap-')===0)ir('capitulos');
+});
+rota();
 </script>
 </body>
 </html>

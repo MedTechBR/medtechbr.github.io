@@ -1,19 +1,17 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-astra="medprovas">
+<html lang="pt-BR" data-viva="medprovas" data-viva-escuro>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>MedProvas · Elaboração e correção de provas com IA</title>
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#F5F6FB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1017" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="medprovas.webmanifest">
 <link rel="apple-touch-icon" href="icone-medprovas-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MedProvas">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.7.0/mammoth.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
@@ -23,7 +21,7 @@
      medprovas-app, autenticado com o token MedTech (endpoints callGeminiHttp/getSubStatusHttp). -->
 <script>window.MT_APP={id:"medprovas",name:"MedProvas"};</script>
 <script src="_mtfb.js?v=1"></script>
-<script type="module" src="_mtauth.js?v=25"></script>
+<script type="module" src="_mtauth.js?v=26"></script>
 <style>
   :root {
     /* Paleta MedProvas — teal médico + navy */
@@ -1241,10 +1239,490 @@
     .dash-stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .dash-stat { padding: 14px; }
   }
+
+  /* ============================================================
+     23/09/2026: camada "viva" (modelo aprovado do ClínicaMed, cm-v97).
+     Folha compartilhada: _mtviva.css (vem por último no <head>). Aqui só o que é do MedProvas,
+     com :root[data-viva="medprovas"] para vencer a folha sem !important quando der.
+     Âmbar é a cor do app: texto escuro sobre ela (--acTxt); texto âmbar só na versão escura (--acInk).
+     A área exportada (.prova-export) continua papel branco e letra preta nos dois temas.
+     ============================================================ */
+  @media screen {
+  :root[data-viva="medprovas"] body{
+    --acInk:color-mix(in srgb,var(--ac) 52%,var(--tinta));
+    /* a folha declara estes aliases no <html>, onde --acSup/--acInk ainda não existem: redeclarados aqui */
+    --primary-soft:var(--acSup); --primary-hover:var(--acInk); --primary-dark:var(--acInk);
+    --primary-border:color-mix(in srgb,var(--ac) 35%,var(--fio)); --accent-soft:var(--acSup);
+    --radius:14px; --radius-lg:22px; --radius-sm:10px;
+    /* preenchimento de acerto/erro com letra branca legível (4,5:1); no escuro vira letra escura sobre a cor viva */
+    --okFill:color-mix(in srgb,var(--okV) 78%,#000); --errFill:color-mix(in srgb,var(--errV) 84%,#000); --fillTxt:#fff;
+    font-size:14.5px; line-height:1.5;
+  }
+  :root[data-viva="medprovas"] body :is(.dash-stat-num,.pro-badge,.status,.stat-num,.aluno-nota){font-family:inherit!important;font-variant-numeric:tabular-nums}
+  :root[data-viva="medprovas"] body a{color:var(--acInk)}
+  :root[data-viva="medprovas"] body .hidden{display:none!important}
+
+  /* ---------- barra lateral clara; cada seção com a sua cor ---------- */
+  :root[data-viva="medprovas"] body .sidebar{background:var(--sup);border-right:1px solid var(--fio);padding:22px 14px 16px}
+  :root[data-viva="medprovas"] body .sidebar-brand{border-bottom:0;padding:2px 8px 22px;margin-bottom:4px}
+  :root[data-viva="medprovas"] body .sidebar-brand .brand-mark{width:36px;height:36px;border-radius:50%;background:var(--ac);color:var(--acTxt);font-size:14px;letter-spacing:-.02em;
+    box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 35%,transparent);transition:transform .25s var(--mola)}
+  :root[data-viva="medprovas"] body .sidebar-brand:hover .brand-mark{transform:rotate(-8deg) scale(1.06)}
+  :root[data-viva="medprovas"] body .sidebar-brand .brand-name{font-weight:700;font-size:18px;letter-spacing:-.02em;color:var(--tinta)}
+  :root[data-viva="medprovas"] body .sidebar-nav{gap:3px}
+  :root[data-viva="medprovas"] body .nav-item{--c:var(--ac);--cTxt:#fff;text-decoration:none;border-radius:999px;min-height:44px;padding:5px 14px 5px 6px;gap:12px;
+    font-size:14px;font-weight:500;color:var(--tinta2);transition:background .2s,color .2s}
+  :root[data-viva="medprovas"] body .nav-item .nv-ic{width:32px;height:32px;flex:0 0 32px;border-radius:50%;display:grid;place-items:center;font-size:17px;
+    background:color-mix(in srgb,var(--c) 14%,transparent);color:color-mix(in srgb,var(--c) 65%,var(--tinta));transition:transform .25s var(--mola),background .2s,color .2s}
+  :root[data-viva="medprovas"] body .nav-item .nv-c{display:none}
+  :root[data-viva="medprovas"] body .nav-item:hover{background:var(--sup2);color:var(--tinta)}
+  :root[data-viva="medprovas"] body .nav-item:hover .nv-ic{transform:scale(1.1) rotate(-6deg)}
+  :root[data-viva="medprovas"] body .nav-item.active{background:color-mix(in srgb,var(--c) 13%,var(--sup));color:color-mix(in srgb,var(--c) 50%,var(--tinta));font-weight:650}
+  :root[data-viva="medprovas"] body .nav-item.active .nv-ic{background:var(--c);color:var(--cTxt);box-shadow:0 6px 14px color-mix(in srgb,var(--c) 40%,transparent)}
+  :root[data-viva="medprovas"] body .sidebar-footer{border-top:0;color:var(--tinta2);font-size:12px}
+
+  /* ---------- cabeçalho de uma linha com selo da seção ---------- */
+  :root[data-viva="medprovas"] body .topbar{padding:0 32px}
+  :root[data-viva="medprovas"] body .topbar .page-title{display:flex;align-items:center;gap:12px;font-size:18px;font-weight:700;letter-spacing:-.02em;min-width:0}
+  :root[data-viva="medprovas"] body .topbar .page-title .pt-txt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  :root[data-viva="medprovas"] body .selo{width:36px;height:36px;flex:0 0 36px;border-radius:50%;display:grid;place-items:center;font-size:19px;
+    background:var(--sc,var(--ac));color:var(--scTxt,#fff);box-shadow:0 8px 18px color-mix(in srgb,var(--sc,var(--ac)) 32%,transparent);animation:vvPop .45s var(--mola) both}
+  :root[data-viva="medprovas"] body .user-info{gap:10px}
+  :root[data-viva="medprovas"] body .pro-badge{font-size:12.5px;font-weight:600;padding:6px 12px;margin:0;cursor:default}
+  :root[data-viva="medprovas"] body .pro-badge.pro{background:var(--okSup);color:color-mix(in srgb,var(--okV) 70%,var(--tinta));box-shadow:none;border:0}
+  :root[data-viva="medprovas"] body .avatar-circle{background:var(--ac);color:var(--acTxt);box-shadow:none;font-size:12.5px}
+  :root[data-viva="medprovas"] body #userInfoTopbar{color:var(--tinta);font-weight:500}
+
+  /* ---------- área principal ---------- */
+  /* overflow-x:clip (e não hidden): hidden transformava o <main> em área de rolagem e o resumo "grudento" parava de grudar */
+  :root[data-viva="medprovas"] body main.content{padding:30px 40px 64px;overflow-x:clip}
+  :root[data-viva="medprovas"] body .container{max-width:1160px}
+  :root[data-viva="medprovas"] body .card{background:var(--sup);border:1px solid var(--fio);border-radius:var(--rG);padding:26px 28px;box-shadow:var(--sombraV);margin-bottom:18px}
+  :root[data-viva="medprovas"] body .card h3{font-size:16px;font-weight:650;margin-bottom:14px}
+  :root[data-viva="medprovas"] body .pg-sub,:root[data-viva="medprovas"] body .dica{color:var(--tinta2);font-size:13.5px;margin:-4px 0 14px}
+  :root[data-viva="medprovas"] body .section-title{margin:28px 0 14px}
+  :root[data-viva="medprovas"] body .section-title h3{font-size:17px;font-weight:700}
+  :root[data-viva="medprovas"] body .form-row label{color:var(--tinta);font-weight:600;font-size:13.5px}
+  :root[data-viva="medprovas"] body :is(input[type=text],input[type=email],input[type=number],input[type=search],input[type=password],select,textarea){min-height:44px;padding:10px 14px;font-size:14.5px}
+  :root[data-viva="medprovas"] body input[type=number]{width:110px;font-variant-numeric:tabular-nums}
+  :root[data-viva="medprovas"] body kbd{font:600 11px/1 inherit;background:var(--sup2);border:1px solid var(--fioF);border-radius:6px;padding:3px 6px;color:var(--tinta2)}
+
+  /* ---------- botões: pílula; principal em âmbar com texto escuro ---------- */
+  :root[data-viva="medprovas"] body button{border-radius:999px;min-height:42px;padding:9px 20px;font-size:14px;font-weight:600;gap:8px;
+    background:var(--ac);color:var(--acTxt);border:1.5px solid var(--ac);box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 28%,transparent)}
+  :root[data-viva="medprovas"] body button .ti{font-size:17px}
+  :root[data-viva="medprovas"] body button:hover{background:var(--ac);filter:brightness(1.05);transform:translateY(-1px);box-shadow:0 10px 22px color-mix(in srgb,var(--ac) 34%,transparent)}
+  :root[data-viva="medprovas"] body button:disabled{background:var(--sup3);border-color:var(--sup3);color:var(--tinta2);box-shadow:none;filter:none;opacity:1;cursor:not-allowed}
+  :root[data-viva="medprovas"] body button.success{background:var(--ac);border-color:var(--ac);color:var(--acTxt)}
+  :root[data-viva="medprovas"] body button.secondary{background:var(--sup);color:var(--tinta);border-color:var(--fioF);box-shadow:none}
+  :root[data-viva="medprovas"] body button.secondary:hover{background:var(--acSup);border-color:color-mix(in srgb,var(--ac) 45%,var(--fio));color:var(--acInk);filter:none}
+  :root[data-viva="medprovas"] body button.ghost{background:transparent;border-color:transparent;color:var(--tinta2);box-shadow:none}
+  :root[data-viva="medprovas"] body button.ghost:hover{background:var(--sup2);color:var(--tinta);filter:none;transform:none}
+  :root[data-viva="medprovas"] body button.danger{background:var(--errSup);border-color:transparent;color:color-mix(in srgb,var(--errV) 80%,var(--tinta));box-shadow:none}
+  :root[data-viva="medprovas"] body button.danger:hover{background:var(--errFill);color:var(--fillTxt);filter:none}
+  :root[data-viva="medprovas"] body button.perigo{color:color-mix(in srgb,var(--errV) 80%,var(--tinta))}
+  :root[data-viva="medprovas"] body button.perigo:hover{background:var(--errSup);color:color-mix(in srgb,var(--errV) 85%,var(--tinta))}
+  :root[data-viva="medprovas"] body button.small{min-height:36px;padding:6px 14px;font-size:13px}
+  :root[data-viva="medprovas"] body button.small .ti{font-size:16px}
+  :root[data-viva="medprovas"] body button.large{min-height:50px;padding:12px 26px;font-size:15px}
+  :root[data-viva="medprovas"] body button.ic-btn{width:42px;min-width:42px;padding:0}
+  :root[data-viva="medprovas"] body button.ic-btn.small{width:36px;min-width:36px}
+  :root[data-viva="medprovas"] body button.gira .ti{animation:spin .8s linear infinite}
+  :root[data-viva="medprovas"] body .spinner{border-color:var(--fioF);border-top-color:var(--acInk)}
+  :root[data-viva="medprovas"] body button .spinner{width:16px;height:16px;margin:0;border-color:color-mix(in srgb,currentColor 30%,transparent);border-top-color:currentColor}
+
+  /* ---------- Início ---------- */
+  :root[data-viva="medprovas"] body .mp-hero{position:relative;overflow:hidden;border-radius:28px;padding:30px 32px;margin-bottom:20px;background:var(--ac);color:var(--acTxt);
+    display:flex;gap:24px;align-items:center;box-shadow:0 18px 40px color-mix(in srgb,var(--ac) 30%,transparent)}
+  :root[data-viva="medprovas"] body .mp-hero .bola{position:absolute;border-radius:50%;background:#fff;opacity:.16;pointer-events:none}
+  :root[data-viva="medprovas"] body .mp-hero .b1{width:260px;height:260px;right:-70px;top:-100px;animation:mpFlutua 9s ease-in-out infinite}
+  :root[data-viva="medprovas"] body .mp-hero .b2{width:130px;height:130px;right:260px;bottom:-70px;opacity:.12;animation:mpFlutua 7s ease-in-out infinite reverse}
+  :root[data-viva="medprovas"] body .mp-hero .b3{width:46px;height:46px;left:46%;top:18px;opacity:.2;animation:mpFlutua 6s ease-in-out infinite}
+  :root[data-viva="medprovas"] body .mp-hero .txt{flex:1;min-width:0;position:relative}
+  :root[data-viva="medprovas"] body .mp-hero small{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;background:rgba(255,255,255,.34);padding:5px 12px;border-radius:999px}
+  :root[data-viva="medprovas"] body .mp-hero h2{font-size:30px;line-height:1.15;margin:14px 0 8px;font-weight:750;letter-spacing:-.03em;color:var(--acTxt)}
+  :root[data-viva="medprovas"] body .mp-hero p{margin:0 0 20px;font-size:14.5px;max-width:52ch;color:var(--acTxt)}
+  :root[data-viva="medprovas"] body .mp-hero .acoesH{display:flex;gap:10px;flex-wrap:wrap}
+  :root[data-viva="medprovas"] body .mp-hero .acoesH button{background:#fff;border-color:#fff;color:var(--acTxt);box-shadow:0 8px 20px rgba(60,35,0,.18)}
+  :root[data-viva="medprovas"] body .mp-hero .acoesH button.sec{background:rgba(255,255,255,.3);border-color:rgba(35,21,0,.18);color:var(--acTxt);box-shadow:none}
+  :root[data-viva="medprovas"] body .mp-ultima{position:relative;flex:0 0 300px;background:rgba(255,255,255,.9);color:#141827;border-radius:22px;padding:18px 20px;box-shadow:0 10px 26px rgba(60,35,0,.14)}
+  :root[data-viva="medprovas"] body .mp-ultima:empty{display:none}
+  :root[data-viva="medprovas"] body .mp-ultima small{display:block;font-size:12px;font-weight:600;color:#5D4A1E;margin-bottom:4px;background:none;padding:0;border-radius:0}
+  :root[data-viva="medprovas"] body .mp-ultima b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:15.5px;line-height:1.3;letter-spacing:-.01em}
+  :root[data-viva="medprovas"] body .mp-ultima .mu-meta{font-size:12.5px;color:#4A4F5E;margin:6px 0 12px}
+  :root[data-viva="medprovas"] body .mp-ultima .mu-b{display:flex;gap:8px}
+  :root[data-viva="medprovas"] body .mp-ultima .mu-b button{flex:1;min-height:38px;padding:6px 12px;font-size:13px;background:var(--acTxt);border-color:var(--acTxt);color:#fff;box-shadow:none}
+  :root[data-viva="medprovas"] body .mp-ultima .mu-b button.sec{background:transparent;color:var(--acTxt);border-color:rgba(35,21,0,.25)}
+
+  :root[data-viva="medprovas"] body .dash-stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:6px}
+  :root[data-viva="medprovas"] body .dash-stat{--k:var(--c-azul);border-radius:24px;padding:18px 20px;border:1px solid color-mix(in srgb,var(--k) 18%,transparent);
+    background:color-mix(in srgb,var(--k) 11%,var(--sup));cursor:pointer;color:var(--tinta);transition:transform .2s var(--mola),box-shadow .2s}
+  :root[data-viva="medprovas"] body .dash-stat:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--k) 30%,transparent);box-shadow:0 12px 26px color-mix(in srgb,var(--k) 22%,transparent)}
+  :root[data-viva="medprovas"] body .dash-stat-icon{width:46px;height:46px;border-radius:50%;background:var(--k);color:#fff;font-size:22px;box-shadow:0 8px 18px color-mix(in srgb,var(--k) 35%,transparent)}
+  :root[data-viva="medprovas"] body .dash-stat-num{font-size:26px;font-weight:800;letter-spacing:-.03em;color:color-mix(in srgb,var(--k) 72%,var(--tinta))}
+  :root[data-viva="medprovas"] body .dash-stat-label{font-size:12.5px;color:var(--tinta2);font-weight:500}
+
+  :root[data-viva="medprovas"] body .menu-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+  :root[data-viva="medprovas"] body .menu-item{--k:var(--ac);border-radius:24px;padding:22px 22px 20px;border:1px solid var(--fio);box-shadow:var(--sombraV);background:var(--sup);position:relative;
+    transition:transform .2s var(--mola),box-shadow .2s,border-color .2s}
+  :root[data-viva="medprovas"] body .menu-item::before{content:none}
+  :root[data-viva="medprovas"] body .menu-item:hover{transform:translateY(-4px);box-shadow:var(--sombraM);border-color:color-mix(in srgb,var(--k) 35%,var(--fio))}
+  :root[data-viva="medprovas"] body .menu-item .icon{width:46px;height:46px;border-radius:50%;background:var(--k);color:#fff;font-size:22px;margin-bottom:14px;
+    box-shadow:0 8px 18px color-mix(in srgb,var(--k) 32%,transparent);transition:transform .25s var(--mola)}
+  :root[data-viva="medprovas"] body .menu-item:hover .icon{transform:scale(1.08) rotate(-6deg)}
+  :root[data-viva="medprovas"] body .menu-item .passo-n{position:absolute;top:20px;right:22px;font-size:13px;font-weight:700;color:color-mix(in srgb,var(--k) 70%,var(--tinta));
+    background:color-mix(in srgb,var(--k) 12%,var(--sup));width:30px;height:30px;border-radius:50%;display:grid;place-items:center}
+  :root[data-viva="medprovas"] body .menu-item .title{font-size:16px;font-weight:700}
+  :root[data-viva="medprovas"] body .menu-item .desc{color:var(--tinta2);font-size:13.5px}
+  :root[data-viva="medprovas"] body .section-title .ghost{color:var(--acInk);font-weight:600}
+
+  /* ---------- listas de provas ---------- */
+  :root[data-viva="medprovas"] body .lista-topo{display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+  :root[data-viva="medprovas"] body .lista-topo h3{margin:0;font-size:17px;font-weight:700;flex:1}
+  :root[data-viva="medprovas"] body .lista-topo .cont{color:var(--tinta2);font-weight:500;font-size:14px}
+  :root[data-viva="medprovas"] body .busca{position:relative;flex:1;min-width:220px;display:flex;align-items:center}
+  :root[data-viva="medprovas"] body .busca .ti{position:absolute;left:14px;font-size:18px;color:var(--tinta2);pointer-events:none}
+  :root[data-viva="medprovas"] body .busca input{width:100%;padding-left:42px!important;border-radius:999px!important;min-width:0}
+  :root[data-viva="medprovas"] body .busca kbd{position:absolute;right:12px}
+  :root[data-viva="medprovas"] body .alunos-topo .busca{flex:0 1 320px}
+  :root[data-viva="medprovas"] body .lista-item{--k:var(--c-teal);border-radius:20px;padding:16px 18px 16px 16px;margin-bottom:12px;border:1px solid var(--fio);background:var(--sup);box-shadow:var(--sombraV);
+    display:flex;align-items:center;gap:14px;transition:transform .2s var(--mola),box-shadow .2s,border-color .2s;cursor:pointer}
+  :root[data-viva="medprovas"] body .lista-item:hover{transform:translateY(-2px);box-shadow:var(--sombraM);border-color:color-mix(in srgb,var(--k) 30%,var(--fio))}
+  :root[data-viva="medprovas"] body .lista-item .li-ic{width:44px;height:44px;flex:0 0 44px;border-radius:50%;display:grid;place-items:center;font-size:20px;
+    background:color-mix(in srgb,var(--k) 14%,var(--sup));color:color-mix(in srgb,var(--k) 72%,var(--tinta))}
+  :root[data-viva="medprovas"] body .lista-item .info{min-width:0}
+  :root[data-viva="medprovas"] body .lista-item .info .titulo{font-weight:650;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  :root[data-viva="medprovas"] body .lista-item .info .meta{display:flex;flex-wrap:wrap;gap:6px 12px;color:var(--tinta2);font-size:12.5px;margin-top:4px}
+  :root[data-viva="medprovas"] body .lista-item .info .meta span{display:inline-flex;align-items:center;gap:4px}
+  :root[data-viva="medprovas"] body .lista-item .acoes{gap:8px}
+  :root[data-viva="medprovas"] body .lista-item .acoes button:not(.secondary){background:var(--acSup);border-color:transparent;color:var(--acInk);box-shadow:none}
+  :root[data-viva="medprovas"] body .lista-item .acoes button:not(.secondary):hover{background:var(--ac);color:var(--acTxt)}
+  :root[data-viva="medprovas"] body .vazio{text-align:center;padding:40px 22px;border:1.5px dashed var(--fioF);border-radius:var(--rG);background:var(--sup);color:var(--tinta2)}
+  :root[data-viva="medprovas"] body .vazio .v-ic{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;margin:0 auto 12px;font-size:26px;background:var(--acSup);color:var(--acInk)}
+  :root[data-viva="medprovas"] body .vazio b{display:block;color:var(--tinta);font-size:15.5px;margin-bottom:4px}
+  :root[data-viva="medprovas"] body .vazio p{font-size:13.5px;max-width:44ch;margin:0 auto 16px}
+
+  /* ---------- disciplinas ---------- */
+  :root[data-viva="medprovas"] body .add-row{flex-wrap:nowrap}
+  :root[data-viva="medprovas"] body #listaDisciplinas{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+  :root[data-viva="medprovas"] body .tag{--k:var(--c-violeta);display:inline-flex;align-items:center;gap:10px;margin:0;padding:6px 6px 6px 8px;border-radius:999px;border:0;font-size:14px;font-weight:600;
+    background:color-mix(in srgb,var(--k) 11%,var(--sup));color:var(--tinta);animation:vvPop .35s var(--mola) both}
+  :root[data-viva="medprovas"] body .tag .t-dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--k);color:#fff;font-size:15px}
+  :root[data-viva="medprovas"] body .tag small{font-weight:500;color:var(--tinta2);font-size:12.5px}
+  :root[data-viva="medprovas"] body .tag button.remove{min-height:32px;width:32px;padding:0;background:transparent;border-color:transparent;color:var(--tinta2);box-shadow:none;opacity:1;margin:0}
+  :root[data-viva="medprovas"] body .tag button.remove:hover{background:var(--errSup);color:color-mix(in srgb,var(--errV) 85%,var(--tinta));transform:none}
+
+  /* ---------- elaborar ---------- */
+  :root[data-viva="medprovas"] body .elab-grade{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
+  :root[data-viva="medprovas"] body .elab-form{padding:8px 28px}
+  :root[data-viva="medprovas"] body .passo{--k:var(--ac);padding:22px 0;border-bottom:1px solid var(--fio)}
+  :root[data-viva="medprovas"] body .passo:last-child{border-bottom:0}
+  :root[data-viva="medprovas"] body .passo h3{display:flex;align-items:center;gap:10px;font-size:16px;margin-bottom:14px}
+  :root[data-viva="medprovas"] body .passo .pn{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--k) 82%,#000);color:#fff;font-size:14px;font-weight:700;
+    box-shadow:0 6px 14px color-mix(in srgb,var(--k) 30%,transparent)}
+  :root[data-viva="medprovas"] body .passo .opc{font-size:12px;font-weight:600;color:var(--tinta2);background:var(--sup2);padding:3px 10px;border-radius:999px}
+  :root[data-viva="medprovas"] body .passo .form-row label{min-width:130px}
+  :root[data-viva="medprovas"] body #pageConfig .form-row label{min-width:190px}
+  :root[data-viva="medprovas"] body .file-drop{display:flex;align-items:center;gap:16px;text-align:left;padding:18px 20px;border:1.5px dashed var(--fioF);border-radius:20px;background:var(--sup2);
+    transition:border-color .2s,background .2s,transform .2s var(--mola)}
+  :root[data-viva="medprovas"] body .file-drop:hover,:root[data-viva="medprovas"] body .file-drop.sobre{border-color:var(--k);background:color-mix(in srgb,var(--k) 8%,var(--sup))}
+  :root[data-viva="medprovas"] body .file-drop.sobre{transform:scale(1.01)}
+  :root[data-viva="medprovas"] body .fd-ic{width:46px;height:46px;flex:0 0 46px;border-radius:50%;display:grid;place-items:center;font-size:22px;background:var(--k);color:#fff;transition:transform .25s var(--mola)}
+  :root[data-viva="medprovas"] body .file-drop:hover .fd-ic{transform:translateY(-3px)}
+  :root[data-viva="medprovas"] body .fd-t{display:flex;flex-direction:column;gap:2px;font-size:14px}
+  :root[data-viva="medprovas"] body .fd-t span{color:var(--tinta2);font-size:12.5px}
+  :root[data-viva="medprovas"] body .file-item{border-radius:16px;background:var(--sup);border:1px solid var(--fio);padding:8px 8px 8px 12px;gap:10px;animation:vvSobe .35s var(--suave) both}
+  :root[data-viva="medprovas"] body .file-item .fi-n{display:flex;align-items:center;gap:10px;min-width:0}
+  :root[data-viva="medprovas"] body .file-item .fi-n i{font-size:20px;color:color-mix(in srgb,var(--c-vermelho) 80%,var(--tinta))}
+  :root[data-viva="medprovas"] body .file-item .fi-n span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  :root[data-viva="medprovas"] body .file-item small{color:var(--tinta2);white-space:nowrap}
+  :root[data-viva="medprovas"] body .elab-resumo{position:sticky;top:84px;padding:22px}
+  :root[data-viva="medprovas"] body .elab-resumo h3{font-size:16px}
+  :root[data-viva="medprovas"] body .elab-resumo button.large{width:100%}
+  :root[data-viva="medprovas"] body .elab-resumo .tempo{margin:10px 0 0;font-size:12.5px;text-align:center}
+  :root[data-viva="medprovas"] body .checa{list-style:none;margin:0 0 18px;padding:0;display:grid;gap:10px}
+  :root[data-viva="medprovas"] body .checa li{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--tinta2)}
+  :root[data-viva="medprovas"] body .checa li i{width:26px;height:26px;flex:0 0 26px;border-radius:50%;display:grid;place-items:center;font-size:15px;background:var(--sup2);color:var(--tinta2);transition:background .2s,color .2s,transform .3s var(--mola)}
+  :root[data-viva="medprovas"] body .checa li.ok{color:var(--tinta)}
+  :root[data-viva="medprovas"] body .checa li.ok i{background:var(--okFill);color:var(--fillTxt);transform:scale(1.05)}
+  :root[data-viva="medprovas"] body .progresso{margin-top:14px;padding:14px 16px;border-radius:18px;background:var(--acSup);color:var(--tinta);font-size:13.5px;display:flex;gap:12px;align-items:flex-start;animation:vvSobe .3s var(--suave) both}
+  :root[data-viva="medprovas"] body .progresso .spinner{flex:0 0 18px;margin:1px 0 0}
+  :root[data-viva="medprovas"] body .aviso{margin-top:14px;padding:14px 16px;border-radius:18px;font-size:13.5px;display:flex;gap:10px;align-items:flex-start;animation:vvSobe .3s var(--suave) both}
+  :root[data-viva="medprovas"] body .aviso i{font-size:18px;margin-top:1px}
+  :root[data-viva="medprovas"] body .aviso.erro{background:var(--errSup);color:color-mix(in srgb,var(--errV) 55%,var(--tinta));animation:vvTreme .45s}
+  :root[data-viva="medprovas"] body .aviso.ok{background:var(--okSup);color:color-mix(in srgb,var(--okV) 55%,var(--tinta))}
+
+  /* ---------- prova ---------- */
+  :root[data-viva="medprovas"] body .breadcrumb{gap:8px;margin-bottom:14px;font-size:13.5px}
+  :root[data-viva="medprovas"] body .breadcrumb a .mob{display:none}
+  :root[data-viva="medprovas"] body .breadcrumb a{white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;display:inline-flex;align-items:center;gap:6px;color:var(--acInk);font-weight:600;text-decoration:none;padding:6px 12px;border-radius:999px;background:var(--acSup)}
+  :root[data-viva="medprovas"] body .breadcrumb a:hover{text-decoration:none;filter:brightness(.97)}
+  :root[data-viva="medprovas"] body .breadcrumb .bc-sep{color:var(--tinta2)}
+  :root[data-viva="medprovas"] body .breadcrumb > span:last-child{color:var(--tinta2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  :root[data-viva="medprovas"] body .prova-topo{padding:24px 26px}
+  :root[data-viva="medprovas"] body .pt-linha{display:flex;gap:16px 20px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+  :root[data-viva="medprovas"] body .pt-tit{min-width:0;flex:1 1 300px}
+  :root[data-viva="medprovas"] body .pt-tit h2{font-size:24px;font-weight:750;letter-spacing:-.03em;margin:0 0 6px}
+  :root[data-viva="medprovas"] body .pt-meta{color:var(--tinta2);font-size:13.5px;display:flex;flex-wrap:wrap;gap:6px 14px}
+  :root[data-viva="medprovas"] body .pt-meta span{display:inline-flex;align-items:center;gap:5px}
+  :root[data-viva="medprovas"] body .pt-acoes{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  :root[data-viva="medprovas"] body .q-mapa-cab{display:flex;align-items:baseline;gap:10px;margin:20px 0 10px;font-size:13px}
+  :root[data-viva="medprovas"] body .q-mapa-cab span{font-weight:650;color:var(--tinta)}
+  :root[data-viva="medprovas"] body .q-mapa-cab em{font-style:normal;color:var(--tinta2)}
+  :root[data-viva="medprovas"] body .q-mapa{display:flex;flex-wrap:wrap;gap:8px}
+  :root[data-viva="medprovas"] body button.qm,:root[data-viva="medprovas"] body .qm{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-width:44px;min-height:48px;padding:4px 8px;border-radius:16px;
+    background:var(--sup2);border:1.5px solid transparent;color:var(--tinta);box-shadow:none;font-weight:700;font-size:15px;line-height:1.1}
+  :root[data-viva="medprovas"] body .qm small{font-size:10.5px;font-weight:600;color:var(--tinta2)}
+  :root[data-viva="medprovas"] body button.qm:hover{background:var(--acSup);border-color:color-mix(in srgb,var(--ac) 45%,transparent);filter:none}
+  :root[data-viva="medprovas"] body .qm.anul{background:var(--avSup);color:color-mix(in srgb,var(--avV) 60%,var(--tinta))}
+  :root[data-viva="medprovas"] body .qm.anul b{font-size:11px;font-weight:700}
+  :root[data-viva="medprovas"] body #provaQuestoes{counter-reset:q}
+  :root[data-viva="medprovas"] body .questao-gerada{position:relative;background:var(--sup);border:1px solid var(--fio);border-radius:var(--rG);padding:22px 24px;margin-bottom:16px;box-shadow:var(--sombraV);scroll-margin-top:84px}
+  :root[data-viva="medprovas"] body .questao-gerada:hover{border-color:var(--fioF)}
+  :root[data-viva="medprovas"] body .questao-gerada.anulada{background:color-mix(in srgb,var(--avV) 5%,var(--sup))}
+  :root[data-viva="medprovas"] body .questao-gerada.destaque{animation:mpPulso 1.2s var(--suave)}
+  :root[data-viva="medprovas"] body .q-cab{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+  :root[data-viva="medprovas"] body .q-cab .q-num{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--acSup);color:var(--acInk);font-weight:750;font-size:15px}
+  :root[data-viva="medprovas"] body .q-cab h4{margin:0;font-size:15.5px;font-weight:700}
+  :root[data-viva="medprovas"] body .q-cab .selo-anul{font-size:12px;font-weight:650;padding:4px 10px;border-radius:999px;background:var(--avSup);color:color-mix(in srgb,var(--avV) 60%,var(--tinta))}
+  :root[data-viva="medprovas"] body .q-cab .q-gab{margin-left:auto;font-size:13px;color:var(--tinta2);display:inline-flex;align-items:center;gap:8px}
+  :root[data-viva="medprovas"] body .q-cab .q-gab b{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--okFill);color:var(--fillTxt);font-size:14px}
+  :root[data-viva="medprovas"] body .enunciado-edit{width:100%;border-radius:16px!important;line-height:1.6!important;font-size:15px!important;padding:12px 14px!important;background:var(--sup2)!important;border-color:transparent!important}
+  :root[data-viva="medprovas"] body .enunciado-edit:focus{background:var(--sup)!important;border-color:var(--ac)!important}
+  :root[data-viva="medprovas"] body .questao-gerada .alternativas{display:grid;gap:8px;margin:12px 0}
+  :root[data-viva="medprovas"] body .questao-alt{align-items:center;gap:12px;margin:0;padding:6px 12px 6px 8px;border-radius:18px;border:1.5px solid var(--fio);background:var(--sup);
+    transition:border-color .15s,background .15s,transform .18s var(--mola)}
+  :root[data-viva="medprovas"] body .questao-alt:hover{border-color:color-mix(in srgb,var(--ac) 50%,var(--fio));background:var(--acSup)}
+  :root[data-viva="medprovas"] body .questao-alt .letra{width:34px;height:34px;min-width:34px;border-radius:50%;display:grid;place-items:center;padding:0!important;font-size:14px;font-weight:700;
+    background:var(--sup2);color:var(--tinta2);transition:background .2s,color .2s,transform .25s var(--mola)}
+  :root[data-viva="medprovas"] body .questao-alt:hover .letra{background:var(--ac);color:var(--acTxt);transform:scale(1.06)}
+  :root[data-viva="medprovas"] body .questao-alt.gabarito{background:var(--okSup);border-color:var(--okV);color:var(--tinta)}
+  :root[data-viva="medprovas"] body .questao-alt.gabarito .letra{background:var(--okFill);color:var(--fillTxt)}
+  :root[data-viva="medprovas"] body .questao-alt.gabarito.acabou{animation:mpAcerto .5s var(--mola)}
+  :root[data-viva="medprovas"] body .questao-alt .alternativa-edit{background:transparent!important;border:0!important;min-height:0!important;padding:6px 0!important;box-shadow:none!important;color:var(--tinta)!important}
+  :root[data-viva="medprovas"] body .q-acoes{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+  :root[data-viva="medprovas"] body .q-acoes .dir{margin-left:auto;display:flex;gap:8px}
+  :root[data-viva="medprovas"] body .chk-anular{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:4px 12px 4px 8px;border-radius:999px;background:var(--sup2);font-size:13px;font-weight:600;color:var(--tinta2);cursor:pointer}
+  :root[data-viva="medprovas"] body .chk-anular input{width:18px;height:18px;accent-color:var(--avV)}
+  :root[data-viva="medprovas"] body .chk-anular:has(input:checked){background:var(--avSup);color:color-mix(in srgb,var(--avV) 60%,var(--tinta))}
+  :root[data-viva="medprovas"] body .q-det{margin-top:10px;border-radius:16px;background:var(--sup2);padding:0 14px;font-size:13.5px}
+  :root[data-viva="medprovas"] body .q-det summary{cursor:pointer;display:flex;align-items:center;gap:8px;min-height:40px;font-weight:600;color:var(--tinta);list-style:none}
+  :root[data-viva="medprovas"] body .q-det summary::-webkit-details-marker{display:none}
+  :root[data-viva="medprovas"] body .q-det summary .ti-chevron-down{margin-left:auto;transition:transform .2s}
+  :root[data-viva="medprovas"] body .q-det[open] summary .ti-chevron-down{transform:rotate(180deg)}
+  :root[data-viva="medprovas"] body .q-det p{padding:0 0 12px;color:var(--tinta2);white-space:pre-wrap;animation:vvSobe .3s var(--suave) both}
+  :root[data-viva="medprovas"] body .q-carregando{position:absolute;inset:0;border-radius:inherit;background:color-mix(in srgb,var(--sup) 82%,transparent);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+    display:flex;align-items:center;justify-content:center;gap:12px;font-weight:600;z-index:2;animation:vvSobe .25s var(--suave) both}
+  :root[data-viva="medprovas"] body .questao-imagem{border-radius:16px;background:var(--sup2);border:0}
+  :root[data-viva="medprovas"] body .questao-sem-imagem{background:color-mix(in srgb,var(--c-azul) 9%,var(--sup));border:0;border-radius:14px;color:var(--tinta2);display:flex;gap:8px;align-items:flex-start}
+  :root[data-viva="medprovas"] body .questao-sem-imagem i{color:color-mix(in srgb,var(--c-azul) 70%,var(--tinta));font-size:17px}
+  :root[data-viva="medprovas"] body .add-q{display:flex;gap:14px 20px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:18px 22px;border:1.5px dashed var(--fioF);border-radius:var(--rG);background:var(--sup)}
+  :root[data-viva="medprovas"] body .aq-t{display:flex;flex-direction:column;gap:2px;font-size:14.5px}
+  :root[data-viva="medprovas"] body .aq-t span{color:var(--tinta2);font-size:13px}
+  :root[data-viva="medprovas"] body .aq-b{display:flex;gap:8px;flex-wrap:wrap}
+
+  /* ---------- correção ---------- */
+  :root[data-viva="medprovas"] body .gb{display:inline-flex;flex-direction:column;align-items:center;min-width:40px;padding:5px 6px;border-radius:14px;background:var(--sup2);font-weight:700;font-size:14.5px;line-height:1.15}
+  :root[data-viva="medprovas"] body .gb small{font-size:10.5px;font-weight:600;color:var(--tinta2)}
+  :root[data-viva="medprovas"] body .gb.anul{background:var(--avSup);color:color-mix(in srgb,var(--avV) 60%,var(--tinta));font-size:11px}
+  :root[data-viva="medprovas"] body .resumo-stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:12px}
+  :root[data-viva="medprovas"] body .stat-box{--k:var(--c-azul);border:0;border-radius:22px;padding:16px 18px;text-align:left;background:color-mix(in srgb,var(--k) 11%,var(--sup));display:flex;align-items:center;gap:12px}
+  :root[data-viva="medprovas"] body .stat-box .sb-ic{width:40px;height:40px;flex:0 0 40px;border-radius:50%;display:grid;place-items:center;background:var(--k);color:#fff;font-size:19px}
+  :root[data-viva="medprovas"] body .stat-num{font-size:24px;font-weight:800;letter-spacing:-.03em;line-height:1.1;color:color-mix(in srgb,var(--k) 72%,var(--tinta))}
+  :root[data-viva="medprovas"] body .stat-label{font-size:12.5px;color:var(--tinta2);margin-top:2px}
+  :root[data-viva="medprovas"] body .resumo-acoes{display:flex;justify-content:flex-end;margin:0 0 22px}
+  :root[data-viva="medprovas"] body .aluno-card{border-radius:var(--rG);padding:18px 20px;border:1px solid var(--fio);background:var(--sup);box-shadow:var(--sombraV);margin-bottom:14px;animation:vvSobe .35s var(--suave) both}
+  :root[data-viva="medprovas"] body .aluno-card:hover{border-color:var(--fioF);box-shadow:var(--sombraV)}
+  :root[data-viva="medprovas"] body .aluno-header{gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  :root[data-viva="medprovas"] body .aluno-av{width:40px;height:40px;flex:0 0 40px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:14px;background:var(--acSup);color:var(--acInk)}
+  :root[data-viva="medprovas"] body .aluno-nome-input{min-width:180px;font-weight:600}
+  :root[data-viva="medprovas"] body .resp-rapida{flex:0 1 220px!important;min-width:150px!important;text-transform:uppercase;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+  :root[data-viva="medprovas"] body .aluno-nota-w{display:flex;align-items:center;gap:10px;margin-left:auto}
+  :root[data-viva="medprovas"] body .aluno-nota{font-size:28px;font-weight:800;letter-spacing:-.03em;padding:4px 14px;border-radius:16px}
+  :root[data-viva="medprovas"] body .aluno-nota.aprovado{color:color-mix(in srgb,var(--okV) 70%,var(--tinta));background:var(--okSup)}
+  :root[data-viva="medprovas"] body .aluno-nota.reprovado{color:color-mix(in srgb,var(--errV) 75%,var(--tinta));background:var(--errSup)}
+  :root[data-viva="medprovas"] body .aluno-acertos{font-size:12.5px;color:var(--tinta2);line-height:1.3}
+  :root[data-viva="medprovas"] body .aluno-acertos b{display:block;color:var(--tinta);font-size:14px}
+  :root[data-viva="medprovas"] body .respostas-mini{grid-template-columns:repeat(auto-fill,minmax(204px,1fr));gap:8px;margin-top:0}
+  :root[data-viva="medprovas"] body .resp-mini{flex-direction:row;justify-content:space-between;gap:8px;padding:6px 8px 6px 10px;border-radius:16px;border:1px solid transparent;background:var(--sup2)}
+  :root[data-viva="medprovas"] body .resp-mini-num{font-size:12.5px;font-weight:700;color:var(--tinta);min-width:26px}
+  :root[data-viva="medprovas"] body .resp-mini-buttons{margin:0;gap:4px;flex-wrap:nowrap}
+  :root[data-viva="medprovas"] body button.resp-mini-btn{min-height:30px;min-width:30px;width:30px;padding:0;border-radius:50%;font-size:12.5px;font-weight:700;background:var(--sup);color:var(--tinta2);border:1.5px solid var(--fio);box-shadow:none}
+  :root[data-viva="medprovas"] body button.resp-mini-btn:hover{border-color:var(--ac);background:var(--acSup);color:var(--acInk);transform:scale(1.06);filter:none}
+  :root[data-viva="medprovas"] body button.resp-mini-btn.selected{background:var(--tinta);border-color:var(--tinta);color:var(--sup)}
+  :root[data-viva="medprovas"] body .resp-mini.correta{background:var(--okSup);border-color:color-mix(in srgb,var(--okV) 35%,transparent)}
+  :root[data-viva="medprovas"] body .resp-mini.correta button.resp-mini-btn.selected{background:var(--okFill);border-color:var(--okFill);color:var(--fillTxt)}
+  :root[data-viva="medprovas"] body .resp-mini.errada{background:var(--errSup);border-color:color-mix(in srgb,var(--errV) 35%,transparent)}
+  :root[data-viva="medprovas"] body .resp-mini.errada button.resp-mini-btn.selected{background:var(--errFill);border-color:var(--errFill);color:var(--fillTxt)}
+  :root[data-viva="medprovas"] body .resp-mini.anulada{background:var(--avSup);border-color:color-mix(in srgb,var(--avV) 35%,transparent)}
+  :root[data-viva="medprovas"] body .resp-mini-gab{display:none}
+
+  /* ---------- modais ---------- */
+  :root[data-viva="medprovas"] body .img-modal,:root[data-viva="medprovas"] body .paywall-modal{background:rgba(20,24,39,.42);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+  :root[data-viva="medprovas"] body .img-modal-card,:root[data-viva="medprovas"] body .paywall-card{background:var(--sup);border:1px solid var(--fio);border-radius:26px;box-shadow:var(--sombraM);animation:vvPop .32s var(--mola) both}
+  :root[data-viva="medprovas"] body .img-modal-header,:root[data-viva="medprovas"] body .img-modal-footer{border-color:var(--fio)}
+  :root[data-viva="medprovas"] body .img-modal-header h3{display:flex;align-items:center;gap:10px}
+  :root[data-viva="medprovas"] body .img-modal-footer{flex-wrap:wrap;justify-content:flex-start}
+  :root[data-viva="medprovas"] body .img-modal-footer .fim{margin-left:auto}
+  :root[data-viva="medprovas"] body .img-result{border-radius:16px;border:1.5px solid var(--fio);background:var(--sup2)}
+  :root[data-viva="medprovas"] body .img-result:hover{border-color:var(--ac)}
+  :root[data-viva="medprovas"] body .img-result-cap{color:var(--tinta2)}
+  :root[data-viva="medprovas"] body .status{border-radius:14px;border:0}
+  :root[data-viva="medprovas"] body .status.info{background:color-mix(in srgb,var(--c-azul) 11%,var(--sup));color:color-mix(in srgb,var(--c-azul) 55%,var(--tinta))}
+  :root[data-viva="medprovas"] body .status.success{background:var(--okSup);color:color-mix(in srgb,var(--okV) 55%,var(--tinta))}
+  :root[data-viva="medprovas"] body .status.warning{background:var(--avSup);color:color-mix(in srgb,var(--avV) 55%,var(--tinta))}
+  :root[data-viva="medprovas"] body .status.error{background:var(--errSup);color:color-mix(in srgb,var(--errV) 55%,var(--tinta))}
+  :root[data-viva="medprovas"] body .paywall-card .paywall-icon{border-radius:50%;background:var(--ac);color:var(--acTxt);font-size:34px;box-shadow:0 12px 28px color-mix(in srgb,var(--ac) 30%,transparent)}
+  :root[data-viva="medprovas"] body .paywall-card .price{color:var(--tinta)}
+  :root[data-viva="medprovas"] body .paywall-card .btn-row .large{background:var(--ac)}
+  :root[data-viva="medprovas"] body .paywall-card ul li::before{content:none}
+  :root[data-viva="medprovas"] body .paywall-card ul li .ti{color:var(--okV)}
+
+  /* ---------- avisos curtos ---------- */
+  .mp-toasts{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:400;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;width:max-content;max-width:calc(100vw - 32px)}
+  :root[data-viva="medprovas"] body .mp-toast{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:11px 18px 11px 12px;border-radius:999px;background:var(--tinta);color:var(--sup);font-size:14px;font-weight:500;
+    box-shadow:var(--sombraM);animation:vvSobe .35s var(--suave) both}
+  :root[data-viva="medprovas"] body .mp-toast i{width:26px;height:26px;flex:0 0 26px;border-radius:50%;display:grid;place-items:center;font-size:16px;background:rgba(255,255,255,.16)}
+  :root[data-viva="medprovas"] body .mp-toast.ok i{background:var(--okFill);color:var(--fillTxt)}
+  :root[data-viva="medprovas"] body .mp-toast.erro{background:var(--errFill);color:var(--fillTxt)}
+  :root[data-viva="medprovas"] body .mp-toast.sai{opacity:0;transform:translateY(8px);transition:opacity .25s,transform .25s}
+
+  /* ---------- a folha exportada é papel: branco e preto, qualquer tema ---------- */
+  :root[data-viva="medprovas"] body .prova-export,:root[data-viva="medprovas"] body .prova-export *{color:#111;font-family:'Times New Roman',serif;letter-spacing:normal}
+  :root[data-viva="medprovas"] body .prova-export{background:#fff}
+
+  /* ---------- movimento ---------- */
+  @keyframes mpFlutua{0%,100%{transform:translate(0,0)}50%{transform:translate(-14px,12px)}}
+  @keyframes mpAcerto{0%{transform:scale(1)}35%{transform:scale(1.02)}100%{transform:scale(1)}}
+  @keyframes mpPulso{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ac) 45%,transparent)}100%{box-shadow:0 0 0 14px transparent}}
+
+  /* ---------- telas médias: barra lateral só com ícones ---------- */
+  @media (min-width:901px) and (max-width:1180px){
+    :root[data-viva="medprovas"] body #appWrapper{grid-template-columns:84px 1fr}
+    :root[data-viva="medprovas"] body .sidebar{padding:22px 10px}
+    :root[data-viva="medprovas"] body .sidebar-brand{justify-content:center;padding:2px 0 22px}
+    :root[data-viva="medprovas"] body .sidebar-brand .brand-name,:root[data-viva="medprovas"] body .nav-item .nv-l,:root[data-viva="medprovas"] body .sidebar-footer{display:none}
+    :root[data-viva="medprovas"] body .nav-item{justify-content:center;padding:5px;width:48px;margin:0 auto}
+    :root[data-viva="medprovas"] body .mp-ultima{flex-basis:260px}
+    :root[data-viva="medprovas"] body .elab-grade{grid-template-columns:1fr}
+    :root[data-viva="medprovas"] body .elab-resumo{position:static}
+  }
+  @media (max-width:1100px){
+    :root[data-viva="medprovas"] body .dash-stats,:root[data-viva="medprovas"] body .resumo-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+
+  /* ---------- celular e tablet: barra inferior ---------- */
+  @media (max-width:900px){
+    :root[data-viva="medprovas"] body{--topbar-h:58px}
+    :root[data-viva="medprovas"] body #appWrapper{grid-template-columns:minmax(0,1fr);grid-template-rows:var(--topbar-h) 1fr;grid-template-areas:"topbar" "main"}
+    :root[data-viva="medprovas"] body .sidebar{position:fixed!important;left:0;right:0;bottom:0;top:auto!important;height:auto!important;z-index:80;padding:6px 6px calc(6px + env(safe-area-inset-bottom))!important;
+      border:0!important;border-top:1px solid var(--fio)!important;background:color-mix(in srgb,var(--sup) 95%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 -6px 20px rgba(20,24,39,.06)}
+    :root[data-viva="medprovas"] body .sidebar-nav{flex-direction:row!important;justify-content:space-around;gap:0!important;overflow:visible!important}
+    :root[data-viva="medprovas"] body .nav-item{flex:1 1 0;min-width:0;flex-direction:column;justify-content:center;gap:3px;padding:3px 0;min-height:54px;border-radius:16px;font-size:11px;font-weight:600;background:none!important;white-space:nowrap}
+    :root[data-viva="medprovas"] body .nav-item .nv-ic{width:50px;height:30px;flex:0 0 30px;border-radius:999px;background:transparent;font-size:20px;color:var(--tinta2)}
+    :root[data-viva="medprovas"] body .nav-item.active .nv-ic{background:var(--c);color:var(--cTxt);box-shadow:none;transform:translateY(-1px)}
+    :root[data-viva="medprovas"] body .nav-item.active{color:color-mix(in srgb,var(--c) 50%,var(--tinta))}
+    :root[data-viva="medprovas"] body .nav-item:hover .nv-ic{transform:none}
+    :root[data-viva="medprovas"] body .nav-item .nv-l:has(+ .nv-c){display:none}
+    :root[data-viva="medprovas"] body .nav-item .nv-c{display:block}
+    :root[data-viva="medprovas"] body .topbar{padding:0 16px;position:sticky}
+    :root[data-viva="medprovas"] body .topbar .page-title{font-size:16.5px}
+    :root[data-viva="medprovas"] body .selo{width:32px;height:32px;flex-basis:32px;font-size:17px}
+    :root[data-viva="medprovas"] body #userInfoTopbar,:root[data-viva="medprovas"] body .user-info .ghost{display:none}
+    :root[data-viva="medprovas"] body main.content{padding:18px 16px calc(96px + env(safe-area-inset-bottom))}
+    :root[data-viva="medprovas"] body .elab-grade{grid-template-columns:minmax(0,1fr)}
+    :root[data-viva="medprovas"] body .elab-resumo{position:static}
+    .mp-toasts{bottom:calc(84px + env(safe-area-inset-bottom))}
+  }
+  @media (max-width:640px){
+    :root[data-viva="medprovas"] body :is(input[type=text],input[type=email],input[type=number],input[type=search],select,textarea){font-size:16px}
+    :root[data-viva="medprovas"] body .enunciado-edit{font-size:16px!important}
+    :root[data-viva="medprovas"] body .pro-badge{display:none}
+    :root[data-viva="medprovas"] body .card{padding:18px 16px;border-radius:20px}
+    :root[data-viva="medprovas"] body .mp-hero{flex-direction:column;align-items:stretch;padding:22px 20px;border-radius:24px;gap:18px}
+    :root[data-viva="medprovas"] body .mp-hero h2{font-size:25px}
+    :root[data-viva="medprovas"] body .mp-hero .acoesH button{flex:1;padding:10px 12px;white-space:nowrap}
+    :root[data-viva="medprovas"] body .mp-ultima{flex-basis:auto}
+    :root[data-viva="medprovas"] body .dash-stats,:root[data-viva="medprovas"] body .resumo-stats{gap:10px}
+    :root[data-viva="medprovas"] body .dash-stat{padding:14px;gap:10px;border-radius:20px}
+    :root[data-viva="medprovas"] body .dash-stat-icon{width:38px;height:38px;font-size:18px}
+    :root[data-viva="medprovas"] body .dash-stat-num{font-size:21px}
+    :root[data-viva="medprovas"] body .menu-grid{grid-template-columns:minmax(0,1fr);gap:10px}
+    :root[data-viva="medprovas"] body .menu-item{display:grid;grid-template-columns:46px 1fr;column-gap:14px;padding:16px 18px;border-radius:20px}
+    :root[data-viva="medprovas"] body .menu-item .icon{grid-row:span 2;margin:0}
+    :root[data-viva="medprovas"] body .menu-item .passo-n{top:14px;right:14px;width:26px;height:26px;font-size:12px}
+    :root[data-viva="medprovas"] body .elab-form{padding:4px 16px}
+    :root[data-viva="medprovas"] body .passo .form-row{flex-wrap:wrap;gap:6px 8px}
+    :root[data-viva="medprovas"] body .passo .form-row label{min-width:0;flex:1 1 100%}
+    :root[data-viva="medprovas"] body .passo .form-row :is(input,select){min-width:0!important;flex:1 1 0;width:auto}
+    :root[data-viva="medprovas"] body .passo .form-row button{flex:0 0 auto;min-height:44px}
+    :root[data-viva="medprovas"] body #pageConfig .form-row{gap:6px}
+    :root[data-viva="medprovas"] body #pageConfig .form-row label{min-width:0;flex:1 1 100%}
+    :root[data-viva="medprovas"] body .breadcrumb{flex-wrap:nowrap}
+    :root[data-viva="medprovas"] body .breadcrumb .bc-sep,:root[data-viva="medprovas"] body .breadcrumb > span:last-child{display:none}
+    :root[data-viva="medprovas"] body #pageCorrigir .breadcrumb > a:first-child{display:none}
+    :root[data-viva="medprovas"] body .breadcrumb a .mob{display:inline-block}
+    :root[data-viva="medprovas"] body .lista-topo:not(.alunos-topo){flex-wrap:nowrap}
+    :root[data-viva="medprovas"] body .lista-topo:not(.alunos-topo) .busca{min-width:0;flex:1 1 0}
+    :root[data-viva="medprovas"] body .lista-topo:not(.alunos-topo) > button{white-space:nowrap;padding:9px 16px}
+    :root[data-viva="medprovas"] body .lista-item .info .titulo{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+    :root[data-viva="medprovas"] body .stat-box{padding:14px;gap:10px;border-radius:20px}
+    :root[data-viva="medprovas"] body .stat-box .sb-ic{width:34px;height:34px;flex-basis:34px;font-size:17px}
+    :root[data-viva="medprovas"] body .stat-num{font-size:21px}
+    :root[data-viva="medprovas"] body .add-row input{min-width:0!important}
+    :root[data-viva="medprovas"] body .lista-item{flex-wrap:wrap;padding:14px}
+    :root[data-viva="medprovas"] body .lista-item .info{flex:1 1 calc(100% - 60px)}
+    :root[data-viva="medprovas"] body .lista-item .acoes{width:100%}
+    :root[data-viva="medprovas"] body .lista-item .acoes button{flex:1}
+    :root[data-viva="medprovas"] body .prova-topo{padding:18px 16px}
+    :root[data-viva="medprovas"] body .pt-tit h2{font-size:20px}
+    :root[data-viva="medprovas"] body .pt-acoes{width:100%}
+    :root[data-viva="medprovas"] body .pt-acoes button.large{flex:1 1 100%}
+    :root[data-viva="medprovas"] body .pt-acoes{flex-wrap:wrap}
+    :root[data-viva="medprovas"] body .pt-acoes button.secondary{flex:1 1 0;min-width:0;padding:9px 10px;font-size:13px;white-space:nowrap}
+    :root[data-viva="medprovas"] body .pt-acoes button.secondary .ti{display:none}
+    :root[data-viva="medprovas"] body .questao-gerada{padding:16px 14px}
+    :root[data-viva="medprovas"] body .questao-alt{padding:4px 10px 4px 6px}
+    :root[data-viva="medprovas"] body .q-acoes .dir{margin-left:0;width:100%}
+    :root[data-viva="medprovas"] body .q-acoes .dir button.secondary{flex:1}
+    :root[data-viva="medprovas"] body .aq-b{width:100%}
+    :root[data-viva="medprovas"] body .aq-b button{flex:1}
+    :root[data-viva="medprovas"] body .alunos-topo .busca{flex:1 1 100%}
+    :root[data-viva="medprovas"] body .aluno-card{padding:14px}
+    :root[data-viva="medprovas"] body .aluno-nome-input{flex:1 1 calc(100% - 60px)!important;min-width:0!important}
+    :root[data-viva="medprovas"] body .resp-rapida{flex:1 1 100%!important}
+    :root[data-viva="medprovas"] body .aluno-nota-w{margin-left:0;width:100%;justify-content:space-between}
+    :root[data-viva="medprovas"] body .respostas-mini{grid-template-columns:minmax(0,1fr)}
+    :root[data-viva="medprovas"] body button.resp-mini-btn{min-height:44px;min-width:44px;width:44px;font-size:14px}
+    :root[data-viva="medprovas"] body .resp-mini{padding:6px 8px 6px 14px}
+    :root[data-viva="medprovas"] body .img-modal{padding:10px;align-items:flex-end}
+    :root[data-viva="medprovas"] body .img-modal-card{max-height:92vh}
+    :root[data-viva="medprovas"] body .img-search-row{flex-direction:column}
+    :root[data-viva="medprovas"] body .img-modal-footer{max-height:36vh;overflow-y:auto}
+    :root[data-viva="medprovas"] body .img-modal-footer button{flex:1 1 calc(50% - 8px);padding:8px 10px;font-size:13px}
+    :root[data-viva="medprovas"] body .busca kbd{display:none}
+  }
+
+  /* ---------- escuro (só com data-viva-escuro no <html>) ---------- */
+  @media (prefers-color-scheme:dark){
+    :root[data-viva="medprovas"][data-viva-escuro] body{--okFill:var(--okV);--errFill:var(--errV);--fillTxt:#0D1017}
+    :root[data-viva="medprovas"][data-viva-escuro] body .mp-hero{box-shadow:0 18px 40px rgba(0,0,0,.35)}
+    :root[data-viva="medprovas"][data-viva-escuro] body .mp-ultima{background:rgba(22,27,38,.92);color:#EDF0F7}
+    :root[data-viva="medprovas"][data-viva-escuro] body .mp-ultima small{color:var(--acInk)}
+    :root[data-viva="medprovas"][data-viva-escuro] body .mp-ultima .mu-meta{color:#A3ABBE}
+    :root[data-viva="medprovas"][data-viva-escuro] body .mp-ultima .mu-b button{background:var(--ac);border-color:var(--ac);color:var(--acTxt)}
+    :root[data-viva="medprovas"][data-viva-escuro] body .mp-ultima .mu-b button.sec{background:transparent;color:#EDF0F7;border-color:rgba(255,255,255,.25)}
+    :root[data-viva="medprovas"][data-viva-escuro] body button.resp-mini-btn.selected{background:var(--tinta);color:var(--papel)}
+    :root[data-viva="medprovas"][data-viva-escuro] body .mp-toast i{background:rgba(20,24,39,.1)}
+  }
+  @media (prefers-reduced-motion:reduce){
+    :root[data-viva="medprovas"] body .mp-hero .bola,:root[data-viva="medprovas"] body .selo,:root[data-viva="medprovas"] body .questao-gerada.destaque{animation:none!important}
+  }
+  } /* @media screen */
 </style>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="vendor/tabler/tabler-icons.min.css?v=3.48.0">
 <link rel="stylesheet" href="_mttokens.css?v=3">
-<link rel="stylesheet" href="_mtastra.css?v=5">
+<link rel="stylesheet" href="_mtviva.css?v=1">
 </head>
 <body>
 
@@ -1327,7 +1805,7 @@
         <input type="text" id="regDisciplinas" placeholder="Ex: Cardiologia, Pediatria, Clínica Médica">
       </div>
       <p style="font-size:0.85em; color:#6b7280; margin-bottom: 12px;">
-        ℹ️ A senha padrão serão os <strong>6 primeiros dígitos do seu CPF</strong>.
+        A senha padrão serão os <strong>6 primeiros dígitos do seu CPF</strong>.
       </p>
       <label style="display:flex;gap:8px;align-items:flex-start;font-size:0.8em;color:#6b7280;margin-bottom:12px;text-align:left">
         <input type="checkbox" id="regConsent" style="margin-top:3px;flex:0 0 auto">
@@ -1340,33 +1818,30 @@
 </div>
 
 <!-- ============ APP (após login) ============ -->
+<!-- 23/09/2026, camada viva: barra lateral clara com o ícone de cada seção em círculo da sua cor
+     (vira barra inferior no celular), título de página com selo, cartões arredondados. Ids mantidos. -->
 <div id="appWrapper" class="hidden">
   <aside class="sidebar">
     <div class="sidebar-brand" onclick="navegar('menu')">
       <div class="brand-mark">M+</div>
-      <div class="brand-name">Med<span>Provas</span></div>
+      <div class="brand-name">MedProvas</div>
     </div>
-    <nav class="sidebar-nav" id="sidebarNav">
-      <div class="nav-item" data-page="menu" onclick="navegar('menu')">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3l9 9"></path><path d="M5 10v10h14V10"></path></svg>
-        Início
-      </div>
-      <div class="nav-item" data-page="disciplinas" onclick="navegar('disciplinas')">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-        Disciplinas
-      </div>
-      <div class="nav-item" data-page="elaborar" onclick="navegar('elaborar')">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"></path></svg>
-        Elaborar prova
-      </div>
-      <div class="nav-item" data-page="provas" onclick="navegar('provas')">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line></svg>
-        Minhas provas
-      </div>
-      <div class="nav-item" data-page="config" onclick="navegar('config')">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.49.21.85.65 1 1.18.07.13.11.27.11.42v.4"></path></svg>
-        Configurações
-      </div>
+    <nav class="sidebar-nav" id="sidebarNav" aria-label="Seções">
+      <a class="nav-item" href="#" data-page="menu" style="--c:var(--ac);--cTxt:var(--acTxt)" onclick="navegar('menu');return false">
+        <span class="nv-ic"><i class="ti ti-home"></i></span><span class="nv-l">Início</span>
+      </a>
+      <a class="nav-item" href="#" data-page="elaborar" style="--c:var(--c-azul)" onclick="navegar('elaborar');return false">
+        <span class="nv-ic"><i class="ti ti-file-plus"></i></span><span class="nv-l">Elaborar prova</span><span class="nv-c">Elaborar</span>
+      </a>
+      <a class="nav-item" href="#" data-page="provas" style="--c:var(--c-teal)" onclick="navegar('provas');return false">
+        <span class="nv-ic"><i class="ti ti-files"></i></span><span class="nv-l">Minhas provas</span><span class="nv-c">Provas</span>
+      </a>
+      <a class="nav-item" href="#" data-page="disciplinas" style="--c:var(--c-violeta)" onclick="navegar('disciplinas');return false">
+        <span class="nv-ic"><i class="ti ti-books"></i></span><span class="nv-l">Disciplinas</span>
+      </a>
+      <a class="nav-item" href="#" data-page="config" style="--c:var(--c-cinza)" onclick="navegar('config');return false">
+        <span class="nv-ic"><i class="ti ti-settings"></i></span><span class="nv-l">Configurações</span><span class="nv-c">Ajustes</span>
+      </a>
     </nav>
     <div class="sidebar-footer">MedProvas · v1.0</div>
   </aside>
@@ -1383,225 +1858,251 @@
 
   <main class="content">
   <div class="container">
-    <!-- MENU PRINCIPAL (DASHBOARD) -->
+    <!-- INÍCIO -->
     <div id="pageMenu" class="page">
-      <div class="dashboard-hero">
-        <h2>Olá, <span id="menuPrimeiroNome">professor</span></h2>
-        <p>Bem-vindo de volta ao MedProvas. Pronto para criar uma nova prova?</p>
+      <div class="mp-hero">
+        <span class="bola b1"></span><span class="bola b2"></span><span class="bola b3"></span>
+        <div class="txt">
+          <small id="heroData"><i class="ti ti-calendar"></i> hoje</small>
+          <h2>Olá, <span id="menuPrimeiroNome">professor</span></h2>
+          <p id="heroResumo">Envie o PDF de uma aula e a IA monta a prova. Você revisa, exporta e corrige aqui.</p>
+          <div class="acoesH">
+            <button class="large" onclick="navegar('elaborar')"><i class="ti ti-file-plus"></i> Elaborar prova</button>
+            <button class="large sec" onclick="navegar('provas')">Minhas provas</button>
+          </div>
+        </div>
+        <div class="mp-ultima" id="heroUltima"></div>
       </div>
 
       <div class="dash-stats" id="dashStats"></div>
 
-      <div class="section-title">
-        <h3>O que você quer fazer?</h3>
-      </div>
+      <div class="section-title"><h3>Passo a passo</h3></div>
       <div class="menu-grid">
-        <div class="menu-item" onclick="navegar('elaborar')">
-          <div class="icon">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"></path></svg>
-          </div>
-          <div class="title">Elaborar Prova</div>
-          <div class="desc">Gere uma prova completa em minutos a partir dos seus materiais didáticos.</div>
+        <div class="menu-item" style="--k:var(--c-azul)" role="button" tabindex="0" onclick="navegar('elaborar')" onkeydown="if(event.key==='Enter')navegar('elaborar')">
+          <div class="icon"><i class="ti ti-file-plus"></i></div>
+          <div class="passo-n">1</div>
+          <div class="title">Elaborar</div>
+          <div class="desc">Envie os PDFs das aulas, escolha a disciplina e quantas questões quer.</div>
         </div>
-        <div class="menu-item" onclick="navegar('provas')">
-          <div class="icon">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-          </div>
-          <div class="title">Minhas Provas</div>
-          <div class="desc">Edite, baixe em Word/PDF ou corrija provas que você já criou.</div>
+        <div class="menu-item" style="--k:var(--c-teal)" role="button" tabindex="0" onclick="navegar('provas')" onkeydown="if(event.key==='Enter')navegar('provas')">
+          <div class="icon"><i class="ti ti-list-check"></i></div>
+          <div class="passo-n">2</div>
+          <div class="title">Revisar</div>
+          <div class="desc">Edite enunciados, troque o gabarito, anule ou refaça uma questão.</div>
         </div>
-        <div class="menu-item" onclick="navegar('disciplinas')">
-          <div class="icon">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-          </div>
-          <div class="title">Minhas Disciplinas</div>
-          <div class="desc">Cadastre as disciplinas que você leciona para organizar suas provas.</div>
+        <div class="menu-item" style="--k:var(--c-violeta)" role="button" tabindex="0" onclick="navegar('provas')" onkeydown="if(event.key==='Enter')navegar('provas')">
+          <div class="icon"><i class="ti ti-clipboard-check"></i></div>
+          <div class="passo-n">3</div>
+          <div class="title">Exportar e corrigir</div>
+          <div class="desc">Baixe em PDF ou Word e lance as respostas dos alunos para ver as notas.</div>
         </div>
       </div>
+
+      <div class="section-title" id="recentesTit"><h3>Provas recentes</h3><button class="ghost small" onclick="navegar('provas')">Ver todas</button></div>
+      <div id="dashRecentes"></div>
     </div>
 
     <!-- DISCIPLINAS -->
     <div id="pageDisciplinas" class="page hidden">
-      <div class="breadcrumb"><a onclick="navegar('menu')">← Menu</a></div>
       <div class="card">
-        <h2>Minhas Disciplinas</h2>
-        <div class="form-row">
-          <input type="text" id="novaDisciplina" placeholder="Nome da disciplina (ex: Emergências Clínicas)" onkeydown="if(event.key==='Enter') adicionarDisciplina()">
+        <p class="pg-sub">As disciplinas organizam as provas e evitam questões repetidas entre provas da mesma disciplina.</p>
+        <div class="form-row add-row">
+          <input type="text" id="novaDisciplina" placeholder="Nome da disciplina, por exemplo Emergências Clínicas" autocomplete="off" onkeydown="if(event.key==='Enter') adicionarDisciplina()">
           <button onclick="adicionarDisciplina()"><i class="ti ti-plus"></i> Adicionar</button>
         </div>
-        <div id="listaDisciplinas" style="margin-top: 16px;"></div>
+        <div id="listaDisciplinas"></div>
       </div>
     </div>
 
     <!-- ELABORAR PROVA -->
     <div id="pageElaborar" class="page hidden">
-      <div class="breadcrumb"><a onclick="navegar('menu')">← Menu</a></div>
-      <div class="card">
-        <h2><i class="ti ti-sparkles"></i> Elaborar Prova com IA</h2>
+      <div class="elab-grade">
+      <div class="card elab-form">
+        <section class="passo" style="--k:var(--c-azul)">
+          <h3><span class="pn">1</span> A prova</h3>
+          <div class="form-row">
+            <label for="elabDisciplina">Disciplina</label>
+            <select id="elabDisciplina" onchange="checarElab()"></select>
+            <button class="secondary small" type="button" onclick="adicionarDisciplinaRapida()"><i class="ti ti-plus"></i> Nova</button>
+          </div>
+          <div class="form-row">
+            <label for="elabTitulo">Título da prova</label>
+            <input type="text" id="elabTitulo" placeholder="Ex.: PR1 Emergências Clínicas, turma 2026.1" autocomplete="off" oninput="checarElab()">
+          </div>
+          <div class="form-row">
+            <label for="elabNumQuestoes">Nº de questões</label>
+            <input type="number" id="elabNumQuestoes" value="10" min="1" max="50" inputmode="numeric" oninput="checarElab()">
+          </div>
+        </section>
 
-        <div class="form-row">
-          <label>Disciplina</label>
-          <select id="elabDisciplina"></select>
-        </div>
-        <div class="form-row">
-          <label>Título da prova</label>
-          <input type="text" id="elabTitulo" placeholder="Ex: PR1 Emergências Clínicas - Turma 2026.1">
-        </div>
-        <div class="form-row">
-          <label>Nº de questões</label>
-          <input type="number" id="elabNumQuestoes" value="10" min="1" max="50">
-        </div>
+        <section class="passo" style="--k:var(--c-teal)">
+          <h3><span class="pn">2</span> Materiais das aulas (PDF)</h3>
+          <p class="dica">Aulas, slides ou textos que servem de base para as questões.</p>
+          <label for="materiaisInput" class="file-drop">
+            <span class="fd-ic"><i class="ti ti-file-upload"></i></span>
+            <span class="fd-t"><strong>Clique ou arraste os PDFs</strong><span>Pode enviar vários de uma vez</span></span>
+          </label>
+          <input type="file" id="materiaisInput" accept=".pdf" multiple style="display:none" onchange="adicionarMateriais(event)">
+          <div id="listaMateriais" class="file-list"></div>
+        </section>
 
-        <h3 style="margin-top:20px;">Materiais didáticos (PDF)</h3>
-        <p style="color:#6b7280; font-size:0.9em; margin-bottom:8px;">
-          Faça upload das aulas/slides/textos que servirão de base para a IA elaborar as questões.
-        </p>
-        <label for="materiaisInput" class="file-drop">
-          <p style="font-size:1.5em;">📄</p>
-          <p><strong>Clique ou arraste PDFs</strong> dos materiais didáticos</p>
-        </label>
-        <input type="file" id="materiaisInput" accept=".pdf" multiple style="display:none" onchange="adicionarMateriais(event)">
-        <div id="listaMateriais" class="file-list"></div>
+        <section class="passo" style="--k:var(--c-violeta)">
+          <h3><span class="pn">3</span> Instruções para a IA <span class="opc">opcional</span></h3>
+          <p class="dica">Ex.: mesmo número de questões por tópico, casos mais difíceis, evitar um tema.</p>
+          <textarea id="elabInstrucoes" placeholder="Ex.: quero o mesmo número de questões para cada tópico das aulas. Use casos com comorbidades. Evite questões puramente teóricas." style="width:100%; min-height:90px;"></textarea>
+        </section>
 
-        <h3 style="margin-top:20px;">Instruções extras para a IA <span style="font-weight:400; color:var(--text-muted); font-size:0.85em;">(opcional)</span></h3>
-        <p style="color:var(--text-muted); font-size:0.9em; margin-bottom:8px;">
-          Escreva orientações específicas sobre como você quer a prova. Ex: "distribuir igualmente entre os tópicos X, Y e Z", "questões mais difíceis", "focar em casos pediátricos", "evitar tema X", etc.
-        </p>
-        <textarea id="elabInstrucoes" placeholder='Ex: "Quero o mesmo número de questões para cada um dos tópicos abordados nos materiais. Use casos mais complexos, com comorbidades. Evite questões puramente teóricas."' style="width:100%; min-height:90px;"></textarea>
+        <section class="passo" style="--k:var(--c-rosa)">
+          <h3><span class="pn">4</span> Modelo da prova <span class="opc">opcional</span></h3>
+          <p class="dica">PDF ou Word com cabeçalho e instruções. Com um .docx você baixa a prova pronta no seu modelo em Word.</p>
+          <label for="esqueletoInput" class="file-drop">
+            <span class="fd-ic"><i class="ti ti-template"></i></span>
+            <span class="fd-t"><strong>Clique ou arraste o modelo</strong><span>PDF ou .docx</span></span>
+          </label>
+          <input type="file" id="esqueletoInput" accept=".pdf,.docx" style="display:none" onchange="adicionarEsqueleto(event)">
+          <div id="esqueletoInfo" class="file-list"></div>
+        </section>
+      </div>
 
-        <h3 style="margin-top:20px;">Esqueleto da prova</h3>
-        <p style="color:#6b7280; font-size:0.9em; margin-bottom:8px;">
-          PDF ou Word com o cabeçalho/instruções/formatação que servirão de modelo. As questões serão geradas no estilo desse modelo.
-        </p>
-        <label for="esqueletoInput" class="file-drop">
-          <p style="font-size:1.5em;"><i class="ti ti-clipboard"></i></p>
-          <p><strong>Clique ou arraste o esqueleto</strong> (PDF ou .docx)</p>
-        </label>
-        <input type="file" id="esqueletoInput" accept=".pdf,.docx" style="display:none" onchange="adicionarEsqueleto(event)">
-        <div id="esqueletoInfo" class="file-list"></div>
-
-        <div style="margin-top:24px;">
-          <button class="success large" onclick="gerarProva()" id="btnGerar">
-            <i class="ti ti-sparkles"></i> Gerar Prova com IA
-          </button>
-          <span id="elabStatus" style="margin-left:12px;"></span>
-        </div>
+      <aside class="card elab-resumo">
+        <h3>Antes de gerar</h3>
+        <ul class="checa" id="elabChecklist"></ul>
+        <button class="large" onclick="gerarProva()" id="btnGerar"><i class="ti ti-file-plus"></i> Gerar prova</button>
+        <p class="dica tempo">Leva de 30 a 60 segundos. Você revisa tudo antes de exportar.</p>
+        <div id="elabStatus"></div>
+      </aside>
       </div>
     </div>
 
     <!-- LISTA DE PROVAS -->
     <div id="pageProvas" class="page hidden">
-      <div class="breadcrumb"><a onclick="navegar('menu')">← Menu</a></div>
-      <div class="card">
-        <h2><i class="ti ti-clipboard"></i> Minhas Provas</h2>
-        <div id="listaProvas"></div>
+      <div class="lista-topo">
+        <label class="busca"><i class="ti ti-search"></i><input type="search" id="buscaProvas" placeholder="Buscar prova ou disciplina" autocomplete="off" oninput="renderListaProvas()"><kbd>/</kbd></label>
+        <button onclick="navegar('elaborar')"><i class="ti ti-file-plus"></i> Nova prova</button>
       </div>
+      <div id="listaProvas"></div>
     </div>
 
     <!-- VER/EDITAR PROVA -->
     <div id="pageProva" class="page hidden">
       <div class="breadcrumb">
-        <a onclick="navegar('menu')">Menu</a> /
-        <a onclick="navegar('provas')">Provas</a> /
+        <a onclick="navegar('provas')"><i class="ti ti-arrow-left"></i> Minhas provas</a>
+        <span class="bc-sep">/</span>
         <span id="provaBreadcrumb"></span>
       </div>
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-          <h2 id="provaTitulo"></h2>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="secondary small" onclick="exportarProvaDocx()" id="btnDocx"><i class="ti ti-file-text"></i> Baixar Word</button>
-            <button class="secondary small" onclick="exportarProvaPDF()"><i class="ti ti-download"></i> Baixar PDF</button>
-            <button class="secondary small" onclick="exportarGabaritoPDF()"><i class="ti ti-key"></i> Gabarito PDF</button>
-            <button class="success small" onclick="navegar('corrigir')"><i class="ti ti-pencil"></i> Corrigir provas</button>
-            <button class="danger small" onclick="removerProvaAtual()"><i class="ti ti-trash"></i> Excluir</button>
+      <div class="card prova-topo">
+        <div class="pt-linha">
+          <div class="pt-tit">
+            <h2 id="provaTitulo"></h2>
+            <p id="provaMeta" class="pt-meta"></p>
+          </div>
+          <div class="pt-acoes">
+            <button class="large" onclick="navegar('corrigir')"><i class="ti ti-checklist"></i> Corrigir provas</button>
+            <button class="secondary" onclick="exportarProvaPDF(this)"><i class="ti ti-file-download"></i> Prova em PDF</button>
+            <button class="secondary" onclick="exportarGabaritoPDF(this)"><i class="ti ti-key"></i> Gabarito em PDF</button>
+            <button class="secondary" onclick="exportarProvaDocx(this)" id="btnDocx"><i class="ti ti-file-word"></i> Baixar Word</button>
+            <button class="ghost ic-btn perigo" onclick="removerProvaAtual()" title="Excluir prova" aria-label="Excluir prova"><i class="ti ti-trash"></i></button>
           </div>
         </div>
-        <p id="provaMeta" style="color:#6b7280; margin-top: 4px;"></p>
-        <div id="provaQuestoes" style="margin-top: 20px;"></div>
-        <div style="margin-top: 16px; padding: 16px; border: 2px dashed var(--border-strong); border-radius: var(--radius); background: var(--bg); display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:center;">
-          <strong style="color:var(--text-muted); margin-right:6px;">Adicionar nova questão:</strong>
-          <button class="success small" id="btnAddIA" onclick="adicionarQuestaoIA()"><i class="ti ti-sparkles"></i> Gerar com IA</button>
-          <button class="secondary small" onclick="adicionarQuestaoManual()"><i class="ti ti-pencil"></i> Em branco</button>
-        </div>
-        <div id="addQuestaoStatus" style="margin-top:10px;"></div>
+        <div class="q-mapa-cab"><span>Gabarito</span><em>Clique na letra de uma alternativa para trocar o gabarito.</em></div>
+        <div class="q-mapa" id="provaMapa"></div>
       </div>
+      <div id="provaQuestoes"></div>
+      <div class="add-q">
+        <div class="aq-t"><strong>Adicionar questão</strong><span>A IA cria sem repetir as que já existem.</span></div>
+        <div class="aq-b">
+          <button id="btnAddIA" onclick="adicionarQuestaoIA()"><i class="ti ti-plus"></i> Gerar com IA</button>
+          <button class="secondary" onclick="adicionarQuestaoManual()"><i class="ti ti-pencil"></i> Em branco</button>
+        </div>
+      </div>
+      <div id="addQuestaoStatus"></div>
     </div>
 
     <!-- CORRIGIR PROVA -->
     <div id="pageCorrigir" class="page hidden">
       <div class="breadcrumb">
-        <a onclick="navegar('menu')">Menu</a> /
-        <a onclick="navegar('provas')">Provas</a> /
-        <a onclick="navegar('prova')" id="corrigirBreadcrumbProva"></a> /
-        Correção
+        <a onclick="navegar('provas')"><i class="ti ti-arrow-left"></i> Minhas provas</a>
+        <span class="bc-sep">/</span>
+        <a onclick="navegar('prova')" id="corrigirBreadcrumbProva"></a>
+        <span class="bc-sep">/</span>
+        <span>Correção</span>
       </div>
-      <div class="card">
-        <h2 id="corrigirTitulo"></h2>
-        <p id="corrigirGabarito" style="color:#6b7280; margin-bottom:16px;"></p>
-
-        <div class="form-row">
-          <button class="success large" onclick="adicionarAlunoCorrecao()"><i class="ti ti-plus"></i> Adicionar Aluno</button>
-          <span style="color:#6b7280; font-size:0.9em;" id="contadorAlunosCorrecao"></span>
+      <div class="card prova-topo">
+        <div class="pt-linha">
+          <div class="pt-tit">
+            <h2 id="corrigirTitulo"></h2>
+            <p class="pt-meta">Marque as respostas de cada aluno. A nota sai na hora; aprovação a partir de 6,0.</p>
+          </div>
+          <div class="pt-acoes">
+            <button class="large" onclick="adicionarAlunoCorrecao()"><i class="ti ti-user-plus"></i> Adicionar aluno</button>
+          </div>
         </div>
-
-        <div id="resumoCorrecao"></div>
-        <div id="listaAlunosCorrecao" style="margin-top: 12px;"></div>
+        <div class="q-mapa-cab"><span>Gabarito</span></div>
+        <div id="corrigirGabarito" class="q-mapa"></div>
       </div>
+
+      <div id="resumoCorrecao"></div>
+      <div class="lista-topo alunos-topo">
+        <h3>Alunos <span id="contadorAlunosCorrecao" class="cont"></span></h3>
+        <label class="busca"><i class="ti ti-search"></i><input type="search" id="buscaAluno" placeholder="Buscar aluno" autocomplete="off" oninput="filtrarAlunos()"></label>
+      </div>
+      <div id="listaAlunosCorrecao"></div>
     </div>
 
     <!-- CONFIG -->
     <div id="pageConfig" class="page hidden">
-      <div class="breadcrumb"><a onclick="navegar('menu')">← Menu</a></div>
       <div class="card">
-        <h2><i class="ti ti-settings"></i> Configurações</h2>
-
-        <h3 style="margin-top:8px;">Meus dados</h3>
+        <h3>Meus dados</h3>
         <div class="form-row">
-          <label>Nome</label>
-          <input type="text" id="configNome">
+          <label for="configNome">Nome</label>
+          <input type="text" id="configNome" autocomplete="name">
         </div>
         <div class="form-row">
-          <label>E-mail (conta MedTech)</label>
+          <label for="configEmail">E-mail da conta MedTech</label>
           <input type="email" id="configEmail" disabled>
         </div>
-        <button onclick="salvarConfig()">Salvar alterações</button>
-
-        <h3 style="margin-top:24px;">Conta</h3>
-        <button class="ghost" onclick="fazerLogout()">Sair da conta MedTech</button>
+        <button onclick="salvarConfig()"><i class="ti ti-check"></i> Salvar alterações</button>
+      </div>
+      <div class="card">
+        <h3>Conta</h3>
+        <p class="pg-sub">Suas provas ficam salvas neste navegador. A IA vem incluída na conta MedTech.</p>
+        <button class="secondary" onclick="fazerLogout()"><i class="ti ti-logout"></i> Sair da conta MedTech</button>
       </div>
     </div>
   </div>
   </main>
 </div>
 
+<div id="mpToast" class="mp-toasts" aria-live="polite"></div>
+
 <!-- Modal de busca de imagem -->
 <div class="img-modal" id="imgModal">
   <div class="img-modal-card">
     <div class="img-modal-header">
       <h3 id="imgModalTitle"><i class="ti ti-photo"></i> Buscar imagem para questão</h3>
-      <button class="ghost small" onclick="fecharBuscaImagem()">✕</button>
+      <button class="ghost small ic-btn" onclick="fecharBuscaImagem()" title="Fechar (Esc)" aria-label="Fechar"><i class="ti ti-x"></i></button>
     </div>
     <div class="img-modal-body">
-      <p style="color:var(--text-muted); font-size:0.9em; margin-bottom:8px;">
-        Você tem várias opções: <strong>buscar no Wikimedia</strong> (digite abaixo — pode ser em português, a IA traduz), <strong>💻 do computador</strong>, <strong>📄 página do material</strong>, ou <strong>🔗 colar URL</strong>.
+      <p style="color:var(--tinta2); font-size:0.9em; margin-bottom:10px;">
+        Busque no Wikimedia Commons (pode escrever em português) ou use uma das opções abaixo: do computador, página do material, link ou gerada pela IA.
       </p>
       <div class="img-search-row">
-        <input type="text" id="imgSearchInput" placeholder='ex: "raio-X tórax pneumonia" ou "ECG anterior STEMI"' onkeydown="if(event.key==='Enter')executarBuscaImagem()">
-        <button onclick="executarBuscaImagem()">Buscar</button>
+        <input type="search" id="imgSearchInput" placeholder='Ex.: raio-X tórax pneumonia' autocomplete="off" onkeydown="if(event.key==='Enter')executarBuscaImagem()">
+        <button onclick="executarBuscaImagem()"><i class="ti ti-search"></i> Buscar</button>
       </div>
       <div id="imgSearchStatus" style="margin-bottom:10px;"></div>
       <div class="img-results-grid" id="imgResults"></div>
     </div>
     <div class="img-modal-footer">
-      <button class="ghost" onclick="removerImagemAtual()"><i class="ti ti-trash"></i> Remover</button>
-      <button class="success" onclick="abrirGeradorECG()" title="Gere um ECG personalizado a partir de uma descrição"><i class="ti ti-heart"></i> Gerar ECG</button>
-      <button class="success" onclick="abrirGeradorImagem()" title="Gere uma imagem médica a partir de uma descrição"><i class="ti ti-palette"></i> Gerar imagem com IA</button>
-      <button class="secondary" onclick="recortarImagemAtualComIA()" title="Detecta e mantém só a figura médica, removendo texto da slide"><i class="ti ti-cut"></i> Recortar com IA</button>
-      <button class="secondary" onclick="document.getElementById('imgUploadInput').click()"><i class="ti ti-device-desktop"></i> Do computador</button>
+      <button class="secondary small" onclick="document.getElementById('imgUploadInput').click()"><i class="ti ti-upload"></i> Do computador</button>
       <input type="file" id="imgUploadInput" accept="image/*" style="display:none" onchange="anexarImagemDoComputador(event)">
-      <button class="secondary" onclick="anexarImagemPorPaginaMaterial()"><i class="ti ti-file"></i> Página do material</button>
-      <button class="secondary" onclick="anexarImagemPorUrl()"><i class="ti ti-link"></i> Colar URL</button>
-      <button class="ghost" onclick="fecharBuscaImagem()">Fechar</button>
+      <button class="secondary small" onclick="anexarImagemPorPaginaMaterial()"><i class="ti ti-file"></i> Página do material</button>
+      <button class="secondary small" onclick="anexarImagemPorUrl()"><i class="ti ti-link"></i> Colar link</button>
+      <button class="secondary small" onclick="abrirGeradorECG()" title="Desenha um ECG a partir de uma descrição"><i class="ti ti-heartbeat"></i> Gerar ECG</button>
+      <button class="secondary small" onclick="abrirGeradorImagem()" title="Gera uma imagem médica a partir de uma descrição"><i class="ti ti-photo-plus"></i> Gerar imagem com IA</button>
+      <button class="secondary small" onclick="recortarImagemAtualComIA()" title="Mantém só a figura médica e tira o texto do slide"><i class="ti ti-crop"></i> Recortar com IA</button>
+      <button class="ghost small perigo" onclick="removerImagemAtual()"><i class="ti ti-trash"></i> Remover imagem</button>
+      <button class="ghost small fim" onclick="fecharBuscaImagem()">Fechar</button>
     </div>
   </div>
 </div>
@@ -1609,17 +2110,17 @@
 <!-- Paywall Modal -->
 <div class="paywall-modal" id="paywallModal">
   <div class="paywall-card">
-    <div class="paywall-icon">⭐</div>
+    <div class="paywall-icon"><i class="ti ti-star"></i></div>
     <h2>Assine o MedProvas Pro</h2>
     <p style="color:var(--text-muted);">Você usou sua prova grátis. Para continuar gerando provas com IA, ative o Pro.</p>
     <div class="price">R$ 39,90</div>
     <div class="price-sub">por mês · cancele quando quiser</div>
     <ul>
-      <li>Provas ilimitadas geradas com IA</li>
-      <li>Regeneração e adição de questões ilimitadas</li>
-      <li>Imagens, ECGs e ilustrações com IA</li>
-      <li>Export Word + PDF + Gabarito comentado</li>
-      <li>Correção de provas com gabaritos editáveis</li>
+      <li><i class="ti ti-check"></i> Provas ilimitadas geradas com IA</li>
+      <li><i class="ti ti-check"></i> Questões novas e refeitas sem limite</li>
+      <li><i class="ti ti-check"></i> Imagens, ECGs e ilustrações com IA</li>
+      <li><i class="ti ti-check"></i> Word, PDF e gabarito comentado</li>
+      <li><i class="ti ti-check"></i> Correção com gabarito editável</li>
     </ul>
     <div class="btn-row">
       <button class="large" onclick="irParaCheckout()">Assinar Pro</button>
@@ -1827,6 +2328,48 @@ function userAtual() {
 }
 
 // ============================================================
+// Camada viva (23/09/2026): aviso curto, número que conta, entrada escalonada
+// ============================================================
+function toast(msg, tipo = '', ms) {
+  const box = document.getElementById('mpToast');
+  if (!box) { if (tipo === 'erro') alert(msg); return; }
+  const el = document.createElement('div');
+  el.className = 'mp-toast ' + tipo;
+  const ic = tipo === 'ok' ? 'ti-check' : tipo === 'erro' ? 'ti-alert-circle' : 'ti-info-circle';
+  el.innerHTML = `<i class="ti ${ic}"></i><span></span>`;
+  el.querySelector('span').textContent = msg;
+  box.appendChild(el);
+  while (box.children.length > 3) box.firstChild.remove();
+  setTimeout(() => { el.classList.add('sai'); setTimeout(() => el.remove(), 300); }, ms || (tipo === 'erro' ? 5200 : 2600));
+}
+const _semMovimento = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+function contar(raiz) {
+  (raiz || document).querySelectorAll('[data-conta]').forEach(el => {
+    const alvo = parseFloat(el.dataset.conta) || 0;
+    const casas = parseInt(el.dataset.casas || '0', 10);
+    const fmt = v => v.toLocaleString('pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas });
+    if (_semMovimento() || alvo === 0) { el.textContent = fmt(alvo); return; }
+    const t0 = performance.now(), dur = 700;
+    const passo = (t) => {
+      const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = fmt(alvo * e);
+      if (k < 1) requestAnimationFrame(passo);
+    };
+    requestAnimationFrame(passo);
+  });
+}
+function animaEntrada(el) {
+  if (!el) return;
+  el.classList.remove('anima'); void el.offsetWidth; el.classList.add('anima');
+}
+function escAttr(s) { return escapeHtml(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+function tamanhoLegivel(n) {
+  n = Number(n) || 0;
+  if (n < 1024 * 1024) return Math.max(1, Math.round(n / 1024)) + ' KB';
+  return (n / 1024 / 1024).toFixed(1).replace('.', ',') + ' MB';
+}
+
+// ============================================================
 // Helpers
 // ============================================================
 function formatarCpf(input) {
@@ -1926,11 +2469,15 @@ function entrarApp() {
 }
 
 function primeiroNome(nome) {
-  return (nome || '').trim().split(/\s+/)[0] || 'professor';
+  // pula o pronome de tratamento ("Profa. Ana" vira "Ana")
+  const partes = (nome || '').trim().split(/\s+/).filter(Boolean);
+  const titulo = /^(prof|profa|profª|professor|professora|dr|dra|drª|sr|sra)\.?$/i;
+  const p = partes.find(x => !titulo.test(x));
+  return p || partes[0] || 'professor';
 }
 
 function iniciaisDeNome(nome) {
-  const partes = (nome || '').trim().split(/\s+/).filter(Boolean);
+  const partes = (nome || '').trim().split(/\s+/).filter(Boolean).filter((x, i, a) => a.length === 1 || !/^(prof|profa|profª|professor|professora|dr|dra|drª|sr|sra)\.?$/i.test(x));
   if (partes.length === 0) return '?';
   if (partes.length === 1) return partes[0][0].toUpperCase();
   return (partes[0][0] + partes[partes.length - 1][0]).toUpperCase();
@@ -1942,12 +2489,22 @@ function iniciaisDeNome(nome) {
 const PAGES = ['menu', 'disciplinas', 'elaborar', 'provas', 'prova', 'corrigir', 'config'];
 const PAGE_TITLES = {
   menu: 'Início',
-  disciplinas: 'Minhas Disciplinas',
-  elaborar: 'Elaborar Prova',
-  provas: 'Minhas Provas',
-  prova: 'Detalhes da Prova',
-  corrigir: 'Correção de Provas',
+  disciplinas: 'Disciplinas',
+  elaborar: 'Elaborar prova',
+  provas: 'Minhas provas',
+  prova: 'Revisar prova',
+  corrigir: 'Correção',
   config: 'Configurações'
+};
+// selo do título: ícone e cor de cada seção (as mesmas da barra lateral)
+const PAGE_SELO = {
+  menu: ['ti-home', 'var(--ac)', 'var(--acTxt)'],
+  disciplinas: ['ti-books', 'var(--c-violeta)'],
+  elaborar: ['ti-file-plus', 'var(--c-azul)'],
+  provas: ['ti-files', 'var(--c-teal)'],
+  prova: ['ti-file-text', 'var(--c-teal)'],
+  corrigir: ['ti-checklist', 'var(--c-teal)'],
+  config: ['ti-settings', 'var(--c-cinza)']
 };
 const NAV_HIGHLIGHT = {
   menu: 'menu',
@@ -1966,14 +2523,22 @@ function navegar(page) {
   const target = document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1));
   if (target) target.classList.remove('hidden');
 
-  // Atualiza título da topbar
+  // Atualiza título da topbar (selo colorido + nome da seção)
   const titleEl = document.getElementById('topbarPageTitle');
-  if (titleEl) titleEl.textContent = PAGE_TITLES[page] || '';
+  if (titleEl) {
+    const s = PAGE_SELO[page] || PAGE_SELO.menu;
+    titleEl.innerHTML = `<span class="selo" style="--sc:${s[1]}${s[2] ? ';--scTxt:' + s[2] : ''}"><i class="ti ${s[0]}"></i></span><span class="pt-txt"></span>`;
+    titleEl.querySelector('.pt-txt').textContent = PAGE_TITLES[page] || '';
+  }
+  document.body.dataset.pg = page;
+  animaEntrada(target);
 
   // Atualiza item ativo da sidebar
   const navHighlight = NAV_HIGHLIGHT[page];
   document.querySelectorAll('.nav-item').forEach(item => {
-    item.classList.toggle('active', item.dataset.page === navHighlight);
+    const on = item.dataset.page === navHighlight;
+    item.classList.toggle('active', on);
+    if (on) item.setAttribute('aria-current', 'page'); else item.removeAttribute('aria-current');
   });
 
   // Scroll para o topo ao navegar
@@ -1998,22 +2563,49 @@ function renderDashboard() {
   const totalAlunos = u.provas.reduce((s, p) => s + (p.alunos ? p.alunos.length : 0), 0);
   const totalQuestoes = u.provas.reduce((s, p) => s + (p.numQuestoes || 0), 0);
 
-  const stats = [
-    { label: 'Disciplinas', num: totalDisciplinas, svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>' },
-    { label: 'Provas criadas', num: totalProvas, svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>' },
-    { label: 'Questões geradas', num: totalQuestoes, svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>' },
-    { label: 'Alunos corrigidos', num: totalAlunos, svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>' }
-  ];
+  const hoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+  document.getElementById('heroData').innerHTML = `<i class="ti ti-calendar"></i> ${escapeHtml(hoje.charAt(0).toUpperCase() + hoje.slice(1))}`;
+  const plural = (n, s, pl) => n + ' ' + (n === 1 ? s : pl);
+  document.getElementById('heroResumo').textContent = totalProvas
+    ? `Você tem ${plural(totalProvas, 'prova', 'provas')} e ${plural(totalAlunos, 'aluno corrigido', 'alunos corrigidos')}. Continue de onde parou ou crie uma nova.`
+    : 'Envie o PDF de uma aula e a IA monta a prova. Você revisa, exporta e corrige aqui.';
 
+  // última prova: atalho para continuar
+  const ult = [...u.provas].sort((a, b) => String(b.criadoEm).localeCompare(String(a.criadoEm)))[0];
+  const hu = document.getElementById('heroUltima');
+  if (ult) {
+    const n = ult.alunos ? ult.alunos.length : 0;
+    const media = n ? ult.alunos.reduce((s, a) => s + calcularNota(a, ult).nota, 0) / n : null;
+    hu.innerHTML = `<small>Última prova</small><b></b>
+      <div class="mu-meta">${ult.numQuestoes} questões · ${n ? plural(n, 'aluno', 'alunos') + ' · média ' + media.toFixed(1).replace('.', ',') : 'sem correção ainda'}</div>
+      <div class="mu-b"><button class="sec" onclick="abrirProva('${ult.id}')">Abrir</button><button onclick="abrirProva('${ult.id}'); navegar('corrigir')">Corrigir</button></div>`;
+    hu.querySelector('b').textContent = ult.titulo;
+  } else hu.innerHTML = '';
+
+  const stats = [
+    { label: 'Provas criadas', num: totalProvas, ic: 'ti-files', k: 'var(--c-azul)', ir: 'provas' },
+    { label: 'Questões', num: totalQuestoes, ic: 'ti-list-numbers', k: 'var(--c-teal)', ir: 'provas' },
+    { label: 'Alunos corrigidos', num: totalAlunos, ic: 'ti-users', k: 'var(--c-violeta)', ir: 'provas' },
+    { label: 'Disciplinas', num: totalDisciplinas, ic: 'ti-books', k: 'var(--c-rosa)', ir: 'disciplinas' }
+  ];
   document.getElementById('dashStats').innerHTML = stats.map(s => `
-    <div class="dash-stat">
-      <div class="dash-stat-icon">${s.svg}</div>
+    <div class="dash-stat" style="--k:${s.k}" role="button" tabindex="0" onclick="navegar('${s.ir}')" onkeydown="if(event.key==='Enter')navegar('${s.ir}')">
+      <div class="dash-stat-icon"><i class="ti ${s.ic}"></i></div>
       <div class="dash-stat-info">
-        <div class="dash-stat-num">${s.num}</div>
+        <div class="dash-stat-num" data-conta="${s.num}">0</div>
         <div class="dash-stat-label">${s.label}</div>
       </div>
     </div>
   `).join('');
+  contar(document.getElementById('dashStats'));
+
+  // provas recentes (até 3)
+  const rec = document.getElementById('dashRecentes');
+  document.getElementById('recentesTit').classList.toggle('hidden', !totalProvas);
+  if (!totalProvas) { rec.innerHTML = ''; return; }
+  rec.innerHTML = '';
+  [...u.provas].sort((a, b) => String(b.criadoEm).localeCompare(String(a.criadoEm))).slice(0, 3)
+    .forEach((p, i) => rec.appendChild(itemProva(p, i)));
 }
 
 // ============================================================
@@ -2025,13 +2617,27 @@ function adicionarDisciplina() {
   if (!nome) return;
   const u = userAtual();
   if (u.disciplinas.includes(nome)) {
-    alert('Disciplina já cadastrada.');
+    toast('Essa disciplina já está cadastrada.', 'erro');
     return;
   }
   u.disciplinas.push(nome);
   salvarEstado();
   input.value = '';
   renderDisciplinas();
+  toast('Disciplina adicionada.', 'ok');
+}
+
+// Atalho na tela Elaborar: cria a disciplina sem sair do formulário
+function adicionarDisciplinaRapida() {
+  const nome = (prompt('Nome da nova disciplina:') || '').trim();
+  if (!nome) return;
+  const u = userAtual();
+  if (!u.disciplinas.includes(nome)) { u.disciplinas.push(nome); salvarEstado(); }
+  const sel = document.getElementById('elabDisciplina');
+  preencherSelectDisciplinas(nome);
+  sel.value = nome;
+  checarElab();
+  toast('Disciplina pronta para usar.', 'ok');
 }
 
 function removerDisciplina(nome) {
@@ -2042,18 +2648,23 @@ function removerDisciplina(nome) {
   renderDisciplinas();
 }
 
+const CORES_LISTA = ['var(--c-violeta)', 'var(--c-azul)', 'var(--c-rosa)', 'var(--c-teal)', 'var(--c-indigo)', 'var(--c-cobalto)'];
 function renderDisciplinas() {
   const u = userAtual();
   const div = document.getElementById('listaDisciplinas');
   if (u.disciplinas.length === 0) {
-    div.innerHTML = '<p style="color:#6b7280;">Nenhuma disciplina cadastrada. Adicione a primeira acima.</p>';
+    div.innerHTML = `<div class="vazio" style="width:100%"><div class="v-ic"><i class="ti ti-books"></i></div><b>Nenhuma disciplina ainda</b><p>Digite o nome acima e toque em Adicionar. Ela aparece na hora de elaborar a prova.</p></div>`;
     return;
   }
   div.innerHTML = '';
-  u.disciplinas.forEach(d => {
+  u.disciplinas.forEach((d, i) => {
+    const n = u.provas.filter(p => p.disciplina === d).length;
     const tag = document.createElement('span');
     tag.className = 'tag';
-    tag.innerHTML = `${d} <span class="remove" onclick="removerDisciplina('${d.replace(/'/g, "\\'")}')">✕</span>`;
+    tag.style.setProperty('--k', CORES_LISTA[i % CORES_LISTA.length]);
+    tag.innerHTML = `<span class="t-dot"><i class="ti ti-book-2"></i></span><span class="t-n"></span><small>${n} ${n === 1 ? 'prova' : 'provas'}</small><button class="remove" title="Remover disciplina" aria-label="Remover disciplina"><i class="ti ti-x"></i></button>`;
+    tag.querySelector('.t-n').textContent = d;
+    tag.querySelector('.remove').onclick = () => removerDisciplina(d);
     div.appendChild(tag);
   });
 }
@@ -2078,24 +2689,48 @@ function salvarConfig() {
   document.getElementById('userInfoTopbar').textContent = u.nome;
   document.getElementById('userAvatar').textContent = iniciaisDeNome(u.nome);
   document.getElementById('menuPrimeiroNome').textContent = primeiroNome(u.nome);
-  alert('Dados atualizados.');
+  toast('Dados salvos.', 'ok');
 }
 
 
 // ============================================================
 // Elaboração de prova
 // ============================================================
-function prepararElaboracao() {
+function preencherSelectDisciplinas(sel) {
   const u = userAtual();
   const select = document.getElementById('elabDisciplina');
   select.innerHTML = '';
   if (u.disciplinas.length === 0) {
-    select.innerHTML = '<option value="">(Adicione uma disciplina primeiro)</option>';
+    select.innerHTML = '<option value="">Nenhuma disciplina: toque em Nova</option>';
   } else {
     u.disciplinas.forEach(d => {
-      select.innerHTML += `<option value="${d}">${d}</option>`;
+      const o = document.createElement('option'); o.value = d; o.textContent = d;
+      if (d === sel) o.selected = true;
+      select.appendChild(o);
     });
   }
+}
+
+// Lista "Antes de gerar": mostra o que falta para a ação principal
+function checarElab() {
+  const ul = document.getElementById('elabChecklist');
+  if (!ul) return;
+  const disc = document.getElementById('elabDisciplina').value;
+  const tit = document.getElementById('elabTitulo').value.trim();
+  const n = parseInt(document.getElementById('elabNumQuestoes').value, 10);
+  const mats = elaboracao.materiaisPdf.length;
+  const itens = [
+    [!!disc, disc ? 'Disciplina: ' + disc : 'Escolha a disciplina'],
+    [!!tit, tit ? 'Título definido' : 'Dê um título à prova'],
+    [n >= 1 && n <= 50, (n >= 1 && n <= 50) ? n + (n === 1 ? ' questão' : ' questões') : 'Número de questões entre 1 e 50'],
+    [mats > 0, mats ? mats + (mats === 1 ? ' PDF de material' : ' PDFs de material') : 'Envie ao menos um PDF das aulas'],
+    [!!elaboracao.esqueleto, elaboracao.esqueleto ? 'Modelo: ' + elaboracao.esqueleto.nome : 'Modelo da prova (opcional)', true]
+  ];
+  ul.innerHTML = itens.map(([ok, txt, opc]) => `<li class="${ok ? 'ok' : ''}"><i class="ti ${ok ? 'ti-check' : (opc ? 'ti-minus' : 'ti-point')}"></i><span>${escapeHtml(txt)}</span></li>`).join('');
+}
+
+function prepararElaboracao() {
+  preencherSelectDisciplinas();
   document.getElementById('elabTitulo').value = '';
   document.getElementById('elabNumQuestoes').value = '10';
   document.getElementById('elabInstrucoes').value = '';
@@ -2104,6 +2739,7 @@ function prepararElaboracao() {
   renderMateriais();
   renderEsqueleto();
   document.getElementById('elabStatus').innerHTML = '';
+  checarElab();
 }
 
 async function fileToBase64(file) {
@@ -2151,6 +2787,7 @@ function removerMaterial(idx) {
 
 function renderMateriais() {
   const div = document.getElementById('listaMateriais');
+  checarElab();
   if (elaboracao.materiaisPdf.length === 0) {
     div.innerHTML = '';
     return;
@@ -2160,8 +2797,9 @@ function renderMateriais() {
     const item = document.createElement('div');
     item.className = 'file-item';
     item.innerHTML = `
-      <span>📄 ${m.nome}</span>
-      <button class="danger small" onclick="removerMaterial(${idx})">✕</button>
+      <span class="fi-n"><i class="ti ti-file-type-pdf"></i><span>${escapeHtml(m.nome)}</span></span>
+      <small>${tamanhoLegivel(tamanhoMaterial(m))}</small>
+      <button class="ghost small ic-btn perigo" onclick="removerMaterial(${idx})" title="Tirar este PDF" aria-label="Tirar este PDF"><i class="ti ti-x"></i></button>
     `;
     div.appendChild(item);
   });
@@ -2217,6 +2855,7 @@ function removerEsqueleto() {
 
 function renderEsqueleto() {
   const div = document.getElementById('esqueletoInfo');
+  checarElab();
   if (!elaboracao.esqueleto) {
     div.innerHTML = '';
     return;
@@ -2224,8 +2863,9 @@ function renderEsqueleto() {
   const e = elaboracao.esqueleto;
   div.innerHTML = `
     <div class="file-item">
-      <span><i class="ti ti-clipboard"></i> ${e.nome}</span>
-      <button class="danger small" onclick="removerEsqueleto()">✕</button>
+      <span class="fi-n"><i class="ti ${e.ext === 'docx' ? 'ti-file-word' : 'ti-file-type-pdf'}"></i><span>${escapeHtml(e.nome)}</span></span>
+      <small>${tamanhoLegivel(e.tamanho)}</small>
+      <button class="ghost small ic-btn perigo" onclick="removerEsqueleto()" title="Tirar o modelo" aria-label="Tirar o modelo"><i class="ti ti-x"></i></button>
     </div>
   `;
 }
@@ -2319,10 +2959,11 @@ async function gerarProva() {
   const numQuestoes = parseInt(document.getElementById('elabNumQuestoes').value);
   const instrucoes = document.getElementById('elabInstrucoes').value.trim();
 
-  if (!disciplina) return alert('Selecione uma disciplina.');
-  if (!titulo) return alert('Informe o título da prova.');
-  if (!numQuestoes || numQuestoes < 1) return alert('Número de questões inválido.');
-  if (elaboracao.materiaisPdf.length === 0) return alert('Adicione pelo menos um PDF de material didático.');
+  const falta = (msg, id) => { toast(msg, 'erro'); const el = id && document.getElementById(id); if (el) { el.focus(); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } checarElab(); };
+  if (!disciplina) return falta('Escolha a disciplina da prova.', 'elabDisciplina');
+  if (!titulo) return falta('Dê um título à prova.', 'elabTitulo');
+  if (!numQuestoes || numQuestoes < 1) return falta('Número de questões inválido.', 'elabNumQuestoes');
+  if (elaboracao.materiaisPdf.length === 0) return falta('Envie pelo menos um PDF das aulas.');
 
   // Confirmação explícita dos PDFs que serão usados (evita confusão se sobrou de prova anterior)
   const listaConf = elaboracao.materiaisPdf.map((m, i) => `${i + 1}. ${m.nome}`).join('\n');
@@ -2332,8 +2973,11 @@ async function gerarProva() {
 
   const statusEl = document.getElementById('elabStatus');
   const btn = document.getElementById('btnGerar');
+  const btnHtml = btn.innerHTML;
   btn.disabled = true;
-  statusEl.innerHTML = '<span class="spinner"></span> Gerando prova com a IA... isso pode levar 30-60 segundos.';
+  btn.innerHTML = '<span class="spinner"></span> Gerando prova';
+  const progresso = (msg) => { statusEl.innerHTML = `<div class="progresso"><span class="spinner"></span><span>${msg}</span></div>`; };
+  progresso('Montando o pedido para a IA.');
 
   try {
     const prompt = montarPromptElaboracao(disciplina, numQuestoes, instrucoes);
@@ -2345,9 +2989,9 @@ async function gerarProva() {
       arquivosPdf.push({ nome: elaboracao.esqueleto.nome, base64: elaboracao.esqueleto.base64, blob: elaboracao.esqueleto.blob, tamanho: elaboracao.esqueleto.tamanho, mime: 'application/pdf' });
     }
 
-    statusEl.innerHTML = '<span class="spinner"></span> Preparando arquivos para envio...';
+    progresso('Preparando os arquivos para envio.');
     const partsArquivos = await prepararPartesGemini(arquivosPdf, appState.apiKey, (msg) => {
-      statusEl.innerHTML = '<span class="spinner"></span> ' + msg;
+      progresso(escapeHtml(msg));
     });
 
     // Monta partes: PDFs + esqueleto-texto (se houver) + prompt
@@ -2357,7 +3001,7 @@ async function gerarProva() {
     }
     parts.push({ text: prompt });
 
-    statusEl.innerHTML = '<span class="spinner"></span> Gerando prova com a IA... isso pode levar 30-60 segundos.';
+    progresso(`A IA está escrevendo ${numQuestoes} ${numQuestoes === 1 ? 'questão' : 'questões'}. Leva de 30 a 60 segundos.`);
 
     const data = await chamarGeminiNoServidor({
       parts,
@@ -2413,7 +3057,7 @@ async function gerarProva() {
 
     while (questoes.length < numQuestoes) {
       questoes.push({
-        enunciado: '(IA não gerou esta questão — preencha manualmente)',
+        enunciado: '(IA não gerou esta questão. Preencha manualmente.)',
         alternativas: { A: '', B: '', C: '', D: '' },
         gabarito: 'A',
         explicacao: '',
@@ -2449,13 +3093,15 @@ async function gerarProva() {
     // Salva PDFs dos materiais no IndexedDB para permitir regeneração de questões depois
     await salvarMateriais(prova.id, elaboracao.materiaisPdf);
 
-    statusEl.innerHTML = '<span style="color:#10b981;">✓ Prova gerada com sucesso!</span>';
-    setTimeout(() => navegar('prova'), 1200);
+    statusEl.innerHTML = '<div class="aviso ok"><i class="ti ti-circle-check"></i><span>Prova pronta. Abrindo para revisão.</span></div>';
+    toast('Prova gerada. Revise antes de exportar.', 'ok');
+    setTimeout(() => navegar('prova'), 900);
   } catch (err) {
-    statusEl.innerHTML = `<span style="color:#ef4444;">❌ ${err.message}</span>`;
+    statusEl.innerHTML = `<div class="aviso erro"><i class="ti ti-alert-circle"></i><span><b>Não deu para gerar a prova.</b> ${escapeHtml(err.message)} Seus arquivos continuam aqui; tente de novo.</span></div>`;
     console.error(err);
   } finally {
     btn.disabled = false;
+    btn.innerHTML = btnHtml;
   }
 }
 
@@ -2566,31 +3212,49 @@ A lista "questoes" deve conter EXATAMENTE ${numQuestoes} elementos. TODOS em por
 // ============================================================
 // Lista de provas
 // ============================================================
+// Um item de prova (lista e Início): clicar abre a revisão; "Corrigir" vai direto à correção
+function itemProva(p, i) {
+  const item = document.createElement('div');
+  item.className = 'lista-item';
+  item.style.setProperty('--k', CORES_LISTA[(i || 0) % CORES_LISTA.length]);
+  const dt = new Date(p.criadoEm).toLocaleDateString('pt-BR');
+  const n = p.alunos ? p.alunos.length : 0;
+  item.innerHTML = `
+    <div class="li-ic"><i class="ti ti-file-text"></i></div>
+    <div class="info">
+      <div class="titulo"></div>
+      <div class="meta"><span><i class="ti ti-book-2"></i><span class="li-d"></span></span><span><i class="ti ti-list-numbers"></i>${p.numQuestoes} questões</span><span><i class="ti ti-calendar"></i>${dt}</span><span><i class="ti ti-users"></i>${n ? n + (n === 1 ? ' aluno corrigido' : ' alunos corrigidos') : 'sem correção'}</span></div>
+    </div>
+    <div class="acoes">
+      <button class="secondary small" data-a="ver"><i class="ti ti-eye"></i> Revisar</button>
+      <button class="small" data-a="corrigir"><i class="ti ti-checklist"></i> Corrigir</button>
+    </div>`;
+  item.querySelector('.titulo').textContent = p.titulo;
+  item.querySelector('.li-d').textContent = p.disciplina;
+  item.onclick = (e) => {
+    const b = e.target.closest('button');
+    abrirProva(p.id);
+    if (b && b.dataset.a === 'corrigir') navegar('corrigir');
+  };
+  return item;
+}
+
 function renderListaProvas() {
   const u = userAtual();
   const div = document.getElementById('listaProvas');
+  const busca = document.getElementById('buscaProvas');
   if (u.provas.length === 0) {
-    div.innerHTML = '<p style="color:#6b7280; text-align:center; padding:20px;">Nenhuma prova criada ainda. Use "Elaborar Prova" no menu.</p>';
+    div.innerHTML = `<div class="vazio"><div class="v-ic"><i class="ti ti-files"></i></div><b>Nenhuma prova ainda</b><p>Envie o PDF de uma aula e a IA monta a primeira prova para você revisar.</p><button onclick="navegar('elaborar')"><i class="ti ti-file-plus"></i> Elaborar prova</button></div>`;
     return;
   }
+  const q = (busca && busca.value || '').trim().toLowerCase();
+  const lista = [...u.provas].reverse().filter(p => !q || (p.titulo + ' ' + p.disciplina).toLowerCase().includes(q));
   div.innerHTML = '';
-  // Mostra mais recentes primeiro
-  [...u.provas].reverse().forEach(p => {
-    const item = document.createElement('div');
-    item.className = 'lista-item';
-    const dt = new Date(p.criadoEm).toLocaleDateString('pt-BR');
-    item.innerHTML = `
-      <div class="info">
-        <div class="titulo">${p.titulo}</div>
-        <div class="meta">${p.disciplina} • ${p.numQuestoes} questões • criada em ${dt} • ${p.alunos.length} aluno(s) corrigido(s)</div>
-      </div>
-      <div class="acoes">
-        <button class="secondary small" onclick="abrirProva('${p.id}')">📖 Ver</button>
-        <button class="success small" onclick="abrirProva('${p.id}'); setTimeout(()=>navegar('corrigir'), 100)"><i class="ti ti-pencil"></i> Corrigir</button>
-      </div>
-    `;
-    div.appendChild(item);
-  });
+  if (!lista.length) {
+    div.innerHTML = `<div class="vazio"><div class="v-ic"><i class="ti ti-search"></i></div><b>Nada encontrado</b><p>Nenhuma prova com "${escapeHtml(q)}" no título ou na disciplina.</p><button class="secondary" onclick="document.getElementById('buscaProvas').value='';renderListaProvas()">Limpar busca</button></div>`;
+    return;
+  }
+  lista.forEach((p, i) => div.appendChild(itemProva(p, i)));
 }
 
 function abrirProva(id) {
@@ -2622,39 +3286,55 @@ function renderProva() {
   if (!p) { navegar('provas'); return; }
   document.getElementById('provaTitulo').textContent = p.titulo;
   document.getElementById('provaBreadcrumb').textContent = p.titulo;
-  const tmpl = p.templateNome ? ` • template: ${p.templateNome}` : '';
-  document.getElementById('provaMeta').textContent = `${p.disciplina} • ${p.numQuestoes} questões • criada em ${new Date(p.criadoEm).toLocaleDateString('pt-BR')}${tmpl}`;
+  const nAnul = p.anuladas.filter(Boolean).length;
+  document.getElementById('provaMeta').innerHTML =
+    `<span><i class="ti ti-book-2"></i>${escapeHtml(p.disciplina)}</span>` +
+    `<span><i class="ti ti-list-numbers"></i>${p.numQuestoes} questões${nAnul ? ' (' + nAnul + (nAnul === 1 ? ' anulada' : ' anuladas') + ')' : ''}</span>` +
+    `<span><i class="ti ti-calendar"></i>criada em ${new Date(p.criadoEm).toLocaleDateString('pt-BR')}</span>` +
+    (p.templateNome ? `<span><i class="ti ti-template"></i>modelo: ${escapeHtml(p.templateNome)}</span>` : '');
   document.getElementById('btnDocx').style.display = p.templateDocxBase64 ? '' : 'none';
+
+  // mapa do gabarito: um círculo por questão; clicar leva até ela
+  document.getElementById('provaMapa').innerHTML = p.questoes.map((q, i) =>
+    `<button class="qm ${p.anuladas[i] ? 'anul' : ''}" onclick="irQuestao(${i})" title="Ir para a questão ${i + 1}"><small>${i + 1}</small>${p.anuladas[i] ? '<b>anul.</b>' : escapeHtml(q.gabarito || '?')}</button>`
+  ).join('');
 
   const div = document.getElementById('provaQuestoes');
   div.innerHTML = '';
   p.questoes.forEach((q, idx) => {
     const card = document.createElement('div');
-    card.className = 'questao-gerada';
+    card.className = 'questao-gerada' + (p.anuladas[idx] ? ' anulada' : '');
+    card.id = 'q-' + idx;
     card.innerHTML = `
-      <h4>Questão ${idx + 1} ${p.anuladas[idx] ? '<span style="color:#92400e; font-size:0.85em;">(ANULADA)</span>' : ''}</h4>
-      <textarea class="enunciado-edit" style="width:100%; min-height:0; padding:12px; line-height:1.55; font-size:0.97em; overflow:hidden; resize:vertical;">${escapeHtml(q.enunciado || '')}</textarea>
-      <div class="alternativas" style="margin-top:10px;">
+      <div class="q-cab">
+        <span class="q-num">${idx + 1}</span>
+        <h4>Questão ${idx + 1}</h4>
+        ${p.anuladas[idx] ? '<span class="selo-anul">Anulada</span>' : ''}
+        <span class="q-gab">Gabarito <b>${escapeHtml(q.gabarito)}</b></span>
+      </div>
+      <textarea class="enunciado-edit" aria-label="Enunciado da questão ${idx + 1}" style="width:100%; min-height:0; overflow:hidden; resize:vertical;">${escapeHtml(q.enunciado || '')}</textarea>
+      <div class="alternativas">
         ${['A','B','C','D'].map(letra => `
-          <div class="questao-alt ${q.gabarito === letra ? 'gabarito' : ''}" data-letra="${letra}" onclick="alterarGabarito('${p.id}', ${idx}, '${letra}')" style="align-items:flex-start;">
-            <span class="letra" style="padding-top:4px;">${letra})</span>
-            <textarea class="alternativa-edit" data-letra="${letra}" rows="1" style="flex:1; min-height:0; border:none; background:transparent; padding:4px 0; font-family:inherit; font-size:inherit; line-height:1.5; resize:none; overflow:hidden; outline:none;" onclick="event.stopPropagation()">${escapeHtml(q.alternativas[letra] || '')}</textarea>
+          <div class="questao-alt ${q.gabarito === letra ? 'gabarito' : ''}" data-letra="${letra}" onclick="alterarGabarito('${p.id}', ${idx}, '${letra}')" title="${q.gabarito === letra ? 'Gabarito desta questão' : 'Marcar ' + letra + ' como gabarito'}">
+            <span class="letra">${letra}</span>
+            <textarea class="alternativa-edit" data-letra="${letra}" rows="1" aria-label="Alternativa ${letra}" style="flex:1; min-height:0; font-family:inherit; font-size:inherit; line-height:1.5; resize:none; overflow:hidden; outline:none;" onclick="event.stopPropagation()">${escapeHtml(q.alternativas[letra] || '')}</textarea>
           </div>
         `).join('')}
       </div>
       ${renderImagemQuestao(q, idx)}
-      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:8px;">
-        <label style="font-size:0.85em; color:#92400e;">
+      <div class="q-acoes">
+        <label class="chk-anular">
           <input type="checkbox" ${p.anuladas[idx] ? 'checked' : ''} onchange="toggleAnulada('${p.id}', ${idx}, this.checked)">
           Anular questão
         </label>
-        <span style="font-size:0.85em; color:#6b7280;">Gabarito: ${q.gabarito}</span>
-        <button class="secondary small" onclick="abrirBuscaImagem(${idx})"><i class="ti ti-photo"></i> ${q.imagem ? 'Trocar imagem' : 'Adicionar imagem'}</button>
-        <button class="secondary small" onclick="regenerarQuestao(${idx})" style="margin-left:auto;">🔄 Regenerar com IA</button>
-        <button class="danger small" onclick="removerQuestao(${idx})" title="Remover esta questão"><i class="ti ti-trash"></i></button>
+        <div class="dir">
+          <button class="secondary small" onclick="abrirBuscaImagem(${idx})"><i class="ti ti-photo"></i> ${q.imagem ? 'Trocar imagem' : 'Adicionar imagem'}</button>
+          <button class="secondary small" onclick="regenerarQuestao(${idx})"><i class="ti ti-refresh"></i> Refazer com IA</button>
+          <button class="ghost small ic-btn perigo" onclick="removerQuestao(${idx})" title="Remover esta questão" aria-label="Remover a questão ${idx + 1}"><i class="ti ti-trash"></i></button>
+        </div>
       </div>
-      ${q.explicacao ? `<details style="margin-top:8px; font-size:0.9em;"><summary style="cursor:pointer; color:#6b7280;">📘 Comentário</summary><p style="margin-top:6px; color:#4b5563; white-space:pre-wrap;">${escapeHtml(q.explicacao)}</p></details>` : ''}
-      ${q.referencias ? `<details style="margin-top:4px; font-size:0.9em;"><summary style="cursor:pointer; color:#6b7280;">📚 Referências</summary><p style="margin-top:6px; color:#4b5563; white-space:pre-wrap;">${escapeHtml(q.referencias)}</p></details>` : ''}
+      ${q.explicacao ? `<details class="q-det"><summary><i class="ti ti-message-2"></i> Comentário <i class="ti ti-chevron-down"></i></summary><p>${escapeHtml(q.explicacao)}</p></details>` : ''}
+      ${q.referencias ? `<details class="q-det"><summary><i class="ti ti-book"></i> Referências <i class="ti ti-chevron-down"></i></summary><p>${escapeHtml(q.referencias)}</p></details>` : ''}
     `;
     div.appendChild(card);
     // Auto-resize helper para qualquer textarea
@@ -2670,6 +3350,7 @@ function renderProva() {
     textarea.onchange = () => {
       q.enunciado = textarea.value;
       salvarEstado();
+      toast('Enunciado salvo.', 'ok', 1600);
     };
 
     // Bind alternativas edit + auto-resize
@@ -2679,18 +3360,32 @@ function renderProva() {
       ta.onchange = () => {
         q.alternativas[ta.dataset.letra] = ta.value;
         salvarEstado();
+        toast('Alternativa salva.', 'ok', 1600);
       };
     });
   });
+}
+
+function irQuestao(i) {
+  const el = document.getElementById('q-' + i);
+  if (!el) return;
+  el.scrollIntoView({ behavior: _semMovimento() ? 'auto' : 'smooth', block: 'start' });
+  el.classList.remove('destaque'); void el.offsetWidth; el.classList.add('destaque');
 }
 
 function alterarGabarito(provaId, idx, letra) {
   const u = userAtual();
   const p = u.provas.find(x => x.id === provaId);
   if (!p) return;
+  const antes = p.questoes[idx].gabarito;
   p.questoes[idx].gabarito = letra;
   salvarEstado();
   renderProva();
+  if (antes !== letra) {
+    const alt = document.querySelector(`#q-${idx} .questao-alt.gabarito`);
+    if (alt) alt.classList.add('acabou');
+    toast(`Gabarito da questão ${idx + 1}: ${letra}`, 'ok', 1800);
+  }
 }
 
 function editarAlternativa(provaId, idx, letra, valor) {
@@ -2708,6 +3403,7 @@ function toggleAnulada(provaId, idx, val) {
   p.anuladas[idx] = val;
   salvarEstado();
   renderProva();
+  toast(val ? `Questão ${idx + 1} anulada: conta como certa para todos.` : `Questão ${idx + 1} volta a valer.`, 'ok');
 }
 
 // ============================================================
@@ -2730,8 +3426,7 @@ function renderImagemQuestao(q, idx) {
   if (q.imagemSugerida) {
     return `
       <div class="questao-sem-imagem">
-        <i class="ti ti-photo"></i> A IA sugeriu uma imagem ilustrativa para esta questão: <em>"${escapeHtml(q.imagemSugerida)}"</em>.
-        Clique em "Adicionar imagem" abaixo para buscar e anexar.
+        <i class="ti ti-photo"></i><span>Imagem sugerida: <em>${escapeHtml(q.imagemSugerida)}</em>. Use Adicionar imagem para buscar e anexar.</span>
       </div>`;
   }
   return '';
@@ -3118,7 +3813,7 @@ async function executarBuscaImagem() {
   let termo = termoOriginal;
   let traduzido = false;
   if (pareceuPortugues(termoOriginal)) {
-    status.innerHTML = '<span class="spinner"></span> Traduzindo termo para inglês médico...';
+    status.innerHTML = '<span class="spinner"></span> Traduzindo termo para inglês médico';
     const traducao = await traduzirTermoParaIngles(termoOriginal);
     if (traducao && traducao.toLowerCase() !== termoOriginal.toLowerCase()) {
       termo = traducao;
@@ -3127,9 +3822,9 @@ async function executarBuscaImagem() {
   }
 
   const aviso = traduzido
-    ? `<div style="color:var(--text-muted); font-size:0.85em; margin-bottom:8px;">🔄 Traduzido: <strong>"${escapeHtml(termoOriginal)}"</strong> → <strong>"${escapeHtml(termo)}"</strong></div>`
+    ? `<div style="color:var(--tinta2); font-size:0.85em; margin-bottom:8px;"><i class="ti ti-language"></i> Buscando em inglês: <strong>${escapeHtml(termo)}</strong> (de "${escapeHtml(termoOriginal)}")</div>`
     : '';
-  status.innerHTML = aviso + '<span class="spinner"></span> Buscando no Wikimedia Commons...';
+  status.innerHTML = aviso + '<span class="spinner"></span> Buscando no Wikimedia Commons';
 
   try {
     const url = `https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrsearch=${encodeURIComponent(termo + ' filetype:bitmap|drawing')}&gsrlimit=24&gsrnamespace=6&prop=imageinfo&iiprop=url|extmetadata|mime|size&iiurlwidth=400&origin=*`;
@@ -3148,7 +3843,7 @@ async function executarBuscaImagem() {
       const qAtual = provaAtual && provaAtual.questoes[_idxImagemAtiva];
       const fallbacks = (qAtual && qAtual.imagemTermos) ? qAtual.imagemTermos.slice(1) : [];
       for (const termoFb of fallbacks) {
-        status.innerHTML = aviso + `<span class="spinner"></span> Sem resultados, tentando: "${escapeHtml(termoFb)}"...`;
+        status.innerHTML = aviso + `<span class="spinner"></span> Sem resultados, tentando: "${escapeHtml(termoFb)}"`;
         const fbResp = await fetch(`https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrsearch=${encodeURIComponent(termoFb + ' filetype:bitmap|drawing')}&gsrlimit=24&gsrnamespace=6&prop=imageinfo&iiprop=url|extmetadata|mime|size&iiurlwidth=400&origin=*`);
         if (!fbResp.ok) continue;
         const fbData = await fbResp.json();
@@ -3169,7 +3864,7 @@ async function executarBuscaImagem() {
       status.innerHTML = aviso + '<div class="status warning">Nenhuma imagem encontrada nem com termos alternativos. Tente reformular manualmente ou usar "Colar URL".</div>';
       return;
     }
-    status.innerHTML = aviso + `<div style="color:var(--text-muted); font-size:0.85em;">${imagens.length} resultado(s) para <strong>"${escapeHtml(termo)}"</strong>. Clique em uma para usar.</div>`;
+    status.innerHTML = aviso + `<div style="color:var(--tinta2); font-size:0.85em;">${imagens.length} ${imagens.length === 1 ? 'resultado' : 'resultados'} para <strong>${escapeHtml(termo)}</strong>. Clique em uma imagem para usar.</div>`;
     grid.innerHTML = '';
     for (const img of imagens) {
       const el = document.createElement('div');
@@ -3191,7 +3886,7 @@ async function executarBuscaImagem() {
 
 async function selecionarImagemBusca(img, autor, licenca) {
   const status = document.getElementById('imgSearchStatus');
-  status.innerHTML = '<span class="spinner"></span> Baixando imagem...';
+  status.innerHTML = '<span class="spinner"></span> Baixando imagem';
   try {
     // Baixa via thumb (menor) para caber no localStorage e ficar leve
     const urlImg = img.thumburl || img.url;
@@ -3225,7 +3920,7 @@ async function recortarImagemAtualComIA() {
     return;
   }
   const status = document.getElementById('imgSearchStatus');
-  status.innerHTML = '<span class="spinner"></span> Detectando a figura médica e recortando...';
+  status.innerHTML = '<span class="spinner"></span> Detectando a figura médica e recortando';
   try {
     const bbox = await detectarBboxFiguraNaPagina(
       q.imagem.dataUrl,
@@ -3238,7 +3933,7 @@ async function recortarImagemAtualComIA() {
     }
     const novoDataUrl = await recortarImagemPorBbox(q.imagem.dataUrl, bbox, 0.04);
     if (novoDataUrl === q.imagem.dataUrl) {
-      status.innerHTML = '<div class="status warning">O recorte sugerido foi muito pequeno ou muito grande — mantida a imagem original.</div>';
+      status.innerHTML = '<div class="status warning">O recorte sugerido ficou pequeno ou grande demais. A imagem original foi mantida.</div>';
       return;
     }
     await attachImagemAQuestao(q, {
@@ -3257,7 +3952,7 @@ async function anexarImagemPorPaginaMaterial() {
   const p = getProvaAtual();
   if (!p) return;
   const status = document.getElementById('imgSearchStatus');
-  status.innerHTML = '<span class="spinner"></span> Carregando materiais...';
+  status.innerHTML = '<span class="spinner"></span> Carregando materiais';
   const materiais = await obterMateriais(p.id);
   if (!materiais || materiais.length === 0) {
     status.innerHTML = '<div class="status warning">Os PDFs dos materiais desta prova não estão mais disponíveis (foram limpos ou esta é uma prova antiga). Você pode usar "Colar URL" ou buscar normalmente.</div>';
@@ -3278,7 +3973,7 @@ async function anexarImagemPorPaginaMaterial() {
     status.innerHTML = '<div class="status warning">Página inválida.</div>';
     return;
   }
-  status.innerHTML = '<span class="spinner"></span> Extraindo página...';
+  status.innerHTML = '<span class="spinner"></span> Extraindo página';
   try {
     const dataUrl = await extrairPaginaPdfComoImagem(materiais[idxMat].blob || materiais[idxMat].base64, numPag);
     aplicarImagemNaQuestao({
@@ -3318,14 +4013,14 @@ async function abrirGeradorImagem() {
   let promptIngles = descricao.trim();
 
   // Refina o prompt usando IA (best-effort; cai no texto original se falhar)
-  status.innerHTML = '<span class="spinner"></span> Refinando descrição para gerar imagem...';
+  status.innerHTML = '<span class="spinner"></span> Refinando descrição para gerar imagem';
   try {
     promptIngles = await refinarPromptImagem(descricao.trim());
   } catch (e) {
     console.warn('Falha ao refinar prompt, usando original:', e);
   }
 
-  status.innerHTML = '<span class="spinner"></span> Gerando imagem... (pode levar 10-30 segundos)';
+  status.innerHTML = '<span class="spinner"></span> Gerando imagem. Leva de 10 a 30 segundos.';
   try {
     const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(promptIngles)}?width=1024&height=1024&nologo=true&enhance=true&seed=${Math.floor(Math.random() * 1e9)}`;
     const resp = await fetch(url);
@@ -3387,22 +4082,22 @@ async function abrirGeradorECG() {
   const descricao = prompt(
     'Descreva o ECG que você quer gerar (em português):\n\n' +
     'Exemplos:\n' +
-    '• "ECG com IAM de parede anterior — supra de ST de 3mm em V1 a V4, com onda Q em V1-V2"\n' +
+    '• "ECG com IAM de parede anterior, supra de ST de 3mm em V1 a V4, com onda Q em V1-V2"\n' +
     '• "Fibrilação atrial com resposta ventricular alta (FC 140)"\n' +
     '• "BAV total, FC 35, dissociação AV"\n' +
-    '• "Hipercalemia — ondas T apiculadas, QRS alargado, FC 70"\n' +
+    '• "Hipercalemia, ondas T apiculadas, QRS alargado, FC 70"\n' +
     '• "Taquicardia ventricular monomórfica, FC 180"\n' +
     '• "BRE típico, FC 80"\n' +
-    '• "Pericardite aguda — supra de ST difuso côncavo, infra de PR"\n',
+    '• "Pericardite aguda, supra de ST difuso côncavo, infra de PR"\n',
     ''
   );
   if (!descricao || !descricao.trim()) return;
 
   const status = document.getElementById('imgSearchStatus');
-  status.innerHTML = '<span class="spinner"></span> Interpretando descrição do ECG...';
+  status.innerHTML = '<span class="spinner"></span> Interpretando descrição do ECG';
   try {
     const params = await interpretarDescricaoECG(descricao);
-    status.innerHTML = '<span class="spinner"></span> Desenhando ECG...';
+    status.innerHTML = '<span class="spinner"></span> Desenhando ECG';
     const dataUrl = await renderizarECG(params);
     aplicarImagemNaQuestao({
       dataUrl,
@@ -3762,7 +4457,7 @@ async function anexarImagemDoComputador(event) {
     return;
   }
   const status = document.getElementById('imgSearchStatus');
-  status.innerHTML = '<span class="spinner"></span> Processando imagem...';
+  status.innerHTML = '<span class="spinner"></span> Processando imagem';
   try {
     // Lê como dataURL e redimensiona para no máximo 1400px de largura (economia de espaço)
     const dataUrlOriginal = await new Promise((resolve, reject) => {
@@ -3811,7 +4506,7 @@ async function anexarImagemPorUrl() {
   const url = prompt('Cole a URL de uma imagem (jpg, png, webp):');
   if (!url) return;
   const status = document.getElementById('imgSearchStatus');
-  status.innerHTML = '<span class="spinner"></span> Baixando imagem...';
+  status.innerHTML = '<span class="spinner"></span> Baixando imagem';
   try {
     const resp = await fetch(url);
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
@@ -3859,6 +4554,7 @@ function removerQuestao(idx) {
   p.numQuestoes = p.questoes.length;
   salvarEstado();
   renderProva();
+  toast(`Questão ${idx + 1} removida.`, 'ok');
 }
 
 function adicionarQuestaoManual() {
@@ -3881,10 +4577,11 @@ function adicionarQuestaoManual() {
   renderProva();
   // Rola para a nova questão
   setTimeout(() => {
-    const cards = document.querySelectorAll('#provaQuestoes .questao-gerada');
-    const ultima = cards[cards.length - 1];
-    if (ultima) ultima.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    irQuestao(p.questoes.length - 1);
+    const ta = document.querySelector(`#q-${p.questoes.length - 1} .enunciado-edit`);
+    if (ta) ta.focus({ preventScroll: true });
   }, 100);
+  toast('Questão em branco adicionada no fim da prova.', 'ok');
 }
 
 async function adicionarQuestaoIA() {
@@ -3910,7 +4607,7 @@ async function adicionarQuestaoIA() {
 
   const statusEl = document.getElementById('addQuestaoStatus');
   const btn = document.getElementById('btnAddIA');
-  if (btn) btn.disabled = true;
+  if (btn) { btn.disabled = true; btn._html = btn.innerHTML; btn.innerHTML = '<span class="spinner"></span> Gerando'; }
   let geradas = 0;
   const erros = [];
 
@@ -3930,7 +4627,7 @@ async function adicionarQuestaoIA() {
     : '';
 
   for (let iLeva = 0; iLeva < qtd; iLeva++) {
-    statusEl.innerHTML = `<span class="spinner"></span> Gerando questão ${iLeva + 1} de ${qtd}${orientacao && orientacao.trim() ? ' — ' + orientacao.trim() : ''}...`;
+    statusEl.innerHTML = `<div class="progresso"><span class="spinner"></span><span>Gerando a questão ${iLeva + 1} de ${qtd}${orientacao && orientacao.trim() ? ' (' + escapeHtml(orientacao.trim()) + ')' : ''}.</span></div>`;
     // Recalcula a cada iteração para a IA não repetir nem as recém-criadas
     const questoesExistentes = p.questoes
       .map((q, i) => `Q${i + 1}: ${(q.enunciado || '').slice(0, 200).replace(/\s+/g, ' ')}`)
@@ -4025,21 +4722,16 @@ Retorne APENAS este JSON, sem markdown:
     }
   } // fim do loop de geração
 
-  if (btn) btn.disabled = false;
+  if (btn) { btn.disabled = false; if (btn._html) btn.innerHTML = btn._html; }
 
   if (geradas > 0) {
     const plural = geradas > 1;
-    statusEl.innerHTML = `<span style="color:#10b981;">✓ ${geradas} quest${plural ? 'ões' : 'ão'} adicionada${plural ? 's' : ''}!</span>${erros.length ? ` <span style="color:#ef4444;">(${erros.length} falhou — tente de novo)</span>` : ''}`;
+    statusEl.innerHTML = erros.length ? `<div class="aviso erro"><i class="ti ti-alert-circle"></i><span>${erros.length} de ${qtd} não saíram. Tente gerar de novo.</span></div>` : '';
+    toast(`${geradas} ${plural ? 'questões adicionadas' : 'questão adicionada'} no fim da prova.`, 'ok');
     renderProva();
-    setTimeout(() => {
-      const cards = document.querySelectorAll('#provaQuestoes .questao-gerada');
-      const ultima = cards[cards.length - 1];
-      if (ultima) ultima.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      const s = document.getElementById('addQuestaoStatus');
-      if (s) s.innerHTML = '';
-    }, 1400);
+    setTimeout(() => irQuestao(p.questoes.length - 1), 300);
   } else {
-    statusEl.innerHTML = `<span style="color:#ef4444;">❌ Falha ao gerar: ${erros.join(' · ') || 'erro desconhecido'}</span>`;
+    statusEl.innerHTML = `<div class="aviso erro"><i class="ti ti-alert-circle"></i><span><b>Não deu para gerar.</b> ${escapeHtml(erros.join(' · ') || 'Erro desconhecido.')}</span></div>`;
   }
 }
 
@@ -4058,6 +4750,13 @@ async function regenerarQuestao(idx) {
 
   const btnsAll = document.querySelectorAll('.questao-gerada button');
   btnsAll.forEach(b => b.disabled = true);
+  const cardQ = document.getElementById('q-' + idx);
+  if (cardQ) {
+    const ov = document.createElement('div');
+    ov.className = 'q-carregando';
+    ov.innerHTML = `<span class="spinner"></span><span>Refazendo a questão ${idx + 1}</span>`;
+    cardQ.appendChild(ov);
+  }
 
   const questoesExistentes = p.questoes
     .map((q, i) => i === idx ? null : `Q${i + 1}: ${(q.enunciado || '').slice(0, 200).replace(/\s+/g, ' ')}`)
@@ -4168,18 +4867,47 @@ Retorne APENAS este JSON, sem markdown:
     // (Imagem NÃO é anexada automaticamente. A IA mantém a sugestão
     // — você decide se quer anexar via botão "Adicionar imagem".)
     renderProva();
+    irQuestao(idx);
+    toast(`Questão ${idx + 1} refeita. Confira o gabarito.`, 'ok');
   } catch (err) {
-    alert('Erro ao regenerar: ' + err.message);
+    toast('Não deu para refazer a questão: ' + err.message, 'erro');
     console.error(err);
   } finally {
     btnsAll.forEach(b => b.disabled = false);
+    document.querySelectorAll('.q-carregando').forEach(o => o.remove());
   }
 }
 
 // ============================================================
 // Exportação PDF
 // ============================================================
-function exportarProvaPDF() {
+// Exporta a .prova-export com html2pdf: botão em "gerando", página no topo (html2canvas
+// captura em branco com a página rolada) e aviso de pronto ou de erro.
+async function _salvarPdf(element, filename, btn) {
+  const html0 = btn ? btn.innerHTML : '';
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Gerando PDF'; }
+  const y0 = window.scrollY;
+  try {
+    window.scrollTo(0, 0);
+    await html2pdf().set({
+      margin: 10,
+      filename,
+      image: { type: 'jpeg', quality: 0.95 },
+      html2canvas: { scale: 2, scrollX: 0, scrollY: 0, backgroundColor: '#ffffff' },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'] }
+    }).from(element).save();
+    toast('PDF baixado: ' + filename, 'ok');
+  } catch (err) {
+    console.error(err);
+    toast('Não deu para gerar o PDF: ' + (err.message || err), 'erro');
+  } finally {
+    window.scrollTo(0, y0);
+    if (btn) { btn.disabled = false; btn.innerHTML = html0; }
+  }
+}
+
+function exportarProvaPDF(btn) {
   const p = getProvaAtual();
   if (!p) return;
   const u = userAtual();
@@ -4215,24 +4943,18 @@ function exportarProvaPDF() {
   const container = document.getElementById('exportContainer');
   container.innerHTML = html;
   const element = container.querySelector('.prova-export');
-
-  html2pdf().set({
-    margin: 10,
-    filename: `${p.titulo.replace(/[^a-z0-9_\- ]/gi, '_')}.pdf`,
-    image: { type: 'jpeg', quality: 0.95 },
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['css', 'legacy'] }
-  }).from(element).save();
+  return _salvarPdf(element, `${p.titulo.replace(/[^a-z0-9_\- ]/gi, '_')}.pdf`, btn);
 }
 
-async function exportarProvaDocx() {
+async function exportarProvaDocx(btn) {
   const p = getProvaAtual();
   if (!p) return;
   if (!p.templateDocxBase64) {
-    alert('Esta prova não tem um template .docx salvo (você enviou um PDF ou nenhum esqueleto). Use "Baixar PDF" no lugar.');
+    toast('Esta prova não tem modelo em Word (.docx). Use Prova em PDF.', 'erro');
     return;
   }
+  const html0 = btn ? btn.innerHTML : '';
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Gerando Word'; }
   try {
     const bytes = base64ToArrayBuffer(p.templateDocxBase64);
     const blob = await gerarDocxComTemplate(bytes, p.questoes, p.numQuestoes);
@@ -4242,9 +4964,12 @@ async function exportarProvaDocx() {
     a.download = `${p.titulo.replace(/[^a-z0-9_\- ]/gi, '_')}.docx`;
     a.click();
     URL.revokeObjectURL(url);
+    toast('Word baixado no seu modelo.', 'ok');
   } catch (err) {
     console.error(err);
-    alert('Erro ao gerar Word: ' + err.message);
+    toast('Não deu para gerar o Word: ' + err.message, 'erro');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = html0; }
   }
 }
 
@@ -4483,7 +5208,7 @@ function construirParagrafosQuestao(num, q, imagemInfo) {
   return xml;
 }
 
-function exportarGabaritoPDF() {
+function exportarGabaritoPDF(btn) {
   const p = getProvaAtual();
   if (!p) return;
   const u = userAtual();
@@ -4495,7 +5220,8 @@ function exportarGabaritoPDF() {
 
   let html = `<div class="prova-export">
     <div class="cabecalho-prova">
-      <h1>GABARITO COMENTADO — ${p.titulo}</h1>
+      <h1>Gabarito comentado</h1>
+      <p style="font-size:1.1em; font-weight:bold; margin-bottom:6px;">${escapeHtml(p.titulo)}</p>
       <p>Disciplina: ${p.disciplina}</p>
       <p>Professor: ${u.nome}</p>
       <p style="margin-top:8px; font-size:0.9em;">Inclui comentários detalhados e referências bibliográficas.</p>
@@ -4513,15 +5239,15 @@ function exportarGabaritoPDF() {
       : '';
     html += `
       <div class="questao-prova" style="border-bottom:1px solid #ddd; padding-bottom:14px;">
-        <div class="q-num">Questão ${idx + 1} ${p.anuladas[idx] ? '— (ANULADA — conta como correta para todos)' : ''} — Resposta correta: <strong>${q.gabarito}</strong></div>
+        <div class="q-num">Questão ${idx + 1}. Resposta correta: <strong>${q.gabarito}</strong>${p.anuladas[idx] ? ' (anulada: conta como correta para todos)' : ''}</div>
         <div class="q-enunciado">${escapeHtml(q.enunciado)}</div>
         ${imgHtmlGab}
         ${linhaAlt('A')}
         ${linhaAlt('B')}
         ${linhaAlt('C')}
         ${linhaAlt('D')}
-        ${q.explicacao ? `<div style="margin-top:10px; padding:8px 10px; background:#eff6ff; border-left:3px solid #3b82f6; border-radius:3px;"><strong>📘 Comentário:</strong><br>${escapeHtml(q.explicacao).replace(/\n/g, '<br>')}</div>` : ''}
-        ${q.referencias ? `<div style="margin-top:8px; padding:8px 10px; background:rgba(163,115,10,.13); border-left:3px solid #A3730A; border-radius:3px; font-size:0.92em; color:#D9E2EE;"><strong>📚 Referências:</strong><br>${escapeHtml(q.referencias).replace(/\n/g, '<br>')}</div>` : ''}
+        ${q.explicacao ? `<div style="margin-top:10px; padding:8px 10px; background:#eff6ff; border-left:3px solid #3b82f6; border-radius:3px;"><strong>Comentário:</strong><br>${escapeHtml(q.explicacao).replace(/\n/g, '<br>')}</div>` : ''}
+        ${q.referencias ? `<div style="margin-top:8px; padding:8px 10px; background:rgba(163,115,10,.13); border-left:3px solid #A3730A; border-radius:3px; font-size:0.92em; color:#3b2e0c;"><strong>Referências:</strong><br>${escapeHtml(q.referencias).replace(/\n/g, '<br>')}</div>` : ''}
       </div>`;
   });
 
@@ -4530,15 +5256,7 @@ function exportarGabaritoPDF() {
   const container = document.getElementById('exportContainer');
   container.innerHTML = html;
   const element = container.querySelector('.prova-export');
-
-  html2pdf().set({
-    margin: 10,
-    filename: `gabarito-${p.titulo.replace(/[^a-z0-9_\- ]/gi, '_')}.pdf`,
-    image: { type: 'jpeg', quality: 0.95 },
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['css', 'legacy'] }
-  }).from(element).save();
+  return _salvarPdf(element, `gabarito-${p.titulo.replace(/[^a-z0-9_\- ]/gi, '_')}.pdf`, btn);
 }
 
 function escapeHtml(s) {
@@ -4553,14 +5271,17 @@ function renderCorrigir() {
   const p = getProvaAtual();
   if (!p) { navegar('provas'); return; }
 
-  document.getElementById('corrigirTitulo').textContent = `Corrigir: ${p.titulo}`;
-  document.getElementById('corrigirBreadcrumbProva').textContent = p.titulo;
-  const gabStr = p.questoes.map((q, i) => p.anuladas[i] ? '⊘' : q.gabarito).join(' ');
-  const anulCount = p.anuladas.filter(x => x).length;
-  document.getElementById('corrigirGabarito').innerHTML = `<strong>Gabarito:</strong> ${gabStr}${anulCount > 0 ? ` • ${anulCount} questão(ões) anulada(s)` : ''}`;
+  document.getElementById('corrigirTitulo').textContent = p.titulo;
+  const bcp = document.getElementById('corrigirBreadcrumbProva');
+  bcp.innerHTML = '<i class="ti ti-arrow-left mob"></i><span></span>';
+  bcp.querySelector('span').textContent = p.titulo;
+  document.getElementById('corrigirGabarito').innerHTML = p.questoes.map((q, i) =>
+    `<span class="gb ${p.anuladas[i] ? 'anul' : ''}" title="${p.anuladas[i] ? 'Anulada: conta como certa para todos' : 'Questão ' + (i + 1)}"><small>${i + 1}</small>${p.anuladas[i] ? 'anul.' : escapeHtml(q.gabarito)}</span>`).join('');
+  const b = document.getElementById('buscaAluno'); if (b) b.value = '';
 
   renderAlunosCorrecao();
   renderResumoCorrecao();
+  contar(document.getElementById('resumoCorrecao'));
 }
 
 function calcularNota(aluno, prova) {
@@ -4601,10 +5322,11 @@ function adicionarAlunoCorrecao() {
   setTimeout(() => {
     const cards = document.querySelectorAll('#listaAlunosCorrecao .aluno-card');
     if (cards.length > 0) {
-      cards[cards.length - 1].querySelector('.aluno-nome-input').focus();
-      cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      cards[cards.length - 1].querySelector('.aluno-nome-input').focus({ preventScroll: true });
+      cards[cards.length - 1].scrollIntoView({ behavior: _semMovimento() ? 'auto' : 'smooth', block: 'center' });
     }
   }, 50);
+  toast('Aluno adicionado. Digite o nome e marque as respostas.', 'ok');
 }
 
 function removerAlunoCorrecao(alunoId) {
@@ -4616,20 +5338,53 @@ function removerAlunoCorrecao(alunoId) {
   p.alunos = p.alunos.filter(x => x.id !== alunoId);
   salvarEstado();
   renderCorrigir();
+  toast('Aluno removido da correção.', 'ok');
+}
+
+function filtrarAlunos() {
+  const q = (document.getElementById('buscaAluno').value || '').trim().toLowerCase();
+  let vis = 0;
+  document.querySelectorAll('#listaAlunosCorrecao .aluno-card').forEach(c => {
+    const nome = (c.querySelector('.aluno-nome-input').value || '').toLowerCase();
+    const ok = !q || nome.includes(q);
+    c.classList.toggle('hidden', !ok);
+    if (ok) vis++;
+  });
+  let msg = document.getElementById('buscaAlunoVazio');
+  if (!vis && q) {
+    if (!msg) { msg = document.createElement('div'); msg.id = 'buscaAlunoVazio'; msg.className = 'vazio'; document.getElementById('listaAlunosCorrecao').appendChild(msg); }
+    msg.innerHTML = `<div class="v-ic"><i class="ti ti-search"></i></div><b>Nenhum aluno com "${escapeHtml(q)}"</b>`;
+  } else if (msg) msg.remove();
+}
+
+// Lançamento rápido: "BCAD" preenche as respostas em ordem; "-" ou "." deixam em branco
+function aplicarRespostasRapidas(a, p, texto) {
+  const validas = LETRAS.slice(0, p.numAlternativas);
+  const limpo = String(texto || '').toUpperCase().replace(/[\s,;]/g, '');
+  const invalidas = [...new Set(limpo.split('').filter(c => !validas.includes(c) && !'-._?'.includes(c)))];
+  if (invalidas.length) { toast(`Use só ${validas.join(', ')} ou "-" para em branco. Não reconheci: ${invalidas.join(' ')}`, 'erro'); return false; }
+  const novas = new Array(p.numQuestoes).fill('');
+  limpo.slice(0, p.numQuestoes).split('').forEach((c, i) => { novas[i] = validas.includes(c) ? c : ''; });
+  a.respostas = novas;
+  salvarEstado();
+  if (limpo.length > p.numQuestoes) toast(`A prova tem ${p.numQuestoes} questões; o excesso foi ignorado.`, 'erro');
+  return true;
 }
 
 function renderAlunosCorrecao() {
   const p = getProvaAtual();
   const container = document.getElementById('listaAlunosCorrecao');
   const contador = document.getElementById('contadorAlunosCorrecao');
-  contador.textContent = p.alunos.length > 0 ? `${p.alunos.length} aluno(s)` : '';
+  contador.textContent = p.alunos.length > 0 ? `(${p.alunos.length})` : '';
+  document.querySelector('.alunos-topo .busca').classList.toggle('hidden', p.alunos.length < 2);
 
   if (p.alunos.length === 0) {
-    container.innerHTML = '<p style="color:#6b7280; padding:16px; text-align:center;">Nenhum aluno adicionado ainda. Clique em "Adicionar Aluno" para começar.</p>';
+    container.innerHTML = `<div class="vazio"><div class="v-ic"><i class="ti ti-users"></i></div><b>Nenhum aluno lançado</b><p>Adicione um aluno por folha de respostas. Dá para marcar questão por questão ou digitar a sequência, por exemplo BCAD.</p><button onclick="adicionarAlunoCorrecao()"><i class="ti ti-user-plus"></i> Adicionar aluno</button></div>`;
     return;
   }
 
   container.innerHTML = '';
+  const validas = LETRAS.slice(0, p.numAlternativas);
   for (const a of p.alunos) {
     const calc = calcularNota(a, p);
     const card = document.createElement('div');
@@ -4638,34 +5393,61 @@ function renderAlunosCorrecao() {
     const header = document.createElement('div');
     header.className = 'aluno-header';
 
+    const av = document.createElement('span');
+    av.className = 'aluno-av';
+    av.textContent = a.nome ? iniciaisDeNome(a.nome) : '?';
+
     const nomeInput = document.createElement('input');
     nomeInput.type = 'text';
     nomeInput.className = 'aluno-nome-input';
     nomeInput.value = a.nome || '';
     nomeInput.placeholder = 'Nome do aluno';
-    nomeInput.oninput = () => { a.nome = nomeInput.value; salvarEstado(); };
+    nomeInput.autocomplete = 'off';
+    nomeInput.setAttribute('aria-label', 'Nome do aluno');
+    nomeInput.oninput = () => { a.nome = nomeInput.value; av.textContent = a.nome ? iniciaisDeNome(a.nome) : '?'; salvarEstado(); };
     nomeInput.onblur = () => renderResumoCorrecao();
 
+    const rapida = document.createElement('input');
+    rapida.type = 'text';
+    rapida.className = 'resp-rapida';
+    rapida.placeholder = 'Respostas em sequência: ' + validas.join('').slice(0, 4);
+    rapida.title = `Digite as letras em ordem (${validas.join(', ')}); use - para questão em branco. Enter aplica.`;
+    rapida.setAttribute('aria-label', 'Respostas em sequência');
+    rapida.autocomplete = 'off'; rapida.spellcheck = false;
+    rapida.setAttribute('autocapitalize', 'characters');
+    rapida.value = a.respostas.some(Boolean) ? a.respostas.map(r => r || '-').join('') : '';
+    rapida.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); rapida.blur(); } };
+    rapida.onchange = () => {
+      if (aplicarRespostasRapidas(a, p, rapida.value)) {
+        renderAlunosCorrecao(); renderResumoCorrecao();
+        toast(`Respostas de ${a.nome || 'aluno sem nome'} lançadas.`, 'ok');
+      }
+    };
+
     const notaWrap = document.createElement('div');
-    notaWrap.style.textAlign = 'center';
+    notaWrap.className = 'aluno-nota-w';
+    const acertos = document.createElement('div');
+    acertos.className = 'aluno-acertos';
+    acertos.innerHTML = `<b>${calc.acertos} de ${calc.total}</b>acertos`;
     const nota = document.createElement('div');
     nota.className = 'aluno-nota ' + (calc.nota >= 6 ? 'aprovado' : 'reprovado');
-    nota.textContent = calc.nota.toFixed(1);
-    const det = document.createElement('div');
-    det.style.fontSize = '0.8em';
-    det.style.color = '#6b7280';
-    det.textContent = `${calc.acertos}/${calc.total}`;
-    notaWrap.appendChild(nota);
-    notaWrap.appendChild(det);
+    nota.textContent = calc.nota.toFixed(1).replace('.', ',');
+    nota.title = calc.nota >= 6 ? 'Aprovado' : 'Abaixo de 6,0';
 
     const btnDel = document.createElement('button');
-    btnDel.className = 'danger small';
-    btnDel.textContent = '✕';
+    btnDel.className = 'ghost small ic-btn perigo';
+    btnDel.innerHTML = '<i class="ti ti-trash"></i>';
+    btnDel.title = 'Remover este aluno';
+    btnDel.setAttribute('aria-label', 'Remover este aluno');
     btnDel.onclick = () => removerAlunoCorrecao(a.id);
+    notaWrap.appendChild(acertos);
+    notaWrap.appendChild(nota);
+    notaWrap.appendChild(btnDel);
 
+    header.appendChild(av);
     header.appendChild(nomeInput);
+    header.appendChild(rapida);
     header.appendChild(notaWrap);
-    header.appendChild(btnDel);
 
     const respGrid = document.createElement('div');
     respGrid.className = 'respostas-mini';
@@ -4673,6 +5455,7 @@ function renderAlunosCorrecao() {
       const d = calc.detalhes[i];
       const mini = document.createElement('div');
       mini.className = 'resp-mini ' + (d.status === 'correta' ? 'correta' : d.status === 'errada' ? 'errada' : d.status === 'anulada' ? 'anulada' : '');
+      mini.title = d.status === 'anulada' ? 'Anulada: conta como certa' : (d.gab ? 'Gabarito: ' + d.gab : '');
       const num = document.createElement('div');
       num.className = 'resp-mini-num';
       num.textContent = 'Q' + (i + 1);
@@ -4682,7 +5465,8 @@ function renderAlunosCorrecao() {
         const btn = document.createElement('button');
         btn.className = 'resp-mini-btn';
         btn.textContent = LETRAS[j];
-        if (a.respostas[i] === LETRAS[j]) btn.classList.add('selected');
+        btn.setAttribute('aria-label', `Questão ${i + 1}, alternativa ${LETRAS[j]}`);
+        if (a.respostas[i] === LETRAS[j]) { btn.classList.add('selected'); btn.setAttribute('aria-pressed', 'true'); }
         btn.onclick = () => {
           if (a.respostas[i] === LETRAS[j]) a.respostas[i] = '';
           else a.respostas[i] = LETRAS[j];
@@ -4706,6 +5490,7 @@ function renderAlunosCorrecao() {
     card.appendChild(respGrid);
     container.appendChild(card);
   }
+  filtrarAlunos();
 }
 
 function renderResumoCorrecao() {
@@ -4719,13 +5504,13 @@ function renderResumoCorrecao() {
   const reprovados = total - aprovados;
   div.innerHTML = `
     <div class="resumo-stats">
-      <div class="stat-box"><div class="stat-num">${total}</div><div class="stat-label">Alunos</div></div>
-      <div class="stat-box"><div class="stat-num">${media.toFixed(1)}</div><div class="stat-label">Média</div></div>
-      <div class="stat-box"><div class="stat-num" style="color:#10b981;">${aprovados}</div><div class="stat-label">Aprovados</div></div>
-      <div class="stat-box"><div class="stat-num" style="color:#ef4444;">${reprovados}</div><div class="stat-label">Reprovados</div></div>
+      <div class="stat-box" style="--k:var(--c-azul)"><span class="sb-ic"><i class="ti ti-users"></i></span><div><div class="stat-num" data-conta="${total}">${total}</div><div class="stat-label">Alunos</div></div></div>
+      <div class="stat-box" style="--k:var(--c-violeta)"><span class="sb-ic"><i class="ti ti-chart-bar"></i></span><div><div class="stat-num" data-conta="${media.toFixed(1)}" data-casas="1">${media.toFixed(1).replace('.', ',')}</div><div class="stat-label">Média da turma</div></div></div>
+      <div class="stat-box" style="--k:var(--c-teal)"><span class="sb-ic"><i class="ti ti-circle-check"></i></span><div><div class="stat-num" data-conta="${aprovados}">${aprovados}</div><div class="stat-label">Aprovados</div></div></div>
+      <div class="stat-box" style="--k:var(--c-rosa)"><span class="sb-ic"><i class="ti ti-circle-x"></i></span><div><div class="stat-num" data-conta="${reprovados}">${reprovados}</div><div class="stat-label">Abaixo de 6,0</div></div></div>
     </div>
-    <div style="text-align:right; margin-bottom:10px;">
-      <button class="success small" onclick="exportarNotasCSV()">📥 Exportar notas (CSV)</button>
+    <div class="resumo-acoes">
+      <button class="secondary small" onclick="exportarNotasCSV()"><i class="ti ti-table-export"></i> Baixar notas (CSV)</button>
     </div>
   `;
 }
@@ -4747,6 +5532,7 @@ function exportarNotasCSV() {
   a.download = `notas-${p.titulo.replace(/[^a-z0-9_\- ]/gi, '_')}.csv`;
   a.click();
   URL.revokeObjectURL(url);
+  toast('Planilha de notas baixada.', 'ok');
 }
 
 // ============================================================
@@ -4762,10 +5548,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const drop = document.querySelector(`label[for="${inputId}"]`);
     if (!drop) return;
     ['dragenter', 'dragover'].forEach(ev => {
-      drop.addEventListener(ev, e => { e.preventDefault(); drop.style.borderColor = '#3b82f6'; });
+      drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('sobre'); });
     });
     ['dragleave', 'drop'].forEach(ev => {
-      drop.addEventListener(ev, e => { e.preventDefault(); drop.style.borderColor = ''; });
+      drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('sobre'); });
     });
     drop.addEventListener('drop', e => {
       e.preventDefault();
@@ -4775,6 +5561,20 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   setupDrop('matDrop', 'materiaisInput', adicionarMateriais);
   setupDrop('esqDrop', 'esqueletoInput', adicionarEsqueleto);
+});
+
+// Atalhos no computador: "/" busca na lista de provas, Esc fecha a janela aberta
+document.addEventListener('keydown', (e) => {
+  const alvo = e.target, digitando = alvo && (alvo.tagName === 'INPUT' || alvo.tagName === 'TEXTAREA' || alvo.tagName === 'SELECT' || alvo.isContentEditable);
+  if (e.key === 'Escape') {
+    if (document.getElementById('imgModal').classList.contains('show')) { fecharBuscaImagem(); return; }
+    if (document.getElementById('paywallModal').classList.contains('show')) { fecharPaywall(); return; }
+  }
+  if (e.key === '/' && !digitando && !e.metaKey && !e.ctrlKey) {
+    const pg = document.body.dataset.pg;
+    const campo = pg === 'provas' ? document.getElementById('buscaProvas') : pg === 'corrigir' ? document.getElementById('buscaAluno') : null;
+    if (campo && campo.offsetParent) { e.preventDefault(); campo.focus(); }
+  }
 });
 
 // ============================================================
@@ -4835,12 +5635,13 @@ function atualizarBadgePro() {
   if (!s) { el.className = 'pro-badge hidden'; el.textContent = ''; el.onclick = null; return; }
   if (s.ecosystem) {
     el.className = 'pro-badge pro';
-    el.textContent = '⭐ MedTech';
+    el.innerHTML = '<i class="ti ti-circle-check"></i> IA incluída';
+    el.title = 'A IA vem incluída na sua conta MedTech';
     el.onclick = null;
   } else if (s.isPaid) {
     const dias = Math.max(0, Math.floor((s.paidUntil - Date.now()) / 86400000));
     el.className = 'pro-badge pro';
-    el.textContent = `⭐ Pro · ${dias}d`;
+    el.textContent = `Pro · ${dias} dias`;
     el.onclick = null;
   } else if (s.freeRemaining > 0) {
     el.className = 'pro-badge trial';
@@ -4881,7 +5682,7 @@ async function chamarGeminiNoServidor({ parts, generationConfig, model, intent }
   try { json = await res.json(); } catch (e) {}
   if (!res.ok) {
     if (res.status === 401) throw new Error('Sessão expirou. Entre na sua conta MedTech novamente.');
-    if (res.status === 413) throw new Error(json.error || 'Arquivo muito grande — reduza ou divida o PDF e tente de novo.');
+    if (res.status === 413) throw new Error(json.error || 'Arquivo muito grande. Reduza ou divida o PDF e tente de novo.');
     throw new Error(json.error || ('Erro da IA (HTTP ' + res.status + ').'));
   }
   // geminiDocHttp devolve { text }; reembrulha no formato Gemini que os geradores de prova esperam.

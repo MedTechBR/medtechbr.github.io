@@ -15,7 +15,9 @@ trocas = [
   ('<link rel="manifest" href="manifest.webmanifest">', '<link rel="manifest" href="provas.webmanifest">'),
   ('<meta name="apple-mobile-web-app-title" content="MedTech App">', '<meta name="apple-mobile-web-app-title" content="MedTech Provas">'),
   ('window.MT_APP={id:"portal",name:"MedTech App",linha:"clinica"};', 'window.MT_APP={id:"portal-provas",name:"MedTech Provas",linha:"provas"};'),
-  ('<span class="wm">MedTech <b>App</b></span>', '<span class="wm">MedTech <b>Provas</b></span>'),
+  ('<span>MedTech <b>App</b></span>', '<span>MedTech <b>Provas</b></span>'),
+  # tema vivo: o portal Provas tem a própria cor (laranja) em _mtviva.css
+  ('<html lang="pt-BR" data-viva="portal"', '<html lang="pt-BR" data-viva="portal-provas"'),
   ('<link rel="apple-touch-icon" href="icone-180.png">', '<link rel="apple-touch-icon" href="icone-provas-180.png">'),
 ]
 for a, b in trocas:

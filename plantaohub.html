@@ -1,165 +1,315 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-astra="plantaohub">
+<html lang="pt-BR" data-viva="plantaohub" data-viva-escuro>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>PlantãoHub — Gestão de plantões | MedTech</title>
-<meta name="description" content="PlantãoHub: organize seus plantões, controle horas e acompanhe quanto você ganha e quanto já recebeu — por local, por mês e por ano. Com login e sincronização na nuvem.">
-<meta name="theme-color" content="#000000">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
+<title>PlantãoHub · MedTech</title>
+<meta name="description" content="PlantãoHub: organize seus plantões, controle horas e acompanhe quanto você ganha e quanto já recebeu, por local, por mês e por ano.">
+<meta name="theme-color" content="#F5F6FB">
+<link rel="stylesheet" href="vendor/tabler/tabler-icons.min.css?v=3.48.0">
 <link rel="icon" type="image/png" href="favicon.png">
 <script src="_mtfb.js?v=1"></script>
 <script src="_mtui.js?v=1"></script>
 <script>window.MT_APP={id:"plantaohub",name:"PlantãoHub"};</script>
-<script type="module" src="_mtauth.js?v=25"></script>
+<script type="module" src="_mtauth.js?v=26"></script>
 <style>
-:root{--petrol:#15966F;--petrol-dark:#0D6449;--ink:#23272E;--mint:#15966F;--mint-dark:#0D6449;--bg:#FAFAF8;--surface:#FFFFFF;--panel2:#F1F1EC;--soft:rgba(21,150,111,.12);--line:#DDDDD5;--line-strong:#D3D3CA;--muted:#5E646B;--dim:#767C84;--glow:rgba(21,150,111,.42);--green:#1D7A46;--green-bg:rgba(29,122,70,.15);--amber:#A3730A;--amber-bg:rgba(163,115,10,.15);--red:#C6453D;--red-bg:rgba(198,69,61,.15);--violet:#b39df5;--violet-bg:rgba(139,110,240,.16)}
+/* ============================================================
+   PlantãoHub no tema vivo (23/09/2026), modelo ClínicaMed "camada viva".
+   Fluxo principal: lançar plantão -> ver o mês -> saber o que falta receber.
+   Cor do app: lima (--ac, do _mtviva.css, já com 4,5:1 sob texto branco).
+   ============================================================ */
+html[data-viva=plantaohub] body{--acF:var(--ac);--k:var(--ac)}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:-.011em;color:var(--ink);background-color:#FAFAF8}
-input:-webkit-autofill,input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 100px #FFFFFF inset;-webkit-text-fill-color:#23272E;caret-color:#23272E;transition:background-color 99999s}
-header{background:rgba(255,255,255,.85);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:var(--ink);border-bottom:1px solid var(--line);padding:14px 0;padding-top:calc(14px + env(safe-area-inset-top))}
-.wrap{max-width:960px;margin:0 auto;padding:0 18px}
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;letter-spacing:-.5px;font-family:'Inter',sans-serif}
-.logo .mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(150deg,#15966F,#107758);display:grid;place-items:center;flex:0 0 auto;box-shadow:0 2px 8px rgba(21,150,111,.28)}
+body{font-size:14.5px;line-height:1.5;min-height:100vh}
+button{font:inherit;color:inherit;cursor:pointer}
+.ti{line-height:1}
+
+/* ---------- cabeçalho: uma linha ---------- */
+header{position:sticky;top:0;z-index:30;padding:10px 0;padding-top:calc(10px + env(safe-area-inset-top))}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.top{display:flex;align-items:center;gap:12px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:19px;letter-spacing:-.02em;margin-right:auto;white-space:nowrap}
+.logo .mark{width:38px;height:38px;border-radius:50%;background:var(--acF)!important;display:grid;place-items:center;flex:0 0 auto}
 .logo .mark svg{width:22px;height:22px}
-.logo b{color:var(--petrol)}
-.subtitle{color:var(--muted);font-size:12.5px;margin-top:3px}
-.usr{display:flex;align-items:center;gap:10px}
-.usr .who{font-size:12.5px;color:var(--muted);text-align:right;line-height:1.3;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.usr a,.usr button{color:var(--ink);text-decoration:none;font-size:13px;font-weight:600;background:transparent;border:1px solid var(--line);border-radius:8px;padding:7px 11px;cursor:pointer;font-family:inherit}
-.usr a:hover,.usr button:hover{background:var(--soft);border-color:var(--petrol);color:var(--petrol)}
-main{max-width:960px;margin:0 auto;padding:18px 18px 60px}
-.tabs{display:flex;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:5px;margin-bottom:16px;width:fit-content}
-.tabs button{border:none;background:none;padding:9px 20px;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;color:var(--muted);font-family:inherit}
-.tabs button.on{background:linear-gradient(150deg,#15966F,#107758);color:#fff;box-shadow:0 2px 8px rgba(21,150,111,.28)}
-.bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap}
-.bar .nav{display:flex;align-items:center;gap:10px}
-.bar h2{font-size:18px;text-transform:capitalize;font-family:'Inter',sans-serif}
-.bar .arr{background:#F7F7F3;border:1px solid var(--line);border-radius:9px;width:38px;height:38px;font-size:18px;cursor:pointer;color:var(--petrol)}
+.logo b{color:var(--acInk);font-weight:700}
+.usr{display:flex;align-items:center;gap:8px}
+.usr .who{font-size:13px;color:var(--tinta2);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.usr a,.usr button{display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-size:13.5px;padding:0 14px}
+.hdr-novo{order:2}
+
+/* ---------- botões ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:9px 18px;border-radius:999px;border:1.5px solid transparent;font-weight:600;font-size:14px;white-space:nowrap;text-decoration:none}
+.btn .ti{font-size:17px}
+html[data-viva=plantaohub][lang] body .btn-p{background:var(--acF)!important;border-color:var(--acF)!important;color:#fff!important}
+.btn-sm{min-height:38px;padding:6px 14px;font-size:13.5px}
+.btn-perigo{background:var(--errSup);color:color-mix(in srgb,var(--errV) 80%,var(--tinta))}
+.btn-perigo:hover{background:var(--errV);color:#fff}
+.ib{width:38px;height:38px;border-radius:50%;border:0;background:transparent;color:var(--tinta2);display:grid;place-items:center;font-size:18px}
+.ib:hover{background:var(--sup2);color:var(--tinta)}
+.ib.del:hover{background:var(--errSup);color:var(--errV)}
+
+main{max-width:1080px;margin:0 auto;padding:16px 20px 60px}
+
+/* ---------- abas ---------- */
+.tabs{display:flex;gap:4px;width:fit-content;margin-bottom:18px}
+.tabs button{border:0;background:none;padding:6px 18px 6px 6px;display:inline-flex;align-items:center;gap:10px;font-size:14.5px}
+.tabs button i{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:17px;background:color-mix(in srgb,var(--c) 14%,transparent);color:color-mix(in srgb,var(--c) 70%,var(--tinta));
+  transition:transform .25s var(--mola),background-color .2s,color .2s}
+.tabs button:hover i{transform:scale(1.1) rotate(-6deg)}
+html[data-viva=plantaohub][lang] body .tabs button.on{background:color-mix(in srgb,var(--c) 13%,var(--sup))!important;color:color-mix(in srgb,var(--c) 60%,var(--tinta))!important;box-shadow:none!important;font-weight:650}
+.tabs button.on i{background:var(--c);color:#fff;box-shadow:0 6px 14px color-mix(in srgb,var(--c) 38%,transparent)}
+
+/* ---------- barra do período ---------- */
+.bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.bar .nav{display:flex;align-items:center;gap:8px}
+.bar h2{font-size:21px;font-weight:700;letter-spacing:-.03em;min-width:0}
+.bar h2::first-letter{text-transform:uppercase}
+.bar .arr{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--fio);background:var(--sup);color:var(--tinta);display:grid;place-items:center;font-size:18px}
+.bar .arr:hover{background:var(--acSup);color:var(--acInk);border-color:transparent}
 .bar .right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-select.flt,.btn{font-family:inherit}
-select.flt{padding:9px 12px;border:1px solid var(--line-strong);border-radius:9px;font-size:13.5px;background:var(--panel2);color:var(--ink)}
-.btn{display:inline-flex;align-items:center;gap:7px;border:none;border-radius:10px;padding:11px 16px;font-weight:700;font-size:14px;cursor:pointer}
-.btn-p{background:linear-gradient(150deg,#15966F,#107758);color:#fff;box-shadow:0 2px 8px rgba(21,150,111,.28)}.btn-p:hover{background:linear-gradient(150deg,#15966F,#107758)}
-.btn-g{background:#F7F7F3;color:var(--petrol);border:1px solid var(--line)}
-.btn-sm{padding:8px 12px;font-size:13px}
-.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin-bottom:16px}
-.kpi{background:linear-gradient(160deg,var(--surface),var(--panel2));border:1px solid var(--line);border-radius:14px;padding:14px}
-.kpi .l{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.03em}
-.kpi .v{font-size:21px;font-weight:800;color:var(--petrol);margin-top:4px;font-family:'JetBrains Mono',monospace}
-.kpi.green .v{color:var(--green)}.kpi.amber .v{color:var(--amber)}.kpi.red .v{color:var(--red)}
-.shift{background:linear-gradient(160deg,var(--surface),var(--panel2));border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin-bottom:10px;display:flex;align-items:center;gap:14px}
-.shift .day{text-align:center;min-width:50px}
-.shift .day .d{font-size:21px;font-weight:800;line-height:1;font-family:'JetBrains Mono',monospace}
-.shift .day .w{font-size:11px;color:var(--muted);text-transform:uppercase}
-.shift .mid{flex:1;min-width:0}
-.shift .mid .loc{font-weight:700;font-size:15px}
-.shift .mid .det{color:var(--muted);font-size:13px;margin-top:2px}
-.shift .mid .obs{font-size:12.5px;color:var(--ink);margin-top:4px;background:var(--soft);padding:4px 9px;border-radius:7px;display:inline-block}
-.shift .val{text-align:right;font-weight:800;color:var(--petrol);white-space:nowrap;font-family:'JetBrains Mono',monospace}
-.shift .acts{display:flex;gap:6px}
-.shift .acts button{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 9px;cursor:pointer;font-size:13px}
-.stat{display:inline-block;font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;margin-top:4px;cursor:pointer}
-.s-ag{background:var(--amber-bg);color:var(--amber)}.s-pg{background:var(--green-bg);color:var(--green)}
-.empty{text-align:center;color:var(--muted);padding:36px;background:linear-gradient(160deg,var(--surface),var(--panel2));border:1px dashed var(--line-strong);border-radius:14px}
-.note{background:var(--soft);border-radius:12px;padding:13px 16px;font-size:13px;color:var(--ink);margin-top:16px}
-.note b{color:var(--petrol)}
-table.yr{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-table.yr th,table.yr td{padding:11px 13px;text-align:right;font-size:13.5px;border-bottom:1px solid var(--line);font-family:'JetBrains Mono',monospace}
-table.yr th{background:var(--soft);color:var(--petrol);font-size:11.5px;text-transform:uppercase;letter-spacing:.03em}
-table.yr td:first-child,table.yr th:first-child{text-align:left;text-transform:capitalize;font-weight:700}
+html[data-viva=plantaohub][lang] body select.flt{min-height:40px;padding:8px 34px 8px 14px;border-radius:999px;font-size:14px;max-width:220px}
+
+/* ---------- herói: quanto falta receber ---------- */
+.ph-hero{position:relative;overflow:hidden;border-radius:26px;padding:22px 24px;background:var(--acF);color:#fff;margin-bottom:14px;
+  display:grid;grid-template-columns:minmax(0,1fr);gap:14px 24px;align-items:center;box-shadow:0 18px 40px color-mix(in srgb,var(--ac) 26%,transparent)}
+.ph-hero .bola{position:absolute;border-radius:50%;background:#fff;opacity:.08;pointer-events:none}
+.ph-hero .b1{width:240px;height:240px;right:-70px;top:-110px;animation:phFlutua 9s ease-in-out infinite}
+.ph-hero .b2{width:110px;height:110px;right:190px;bottom:-60px;opacity:.06;animation:phFlutua 7s ease-in-out infinite reverse}
+.ph-hero>*{position:relative}
+.ph-hero small{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;background:rgba(0,0,0,.16);padding:5px 12px;border-radius:999px}
+.ph-hero .big{display:block;font-size:38px;font-weight:800;letter-spacing:-.04em;line-height:1.1;margin:10px 0 4px;font-variant-numeric:tabular-nums}
+.ph-hero p{font-size:14px;opacity:.95;margin:0}
+.ph-hero p b{font-weight:700}
+.ph-prog{grid-column:1/-1}
+.ph-prog .trilho{height:10px;border-radius:999px;background:rgba(0,0,0,.2);overflow:hidden}
+.ph-prog .trilho i{display:block;height:100%;width:0;border-radius:999px;background:#fff;transition:width 1.1s var(--suave)}
+.ph-prog .leg{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;margin-top:6px;opacity:.95;font-variant-numeric:tabular-nums}
+.ph-hero .btn{background:#fff;color:var(--acF);box-shadow:0 8px 20px rgba(0,0,0,.16)}
+.ph-hero .btn:hover{transform:translateY(-1px)}
+
+/* ---------- indicadores ---------- */
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.kpi{--k:var(--c-azul);border-radius:20px;padding:14px 16px;display:flex;align-items:center;gap:12px;border:1px solid color-mix(in srgb,var(--k) 18%,transparent)!important;
+  background:color-mix(in srgb,var(--k) 11%,var(--sup))!important;transition:transform .2s var(--mola),box-shadow .2s}
+.kpi:hover{transform:translateY(-3px);box-shadow:0 12px 26px color-mix(in srgb,var(--k) 20%,transparent)}
+.kpi .ic{width:40px;height:40px;border-radius:50%;background:var(--k);color:#fff;display:grid;place-items:center;font-size:20px;flex:0 0 auto;box-shadow:0 8px 18px color-mix(in srgb,var(--k) 32%,transparent)}
+.kpi .l{font-size:12.5px;color:var(--tinta2);font-weight:500}
+html[data-viva=plantaohub][lang] body .kpi .v{display:block;font-size:22px;font-weight:800;letter-spacing:-.03em;line-height:1.15;color:color-mix(in srgb,var(--k) 60%,var(--tinta));font-variant-numeric:tabular-nums;white-space:nowrap}
+/* [lang] sobe a especificidade acima do :nth-child do tema, que pintaria as cores fora de ordem */
+html[data-viva=plantaohub][lang] body .kpi.k-azul{--k:var(--c-azul)}html[data-viva=plantaohub][lang] body .kpi.k-violeta{--k:var(--c-violeta)}
+html[data-viva=plantaohub][lang] body .kpi.k-verde{--k:var(--c-verde)}html[data-viva=plantaohub][lang] body .kpi.k-laranja{--k:var(--c-laranja)}
+
+/* ---------- blocos e lista de plantões ---------- */
+.ph-cols{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:start}
+.ph-cols>*,.ph-cols .lado>*{min-width:0}
+.ph-bloco{background:var(--sup);border:1px solid var(--fio);border-radius:var(--rG);box-shadow:var(--sombraV);padding:18px}
+.vTit{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.vTit h3{font-size:15.5px;font-weight:650;letter-spacing:-.01em}
+.vTit .ic{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:16px;background:color-mix(in srgb,var(--k) 14%,var(--sup));color:color-mix(in srgb,var(--k) 65%,var(--tinta))}
+.vTit .lk{margin-left:auto;background:var(--sup2);border:0;border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:600;color:var(--tinta2);display:inline-flex;align-items:center;gap:5px;min-height:34px}
+.vTit .lk:hover{background:var(--acSup);color:var(--acInk)}
+.shift{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px 14px;align-items:center;padding:12px 8px 12px 10px;border-radius:18px;transition:background-color .15s}
+.shift+.shift{border-top:1px solid var(--fio)}
+.shift:hover{background:var(--sup2)}
+.shift .day{width:48px;height:48px;border-radius:50%;display:grid;place-content:center;text-align:center;background:var(--acSup);color:var(--acInk);line-height:1}
+.shift.pago .day{background:color-mix(in srgb,var(--okV) 14%,var(--sup));color:color-mix(in srgb,var(--okV) 62%,var(--tinta))}
+.shift .day .d{font-size:17px;font-weight:800;font-variant-numeric:tabular-nums}
+.shift .day .w{font-size:11px;font-weight:600;margin-top:2px}
+.shift .mid{min-width:0;cursor:pointer}
+.shift .mid .loc{font-weight:650;font-size:15px;overflow-wrap:anywhere}
+.shift .mid .det{color:var(--tinta2);font-size:13px;margin-top:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.shift .mid .det .ti{font-size:14px}
+.shift .obs{font-size:12.5px;color:var(--tinta2);margin-top:4px;display:flex;gap:5px;align-items:center}
+.shift .fim{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.shift .val{font-weight:750;font-size:15.5px;white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.shift .acts{display:flex;gap:2px;justify-content:flex-end}
+@media (min-width:641px){.shift{grid-template-columns:auto minmax(0,1fr) auto auto}.shift .fim{flex-direction:row;align-items:center;gap:12px}}
+@media (max-width:640px){.shift .acts{grid-column:2/-1;margin-top:-2px}}
+.ph-st{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:650;padding:5px 11px;border-radius:999px;border:0;min-height:30px;transition:transform .2s var(--mola)}
+.ph-st:active{transform:scale(.94)}
+.s-ag{background:color-mix(in srgb,var(--c-ambar) 16%,var(--sup));color:color-mix(in srgb,var(--c-ambar) 45%,var(--tinta))}
+.s-pg{background:color-mix(in srgb,var(--okV) 15%,var(--sup));color:color-mix(in srgb,var(--okV) 58%,var(--tinta))}
+.ph-st .ti{font-size:14px}
+.ph-st.pula{animation:phPop .4s var(--mola)}
+
+/* ---------- vazio ---------- */
+.vazio{text-align:center;padding:30px 16px;color:var(--tinta2)}
+.vazio .ic{width:54px;height:54px;border-radius:50%;margin:0 auto 10px;display:grid;place-items:center;font-size:26px;background:var(--acSup);color:var(--acInk)}
+.vazio b{display:block;color:var(--tinta);font-size:15.5px;margin-bottom:4px}
+.vazio p{font-size:13.5px;margin-bottom:14px}
+
+/* ---------- previsão de recebimento ---------- */
+.prev-top{font-size:14.5px;margin-bottom:10px}
+.prev-top b{font-variant-numeric:tabular-nums}
+.prev-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:10px 8px;border-radius:14px;cursor:pointer;font-size:14px;border:0;background:none;width:100%;text-align:left}
+.prev-row:hover{background:var(--sup2)}
+.prev-row .dt{width:44px;height:44px;border-radius:50%;background:color-mix(in srgb,var(--c-azul) 12%,var(--sup));color:color-mix(in srgb,var(--c-azul) 60%,var(--tinta));
+  display:grid;place-content:center;text-align:center;line-height:1;font-variant-numeric:tabular-nums}
+.prev-row .dt b{font-size:15px;font-weight:800}.prev-row .dt small{font-size:10.5px;font-weight:600;margin-top:2px}
+.prev-l{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.prev-d{display:block;color:var(--tinta2);font-size:12.5px;font-weight:500}
+.prev-v{font-weight:750;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.prev-nota{margin-top:10px;font-size:12.5px;color:var(--tinta2);line-height:1.45}
+.prev-vazio{font-size:13.5px;color:var(--tinta2);display:flex;gap:8px;align-items:center}
+.prev-vazio .ti{color:var(--okV);font-size:18px}
+
+/* ---------- calendário ---------- */
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cal .hd{text-align:center;font-size:12px;font-weight:600;color:var(--tinta2);padding:2px 0}
+.cal .cell{background:var(--sup);border:1px solid var(--fio);border-radius:16px;min-height:96px;padding:6px;position:relative;cursor:pointer;display:flex;flex-direction:column;gap:4px;overflow:hidden;
+  transition:border-color .15s,box-shadow .2s,transform .2s var(--mola)}
+.cal .cell:hover{border-color:color-mix(in srgb,var(--ac) 45%,var(--fio));box-shadow:0 8px 20px color-mix(in srgb,var(--ac) 12%,transparent)}
+.cal .cell.out{background:transparent;border-style:dashed;opacity:.55}
+.cal .cell .dn{font-size:12.5px;font-weight:650;color:var(--tinta2);align-self:flex-start;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.cal .cell.today .dn{background:var(--acF);color:#fff}
+.cal .cell .cp{position:absolute;top:4px;right:4px;width:30px;height:30px;border-radius:50%;border:0;background:var(--sup2);color:var(--tinta2);display:grid;place-items:center;font-size:15px;opacity:0;transition:opacity .15s}
+.cal .cell:hover .cp,.cal .cell .cp:focus-visible{opacity:1}
+.cal .chip{font-size:11px;font-weight:650;border-radius:10px;padding:3px 7px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;line-height:1.25;font-variant-numeric:tabular-nums}
+.cal .chip .ch-h{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal .chip .ch-l{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal .chip.c-ag{background:color-mix(in srgb,var(--c-ambar) 17%,var(--sup));color:color-mix(in srgb,var(--c-ambar) 42%,var(--tinta))}
+.cal .chip.c-pg{background:color-mix(in srgb,var(--okV) 15%,var(--sup));color:color-mix(in srgb,var(--okV) 55%,var(--tinta))}
+.cal.pasting .cell{border-style:dashed;border-color:var(--ac)}
+.cal.pasting .cell:hover{background:var(--acSup)}
+.cal-leg{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:12px;font-size:12.5px;color:var(--tinta2);align-items:center}
+.cal-leg i:not(.ti){display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.clipbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:color-mix(in srgb,var(--c-violeta) 12%,var(--sup));color:color-mix(in srgb,var(--c-violeta) 55%,var(--tinta));
+  border-radius:18px;padding:10px 12px 10px 16px;font-size:13.5px;font-weight:600;margin-bottom:12px}
+.clipbar .ti{font-size:18px}
+.clipbar span{flex:1;min-width:0}
+.clipbar button{background:var(--sup);color:var(--tinta);border:0;border-radius:999px;min-height:36px;padding:6px 14px;font-weight:600;font-size:13px}
+
+/* ---------- ano ---------- */
+.ano-meses{display:grid;gap:6px}
+.am{display:grid;grid-template-columns:92px minmax(0,1fr) auto;gap:12px;align-items:center;padding:6px 6px;border-radius:12px;font-size:13.5px}
+.am:hover{background:var(--sup2)}
+.am .m{font-weight:600}
+.am .m::first-letter{text-transform:uppercase}
+.am .tr{height:12px;border-radius:999px;background:var(--sup3);position:relative;overflow:hidden}
+.am .tr i{position:absolute;left:0;top:0;bottom:0;border-radius:999px;width:0;transition:width 1s var(--suave)}
+.am .tr .pv{background:color-mix(in srgb,var(--c-ambar) 55%,var(--sup3))}
+.am .tr .rc{background:var(--okV)}
+.am .n{font-variant-numeric:tabular-nums;font-weight:650;text-align:right;white-space:nowrap}
+.am .n small{display:block;font-weight:500;color:var(--tinta2);font-size:12px}
+.am.vazio-m{color:var(--tinta2)}
+table.yr{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+table.yr th,table.yr td{padding:9px 8px;text-align:right;font-size:13.5px;border-bottom:1px solid var(--fio);white-space:nowrap}
+table.yr th{font-size:12.5px;color:var(--tinta2);font-weight:600}
+table.yr td:first-child,table.yr th:first-child{text-align:left;font-weight:600}
+table.yr td:first-child::first-letter{text-transform:uppercase}
 table.yr tr:last-child td{border-bottom:none}
-table.yr tr.tot td{background:rgba(21,150,111,.1);font-weight:800;color:var(--petrol)}
-.locgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:11px;margin-top:14px}
-.loccard{background:linear-gradient(160deg,var(--surface),var(--panel2));border:1px solid var(--line);border-radius:12px;padding:13px 15px}
-.loccard .ln{font-weight:700;font-size:14px}.loccard .lv{color:var(--muted);font-size:12.5px;margin-top:3px}
-.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-.cal .hd{text-align:center;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;padding:2px 0}
-.cal .cell{background:var(--panel2);border:1px solid var(--line);border-radius:10px;min-height:90px;padding:6px;position:relative;cursor:pointer;display:flex;flex-direction:column;gap:3px;overflow:hidden}
-.cal .cell:hover{border-color:var(--mint)}
-.cal .cell.out{background:rgba(35,39,46,.04);opacity:.55}
-.cal .cell .dn{font-size:12px;font-weight:700;color:var(--muted);align-self:flex-start;font-family:'JetBrains Mono',monospace}
-.cal .cell.today .dn{background:var(--petrol);color:#fff;border-radius:6px;padding:0 6px}
-.cal .cell .cp{position:absolute;top:5px;right:5px;font-size:12px;background:var(--soft);border:1px solid var(--line);border-radius:7px;padding:0 6px;cursor:pointer;opacity:0;transition:opacity .12s;color:var(--petrol)}
-.cal .cell:hover .cp{opacity:1}
-.cal .chip{font-size:10.5px;font-weight:700;border-radius:6px;padding:2px 6px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;line-height:1.25;font-family:'JetBrains Mono',monospace}
-.cal .chip .ch-h{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cal .chip .ch-l{font-weight:600;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cal .chip.c-ag{background:var(--amber-bg);color:var(--amber)}
-.cal .chip.c-pg{background:var(--green-bg);color:var(--green)}
-.cal.pasting .cell{border-style:dashed;border-color:var(--mint)}
-.cal.pasting .cell:hover{background:var(--soft);box-shadow:0 0 0 2px var(--mint)}
-.clipbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--violet-bg);color:var(--violet);border:1px solid rgba(139,110,240,.35);border-radius:10px;padding:9px 14px;font-size:13px;font-weight:600;margin-bottom:12px}
-.clipbar button{background:#8b6ef0;color:#fff;border:none;border-radius:7px;padding:5px 11px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
-@media(max-width:520px){.cal{gap:3px}.cal .cell{min-height:60px;padding:3px;border-radius:8px}.cal .chip{font-size:9px;padding:1px 4px}.cal .cell .cp{opacity:1}}
-.modal{position:fixed;inset:0;background:rgba(2,6,12,.66);display:flex;align-items:center;justify-content:center;padding:18px;z-index:60}
-.modal .box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;max-width:460px;width:100%;max-height:92vh;overflow:auto}
-.modal h3{margin-bottom:16px;font-family:'Inter',sans-serif}
-.field{margin-bottom:13px}.field label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
-.field input,.field select,.field textarea{width:100%;padding:11px 13px;border:1px solid var(--line-strong);border-radius:10px;font-size:15px;font-family:inherit;background:var(--panel2);color:var(--ink)}
-.field textarea{resize:vertical;min-height:52px}
-.field input:focus,.field textarea:focus{outline:none;border-color:var(--mint);box-shadow:0 0 0 3px rgba(21,150,111,.15)}
+table.yr tr.tot td{font-weight:800;color:var(--acInk);background:var(--acSup)}
+table.yr tr.tot td:first-child{border-radius:12px 0 0 12px}table.yr tr.tot td:last-child{border-radius:0 12px 12px 0}
+.tbl-wrap{overflow-x:auto}
+.locgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.loccard{--k:var(--c-azul);display:flex;align-items:center;gap:12px;background:color-mix(in srgb,var(--k) 9%,var(--sup));border-radius:18px;padding:12px 14px}
+.loccard:nth-child(4n+2){--k:var(--c-violeta)}.loccard:nth-child(4n+3){--k:var(--c-laranja)}.loccard:nth-child(4n+4){--k:var(--c-teal)}
+.loccard .ic{width:36px;height:36px;border-radius:50%;background:var(--k);color:#fff;display:grid;place-items:center;font-size:17px;flex:0 0 auto}
+.loccard .ln{font-weight:650;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.loccard .lv{color:var(--tinta2);font-size:12.5px;font-variant-numeric:tabular-nums}
+
+/* ---------- modal ---------- */
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;z-index:60}
+.modal .box{padding:24px;max-width:480px;width:100%;max-height:92vh;overflow:auto}
+.modal h3{margin-bottom:16px;font-size:19px;font-weight:700;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
+.modal h3 .ti{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--acSup);color:var(--acInk);font-size:19px;flex:0 0 auto}
+.hint{font-size:13.5px;color:var(--tinta2);line-height:1.45}
+.field{margin-bottom:13px}.field label{display:block;font-weight:600;font-size:13px;color:var(--tinta2);margin-bottom:6px}
+html[data-viva=plantaohub][lang] body .field :is(input,select,textarea){width:100%;padding:11px 14px;font-size:16px}
+.field textarea{resize:vertical;min-height:56px}
+.seg-st{display:flex;gap:8px}
+.seg-st label{flex:1;position:relative;margin:0}
+.seg-st input{position:absolute;opacity:0;inset:0}
+.seg-st span{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;border-radius:999px;border:1.5px solid var(--fio);font-weight:600;font-size:14px;color:var(--tinta2);cursor:pointer}
+.seg-st input:checked+span.ag{background:var(--c-ambar);border-color:var(--c-ambar);color:#231500}
+.seg-st input:checked+span.pg{background:color-mix(in srgb,var(--okV) 80%,#000);border-color:transparent;color:#fff}
+.seg-st input:focus-visible+span{box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 28%,transparent)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .row{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap}
-footer{text-align:center;color:var(--muted);font-size:13px;padding:24px}
-footer a{color:var(--petrol-dark);font-weight:600;text-decoration:none}
-@media(max-width:760px){.cards{grid-template-columns:1fr 1fr 1fr}}
-@media(max-width:520px){.cards{grid-template-columns:1fr 1fr}.shift{flex-wrap:wrap}}
-/* ===== modo app (PWA mobile): bottom nav ===== */
-@media(max-width:640px){
-  .subtitle{display:none}
-  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:55;width:auto;max-width:none;margin:0;border-radius:0;border:none;border-top:1px solid var(--line);padding:6px 10px calc(8px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:rgba(255,255,255,.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 -4px 18px rgba(20,24,30,.08)}
-  .tabs button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:7px 2px;font-size:10.5px;font-weight:600;border-radius:10px}
-  .tabs button i{font-size:21px;line-height:1}
-  .tabs button.on{background:var(--soft);color:var(--petrol-dark);font-weight:700}
-  main{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
-  footer{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
-  .field input,.field select,.field textarea{font-size:16px}
-}
+.row.actions .btn{flex:1 1 auto}
 
-/* Previsão de recebimento da competência */
-.prev-box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin:12px 0 16px}
-.prev-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
-.prev-h b{color:var(--petrol-dark);font-size:12px}
-.prev-cfg{display:inline-flex;align-items:center;gap:4px;cursor:pointer;color:var(--muted);font-size:11.5px;text-transform:none;letter-spacing:0}
-.prev-cfg:hover{color:var(--petrol-dark)}
-.prev-top{font-size:15px;margin-bottom:9px}
-.prev-row{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:9px;cursor:pointer;font-size:13.5px}
-.prev-row:hover{background:var(--panel2)}
-.prev-l{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.prev-d{flex:0 0 auto;color:var(--muted);font-variant-numeric:tabular-nums}
-.prev-pad{opacity:.7;font-size:10.5px}
-.prev-v{flex:0 0 auto;font-weight:700;font-variant-numeric:tabular-nums;min-width:88px;text-align:right}
-.prev-nota{margin-top:8px;font-size:11.5px;color:var(--muted);line-height:1.45}
-.prev-vazio{font-size:13px;color:var(--muted)}
+/* ---------- rodapé e avisos ---------- */
+.note{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--tinta2);margin-top:18px;padding:0 4px}
+.note b{color:var(--tinta);font-weight:600}
+footer{text-align:center;font-size:13px;padding:24px}
+footer a{font-weight:600;text-decoration:none;display:inline-block;padding:8px 2px}
+.toast{position:fixed;left:0;right:0;margin:0 auto;width:max-content;max-width:calc(100% - 32px);bottom:calc(28px + env(safe-area-inset-bottom));z-index:90;padding:11px 18px;font-size:14px;font-weight:600}
+.fab{display:none}
+kbd{font:600 11px 'Inter',system-ui,sans-serif;background:var(--sup2);border:1px solid var(--fioF);border-bottom-width:2px;border-radius:6px;padding:1px 6px;color:var(--tinta2)}
+.atalhos{font-size:12px;color:var(--tinta2);display:flex;gap:12px;flex-wrap:wrap;margin-top:6px;padding:0 4px}
+
+/* ---------- movimento ---------- */
+.anima>*{animation:vvSobe .5s var(--suave) both;animation-delay:calc(var(--i,0) * 55ms)}
+@keyframes phFlutua{0%,100%{transform:translate(0,0)}50%{transform:translate(-14px,12px)}}
+@keyframes phPop{0%{transform:scale(.8)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+
+@media (min-width:900px){
+  .ph-cols{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
+  .ph-cols .lado{position:sticky;top:84px;display:grid;gap:16px}
+}
+@media (max-width:760px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi.k-teal{grid-column:1/-1}}
+/* ---------- celular: barra inferior e botão flutuante ---------- */
+@media (max-width:640px){
+  .wrap{padding:0 16px}
+  main{padding:12px 14px calc(96px + env(safe-area-inset-bottom))}
+  .logo{font-size:18px}
+  .usr .who{display:none}
+  .hdr-novo{display:none}
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:55;width:auto;margin:0;padding:6px 8px calc(6px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+  .tabs button{flex-direction:column;gap:3px;padding:4px 2px;font-size:11px;font-weight:600;min-height:52px;justify-content:center}
+  html[data-viva=plantaohub][lang] body .tabs button.on{background:transparent!important}
+  .tabs button i{width:46px;height:30px;border-radius:999px;font-size:20px;background:transparent;color:inherit}
+  .tabs button.on i{background:var(--c);color:#fff;box-shadow:none}
+  .fab{display:grid;position:fixed;right:16px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:56;width:58px;height:58px;border-radius:50%;border:0;background:var(--acF);color:#fff;
+    font-size:26px;place-items:center;box-shadow:0 10px 24px color-mix(in srgb,var(--ac) 40%,transparent);transition:transform .2s var(--mola)}
+  .fab:active{transform:scale(.9)}
+  .bar h2{font-size:18px}
+  .bar .nav{width:100%;justify-content:space-between}
+  .bar .right{width:100%;display:grid;grid-template-columns:1fr 1fr auto}
+  html[data-viva=plantaohub][lang] body .bar .right select.flt{max-width:none;min-width:0;width:100%;font-size:14px}
+  .bar .right .btn-p{display:none}
+  .ph-hero{padding:20px 18px;grid-template-columns:1fr}
+  .ph-hero .big{font-size:32px}
+  .ph-hero .btn{display:none}
+  .kpi{padding:11px 12px;gap:10px}
+  .kpi .ic{width:34px;height:34px;font-size:17px}
+  html[data-viva=plantaohub][lang] body .kpi .v{font-size:18px}
+  .ph-bloco{padding:14px 10px}
+  .shift{gap:4px 10px;padding:10px 4px}
+  .shift .day{width:44px;height:44px}
+  .cal{gap:3px}.cal .cell{min-height:64px;padding:3px;border-radius:12px}.cal .chip{font-size:9.5px;padding:2px 4px;border-radius:7px}.cal .chip .ch-l,.cal .chip .ate{display:none}.cal .chip{text-align:center}
+  .cal .cell .cp{opacity:1;width:24px;height:24px;font-size:13px;top:2px;right:2px}
+  .cal .cell .dn{width:22px;height:22px;font-size:11.5px}
+  .am{grid-template-columns:70px minmax(0,1fr) auto;gap:8px}
+  .toast{bottom:calc(84px + env(safe-area-inset-bottom))}
+  footer{padding-bottom:calc(90px + env(safe-area-inset-bottom))}
+  .atalhos{display:none}
+}
+@media (prefers-reduced-motion:reduce){.anima>*,.ph-hero .bola,.ph-st.pula{animation:none!important}.ph-prog .trilho i,.am .tr i{transition:none!important}}
 </style>
 <link rel="stylesheet" href="_mttokens.css?v=3">
-<link rel="stylesheet" href="_mtastra.css?v=5">
+<link rel="stylesheet" href="_mtviva.css?v=1">
 </head>
 <body>
 <header>
   <div class="wrap top">
-    <div>
-      <div class="logo"><span class="mark"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Plantão<b>Hub</b></span></div>
-      <div class="subtitle">Seus plantões, horas e ganhos sob controle · por MedTech</div>
-    </div>
+    <div class="logo"><span class="mark" aria-hidden="true"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Plantão<b>Hub</b></span></div>
+    <button class="btn btn-p hdr-novo" onclick="openForm()"><i class="ti ti-plus" aria-hidden="true"></i> Novo plantão</button>
     <div class="usr" id="usr"></div>
   </div>
 </header>
 
 <main>
-  <div class="tabs">
-    <button id="tab-mes" class="on" onclick="setTab('mes')"><i class="ti ti-clipboard-list"></i> Competência</button>
-    <button id="tab-cal" onclick="setTab('cal')"><i class="ti ti-calendar-month"></i> Calendário</button>
-    <button id="tab-ano" onclick="setTab('ano')"><i class="ti ti-calendar-stats"></i> Ano</button>
-  </div>
+  <nav class="tabs" aria-label="Seções">
+    <button id="tab-mes" class="on" style="--c:var(--c-lima)" onclick="setTab('mes')" aria-current="page"><i class="ti ti-clipboard-list" aria-hidden="true"></i><span>Mês</span></button>
+    <button id="tab-cal" style="--c:var(--c-violeta)" onclick="setTab('cal')"><i class="ti ti-calendar-month" aria-hidden="true"></i><span>Calendário</span></button>
+    <button id="tab-ano" style="--c:var(--c-azul)" onclick="setTab('ano')"><i class="ti ti-calendar-stats" aria-hidden="true"></i><span>Ano</span></button>
+  </nav>
   <div id="view"></div>
-  <div class="note"><i class="ti ti-pin" aria-hidden="true"></i> <b id="storenote">Carregando…</b> Suas horas, seus recebimentos e o que já caiu — por mês, por ano e por local.</div>
+  <div class="note"><i class="ti ti-cloud-check" aria-hidden="true"></i> <span id="storenote">Carregando</span></div>
+  <div class="atalhos"><span><kbd>N</kbd> novo plantão</span><span><kbd>&larr;</kbd> <kbd>&rarr;</kbd> mês anterior e seguinte</span><span><kbd>Esc</kbd> fechar</span></div>
 </main>
+<button class="fab" onclick="openForm()" aria-label="Novo plantão" title="Novo plantão"><i class="ti ti-plus"></i></button>
 
 <footer>© 2026 <a href="index.html">MedTech</a> · <a href="privacidade.html">Privacidade</a></footer>
 
@@ -225,7 +375,7 @@ function fmtDia(d){ return pad2(d.getDate())+'/'+pad2(d.getMonth()+1)+'/'+d.getF
 function previsaoDaComp(shifts, r){
   const porLocal=new Map();
   shifts.forEach(sh=>{
-    const k=sh.local||'—';
+    const k=sh.local||'Sem local';
     if(!porLocal.has(k)) porLocal.set(k,{local:k,total:0,pago:0,n:0});
     const o=porLocal.get(k);
     o.total+=Number(sh.value||0); o.n++;
@@ -240,10 +390,10 @@ function previsaoDaComp(shifts, r){
 function sampleSeed(){const t=new Date();const f=dd=>{const x=new Date(t);x.setDate(dd);return x.toISOString().slice(0,10);};
   return {shifts:[
    {id:uid(),date:f(5),local:'UPA Central',start:'19:00',end:'07:00',value:1200,status:'pago',note:''},
-   {id:uid(),date:f(12),local:'Hospital São Lucas — PS',start:'07:00',end:'19:00',value:1100,status:'pago',note:''},
+   {id:uid(),date:f(12),local:'Hospital São Lucas, PS',start:'07:00',end:'19:00',value:1100,status:'pago',note:''},
    {id:uid(),date:f(20),local:'UPA Central',start:'19:00',end:'07:00',value:1200,status:'agendado',note:''},
-   {id:uid(),date:f(26),local:'Clínica Vida — ambulatório',start:'08:00',end:'12:00',value:500,status:'agendado',note:'Levar carimbo'}
-  ],locais:{'UPA Central':{start:'19:00',end:'07:00',value:1200},'Hospital São Lucas — PS':{start:'07:00',end:'19:00',value:1100}},compDay:1};
+   {id:uid(),date:f(26),local:'Clínica Vida, ambulatório',start:'08:00',end:'12:00',value:500,status:'agendado',note:'Levar carimbo'}
+  ],locais:{'UPA Central':{start:'19:00',end:'07:00',value:1200},'Hospital São Lucas, PS':{start:'07:00',end:'19:00',value:1100}},compDay:1};
 }
 
 /* ---------- boot via MT (login + nuvem ou demo) ---------- */
@@ -265,23 +415,68 @@ whenMT(()=>{
   renderUser();
 });
 function persist(){MT.save(state);}
+const toast=m=>MTUI.toast(m);   /* aviso curto a cada ação (estilo do tema vivo) */
 function renderUser(){
   const el=document.getElementById('usr');if(!el)return;
-  document.getElementById('storenote').textContent=(MT.mode==='demo')?'Modo demonstração — dados salvos neste navegador.':'Conectado — seus dados sincronizam na nuvem.';
-  if(MT.mode==='demo'){el.innerHTML='<span class="who">Modo demo</span><a href="index.html">← MedTech</a>';return;}
+  document.getElementById('storenote').textContent=(MT.mode==='demo')?'Modo demonstração: os dados ficam salvos neste navegador.':'Conectado. Seus dados sincronizam na nuvem MedTech.';
+  if(MT.mode==='demo'){el.innerHTML='<span class="who">Modo demonstração</span><a href="index.html"><i class="ti ti-arrow-left" aria-hidden="true"></i> MedTech</a>';return;}
   const u=MT.user;const nm=u?(u.displayName||u.email||'Conta'):'';
-  el.innerHTML=`<span class="who">${esc(nm)}</span><button onclick="MT.signOut()">Sair</button>`;
+  el.innerHTML=`<span class="who">${esc(nm)}</span><button onclick="MT.signOut()" title="Sair da conta"><i class="ti ti-logout" aria-hidden="true"></i> Sair</button>`;
 }
 
 /* ---------- tabs ---------- */
 function setTab(t){tab=t;
-  document.getElementById('tab-mes').className=t==='mes'?'on':'';
-  document.getElementById('tab-cal').className=t==='cal'?'on':'';
-  document.getElementById('tab-ano').className=t==='ano'?'on':'';
-  render();}
-function render(){tab==='ano'?renderYear():tab==='cal'?renderCal():renderComp();}
+  ['mes','cal','ano'].forEach(k=>{const b=document.getElementById('tab-'+k);b.className=t===k?'on':'';if(t===k)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+  render(true);window.scrollTo(0,0);}
+let _ultimaTela='';
+function render(entra){tab==='ano'?renderYear():tab==='cal'?renderCal():renderComp();
+  const chave=tab+'|'+(tab==='ano'?curY:ymd(compRange(cur).s));
+  vivo(entra||chave!==_ultimaTela); _ultimaTela=chave;}
+
+/* ---------- movimento: entrada escalonada, números que contam, barras que enchem ---------- */
+const REDUZ=matchMedia('(prefers-reduced-motion:reduce)');
+const _vals={};
+function vivo(entra){
+  const v=document.getElementById('view');
+  if(entra&&!REDUZ.matches){v.classList.remove('anima');void v.offsetWidth;v.classList.add('anima');[...v.children].forEach((c,k)=>c.style.setProperty('--i',Math.min(k,8)));}
+  v.querySelectorAll('[data-conta]').forEach(el=>{
+    const fim=+el.dataset.conta, fmt=el.dataset.fmt, k=el.dataset.k||'', ini=entra?0:(_vals[k]||0); _vals[k]=fim;
+    const pinta=x=>el.textContent=fmt==='money'?money0(x):fmt==='h'?hnum(Math.round(x*10)/10)+'h':String(Math.round(x));
+    if(REDUZ.matches||ini===fim){pinta(fim);return;}
+    const t0=performance.now(),d=850;const passo=t=>{const p=Math.min(1,(t-t0)/d),e=1-Math.pow(1-p,3);pinta(ini+(fim-ini)*e);if(p<1)requestAnimationFrame(passo);};requestAnimationFrame(passo);
+  });
+  requestAnimationFrame(()=>requestAnimationFrame(()=>v.querySelectorAll('[data-w]').forEach(el=>el.style.width=el.dataset.w)));
+}
+/* indicadores do período (Mês, Calendário e Ano usam os mesmos) */
+function kpisHTML(n,h,prev,receb){
+  return `<div class="cards">
+    <div class="kpi k-azul"><span class="ic"><i class="ti ti-stethoscope" aria-hidden="true"></i></span><div><span class="v" data-k="n" data-conta="${n}">${n}</span><span class="l">Plantões</span></div></div>
+    <div class="kpi k-violeta"><span class="ic"><i class="ti ti-clock" aria-hidden="true"></i></span><div><span class="v" data-k="h" data-conta="${h}" data-fmt="h">${hnum(h)}h</span><span class="l">Horas</span></div></div>
+    <div class="kpi k-laranja"><span class="ic"><i class="ti ti-report-money" aria-hidden="true"></i></span><div><span class="v" data-k="p" data-conta="${prev}" data-fmt="money">${money0(prev)}</span><span class="l">Previsto</span></div></div>
+    <div class="kpi k-verde"><span class="ic"><i class="ti ti-circle-check" aria-hidden="true"></i></span><div><span class="v" data-k="r" data-conta="${receb}" data-fmt="money">${money0(receb)}</span><span class="l">Recebido</span></div></div>
+  </div>`;
+}
+function vazioHTML(ic,tit,txt,bt,acao){return `<div class="vazio"><div class="ic"><i class="ti ti-${ic}" aria-hidden="true"></i></div><b>${tit}</b><p>${txt}</p>${bt?`<button class="btn btn-p btn-sm" onclick="${acao}"><i class="ti ti-plus" aria-hidden="true"></i> ${bt}</button>`:''}</div>`;}
 
 /* ---------- COMPETÊNCIA (período por dia de corte) ---------- */
+function cutOptsHTML(){
+  const cd=compDayVal();
+  return ['<option value="1"'+(cd===1?' selected':'')+'>Mês civil (dia 1)</option>'].concat(
+     Array.from({length:27},(_,i)=>i+2).map(n=>`<option value="${n}" ${cd===n?'selected':''}>Fecha no dia ${n}</option>`)).join('');
+}
+function shiftHTML(s){
+  const dt=new Date(s.date+'T00:00:00'), pg=s.status==='pago';
+  return `<div class="shift ${pg?'pago':''}" data-id="${s.id}">
+    <div class="day" aria-hidden="true"><span class="d">${String(dt.getDate()).padStart(2,'0')}</span><span class="w">${WD[dt.getDay()]}</span></div>
+    <div class="mid" onclick="openForm('${s.id}')"><div class="loc">${esc(s.local)}</div>
+      <div class="det"><i class="ti ti-clock" aria-hidden="true"></i>${esc(s.start)} às ${esc(s.end)}, ${hnum(hoursOf(s))}h</div>
+      ${s.note?`<div class="obs"><i class="ti ti-note" aria-hidden="true"></i>${esc(s.note)}</div>`:''}
+    </div>
+    <div class="fim"><span class="val">${money(s.value)}</span>
+      <button class="ph-st ${pg?'s-pg':'s-ag'}" onclick="toggleStatus('${s.id}')" title="${pg?'Marcar como não recebido':'Marcar como recebido'}"><i class="ti ${pg?'ti-circle-check':'ti-hourglass'}" aria-hidden="true"></i>${pg?'Recebido':'A receber'}</button></div>
+    <div class="acts"><button class="ib" title="Duplicar para a semana seguinte" aria-label="Duplicar para a semana seguinte" onclick="dup('${s.id}')"><i class="ti ti-copy"></i></button><button class="ib" title="Editar" aria-label="Editar" onclick="openForm('${s.id}')"><i class="ti ti-pencil"></i></button><button class="ib del" title="Excluir" aria-label="Excluir" onclick="del('${s.id}')"><i class="ti ti-trash"></i></button></div>
+  </div>`;
+}
 function renderComp(){
   const r=compRange(cur);
   let ms=state.shifts.filter(s=>inComp(s,r));
@@ -293,54 +488,49 @@ function renderComp(){
   const receb=ms.filter(x=>x.status==='pago').reduce((s,x)=>s+Number(x.value||0),0);
   const areceber=prev-receb;
   const opts=['<option value="">Todos os locais</option>'].concat(locs.map(l=>`<option value="${esc(l)}" ${fltLocal===l?'selected':''}>${esc(l)}</option>`)).join('');
-  const cd=compDayVal();
-  const cutOpts=['<option value="1"'+(cd===1?' selected':'')+'>Mês civil (dia 1)</option>'].concat(
-     Array.from({length:27},(_,i)=>i+2).map(n=>`<option value="${n}" ${cd===n?'selected':''}>fecha dia ${n}</option>`)).join('');
+  const linhas=previsaoDaComp(ms,r).filter(x=>x.aReceber>0);
+  const prox=linhas[0];
+  const pct=prev?Math.round(receb/prev*100):0;
   let html=`<div class="bar">
-    <div class="nav"><button class="arr" onclick="moveComp(-1)">‹</button><h2>${r.label}</h2><button class="arr" onclick="moveComp(1)">›</button></div>
-    <div class="right"><select class="flt" title="Período da competência" onchange="setCompDay(this.value)">${cutOpts}</select><select class="flt" onchange="fltLocal=this.value;render()">${opts}</select><button class="btn btn-g btn-sm" onclick="exportCSV()"><i class="ti ti-download"></i> CSV</button><button class="btn btn-p btn-sm" onclick="openForm()">+ Novo plantão</button></div>
+    <div class="nav"><button class="arr" onclick="moveComp(-1)" aria-label="Período anterior"><i class="ti ti-chevron-left"></i></button><h2>${r.label}</h2><button class="arr" onclick="moveComp(1)" aria-label="Próximo período"><i class="ti ti-chevron-right"></i></button></div>
+    <div class="right"><select class="flt" aria-label="Período da competência" title="Período da competência" onchange="setCompDay(this.value)">${cutOptsHTML()}</select><select class="flt" aria-label="Filtrar por local" onchange="fltLocal=this.value;render()">${opts}</select><button class="btn btn-g btn-sm" onclick="exportCSV()"><i class="ti ti-download" aria-hidden="true"></i> CSV</button></div>
   </div>
-  <div class="cards">
-    <div class="kpi"><div class="l">Plantões</div><div class="v">${ms.length}</div></div>
-    <div class="kpi"><div class="l">Horas</div><div class="v">${hnum(horas)}h</div></div>
-    <div class="kpi amber"><div class="l">Previsto</div><div class="v" style="font-size:18px">${money0(prev)}</div></div>
-    <div class="kpi green"><div class="l">Recebido</div><div class="v" style="font-size:18px">${money0(receb)}</div></div>
-    <div class="kpi red"><div class="l">A receber</div><div class="v" style="font-size:18px">${money0(areceber)}</div></div>
-  </div>`;
-  html += previsaoHTML(ms, r);
-  if(!ms.length){html+=`<div class="empty">Nenhum plantão ${fltLocal?'deste local ':''}nesta competência.<br>Toque em <b>+ Novo plantão</b> para começar.</div>`;}
-  else{html+=ms.map(s=>{const dt=new Date(s.date+'T00:00:00');return `<div class="shift">
-    <div class="day"><div class="d">${String(dt.getDate()).padStart(2,'0')}</div><div class="w">${WD[dt.getDay()]}</div></div>
-    <div class="mid"><div class="loc">${esc(s.local)}</div>
-      <div class="det">${s.start}–${s.end} · ${hnum(hoursOf(s))}h</div>
-      ${s.note?`<div class="obs">${esc(s.note)}</div>`:''}
-      <span class="stat ${s.status==='pago'?'s-pg':'s-ag'}" onclick="toggleStatus('${s.id}')">${s.status==='pago'?'✓ recebido':'agendado'}</span>
-    </div>
-    <div class="val">${money(s.value)}</div>
-    <div class="acts"><button title="Duplicar p/ semana seguinte" onclick="dup('${s.id}')"><i class="ti ti-copy"></i></button><button title="Editar" onclick="openForm('${s.id}')"><i class="ti ti-pencil"></i></button><button title="Excluir" onclick="del('${s.id}')"><i class="ti ti-trash"></i></button></div>
-  </div>`;}).join('');}
+  <div class="ph-hero">
+    <i class="bola b1"></i><i class="bola b2"></i>
+    <div><small><i class="ti ti-hourglass" aria-hidden="true"></i> A receber${fltLocal?' em '+esc(fltLocal):' neste período'}</small>
+      <span class="big" data-k="ar" data-conta="${areceber}" data-fmt="money">${money0(areceber)}</span>
+      <p>${!ms.length?'Nenhum plantão lançado neste período.':areceber<=0?'Tudo deste período já foi recebido.':prox?`Próximo crédito previsto: <b>${money0(prox.aReceber)}</b> em <b>${fmtDia(prox.data)}</b>${linhas.length>1?`, de ${linhas.length} datas`:''}.`:''}</p></div>
+    <div class="ph-prog"><div class="trilho" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Recebido do previsto"><i data-w="${pct}%"></i></div>
+      <div class="leg"><span>Recebido ${money0(receb)}</span><span>${pct}% de ${money0(prev)}</span></div></div>
+  </div>
+  ${kpisHTML(ms.length,horas,prev,receb)}`;
+  const lista=!ms.length
+    ? vazioHTML('calendar-plus',`Nenhum plantão ${fltLocal?'deste local ':''}neste período`,'Lance o primeiro e acompanhe horas e valores.','Novo plantão','openForm()')
+    : ms.map(shiftHTML).join('');
+  html+=`<div class="ph-cols"><div class="ph-bloco" style="--k:var(--c-lima)"><div class="vTit"><span class="ic"><i class="ti ti-clipboard-list" aria-hidden="true"></i></span><h3>Plantões do período</h3></div>${lista}</div>
+    <div class="lado">${previsaoHTML(ms, r)}</div></div>`;
   document.getElementById('view').innerHTML=html;
 }
 function moveComp(n){const r=compRange(cur);cur=new Date(r.s);cur.setMonth(cur.getMonth()+n);render();}
 /* Bloco "quando cai" — o dado que faltava para cruzar com as contas do mês. */
 function previsaoHTML(ms, r){
-  if(!ms.length) return '';
+  const cab=`<div class="vTit" style="--k:var(--c-azul)"><span class="ic"><i class="ti ti-calendar-due" aria-hidden="true"></i></span><h3>Quando cai</h3><button class="lk" onclick="abrirRegraPg('')"><i class="ti ti-settings" aria-hidden="true"></i> Regra padrão</button></div>`;
+  if(!ms.length) return `<div class="ph-bloco">${cab}<div class="prev-vazio">Sem plantões neste período.</div></div>`;
   const linhas = previsaoDaComp(ms, r).filter(x=>x.aReceber>0);
-  if(!linhas.length) return `<div class="prev-box"><div class="prev-h"><b>Previsão de recebimento</b></div><div class="prev-vazio">Tudo desta competência já foi recebido.</div></div>`;
+  if(!linhas.length) return `<div class="ph-bloco">${cab}<div class="prev-vazio"><i class="ti ti-circle-check" aria-hidden="true"></i>Tudo deste período já foi recebido.</div></div>`;
   const total = linhas.reduce((s,x)=>s+x.aReceber,0);
   const datas = [...new Set(linhas.map(x=>ymd(x.data)))];
   const resumo = datas.length===1
-    ? `<b>${money0(total)}</b> previstos para <b>${fmtDia(linhas[0].data)}</b>`
-    : `<b>${money0(total)}</b> previstos em ${datas.length} datas`;
-  return `<div class="prev-box">
-    <div class="prev-h"><b>Previsão de recebimento</b><span class="prev-cfg" onclick="abrirRegraPg('')"><i class="ti ti-settings"></i> padrão</span></div>
+    ? `<b>${money0(total)}</b> previstos para <b>${fmtDia(linhas[0].data)}</b>.`
+    : `<b>${money0(total)}</b> previstos em ${datas.length} datas.`;
+  return `<div class="ph-bloco">${cab}
     <div class="prev-top">${resumo}</div>
-    ${linhas.map(x=>`<div class="prev-row" onclick="abrirRegraPg('${esc(x.local).replace(/'/g,"\\'")}')">
-      <span class="prev-l">${esc(x.local)}</span>
-      <span class="prev-d">${fmtDia(x.data)}${x.regra.proprio?'':' <small class="prev-pad">padrão</small>'}</span>
+    ${linhas.map(x=>`<button class="prev-row" onclick="abrirRegraPg('${esc(x.local).replace(/'/g,"\\'")}')" title="Ajustar o dia de pagamento deste local">
+      <span class="dt" aria-hidden="true"><b>${pad2(x.data.getDate())}</b><small>${MESC[x.data.getMonth()]}</small></span>
+      <span class="prev-l">${esc(x.local)}<span class="prev-d">${fmtDia(x.data)}${x.regra.proprio?'':', regra padrão'}</span></span>
       <span class="prev-v">${money0(x.aReceber)}</span>
-    </div>`).join('')}
-    <div class="prev-nota">Estimativa: a competência fecha e o pagamento é creditado conforme a regra de cada local. Toque numa linha para ajustar.</div>
+    </button>`).join('')}
+    <div class="prev-nota">Estimativa pela regra de pagamento de cada local, contada do fechamento do período. Toque num local para ajustar.</div>
   </div>`;
 }
 
@@ -350,11 +540,11 @@ function abrirRegraPg(local){
   const m = local ? ((state.locais||{})[local]||{}) : null;
   const usaPadrao = local ? !g.proprio : false;
   const opts = [0,1,2,3].map(n=>`<option value="${n}" ${g.mes===n?'selected':''}>${n===0?'no mesmo mês do fechamento':n===1?'no mês seguinte':'em '+n+' meses'}</option>`).join('');
-  modal(`<h3>${local?('Pagamento — '+esc(local)):'Pagamento — padrão geral'}</h3>
+  modal(`<h3><i class="ti ti-calendar-due" aria-hidden="true"></i><span>${local?('Pagamento em '+esc(local)):'Regra padrão de pagamento'}</span></h3>
    <div class="hint" style="margin-bottom:10px">${local?'Vale só para este local. Deixe em branco para usar o padrão geral.':'Vale para todos os locais que não tiverem regra própria.'}</div>
    <div class="row">
-     <div class="field" style="flex:1"><label>Dia do crédito</label><input id="pg_dia" type="number" min="1" max="28" value="${usaPadrao?'':g.dia}" placeholder="${usaPadrao?String(g.dia)+' (padrão)':''}"></div>
-     <div class="field" style="flex:1.4"><label>Quando</label><select id="pg_mes">${opts}</select></div>
+     <div class="field" style="flex:1"><label for="pg_dia">Dia do crédito</label><input id="pg_dia" type="number" inputmode="numeric" min="1" max="28" value="${usaPadrao?'':g.dia}" placeholder="${usaPadrao?String(g.dia)+' (padrão)':''}"></div>
+     <div class="field" style="flex:1.4"><label for="pg_mes">Quando</label><select id="pg_mes">${opts}</select></div>
    </div>
    <div class="hint" id="pg_prev" style="margin-top:6px"></div>
    <div class="row actions">
@@ -381,20 +571,23 @@ function salvarRegraPg(local){
     if(!state.locais[local])state.locais[local]={};
     state.locais[local].pgDia=dia; state.locais[local].pgMes=mes;
   } else { state.pgDia=dia; state.pgMes=mes; }
-  persist(); closeModal(); render();
+  persist(); closeModal(); render(); toast('Regra de pagamento salva');
 }
 function limparRegraPg(local){
   const m=(state.locais||{})[local];
   if(m){ delete m.pgDia; delete m.pgMes; }
-  persist(); closeModal(); render();
+  persist(); closeModal(); render(); toast('Este local volta a usar a regra padrão');
 }
 
-function setCompDay(v){state.compDay=Math.min(28,Math.max(1,parseInt(v)||1));persist();render();}
-function toggleStatus(id){const s=state.shifts.find(x=>x.id===id);if(!s)return;s.status=s.status==='pago'?'agendado':'pago';s.updatedAt=Date.now();persist();render();}
-function del(id){if(confirm('Excluir este plantão?')){MT.markDeleted(state,id);state.shifts=state.shifts.filter(x=>x.id!==id);persist();render();}}
-function delFromForm(id){if(confirm('Excluir este plantão?')){MT.markDeleted(state,id);state.shifts=state.shifts.filter(x=>x.id!==id);persist();closeModal();render();}}
+function setCompDay(v){state.compDay=Math.min(28,Math.max(1,parseInt(v)||1));persist();render();toast(state.compDay===1?'Período: mês civil':'Período fecha no dia '+state.compDay);}
+function toggleStatus(id){const s=state.shifts.find(x=>x.id===id);if(!s)return;s.status=s.status==='pago'?'agendado':'pago';s.updatedAt=Date.now();persist();render();
+  const b=document.querySelector('.shift[data-id="'+id+'"] .ph-st');if(b)b.classList.add('pula');
+  toast(s.status==='pago'?'Marcado como recebido':'Voltou para a receber');}
+function del(id){if(confirm('Excluir este plantão?')){MT.markDeleted(state,id);state.shifts=state.shifts.filter(x=>x.id!==id);persist();render();toast('Plantão excluído');}}
+function delFromForm(id){if(confirm('Excluir este plantão?')){MT.markDeleted(state,id);state.shifts=state.shifts.filter(x=>x.id!==id);persist();closeModal();render();toast('Plantão excluído');}}
 function dup(id){const s=state.shifts.find(x=>x.id===id);if(!s)return;const d=new Date(s.date+'T00:00:00');d.setDate(d.getDate()+7);
-  state.shifts.push({...s,id:uid(),date:d.toISOString().slice(0,10),status:'agendado',updatedAt:Date.now()});persist();cur=new Date(d);render();}
+  state.shifts.push({...s,id:uid(),date:ymd(d),status:'agendado',updatedAt:Date.now()});persist();cur=new Date(d);render();
+  toast('Duplicado para '+pad2(d.getDate())+'/'+pad2(d.getMonth()+1));}
 
 /* ---------- CALENDÁRIO (com copiar/colar dia) ---------- */
 function fmtH(t){t=t||'';return /:00$/.test(t)?t.slice(0,2)+'h':t;}
@@ -415,40 +608,31 @@ function renderCal(){
     const d=new Date(gs);d.setDate(gs.getDate()+i);
     const ds=ymd(d);const out=ds<sYmd||ds>eYmd;             // fora da competência → esmaecido
     const sh=shiftsOn(ds);
-    const chips=sh.map(s=>{const t=(s.start||s.end)?`<span class="ch-h">${esc(fmtH(s.start))}–${esc(fmtH(s.end))}</span>`:'';return `<div class="chip ${s.status==='pago'?'c-pg':'c-ag'}" title="${esc(s.local)} · ${s.start}–${s.end} · ${money(s.value)} — toque para editar" onclick="event.stopPropagation();openForm('${s.id}')">${t}<span class="ch-l">${esc((s.local||'').split('—')[0].trim()).slice(0,18)}</span></div>`;}).join('');
-    const cp=sh.length?`<button class="cp" title="Copiar este dia" onclick="event.stopPropagation();copyDay('${ds}')">⧉</button>`:'';
+    const chips=sh.map(s=>{const t=(s.start||s.end)?`<span class="ch-h">${esc(fmtH(s.start))}<span class="ate"> às ${esc(fmtH(s.end))}</span></span>`:'';return `<div class="chip ${s.status==='pago'?'c-pg':'c-ag'}" role="button" tabindex="0" title="${esc(s.local)}, ${s.start} às ${s.end}, ${money(s.value)}. Toque para editar" onclick="event.stopPropagation();openForm('${s.id}')">${t}<span class="ch-l">${esc((s.local||'').split('—')[0].split(',')[0].trim()).slice(0,18)}</span></div>`;}).join('');
+    const cp=sh.length?`<button class="cp" title="Copiar este dia" aria-label="Copiar os plantões do dia ${d.getDate()}" onclick="event.stopPropagation();copyDay('${ds}')"><i class="ti ti-copy"></i></button>`:'';
     cells+=`<div class="cell ${out?'out':''} ${ds===today?'today':''}" onclick="event.stopPropagation();cellClick('${ds}')"><div class="dn">${d.getDate()}</div>${cp}${chips}</div>`;
   }
   const heads=WD.map(w=>`<div class="hd">${w}</div>`).join('');
-  const cd=compDayVal();
-  const cutOpts=['<option value="1"'+(cd===1?' selected':'')+'>Mês civil (dia 1)</option>'].concat(
-     Array.from({length:27},(_,i)=>i+2).map(n=>`<option value="${n}" ${cd===n?'selected':''}>fecha dia ${n}</option>`)).join('');
   let clip='';
-  if(dayClip){const fd=new Date(dayClip.from+'T00:00:00');
-    clip=`<div class="clipbar"><span>📋 Copiado: ${dayClip.shifts.length} plantão(ões) de ${pad2(fd.getDate())}/${pad2(fd.getMonth()+1)} — toque num dia para colar. Clique fora do calendário para cancelar.</span><button onclick="clearClip()">Limpar</button></div>`;}
+  if(dayClip){const fd=new Date(dayClip.from+'T00:00:00');const n=dayClip.shifts.length;
+    clip=`<div class="clipbar" role="status"><i class="ti ti-clipboard" aria-hidden="true"></i><span>${n} ${n>1?'plantões':'plantão'} de ${pad2(fd.getDate())}/${pad2(fd.getMonth()+1)} copiado${n>1?'s':''}. Toque nos dias para colar.</span><button onclick="clearClip()">Parar de colar</button></div>`;}
   let html=`<div class="bar">
-    <div class="nav"><button class="arr" onclick="moveComp(-1)">‹</button><h2>${r.label}</h2><button class="arr" onclick="moveComp(1)">›</button></div>
-    <div class="right"><select class="flt" title="Período da competência" onchange="setCompDay(this.value)">${cutOpts}</select><button class="btn btn-p btn-sm" onclick="openForm()">+ Novo plantão</button></div>
+    <div class="nav"><button class="arr" onclick="moveComp(-1)" aria-label="Período anterior"><i class="ti ti-chevron-left"></i></button><h2>${r.label}</h2><button class="arr" onclick="moveComp(1)" aria-label="Próximo período"><i class="ti ti-chevron-right"></i></button></div>
+    <div class="right"><select class="flt" aria-label="Período da competência" title="Período da competência" onchange="setCompDay(this.value)">${cutOptsHTML()}</select></div>
   </div>
+  ${kpisHTML(mm.length,horas,prev,receb)}
   ${clip}
-  <div class="cards">
-    <div class="kpi"><div class="l">Plantões</div><div class="v">${mm.length}</div></div>
-    <div class="kpi"><div class="l">Horas</div><div class="v">${hnum(horas)}h</div></div>
-    <div class="kpi amber"><div class="l">Previsto</div><div class="v" style="font-size:18px">${money0(prev)}</div></div>
-    <div class="kpi green"><div class="l">Recebido</div><div class="v" style="font-size:18px">${money0(receb)}</div></div>
-    <div class="kpi red"><div class="l">A receber</div><div class="v" style="font-size:18px">${money0(prev-receb)}</div></div>
-  </div>
   <div class="cal ${dayClip?'pasting':''}">${heads}${cells}</div>
-  <div class="note" style="margin-top:12px">Toque num dia vazio para adicionar · na etiqueta para editar · em <b>⧉</b> para copiar o dia.</div>`;
+  <div class="cal-leg"><span><i style="background:color-mix(in srgb,var(--c-ambar) 60%,var(--sup))"></i>A receber</span><span><i style="background:var(--okV)"></i>Recebido</span><span>Toque num dia para lançar, num plantão para editar, em <i class="ti ti-copy" aria-label="copiar"></i> para copiar o dia.</span></div>`;
   document.getElementById('view').innerHTML=html;
 }
-function copyDay(ds){const sh=shiftsOn(ds);if(!sh.length)return;dayClip={from:ds,shifts:sh.map(s=>({local:s.local,start:s.start,end:s.end,value:s.value,note:s.note||''}))};render();}
+function copyDay(ds){const sh=shiftsOn(ds);if(!sh.length)return;dayClip={from:ds,shifts:sh.map(s=>({local:s.local,start:s.start,end:s.end,value:s.value,note:s.note||''}))};render();toast('Dia copiado. Toque nos dias para colar');}
 function clearClip(){dayClip=null;render();}
 function cellClick(ds){
   if(dayClip){
     if(ds===dayClip.from)return;          // não recolar no dia de origem
     dayClip.shifts.forEach(s=>state.shifts.push({id:uid(),date:ds,local:s.local,start:s.start,end:s.end,value:s.value,status:'agendado',note:s.note||'',updatedAt:Date.now()}));
-    persist();render();return;           // mantém o clipboard p/ colar em vários dias
+    persist();render();toast('Colado em '+ds.slice(8,10)+'/'+ds.slice(5,7));return;           // mantém o clipboard p/ colar em vários dias
   }
   openForm(null,ds);
 }
@@ -456,54 +640,68 @@ function cellClick(ds){
 /* ---------- ANO ---------- */
 function renderYear(){
   const ys=state.shifts.filter(s=>s.date.slice(0,4)==String(curY));
-  const rows=[];let tP=0,tR=0,tH=0,tN=0;
+  const meses=[];let tP=0,tR=0,tH=0,tN=0;
   for(let m=0;m<12;m++){
     const mm=ys.filter(s=>Number(s.date.slice(5,7))===m+1);
     const h=mm.reduce((a,x)=>a+hoursOf(x),0);
     const p=mm.reduce((a,x)=>a+Number(x.value||0),0);
     const r=mm.filter(x=>x.status==='pago').reduce((a,x)=>a+Number(x.value||0),0);
     tP+=p;tR+=r;tH+=h;tN+=mm.length;
-    rows.push(`<tr><td>${MES[m]}</td><td>${mm.length||''}</td><td>${mm.length?hnum(h)+'h':''}</td><td>${mm.length?money0(p):''}</td><td>${mm.length?money0(r):''}</td></tr>`);
+    meses.push({m,n:mm.length,h,p,r});
   }
+  const maxP=Math.max(1,...meses.map(x=>x.p));
+  const barras=meses.map(x=>`<div class="am${x.n?'':' vazio-m'}" title="${MES[x.m]}: ${x.n} plantões, ${hnum(x.h)}h, previsto ${money0(x.p)}, recebido ${money0(x.r)}">
+      <span class="m">${MES[x.m]}</span>
+      <span class="tr" aria-hidden="true"><i class="pv" data-w="${(x.p/maxP*100).toFixed(1)}%"></i><i class="rc" data-w="${(x.r/maxP*100).toFixed(1)}%"></i></span>
+      <span class="n">${x.n?money0(x.p):'Sem plantões'}${x.n?`<small>${x.n} ${x.n>1?'plantões':'plantão'}, ${hnum(x.h)}h</small>`:''}</span></div>`).join('');
+  const rows=meses.map(x=>`<tr><td>${MES[x.m]}</td><td>${x.n||''}</td><td>${x.n?hnum(x.h)+'h':''}</td><td>${x.n?money0(x.p):''}</td><td>${x.n?money0(x.r):''}</td></tr>`).join('');
   const porLocal={};
   ys.forEach(s=>{porLocal[s.local]=(porLocal[s.local]||0)+Number(s.value||0);});
   const topLoc=Object.entries(porLocal).sort((a,b)=>b[1]-a[1]);
   let html=`<div class="bar">
-    <div class="nav"><button class="arr" onclick="moveYear(-1)">‹</button><h2>${curY}</h2><button class="arr" onclick="moveYear(1)">›</button></div>
-    <div class="right"><button class="btn btn-g btn-sm" onclick="exportCSV(true)"><i class="ti ti-download"></i> CSV do ano</button></div>
+    <div class="nav"><button class="arr" onclick="moveYear(-1)" aria-label="Ano anterior"><i class="ti ti-chevron-left"></i></button><h2>${curY}</h2><button class="arr" onclick="moveYear(1)" aria-label="Próximo ano"><i class="ti ti-chevron-right"></i></button></div>
+    <div class="right"><button class="btn btn-g btn-sm" onclick="exportCSV(true)"><i class="ti ti-download" aria-hidden="true"></i> CSV do ano</button></div>
   </div>
-  <div class="cards">
-    <div class="kpi"><div class="l">Plantões</div><div class="v">${tN}</div></div>
-    <div class="kpi"><div class="l">Horas</div><div class="v">${hnum(tH)}h</div></div>
-    <div class="kpi amber"><div class="l">Previsto</div><div class="v" style="font-size:18px">${money0(tP)}</div></div>
-    <div class="kpi green"><div class="l">Recebido</div><div class="v" style="font-size:18px">${money0(tR)}</div></div>
-    <div class="kpi red"><div class="l">A receber</div><div class="v" style="font-size:18px">${money0(tP-tR)}</div></div>
-  </div>
-  <table class="yr"><thead><tr><th>Mês</th><th>Plantões</th><th>Horas</th><th>Previsto</th><th>Recebido</th></tr></thead>
-  <tbody>${rows.join('')}<tr class="tot"><td>Total ${curY}</td><td>${tN}</td><td>${hnum(tH)}h</td><td>${money0(tP)}</td><td>${money0(tR)}</td></tr></tbody></table>`;
-  if(topLoc.length){html+=`<div class="locgrid">`+topLoc.map(([l,v])=>`<div class="loccard"><div class="ln">${esc(l)}</div><div class="lv">${money(v)} no ano</div></div>`).join('')+`</div>`;}
+  ${kpisHTML(tN,tH,tP,tR)}`;
+  if(!tN){ html+=`<div class="ph-bloco">${vazioHTML('calendar-stats','Nenhum plantão em '+curY,'Os plantões lançados aparecem aqui somados por mês e por local.','Novo plantão','openForm()')}</div>`; }
+  else {
+    html+=`<div class="ph-cols"><div class="ph-bloco" style="--k:var(--c-azul)"><div class="vTit"><span class="ic"><i class="ti ti-chart-bar" aria-hidden="true"></i></span><h3>Mês a mês</h3></div>
+      <div class="ano-meses">${barras}</div>
+      <div class="cal-leg"><span><i style="background:color-mix(in srgb,var(--c-ambar) 55%,var(--sup3))"></i>Previsto</span><span><i style="background:var(--okV)"></i>Recebido</span></div></div>
+      <div class="lado">${topLoc.length?`<div class="ph-bloco" style="--k:var(--c-violeta)"><div class="vTit"><span class="ic"><i class="ti ti-building-hospital" aria-hidden="true"></i></span><h3>Por local</h3></div><div class="locgrid">`+topLoc.map(([l,v])=>`<div class="loccard"><span class="ic"><i class="ti ti-building-hospital" aria-hidden="true"></i></span><div style="min-width:0"><div class="ln">${esc(l)}</div><div class="lv">${money(v)} no ano</div></div></div>`).join('')+`</div></div>`:''}
+      <div class="ph-bloco" style="--k:var(--c-teal)"><div class="vTit"><span class="ic"><i class="ti ti-table" aria-hidden="true"></i></span><h3>Tabela do ano</h3></div><div class="tbl-wrap"><table class="yr"><thead><tr><th>Mês</th><th>Plantões</th><th>Horas</th><th>Previsto</th><th>Recebido</th></tr></thead>
+      <tbody>${rows}<tr class="tot"><td>Total</td><td>${tN}</td><td>${hnum(tH)}h</td><td>${money0(tP)}</td><td>${money0(tR)}</td></tr></tbody></table></div></div></div></div>`;
+  }
   document.getElementById('view').innerHTML=html;
 }
 function moveYear(n){curY+=n;render();}
 
 /* ---------- form ---------- */
 function openForm(id,presetDate){
-  const s=id?state.shifts.find(x=>x.id===id):{date:presetDate||new Date().toISOString().slice(0,10),local:'',start:'19:00',end:'07:00',value:'',status:'agendado',note:''};
+  const s=(id&&state.shifts.find(x=>x.id===id))||{date:presetDate||ymd(new Date()),local:'',start:'19:00',end:'07:00',value:'',status:'agendado',note:''};
+  if(id&&!state.shifts.find(x=>x.id===id)) id=null;
   const dl=Object.keys(state.locais||{}).map(l=>`<option value="${esc(l)}">`).join('');
-  modal(`<h3>${id?'Editar':'Novo'} plantão</h3>
-   <div class="field"><label>Data</label><input id="f_date" type="date" value="${s.date}"></div>
-   <div class="field"><label>Local / instituição</label><input id="f_local" list="locdl" value="${esc(s.local)}" placeholder="Ex.: UPA Central" oninput="fillLocal()"><datalist id="locdl">${dl}</datalist></div>
-   <div class="two"><div class="field"><label>Início</label><input id="f_start" type="time" value="${s.start}"></div>
-   <div class="field"><label>Fim</label><input id="f_end" type="time" value="${s.end}"></div></div>
-   <div class="two"><div class="field"><label>Valor (R$)</label><input id="f_value" type="number" step="0.01" value="${s.value}" placeholder="0,00"></div>
-   <div class="field"><label>Status</label><select id="f_status"><option value="agendado" ${s.status==='agendado'?'selected':''}>Agendado</option><option value="pago" ${s.status==='pago'?'selected':''}>Recebido</option></select></div></div>
-   <div class="field"><label>Observação (opcional)</label><textarea id="f_note" placeholder="Ex.: levar carimbo, escala dupla...">${esc(s.note||'')}</textarea></div>
-   <div class="row"><button class="btn btn-p" onclick="saveForm('${id||''}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button>${id?`<button class="btn" style="background:rgba(198,69,61,.14);color:var(--red);margin-left:auto" onclick="delFromForm('${id}')"><i class="ti ti-trash"></i> Excluir</button>`:''}</div>`);
+  modal(`<h3><i class="ti ${id?'ti-pencil':'ti-calendar-plus'}" aria-hidden="true"></i><span>${id?'Editar':'Novo'} plantão</span></h3>
+   <div class="two"><div class="field"><label for="f_date">Data</label><input id="f_date" type="date" value="${esc(s.date)}"></div>
+   <div class="field"><label for="f_value">Valor (R$)</label><input id="f_value" type="number" inputmode="decimal" step="0.01" min="0" value="${esc(String(s.value))}" placeholder="0,00"></div></div>
+   <div class="field"><label for="f_local">Local ou instituição</label><input id="f_local" list="locdl" value="${esc(s.local)}" placeholder="Ex.: UPA Central" oninput="fillLocal()" autocomplete="off"><datalist id="locdl">${dl}</datalist></div>
+   <div class="two"><div class="field"><label for="f_start">Início</label><input id="f_start" type="time" value="${esc(s.start)}"></div>
+   <div class="field"><label for="f_end">Fim</label><input id="f_end" type="time" value="${esc(s.end)}"></div></div>
+   <div class="field"><label>Pagamento</label><div class="seg-st" role="radiogroup">
+     <label><input type="radio" name="f_status" value="agendado" ${s.status!=='pago'?'checked':''}><span class="ag"><i class="ti ti-hourglass" aria-hidden="true"></i>A receber</span></label>
+     <label><input type="radio" name="f_status" value="pago" ${s.status==='pago'?'checked':''}><span class="pg"><i class="ti ti-circle-check" aria-hidden="true"></i>Recebido</span></label></div></div>
+   <div class="field"><label for="f_note">Observação (opcional)</label><textarea id="f_note" placeholder="Ex.: levar carimbo, escala dupla">${esc(s.note||'')}</textarea></div>
+   <div class="hint" id="f_resumo" style="margin:-4px 0 10px"></div>
+   <div class="row actions">${id?`<button class="btn btn-perigo" onclick="delFromForm('${id}')"><i class="ti ti-trash" aria-hidden="true"></i> Excluir</button>`:''}<button class="btn btn-g" onclick="closeModal()">Cancelar</button><button class="btn btn-p" id="f_salvar" onclick="saveForm('${id||''}')"><i class="ti ti-check" aria-hidden="true"></i> Salvar</button></div>`);
+  const resumo=()=>{const a=document.getElementById('f_start').value,b=document.getElementById('f_end').value,v=parseFloat(document.getElementById('f_value').value)||0;
+    const el=document.getElementById('f_resumo');if(!a||!b){el.textContent='';return;}const h=hoursOf({start:a,end:b});el.textContent=`${hnum(h)} horas${v?`, ${money(v)} (${money(v/h)} por hora)`:''}.`;};
+  ['f_start','f_end','f_value'].forEach(k=>document.getElementById(k).addEventListener('input',resumo));resumo();
+  if(!id) setTimeout(()=>{const l=document.getElementById('f_local');if(l)l.focus();},60);
 }
-function fillLocal(){const v=document.getElementById('f_local').value;const m=(state.locais||{})[v];if(m){document.getElementById('f_start').value=m.start;document.getElementById('f_end').value=m.end;if(!document.getElementById('f_value').value)document.getElementById('f_value').value=m.value;}}
+function fillLocal(){const v=document.getElementById('f_local').value;const m=(state.locais||{})[v];if(m){document.getElementById('f_start').value=m.start;document.getElementById('f_end').value=m.end;if(!document.getElementById('f_value').value)document.getElementById('f_value').value=m.value;document.getElementById('f_start').dispatchEvent(new Event('input'));}}
 function saveForm(id){
-  const o={date:document.getElementById('f_date').value,local:document.getElementById('f_local').value.trim()||'Plantão',start:document.getElementById('f_start').value,end:document.getElementById('f_end').value,value:parseFloat(document.getElementById('f_value').value)||0,status:document.getElementById('f_status').value,note:document.getElementById('f_note').value.trim()};
-  if(!o.date){alert('Informe a data.');return;}
+  const o={date:document.getElementById('f_date').value,local:document.getElementById('f_local').value.trim()||'Plantão',start:document.getElementById('f_start').value,end:document.getElementById('f_end').value,value:parseFloat(document.getElementById('f_value').value)||0,status:(document.querySelector('input[name=f_status]:checked')||{}).value||'agendado',note:document.getElementById('f_note').value.trim()};
+  if(!o.date){const d=document.getElementById('f_date');d.focus();d.style.animation='vvTreme .4s';toast('Informe a data do plantão');return;}
   o.updatedAt=Date.now();
   if(id){
     const alvo=state.shifts.find(x=>x.id===id);
@@ -512,6 +710,7 @@ function saveForm(id){
   }else{state.shifts.push({id:uid(),...o});}
   if(!state.locais)state.locais={};state.locais[o.local]={start:o.start,end:o.end,value:o.value};
   persist();closeModal();const od=new Date(o.date+'T00:00:00');cur=new Date(od);if(tab==='ano')curY=od.getFullYear();render();
+  toast(id?'Plantão atualizado':'Plantão lançado em '+pad2(od.getDate())+'/'+pad2(od.getMonth()+1));
 }
 const modal=MTUI.modal, closeModal=MTUI.closeModal; /* compartilhados em _mtui.js (com fix de modal empilhado) */
 
@@ -525,11 +724,22 @@ function exportCSV(year){
   const csv='﻿'+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);a.download=fname+'.csv';a.click();URL.revokeObjectURL(a.href);
+  toast(list.length?'CSV baixado com '+list.length+' plantões':'CSV baixado, sem plantões no período');
 }
 
 /* Clicar FORA do calendário desativa o modo copiar/colar (os cliques dentro do
    calendário dão stopPropagation, então só cliques externos chegam aqui). */
 document.addEventListener('click',e=>{ if(dayClip && !e.target.closest('.clipbar')) clearClip(); });
+/* atalhos no computador: N novo plantão, setas trocam o período, Esc fecha */
+document.addEventListener('keydown',e=>{
+  const aberto=document.getElementById('modal');
+  if(e.key==='Escape'){ if(aberto){e.preventDefault();closeModal();} else if(dayClip) clearClip(); return; }
+  const tg=e.target; if(aberto||e.metaKey||e.ctrlKey||e.altKey||(tg&&/^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName))) return;
+  if(e.key==='n'||e.key==='N'){e.preventDefault();openForm();}
+  else if(e.key==='ArrowLeft'){tab==='ano'?moveYear(-1):moveComp(-1);}
+  else if(e.key==='ArrowRight'){tab==='ano'?moveYear(1):moveComp(1);}
+  else if(e.key==='Enter'&&tg&&tg.classList&&tg.classList.contains('chip')) tg.click();
+});
 </script>
 </body>
 </html>

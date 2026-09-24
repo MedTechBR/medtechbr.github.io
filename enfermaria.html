@@ -1,15 +1,13 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-astra="enfermaria">
+<html lang="pt-BR" data-viva="enfermaria" data-viva-escuro>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>EnfermarIA — Gestão de pacientes internados | MedTech</title>
+<title>EnfermarIA · Pacientes internados | MedTech</title>
 <meta name="description" content="EnfermarIA: gestão de pacientes internados e visita beira-leito — evolução do dia, exame físico, transcrição de parâmetros por foto e evolução pronta para colar no sistema do hospital.">
-<meta name="theme-color" content="#000000">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
+<meta name="theme-color" content="#F5F6FB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1017" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="vendor/tabler/tabler-icons.min.css?v=3.48.0">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="manifest" href="enfermaria.webmanifest">
 <link rel="apple-touch-icon" href="icone-enfermaria-180.png">
@@ -19,7 +17,7 @@
 <meta name="apple-mobile-web-app-title" content="EnfermarIA">
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"enfermaria",name:"EnfermarIA"};</script>
-<script type="module" src="_mtauth.js?v=25"></script>
+<script type="module" src="_mtauth.js?v=26"></script>
 <style>
 :root{--petrol:#3B7BE0;--petrol-btn:#3169CC;--petrol-dark:#2F62B3;--ink:#23272E;--mint:#3B7BE0;--mint-dark:#2F62B3;--bg:#FAFAF8;--soft:rgba(59,123,224,.12);--line:#E8E8E2;--muted:#5E646B;--green:#186139;--green-bg:rgba(29,122,70,.12);--amber:#8A6009;--amber-bg:rgba(163,115,10,.12);--red:#C6453D;--red-bg:rgba(198,69,61,.12);--blue:#3B7BE0;--blue-bg:rgba(59,123,224,.12);--violet:#5B3BC4;--violet-bg:rgba(167,139,250,.14);--violet-btn:#6d4bd8;--surface:#FFFFFF;--card:#FFFFFF;--panel2:#F1F1EC;--line-strong:#DDDDD5;--dim:#767C84;--teal:#0E8A63;--glow:rgba(59,123,224,.42);--disp:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -280,27 +278,321 @@ footer a{color:var(--petrol-dark);font-weight:600;text-decoration:none}
 @media (max-width:720px){ .pt-card.aberta{padding-top:56px} }
 
 </style>
+<!-- viva:enfermaria -->
+<style>
+/* ============================================================
+   23/09/2026: camada "viva" (modelo aprovado do ClínicaMed, cm-v97).
+   Cor do app: índigo (--ac vem do _mtviva.css). Os seletores levam
+   :root para vencer a folha compartilhada, que entra DEPOIS deste bloco.
+   Dado do paciente continua em maiúsculas (padrão da evolução do hospital);
+   rótulos da interface ficam em frase normal.
+   ============================================================ */
+@media screen{
+html:root[data-viva="enfermaria"] body {font-size:14.5px}
+html:root[data-viva="enfermaria"] body .wrap,html:root[data-viva="enfermaria"] body main{max-width:1060px}
+/* cabeçalho de uma linha */
+html:root[data-viva="enfermaria"] body header{padding:calc(10px + env(safe-area-inset-top)) 0 10px}
+html:root[data-viva="enfermaria"] body .logo{font-size:19px;letter-spacing:-.02em;gap:11px;cursor:default}
+html:root[data-viva="enfermaria"] body .logo .mark{width:36px;height:36px;font-size:19px}
+html:root[data-viva="enfermaria"] body .logo b{color:var(--acInk)}
+html:root[data-viva="enfermaria"] body .usr .who{color:var(--tinta2)}
+html:root[data-viva="enfermaria"] body .usr a,html:root[data-viva="enfermaria"] body .usr button{display:inline-flex;align-items:center;gap:6px;padding:8px 14px}
+html:root[data-viva="enfermaria"] body main{padding-top:20px}
+
+/* abas: pílula colorida na ativa, ícone em círculo */
+html:root[data-viva="enfermaria"] body .tabs{margin:0 0 20px;gap:4px}
+html:root[data-viva="enfermaria"] body .tabs button{display:inline-flex;align-items:center;gap:9px;padding:6px 16px 6px 6px;font-size:14px;font-weight:600;position:relative}
+html:root[data-viva="enfermaria"] body .tabs button>i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:17px;background:var(--acSup);color:var(--acInk);transition:transform .25s var(--mola),background .2s,color .2s}
+html:root[data-viva="enfermaria"] body .tabs button:hover>i{transform:scale(1.08) rotate(-6deg)}
+html:root[data-viva="enfermaria"] body .tabs button.on{background:var(--ac);color:var(--acTxt);box-shadow:0 6px 14px color-mix(in srgb,var(--ac) 30%,transparent)}
+html:root[data-viva="enfermaria"] body .tabs button.on>i{background:rgba(255,255,255,.22);color:#fff}
+html:root[data-viva="enfermaria"] body .tabs .tab-n{min-width:22px;height:22px;padding:0 7px;border-radius:999px;display:inline-grid;place-items:center;background:var(--sup2);color:var(--tinta2);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+html:root[data-viva="enfermaria"] body .tabs .tab-n[hidden]{display:none}
+html:root[data-viva="enfermaria"] body .tabs button.on .tab-n{background:var(--sup);color:var(--acInk)}
+html:root[data-viva="enfermaria"] body .tabs .tab-novo{display:none}
+
+/* indicadores: blocos tingidos, cada um de uma cor; tocar filtra a lista */
+html:root[data-viva="enfermaria"] body .cards{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}
+html:root[data-viva="enfermaria"] body .kpi{--k:var(--c-azul);display:flex;align-items:center;gap:14px;text-align:left;padding:16px 18px;border-radius:22px;
+  background:color-mix(in srgb,var(--k) 10%,var(--sup))!important;border:1.5px solid color-mix(in srgb,var(--k) 16%,transparent)!important;
+  font:inherit;color:var(--tinta);cursor:pointer;min-width:0;transition:transform .2s var(--mola),box-shadow .2s,border-color .2s}
+html:root[data-viva="enfermaria"] body .kpi:hover{transform:translateY(-3px);box-shadow:0 12px 26px color-mix(in srgb,var(--k) 20%,transparent)!important}
+html:root[data-viva="enfermaria"] body .kpi:active{transform:scale(.97)}
+html:root[data-viva="enfermaria"] body .kpi.on{border-color:var(--k)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--k) 22%,transparent)!important}
+html:root[data-viva="enfermaria"] body .kpi.k-azul{--k:var(--c-azul)}html:root[data-viva="enfermaria"] body .kpi.k-laranja{--k:var(--c-laranja)}html:root[data-viva="enfermaria"] body .kpi.k-violeta{--k:var(--c-violeta)}html:root[data-viva="enfermaria"] body .kpi.k-rosa{--k:var(--c-rosa)}
+html:root[data-viva="enfermaria"] body .kpi .ki{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;font-size:21px;color:#fff;
+  background:color-mix(in srgb,var(--k) 86%,#141827);box-shadow:0 8px 18px color-mix(in srgb,var(--k) 32%,transparent)}
+html:root[data-viva="enfermaria"] body .kpi .kt{display:flex;flex-direction:column;min-width:0;flex:1}
+html:root[data-viva="enfermaria"] body .kpi .v{font-family:inherit;font-size:26px;font-weight:800;line-height:1.05;letter-spacing:-.03em;margin:0;font-variant-numeric:tabular-nums;
+  color:color-mix(in srgb,var(--k) 70%,var(--tinta))!important}
+html:root[data-viva="enfermaria"] body .kpi .l{font-size:12.5px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--tinta2);line-height:1.3;margin-top:2px}
+html:root[data-viva="enfermaria"] body .kpi small{font-size:11.5px;color:var(--tinta2);margin-top:3px;font-variant-numeric:tabular-nums}
+html:root[data-viva="enfermaria"] body .kbar{display:block;height:6px;border-radius:999px;background:color-mix(in srgb,var(--k) 20%,var(--sup));overflow:hidden;margin-top:7px}
+html:root[data-viva="enfermaria"] body .kbar i{display:block;height:100%;width:0;border-radius:999px;background:color-mix(in srgb,var(--k) 86%,#141827);transition:width 1s var(--suave)}
+
+/* barra de busca e ações */
+html:root[data-viva="enfermaria"] body .bar{gap:10px;margin-bottom:12px}
+html:root[data-viva="enfermaria"] body .busca{position:relative;flex:1 1 300px;max-width:440px;display:block}
+html:root[data-viva="enfermaria"] body .busca>i{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--tinta2);font-size:18px;pointer-events:none}
+html:root[data-viva="enfermaria"] body .busca kbd{position:absolute;right:12px;top:50%;transform:translateY(-50%);min-width:24px;height:24px;display:grid;place-items:center;border-radius:8px;
+  background:var(--sup2);border:1px solid var(--fioF);color:var(--tinta2);font:600 12px/1 inherit;pointer-events:none}
+html:root[data-viva="enfermaria"] body .busca input.search{width:100%;min-width:0;padding:11px 44px 11px 44px;border-radius:999px!important;font-size:15px;min-height:46px}
+html:root[data-viva="enfermaria"] body .busca input.search:focus+kbd{display:none}
+html:root[data-viva="enfermaria"] body .bar .right{gap:8px}
+html:root[data-viva="enfermaria"] body .bar .right .btn-sm{min-height:44px;padding:9px 16px;font-size:13.5px;font-weight:600;gap:7px}
+html:root[data-viva="enfermaria"] body .filtro-info{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 0 12px;padding:9px 10px 9px 14px;border-radius:999px;width:fit-content;max-width:100%;
+  background:var(--acSup);color:var(--acInk);font-size:13.5px;font-weight:500}
+html:root[data-viva="enfermaria"] body .filtro-info>i{font-size:16px}
+html:root[data-viva="enfermaria"] body .filtro-info button{display:inline-flex;align-items:center;gap:5px;border:0;border-radius:999px;background:var(--sup);color:var(--tinta);font:600 12.5px inherit;padding:6px 12px;cursor:pointer;min-height:32px}
+html:root[data-viva="enfermaria"] body .filtro-info button:hover{color:var(--acInk)}
+
+/* grupos por setor, cada um com a sua cor */
+html:root[data-viva="enfermaria"] body .setor-h{--sc:var(--c-azul);font-size:14.5px;font-weight:700;color:var(--tinta);text-transform:none;letter-spacing:-.01em;margin:22px 2px 10px;gap:10px}
+html:root[data-viva="enfermaria"] body .setor-h>i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:16px;
+  background:color-mix(in srgb,var(--sc) 14%,var(--sup));color:color-mix(in srgb,var(--sc) 72%,var(--tinta))}
+html:root[data-viva="enfermaria"] body .setor-h .sn{background:none;padding:0;font-size:inherit;color:inherit;border-radius:0;font-weight:700}
+html:root[data-viva="enfermaria"] body .setor-h .n{background:var(--sup2);color:var(--tinta2);border-radius:999px;padding:2px 9px;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* linha do paciente */
+html:root[data-viva="enfermaria"] body .pt-row{gap:14px;border-radius:18px;padding:9px 14px 9px 9px;margin-bottom:8px;border:1px solid var(--fio);box-shadow:var(--sombraV);
+  transition:transform .18s var(--mola),box-shadow .2s,border-color .2s,background .2s}
+html:root[data-viva="enfermaria"] body .pt-row:hover{border-color:color-mix(in srgb,var(--ac) 35%,var(--fio));background:var(--sup);transform:translateX(3px);box-shadow:var(--sombraM)}
+html:root[data-viva="enfermaria"] body .pt-row:active{transform:scale(.99)}
+html:root[data-viva="enfermaria"] body .pt-row:focus-visible{outline:none}
+html:root[data-viva="enfermaria"] body .pr-leito{flex:0 0 60px;min-height:46px;display:grid;place-items:center;border-radius:14px;background:var(--acSup);color:var(--acInk);font-size:15px;font-weight:800;padding:4px}
+html:root[data-viva="enfermaria"] body .pt-row.vista .pr-leito{background:color-mix(in srgb,var(--okV) 13%,var(--sup));color:color-mix(in srgb,var(--okV) 62%,var(--tinta))}
+html:root[data-viva="enfermaria"] body .pr-nome{font-size:14.5px;font-weight:650;color:var(--tinta)}
+html:root[data-viva="enfermaria"] body .pr-dx{font-size:13px;color:var(--tinta2);margin-top:3px}
+html:root[data-viva="enfermaria"] body .pr-meta{color:var(--tinta2);font-weight:600;margin-right:8px}
+html:root[data-viva="enfermaria"] body .pr-sinais{gap:8px}
+html:root[data-viva="enfermaria"] body .pr-badge{height:28px;min-width:0;padding:0 10px;gap:4px;border-radius:999px;font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums;
+  background:color-mix(in srgb,var(--c-violeta) 13%,var(--sup));color:color-mix(in srgb,var(--c-violeta) 72%,var(--tinta))}
+html:root[data-viva="enfermaria"] body .pr-badge i{font-size:14px}
+html:root[data-viva="enfermaria"] body .pr-vis{display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 11px;border-radius:999px;font-size:12.5px;font-weight:600;white-space:nowrap}
+html:root[data-viva="enfermaria"] body .pr-vis i{font-size:15px}
+html:root[data-viva="enfermaria"] body .pr-vis.ok{background:color-mix(in srgb,var(--okV) 13%,var(--sup));color:color-mix(in srgb,var(--okV) 60%,var(--tinta))}
+html:root[data-viva="enfermaria"] body .pr-vis.wait{background:color-mix(in srgb,var(--c-laranja) 13%,var(--sup));color:color-mix(in srgb,var(--c-laranja) 60%,var(--tinta))}
+html:root[data-viva="enfermaria"] body .pr-chev{color:var(--tinta2);font-size:18px;transition:transform .2s var(--mola)}
+html:root[data-viva="enfermaria"] body .pt-row:hover .pr-chev{transform:translateX(3px);color:var(--acInk)}
+
+/* ficha aberta */
+html:root[data-viva="enfermaria"] body .pt-card{border-radius:22px;padding:18px;gap:16px;margin-bottom:10px;border:1px solid var(--fio);box-shadow:var(--sombraV)}
+html:root[data-viva="enfermaria"] body .pt-card.entra{animation:vvSobe .35s var(--suave) both}
+html:root[data-viva="enfermaria"] body .pt-card.aberta{padding-top:18px;border-color:color-mix(in srgb,var(--ac) 42%,var(--fio));box-shadow:0 14px 34px color-mix(in srgb,var(--ac) 13%,transparent)}
+html:root[data-viva="enfermaria"] body .leito{min-width:66px;border-radius:18px;padding:11px 8px;background:var(--ac);color:var(--acTxt);box-shadow:0 8px 18px color-mix(in srgb,var(--ac) 28%,transparent)}
+html:root[data-viva="enfermaria"] body .leito .ln{font-family:inherit;font-size:19px;font-variant-numeric:tabular-nums}
+html:root[data-viva="enfermaria"] body .leito .ls{letter-spacing:0;font-size:10.5px;font-weight:600;opacity:1;margin-top:5px}
+html:root[data-viva="enfermaria"] body .leito.sai{background:var(--sup3);color:var(--tinta);box-shadow:none}
+html:root[data-viva="enfermaria"] body .pt-main :is(.pt-pend-h,.pend-empty,.pt-prev,.pt-exh,.chip-hoje,.chip-wait,.badge,.pend-n),html:root[data-viva="enfermaria"] body .pt-main .pt-field>b{text-transform:none}
+html:root[data-viva="enfermaria"] body .pt-top{gap:10px;align-items:center}
+html:root[data-viva="enfermaria"] body .pt-top .nome{font-size:17px;font-weight:750;letter-spacing:-.01em}
+html:root[data-viva="enfermaria"] body .pt-top .meta{color:var(--tinta2)}
+html:root[data-viva="enfermaria"] body .chip-hoje,html:root[data-viva="enfermaria"] body .chip-wait{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:4px 11px;border-radius:999px;margin-left:0}
+html:root[data-viva="enfermaria"] body .chip-hoje{background:color-mix(in srgb,var(--okV) 13%,var(--sup));color:color-mix(in srgb,var(--okV) 60%,var(--tinta))}
+html:root[data-viva="enfermaria"] body .chip-wait{background:color-mix(in srgb,var(--c-laranja) 13%,var(--sup));color:color-mix(in srgb,var(--c-laranja) 60%,var(--tinta))}
+html:root[data-viva="enfermaria"] body .pt-field{font-size:14px;margin-top:10px}
+html:root[data-viva="enfermaria"] body .pt-field b{color:var(--acInk)}
+html:root[data-viva="enfermaria"] body .pt-exh .chev{margin-left:auto;color:var(--tinta2);font-size:18px;transition:transform .25s var(--mola)}
+html:root[data-viva="enfermaria"] body .pt-exh .chev.on{transform:rotate(180deg)}
+html:root[data-viva="enfermaria"] body .pt-obs{color:var(--tinta2);font-size:13px}
+html:root[data-viva="enfermaria"] body .pt-pend{margin-top:12px;border-radius:16px;padding:10px 12px;background:color-mix(in srgb,var(--c-violeta) 7%,var(--sup));border:1px solid color-mix(in srgb,var(--c-violeta) 17%,transparent)}
+html:root[data-viva="enfermaria"] body .pt-pend-h{margin-bottom:2px}
+html:root[data-viva="enfermaria"] body .pt-pend-l{gap:8px}
+html:root[data-viva="enfermaria"] body .pt-pend-h b{text-transform:none;display:inline-flex;align-items:center;gap:6px;color:color-mix(in srgb,var(--c-violeta) 72%,var(--tinta));font-size:13.5px;font-weight:700;letter-spacing:0}
+html:root[data-viva="enfermaria"] body .pend-n{white-space:nowrap;font-size:12px;font-weight:600;color:var(--tinta2);font-variant-numeric:tabular-nums}
+html:root[data-viva="enfermaria"] body .pend-item{color:var(--tinta);font-size:14px;padding:6px 4px;gap:10px;border-radius:10px;align-items:center;transition:background .15s}
+html:root[data-viva="enfermaria"] body .pend-item:hover{background:color-mix(in srgb,var(--c-violeta) 8%,transparent)}
+html:root[data-viva="enfermaria"] body .pend-item input{margin:0;width:20px;height:20px;accent-color:var(--c-violeta)}
+html:root[data-viva="enfermaria"] body .pend-item input:checked{animation:vvPopE .3s var(--mola)}
+html:root[data-viva="enfermaria"] body .pend-item.done span{color:var(--tinta2)}
+html:root[data-viva="enfermaria"] body .pend-empty{color:var(--tinta2)}
+html:root[data-viva="enfermaria"] body .pt-prev{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:5px 11px;border-radius:999px;letter-spacing:0;
+  background:color-mix(in srgb,var(--okV) 13%,var(--sup));color:color-mix(in srgb,var(--okV) 60%,var(--tinta))}
+html:root[data-viva="enfermaria"] body .pt-prev.empty{box-shadow:none;border-radius:999px;opacity:1;background:var(--sup);color:var(--tinta2);border:1.5px dashed var(--fioF)}
+html:root[data-viva="enfermaria"] body .pt-prev:hover{filter:none;border-color:var(--ac);color:var(--acInk)}
+html:root[data-viva="enfermaria"] body .mini-ed{width:32px;height:32px;min-height:0;padding:0;border-radius:50%;display:inline-grid;place-items:center;opacity:1;color:var(--tinta2);font-size:15px;transition:background .15s,color .15s}
+html:root[data-viva="enfermaria"] body .mini-ed:hover{background:var(--acSup);color:var(--acInk)}
+html:root[data-viva="enfermaria"] body .pt-acts{gap:8px;min-width:136px}
+html:root[data-viva="enfermaria"] body .pt-acts button{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:999px;min-height:42px;padding:9px 16px;font-weight:600;font-size:13.5px;
+  background:var(--sup);color:var(--tinta);border:1.5px solid var(--fioF)}
+html:root[data-viva="enfermaria"] body .pt-acts button:hover{background:var(--acSup);border-color:color-mix(in srgb,var(--ac) 40%,var(--fio));color:var(--acInk)}
+html:root[data-viva="enfermaria"] body .pt-acts .visita{background:var(--ac);border-color:var(--ac);color:var(--acTxt);box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 28%,transparent)}
+html:root[data-viva="enfermaria"] body .pt-acts .visita:hover{background:var(--ac);border-color:var(--ac);color:var(--acTxt);filter:brightness(1.07);transform:translateY(-1px)}
+html:root[data-viva="enfermaria"] body .pt-acts .saida{color:color-mix(in srgb,var(--c-laranja) 60%,var(--tinta))}
+html:root[data-viva="enfermaria"] body .pt-acts .del{color:color-mix(in srgb,var(--errV) 78%,var(--tinta))}
+html:root[data-viva="enfermaria"] body .pt-acts .del:hover{background:var(--errSup);border-color:transparent;color:var(--errV)}
+html:root[data-viva="enfermaria"] body .pt-card.aberta .pt-acts{padding-top:52px}
+html:root[data-viva="enfermaria"] body .pt-fechar{top:14px;right:18px;min-height:40px;padding:8px 14px;background:var(--sup2);border:0;color:var(--tinta);font-weight:600}
+html:root[data-viva="enfermaria"] body .pt-fechar:hover{background:var(--acSup);color:var(--acInk)}
+html:root[data-viva="enfermaria"] body .badge{display:inline-flex;align-items:center;gap:4px;font-family:inherit;font-size:12px;font-weight:600;padding:4px 11px}
+html:root[data-viva="enfermaria"] body .b-alta{background:color-mix(in srgb,var(--okV) 13%,var(--sup));color:color-mix(in srgb,var(--okV) 60%,var(--tinta))}
+html:root[data-viva="enfermaria"] body .b-obito{background:var(--sup3);color:var(--tinta)}
+html:root[data-viva="enfermaria"] body .b-transf{background:color-mix(in srgb,var(--c-azul) 13%,var(--sup));color:color-mix(in srgb,var(--c-azul) 70%,var(--tinta))}
+html:root[data-viva="enfermaria"] body .sai-bar{justify-content:space-between}
+html:root[data-viva="enfermaria"] body .sai-cont{display:flex;align-items:center;gap:12px;font-size:14.5px;color:var(--tinta2)}
+html:root[data-viva="enfermaria"] body .sai-cont b{font-size:22px;font-weight:800;color:var(--tinta);font-variant-numeric:tabular-nums;margin-right:2px}
+html:root[data-viva="enfermaria"] body .sai-cont .ki{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--acSup);color:var(--acInk);font-size:19px}
+
+/* vazio e carregando */
+html:root[data-viva="enfermaria"] body div.empty{display:flex;flex-direction:column;align-items:center;gap:10px;padding:40px 22px;border-radius:24px;border:1.5px dashed var(--fioF);background:var(--sup);box-shadow:none;color:var(--tinta2)}
+html:root[data-viva="enfermaria"] body .empty .ei{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;background:var(--acSup);color:var(--acInk);font-size:29px;animation:vvPopE .45s var(--mola) both}
+html:root[data-viva="enfermaria"] body .empty h3{font-size:17px;margin:4px 0 0;color:var(--tinta)}
+html:root[data-viva="enfermaria"] body .empty p{margin:0;max-width:46ch;line-height:1.55;font-size:14px}
+html:root[data-viva="enfermaria"] body .empty .btn{margin-top:6px}
+html:root[data-viva="enfermaria"] body .esq{display:flex;flex-direction:column;gap:8px}
+html:root[data-viva="enfermaria"] body .esq-t{display:flex;align-items:center;gap:9px;color:var(--tinta2);font-size:14px;margin:4px 2px 6px}
+html:root[data-viva="enfermaria"] body .esq i{display:block;height:64px;border-radius:18px;background:var(--sup3);animation:vvPulsa 1.3s ease-in-out infinite}
+html:root[data-viva="enfermaria"] body .esq i:nth-child(3){animation-delay:.15s}html:root[data-viva="enfermaria"] body .esq i:nth-child(4){animation-delay:.3s}html:root[data-viva="enfermaria"] body .esq i:nth-child(5){animation-delay:.45s}
+html:root[data-viva="enfermaria"] body .spin{border-color:var(--acInk);border-top-color:transparent}
+html:root[data-viva="enfermaria"] body .note{display:flex;align-items:flex-start;gap:10px;background:var(--sup2);border:0;box-shadow:none;border-radius:18px;color:var(--tinta2);font-size:13px;margin-top:22px}
+html:root[data-viva="enfermaria"] body .note>i{font-size:18px;color:var(--acInk);flex:0 0 auto}
+html:root[data-viva="enfermaria"] body .note b{color:var(--tinta)}
+
+/* modais */
+html:root[data-viva="enfermaria"] body .modal .box{padding:24px 26px}
+html:root[data-viva="enfermaria"] body .modal h3{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;letter-spacing:-.02em;padding-bottom:10px;background:var(--sup);box-shadow:0 -30px 0 0 var(--sup)}
+html:root[data-viva="enfermaria"] body .modal h3>i{width:36px;height:36px;flex:0 0 auto;border-radius:50%;display:inline-grid;place-items:center;background:var(--acSup);color:var(--acInk);font-size:19px}
+html:root[data-viva="enfermaria"] body .modal-x{width:40px;height:40px;border-radius:50%;background:var(--sup2);border:0;color:var(--tinta);box-shadow:none}
+html:root[data-viva="enfermaria"] body .modal-x:hover{background:var(--acSup);color:var(--acInk)}
+html:root[data-viva="enfermaria"] body .draft-ok{background:color-mix(in srgb,var(--okV) 13%,var(--sup));color:color-mix(in srgb,var(--okV) 60%,var(--tinta));border:0;font-weight:600}
+html:root[data-viva="enfermaria"] body .draft-hint{border-radius:14px;border:0;background:var(--avSup);color:color-mix(in srgb,var(--avV) 70%,var(--tinta))}
+html:root[data-viva="enfermaria"] body .draft-hint button{color:inherit;font-weight:700}
+html:root[data-viva="enfermaria"] body .hint{color:var(--tinta2);font-size:12.5px}
+html:root[data-viva="enfermaria"] body .sec-h{display:flex;align-items:center;gap:9px;text-transform:none;letter-spacing:-.01em;font-size:14.5px;font-weight:700;color:var(--tinta);margin:20px 0 10px;border-top:1px solid var(--fio);padding-top:16px}
+html:root[data-viva="enfermaria"] body .sec-h::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--ac);flex:0 0 auto}
+html:root[data-viva="enfermaria"] body .field label{font-size:12.5px;font-weight:600;color:var(--tinta);margin-bottom:5px}
+html:root[data-viva="enfermaria"] body .field input,html:root[data-viva="enfermaria"] body .field select,html:root[data-viva="enfermaria"] body .field textarea{padding:10px 12px}
+html:root[data-viva="enfermaria"] body .ai-box{border-radius:20px;padding:16px;background:var(--acSup);border:1px solid color-mix(in srgb,var(--ac) 22%,transparent)}
+html:root[data-viva="enfermaria"] body .ai-box .ai-h{color:var(--acInk);font-size:14.5px;font-weight:700;gap:8px}
+html:root[data-viva="enfermaria"] body .ai-box .ai-h i{width:28px;height:28px;border-radius:50%;display:inline-grid;place-items:center;background:var(--ac);color:var(--acTxt);font-size:15px}
+html:root[data-viva="enfermaria"] body .ai-box .hint b{color:var(--tinta)}
+html:root[data-viva="enfermaria"] body .file-in{border-radius:14px;border:1.5px dashed var(--fioF);background:var(--sup);color:var(--tinta2)}
+html:root[data-viva="enfermaria"] body .file-in{padding:8px;font-size:14px;cursor:pointer}
+html:root[data-viva="enfermaria"] body .file-in::file-selector-button{font:600 14px/1 inherit;border:0;border-radius:999px;padding:11px 18px;margin-right:12px;background:var(--acSup);color:var(--acInk);cursor:pointer;transition:background .2s}
+html:root[data-viva="enfermaria"] body .file-in:hover::file-selector-button{background:color-mix(in srgb,var(--ac) 20%,var(--sup))}
+html:root[data-viva="enfermaria"] body .thumb{border-radius:14px}
+html:root[data-viva="enfermaria"] body .thumb button{display:grid;place-items:center;width:24px;height:24px;font-size:14px}
+html:root[data-viva="enfermaria"] body .thumb-ph{color:var(--acInk);background:var(--sup2)}
+html:root[data-viva="enfermaria"] body .thumb-ph span{letter-spacing:0}
+html:root[data-viva="enfermaria"] body .thumbs-n{color:color-mix(in srgb,var(--okV) 60%,var(--tinta));font-weight:700}
+html:root[data-viva="enfermaria"] body .thumbs-err{border-radius:12px}
+html:root[data-viva="enfermaria"] body .ef-lbl{letter-spacing:0;color:var(--acInk);font-size:11.5px;font-weight:700}
+html:root[data-viva="enfermaria"] body .ef-row textarea{border-radius:12px}
+html:root[data-viva="enfermaria"] body .modal .box{--padB:22px;padding-bottom:var(--padB)}
+html:root[data-viva="enfermaria"] body .row.actions{background:var(--sup);gap:8px;bottom:calc(-1 * var(--padB));margin-bottom:calc(-1 * var(--padB));padding-bottom:calc(var(--padB) + env(safe-area-inset-bottom))}
+html:root[data-viva="enfermaria"] body #admRecBtn.gravando{background:var(--errV)!important;color:#fff!important;border-color:var(--errV)!important;animation:vvPulsa 1.4s ease-in-out infinite}
+html:root[data-viva="enfermaria"] body .sug-out{border-radius:16px;background:var(--okSup);border:1px solid color-mix(in srgb,var(--okV) 25%,transparent);font-size:13.5px}
+html:root[data-viva="enfermaria"] body .sug-out.sug-erro{background:var(--errSup);border-color:color-mix(in srgb,var(--errV) 25%,transparent);color:color-mix(in srgb,var(--errV) 70%,var(--tinta))}
+html:root[data-viva="enfermaria"] body .sug-item{border-bottom-color:color-mix(in srgb,var(--okV) 20%,transparent)}
+html:root[data-viva="enfermaria"] body .sug-ok{border-radius:999px;border:1.5px solid color-mix(in srgb,var(--okV) 45%,transparent);color:color-mix(in srgb,var(--okV) 60%,var(--tinta));background:var(--sup);padding:5px 12px;font-weight:700}
+html:root[data-viva="enfermaria"] body .sug-ok:hover{background:var(--okV);color:#fff}
+html:root[data-viva="enfermaria"] body .sug-nota{color:var(--tinta2);font-size:12.5px;margin-top:8px}
+html:root[data-viva="enfermaria"] body .sug-ok-l{color:color-mix(in srgb,var(--okV) 60%,var(--tinta));font-weight:600}
+html:root[data-viva="enfermaria"] body .sug-clear button{display:inline-flex;align-items:center;gap:5px;color:var(--tinta2);text-decoration:none;font-weight:600}
+html:root[data-viva="enfermaria"] body .sug-h{color:var(--tinta)}
+html:root[data-viva="enfermaria"] body .evo-out{border-radius:16px!important}
+
+/* avisos */
+html:root[data-viva="enfermaria"] body #toastWrap .toast{border-radius:18px!important;padding:12px 16px;align-items:center;font-size:14px}
+html:root[data-viva="enfermaria"] body #toastWrap .toast .tico{font-size:19px;line-height:1}
+html:root[data-viva="enfermaria"] body #toastWrap .toast.erro{background:#C72F34!important;color:#fff!important}
+html:root[data-viva="enfermaria"] body #toastWrap .toast.ok{background:#0B7A55!important;color:#fff!important}
+html:root[data-viva="enfermaria"] body .campo-erro{animation:vvTreme .4s}
+
+@keyframes vvPulsa{0%,100%{opacity:1}50%{opacity:.55}}
+@keyframes vvPopE{0%{transform:scale(.5)}100%{transform:scale(1)}}
+
+/* celular: barra inferior com o ícone ativo em pílula e o botão Novo no meio */
+@media(max-width:640px){
+  html:root[data-viva="enfermaria"] body main{padding:14px 14px calc(104px + env(safe-area-inset-bottom))}
+  html:root[data-viva="enfermaria"] body footer{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
+  html:root[data-viva="enfermaria"] body .logo{font-size:18px}
+  html:root[data-viva="enfermaria"] body .usr .who{display:none}
+  html:root[data-viva="enfermaria"] body .tabs{margin:0!important;grid-template-columns:repeat(3,1fr)!important;padding:6px 14px calc(8px + env(safe-area-inset-bottom))!important;gap:0}
+  html:root[data-viva="enfermaria"] body .tabs button{flex-direction:column;justify-content:flex-end;gap:3px;padding:4px 2px 2px!important;min-height:56px;font-size:11.5px;font-weight:600;
+    background:transparent!important;box-shadow:none!important;color:var(--tinta2)!important}
+  html:root[data-viva="enfermaria"] body .tabs button>i{width:52px;height:30px;border-radius:999px;background:transparent;color:inherit;font-size:21px}
+  html:root[data-viva="enfermaria"] body .tabs button:hover>i{transform:none}
+  html:root[data-viva="enfermaria"] body .tabs button.on{color:var(--acInk)!important;background:transparent!important}
+  html:root[data-viva="enfermaria"] body .tabs button.on>i{background:var(--ac);color:var(--acTxt);transform:translateY(-1px)}
+  html:root[data-viva="enfermaria"] body .tabs .tab-novo{display:flex;color:var(--acInk)!important}
+  html:root[data-viva="enfermaria"] body .tabs .tab-novo>i{width:54px;height:54px;margin-top:-28px;border-radius:50%;background:var(--ac);color:var(--acTxt);font-size:25px;
+    box-shadow:0 10px 22px color-mix(in srgb,var(--ac) 40%,transparent),0 0 0 5px var(--sup)}
+  html:root[data-viva="enfermaria"] body .tabs .tab-n{position:absolute;top:0;left:calc(50% + 8px);min-width:19px;height:19px;padding:0 5px;font-size:11px;background:var(--c-laranja);color:#141827}
+  html:root[data-viva="enfermaria"] body .tabs button.on .tab-n{background:var(--c-laranja);color:#141827}
+  html:root[data-viva="enfermaria"] body .cards{gap:6px;margin-bottom:14px}
+  html:root[data-viva="enfermaria"] body .kpi{flex-direction:column;align-items:center;text-align:center;gap:6px;padding:10px 4px 9px;border-radius:18px}
+  html:root[data-viva="enfermaria"] body .kpi .ki{width:32px;height:32px;font-size:16px;box-shadow:none}
+  html:root[data-viva="enfermaria"] body .kpi .kt{align-items:center}
+  html:root[data-viva="enfermaria"] body .kpi .v{font-size:20px}
+  html:root[data-viva="enfermaria"] body .kpi .l{font-size:10.5px;line-height:1.2}
+  html:root[data-viva="enfermaria"] body .kpi small{display:none}
+  html:root[data-viva="enfermaria"] body .kbar{width:80%;height:4px;margin-top:5px}
+  html:root[data-viva="enfermaria"] body .busca{flex:1 1 100%;max-width:none}
+  html:root[data-viva="enfermaria"] body .busca kbd{display:none}
+  html:root[data-viva="enfermaria"] body .busca input.search{padding-right:16px;font-size:16px}
+  html:root[data-viva="enfermaria"] body .bar .right{grid-template-columns:repeat(3,1fr)}
+  html:root[data-viva="enfermaria"] body .bar .right .bt-novo{display:none}
+  html:root[data-viva="enfermaria"] body .bar .right .btn-sm{padding:10px 4px;font-size:12.5px}
+  html:root[data-viva="enfermaria"] body .setor-h{margin:18px 2px 8px}
+  html:root[data-viva="enfermaria"] body .pt-row{gap:11px;padding:8px 10px 8px 8px}
+  html:root[data-viva="enfermaria"] body .pr-leito{flex-basis:54px;min-height:44px;font-size:14px}
+  html:root[data-viva="enfermaria"] body .pr-vis{width:28px;padding:0;justify-content:center}
+  html:root[data-viva="enfermaria"] body .pr-vis span{display:none}
+  html:root[data-viva="enfermaria"] body .pr-badge{padding:0 8px}
+  html:root[data-viva="enfermaria"] body .pt-card{padding:16px}
+  html:root[data-viva="enfermaria"] body .pt-card.aberta{padding-top:16px}
+  html:root[data-viva="enfermaria"] body .pt-card.aberta .pt-acts{padding-top:0}
+  html:root[data-viva="enfermaria"] body .pt-card.aberta .pt-top{padding-right:46px}
+  html:root[data-viva="enfermaria"] body .pt-fechar{top:12px;right:12px;width:40px;height:40px;min-height:0;padding:0;justify-content:center;font-size:0;gap:0}
+  html:root[data-viva="enfermaria"] body .pt-fechar i{font-size:18px}
+  html:root[data-viva="enfermaria"] body .leito{min-width:58px;padding:9px 6px;border-radius:16px}
+  html:root[data-viva="enfermaria"] body .leito .ln{font-size:16px}
+  html:root[data-viva="enfermaria"] body .pt-top .nome{font-size:16px}
+  html:root[data-viva="enfermaria"] body .pt-acts button{flex:1 1 40%}
+  html:root[data-viva="enfermaria"] body .pt-acts .del{flex:0 0 46px;padding:0}
+  html:root[data-viva="enfermaria"] body .pt-acts .del span{display:none}
+  /* ficha aberta no celular: o leito ao lado do nome e o conteúdo na largura toda (antes a coluna do leito comia 1/3 da tela) */
+  html:root[data-viva="enfermaria"] body .pt-card{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:12px;row-gap:0;align-items:center}
+  html:root[data-viva="enfermaria"] body .pt-card>.pt-main{display:contents}
+  html:root[data-viva="enfermaria"] body .pt-card>.pt-main>:not(.pt-top),html:root[data-viva="enfermaria"] body .pt-card>.pt-acts{grid-column:1/-1}
+  html:root[data-viva="enfermaria"] body .pt-card>.pt-acts{margin-top:14px}
+  html:root[data-viva="enfermaria"] body .pt-card .leito{align-self:start}
+  html:root[data-viva="enfermaria"] body .pt-card .leito .ls{display:none}
+  html:root[data-viva="enfermaria"] body .pt-card .pt-top{row-gap:4px}
+  html:root[data-viva="enfermaria"] body .modal .box{--padB:14px;border-radius:26px 26px 0 0!important;padding:18px 16px 14px;animation:vvSobeM .32s var(--suave) both}
+  html:root[data-viva="enfermaria"] body .mini-ed{width:44px;height:44px;margin:-6px -4px}
+  html:root[data-viva="enfermaria"] body .pt-prev{min-height:40px;padding:6px 14px}
+  html:root[data-viva="enfermaria"] body .file-in{font-size:16px}
+  html:root[data-viva="enfermaria"] body .note{margin-top:18px}
+  html:root[data-viva="enfermaria"] body footer a{display:inline-block;padding:12px 4px}
+  html:root[data-viva="enfermaria"] body #toastWrap{bottom:calc(96px + env(safe-area-inset-bottom))}
+}
+@keyframes vvSobeM{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+@media(max-width:380px){html:root[data-viva="enfermaria"] body .kpi .l{font-size:10px}}
+@media(prefers-reduced-motion:reduce){html:root[data-viva="enfermaria"] body .esq i,html:root[data-viva="enfermaria"] body #admRecBtn.gravando,html:root[data-viva="enfermaria"] body .pend-item input:checked,html:root[data-viva="enfermaria"] body .empty .ei,html:root[data-viva="enfermaria"] body .pt-card.entra{animation:none!important}html:root[data-viva="enfermaria"] body .kbar i{transition:none}}
+}
+</style>
+<!-- /viva:enfermaria -->
 <link rel="stylesheet" href="_mttokens.css?v=3">
-<link rel="stylesheet" href="_mtastra.css?v=5">
+<link rel="stylesheet" href="_mtviva.css?v=1">
 </head>
 <body>
 <header>
   <div class="wrap top">
-    <div>
-      <div class="logo"><span class="mark"><i class="ti ti-bed"></i></span><span>Enfermar<b>IA</b></span></div>
-      <div class="subtitle">Visita beira-leito · evolução por IA · por MedTech</div>
-    </div>
+    <div class="logo" title="Visita beira-leito com evolução por IA"><span class="mark" aria-hidden="true"><i class="ti ti-bed"></i></span><span>Enfermar<b>IA</b></span></div>
     <div class="usr" id="usr"></div>
   </div>
 </header>
 
 <main>
-  <div class="tabs">
-    <button id="tab-ativos" class="on" onclick="setTab('ativos')"><i class="ti ti-bed"></i> Internados</button>
-    <button id="tab-saidas" onclick="setTab('saidas')"><i class="ti ti-logout"></i> Saídas</button>
-  </div>
-  <div id="view"></div>
-  <div class="note" id="storenote">Carregando…</div>
+  <nav class="tabs" role="tablist" aria-label="Seções">
+    <button id="tab-ativos" class="on" role="tab" aria-selected="true" onclick="setTab('ativos')"><i class="ti ti-bed" aria-hidden="true"></i><span>Internados</span></button>
+    <button id="tab-novo" class="tab-novo" type="button" onclick="openForm()"><i class="ti ti-plus" aria-hidden="true"></i><span>Novo</span></button>
+    <button id="tab-saidas" role="tab" aria-selected="false" onclick="setTab('saidas')"><i class="ti ti-door-exit" aria-hidden="true"></i><span>Saídas</span><b class="tab-n" id="nSaidas" hidden></b></button>
+  </nav>
+  <div id="view"><div class="esq" role="status" aria-label="Carregando os pacientes"><span class="esq-t"><span class="spin"></span> Carregando seus pacientes</span><i></i><i></i><i></i><i></i></div></div>
+  <div class="note" id="storenote"><i class="ti ti-loader-2"></i> Conectando</div>
 </main>
 
 <footer>© 2026 <a href="index.html">MedTech</a> · <a href="privacidade.html">Privacidade</a></footer>
@@ -313,8 +605,8 @@ function toast(msg, tipo){
   if(!w){w=document.createElement('div');w.id='toastWrap';w.setAttribute('role','status');w.setAttribute('aria-live','polite');document.body.appendChild(w);}
   const t=document.createElement('div');
   t.className='toast'+(tipo?' '+tipo:'');
-  const ico=tipo==='erro'?'!':tipo==='ok'?'✓':'i';
-  t.innerHTML='<span class="tico">'+ico+'</span><span></span>';
+  const ico=tipo==='erro'?'ti-alert-circle':tipo==='ok'?'ti-circle-check':'ti-info-circle';
+  t.innerHTML='<i class="tico ti '+ico+'" aria-hidden="true"></i><span></span>';
   t.lastChild.textContent=String(msg).replace(/^⚠️\s*/,'');
   w.appendChild(t);
   const fora=setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .2s';setTimeout(()=>t.remove(),220);}, tipo==='erro'?6500:4000);
@@ -331,7 +623,7 @@ function focarCampo(id){
 </script>
 <script>
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
-const SAIDA={alta:{l:'Alta',c:'b-alta'},obito:{l:'Óbito',c:'b-obito'},transferencia:{l:'Transferência',c:'b-transf'}};
+const SAIDA={alta:{l:'Alta',c:'b-alta',i:'ti-home-check'},obito:{l:'Óbito',c:'b-obito',i:'ti-flower'},transferencia:{l:'Transferência',c:'b-transf',i:'ti-transfer'}};
 const EF_TEMPLATE='- ESTADO GERAL: \n- NEURO: \n- AC: \n- AP: \n- ABDOME: \n- EXT: \n- PELE: ';
 let state={pacientes:[]};
 let tab='ativos', busca='', visitaImgs=[], visitaImgErrs=[];
@@ -360,29 +652,59 @@ whenMT(()=>{MT.mergeFn=(r,l)=>MT.mergeState(r,l,['pacientes']);MT.onData(d=>{
 function persist(){MT.save(state);}
 function renderUser(){const el=document.getElementById('usr');if(!el)return;
   const sn=document.getElementById('storenote');
-  if(sn)sn.innerHTML=(MT.mode==='demo')?'<i class="ti ti-tool"></i> <b>Modo demonstração</b> — dados salvos só neste navegador. Entre na conta MedTech para sincronizar e usar a IA.':'<i class="ti ti-cloud-check"></i> Conectado — sua lista de internados sincroniza na nuvem MedTech.';
-  if(MT.mode==='demo'){el.innerHTML='<span class="who">Modo demo</span><a href="index.html">← MedTech</a>';return;}
+  if(sn)sn.innerHTML=(MT.mode==='demo')?'<i class="ti ti-device-laptop"></i> <span><b>Modo demonstração.</b> Os dados ficam só neste navegador. Entre na conta MedTech para sincronizar e usar a IA.</span>':'<i class="ti ti-cloud-check"></i> <span>Conectado. Sua lista de internados sincroniza na nuvem MedTech.</span>';
+  if(MT.mode==='demo'){el.innerHTML='<span class="who">Modo demo</span><a href="index.html"><i class="ti ti-arrow-left"></i> MedTech</a>';return;}
   const u=MT.user;const nm=u?(u.displayName||u.email||'Conta'):'';
   el.innerHTML=`<span class="who">${esc(nm)}</span><button onclick="MT.signOut()">Sair</button>`;}
 
 /* ===== navegação ===== */
-function setTab(t){tab=t;busca='';['ativos','saidas'].forEach(x=>{const b=document.getElementById('tab-'+x);if(b)b.className=(x===t?'on':'');});render();}
+function setTab(t){tab=t;busca='';['ativos','saidas'].forEach(x=>{const b=document.getElementById('tab-'+x);if(b){b.classList.toggle('on',x===t);b.setAttribute('aria-selected',x===t?'true':'false');}});render();}
 function ativos(){return state.pacientes.filter(p=>p.status!=='saida');}
 function saidos(){return state.pacientes.filter(p=>p.status==='saida');}
 function leitoSort(a,b){return String(a.setor||'').localeCompare(String(b.setor||''))||String(a.leito||'').localeCompare(String(b.leito||''),'pt',{numeric:true});}
-function render(){tab==='ativos'?renderAtivos():renderSaidas();}
+function render(){
+  const nS=document.getElementById('nSaidas');if(nS){const n=saidos().length;nS.textContent=n;nS.hidden=!n;}
+  tab==='ativos'?renderAtivos():renderSaidas();
+  const anima=telaAnimada!==tab;telaAnimada=tab;vivo(document.getElementById('view'),anima);
+}
+/* ===== camada viva (23/09/2026): filtro pelos indicadores, contadores, entrada, estados vazios ===== */
+let filtro='todos', telaAnimada='', recemAberto=null;
+const FILTRO_L={aguarda:'Aguardam visita',pend:'Com pendências',uti:'Em UTI'};
+function isUTI(p){return /\buti\b/i.test(p.setor||'')||/\buti\b/i.test(p.leito||'');}
+function setFiltro(f){filtro=(filtro===f&&f!=='todos')?'todos':f;renderAtivos();vivo(document.getElementById('view'),false);}
+function matchFiltro(p){if(filtro==='aguarda')return p.visitaEm!==ymd();if(filtro==='pend')return (p.pendencias||[]).some(x=>!x.done);if(filtro==='uti')return isUTI(p);return true;}
+const MOV_REDUZIDO=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+function vivo(root,anima){
+  if(!root)return;
+  root.querySelectorAll('[data-w]').forEach(el=>{const w=el.getAttribute('data-w')+'%';if(!anima||MOV_REDUZIDO){el.style.width=w;return;}el.style.width='0';requestAnimationFrame(()=>requestAnimationFrame(()=>{el.style.width=w;}));});
+  if(!anima||MOV_REDUZIDO)return;
+  root.classList.remove('anima');void root.offsetWidth;root.classList.add('anima');clearTimeout(root._an);root._an=setTimeout(()=>root.classList.remove('anima'),900);
+  root.querySelectorAll('[data-conta]').forEach(el=>{const n=+el.getAttribute('data-conta')||0;if(n<2)return;const t0=performance.now();const f=t=>{const k=Math.min(1,(t-t0)/650);el.textContent=Math.round(n*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(f);};el.textContent='0';requestAnimationFrame(f);});
+}
+function vazio(ic,titulo,texto,acao){return `<div class="empty"><span class="ei"><i class="ti ${ic}"></i></span><h3>${titulo}</h3>${texto?`<p>${texto}</p>`:''}${acao||''}</div>`;}
+function nomeSetor(k){if(k==='Sem setor')return k;return String(k).toLowerCase().split(' ').map((w,i)=>/^(uti|cti|uci|uco|ps|pa|utq|ucc|uce)$/.test(w)?w.toUpperCase():(i===0?w.charAt(0).toUpperCase()+w.slice(1):w)).join(' ');}
+function corSetor(k){if(/\b(UTI|CTI|UCI|UCO)\b/.test(k))return '--c-rosa';const pal=['--c-azul','--c-verde','--c-violeta','--c-teal','--c-laranja','--c-ciano'];let h=0;for(const c of String(k))h=(h*31+c.charCodeAt(0))>>>0;return pal[h%pal.length];}
+function buscaRender(){tab==='ativos'?renderListOnly():renderSaidasLista();}
+function limparBusca(){busca='';const s=document.getElementById('sin');if(s){s.value='';s.focus();}buscaRender();}
+function campoBusca(){return `<label class="busca"><i class="ti ti-search" aria-hidden="true"></i><input class="search" id="sin" type="text" name="filtro-leito" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" data-1p-ignore data-lpignore="true" placeholder="Buscar leito, nome ou diagnóstico" aria-label="Buscar paciente" value="${esc(busca)}" oninput="onBusca(this)" onkeydown="if(event.key==='Escape'&&this.value){event.stopPropagation();limparBusca();}" onfocus="if(buscaSuja(this.value)){this.value='';busca='';buscaRender();}"><kbd aria-hidden="true">/</kbd></label>`;}
+document.addEventListener('keydown',e=>{
+  const m=document.getElementById('modal');
+  if(e.key==='Escape'&&m){const box=m.querySelector('.box');const temCampo=box&&box.querySelector('textarea:not([readonly]),select,input:not([type=hidden]):not([type=file]):not([readonly])');if(draftKey||!temCampo)closeModal();return;}
+  const tg=e.target;const digitando=tg&&(/^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName)||tg.isContentEditable);
+  if(e.key==='/'&&!digitando&&!m&&!e.metaKey&&!e.ctrlKey){const s=document.getElementById('sin');if(s){e.preventDefault();s.focus();s.select();}}
+});
 function examesFmt(p){return [p.laboratorio,p.culturas,p.imagem].filter(Boolean).join('\n')||p.exames||'';}
 let examOpen=new Set(); let examAllOpen=false;
 let obsOpen=new Set();   /* observações começam recolhidas: o texto da IA é longo */
-function toggleExames(id){const o=examOpen.has(id);o?examOpen.delete(id):examOpen.add(id);const b=document.getElementById('exb-'+id),c=document.getElementById('exc-'+id);if(b)b.style.display=o?'none':'';if(c)c.textContent=o?'▸':'▾';}
-function toggleObs(id){const o=obsOpen.has(id);o?obsOpen.delete(id):obsOpen.add(id);const b=document.getElementById('obb-'+id),c=document.getElementById('obc-'+id);if(b)b.style.display=o?'none':'';if(c)c.textContent=o?'▸':'▾';}
+function toggleExames(id){const o=examOpen.has(id);o?examOpen.delete(id):examOpen.add(id);const b=document.getElementById('exb-'+id),c=document.getElementById('exc-'+id);if(b)b.style.display=o?'none':'';if(c)c.classList.toggle('on',!o);}
+function toggleObs(id){const o=obsOpen.has(id);o?obsOpen.delete(id):obsOpen.add(id);const b=document.getElementById('obb-'+id),c=document.getElementById('obc-'+id);if(b)b.style.display=o?'none':'';if(c)c.classList.toggle('on',!o);}
 function toggleAllExames(){examAllOpen=!examAllOpen;examOpen.clear();if(examAllOpen)ativos().forEach(p=>{if(examesFmt(p))examOpen.add(p.id);});render();}
 
 /* O Chrome trata qualquer campo de texto solto como login e injeta o e-mail da conta
    aqui — a lista de pacientes ficava vazia "sozinha". Valor com "@" nunca é busca. */
 function buscaSuja(q){return q.indexOf('@')>=0;}
 function matchBusca(p){const q=busca.trim().toLowerCase();if(!q||buscaSuja(q))return true;return [p.leito,p.nome,p.diagnosticos,p.setor].some(x=>(x||'').toLowerCase().includes(q));}
-function onBusca(el){if(buscaSuja(el.value)){el.value='';busca='';}else busca=el.value;renderListOnly();}
+function onBusca(el){if(buscaSuja(el.value)){el.value='';busca='';}else busca=el.value;buscaRender();}
 
 /* ---------- Lista densa ----------
    O card completo tinha 746px de altura: 1,05 paciente por tela num celular
@@ -393,26 +715,27 @@ let abertos = new Set();
 function toggleDenso(){ denso = !denso; localStorage.setItem('enf_denso', denso ? '1' : '0'); abertos.clear(); render(); }
 function toggleCard(id, ev){
   if (ev && ev.target.closest('button, input, label, .pt-prev')) return; // não abre ao clicar num controle
-  abertos.has(id) ? abertos.delete(id) : abertos.add(id);
+  abertos.has(id) ? abertos.delete(id) : (abertos.add(id), recemAberto = id);
   renderListOnly();
+  recemAberto = null;
 }
 function ptRow(p){
   const meta = [p.idade || '', p.sexo || ''].filter(Boolean).join(' · ');
   const pend = (p.pendencias || []).filter(x => !x.done).length;
   const visitHoje = p.visitaEm === ymd();
   const dx1 = String(p.diagnosticos || '').split('\n').map(x => x.replace(/^[-•*>]\s*/, '').trim()).filter(Boolean)[0] || '';
-  return `<div class="pt-row" onclick="toggleCard('${p.id}',event)" tabindex="0" role="button"
+  return `<div class="pt-row${visitHoje ? ' vista' : ''}" onclick="toggleCard('${p.id}',event)" tabindex="0" role="button"
       onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCard('${p.id}')}"
-      aria-label="Abrir ficha de ${esc(p.nome || 'paciente')}">
+      aria-label="Abrir ficha de ${esc(p.nome || 'paciente')}, leito ${esc(p.leito || 'sem número')}">
     <div class="pr-leito">${esc(p.leito || '—')}</div>
     <div class="pr-main">
       <div class="pr-l1"><span class="pr-nome">${esc(p.nome || 'Paciente')}</span></div>
       <div class="pr-dx">${meta ? `<span class="pr-meta">${esc(meta)}</span>` : ''}${dx1 ? esc(dx1) : '<span class="pt-muted">sem diagnóstico</span>'}</div>
     </div>
     <div class="pr-sinais">
-      ${pend ? `<span class="pr-badge" title="${pend} pendência(s) em aberto">${pend}</span>` : ''}
-      <span class="pr-dot ${visitHoje ? 'ok' : 'wait'}" title="${visitHoje ? 'visto hoje' : 'aguarda visita'}"></span>
-      <i class="ti ti-chevron-right pr-chev"></i>
+      ${pend ? `<span class="pr-badge" title="${pend} pendência(s) em aberto"><i class="ti ti-list-check" aria-hidden="true"></i>${pend}</span>` : ''}
+      <span class="pr-vis ${visitHoje ? 'ok' : 'wait'}" title="${visitHoje ? 'Visto hoje' : 'Aguarda visita'}"><i class="ti ${visitHoje ? 'ti-circle-check' : 'ti-clock'}" aria-hidden="true"></i><span>${visitHoje ? 'Visto hoje' : 'Aguarda visita'}</span></span>
+      <i class="ti ti-chevron-right pr-chev" aria-hidden="true"></i>
     </div>
   </div>`;
 }
@@ -422,23 +745,24 @@ function ptCard(p){
   const pend=(p.pendencias||[]);
   const exFmt=examesFmt(p);
   const visitHoje=p.visitaEm===ymd();
-  const pendHtml=`<div class="pt-pend"><div class="pt-pend-h"><span class="pt-pend-l"><b>Pendências</b><button class="mini-ed" onclick="editCampo('${p.id}','pendencias')"><i class="ti ti-pencil"></i></button></span><span class="pt-prev${p.previsaoAlta?'':' empty'}" onclick="editPrevAlta('${p.id}')" title="Previsão de alta — clique para editar"><i class="ti ti-calendar"></i> ${p.previsaoAlta?('Alta: '+esc(fmtData(p.previsaoAlta))):'+ previsão de alta'}</span></div>${pend.length?pend.map(it=>`<label class="pend-item${it.done?' done':''}"><input type="checkbox" ${it.done?'checked':''} onclick="togglePend('${p.id}','${it.id}')"><span>${esc(it.t)}</span></label>`).join(''):'<div class="pend-empty">Nenhuma pendência.</div>'}</div>`;
+  const abertasN=pend.filter(x=>!x.done).length;
+  const pendHtml=`<div class="pt-pend"><div class="pt-pend-h"><span class="pt-pend-l"><b><i class="ti ti-list-check" aria-hidden="true"></i> Pendências</b>${pend.length?`<span class="pend-n">${abertasN?abertasN+' em aberto':'todas feitas'}</span>`:''}<button class="mini-ed" onclick="editCampo('${p.id}','pendencias')" aria-label="Editar pendências" title="Editar pendências"><i class="ti ti-pencil"></i></button></span><span class="pt-prev${p.previsaoAlta?'':' empty'}" role="button" tabindex="0" onclick="editPrevAlta('${p.id}')" onkeydown="if(event.key==='Enter'){editPrevAlta('${p.id}')}" title="Previsão de alta: toque para editar"><i class="ti ${p.previsaoAlta?'ti-calendar-event':'ti-calendar-plus'}" aria-hidden="true"></i> ${p.previsaoAlta?('Alta prevista '+esc(fmtData(p.previsaoAlta))):'Previsão de alta'}</span></div>${pend.length?pend.map(it=>`<label class="pend-item${it.done?' done':''}"><input type="checkbox" ${it.done?'checked':''} onclick="togglePend('${p.id}','${it.id}')"><span>${esc(it.t)}</span></label>`).join(''):'<div class="pend-empty">Nenhuma pendência.</div>'}</div>`;
   const barraFechar = (denso && abertos.has(p.id)) ? `<button type="button" class="pt-fechar" onclick="toggleCard('${p.id}')" aria-label="Recolher a ficha de ${esc(p.nome||'paciente')}"><i class="ti ti-chevron-up"></i> Recolher</button>` : '';
-  return `<div class="pt-card${denso && abertos.has(p.id) ? ' aberta' : ''}">
+  return `<div class="pt-card${denso && abertos.has(p.id) ? ' aberta' : ''}${recemAberto===p.id?' entra':''}">
     ${barraFechar}
     <div class="leito"><div class="ln">${esc(p.leito||'—')}</div>${p.setor?`<div class="ls">${esc(p.setor)}</div>`:''}</div>
     <div class="pt-main">
-      <div class="pt-top"><span class="nome">${esc(p.nome||'Paciente')}</span>${meta?`<span class="meta">${esc(meta)}</span>`:''}${visitHoje?'<span class="chip-hoje"><i class="ti ti-check"></i> visto hoje</span>':'<span class="chip-wait"><i class="ti ti-clock"></i> aguarda visita</span>'}</div>
-      <div class="pt-field"><b>Dx:</b> <button class="mini-ed" onclick="editCampo('${p.id}','dx')"><i class="ti ti-pencil"></i></button>${p.diagnosticos?('\n'+esc(bullets(p.diagnosticos))):' <span class="pt-muted">—</span>'}</div>
-      <div class="pt-field pt-exwrap">${exFmt?`<div class="pt-exh" onclick="toggleExames('${p.id}')" style="cursor:pointer;display:flex;align-items:center;gap:6px"><b>Exames</b><span class="pt-muted" style="font-weight:400">(${exFmt.split('\n').filter(Boolean).length})</span><button class="mini-ed" onclick="event.stopPropagation();openForm('${p.id}')"><i class="ti ti-pencil"></i></button><span id="exc-${p.id}" style="margin-left:auto;color:var(--muted)">${examOpen.has(p.id)?'▾':'▸'}</span></div><div id="exb-${p.id}" style="${examOpen.has(p.id)?'':'display:none;'}white-space:pre-wrap;margin-top:2px">${esc(bullets(exFmt))}</div>`:`<b>Exames:</b> <button class="mini-ed" onclick="openForm('${p.id}')"><i class="ti ti-pencil"></i></button> <span class="pt-muted">—</span>`}</div>
+      <div class="pt-top"><span class="nome">${esc(p.nome||'Paciente')}</span>${meta?`<span class="meta">${esc(meta)}</span>`:''}${visitHoje?'<span class="chip-hoje"><i class="ti ti-circle-check"></i> Visto hoje</span>':'<span class="chip-wait"><i class="ti ti-clock"></i> Aguarda visita</span>'}</div>
+      <div class="pt-field"><b>Dx:</b> <button class="mini-ed" onclick="editCampo('${p.id}','dx')" aria-label="Editar diagnósticos" title="Editar diagnósticos"><i class="ti ti-pencil"></i></button>${p.diagnosticos?('\n'+esc(bullets(p.diagnosticos))):' <span class="pt-muted">—</span>'}</div>
+      <div class="pt-field pt-exwrap">${exFmt?`<div class="pt-exh" onclick="toggleExames('${p.id}')" style="cursor:pointer;display:flex;align-items:center;gap:6px"><b>Exames</b><span class="pt-muted" style="font-weight:400">(${exFmt.split('\n').filter(Boolean).length})</span><button class="mini-ed" onclick="event.stopPropagation();openForm('${p.id}')" aria-label="Editar exames" title="Editar exames"><i class="ti ti-pencil"></i></button><i id="exc-${p.id}" class="ti ti-chevron-down chev${examOpen.has(p.id)?' on':''}" aria-hidden="true"></i></div><div id="exb-${p.id}" style="${examOpen.has(p.id)?'':'display:none;'}white-space:pre-wrap;margin-top:2px">${esc(bullets(exFmt))}</div>`:`<b>Exames:</b> <button class="mini-ed" onclick="openForm('${p.id}')" aria-label="Editar exames" title="Editar exames"><i class="ti ti-pencil"></i></button> <span class="pt-muted">—</span>`}</div>
       ${pendHtml}
-      ${p.obs?`<div class="pt-field pt-obswrap"><div class="pt-exh" onclick="toggleObs('${p.id}')" style="cursor:pointer;display:flex;align-items:center;gap:6px"><i class="ti ti-note"></i><b>Observações</b><span class="pt-muted" style="font-weight:400">(${p.obs.split('\n').filter(l=>l.trim()).length})</span><button class="mini-ed" onclick="event.stopPropagation();openForm('${p.id}')"><i class="ti ti-pencil"></i></button><span id="obc-${p.id}" style="margin-left:auto;color:var(--muted)">${obsOpen.has(p.id)?'▾':'▸'}</span></div><div id="obb-${p.id}" class="pt-obs" style="${obsOpen.has(p.id)?'':'display:none;'}">${esc(p.obs)}</div></div>`:''}
+      ${p.obs?`<div class="pt-field pt-obswrap"><div class="pt-exh" onclick="toggleObs('${p.id}')" style="cursor:pointer;display:flex;align-items:center;gap:6px"><i class="ti ti-note"></i><b>Observações</b><span class="pt-muted" style="font-weight:400">(${p.obs.split('\n').filter(l=>l.trim()).length})</span><button class="mini-ed" onclick="event.stopPropagation();openForm('${p.id}')" aria-label="Editar observações" title="Editar observações"><i class="ti ti-pencil"></i></button><i id="obc-${p.id}" class="ti ti-chevron-down chev${obsOpen.has(p.id)?' on':''}" aria-hidden="true"></i></div><div id="obb-${p.id}" class="pt-obs" style="${obsOpen.has(p.id)?'':'display:none;'}">${esc(p.obs)}</div></div>`:''}
     </div>
     <div class="pt-acts">
       <button class="visita" onclick="openVisita('${p.id}')"><i class="ti ti-stethoscope"></i> Visita</button>
       <button onclick="openForm('${p.id}')"><i class="ti ti-clipboard-text"></i> Ficha</button>
       <button class="saida" onclick="openSaida('${p.id}')"><i class="ti ti-door-exit"></i> Saída</button>
-      <button onclick="delPac('${p.id}')"><i class="ti ti-trash"></i></button>
+      <button class="del" onclick="delPac('${p.id}')" aria-label="Excluir paciente" title="Excluir paciente"><i class="ti ti-trash"></i><span>Excluir</span></button>
     </div>
   </div>`;
 }
@@ -446,7 +770,7 @@ function editCampo(pid,campo){
   const p=state.pacientes.find(x=>x.id===pid);if(!p)return;
   const M={dx:{l:'Diagnósticos / hipóteses',v:bullets(p.diagnosticos)},pendencias:{l:'Pendências',v:(p.pendencias||[]).map(x=>'- '+x.t).join('\n')}}[campo];
   if(!M)return;
-  modal(`<h3>Editar ${M.l}</h3><div class="hint" style="margin-bottom:8px">${esc(p.nome||'Paciente')} · leito ${esc(p.leito||'—')} — um item por linha</div>
+  modal(`<h3>Editar ${M.l}</h3><div class="hint" style="margin-bottom:8px">${esc(p.nome||'Paciente')} · leito ${esc(p.leito||'—')} · um item por linha</div>
    <div class="field"><textarea id="ec_txt" placeholder="- um por linha">${esc(M.v)}</textarea></div>
    <div class="row actions"><button class="btn btn-p" onclick="saveCampo('${pid}','${campo}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
   const t=document.getElementById('ec_txt');if(t){t.focus();t.setSelectionRange(t.value.length,t.value.length);}
@@ -456,35 +780,37 @@ function saveCampo(pid,campo){
   const v=getVal('ec_txt');
   if(campo==='dx')p.diagnosticos=bullets(v);
   else if(campo==='pendencias'){const oldP=p.pendencias||[];p.pendencias=v.split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean).map(t=>{const ex=oldP.find(o=>up(o.t)===up(t));return {id:ex?ex.id:uid(),t,done:ex?ex.done:false};});}
-  persist();closeModal();render();
+  persist();closeModal();render();toast(campo==='dx'?'Diagnósticos salvos.':'Pendências salvas.','ok');
 }
 function editPrevAlta(pid){
   const p=state.pacientes.find(x=>x.id===pid);if(!p)return;
   modal(`<h3><i class="ti ti-calendar"></i> Previsão de alta</h3>
-   <div class="hint" style="margin-bottom:8px">${esc(p.nome||'Paciente')} · leito ${esc(p.leito||'—')} — opcional, preenchimento manual.</div>
+   <div class="hint" style="margin-bottom:8px">${esc(p.nome||'Paciente')} · leito ${esc(p.leito||'—')}. Opcional, preenchida à mão.</div>
    <div class="field"><label>Data prevista para a alta</label><input type="date" id="pa_date" value="${esc(p.previsaoAlta||'')}"></div>
    <div class="row actions"><button class="btn btn-p" onclick="savePrevAlta('${pid}')">Salvar</button>${p.previsaoAlta?`<button class="btn btn-g" onclick="savePrevAlta('${pid}',true)">Remover</button>`:''}<button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
 }
 function savePrevAlta(pid,clear){
   const p=state.pacientes.find(x=>x.id===pid);if(!p)return;p.updatedAt=Date.now();
-  p.previsaoAlta=clear?'':getVal('pa_date');persist();closeModal();render();
+  p.previsaoAlta=clear?'':getVal('pa_date');persist();closeModal();render();toast(clear?'Previsão de alta removida.':(p.previsaoAlta?'Previsão de alta salva.':'Previsão de alta sem data.'),'ok');
 }
 
 function renderAtivos(){
-  const list=ativos().slice().sort(leitoSort).filter(matchBusca);
-  const tot=ativos().length;
-  const uti=ativos().filter(p=>/\buti\b/i.test(p.setor||'')||/\buti\b/i.test(p.leito||'')).length;
-  const comPend=ativos().filter(p=>(p.pendencias||[]).some(x=>!x.done)).length;
+  const at=ativos(), tot=at.length, hoje=ymd();
+  const uti=at.filter(isUTI).length;
+  const comPend=at.filter(p=>(p.pendencias||[]).some(x=>!x.done)).length;
+  const vistos=at.filter(p=>p.visitaEm===hoje).length;
+  const pct=tot?Math.round(vistos/tot*100):0;
+  const kpi=(id,cor,ic,l,n,extra)=>`<button type="button" class="kpi k-${cor}${filtro===id&&id!=='todos'?' on':''}" onclick="setFiltro('${id}')" aria-pressed="${filtro===id&&id!=='todos'}" title="${filtro===id&&id!=='todos'?'Mostrar todos':(id==='todos'?'Mostrar todos':'Filtrar: '+l)}"><span class="ki" aria-hidden="true"><i class="ti ${ic}"></i></span><span class="kt"><b class="v" data-conta="${n}">${n}</b><span class="l">${l}</span>${extra||''}</span></button>`;
   let html=`<div class="cards">
-    <div class="kpi"><div class="l">Internados</div><div class="v">${tot}</div></div>
-    <div class="kpi blue"><div class="l">Em UTI</div><div class="v">${uti}</div></div>
-    <div class="kpi"><div class="l">Com pendências</div><div class="v">${comPend}</div></div>
-    <div class="kpi green"><div class="l">Saídas registradas</div><div class="v">${saidos().length}</div></div>
+    ${kpi('todos','azul','ti-bed','Internados',tot)}
+    ${kpi('aguarda','laranja','ti-stethoscope','Aguardam visita',tot-vistos,`<span class="kbar" aria-hidden="true"><i data-w="${pct}"></i></span><small>${vistos} de ${tot} vistos hoje</small>`)}
+    ${kpi('pend','violeta','ti-list-check','Com pendências',comPend)}
+    ${kpi('uti','rosa','ti-heart-rate-monitor','Em UTI',uti)}
   </div>
   <div class="bar">
-    <input class="search" id="sin" type="text" name="filtro-leito" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" data-1p-ignore data-lpignore="true" placeholder="Buscar leito, nome ou diagnóstico..." value="${esc(busca)}" oninput="onBusca(this)" onfocus="if(buscaSuja(this.value)){this.value='';busca='';renderListOnly();}">
-    <div class="right"><button class="btn btn-g btn-sm" onclick="toggleAllExames()" title="Recolher/expandir os exames de todos">${examAllOpen?'<i class="ti ti-chevrons-up"></i> Exames':'<i class="ti ti-chevrons-down"></i> Exames'}</button><button class="btn btn-g btn-sm" onclick="toggleDenso()" title="Alternar entre lista compacta e fichas completas">${denso?'<i class="ti ti-layout-rows"></i> Fichas':'<i class="ti ti-list"></i> Compacta'}</button><button class="btn btn-g btn-sm" onclick="resumoPlantao()"><i class="ti ti-clipboard-list"></i> Plantão</button><button class="btn btn-p btn-sm" onclick="openForm()">+ Paciente</button></div>
-  </div><div id="ptlist"></div>`;
+    ${campoBusca()}
+    <div class="right"><button class="btn btn-g btn-sm" onclick="toggleAllExames()" title="Recolher ou expandir os exames de todos">${examAllOpen?'<i class="ti ti-chevrons-up"></i> Exames':'<i class="ti ti-chevrons-down"></i> Exames'}</button><button class="btn btn-g btn-sm" onclick="toggleDenso()" title="Alternar entre lista compacta e fichas completas">${denso?'<i class="ti ti-layout-rows"></i> Fichas':'<i class="ti ti-list"></i> Compacta'}</button><button class="btn btn-g btn-sm" onclick="resumoPlantao()"><i class="ti ti-clipboard-list"></i> Plantão</button><button class="btn btn-p btn-sm bt-novo" onclick="openForm()"><i class="ti ti-plus"></i> Novo paciente</button></div>
+  </div><div id="filtroInfo"></div><div id="ptlist"></div>`;
   document.getElementById('view').innerHTML=html;
   const inp=document.getElementById('sin');if(inp&&busca){inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length);}
   renderListOnly();
@@ -493,30 +819,44 @@ function grupoKeys(groups){return Object.keys(groups).sort((a,b)=>a==='Sem setor
 function agrupaPorSetor(list){const g={};list.forEach(p=>{const k=(p.setor||'').replace(/\s+/g,' ').trim().toUpperCase()||'Sem setor';(g[k]=g[k]||[]).push(p);});Object.keys(g).forEach(k=>g[k].sort((a,b)=>String(a.leito||'').localeCompare(String(b.leito||''),'pt',{numeric:true})));return g;}
 function renderListOnly(){
   const box=document.getElementById('ptlist');if(!box)return;
-  const list=ativos().filter(matchBusca);
-  if(!list.length){box.innerHTML=ativos().length?'<div class="empty">Nenhum paciente encontrado para a busca.</div>':'<div class="empty">Nenhum paciente internado.<br>Toque em <b>+ Paciente</b> para começar.</div>';return;}
+  const list=ativos().filter(matchBusca).filter(matchFiltro);
+  const fi=document.getElementById('filtroInfo');
+  if(fi)fi.innerHTML=(filtro!=='todos'&&ativos().length)?`<div class="filtro-info"><i class="ti ti-filter" aria-hidden="true"></i><span>${FILTRO_L[filtro]}: <b>${list.length}</b> ${list.length===1?'paciente':'pacientes'}</span><button type="button" onclick="setFiltro('todos')"><i class="ti ti-x" aria-hidden="true"></i> Mostrar todos</button></div>`:'';
+  if(!list.length){
+    const q=busca.trim();
+    if(!ativos().length)box.innerHTML=vazio('ti-bed','Nenhum paciente internado','Cadastre o primeiro leito. Cole a evolução e a IA preenche a ficha, ou preencha à mão.','<button class="btn btn-p" onclick="openForm()"><i class="ti ti-plus"></i> Novo paciente</button>');
+    else if(q&&!buscaSuja(q))box.innerHTML=vazio('ti-search','Nada encontrado para "'+esc(q)+'"','Busque pelo leito, pelo nome ou pelo diagnóstico.','<button class="btn btn-g" onclick="limparBusca()"><i class="ti ti-x"></i> Limpar busca</button>');
+    else if(filtro==='aguarda')box.innerHTML=vazio('ti-circle-check','Todos já foram vistos hoje','A visita do dia está completa.','<button class="btn btn-g" onclick="setFiltro(\'todos\')">Mostrar todos</button>');
+    else box.innerHTML=vazio('ti-filter','Nenhum paciente neste filtro','','<button class="btn btn-g" onclick="setFiltro(\'todos\')">Mostrar todos</button>');
+    return;}
   const g=agrupaPorSetor(list);
-  box.innerHTML=grupoKeys(g).map(k=>`<div class="setor-h"><i class="ti ti-building-hospital"></i> ${esc(k)} <span>${g[k].length}</span></div>`+g[k].map(ptCard).join('')).join('');
+  box.innerHTML=grupoKeys(g).map(k=>`<div class="setor-h" style="--sc:var(${corSetor(k)})"><i class="ti ${/\b(UTI|CTI|UCI|UCO)\b/.test(k)?'ti-heart-rate-monitor':'ti-building-hospital'}" aria-hidden="true"></i><span class="sn">${esc(nomeSetor(k))}</span><span class="n">${g[k].length}</span></div>`+g[k].map(ptCard).join('')).join('');
 }
 
 function renderSaidas(){
-  const list=saidos().slice().sort((a,b)=>String((b.saida&&b.saida.data)||'').localeCompare(String((a.saida&&a.saida.data)||'')));
-  let html=`<div class="bar"><div style="color:var(--muted);font-size:13px;font-weight:600">${list.length} saída(s) registrada(s)</div></div>`;
-  if(!list.length){html+='<div class="empty">Nenhuma saída registrada ainda.<br>Em um paciente internado, toque em <b>Saída</b> para registrar alta, óbito ou transferência.</div>';}
-  else html+=list.map(p=>{const s=p.saida||{};const sd=SAIDA[s.tipo]||{l:s.tipo||'Saída',c:'b-obito'};
+  const n=saidos().length;
+  document.getElementById('view').innerHTML=`<div class="bar sai-bar"><div class="sai-cont"><span class="ki" aria-hidden="true"><i class="ti ti-door-exit"></i></span><span><b>${n}</b> ${n===1?'saída registrada':'saídas registradas'}</span></div>${n?campoBusca():''}</div><div id="salist"></div>`;
+  const inp=document.getElementById('sin');if(inp&&busca){inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length);}
+  renderSaidasLista();
+}
+function renderSaidasLista(){
+  const box=document.getElementById('salist');if(!box)return;
+  if(!saidos().length){box.innerHTML=vazio('ti-door-exit','Nenhuma saída registrada','Quando um paciente tiver alta, óbito ou transferência, abra a ficha dele na lista de internados e toque em Saída.','<button class="btn btn-g" onclick="setTab(\'ativos\')"><i class="ti ti-bed"></i> Ver internados</button>');return;}
+  const list=saidos().filter(matchBusca).sort((a,b)=>String((b.saida&&b.saida.data)||'').localeCompare(String((a.saida&&a.saida.data)||'')));
+  if(!list.length){const q=busca.trim();box.innerHTML=vazio('ti-search','Nada encontrado para "'+esc(q)+'"','Busque pelo leito, pelo nome ou pelo diagnóstico.','<button class="btn btn-g" onclick="limparBusca()"><i class="ti ti-x"></i> Limpar busca</button>');return;}
+  box.innerHTML=list.map(p=>{const s=p.saida||{};const sd=SAIDA[s.tipo]||{l:s.tipo||'Saída',c:'b-obito',i:'ti-door-exit'};
     return `<div class="pt-card sa">
-      <div class="leito" style="background:var(--muted)"><div class="ln">${esc(p.leito||'—')}</div></div>
+      <div class="leito sai"><div class="ln">${esc(p.leito||'—')}</div></div>
       <div class="pt-main">
-        <div class="pt-top"><span class="nome">${esc(p.nome||'Paciente')}</span><span class="badge ${sd.c}">${sd.l}</span><span class="meta">${fmtData(s.data)}${s.destino?(' · '+esc(s.destino)):''}</span></div>
+        <div class="pt-top"><span class="nome">${esc(p.nome||'Paciente')}</span><span class="badge ${sd.c}"><i class="ti ${sd.i||'ti-door-exit'}" aria-hidden="true"></i> ${sd.l}</span><span class="meta">${fmtData(s.data)}${s.destino?(' · '+esc(s.destino)):''}</span></div>
         ${p.diagnosticos?`<div class="pt-field"><b>Dx:</b> ${esc(p.diagnosticos)}</div>`:''}
         ${s.obs?`<div class="pt-obs"><i class="ti ti-note"></i> ${esc(s.obs)}</div>`:''}
       </div>
       <div class="pt-acts">
-        <button onclick="reabrir('${p.id}')">↩️ Reinternar</button>
-        <button onclick="delPac('${p.id}')"><i class="ti ti-trash"></i></button>
+        <button onclick="reabrir('${p.id}')"><i class="ti ti-arrow-back-up"></i> Reinternar</button>
+        <button class="del" onclick="delPac('${p.id}')" aria-label="Excluir registro" title="Excluir registro"><i class="ti ti-trash"></i><span>Excluir</span></button>
       </div>
     </div>`;}).join('');
-  document.getElementById('view').innerHTML=html;
 }
 
 /* ===== ficha do paciente (dados de base + extração por IA) ===== */
@@ -537,14 +877,14 @@ async function gravarAdmissao(id){
   admRec.ondataavailable=e=>{if(e.data&&e.data.size)admChunks.push(e.data);};
   admRec.onstop=()=>{admStop();processAdmissaoAudio(id);};
   admRec.start(1000);admListening=true;
-  if(btn){btn.innerHTML='⏹️ Parar e transcrever';btn.style.background='#dc2626';btn.style.color='#fff';}
+  if(btn){btn.innerHTML='<i class="ti ti-player-stop-filled"></i> Parar e transcrever';btn.classList.add('gravando');}
 }
 async function processAdmissaoAudio(id){
   const blob=new Blob(admChunks,{type:(admChunks[0]&&admChunks[0].type)||'audio/webm'});
   const btn=document.getElementById('admRecBtn');
-  const reset=()=>{if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-microphone"></i> '+(id?'Gravar evolução':'Gravar admissão');btn.style.background='';btn.style.color='';}};
+  const reset=()=>{if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-microphone"></i> '+(id?'Gravar evolução':'Gravar admissão');btn.classList.remove('gravando');}};
   if(!blob.size){reset();return;}
-  if(btn){btn.disabled=true;btn.style.background='';btn.style.color='';btn.innerHTML='<span class="spin"></span> Transcrevendo…';}
+  if(btn){btn.disabled=true;btn.classList.remove('gravando');btn.innerHTML='<span class="spin"></span> Transcrevendo';}
   try{
     const b64=await blobToB64(blob);
     if(b64.length>9400000){toast('Gravação muito longa (~30–40 min por bloco). Grave em partes menores.','erro');reset();return;}
@@ -552,7 +892,7 @@ async function processAdmissaoAudio(id){
     const prompt='Você recebeu o ÁUDIO da ADMISSÃO de um paciente sendo INTERNADO (anamnese de admissão — fala do médico e do paciente). Transcreva internamente e organize uma ANAMNESE DE ADMISSÃO clara em português do Brasil, com as seções: Identificação, Queixa principal, História da doença atual, Antecedentes pessoais, Medicações em uso, Alergias, Exame físico e Hipóteses/Conduta inicial. REGRAS: a HDA deve ser TEXTO CORRIDO e CRONOLÓGICO, conectando os sintomas; em Antecedentes use os DIAGNÓSTICOS padronizados (ex.: "pressão alta"→HAS, "colesterol alto"→dislipidemia/DLP, "diabetes"→DM2), não a fala literal; em Medicações em uso liste APENAS os nomes; não invente — escreva "[não informado]" se faltar; texto limpo, SEM markdown (sem # nem *).';
     const text=await MT.aiAudio(b64,mt,prompt);
     const ev=document.getElementById('f_evol');if(ev)ev.value=(text||'').trim();
-    if(btn)btn.innerHTML='<span class="spin"></span> Preenchendo a ficha…';
+    if(btn)btn.innerHTML='<span class="spin"></span> Preenchendo a ficha';
     await extrairEvol(id||'');
   }catch(e){toast(e.message||'Falha ao processar o áudio.','erro');}
   finally{reset();}
@@ -560,12 +900,12 @@ async function processAdmissaoAudio(id){
 function openForm(id){
   const p=id?state.pacientes.find(x=>x.id===id):{leito:'',setor:'',nome:'',idade:'',sexo:'',clinica:'Clínica Médica',diagnosticos:'',comorbidades:'',alergias:'',muc:'',hda:'',laboratorio:'',culturas:'',imagem:'',exameFisico:'',conduta:'',obs:''};
   const sx=['','M','F'].map(k=>`<option value="${k}" ${p.sexo===k?'selected':''}>${k||'—'}</option>`).join('');
-  modal(`<h3>${id?'Editar':'Novo'} paciente</h3>
+  modal(`<h3><i class="ti ${id?'ti-clipboard-text':'ti-user-plus'}"></i> ${id?'Editar':'Novo'} paciente</h3>
    <div class="ai-box">
-     <div class="ai-h"><i class="ti ti-sparkles"></i> ${id?'Atualizar pela nova evolução':'Colar evolução ou gravar a admissão — a IA preenche a ficha'}</div>
-     <textarea id="f_evol" placeholder="${id?'Cole a NOVA evolução de hoje — a IA ATUALIZA exames, exame físico, conduta e pendências, mantendo os dados de base.':'Cole aqui a evolução / prontuário do paciente. A IA extrai identificação, comorbidades, HDA, exames, exame físico, conduta e pendências.'}"></textarea>
+     <div class="ai-h"><i class="ti ti-sparkles"></i> ${id?'Atualizar pela nova evolução':'Cole a evolução ou grave a admissão: a IA preenche a ficha'}</div>
+     <textarea id="f_evol" placeholder="${id?'Cole a evolução nova de hoje. A IA atualiza exames, exame físico, conduta e pendências e mantém os dados de base.':'Cole aqui a evolução ou o prontuário do paciente. A IA extrai identificação, comorbidades, HDA, exames, exame físico, conduta e pendências.'}"></textarea>
      <div class="row"><button class="btn btn-p btn-sm" id="extrairBtn" onclick="extrairEvol('${id||''}')">${id?'<i class="ti ti-sparkles"></i> Atualizar dados':'<i class="ti ti-sparkles"></i> Extrair dados'}</button><button class="btn btn-g btn-sm" id="admRecBtn" onclick="gravarAdmissao('${id||''}')"><i class="ti ti-microphone"></i> ${id?'Gravar evolução':'Gravar admissão'}</button></div>
-     <div class="hint">Revise sempre o que a IA ${id?'atualizar (ela mescla com os dados atuais)':'preencher. O <b>leito</b> você informa manualmente'}. Para gravar, precisa de microfone e conta MedTech — grave com o consentimento do paciente.${MT.mode==='demo'?' <b>Entre na conta MedTech para usar a IA.</b>':''}</div>
+     <div class="hint">Revise sempre o que a IA ${id?'atualizar (ela mescla com os dados atuais)':'preencher. O <b>leito</b> você informa manualmente'}. Para gravar, precisa de microfone e conta MedTech. Grave só com o consentimento do paciente.${MT.mode==='demo'?' <b>Entre na conta MedTech para usar a IA.</b>':''}</div>
    </div>
    <div class="sec-h">Identificação</div>
    <div class="three"><div class="field"><label>Leito *</label><input id="f_leito" value="${esc(p.leito)}" placeholder="12A"></div>
@@ -573,7 +913,7 @@ function openForm(id){
      <div class="field"><label>Idade</label><input id="f_idade" value="${esc(p.idade)}" placeholder="74 anos"></div></div>
    <div class="two"><div class="field"><label>Setor / clínica</label><input id="f_setor" value="${esc(p.setor||p.clinica||'')}" placeholder="Clínica Médica, UTI, Cirurgia..."></div>
      <div class="field"><label>Sexo</label><select id="f_sexo">${sx}</select></div></div>
-   <div class="field"><label>Motivo da internação / hipóteses <span style="color:var(--muted);font-weight:400">(um por linha — vira o "IH POR")</span></label><textarea id="f_dx" placeholder="- um por linha">${esc(bullets(p.diagnosticos))}</textarea></div>
+   <div class="field"><label>Motivo da internação / hipóteses <span style="color:var(--muted);font-weight:400">(um por linha; vira o "IH POR")</span></label><textarea id="f_dx" placeholder="- um por linha">${esc(bullets(p.diagnosticos))}</textarea></div>
    <div class="sec-h">Dados de base</div>
    <div class="field"><label>Comorbidades</label><textarea id="f_comorb" placeholder="HAS, DM2...">${esc(p.comorbidades||'')}</textarea></div>
    <div class="two"><div class="field"><label>Alergias</label><input id="f_alergias" value="${esc(p.alergias||'')}" placeholder="Nega / ..."></div>
@@ -600,11 +940,11 @@ function saveForm(id){
   if(!o.leito&&!o.nome){toast('Informe ao menos o leito ou o nome do paciente.','erro');focarCampo(getVal('f_leito')?'f_nome':'f_leito');return;}
   if(id){const cur=state.pacientes.find(x=>x.id===id);if(!cur){state.pacientes.push({id,status:'ativo',criadoEm:nowISO(),...o,updatedAt:Date.now()});}else{delete cur.exames;Object.assign(cur,o,{updatedAt:Date.now()});}}
   else{state.pacientes.push({id:uid(),status:'ativo',criadoEm:nowISO(),...o,updatedAt:Date.now()});}
-  persist();clearDraft();closeModal();render();
+  persist();clearDraft();closeModal();render();toast(id?'Ficha salva.':'Paciente cadastrado.','ok');
 }
 function delPac(id){const p=state.pacientes.find(x=>x.id===id);if(!p)return;
-  if(confirm(`Excluir definitivamente ${p.nome||'este paciente'} (leito ${p.leito||'—'})?`)){MT.markDeleted(state,id);state.pacientes=state.pacientes.filter(x=>x.id!==id);persist();render();}}
-function reabrir(id){const p=state.pacientes.find(x=>x.id===id);if(!p)return;p.updatedAt=Date.now();p.status='ativo';delete p.saida;persist();render();}
+  if(confirm(`Excluir definitivamente ${p.nome||'este paciente'} (leito ${p.leito||'—'})?`)){MT.markDeleted(state,id);state.pacientes=state.pacientes.filter(x=>x.id!==id);persist();render();toast('Registro excluído.');}}
+function reabrir(id){const p=state.pacientes.find(x=>x.id===id);if(!p)return;p.updatedAt=Date.now();p.status='ativo';delete p.saida;persist();render();toast((p.nome||'Paciente')+' voltou para os internados.','ok');}
 function togglePend(pid,itemId){const p=state.pacientes.find(x=>x.id===pid);if(!p)return;const it=(p.pendencias||[]).find(x=>x.id===itemId);if(!it)return;it.done=!it.done;p.updatedAt=Date.now();persist();renderAtivos();}
 function oneLine(s){return String(s||'').replace(/\s*\n\s*/g,'; ').trim();}
 function bullets(s){return String(s||'').split('\n').map(x=>x.trim()).filter(Boolean).map(x=>/^[-•*>]/.test(x)?('- '+x.replace(/^[-•*>]\s*/,'')):('- '+x)).join('\n');}
@@ -661,19 +1001,21 @@ function renderSugestoes(id,txt,alvo){
   const ack=p.sugAck||[];
   const ackDia=(p.sugAckDia&&p.sugAckDia.data===ymd())?(p.sugAckDia.items||[]):[];
   _sugAtual=[];let html='',nItens=0;
-  String(txt||'').split('\n').map(l=>l.trim()).filter(Boolean).forEach(l=>{
+  String(txt||'').split('\n').map(l=>l.trim().replace(/<i class="ti ti-[\w-]+"><\/i>\s*/g,'').replace(/^(✅|⚠️|⚠)\s*/,'')).filter(Boolean).forEach(l=>{
     if(/^[-•*]\s/.test(l)){
       const item=l.replace(/^[-•*]\s*/,'');
       if((isDinamica(item)?ackDia:ack).some(a=>normSug(a)===normSug(item)))return; // estáticos: silenciados de vez; dinâmicos (PA/glicemia/febre): só no dia de hoje
       const i=_sugAtual.length;_sugAtual.push(item);nItens++;
-      html+=`<div class="sug-item"><div class="sug-tx">${mdInline(item)}</div><button class="sug-ok" onclick="ackSug('${id}',${i},this)" title="Marcar como resolvido — não sugerir de novo"><i class="ti ti-check"></i> OK</button></div>`;
+      html+=`<div class="sug-item"><div class="sug-tx">${mdInline(item)}</div><button class="sug-ok" onclick="ackSug('${id}',${i},this)" title="Marcar como resolvido e não sugerir de novo"><i class="ti ti-check"></i> OK</button></div>`;
     } else if(/^#{1,4}\s/.test(l)){
       html+=`<div class="sug-h">${esc(l.replace(/^#{1,4}\s*/,''))}</div>`;
-    } else { html+=`<div class="sug-p">${mdInline(l)}</div>`; }
+    } else if(/^sugest[õo]es de apoio/i.test(l)){ html+=`<div class="sug-p sug-nota"><i class="ti ti-alert-triangle"></i> ${mdInline(l)}</div>`; }
+    else if(/sem oportunidades?/i.test(l)){ html+=`<div class="sug-p sug-ok-l"><i class="ti ti-circle-check"></i> ${mdInline(l)}</div>`; }
+    else { html+=`<div class="sug-p">${mdInline(l)}</div>`; }
   });
-  if(!nItens && !/✅|sem oportunidade/i.test(txt)) html+='<div class="sug-p">✅ Sem novas oportunidades (os pontos marcados como OK foram ocultados).</div>';
+  if(!nItens && !/✅|sem oportunidade/i.test(txt)) html+='<div class="sug-p sug-ok-l"><i class="ti ti-circle-check"></i> Sem novas oportunidades (os pontos marcados como OK foram ocultados).</div>';
   const nAck=ack.length+ackDia.length;
-  if(nAck) html+=`<div class="sug-clear"><button onclick="limparAck('${id}')">↺ Limpar ${nAck} marcação(ões) "OK"</button></div>`;
+  if(nAck) html+=`<div class="sug-clear"><button onclick="limparAck('${id}')"><i class="ti ti-refresh"></i> Limpar ${nAck} marcação(ões) "OK"</button></div>`;
   alvo.innerHTML='<div class="sug-out">'+html+'</div>';
 }
 function ackSug(id,i,btn){
@@ -696,7 +1038,7 @@ function limparAck(id){
 }
 async function rodarAnalise(id,alvo,btn){
   const p=state.pacientes.find(x=>x.id===id);if(!p||!alvo)return;
-  alvo.innerHTML='<div class="sug-out"><span class="spin"></span> Analisando o caso e buscando oportunidades de melhoria…</div>';
+  alvo.innerHTML='<div class="sug-out"><span class="spin"></span> Analisando o caso</div>';
   if(btn)btn.disabled=true;
   try{
     const ack=(p.sugAck||[]);
@@ -704,7 +1046,7 @@ async function rodarAnalise(id,alvo,btn){
     const txt=await MT.ai(PROMPT_ANALISE+'\n\n=== CASO ===\n'+dadosParaAnalise(p)+ackBlock, 'gemini-2.5-pro');
     renderSugestoes(id,txt,alvo);
   }catch(e){
-    alvo.innerHTML='<div class="sug-out" style="color:var(--red)">⚠️ '+esc(e.message||'Falha na IA.')+(MT.mode==='demo'?' (Entre na conta MedTech para usar a IA.)':'')+'</div>';
+    alvo.innerHTML='<div class="sug-out sug-erro"><i class="ti ti-alert-triangle"></i> '+esc(e.message||'Falha na IA.')+(MT.mode==='demo'?' Entre na conta MedTech para usar a IA.':' Tente de novo em instantes.')+'</div>';
   }
   if(btn)btn.disabled=false;
 }
@@ -714,23 +1056,23 @@ function openVisita(id){
   const ef=(p.exameFisico&&p.exameFisico.trim())?p.exameFisico:EF_TEMPLATE;
   const efP=parseEF(ef);
   modal(`<h3><i class="ti ti-stethoscope"></i> Visita · ${esc(p.nome||'Paciente')}</h3>
-   <div class="hint" style="margin-bottom:6px">Leito ${esc(p.leito||'—')}${p.idade?(' · '+esc(p.idade)):''}. Atualize a evolução do dia — o exame físico já vem do dia anterior, edite só o que mudou.</div>
+   <div class="hint" style="margin-bottom:6px">Leito ${esc(p.leito||'—')}${p.idade?(' · '+esc(p.idade)):''}. Atualize a evolução do dia. O exame físico vem do dia anterior: edite só o que mudou.</div>
    <div class="field"><label>Evolução do dia <span style="color:var(--muted);font-weight:400">(queixas / intercorrências)</span></label><textarea id="v_evol" autocapitalize="characters" spellcheck="false" placeholder="PACIENTE ESTÁVEL, SEM QUEIXAS NO PERÍODO..." style="min-height:190px">${esc(p.evolucao||'')}</textarea></div>
    <div class="ai-box">
      <div class="ai-h"><i class="ti ti-camera"></i> Parâmetros das últimas 24h (foto)</div>
-     <div class="hint">Tire foto do controle hemodinâmico e, se tiver, da folha de diurese/balanço — <b>uma foto por folha</b>. Para a IA ler os últimos horários: <b>de frente, folha reta, sem sombra atravessada</b> no papel (a sombra da luz do teto some os valores das últimas colunas). <b>Confira sempre a linha transcrita</b> antes de salvar.</div>
+     <div class="hint">Tire foto do controle hemodinâmico e, se tiver, da folha de diurese/balanço. <b>Uma foto por folha</b>. Para a IA ler os últimos horários: <b>de frente, folha reta, sem sombra atravessada</b> no papel (a sombra da luz do teto some os valores das últimas colunas). <b>Confira sempre a linha transcrita</b> antes de salvar.</div>
      <input class="file-in" type="file" id="v_imgs" accept="image/*,.heic,.heif,.jpg,.jpeg,.png" multiple onchange="addParamImgs(this)">
      <div id="v_thumbs" class="thumbs"></div>
      <div class="row"><button class="btn btn-p" id="transBtn" style="width:100%" onclick="transcreverParams()"><i class="ti ti-sparkles"></i> Transcrever com IA</button></div>
    </div>
    <div class="field"><label>Parâmetros</label><textarea id="v_param" autocapitalize="characters" spellcheck="false" placeholder="PA ... // FC ... // FR ... // T ... // SPO2 ... // DX ... // DIURESE ... // BH ..." style="min-height:110px">${esc(p.parametros||'')}</textarea></div>
-   <div class="field"><label>Exame físico <span style="color:var(--muted);font-weight:400">(vem do dia anterior — edite o que mudou)</span></label>
+   <div class="field"><label>Exame físico <span style="color:var(--muted);font-weight:400">(vem do dia anterior; edite o que mudou)</span></label>
      <div class="ef-grid">${SISTEMAS.map(s=>`<div class="ef-row"><span class="ef-lbl">${s.l}</span><textarea id="ef_${s.k}" rows="1" autocapitalize="characters" spellcheck="false" placeholder="—">${esc(efP.map[s.k]||'')}</textarea></div>`).join('')}</div>
      <textarea id="ef_outros" class="ef-outros" autocapitalize="characters" spellcheck="false" placeholder="+ OUTROS ACHADOS (OPCIONAL)">${esc(efP.outros||'')}</textarea></div>
-   <div class="field"><label>Conduta <span style="color:var(--muted);font-weight:400">(uma por linha — "EXPLICO PLANO TERAPEUTICO" entra automático)</span></label><textarea id="v_conduta" autocapitalize="characters" spellcheck="false" placeholder="- MANTENHO ATB&#10;- SOLICITO NOVA ROTINA&#10;- AGUARDO EXAMES" style="min-height:190px">${esc(p.conduta||'')}</textarea></div>
+   <div class="field"><label>Conduta <span style="color:var(--muted);font-weight:400">(uma por linha; "EXPLICO PLANO TERAPEUTICO" entra sozinho)</span></label><textarea id="v_conduta" autocapitalize="characters" spellcheck="false" placeholder="- MANTENHO ATB&#10;- SOLICITO NOVA ROTINA&#10;- AGUARDO EXAMES" style="min-height:190px">${esc(p.conduta||'')}</textarea></div>
    <div class="field"><label>Pendências <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="v_pend" autocapitalize="characters" spellcheck="false" placeholder="- ..." style="min-height:110px">${esc((p.pendencias||[]).map(x=>'- '+x.t).join('\n'))}</textarea></div>
    <div class="field"><label>Previsão de alta <span style="color:var(--muted);font-weight:400">(opcional)</span></label><input type="date" id="v_prevAlta" value="${esc(p.previsaoAlta||'')}"></div>
-   <div class="row" style="margin-top:2px"><button class="btn btn-g btn-sm" style="width:100%" onclick="rodarAnalise('${id}',document.getElementById('v_sug'),this)"><i class="ti ti-search"></i> Analisar evolução por IA — oportunidades de melhoria</button></div>
+   <div class="row" style="margin-top:2px"><button class="btn btn-g btn-sm" style="width:100%" onclick="rodarAnalise('${id}',document.getElementById('v_sug'),this)"><i class="ti ti-bulb"></i> Buscar oportunidades de melhoria com IA</button></div>
    <div id="v_sug"></div>
    <div class="row actions"><button class="btn btn-p" onclick="saveVisita('${id}',true)"><i class="ti ti-file-text"></i> Gerar evolução</button><button class="btn btn-g" onclick="saveVisita('${id}',false)">Salvar</button></div>`);
   draftKey='visita:'+id+':'+ymd();draftReopen=()=>openVisita(id);restoreDraft();
@@ -747,6 +1089,7 @@ function saveVisita(id,gerar){
   p.visitaEm=ymd();
   persist();clearDraft();
   if(gerar)verEvolucao(id);else{closeModal();render();}
+  toast('Visita salva.','ok');
 }
 
 /* fotos dos parâmetros */
@@ -782,7 +1125,7 @@ function addParamImgs(input){
 }
 function renderThumbs(){const box=document.getElementById('v_thumbs');if(!box)return;
   let h=(visitaImgs.length?`<div class="thumbs-n"><i class="ti ti-check"></i> ${visitaImgs.length} foto(s) anexada(s)</div>`:'');
-  h+=visitaImgs.map((im,i)=>`<div class="thumb">${im.heic?'<div class="thumb-ph"><i class="ti ti-photo"></i><span>FOTO</span></div>':`<img src="${im.thumb}" onerror="this.style.opacity=0">`}<button onclick="rmThumb(${i})">✕</button></div>`).join('');
+  h+=visitaImgs.map((im,i)=>`<div class="thumb">${im.heic?'<div class="thumb-ph"><i class="ti ti-photo"></i><span>FOTO</span></div>':`<img src="${im.thumb}" onerror="this.style.opacity=0">`}<button onclick="rmThumb(${i})" aria-label="Remover foto"><i class="ti ti-x"></i></button></div>`).join('');
   if(visitaImgErrs.length)h+=`<div class="thumbs-err"><i class="ti ti-alert-triangle"></i> Não consegui ler: ${esc(visitaImgErrs.join(', '))}. No Mac, fotos do iPhone podem estar no iCloud sem download — abra a foto no app Fotos (ou arraste pra Mesa) e tente de novo. No celular, tire a foto na hora.</div>`;
   box.innerHTML=h;}
 function rmThumb(i){visitaImgs.splice(i,1);renderThumbs();}
@@ -814,7 +1157,7 @@ const PARAM_PROMPT='Você é um escriba clínico. Recebe a FOTO manuscrita de UM
  +'(I) Se um sinal não aparece nas fotos, omita o campo inteiro. Repito: a resposta é SÓ a linha de parâmetros, nada mais.';
 async function transcreverParams(){
   if(!visitaImgs.length){toast('Anexe ao menos uma foto dos parâmetros.','erro');return;}
-  const b=document.getElementById('transBtn');b.innerHTML='<span class="spin"></span> Transcrevendo...';b.disabled=true;
+  const b=document.getElementById('transBtn');b.innerHTML='<span class="spin"></span> Transcrevendo';b.disabled=true;
   // 1 chamada de IA POR FOTO (campo visual menor lê o manuscrito muito melhor que fotos juntas)
   const extrairFinal=out=>{
     const ls=String(out||'').replace(/```/g,'').replace(/\*\*/g,'').split('\n').map(s=>s.trim()).filter(Boolean);
@@ -896,18 +1239,19 @@ function copyEvoFmt(id,btnId){
   let ok=false;
   try{const ta=document.createElement('textarea');ta.value=plain;ta.setAttribute('style','position:fixed;left:-9999px;top:0;opacity:0');document.body.appendChild(ta);ta.focus();ta.select();ok=document.execCommand('copy');document.body.removeChild(ta);}catch(e){ok=false;}
   if(!ok&&navigator.clipboard){try{navigator.clipboard.writeText(plain);ok=true;}catch(e){}}
-  const b=document.getElementById(btnId);if(b){b.textContent=ok?'✓ Copiado p/ o sistema':'Selecione e copie manualmente';setTimeout(()=>b.textContent='Copiar p/ o sistema',2000);}
+  const b=document.getElementById(btnId);if(b){b.innerHTML=ok?'<i class="ti ti-check"></i> Copiado':'Selecione e copie manualmente';setTimeout(()=>b.innerHTML='<i class="ti ti-copy"></i> Copiar para o sistema',2000);}
+  toast(ok?'Evolução copiada. Cole no sistema do hospital.':'Não consegui copiar. Selecione o texto e copie à mão.',ok?'ok':'erro');
 }
 function verEvolucao(id){
   const p=state.pacientes.find(x=>x.id===id);if(!p)return;
   const txt=gerarEvolucao(p);
-  modal(`<h3><i class="ti ti-file-text"></i> Evolução — pronta para colar</h3>
+  modal(`<h3><i class="ti ti-file-text"></i> Evolução pronta para colar</h3>
    <div class="hint" style="margin-bottom:8px">${esc(p.nome||'Paciente')} · leito ${esc(p.leito||'—')}. Revise antes de colar no sistema do hospital.</div>
-   <div class="hint" style="margin:-2px 0 8px">Use o botão <b>Copiar p/ o sistema</b> e cole no destino. Os cabeçalhos saem marcados com <b>#</b> e os itens com <b>-</b>; as quebras de linha são preservadas no ISGH.</div>
+   <div class="hint" style="margin:-2px 0 8px">Use o botão <b>Copiar para o sistema</b> e cole no destino. Os cabeçalhos saem marcados com <b>#</b> e os itens com <b>-</b>; as quebras de linha são preservadas no ISGH.</div>
    <textarea readonly class="evo-out" style="width:100%;box-sizing:border-box;min-height:42vh;max-height:55vh;border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--panel2)">${esc(txt)}</textarea>
-   <div class="row actions"><button class="btn btn-p" id="copyEvoBtn" onclick="copyEvoFmt('${id}','copyEvoBtn')">Copiar p/ o sistema</button><button class="btn btn-g" onclick="openVisita('${id}')">← Voltar</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
+   <div class="row actions"><button class="btn btn-p" id="copyEvoBtn" onclick="copyEvoFmt('${id}','copyEvoBtn')"><i class="ti ti-copy"></i> Copiar para o sistema</button><button class="btn btn-g" onclick="openVisita('${id}')"><i class="ti ti-arrow-left"></i> Visita</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
 }
-function copyTa(taId,btnId,label){const t=document.getElementById(taId);if(!t)return;t.focus();t.select();try{document.execCommand('copy');}catch(e){}if(navigator.clipboard){try{navigator.clipboard.writeText(t.value);}catch(e){}}const b=document.getElementById(btnId);if(b){b.textContent='✓ Copiado';setTimeout(()=>b.textContent=label,1600);}}
+function copyTa(taId,btnId,label){const t=document.getElementById(taId);if(!t)return;t.focus();t.select();try{document.execCommand('copy');}catch(e){}if(navigator.clipboard){try{navigator.clipboard.writeText(t.value);}catch(e){}}const b=document.getElementById(btnId);if(b){b.innerHTML='<i class="ti ti-check"></i> Copiado';setTimeout(()=>b.innerHTML='<i class="ti ti-copy"></i> '+label,1600);}toast('Resumo copiado.','ok');}
 
 function resumoPlantao(){
   const list=ativos();
@@ -922,13 +1266,13 @@ function resumoPlantao(){
       if(pend.length)txt+='Pendências:\n'+pend.map(x=>'- '+x.t).join('\n')+'\n';
       if(p.previsaoAlta)txt+='Previsão de alta: '+fmtData(p.previsaoAlta)+'\n';
       if(p.obs)txt+='Obs: '+oneLine(p.obs)+'\n';});});
-  modal(`<h3><i class="ti ti-clipboard-list"></i> Passar plantão</h3><div class="hint" style="margin-bottom:8px">Resumo dos ${list.length} internado(s), agrupado por setor (só pendências em aberto). Revise e copie.</div><div class="field"><textarea id="resumoTa" class="evo-out" style="min-height:50vh">${esc(txt.toUpperCase())}</textarea></div><div class="row actions"><button class="btn btn-p" id="copyResBtn" onclick="copyTa('resumoTa','copyResBtn','Copiar tudo')">Copiar tudo</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
+  modal(`<h3><i class="ti ti-clipboard-list"></i> Passar plantão</h3><div class="hint" style="margin-bottom:8px">Resumo dos ${list.length} internado(s), agrupado por setor (só pendências em aberto). Revise e copie.</div><div class="field"><textarea id="resumoTa" class="evo-out" style="min-height:50vh">${esc(txt.toUpperCase())}</textarea></div><div class="row actions"><button class="btn btn-p" id="copyResBtn" onclick="copyTa('resumoTa','copyResBtn','Copiar tudo')"><i class="ti ti-copy"></i> Copiar tudo</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
 }
 
 /* ===== saída (alta / óbito / transferência) ===== */
 function openSaida(id){
   const p=state.pacientes.find(x=>x.id===id);if(!p)return;
-  modal(`<h3>Registrar saída · ${esc(p.nome||'Paciente')} (leito ${esc(p.leito||'—')})</h3>
+  modal(`<h3><i class="ti ti-door-exit"></i> Registrar saída · ${esc(p.nome||'Paciente')} (leito ${esc(p.leito||'—')})</h3>
    <div class="field"><label>Tipo de saída</label><select id="s_tipo" onchange="saidaToggle()">
      <option value="alta">Alta</option><option value="obito">Óbito</option><option value="transferencia">Transferência</option></select></div>
    <div class="two"><div class="field"><label>Data</label><input id="s_data" type="date" value="${ymd()}"></div>
@@ -941,7 +1285,7 @@ function saveSaida(id){
   const p=state.pacientes.find(x=>x.id===id);if(!p)return;p.updatedAt=Date.now();
   p.status='saida';
   p.saida={tipo:document.getElementById('s_tipo').value,data:document.getElementById('s_data').value||ymd(),destino:getVal('s_dest'),obs:getVal('s_obs'),em:nowISO()};
-  persist();closeModal();render();
+  persist();closeModal();render();toast('Saída registrada: '+((SAIDA[p.saida.tipo]||{}).l||'saída').toLowerCase()+'.','ok');
 }
 
 /* ===== IA: extrair dados da evolução ===== */
@@ -950,7 +1294,7 @@ async function extrairEvol(id){
   const raw=getVal('f_evol');
   const editar=!!id;
   if(!raw){toast('Cole a evolução do paciente antes de '+(editar?'atualizar.':'extrair.'),'erro');return;}
-  const b=document.getElementById('extrairBtn');b.innerHTML='<span class="spin"></span> '+(editar?'Atualizando…':'Extraindo…');b.disabled=true;
+  const b=document.getElementById('extrairBtn');b.innerHTML='<span class="spin"></span> '+(editar?'Atualizando':'Extraindo');b.disabled=true;
   const KEYS=''
    +'- "nome" (string)\n'
    +'- "idade" (string, ex.: "78 anos")\n'
@@ -1004,7 +1348,7 @@ async function extrairEvol(id){
       setVal('f_ef',data.exameFisico||'');
       setVal('f_conduta',bullets(toLines(data.conduta)));
       const okN=(data.nome||'')?'':' (nome não encontrado)';
-      const bb=document.getElementById('extrairBtn');if(bb){bb.innerHTML=(editar?'✓ Ficha atualizada':'✓ Ficha preenchida')+okN;setTimeout(()=>{bb.innerHTML=editar?'<i class="ti ti-sparkles"></i> Atualizar dados':'<i class="ti ti-sparkles"></i> Extrair dados';bb.disabled=false;},1800);}
+      toast((editar?'Ficha atualizada':'Ficha preenchida')+okN+'. Revise antes de salvar.','ok');const bb=document.getElementById('extrairBtn');if(bb){bb.innerHTML='<i class="ti ti-check"></i> '+(editar?'Ficha atualizada':'Ficha preenchida')+okN;setTimeout(()=>{bb.innerHTML=editar?'<i class="ti ti-sparkles"></i> Atualizar dados':'<i class="ti ti-sparkles"></i> Extrair dados';bb.disabled=false;},1800);}
       return;
     }
   }catch(e){toast('Não consegui '+(editar?'atualizar':'extrair')+' agora: '+(e.message||'falha na IA')+'. A evolução continua no campo — pode tentar de novo.','erro');}
@@ -1070,7 +1414,7 @@ function restoreDraft(){if(!draftKey)return;
   if(restaurados||descartados){const h=document.createElement('div');h.className='draft-hint';
     h.innerHTML=restaurados
       ? '<i class="ti ti-history"></i> Recuperei o que você digitou e não salvou'+(descartados?' (o resto foi atualizado em outra tela)':'')+' <button type="button" onclick="descartarDraft()">descartar</button>'
-      : '<i class="ti ti-refresh"></i> Estes dados foram atualizados em outra tela — mostrando a versão mais recente.';
+      : '<i class="ti ti-refresh"></i> Estes dados mudaram em outra tela. Mostrando a versão mais recente.';
     const t=box.querySelector('h3');if(t)t.after(h);else box.prepend(h);}}
 function clearDraft(){if(!draftKey)return;try{localStorage.removeItem('enfdraft:'+draftKey);}catch(e){}}
 function descartarDraft(){clearDraft();const r=draftReopen;if(r)r();else closeModal();}

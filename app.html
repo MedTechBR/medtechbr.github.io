@@ -1,15 +1,12 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-astra="portal">
+<html lang="pt-BR" data-viva="portal" data-viva-escuro>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>MedTech App — seus apps médicos</title>
 <meta name="description" content="MedTech App: os apps do médico assistencial em um só lugar, com uma conta.">
-<meta name="theme-color" content="#000000">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
+<meta name="theme-color" content="#F5F6FB">
+<link rel="stylesheet" href="vendor/tabler/tabler-icons.min.css?v=3.48.0">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icone-180.png">
@@ -18,105 +15,131 @@
 <meta name="apple-mobile-web-app-title" content="MedTech App">
 <script>window.MT_APP={id:"portal",name:"MedTech App",linha:"clinica"};</script>
 <script src="_mtfb.js?v=1"></script>
-<script type="module" src="_mtauth.js?v=25"></script>
+<script type="module" src="_mtauth.js?v=26"></script>
 <style>
-:root{--ink:#fff;--muted:rgba(255,255,255,.6);--dim:rgba(255,255,255,.6);--paper:#000;--line:rgba(255,255,255,.12);--line-strong:rgba(255,255,255,.2);--accent:#fff;--ok:#4ADE80;--danger:#F87171;--fg6:rgba(255,255,255,.06);--fg12:rgba(255,255,255,.12);--fg20:rgba(255,255,255,.2);--ease:cubic-bezier(.16,1,.3,1)}
+/* ============================================================
+   Portal no tema vivo (23/09/2026), modelo ClínicaMed "camada viva".
+   A grade compacta de ícones continua (pedido dele: grade, não cartões);
+   cada app agora tem o ícone em círculo na cor do próprio app (--c, vindo
+   do catálogo). Cadeados, "Meus apps" e Assinatura seguem iguais.
+   Cor do portal: índigo (MedTech App) ou laranja (MedTech Provas), via --ac.
+   ============================================================ */
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{overflow-x:clip}
 .install[hidden]{display:none}
-html{background:#000}
-body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--ink);background:var(--paper);min-height:100vh;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-:focus-visible{outline:2px solid rgba(255,255,255,.6);outline-offset:3px;border-radius:8px}
-::selection{background:#fff;color:#000}
-/* cabeçalho no vocabulário da landing: preto com blur, fio embaixo, pílulas */
-header{position:sticky;top:0;z-index:50;display:flex;align-items:center;min-height:calc(64px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top);background:rgba(0,0,0,.72);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
-.wrap{max-width:920px;margin:0 auto;padding:0 24px;width:100%}
+body{font-size:15px;line-height:1.5;min-height:100vh}
+button{font:inherit;color:inherit}
+.ti{line-height:1}
+
+/* ---------- cabeçalho: uma linha ---------- */
+header{position:sticky;top:0;z-index:50;display:flex;align-items:center;min-height:calc(64px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top)}
+.wrap{max-width:960px;margin:0 auto;padding:0 24px;width:100%}
 .top{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.wm{font-weight:600;font-size:19px;letter-spacing:-.02em;white-space:nowrap}
-.wm b{font-weight:600;color:#fff}
+.wm{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:19px;letter-spacing:-.02em;white-space:nowrap}
+.wm .mk{width:36px;height:36px;border-radius:50%;background:var(--ac);color:var(--acTxt);display:grid;place-items:center;font-size:19px;box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 35%,transparent)}
+.wm b{font-weight:700;color:var(--acInk)}
 .top-r{display:flex;align-items:center;gap:8px}
 .usr{display:flex;align-items:center;gap:8px}
-.usr .who{font-size:13px;color:var(--muted);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.usr button,.ghost{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:44px;padding:0 16px;border-radius:40px;border:0;background:var(--fg12);color:#fff;font:500 13.5px 'Inter',system-ui,sans-serif;cursor:pointer;white-space:nowrap;transition:background-color .2s,color .2s}
-.usr button:hover,.ghost:hover{background:var(--fg20);color:#fff}
-.usr button i,.ghost i,.install i{font-size:17px;line-height:1}
-.install{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:44px;padding:0 18px;border-radius:40px;border:0;background:#fff;color:#000;font:500 13.5px 'Inter',system-ui,sans-serif;cursor:pointer;white-space:nowrap;transition:background-color .2s}
-.install:hover{background:#e6e6e6}
-main{padding:56px 0 calc(24px + env(safe-area-inset-bottom))}
-.hello{text-align:center;margin-bottom:44px}
-.hello h1{font-size:clamp(28px,4vw,38px);font-weight:500;letter-spacing:-.03em;line-height:1.1}
-.hello .dt{font-size:14px;color:var(--muted);margin-top:8px}
-/* launcher: só os ícones, tiles neutros que acendem no hover */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:32px 14px;justify-items:center;max-width:780px;margin:0 auto;padding:0 22px}
-.app{display:flex;flex-direction:column;align-items:center;gap:10px;text-decoration:none;color:inherit;width:100%}
-.app .ic{width:68px;height:68px;border-radius:18px;display:grid;place-items:center;font-size:31px;color:#fff;background:var(--fg12);transition:background-color .2s,color .2s,transform .35s var(--ease)}
-.app:hover .ic{background:#fff;color:#000;transform:translateY(-3px)}
-.app:active .ic{transform:scale(.97)}
-.app .nm{font-size:13px;font-weight:500;color:var(--ink);text-align:center;line-height:1.25}
-.app .nm b{font-weight:500;color:inherit}
-.fine{text-align:center;font-size:13px;color:var(--muted);margin-top:44px;padding:0 22px}
-footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 22px calc(24px + env(safe-area-inset-bottom));border-top:1px solid var(--line);margin-top:56px}
-footer a{color:var(--muted);text-decoration:none;display:inline-block;padding:10px 2px}footer a:hover{color:#fff}
-/* modais: fundo escurecido, caixa opaca com fio */
-.sug-modal{position:fixed;inset:0;background:rgba(0,0,0,.72);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:18px;z-index:80}
-.sug-box{background:#0F0F0F;border:1px solid var(--line);border-radius:16px;padding:24px;max-width:460px;width:100%;max-height:92vh;overflow:auto}
-.sug-box h3{margin-bottom:6px;color:#fff;font-weight:500;font-size:18px;letter-spacing:-.02em}
-.sug-box p.sub{color:var(--muted);font-size:13.5px;margin-bottom:8px;line-height:1.5}
-.sug-box label{display:block;font-weight:500;font-size:13px;margin:12px 0 6px;color:var(--muted)}
-.sug-box select,.sug-box input,.sug-box textarea{width:100%;padding:11px 12px;border:1px solid var(--fg20);border-radius:12px;font-size:16px;font-family:inherit;background:#1F1F1F;color:#fff}
+.usr .who{font-size:13px;color:var(--tinta2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.usr button,.ghost{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:44px;padding:0 16px;border-radius:999px;border:0;background:var(--sup2);color:var(--tinta);
+  font-weight:500;font-size:13.5px;cursor:pointer;white-space:nowrap;transition:background-color .2s,color .2s,transform .18s var(--mola)}
+.usr button:hover,.ghost:hover{background:var(--acSup);color:var(--acInk)}
+.usr button i,.ghost i,.install i{font-size:18px;line-height:1}
+.install{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:44px;padding:0 18px;border-radius:999px;border:0;background:var(--ac);color:var(--acTxt);
+  font-weight:600;font-size:13.5px;cursor:pointer;white-space:nowrap;box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 28%,transparent)}
+.install:hover{filter:brightness(1.08);transform:translateY(-1px)}
+
+/* ---------- saudação ---------- */
+main{padding:44px 0 calc(24px + env(safe-area-inset-bottom))}
+.hello{text-align:center;margin-bottom:36px}
+.hello h1{font-size:clamp(28px,4vw,36px);font-weight:750;letter-spacing:-.035em;line-height:1.1}
+.hello .dt{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:600;color:var(--acInk);background:var(--acSup);padding:5px 14px;border-radius:999px;margin-top:12px}
+.hello .dt:empty{display:none}
+
+/* ---------- grade de apps: compacta, ícone em círculo na cor do app ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:28px 12px;justify-items:center;max-width:800px;margin:0 auto;padding:0 22px}
+.app{--c:var(--ac);--t:#fff;display:flex;flex-direction:column;align-items:center;gap:10px;text-decoration:none;color:inherit;width:100%;border-radius:22px;padding:6px 2px}
+.app .ic{position:relative;width:68px;height:68px;border-radius:50%;display:grid;place-items:center;font-size:30px;color:var(--t);background:var(--c);
+  box-shadow:0 10px 22px color-mix(in srgb,var(--c) 30%,transparent);transition:transform .3s var(--mola),box-shadow .25s}
+.app:hover .ic{transform:translateY(-4px) scale(1.04) rotate(-5deg);box-shadow:0 16px 30px color-mix(in srgb,var(--c) 38%,transparent)}
+.app:active .ic{transform:scale(.94)}
+.app .nm{font-size:13px;font-weight:600;color:var(--tinta);text-align:center;line-height:1.25}
+.app .nm b{font-weight:600;color:inherit}
+.app:focus-visible{outline:none;box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 28%,transparent)}
+.grid.anima>*{animation:vvSobe .5s var(--suave) both;animation-delay:calc(var(--i,0) * 35ms)}
+/* fora do plano: ícone apagado com cadeado */
+.app.trav .ic{background:var(--sup3);color:var(--tinta2);box-shadow:none}
+.app.trav .nm{color:var(--tinta2)}
+.app .lk{position:absolute;right:-4px;top:-4px;width:24px;height:24px;border-radius:50%;background:var(--tinta);color:var(--sup);display:grid;place-items:center;font-size:13px;box-shadow:0 0 0 3px var(--papel)}
+.fine{text-align:center;font-size:13px;color:var(--tinta2);margin-top:36px;padding:0 22px}
+footer{text-align:center;font-size:13px;padding:24px 22px calc(24px + env(safe-area-inset-bottom));margin-top:48px}
+footer a{text-decoration:none;display:inline-block;padding:10px 2px}
+
+/* ---------- modais ---------- */
+.sug-modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;z-index:80}
+.sug-box{padding:24px;max-width:480px;width:100%;max-height:92vh;overflow:auto}
+.sug-box h3{margin-bottom:6px;font-weight:700;font-size:19px;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
+.sug-box h3 .ti{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--acSup);color:var(--acInk);font-size:19px;flex:0 0 auto}
+.sug-box p.sub{color:var(--tinta2);font-size:13.5px;margin-bottom:8px;line-height:1.5}
+.sug-box label{display:block;font-weight:600;font-size:13px;margin:12px 0 6px;color:var(--tinta2)}
+html[data-viva^=portal][lang] body .sug-box :is(select,input,textarea){width:100%;padding:11px 14px;font-size:16px}
 .sug-box textarea{min-height:110px;resize:vertical;line-height:1.5}
-.sug-box select:focus,.sug-box input:focus,.sug-box textarea:focus{outline:none;border-color:rgba(255,255,255,.6);box-shadow:none}
-.sug-row{display:flex;gap:10px;margin-top:18px}
-.sug-row .b{flex:1;border:0;border-radius:999px;padding:11px 14px;min-height:44px;font-weight:500;font-size:14px;cursor:pointer;font-family:inherit;transition:background-color .2s}
-.sug-row .ok{background:#fff;color:#000}
-.sug-row .ok:hover{background:#e6e6e6}
-.sug-row .cancel{background:var(--fg12);color:#fff}
-.sug-row .cancel:hover{background:var(--fg20)}
-.cfg-sec{border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;background:var(--fg6)}
-.cfg-sec h4{font-size:14.5px;font-weight:500;color:#fff;margin-bottom:4px;display:flex;align-items:center;gap:8px}
-.cfg-sec h4 i{color:var(--muted);font-size:17px}
-.cfg-sec .desc{font-size:13px;color:var(--muted);margin:2px 0 8px;line-height:1.5}
+.sug-row{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.sug-box .b{border:1.5px solid transparent;border-radius:999px;padding:10px 16px;min-height:44px;font-weight:600;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  transition:filter .2s,transform .18s var(--mola),background-color .2s}
+.sug-row .b{flex:1}
+.sug-box .ok{background:var(--ac);color:var(--acTxt);box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 28%,transparent)}
+.sug-box .ok:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.sug-box .cancel{background:var(--sup);color:var(--tinta);border-color:var(--fioF)}
+.sug-box .cancel:hover{background:var(--acSup);color:var(--acInk)}
+.cfg-sec{border-radius:20px;padding:16px;margin-bottom:12px;background:var(--sup2)}
+.cfg-sec h4{font-size:15px;font-weight:650;margin-bottom:4px;display:flex;align-items:center;gap:10px}
+.cfg-sec h4 i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--sup);color:var(--acInk);font-size:16px}
+.cfg-sec .desc{font-size:13px;color:var(--tinta2);margin:2px 0 8px;line-height:1.5}
 .cfg-msg{font-size:13px;margin-top:8px;min-height:14px;line-height:1.5}
-.cfg-msg.ok{color:var(--ok)}.cfg-msg.err{color:var(--danger)}
+.cfg-msg.ok{color:color-mix(in srgb,var(--okV) 70%,var(--tinta))}.cfg-msg.err{color:color-mix(in srgb,var(--errV) 80%,var(--tinta))}
 /* Meus apps: catálogo com interruptores */
-.link{background:none;border:0;color:var(--muted);font:500 13px 'Inter',system-ui,sans-serif;cursor:pointer;padding:10px 6px;border-radius:999px}
-.link:hover{color:#fff}
-.apps-cat{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:16px 0 4px}
+.link{background:none;border:0;color:var(--acInk);font-weight:600;font-size:13.5px;cursor:pointer;padding:10px 14px;border-radius:999px;display:inline-flex;align-items:center;gap:6px}
+.link:hover{background:var(--acSup)}
+.apps-cat{font-size:13px;font-weight:650;color:var(--tinta2);margin:16px 0 4px}
 .apps-cat:first-child{margin-top:4px}
-.sug-box .apps-row{display:flex;align-items:center;gap:12px;padding:10px 0;margin:0;border-bottom:1px solid var(--line);cursor:pointer;color:#fff;font-size:14px;font-weight:400}
-.sug-box .apps-row:hover{background:var(--fg6)}
-.sug-box .apps-row:last-child{border-bottom:0}
-.apps-row .k{width:38px;height:38px;border-radius:11px;background:var(--fg12);display:grid;place-items:center;font-size:19px;color:#fff;flex:0 0 auto}
+.sug-box .apps-row{display:flex;align-items:center;gap:12px;padding:7px 6px;margin:0;cursor:pointer;color:var(--tinta);font-size:14px;font-weight:400;border-radius:14px}
+.sug-box .apps-row:hover{background:var(--sup2)}
+
+.apps-row .k{--c:var(--ac);--t:#fff;width:38px;height:38px;border-radius:50%;background:var(--c);display:grid;place-items:center;font-size:19px;color:var(--t);flex:0 0 auto}
 .apps-row .t{flex:1;min-width:0}
-.apps-row .t b{display:block;font-weight:500;font-size:14.5px}
-.apps-row .t small{display:block;font-size:12px;color:var(--muted);margin-top:1px}
-.sw{position:relative;width:44px;height:26px;flex:0 0 auto}
+.apps-row .t b{display:block;font-weight:600;font-size:14.5px}
+.apps-row .t small{display:block;font-size:12.5px;color:var(--tinta2);margin-top:1px}
+.sw{position:relative;width:46px;height:28px;flex:0 0 auto}
 .sw input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
-.sw span{position:absolute;inset:0;border-radius:999px;background:var(--fg20);transition:background-color .2s}
-.sw span::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s var(--ease),background-color .2s}
-.sw input:checked+span{background:#fff}
-.sw input:checked+span::after{transform:translateX(18px);background:#000}
-.sw input:focus-visible+span{outline:2px solid rgba(255,255,255,.6);outline-offset:3px}
+.sw span{position:absolute;inset:0;border-radius:999px;background:var(--sup3);transition:background-color .2s}
+.sw span::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .25s var(--mola)}
+.sw input:checked+span{background:var(--ac)}
+.sw input:checked+span::after{transform:translateX(18px)}
+.sw input:disabled+span{opacity:.45}
+.sw input:focus-visible+span{box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 28%,transparent)}
 .apps-tools{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 2px}
-.apps-tools .b{flex:0 0 auto;min-height:44px;padding:0 16px;font-size:13px}
-.apps-vazio{grid-column:1/-1;text-align:center;color:var(--muted);padding:34px 16px;border:1px dashed var(--fg20);border-radius:16px;font-size:14px;line-height:1.5}
-.apps-vazio .b{display:inline-flex;align-items:center;justify-content:center;margin-top:14px;min-height:44px;padding:0 18px;border-radius:999px;background:#fff;color:#000;border:0;font:500 14px 'Inter',system-ui,sans-serif;cursor:pointer}
-@media(max-width:560px){.ghost .lbl{display:none}.ghost{width:44px;padding:0;justify-content:center}.ghost i{font-size:19px}}
-@media(max-width:560px){.wrap{padding:0 16px}.wm{font-size:17px}.top-r{gap:6px}.install .lbl{display:none}.install{width:44px;padding:0}.usr button{width:44px;padding:0}#btnOut{display:none}.grid{grid-template-columns:repeat(4,1fr);gap:26px 8px}.app .ic{width:62px;height:62px;border-radius:16px;font-size:29px}.app .nm{font-size:11.5px}.hello{margin-bottom:30px}.hello h1{font-size:26px}main{padding-top:36px}.usr .who{display:none}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
-.app .ic{position:relative}
+.apps-tools .b{flex:0 0 auto;min-height:40px;padding:0 16px;font-size:13px}
+.apps-vazio{grid-column:1/-1;text-align:center;color:var(--tinta2);padding:34px 16px;background:var(--sup);border:1px solid var(--fio);border-radius:var(--rG);font-size:14px;line-height:1.5;box-shadow:var(--sombraV)}
+.apps-vazio .b{display:inline-flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;min-height:44px;padding:0 20px;border-radius:999px;background:var(--ac);color:var(--acTxt);border:0;font-weight:600;font-size:14px;cursor:pointer}
 #cfgAssinBt{flex-wrap:wrap}#cfgAssinBt .b{flex:1 1 150px}
-.app.trav .ic{background:var(--fg6);color:var(--muted)}
-.app .lk{position:absolute;right:-5px;top:-5px;width:22px;height:22px;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center;font-size:13px}
-.aviso{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:90;max-width:min(520px,calc(100vw - 32px));padding:14px 18px;border-radius:14px;background:#141416;border:1px solid var(--line);color:#fff;font-size:14px;line-height:1.45;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.aviso{position:fixed;left:0;right:0;margin:0 auto;width:max-content;bottom:calc(20px + env(safe-area-inset-bottom));z-index:90;max-width:min(520px,calc(100vw - 32px));padding:12px 18px;border-radius:18px;
+  background:var(--tinta);color:var(--sup);font-size:14px;line-height:1.45;box-shadow:var(--sombraM);animation:vvSobe .35s var(--suave) both}
+@media(max-width:560px){
+  .ghost .lbl{display:none}.ghost{width:44px;padding:0;justify-content:center}.ghost i{font-size:19px}
+  .wrap{padding:0 16px}.wm{font-size:17px}.wm .mk{width:32px;height:32px;font-size:17px}.top-r{gap:6px}.install .lbl{display:none}.install{width:44px;padding:0}.usr button{width:44px;padding:0}#btnOut{display:none}
+  .grid{grid-template-columns:repeat(4,1fr);gap:22px 6px;padding:0 12px}.app .ic{width:60px;height:60px;font-size:27px}.app .nm{font-size:11.5px}
+  .hello{margin-bottom:28px}.hello h1{font-size:26px}main{padding-top:30px}.usr .who{display:none}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}.grid.anima>*,.aviso{animation:none!important}}
 </style>
 <link rel="stylesheet" href="_mttokens.css?v=3">
-<link rel="stylesheet" href="_mtastra.css?v=5">
+<link rel="stylesheet" href="_mtviva.css?v=1">
 </head>
 <body>
 <header>
   <div class="wrap top">
-    <span class="wm">MedTech <b>App</b></span>
+    <span class="wm"><span class="mk" aria-hidden="true"><i class="ti ti-apps"></i></span><span>MedTech <b>App</b></span></span>
     <div class="top-r">
       <button class="ghost" id="btnApps" onclick="openMeusApps()" title="Escolher quais apps aparecem aqui"><i class="ti ti-layout-grid-add" aria-hidden="true"></i><span class="lbl">Meus apps</span></button>
       <button class="ghost" id="btnSug" onclick="openSug()"><i class="ti ti-bulb" aria-hidden="true"></i><span class="lbl">Sugestão</span></button>
@@ -129,7 +152,7 @@ footer a{color:var(--muted);text-decoration:none;display:inline-block;padding:10
 <main>
   <div class="hello"><h1 id="hello">Bem-vindo</h1><div class="dt" id="issueDate"></div></div>
   <div class="grid" id="grid"></div>
-  <div class="fine"><button class="link" onclick="openMeusApps()">Escolher quais apps aparecem aqui</button></div>
+  <div class="fine"><button class="link" onclick="openMeusApps()"><i class="ti ti-layout-grid-add" aria-hidden="true"></i> Escolher quais apps aparecem aqui</button></div>
 </main>
 
 <footer>© 2026 <a href="index.html">MedTech</a> · <a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a></footer>
@@ -139,22 +162,22 @@ const BASE = 'https://medtechbr.com.br/';
 /* Catálogo de TUDO que o MedTech oferece. O id é o mesmo do trocador de funções (_mtauth.js).
    O que aparece na página é a escolha do usuário (salva na conta, sincroniza entre aparelhos). */
 const CATALOGO = [
-  { id:'enfermaria',    nm:'EnfermarIA',       ic:'ti-bed',              url:BASE+'enfermaria.html',       cat:'Atendimento',          linha:'clinica' },
-  { id:'condutai',      nm:'CondutAI',         ic:'ti-stethoscope',      url:BASE+'condutai.html',         cat:'Referência clínica',   linha:'clinica' },
-  { id:'atbguia',       nm:'ATBguia',          ic:'ti-pill',             url:BASE+'atbguia.html',          cat:'Referência clínica',   linha:'clinica' },
-  { id:'calcmed',       nm:'CalcMed',          ic:'ti-calculator',       url:BASE+'calcmed.html',          cat:'Referência clínica',   linha:'clinica' },
-  { id:'paliai',        nm:'PaliAI',           ic:'ti-heart-handshake',  url:BASE+'paliai.html',           cat:'Referência clínica',   linha:'clinica' },
-  { id:'guiainterno',   nm:'Guia do Interno',  ic:'ti-school',           url:BASE+'guiainterno.html',      cat:'Referência clínica',   linha:'clinica' },
-  { id:'pocusai',       nm:'PocusAI',          ic:'ti-scan',             url:BASE+'pocusai.html',          cat:'Hospital e imagem',    linha:'clinica' },
-  { id:'laudai',        nm:'LaudAI',           ic:'ti-report-medical',   url:BASE+'laudai.html',           cat:'Hospital e imagem',    linha:'clinica' },
-  { id:'foco',          nm:'Foco',             ic:'ti-target-arrow',     url:BASE+'foco.html',             cat:'Rotina do médico',     linha:'clinica' },
-  { id:'plantaohub',    nm:'PlantãoHub',       ic:'ti-clock',            url:BASE+'plantaohub.html',       cat:'Rotina do médico',     linha:'clinica' },
-  { id:'granae',        nm:'Granaê',           ic:'ti-wallet',           url:BASE+'granae.html',           cat:'Rotina do médico',     linha:'clinica' },
-  { id:'logbook',       nm:'Logbook',          ic:'ti-notebook',         url:BASE+'logbook.html',          cat:'Rotina do médico',     linha:'clinica' },
-  { id:'clinicamed',    nm:'ClínicaMed',       ic:'ti-heartbeat',        url:BASE+'clinicamed/',           cat:'Prova de título',      linha:'provas', sub:'título de Clínica Médica (TECM) e acesso R+' },
-  { id:'trafegotitulo', nm:'TráfegoTítulo',    ic:'ti-car',              url:BASE+'trafego-titulo/',       cat:'Prova de título',      linha:'provas', sub:'título de Medicina do Tráfego' },
-  { id:'medprovas',     nm:'MedProvas',        ic:'ti-clipboard-text',   url:BASE+'medprovas.html',        cat:'Residência e concursos', linha:'provas' },
-  { id:'flashmed',      nm:'FlashMed',         ic:'ti-cards',            url:BASE+'flashmed.html',         cat:'Residência e concursos', linha:'provas' }
+  { id:'enfermaria',    nm:'EnfermarIA',       ic:'ti-bed',              url:BASE+'enfermaria.html',       cat:'Atendimento',          linha:'clinica' , c:'var(--c-indigo)' },
+  { id:'condutai',      nm:'CondutAI',         ic:'ti-stethoscope',      url:BASE+'condutai.html',         cat:'Referência clínica',   linha:'clinica' , c:'var(--c-azul)' },
+  { id:'atbguia',       nm:'ATBguia',          ic:'ti-pill',             url:BASE+'atbguia.html',          cat:'Referência clínica',   linha:'clinica' , c:'color-mix(in srgb,var(--c-ciano) 80%,#000)' },
+  { id:'calcmed',       nm:'CalcMed',          ic:'ti-calculator',       url:BASE+'calcmed.html',          cat:'Referência clínica',   linha:'clinica' , c:'color-mix(in srgb,var(--c-laranja) 86%,#000)' },
+  { id:'paliai',        nm:'PaliAI',           ic:'ti-heart-handshake',  url:BASE+'paliai.html',           cat:'Referência clínica',   linha:'clinica' , c:'var(--c-rosa)' },
+  { id:'guiainterno',   nm:'Guia do Interno',  ic:'ti-school',           url:BASE+'guiainterno.html',      cat:'Referência clínica',   linha:'clinica' , c:'var(--c-ambar)', t:'#231500' },
+  { id:'pocusai',       nm:'PocusAI',          ic:'ti-scan',             url:BASE+'pocusai.html',          cat:'Hospital e imagem',    linha:'clinica' , c:'var(--c-teal)' },
+  { id:'laudai',        nm:'LaudAI',           ic:'ti-report-medical',   url:BASE+'laudai.html',           cat:'Hospital e imagem',    linha:'clinica' , c:'var(--c-cobalto)' },
+  { id:'foco',          nm:'Foco',             ic:'ti-target-arrow',     url:BASE+'foco.html',             cat:'Rotina do médico',     linha:'clinica' , c:'#0B7A54' },
+  { id:'plantaohub',    nm:'PlantãoHub',       ic:'ti-clock',            url:BASE+'plantaohub.html',       cat:'Rotina do médico',     linha:'clinica' , c:'#4D7C0F' },
+  { id:'granae',        nm:'Granaê',           ic:'ti-wallet',           url:BASE+'granae.html',           cat:'Rotina do médico',     linha:'clinica' , c:'#7C4DE8' },
+  { id:'logbook',       nm:'Logbook',          ic:'ti-notebook',         url:BASE+'logbook.html',          cat:'Rotina do médico',     linha:'clinica' , c:'var(--c-terracota)' },
+  { id:'clinicamed',    nm:'ClínicaMed',       ic:'ti-heartbeat',        url:BASE+'clinicamed/',           cat:'Prova de título',      linha:'provas', sub:'título de Clínica Médica (TECM) e acesso R+' , c:'var(--c-indigo)' },
+  { id:'trafegotitulo', nm:'TráfegoTítulo',    ic:'ti-car',              url:BASE+'trafego-titulo/',       cat:'Prova de título',      linha:'provas', sub:'título de Medicina do Tráfego' , c:'var(--c-teal)' },
+  { id:'medprovas',     nm:'MedProvas',        ic:'ti-clipboard-text',   url:BASE+'medprovas.html',        cat:'Residência e concursos', linha:'provas' , c:'var(--c-ambar)', t:'#231500' },
+  { id:'flashmed',      nm:'FlashMed',         ic:'ti-cards',            url:BASE+'flashmed.html',         cat:'Residência e concursos', linha:'provas' , c:'var(--c-coral)' }
 ];
 /* Linha deste portal. provas.html é GERADO deste arquivo por _gera_provas.py — editar aqui. */
 const LINHA = 'clinica';
@@ -193,17 +216,22 @@ function travado(id){
 }
 function appItem(a){
   const tv = travado(a.id);
-  return `<a class="app${tv?' trav':''}" href="${a.url}" data-id="${esc(a.id)}"${tv?' aria-label="'+esc(a.nm)+' (fora do seu plano)"':''}>
+  return `<a class="app${tv?' trav':''}" href="${a.url}" data-id="${esc(a.id)}" style="${corApp(a)}"${tv?' aria-label="'+esc(a.nm)+' (fora do seu plano)"':''}>
     <span class="ic"><i class="ti ${a.ic}" aria-hidden="true"></i>${tv?'<span class="lk"><i class="ti ti-lock" aria-hidden="true"></i></span>':''}</span>
     <span class="nm">${fmtName(a.nm)}</span>
   </a>`;
 }
+/* cor do app: círculo na cor dele, com o ícone em branco (ou escuro, no âmbar) */
+function corApp(a){ return a.c ? `--c:${a.c};--t:${a.t||'#fff'}` : ''; }
+let _gradeAnimada=false;
 function renderGrid(){
   const sel = new Set(selecao());
   const lista = disponiveis().filter(a => sel.has(a.id));
   const g = document.getElementById('grid');
   g.innerHTML = lista.length ? lista.map(appItem).join('')
-    : `<div class="apps-vazio">Nenhum app na sua página ainda.<br><button class="b" onclick="openMeusApps()"><i class="ti ti-layout-grid-add" aria-hidden="true"></i>&nbsp;Escolher apps</button></div>`;
+    : `<div class="apps-vazio">Nenhum app na sua página ainda.<br><button class="b" onclick="openMeusApps()"><i class="ti ti-layout-grid-add" aria-hidden="true"></i> Escolher apps</button></div>`;
+  /* entrada escalonada só na primeira pintura (os re-render da nuvem não piscam) */
+  if (!_gradeAnimada && lista.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) { _gradeAnimada = true; [...g.children].forEach((c,k)=>c.style.setProperty('--i',k)); g.classList.add('anima'); }
   try { localStorage.setItem(CACHE_APPS, JSON.stringify([...sel])); } catch(e){}
 }
 function openMeusApps(){
@@ -215,13 +243,13 @@ function openMeusApps(){
     if (!itens.length) return '';
     return `<div class="apps-cat">${esc(cat)}</div>` + itens.map(a => `
       <label class="apps-row">
-        <span class="k"><i class="ti ${a.ic}" aria-hidden="true"></i></span>
+        <span class="k" style="${corApp(a)}"><i class="ti ${a.ic}" aria-hidden="true"></i></span>
         <span class="t"><b>${esc(a.nm)}</b>${a.sub?`<small>${esc(a.sub)}</small>`:''}</span>
         <span class="sw"><input type="checkbox" data-id="${esc(a.id)}" ${sel.has(a.id)?'checked':''}><span></span></span>
       </label>`).join('');
   }).join('');
   wrap.innerHTML = `<div class="sug-box">
-    <h3 style="display:flex;align-items:center;gap:8px"><i class="ti ti-layout-grid-add" aria-hidden="true"></i>Meus apps</h3>
+    <h3><i class="ti ti-layout-grid-add" aria-hidden="true"></i>Meus apps</h3>
     <p class="sub">Escolha o que aparece na sua página. Vale em todos os seus aparelhos.</p>
     <div class="apps-tools"><button class="b cancel" onclick="marcarApps(true)">Todos</button><button class="b cancel" onclick="marcarApps(false)">Nenhum</button><button class="b cancel" onclick="marcarApps('padrao')">Padrão</button></div>
     <div id="appsLista">${linhas}</div>
@@ -239,7 +267,7 @@ function marcarApps(modo){
 function closeApps(){ const m=document.getElementById('appsModal'); if (m) m.remove(); }
 async function salvarApps(){
   const sel = [...document.querySelectorAll('#appsLista input[type=checkbox]:checked')].map(i => i.dataset.id);
-  const msg = document.getElementById('appsMsg'); msg.className='cfg-msg'; msg.textContent='Salvando…';
+  const msg = document.getElementById('appsMsg'); msg.className='cfg-msg'; msg.textContent='Salvando';
   try { localStorage.setItem(CACHE_APPS, JSON.stringify(sel)); } catch(e){}
   try {
     const base = dados() || {};
@@ -248,7 +276,7 @@ async function salvarApps(){
   } catch(e) { msg.className='cfg-msg err'; msg.textContent='Não foi possível salvar: '+(e.message||e); }
 }
 renderGrid();
-document.getElementById('issueDate').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+document.getElementById('issueDate').textContent=(s=>s.charAt(0).toUpperCase()+s.slice(1))(new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}));
 
 /* ===== Sugestões de funções (vão por e-mail para a equipe MedTech) ===== */
 const SUG_EMAIL = 'medtechbr1@gmail.com';
@@ -257,10 +285,10 @@ function openSug(){
   const opts = ['Geral / portal'].concat(CATALOGO_LINHA.map(a=>a.nm)).map(n=>`<option>${esc(n)}</option>`).join('');
   const wrap = document.createElement('div'); wrap.className='sug-modal'; wrap.id='sugModal';
   wrap.innerHTML = `<div class="sug-box">
-    <h3 style="display:flex;align-items:center;gap:8px"><i class="ti ti-bulb" aria-hidden="true"></i>Sugerir uma função</h3>
+    <h3><i class="ti ti-bulb" aria-hidden="true"></i>Sugerir uma função</h3>
     <p class="sub">Conte o que você gostaria de ver nos apps MedTech. Sua ideia vai direto para a equipe.</p>
     <label>App</label><select id="sugApp">${opts}</select>
-    <label>Sua sugestão</label><textarea id="sugTxt" placeholder="Ex.: no EnfermarIA, poder ordenar os leitos por gravidade..."></textarea>
+    <label>Sua sugestão</label><textarea id="sugTxt" placeholder="Ex.: no EnfermarIA, poder ordenar os leitos por gravidade"></textarea>
     <label>Seu contato (opcional)</label><input id="sugContato" value="${esc((u&&u.email)||'')}" placeholder="e-mail ou WhatsApp para retorno">
     <div class="sug-row"><button class="b ok" onclick="enviarSug()">Enviar sugestão</button><button class="b cancel" onclick="closeSug()">Cancelar</button></div>
   </div>`;
@@ -291,7 +319,7 @@ function openCfg(){
   const perfil = (window.MT && MT._data && MT._data.perfil) || {};
   const wrap = document.createElement('div'); wrap.className='sug-modal'; wrap.id='cfgModal';
   wrap.innerHTML = `<div class="sug-box">
-    <h3 style="display:flex;align-items:center;gap:8px"><i class="ti ti-settings" aria-hidden="true"></i>Configurações</h3>
+    <h3><i class="ti ti-settings" aria-hidden="true"></i>Configurações</h3>
     <div class="cfg-sec">
       <h4><i class="ti ti-user" aria-hidden="true"></i>Perfil e cadastro</h4>
       <div class="desc">Seu nome aparece em todos os apps MedTech.</div>
@@ -314,7 +342,7 @@ function openCfg(){
     </div>
     <div class="cfg-sec">
       <h4><i class="ti ti-credit-card" aria-hidden="true"></i>Assinatura e pagamento</h4>
-      <div class="desc" id="cfgAssin">Carregando a sua assinatura…</div>
+      <div class="desc" id="cfgAssin">Carregando a sua assinatura</div>
       <div class="sug-row" id="cfgAssinBt"><button class="b ok" onclick="abrirPlanos()">Ver planos</button><button class="b cancel" onclick="abrirPagamento()">Gerenciar pagamento</button></div>
       <div class="cfg-msg" id="cfgPagMsg"></div>
     </div>
@@ -326,14 +354,14 @@ function openCfg(){
 }
 function closeCfg(){ const m=document.getElementById('cfgModal'); if (m) m.remove(); }
 async function salvarPerfil(){
-  const msg=document.getElementById('cfgPerfilMsg'); msg.className='cfg-msg'; msg.textContent='Salvando…';
+  const msg=document.getElementById('cfgPerfilMsg'); msg.className='cfg-msg'; msg.textContent='Salvando';
   try{
     const nome=cfgVal('cfgNome');
     if (window.MT && MT._fb && MT.user && nome && nome!==(MT.user.displayName||'')) { await MT._fb.A.updateProfile(MT.user, {displayName:nome}); }
     const perfil={fone:cfgVal('cfgFone'),crm:cfgVal('cfgCrm'),esp:cfgVal('cfgEsp'),inst:cfgVal('cfgInst')};
     const base=(window.MT && MT._data && typeof MT._data==='object')?MT._data:{};
     if (window.MT && MT.save) await MT.save(Object.assign({}, base, {perfil}));
-    msg.className='cfg-msg ok'; msg.textContent='✓ Perfil salvo.';
+    msg.className='cfg-msg ok'; msg.textContent='Perfil salvo.';
     refreshUser();
   }catch(e){ msg.className='cfg-msg err'; msg.textContent='Erro ao salvar: '+(e.message||e); }
 }
@@ -343,10 +371,10 @@ async function alterarSenha(){
   if (p1.length<6){ msg.className='cfg-msg err'; msg.textContent='A senha deve ter ao menos 6 caracteres.'; return; }
   if (p1!==p2){ msg.className='cfg-msg err'; msg.textContent='As senhas não conferem.'; return; }
   if (!(window.MT && MT._fb && MT.user)){ msg.className='cfg-msg err'; msg.textContent='Sessão indisponível.'; return; }
-  const A=MT._fb.A; msg.textContent='Alterando…';
+  const A=MT._fb.A; msg.textContent='Alterando';
   try{
     await A.updatePassword(MT.user, p1);
-    msg.className='cfg-msg ok'; msg.textContent='✓ Senha alterada com sucesso.';
+    msg.className='cfg-msg ok'; msg.textContent='Senha alterada.';
     document.getElementById('cfgPass1').value=''; document.getElementById('cfgPass2').value='';
   }catch(e){
     if (e && e.code==='auth/requires-recent-login'){
@@ -356,7 +384,7 @@ async function alterarSenha(){
         const cred=A.EmailAuthProvider.credential(MT.user.email, cur);
         await A.reauthenticateWithCredential(MT.user, cred);
         await A.updatePassword(MT.user, p1);
-        msg.className='cfg-msg ok'; msg.textContent='✓ Senha alterada com sucesso.';
+        msg.className='cfg-msg ok'; msg.textContent='Senha alterada.';
         document.getElementById('cfgPass1').value=''; document.getElementById('cfgPass2').value='';
       }catch(e2){ const w=(e2.code==='auth/wrong-password'||e2.code==='auth/invalid-credential'); msg.className='cfg-msg err'; msg.textContent=w?'Senha atual incorreta.':('Não foi possível: '+(e2.message||e2)); }
     } else { msg.className='cfg-msg err'; msg.textContent='Não foi possível: '+(e.message||e); }
@@ -365,13 +393,13 @@ async function alterarSenha(){
 async function enviarResetSenha(){
   const msg=document.getElementById('cfgSenhaMsg'); msg.className='cfg-msg';
   if (!(window.MT && MT._fb && MT.user)){ msg.className='cfg-msg err'; msg.textContent='Sessão indisponível.'; return; }
-  try{ await MT._fb.A.sendPasswordResetEmail(MT._fb.auth, MT.user.email); msg.className='cfg-msg ok'; msg.textContent='✓ Link enviado para '+MT.user.email+'.'; }
+  try{ await MT._fb.A.sendPasswordResetEmail(MT._fb.auth, MT.user.email); msg.className='cfg-msg ok'; msg.textContent='Link enviado para '+MT.user.email+'.'; }
   catch(e){ msg.className='cfg-msg err'; msg.textContent='Erro: '+(e.message||e); }
 }
 /* ---------- assinatura: estado, planos, escolha de apps ---------- */
 function preencheAssinatura(){
   const el = document.getElementById('cfgAssin'); if (!el) return;
-  if (!ACESSO) { el.textContent = 'Carregando a sua assinatura…'; return; }
+  if (!ACESSO) { el.textContent = 'Carregando a sua assinatura'; return; }
   if (!ACESSO.venda) { el.innerHTML = 'As assinaturas abrem em breve. Até lá, <b>todos os apps estão liberados</b> na sua conta.'; return; }
   if (ACESSO.falha) { el.textContent = 'Não foi possível consultar a assinatura agora. Os apps seguem abertos; tente de novo mais tarde.'; return; }
   const P = ACESSO.P, mt = ACESSO.mt || {}, ag = Math.floor(Date.now()/1000), L = [];
@@ -400,15 +428,15 @@ function escolherAppsPlano(){
   const P = ACESSO.P, mt = ACESSO.mt || {}, vg = MTAcesso.vagas(P, mt, LINHA);
   const atuais = new Set(MTAcesso.escolhidos(P, mt, LINHA).slice(0, vg));
   const wrap = document.createElement('div'); wrap.className = 'sug-modal'; wrap.id = 'escModal';
-  wrap.innerHTML = `<div class="sug-box"><h3>Apps do seu plano</h3><p class="sub">Escolha ${vg===1?'1 app':vg+' apps'}. Trocar um app já escolhido só é possível uma vez a cada ${P.troca_dias||30} dias; preencher uma vaga livre é sempre possível.</p>` +
-    CATALOGO_LINHA.filter(a => (P.linhas[LINHA]||[]).includes(a.id)).map(a => `<label class="apps-row"><span class="k"><i class="ti ${a.ic}" aria-hidden="true"></i></span><span class="t"><b>${esc(a.nm)}</b></span><span class="sw"><input type="checkbox" data-id="${esc(a.id)}" ${atuais.has(a.id)?'checked':''}><span></span></span></label>`).join('') +
+  wrap.innerHTML = `<div class="sug-box"><h3><i class="ti ti-apps" aria-hidden="true"></i>Apps do seu plano</h3><p class="sub">Escolha ${vg===1?'1 app':vg+' apps'}. Trocar um app já escolhido só é possível uma vez a cada ${P.troca_dias||30} dias; preencher uma vaga livre é sempre possível.</p>` +
+    CATALOGO_LINHA.filter(a => (P.linhas[LINHA]||[]).includes(a.id)).map(a => `<label class="apps-row"><span class="k" style="${corApp(a)}"><i class="ti ${a.ic}" aria-hidden="true"></i></span><span class="t"><b>${esc(a.nm)}</b></span><span class="sw"><input type="checkbox" data-id="${esc(a.id)}" ${atuais.has(a.id)?'checked':''}><span></span></span></label>`).join('') +
     `<div class="cfg-msg" id="escMsg"></div><div class="sug-row"><button class="b ok" id="escSalvar">Salvar</button><button class="b cancel" onclick="document.getElementById('escModal').remove()">Cancelar</button></div></div>`;
   document.body.appendChild(wrap);
   const caixas = [...wrap.querySelectorAll('input[type=checkbox]')];
   const limita = () => { const n = caixas.filter(c => c.checked).length; caixas.forEach(c => { c.disabled = !c.checked && n >= vg; }); };
   caixas.forEach(c => c.addEventListener('change', limita)); limita();
   wrap.querySelector('#escSalvar').onclick = async () => {
-    const m = wrap.querySelector('#escMsg'); m.className = 'cfg-msg'; m.textContent = 'Salvando…';
+    const m = wrap.querySelector('#escMsg'); m.className = 'cfg-msg'; m.textContent = 'Salvando';
     try { await MTAcesso.chamar('mtEscolherApps', { linha: LINHA, apps: caixas.filter(c => c.checked).map(c => c.dataset.id) }, MT.user);
       await MT.user.getIdToken(true); ACESSO.mt = await MTAcesso.lerMt(MT.user, false); wrap.remove(); renderGrid(); preencheAssinatura();
     } catch (e) { m.className = 'cfg-msg err'; m.textContent = e.message || 'Não foi possível salvar.'; }

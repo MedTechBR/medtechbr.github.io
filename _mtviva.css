@@ -1,0 +1,284 @@
+/* ============================================================
+   _mtviva.css — tema "vivo" dos apps MedTech (23/09/2026)
+   O mesmo modelo aprovado no ClínicaMed (camada viva, cm-v97):
+   papel levemente cinza, superfícies brancas, uma cor viva por app,
+   botões e filtros em pílula com sombra da própria cor, ícones em
+   círculo, cartões de 22 px, entrada escalonada e retorno a cada toque.
+   Fora: gradiente, emoji na interface, fonte baixada da web (a Inter
+   é servida daqui, /fonts), versalete, etiqueta colorida em tudo.
+
+   COMO ENTRA NUM APP (substitui o _mtastra.css):
+     <html lang="pt-BR" data-viva="<id do app>">
+     <link rel="stylesheet" href="_mtviva.css?v=N">   ← ÚLTIMO css do <head>
+   Tema escuro: só liga no app que foi conferido nos dois temas,
+     com data-viva-escuro no <html> (segue o modo do aparelho).
+
+   Por que é um arquivo só: os apps nomeiam as cores de 16 jeitos
+   (--petrol, --primary, --teal, --ink, --txt…). Aqui cada alias é
+   remapeado uma vez para os tokens do ClínicaMed; a cor do app é --ac.
+   Tudo dentro de @media screen: impressão continua como era.
+   ============================================================ */
+@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/inter-400.woff2) format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/inter-500.woff2) format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/inter-600.woff2) format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/inter-700.woff2) format('woff2')}
+
+@media screen {
+
+/* ---------------- tokens (claro) ---------------- */
+html[data-viva], html[data-viva][data-theme], html[data-viva] [data-theme] {
+  color-scheme: light;
+  --papel:#F5F6FB; --sup:#FFFFFF; --sup2:#F1F3F9; --sup3:#E7EAF3;
+  --tinta:#141827; --tinta2:#5D6579; --tinta3:#666E83; --fio:#E6E9F2; --fioF:#D3D8E5;
+  --c-indigo:#5B5BF0; --c-azul:#2F7BF6; --c-laranja:#F76E1E; --c-verde:#11A870; --c-violeta:#8E5AF2;
+  --c-ambar:#F2A007; --c-ciano:#0AA5C2; --c-rosa:#E8468E; --c-cinza:#667085; --c-vermelho:#E5484D;
+  --c-teal:#0F9F8F; --c-cobalto:#3E5BD8; --c-lima:#5B9A0E; --c-terracota:#C2410C; --c-coral:#F0506E;
+  --okV:#0E9F6E; --okSup:#E3F8EF; --errV:#E5484D; --errSup:#FFECEC; --avV:#B7791F; --avSup:#FFF4DB;
+  --rG:22px; --r:14px;
+  --sombraV:0 1px 2px rgba(20,24,39,.04),0 4px 14px rgba(20,24,39,.05);
+  --sombraM:0 10px 30px rgba(20,24,39,.10),0 2px 6px rgba(20,24,39,.05);
+  --mola:cubic-bezier(.34,1.56,.64,1); --suave:cubic-bezier(.22,1,.36,1);
+
+  /* ---- remapeamento dos aliases legados (todos os apps) ---- */
+  --bg:var(--papel); --paper:var(--papel); --mt-bg:var(--papel);
+  --surface:var(--sup); --card:var(--sup); --bg-card:var(--sup); --mt-surface:var(--sup);
+  --panel2:var(--sup2); --bg-soft:var(--sup2); --surface2:var(--sup2); --surface-2:var(--sup2);
+  --bg-2:var(--sup2); --mt-surface-2:var(--sup2); --bg-3:var(--sup3);
+  --ink:var(--tinta); --text:var(--tinta); --txt:var(--tinta); --mt-text:var(--tinta);
+  --muted:var(--tinta2); --text-soft:var(--tinta2); --ink-soft:var(--tinta2); --mt-text-dim:var(--tinta2);
+  --dim:var(--tinta2); --text-mute:var(--tinta2); --mt-text-faint:var(--tinta2);
+  --text-dim:var(--tinta2); --text-faint:var(--tinta2); --text-muted:var(--tinta2); --muted-2:var(--tinta2);
+  --line:var(--fio); --border:var(--fio); --mt-line:var(--fio);
+  --line-strong:var(--fioF); --border-strong:var(--fioF); --mt-line-strong:var(--fioF); --border-2:var(--fioF);
+  --primary-border:color-mix(in srgb,var(--ac) 35%,var(--fio));
+  --petrol:var(--ac); --petrol-dark:var(--acInk); --petrol-btn:var(--ac); --petrol-d:var(--acInk);
+  --mint:var(--ac); --mint-dark:var(--acInk); --mint-d:var(--acInk);
+  --primary:var(--ac); --primary-dark:var(--acInk); --primary-hover:var(--acInk); --primary-2:var(--ac);
+  --accent:var(--ac); --accent2:var(--ac); --accent-2:var(--ac); --teal:var(--ac); --teal-deep:var(--acInk); --teal-btn:var(--ac);
+  --blue:var(--c-azul); --info:var(--c-azul);
+  --mt-brand:var(--ac); --mt-brand-strong:var(--acInk); --mt-accent:var(--ac);
+  --mt-brand-grad:var(--ac); --accent-grad:var(--ac);
+  --on-mint:var(--acTxt);
+  --soft:var(--acSup); --primary-soft:var(--acSup); --primary-soft-2:var(--sup2); --teal-tint:var(--acSup);
+  --blue-bg:color-mix(in srgb,var(--c-azul) 12%,var(--sup)); --info-soft:color-mix(in srgb,var(--c-azul) 12%,var(--sup)); --accent-soft:var(--acSup);
+  --green:var(--okV); --ok:var(--okV); --success:var(--okV); --right:var(--okV); --mt-ok:var(--okV); --success-btn:var(--okV);
+  --green-bg:var(--okSup); --success-soft:var(--okSup); --right-bg:var(--okSup);
+  --amber:var(--avV); --warn:var(--avV); --warning:var(--avV); --caso:var(--avV); --caso-dark:#8A5A0B; --mt-warn:var(--avV);
+  --amber-bg:var(--avSup); --warn-soft:var(--avSup); --warning-soft:var(--avSup); --caso-soft:var(--avSup);
+  --red:var(--errV); --danger:var(--errV); --wrong:var(--errV); --mt-danger:var(--errV);
+  --red-bg:var(--errSup); --wrong-bg:var(--errSup); --danger-soft:var(--errSup);
+  --violet:var(--c-violeta); --purple:var(--c-violeta); --violet-btn:var(--c-violeta);
+  --violet-bg:color-mix(in srgb,var(--c-violeta) 12%,var(--sup)); --purple-soft:color-mix(in srgb,var(--c-violeta) 12%,var(--sup));
+  --income:var(--okV); --income-2:var(--okV); --expense:var(--tinta); --expense-2:var(--errV);
+  --shadow-xs:var(--sombraV); --shadow-sm:var(--sombraV); --shadow-md:var(--sombraM); --shadow-glow:none; --shadow-glow-pink:none;
+  --shadow:var(--sombraV); --shadow-lg:var(--sombraM); --mt-shadow:var(--sombraM);
+  --glow:transparent; --glow-bg:transparent; --mt-glow:transparent;
+  --mt-overlay:rgba(20,24,39,.45);
+  --mt-ring:0 0 0 4px color-mix(in srgb,var(--ac) 20%,transparent);
+  --disp:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mt-font-display:var(--disp); --mt-font-text:var(--disp);
+}
+
+/* ---------------- a cor de cada app ---------------- */
+/* --ac fica FORA do bloco de tokens: lá ele teria a especificidade de html[data-viva][data-theme] e venceria a cor do app */
+html[data-viva]{--ac:var(--c-indigo);--acTxt:#fff}
+/* Tons dos botões medidos: texto (--acTxt) sobre a cor passa 4,5:1 (AA). Onde o branco não passava, a cor
+   fechou um pouco (azul, ciano, teal, rosa, verde, lima, violeta, coral) ou o texto virou escuro (laranja, âmbar). */
+html[data-viva="portal"],html[data-viva="admin-acessos"]{--ac:#5B5BF0}
+html[data-viva="portal-provas"]{--ac:#C2410C}
+html[data-viva="condutai"]{--ac:#2563EB}
+html[data-viva="atbguia"]{--ac:#0E7C94}
+html[data-viva="enfermaria"]{--ac:#5B5BF0}
+html[data-viva="pocusai"]{--ac:#0F7F74}
+html[data-viva="laudai"]{--ac:#3E5BD8}
+html[data-viva="paliai"]{--ac:#D6336C}
+html[data-viva="calcmed"]{--ac:#F76E1E;--acTxt:#1C0D02}
+html[data-viva="guiainterno"]{--ac:#F2A007;--acTxt:#231500}
+html[data-viva="foco"]{--ac:#0B7A54}
+html[data-viva="plantaohub"]{--ac:#4D7C0F}
+html[data-viva="granae"]{--ac:#7C4DE8}
+html[data-viva="logbook"]{--ac:#C2410C}
+html[data-viva="medprovas"]{--ac:#F2A007;--acTxt:#231500}
+html[data-viva="flashmed"]{--ac:#CF2F4F}
+/* --acSup/--acInk precisam existir JÁ no <html>: os apelidos antigos (--primary-dark, --soft, --petrol-dark…)
+   são declarados ali e, sem elas, resolviam vazios (era o branco sobre branco do CondutAI). */
+html[data-viva]{--acSup:color-mix(in srgb,var(--ac) 12%,var(--sup));--acInk:color-mix(in srgb,var(--ac) 80%,var(--tinta))}
+/* a mistura de tinta tem de ser recalculada depois que --ac muda no mesmo elemento */
+html[data-viva] body{--acSup:color-mix(in srgb,var(--ac) 12%,var(--sup));--acInk:color-mix(in srgb,var(--ac) 80%,var(--tinta))}
+
+/* ---------------- tema escuro (só nos apps conferidos) ---------------- */
+@media (prefers-color-scheme: dark){
+  html[data-viva][data-viva-escuro], html[data-viva][data-viva-escuro][data-theme], html[data-viva][data-viva-escuro] [data-theme]{
+    color-scheme: dark;
+    --papel:#0D1017; --sup:#161B26; --sup2:#1C2230; --sup3:#252D3E;
+    --tinta:#EDF0F7; --tinta2:#A3ABBE; --tinta3:#8B94AB; --fio:#252C3B; --fioF:#343D51;
+    --okSup:#0F2A20; --errSup:#34181A; --avSup:#33280F; --okV:#34C98D; --errV:#FF6B6F; --avV:#F2B544;
+    --sombraV:0 1px 2px rgba(0,0,0,.4); --sombraM:0 12px 30px rgba(0,0,0,.5);
+    --mt-overlay:rgba(0,0,0,.6);
+  }
+  html[data-viva][data-viva-escuro],html[data-viva][data-viva-escuro] body{--acSup:color-mix(in srgb,var(--ac) 20%,var(--sup));--acInk:color-mix(in srgb,var(--ac) 70%,#fff)}
+}
+
+/* ---------------- base ---------------- */
+html[data-viva]{background:var(--papel)!important;background-image:none!important}
+html[data-viva] body{background:var(--papel)!important;background-image:none!important;color:var(--tinta);
+  font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+html[data-viva] body::before{content:none!important}
+html[data-viva] body ::selection{background:color-mix(in srgb,var(--ac) 24%,transparent);color:var(--tinta)}
+:where(html[data-viva] body) :where(h1,h2,h3){letter-spacing:-.02em;color:var(--tinta)}
+html[data-viva] body :where(a,button,[role=button],input,select,textarea,summary,[tabindex]):focus-visible{
+  outline:none;box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 28%,transparent)!important;border-radius:12px}
+html[data-viva] body ::-webkit-scrollbar{width:10px;height:10px}
+html[data-viva] body ::-webkit-scrollbar-thumb{background:var(--fioF);border-radius:999px;border:2px solid var(--papel)}
+html[data-viva] body ::-webkit-scrollbar-track{background:transparent}
+
+/* ---------------- cabeçalho: superfície branca, fio embaixo ---------------- */
+/* sem backdrop-filter: ele transforma o cabeçalho em bloco de contenção e prende no topo a barra fixa que
+   estiver dentro dele (a barra inferior do celular). E só o cabeçalho do app, não o de diálogos e folhas. */
+html[data-viva] body :is(header,.topbar,.header):not(dialog *):not(.modal *):not(.sheet *):not(.sug-box *):not(.mt-card *){
+  background:color-mix(in srgb,var(--sup) 97%,transparent)!important;background-image:none!important;
+  border-bottom:1px solid var(--fio)!important;box-shadow:none!important;color:var(--tinta)}
+/* marca do app: círculo na cor do app (o quadradinho denunciava "gerado") */
+html[data-viva] body .logo .mark,html[data-viva] body .brand .mark,html[data-viva] body .logo-mark{
+  background:var(--ac)!important;color:var(--acTxt)!important;border-radius:50%!important;border:0!important;
+  box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 35%,transparent)!important}
+
+/* ---------------- campos ---------------- */
+html[data-viva] body input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]),
+html[data-viva] body select,html[data-viva] body textarea{
+  background:var(--sup)!important;color:var(--tinta)!important;border:1.5px solid var(--fio)!important;border-radius:14px;
+  box-shadow:none!important;font-family:inherit;transition:border-color .15s,box-shadow .2s}
+html[data-viva] body input::placeholder,html[data-viva] body textarea::placeholder{color:var(--tinta3)}
+html[data-viva] body input:focus,html[data-viva] body select:focus,html[data-viva] body textarea:focus{
+  border-color:var(--ac)!important;outline:none;box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 16%,transparent)!important}
+html[data-viva] body input:-webkit-autofill,html[data-viva] body input:-webkit-autofill:focus{
+  -webkit-box-shadow:0 0 0 100px var(--sup) inset!important;-webkit-text-fill-color:var(--tinta)!important}
+html[data-viva] body input[type=checkbox],html[data-viva] body input[type=radio],html[data-viva] body input[type=range]{accent-color:var(--ac)}
+
+/* ---------------- botões: pílula, sombra da própria cor, mola ---------------- */
+html[data-viva] body button,html[data-viva] body .btn,html[data-viva] body a.btn,html[data-viva] body [role=button]{
+  font-family:inherit;text-shadow:none;
+  transition:background-color .2s,color .2s,border-color .2s,box-shadow .2s,transform .18s var(--mola),filter .2s}
+html[data-viva] body .btn,html[data-viva] body a.btn,html[data-viva] body button.btn,
+html[data-viva] body [class*="btn-"],html[data-viva] body [class$="-btn"]{border-radius:999px}
+html[data-viva] body .btn-p,html[data-viva] body .btn-primary,html[data-viva] body .btn.primary,html[data-viva] body .btn-ai,
+html[data-viva] body button.primary,html[data-viva] body .primary-btn{
+  background:var(--ac)!important;color:var(--acTxt)!important;border-color:var(--ac)!important;
+  box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 28%,transparent)!important}
+html[data-viva] body .btn-p:hover,html[data-viva] body .btn-primary:hover,html[data-viva] body .btn.primary:hover,html[data-viva] body .btn-ai:hover,
+html[data-viva] body button.primary:hover,html[data-viva] body .primary-btn:hover{
+  filter:brightness(1.07);transform:translateY(-1px);box-shadow:0 10px 22px color-mix(in srgb,var(--ac) 34%,transparent)!important}
+html[data-viva] body .btn-g,html[data-viva] body .btn-ghost,html[data-viva] body .btn-secondary,html[data-viva] body .btn.ghost,html[data-viva] body .btn.secondary{
+  background:var(--sup)!important;color:var(--tinta)!important;border:1.5px solid var(--fioF)!important;box-shadow:none!important}
+html[data-viva] body .btn-g:hover,html[data-viva] body .btn-ghost:hover,html[data-viva] body .btn-secondary:hover,html[data-viva] body .btn.ghost:hover,html[data-viva] body .btn.secondary:hover{
+  background:var(--acSup)!important;border-color:color-mix(in srgb,var(--ac) 40%,var(--fio))!important;color:var(--acInk)!important}
+html[data-viva] body .btn-dn,html[data-viva] body .btn-danger,html[data-viva] body .btn.danger{background:var(--errSup)!important;color:var(--errV)!important;border-color:transparent!important;box-shadow:none!important}
+html[data-viva] body button:not(:disabled):active,html[data-viva] body .btn:not(:disabled):active,html[data-viva] body [role=button]:active{transform:scale(.96)}
+:where(html[data-viva] body) :where(button,.btn):disabled{opacity:.5;box-shadow:none;transform:none}
+html[data-viva] body .btn-p .spin{border-color:var(--acTxt);border-top-color:transparent}
+
+/* ---------------- superfícies: cartões de 22 px ---------------- */
+html[data-viva] body .card,html[data-viva] body .box,html[data-viva] body .panel,html[data-viva] body .sheet,
+html[data-viva] body [class$="-card"],html[data-viva] body [class*="card "],html[data-viva] body :is(div,section,p).empty,html[data-viva] body .note{
+  border-radius:var(--rG);border-color:var(--fio);box-shadow:var(--sombraV);background-image:none}
+html[data-viva] body .card:where(a,button,[onclick],[role=button]),html[data-viva] body a[class$="-card"],html[data-viva] body button[class$="-card"]{
+  transition:transform .2s var(--mola),box-shadow .2s,border-color .2s}
+html[data-viva] body .card:where(a,button,[onclick],[role=button]):hover,html[data-viva] body a[class$="-card"]:hover,html[data-viva] body button[class$="-card"]:hover{
+  transform:translateY(-3px);box-shadow:var(--sombraM);border-color:color-mix(in srgb,var(--ac) 30%,var(--fio))}
+/* indicadores: blocos tingidos, cada um de uma cor, como no ClínicaMed */
+:where(html[data-viva] body) :where(.kpi){--k:var(--ac);border-radius:18px;border:0;box-shadow:none;background:color-mix(in srgb,var(--k) 10%,var(--sup))}
+:where(html[data-viva] body) :where(.kpi:nth-child(4n+1)){--k:var(--c-azul)}
+:where(html[data-viva] body) :where(.kpi:nth-child(4n+2)){--k:var(--c-verde)}
+:where(html[data-viva] body) :where(.kpi:nth-child(4n+3)){--k:var(--c-laranja)}
+:where(html[data-viva] body) :where(.kpi:nth-child(4n+4)){--k:var(--c-violeta)}
+:where(html[data-viva] body) :where(.kpi) :where(b,strong,.v,.val,.value,.num){color:color-mix(in srgb,var(--k) 78%,var(--tinta))}
+/* etiquetas e fichas em pílula tingida */
+html[data-viva] body .chip,html[data-viva] body .badge,html[data-viva] body .tag,html[data-viva] body .pill{border-radius:999px;box-shadow:none!important}
+html[data-viva] body :is(.chip,.pill,.seg,.sugg).on,html[data-viva] body :is(.chip,.pill,.seg,.sugg).active,html[data-viva] body :is(.chip,.pill,.seg,.sugg)[aria-pressed=true]{
+  background:var(--ac)!important;color:var(--acTxt)!important;border-color:var(--ac)!important}
+
+/* ---------------- abas: pílula colorida na ativa ---------------- */
+html[data-viva] body .tabs{background:var(--sup);border:1px solid var(--fio);border-radius:999px;box-shadow:var(--sombraV)!important;padding:4px}
+html[data-viva] body .tabs button{border-radius:999px;font-weight:500;min-height:42px;color:var(--tinta2);transition:background-color .2s,color .2s,transform .18s var(--mola)}
+html[data-viva] body .tabs button:hover{background:var(--sup2);color:var(--tinta)}
+:where(html[data-viva] body .tabs) button:where(.on,.active,[aria-selected=true]){
+  background:var(--ac);color:var(--acTxt);box-shadow:0 6px 14px color-mix(in srgb,var(--ac) 30%,transparent)}
+@media (max-width:640px){
+  /* barra inferior: fundo claro, a aba ativa com o ícone em pílula colorida */
+  html[data-viva] body .tabs{border-radius:0;border:0;border-top:1px solid var(--fio);background:color-mix(in srgb,var(--sup) 97%,transparent);
+    box-shadow:0 -6px 20px rgba(20,24,39,.06)!important}
+  :where(html[data-viva] body .tabs) button:where(.on,.active,[aria-selected=true]){background:var(--acSup);color:var(--acInk);box-shadow:none}
+}
+
+/* ---------------- modais ---------------- */
+/* .modal só é o fundo escurecido quando traz a caixa dentro (.modal > .box); em apps onde .modal É a caixa
+   (LaudAI: .modal-bg > .modal), pintar o fundo nela deixava a caixa cinza translúcida */
+html[data-viva] body :is(.modal:has(> :is(.box,.modal-card,.sug-box)),.modal-backdrop,.sug-modal,.sheet-bg):not(dialog){
+  background:rgba(20,24,39,.42)!important;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+html[data-viva] body .modal .box,html[data-viva] body .modal-backdrop .modal,html[data-viva] body .sug-box,html[data-viva] body .modal-card,html[data-viva] body .mt-sw-box{
+  background:var(--sup)!important;border:1px solid var(--fio);border-radius:26px!important;box-shadow:var(--sombraM)!important;color:var(--tinta);
+  animation:vvPop .32s var(--mola) both}
+html[data-viva] body dialog{background:var(--sup);color:var(--tinta);border:1px solid var(--fio);border-radius:26px;box-shadow:var(--sombraM)}
+html[data-viva] body dialog::backdrop{background:rgba(20,24,39,.42);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+html[data-viva] body .modal-x{border-radius:50%;background:var(--sup2);border-color:transparent;color:var(--tinta)}
+
+/* ---------------- tabelas, avisos, rodapé ---------------- */
+html[data-viva] body th,html[data-viva] body td{border-color:var(--fio)!important}
+html[data-viva] body th{color:var(--tinta2);font-weight:600}
+html[data-viva] body .toast{background:var(--tinta)!important;color:var(--sup)!important;border:0;border-radius:999px!important;box-shadow:var(--sombraM)!important;animation:vvSobe .35s var(--suave) both}
+html[data-viva] body .toast.erro,html[data-viva] body .toast.error,html[data-viva] body .toast.err{background:#B42318!important;color:#fff!important}
+html[data-viva] body .toast.ok,html[data-viva] body .toast.success{background:#0B7A54!important;color:#fff!important}
+html[data-viva] body footer:not(dialog *):not(.modal *):not(.sheet *){color:var(--tinta2);border-top:1px solid var(--fio)}
+html[data-viva] body footer a{color:var(--tinta2)}
+html[data-viva] body footer a:hover{color:var(--acInk)}
+html[data-viva] body .usr a,html[data-viva] body .usr button{border-radius:999px;background:var(--sup2);border-color:transparent;color:var(--tinta);font-weight:500;min-height:40px}
+html[data-viva] body .usr a:hover,html[data-viva] body .usr button:hover{background:var(--acSup);color:var(--acInk)}
+html[data-viva] body progress{accent-color:var(--ac)}
+
+/* ---------------- movimento ---------------- */
+/* A página entra uma vez ao abrir: a animação fica no <main> (que não é recriado), não nos filhos — nos filhos
+   ela se repetia a cada redesenho, inclusive a cada tecla na busca. Entrada escalonada é opt-in: .anima */
+html[data-viva] body main{animation:vvSobe .45s var(--suave) both}
+html[data-viva] body .anima>*{animation:vvSobe .5s var(--suave) both}
+html[data-viva] body .anima>*:nth-child(2){animation-delay:.05s}
+html[data-viva] body .anima>*:nth-child(3){animation-delay:.1s}
+html[data-viva] body .anima>*:nth-child(4){animation-delay:.15s}
+html[data-viva] body .anima>*:nth-child(n+5){animation-delay:.2s}
+@keyframes vvSobe{from{opacity:0;translate:0 14px}to{opacity:1;translate:0 0}}
+@keyframes vvPop{from{opacity:0;scale:.94}to{opacity:1;scale:1}}
+@keyframes vvTreme{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+
+/* ============================================================
+   MÓDULO COMPARTILHADO (_mtauth.js): login, splash, trocador,
+   botão "voltar", barra de demonstração
+   ============================================================ */
+html[data-viva] .mt-auth{background:var(--papel);font-family:'Inter',system-ui,sans-serif}
+html[data-viva] .mt-card{background:var(--sup);border:1px solid var(--fio);border-radius:28px;box-shadow:var(--sombraM);animation:vvPop .4s var(--mola) both}
+html[data-viva] .mt-brand{color:var(--tinta);font-family:'Inter',system-ui,sans-serif;font-weight:700;letter-spacing:-.02em}
+html[data-viva] .mt-brand .mk{background:var(--ac);border-radius:50%;box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 35%,transparent)}
+html[data-viva] .mt-brand b{color:var(--acInk)}
+html[data-viva] .mt-sub,html[data-viva] .mt-consent{color:var(--tinta2)}
+html[data-viva] .mt-auth h2{color:var(--tinta);font-family:'Inter',system-ui,sans-serif}
+html[data-viva] .mt-auth input{background:var(--sup);color:var(--tinta);border:1.5px solid var(--fio);border-radius:14px}
+html[data-viva] .mt-auth input:focus{border-color:var(--ac);box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 16%,transparent)}
+html[data-viva] .mt-auth .mt-btn{background:var(--ac);color:var(--acTxt);border-radius:999px;box-shadow:0 8px 20px color-mix(in srgb,var(--ac) 30%,transparent);font-weight:600}
+html[data-viva] .mt-auth .mt-link,html[data-viva] .mt-consent a{color:var(--acInk)}
+html[data-viva] .mt-err{color:var(--errV)}
+html[data-viva] .mt-demobar{background:var(--sup);color:var(--tinta2);border-top:1px solid var(--fio)}
+html[data-viva] .mt-demobar b{color:var(--acInk)}
+html[data-viva] .mt-demobar button{background:var(--ac);color:var(--acTxt);border-radius:999px}
+html[data-viva] .mt-home{background:var(--sup);color:var(--tinta);box-shadow:0 4px 14px rgba(20,24,39,.12),inset 0 0 0 1px var(--fio);font-family:'Inter',system-ui,sans-serif;font-weight:600;opacity:.95}
+html[data-viva] .mt-sw{background:rgba(20,24,39,.42);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+html[data-viva] .mt-sw-box{background:var(--sup);border:1px solid var(--fio);border-radius:26px;box-shadow:var(--sombraM)}
+html[data-viva] .mt-sw-h{color:var(--tinta2);font-family:'Inter',system-ui,sans-serif}
+html[data-viva] .mt-sw-a{color:var(--tinta)}
+html[data-viva] .mt-sw-a .k{border-radius:50%!important;transition:transform .25s var(--mola)}
+html[data-viva] .mt-sw-a:hover .k{transform:scale(1.08) rotate(-6deg)}
+html[data-viva] .mt-splash{background:var(--papel)}
+html[data-viva] .mt-splash .mk{background:var(--ac);border-radius:50%}
+html[data-viva] .mt-splash .sp{border-color:var(--fio);border-top-color:var(--ac)}
+
+@media (prefers-reduced-motion:reduce){
+  html[data-viva] body *,html[data-viva] .mt-card{animation:none!important;transition:none!important}
+}
+} /* @media screen */

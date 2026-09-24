@@ -893,3 +893,274 @@ hr { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
 /* alvo de toque mínimo: botão redondo do seletor de mês e o "+ Lançar" do resumo */
 .round { min-width: 44px; min-height: 44px; }
 #dashLancar { min-height: 44px; }
+
+/* ============================================================
+   CAMADA VIVA (23/09/2026), modelo ClínicaMed "camada viva".
+   Vem por último e sobrescreve o que está acima. Cor do app: violeta (--ac).
+   Números em Inter com tabular-nums (sem fonte monoespaçada), rótulos em
+   frase normal (sem maiúsculas espaçadas), sem gradiente. Os emoji das
+   categorias são DADO do usuário e ficam.
+   [lang] no seletor: sobe a especificidade acima das regras do _mtviva.css.
+   ============================================================ */
+html[data-viva=granae] body{
+  --acF:var(--ac);                                              /* a cor do app já passa 4,5:1 com branco */
+  --income:color-mix(in srgb,var(--okV) 70%,var(--tinta));     /* receita legível em texto pequeno */
+  --income-2:var(--income);
+  --expense-2:color-mix(in srgb,var(--errV) 82%,var(--tinta));
+  --warning:color-mix(in srgb,var(--avV) 72%,var(--tinta));
+  --gasto:var(--c-laranja);
+  --primary-2:var(--acInk);
+  --radius:var(--rG); --radius-sm:18px; --radius-input:14px;
+  padding-bottom:150px;
+}
+html[data-viva=granae] body :is(h1,h2,h3){font-family:'Inter',system-ui,sans-serif}
+
+/* cabeçalho: uma linha, marca em círculo */
+html[data-viva=granae] .topbar{padding:10px 18px;padding-top:max(10px,env(safe-area-inset-top))}
+html[data-viva=granae] .brand .logo{width:40px;height:40px;border-radius:50%;background:var(--acF);box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 35%,transparent);font-size:21px}
+html[data-viva=granae] .brand .brand-text{display:flex;align-items:baseline;gap:10px}
+html[data-viva=granae] .brand h1{font-size:20px;font-weight:700;letter-spacing:-.02em}
+html[data-viva=granae] .brand .user-name{margin:0;font-size:13px;color:var(--tinta2)}
+html[data-viva=granae] .topbar .icon-btn{border-radius:50%;border:0;background:var(--sup2)}
+html[data-viva=granae] .topbar .icon-btn:hover{background:var(--acSup)}
+html[data-viva=granae] .topbar .icon-btn svg{color:var(--tinta);opacity:.85}
+
+/* seletor de mês: "Setembro de 2026" (o capitalize deixava "Setembro De 2026") */
+html[data-viva=granae] .month-switcher h2{text-transform:none;font-size:18px;font-weight:700;letter-spacing:-.02em}
+html[data-viva=granae] .month-switcher h2::first-letter,html[data-viva=granae] .proj-m::first-letter{text-transform:uppercase}
+html[data-viva=granae] .proj-m{text-transform:none}
+html[data-viva=granae] .round{border:1.5px solid var(--fio);background:var(--sup);font-size:19px;color:var(--tinta)}
+html[data-viva=granae] .round:hover{background:var(--acSup);color:var(--acInk);border-color:transparent}
+
+/* rótulos: frase normal, sem versalete */
+html[data-viva=granae] :is(.card-label,.flow-label,.tms-label,.donut-label,.trend-label,.uppercase,.cmt-grupo,.badge-pending,.month-hero .hero-head .card-label){
+  text-transform:none!important;letter-spacing:0!important}
+html[data-viva=granae] .card-label{font-size:13px;font-weight:600;color:var(--tinta2)}
+html[data-viva=granae] .section-title h3{text-transform:none;letter-spacing:-.01em;font-size:15.5px;font-weight:650;color:var(--tinta)}
+html[data-viva=granae] .section-title h2{font-size:24px;font-weight:750;letter-spacing:-.03em}
+html[data-viva=granae] h3.uppercase{font-size:13.5px;font-weight:650;color:var(--tinta2)}
+html[data-viva=granae] .field>span{text-transform:none;letter-spacing:0;font-size:13px;font-weight:600;color:var(--tinta2)}
+html[data-viva=granae] .tx-list.as-table .tx-head{text-transform:none;letter-spacing:0;font-size:12.5px;font-weight:600}
+html[data-viva=granae] .badge-pending{font-size:11px;font-weight:700}
+html[data-viva=granae] .trend-label{font-size:11px;font-weight:600}
+
+/* abas Resumo | Gráficos: pílula colorida */
+html[data-viva=granae] .dash-tabs{background:var(--sup);border:1px solid var(--fio);border-radius:999px;padding:4px;box-shadow:var(--sombraV)}
+html[data-viva=granae] .dash-tabs button{border-radius:999px;font:600 14px 'Inter',system-ui,sans-serif;color:var(--tinta2)}
+html[data-viva=granae] .dash-tabs button:hover{background:var(--sup2);color:var(--tinta)}
+html[data-viva=granae][lang] .dash-tabs button.on{background:var(--acF)!important;color:#fff!important;box-shadow:0 6px 14px color-mix(in srgb,var(--ac) 30%,transparent)}
+
+/* herói do mês: saldo em bloco violeta, receitas e despesas em cartão com ícone em círculo */
+html[data-viva=granae] .month-hero{padding:0;gap:12px;text-align:left}
+html[data-viva=granae] .month-hero .hero-head{position:relative;overflow:hidden;align-items:flex-start;gap:4px;padding:22px 24px 24px;border-radius:26px;background:var(--acF);color:#fff;
+  box-shadow:0 18px 40px color-mix(in srgb,var(--ac) 28%,transparent)}
+html[data-viva=granae] .month-hero .hero-head::before,html[data-viva=granae] .month-hero .hero-head::after{content:"";position:absolute;border-radius:50%;background:#fff;opacity:.09;pointer-events:none}
+html[data-viva=granae] .month-hero .hero-head::before{width:220px;height:220px;right:-70px;top:-100px;animation:grFlutua 9s ease-in-out infinite}
+html[data-viva=granae] .month-hero .hero-head::after{width:100px;height:100px;right:160px;bottom:-50px;opacity:.07;animation:grFlutua 7s ease-in-out infinite reverse}
+html[data-viva=granae] .month-hero .hero-head .card-label{position:relative;color:#fff;font-size:12.5px;font-weight:600;background:rgba(0,0,0,.16);padding:5px 12px;border-radius:999px}
+html[data-viva=granae] .hero-number{position:relative;font-family:'Inter',system-ui,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.04em;font-weight:800;
+  font-size:clamp(36px,10vw,50px);color:#fff;margin-top:8px}
+html[data-viva=granae] .hero-number.negative{color:#fff}
+html[data-viva=granae] .hero-number.negative::after{content:"no vermelho";display:inline-block;margin-left:12px;vertical-align:middle;font-size:12.5px;font-weight:700;letter-spacing:0;
+  background:#fff;color:color-mix(in srgb,var(--errV) 85%,#000);padding:4px 10px;border-radius:999px}
+html[data-viva=granae] .hero-flow{border-radius:var(--rG);border-color:var(--fio);box-shadow:var(--sombraV);padding:16px 18px;gap:16px}
+html[data-viva=granae] .flow-label-wrap{display:grid;grid-template-columns:40px 1fr;column-gap:12px;align-items:center}
+html[data-viva=granae] .flow-ic{grid-row:span 2;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:20px;color:#fff}
+html[data-viva=granae] .flow-ic.in{background:var(--c-verde)}
+html[data-viva=granae] .flow-ic.out{background:var(--c-laranja)}
+html[data-viva=granae] .flow-label{font-size:14.5px;font-weight:650;color:var(--tinta)}
+html[data-viva=granae] .flow-meta{grid-column:2}
+html[data-viva=granae] .flow-value{font-size:20px;letter-spacing:-.02em}
+html[data-viva=granae] .flow-bar{height:8px;background:var(--sup3);margin-top:8px}
+html[data-viva=granae] .flow-bar>i.ok{background:var(--c-verde)}
+html[data-viva=granae] .flow-bar>i.under{background:var(--c-ambar)}
+html[data-viva=granae] .flow-bar>i.over{background:var(--c-vermelho)}
+html[data-viva=granae] .flow-bar>i{transition:width 1s var(--suave)}
+html[data-viva=granae] .hero-cta{border-top:1px solid var(--fio);padding-top:2px}
+
+/* ação principal do resumo */
+html[data-viva=granae] .lancar-wrap{display:flex;justify-content:center;margin:2px 0 18px}
+html[data-viva=granae][lang] #dashLancar,html[data-viva=granae][lang] body button.primary{background:var(--acF)!important;border-color:var(--acF)!important;color:#fff!important}
+html[data-viva=granae] #dashLancar{min-height:48px;padding:10px 24px;border-radius:999px;font-size:15px;display:inline-flex;align-items:center;gap:8px}
+html[data-viva=granae] #dashLancar .ti{font-size:19px}
+html[data-viva=granae] button.primary{border-radius:999px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+html[data-viva=granae] button.primary.big{border-radius:999px}
+html[data-viva=granae] button.ghost{border-radius:999px;min-height:40px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+html[data-viva=granae] button.danger{border-radius:999px;background:var(--errSup);color:color-mix(in srgb,var(--errV) 80%,var(--tinta));border:0}
+html[data-viva=granae] button.danger:hover{background:var(--errV);color:#fff}
+html[data-viva=granae] button.link{color:var(--acInk);display:inline-flex;align-items:center;gap:4px}
+html[data-viva=granae] .file-btn{border-radius:999px;border:1.5px solid var(--fioF);background:var(--sup)}
+html[data-viva=granae] .x-btn{width:40px;height:40px;padding:0!important;border-radius:50%!important;border:0!important;background:var(--sup2)!important;font-size:18px}
+
+/* cartões e listas */
+html[data-viva=granae] .card{border-radius:var(--rG);border-color:var(--fio);box-shadow:var(--sombraV)}
+html[data-viva=granae] .card.alt{background:var(--sup)}
+html[data-viva=granae] .bar-item{border-radius:20px;border-color:var(--fio);box-shadow:var(--sombraV);transition:transform .2s var(--mola),box-shadow .2s,border-color .2s}
+html[data-viva=granae] .bar-item:hover{transform:translateY(-3px);box-shadow:var(--sombraM);border-color:color-mix(in srgb,var(--ac) 30%,var(--fio))}
+html[data-viva=granae] .bar-item .name .emoji{width:36px;height:36px;border-radius:50%;background:var(--sup2);display:grid;place-items:center;font-size:19px}
+html[data-viva=granae] .bar-item .track{background:var(--sup3);height:8px}
+html[data-viva=granae] .bar-item .fill{transition:width 1s var(--suave)}
+html[data-viva=granae] .tx-list{border-radius:var(--rG);border-color:var(--fio);box-shadow:var(--sombraV)}
+html[data-viva=granae] .tx-item .val{font-variant-numeric:tabular-nums}
+html[data-viva=granae] .tx-cat-chip{font-weight:650}
+html[data-viva=granae] .tx-day{background:var(--sup2)}
+html[data-viva=granae] .tx-month-summary{gap:10px;background:none;border:0;overflow:visible}
+html[data-viva=granae] .tms-cell{--k:var(--c-verde);border-radius:18px;background:color-mix(in srgb,var(--k) 11%,var(--sup));padding:12px 14px}
+html[data-viva=granae] .tms-cell:nth-child(2){--k:var(--c-laranja)}
+html[data-viva=granae] .tms-cell:nth-child(3){--k:var(--c-violeta)}
+html[data-viva=granae] .tms-label{font-size:12.5px;font-weight:600;color:var(--tinta2)}
+html[data-viva=granae] .tms-val{font-size:15px;color:color-mix(in srgb,var(--k) 58%,var(--tinta))}
+html[data-viva=granae] .tms-val.negative{color:var(--expense-2)}
+html[data-viva=granae] .scheduled-card{border-radius:var(--rG)}
+html[data-viva=granae] .scheduled-head:hover{background:var(--sup2)}
+html[data-viva=granae] .scheduled-hint{border-radius:14px;background:var(--acSup);border-color:transparent}
+html[data-viva=granae] .tx-filter-chip{background:var(--acSup);color:var(--acInk);border-color:transparent}
+html[data-viva=granae] .cat-item,html[data-viva=granae] .cmt-item,html[data-viva=granae] .fat-row,html[data-viva=granae] .cmt-kpi{border-radius:18px;border-color:var(--fio);box-shadow:var(--sombraV)}
+html[data-viva=granae] .cat-item{transition:transform .2s var(--mola),box-shadow .2s}
+html[data-viva=granae] .cat-item:hover{transform:translateY(-2px);box-shadow:var(--sombraM)}
+html[data-viva=granae] .cat-item .icon{border-radius:50%}
+html[data-viva=granae] .cmt-ico{border-radius:50%}
+html[data-viva=granae] .cmt-kpi{--k:var(--c-rosa);background:color-mix(in srgb,var(--k) 10%,var(--sup));border:0}
+html[data-viva=granae] .cmt-kpi:nth-child(2){--k:var(--c-laranja)}
+html[data-viva=granae] .cmt-kpi:nth-child(3){--k:var(--c-azul)}
+html[data-viva=granae] .cmt-bar,html[data-viva=granae] .proj-bar,html[data-viva=granae] .orc-mini-bar{background:var(--sup3)}
+html[data-viva=granae] .det-hero,html[data-viva=granae] .rev-tx{background:var(--sup2);border-radius:16px}
+html[data-viva=granae] .sf-chip{border-color:var(--fioF)}
+html[data-viva=granae] .chip-suggestion{border-radius:999px;min-height:38px}
+html[data-viva=granae] .file-drop{border-radius:var(--rG);border-color:var(--fioF)}
+html[data-viva=granae] .file-drop:hover{border-color:var(--ac);background:var(--acSup)}
+html[data-viva=granae] .deep-list,html[data-viva=granae] .ai-output{border-radius:var(--rG);border-color:var(--fio)}
+html[data-viva=granae] .deep-list li::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ac);top:14px;left:-18px}
+html[data-viva=granae] .ai-output strong{color:var(--acInk)}
+html[data-viva=granae] .empty{color:var(--tinta2)}
+html[data-viva=granae] .donut-svg>circle:first-child{stroke:var(--sup3)}
+html[data-viva=granae] .donut-total{font-weight:750;font-variant-numeric:tabular-nums}
+html[data-viva=granae] .chart-card{border-radius:var(--rG)}
+html[data-viva=granae] .tx-tools input{border-radius:999px!important;background:var(--sup)}
+html[data-viva=granae] .tx-tools button{border-radius:999px}
+
+/* segmentados (Despesa | Receita) e abas da IA */
+html[data-viva=granae] .seg,html[data-viva=granae] .ai-tabs{border-radius:999px;background:var(--sup2);border:0}
+html[data-viva=granae] .seg span,html[data-viva=granae] .ai-tab{border-radius:999px;min-height:40px}
+html[data-viva=granae] .seg input:checked+span,html[data-viva=granae] .ai-tab.active{background:var(--acF);color:#fff;box-shadow:0 6px 14px color-mix(in srgb,var(--ac) 28%,transparent)}
+html[data-viva=granae] .seg input:focus-visible+span{box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 28%,transparent)}
+
+/* modais: o tema trata .modal como fundo escurecido; aqui .modal é a própria caixa (dialog) */
+html[data-viva=granae][lang] body dialog.modal{background:var(--sup)!important;color:var(--tinta);border:1px solid var(--fio);border-radius:26px;box-shadow:var(--sombraM);
+  -webkit-backdrop-filter:none;backdrop-filter:none;padding:0}
+html[data-viva=granae] dialog.modal[open]{animation:vvPop .32s var(--mola) both}
+html[data-viva=granae] .modal::backdrop{background:rgba(20,24,39,.42);backdrop-filter:blur(6px)}
+html[data-viva=granae] .modal-head h3{font-size:19px;font-weight:700;letter-spacing:-.02em}
+
+/* botões flutuantes */
+html[data-viva=granae] .fab{background:var(--acF);box-shadow:0 10px 24px color-mix(in srgb,var(--ac) 40%,transparent);width:58px;height:58px;transition:transform .2s var(--mola)}
+html[data-viva=granae] .fab:hover{transform:translateY(-2px)}
+html[data-viva=granae] .fab.small{width:64px;height:64px;font-size:26px;display:inline-grid;place-items:center;color:#fff}
+html[data-viva=granae] .fab.small.danger{background:var(--errV)}
+html[data-viva=granae] #micBtn{bottom:calc(92px + env(safe-area-inset-bottom))}
+html[data-viva=granae] .new-tx-fab{display:none!important}
+html[data-viva=granae] .pulse{background:var(--acF)}
+
+/* aviso: centralizado sem transform (a animação do tema zera o translateX) */
+html[data-viva=granae][lang] body .toast{left:0;right:0;margin:0 auto;width:max-content;max-width:calc(100% - 32px);transform:none;bottom:calc(96px + env(safe-area-inset-bottom))}
+
+/* ---------- navegação ---------- */
+html[data-viva=granae] .bottom-nav{grid-template-columns:repeat(5,1fr);background:color-mix(in srgb,var(--sup) 94%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border-top:1px solid var(--fio);box-shadow:0 -6px 20px rgba(20,24,39,.06);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+html[data-viva=granae] .bottom-nav .nav-extra,html[data-viva=granae] .nav-lancar-pc{display:none}
+html[data-viva=granae] .bottom-nav button{color:var(--tinta2);gap:3px;padding:4px 2px;min-height:52px}
+html[data-viva=granae] .bottom-nav button small{font-size:11px;font-weight:600;letter-spacing:0;white-space:nowrap}
+html[data-viva=granae] .nav-ico{width:46px;height:30px;border-radius:999px;display:grid;place-items:center;font-size:21px;opacity:1;color:inherit;transition:background-color .2s,color .2s,transform .25s var(--mola)}
+html[data-viva=granae] .bottom-nav button.active{color:color-mix(in srgb,var(--c) 62%,var(--tinta))}
+html[data-viva=granae] .bottom-nav button.active small{color:inherit}
+html[data-viva=granae] .bottom-nav button.active .nav-ico{background:var(--c);color:#fff;transform:translateY(-1px)}
+html[data-viva=granae] .nav-lancar .nav-ico{width:48px;height:48px;border-radius:50%;background:var(--acF);color:#fff;font-size:24px;margin-top:-18px;box-shadow:0 8px 20px color-mix(in srgb,var(--ac) 40%,transparent)}
+html[data-viva=granae] .nav-lancar small{color:var(--acInk)}
+html[data-viva=granae] .mais-menu{position:fixed;right:10px;bottom:calc(74px + env(safe-area-inset-bottom));z-index:30;background:var(--sup);border:1px solid var(--fio);border-radius:22px;
+  box-shadow:var(--sombraM);padding:8px;display:grid;gap:2px;min-width:230px;animation:vvPop .25s var(--mola) both}
+html[data-viva=granae] .mais-menu[hidden]{display:none}
+html[data-viva=granae] .mais-menu button{display:flex;align-items:center;gap:12px;border:0;background:none;border-radius:16px;padding:8px 12px 8px 8px;font-size:14.5px;font-weight:600;color:var(--tinta);min-height:48px;text-align:left}
+html[data-viva=granae] .mais-menu button:hover{background:var(--sup2)}
+html[data-viva=granae] .mais-menu .nav-ico{width:34px;height:34px;border-radius:50%;font-size:18px;background:color-mix(in srgb,var(--c) 14%,var(--sup));color:color-mix(in srgb,var(--c) 70%,var(--tinta))}
+
+@media (min-width:720px){
+  html[data-viva=granae] .bottom-nav{border-radius:999px;background:var(--sup);box-shadow:var(--sombraM)}
+}
+@media (min-width:1024px){
+  html[data-viva=granae] body{padding-bottom:0;padding-left:248px}
+  html[data-viva=granae] .bottom-nav{width:248px;border-radius:0;background:var(--sup);box-shadow:none;border-right:1px solid var(--fio);padding:84px 14px 18px;gap:3px;grid-template-columns:1fr}
+  html[data-viva=granae] .bottom-nav .nav-extra{display:grid}
+  html[data-viva=granae] .bottom-nav .nav-lancar,html[data-viva=granae] .bottom-nav .nav-mais{display:none}
+  html[data-viva=granae] .nav-lancar-pc{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;border:0;border-radius:999px;background:var(--acF);color:#fff;font-weight:650;font-size:15px;
+    margin:0 4px 14px;box-shadow:0 8px 20px color-mix(in srgb,var(--ac) 32%,transparent);transition:transform .2s var(--mola),filter .2s}
+  html[data-viva=granae] .nav-lancar-pc:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  html[data-viva=granae] .nav-lancar-pc .ti{font-size:19px}
+  html[data-viva=granae] .bottom-nav button[data-nav]{grid-template-columns:34px 1fr;border-radius:999px;padding:5px 12px 5px 6px;min-height:44px;gap:12px;color:var(--tinta2)}
+  html[data-viva=granae] .bottom-nav button[data-nav] small{font-size:14px;font-weight:500}
+  html[data-viva=granae] .bottom-nav .nav-ico{width:34px;height:34px;border-radius:50%;font-size:18px;background:color-mix(in srgb,var(--c) 13%,transparent);color:color-mix(in srgb,var(--c) 72%,var(--tinta))}
+  html[data-viva=granae] .bottom-nav button[data-nav]:hover{background:var(--sup2);color:var(--tinta)}
+  html[data-viva=granae] .bottom-nav button[data-nav]:hover .nav-ico{transform:scale(1.1) rotate(-6deg)}
+  html[data-viva=granae] .bottom-nav button.active{background:color-mix(in srgb,var(--c) 11%,var(--sup))!important;color:color-mix(in srgb,var(--c) 62%,var(--tinta))}
+  html[data-viva=granae] .bottom-nav button.active small{font-weight:650}
+  html[data-viva=granae] .bottom-nav button.active .nav-ico{background:var(--c);color:#fff;box-shadow:0 6px 14px color-mix(in srgb,var(--c) 38%,transparent);transform:none}
+  html[data-viva=granae] .topbar{padding-left:28px}
+  html[data-viva=granae] .month-switcher,html[data-viva=granae] .month-switcher.tx-month{background:var(--papel)}
+  html[data-viva=granae] .hero-number{font-size:2.9rem!important}
+  html[data-viva=granae] #micBtn{bottom:28px}
+  html[data-viva=granae][lang] body .toast{bottom:28px}
+  html[data-viva=granae] .mais-menu{display:none}
+}
+@media (max-width:1023px){ html[data-viva=granae] .brand .user-name{display:none} }
+@keyframes grFlutua{0%,100%{transform:translate(0,0)}50%{transform:translate(-14px,12px)}}
+@media (prefers-reduced-motion:reduce){
+  html[data-viva=granae] .month-hero .hero-head::before,html[data-viva=granae] .month-hero .hero-head::after,html[data-viva=granae] dialog.modal[open],html[data-viva=granae] .mais-menu{animation:none!important}
+  html[data-viva=granae] :is(.flow-bar>i,.bar-item .fill){transition:none!important}
+}
+/* ajustes da camada viva (2ª passada) */
+html[data-viva=granae] .bottom-nav .nav-lancar-pc{color:#fff;display:none}
+@media (min-width:1024px){
+  html[data-viva=granae] .bottom-nav .nav-lancar-pc{display:inline-flex;grid-template-columns:none;padding:0 18px;font-size:15px;font-weight:650}
+  html[data-viva=granae] .bottom-nav{padding-top:22px}
+}
+html[data-viva=granae] .lancar-wrap{display:none}
+html[data-viva=granae] .proj-m{flex:0 0 86px}
+html[data-viva=granae] .tx-tools{flex-wrap:wrap}
+html[data-viva=granae] .tx-tools #txSearch{flex:1 1 100%;min-width:0}
+html[data-viva=granae] .tx-tools button{flex:1 1 auto;padding:0 12px}
+html[data-viva=granae] .tx-tools-2 select{flex:1 1 40%;min-width:0;border-radius:999px!important}
+html[data-viva=granae] .tx-tools-2 button{flex:1 1 auto}
+html[data-viva=granae] #filterType{width:auto;flex:0 0 auto;min-width:130px;border-radius:999px!important}
+html[data-viva=granae] .tx-item.pending{border-style:solid;background:color-mix(in srgb,var(--ac) 6%,var(--sup))}
+html[data-viva=granae] .tx-item.pending .val{font-style:normal}
+@media (min-width:1024px){
+  html[data-viva=granae] .tx-tools #txSearch{flex:1 1 320px}
+  html[data-viva=granae] .tx-tools button{flex:0 0 auto}
+}
+html[data-viva=granae] .tx-item.pending{border-width:0 0 1px;border-color:var(--fio)}
+html[data-viva=granae] .donut-total{font-size:15px}
+html[data-viva=granae] .donut-label{font-size:11.5px;font-weight:600}
+@media (min-width:440px){html[data-viva=granae] .donut-wrap{grid-template-columns:170px 1fr}html[data-viva=granae] .donut-svg-wrap{width:170px;height:170px}}
+html[data-viva=granae] .trend-svg{max-height:300px}
+@media (min-width:1024px){
+  html[data-viva=granae] #dashGraficos:not([hidden]){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 18px;align-items:start}
+  html[data-viva=granae] #dashGraficos #aiMonthBtn{grid-column:1/-1;width:auto!important;justify-self:center;padding:12px 26px}
+}
+/* cabeçalho e rodapé dos diálogos: o tema pinta todo header/footer como barra do app */
+html[data-viva=granae][lang] body dialog header.modal-head,html[data-viva=granae][lang] body dialog footer.modal-foot{background:none!important;border:0!important;-webkit-backdrop-filter:none;backdrop-filter:none;padding-top:0}
+html[data-viva=granae] .modal-foot{align-items:center}
+html[data-viva=granae] .modal-foot .primary{min-width:140px}
+@media (min-width:1024px){html[data-viva=granae] .cat-list{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}}
+/* cores fixas antigas trocadas por tokens (valem no claro e no escuro) */
+html[data-viva=granae] .cmt-juros{background:var(--avSup);border-color:transparent;color:var(--warning)}
+html[data-viva=granae] .proj-alerta{background:var(--errSup);border-color:transparent;color:var(--expense-2)}
+html[data-viva=granae] .fat-pg{border-color:var(--fioF);background:var(--sup);color:var(--tinta2)}
+html[data-viva=granae] .fat-pg.on{color:var(--income);border-color:var(--income);background:color-mix(in srgb,var(--okV) 12%,var(--sup))}
+html[data-viva=granae] .par-row.paga{background:color-mix(in srgb,var(--okV) 10%,var(--sup))}
+html[data-viva=granae] .par-row.paga .par-s{color:var(--income)}
+html[data-viva=granae] .dash-tabs{border-color:var(--fio)}
+html[data-viva=granae] .rev-cat{border-color:var(--fio);background:var(--sup)}
+html[data-viva=granae] .rev-cat kbd,html[data-viva=granae] .ai-output code{background:var(--sup2)}
+html[data-viva=granae] .section-title{flex-wrap:wrap;gap:8px}
+html[data-viva=granae] .section-title h2{margin-right:auto}
+/* a regra antiga ".bottom-nav button span" dessaturava o ícone (grayscale) */
+html[data-viva=granae] .bottom-nav .nav-ico,html[data-viva=granae] .mais-menu .nav-ico{filter:none;opacity:1}

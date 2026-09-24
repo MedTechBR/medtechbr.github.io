@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-astra="flashmed">
+<html lang="pt-BR" data-viva="flashmed" data-viva-escuro>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>FlashMed · Questões e Simulados · Residência Médica</title>
 <meta name="description" content="Banco de questões comentadas de residência médica e Revalida: monte sessões por concurso, ano, área, tema e prova. Simulados de provas reais com gabarito oficial.">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#F5F6FB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1017" media="(prefers-color-scheme: dark)">
 <link rel="icon" type="image/png" sizes="192x192" href="icone-192.png">
 <link rel="apple-touch-icon" href="icone-flashmed-180.png">
 <link rel="manifest" href="flashmed.webmanifest">
@@ -14,12 +15,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FlashMed">
 <link rel="icon" type="image/png" href="favicon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"flashmed",name:"FlashMed"};</script>
-<script type="module" src="_mtauth.js?v=25"></script>
+<script type="module" src="_mtauth.js?v=26"></script>
 <style>
   :root{
     --bg:#FAFAF8;
@@ -343,6 +341,7 @@
   .cond-xlink:hover{background:rgba(208,144,42,.20);border-color:rgba(208,144,42,.5)}
 </style>
 <link rel="stylesheet" href="_mttokens.css?v=3">
+<<<<<<< Updated upstream
 <link rel="stylesheet" href="_mtastra.css?v=5">
 <style id="fm-viva">
 /* ============================================================
@@ -729,6 +728,261 @@ html[data-astra] .topic .kind,html[data-astra] .topic .n{color:var(--k)!importan
     </div>
   </div>
 </header>
+=======
+<link rel="stylesheet" href="vendor/tabler/tabler-icons.min.css?v=3.48.0">
+<link rel="stylesheet" href="_mtviva.css?v=1">
+<style id="viva-flashmed">
+/* ============================================================
+   FlashMed, camada viva (23/09/2026). Modelo: ClínicaMed cm-v97.
+   Fica DEPOIS do _mtviva.css: é a camada do próprio app (vence pela ordem).
+   Questões: montar sessão → responder (letra em círculo; acerto pulsa, erro
+   treme) → comentário. Simulado: prova com barra de progresso → nota.
+   --paper aqui é a superfície do cartão (no _mtviva ele vira o fundo da página).
+   ============================================================ */
+html[data-viva="flashmed"] body{--paper:var(--sup);--shadow:var(--sombraV);padding:0 0 40px;font-size:15px}
+.wrap{max-width:820px}
+[hidden]{display:none!important}
+
+/* cabeçalho de uma linha, com as abas */
+html[data-viva="flashmed"] body header{position:sticky;top:0;z-index:30;padding:calc(env(safe-area-inset-top)) 0 0;margin-bottom:22px}
+.top{display:flex;align-items:center;gap:14px;min-height:64px;max-width:1120px}
+.logo{display:flex;align-items:center;gap:11px;font-weight:700;font-size:19px;letter-spacing:-.02em;color:var(--tinta);flex:0 0 auto}
+.logo .mark{width:36px;height:36px;display:grid;place-items:center;font-size:19px;flex:0 0 auto}
+.tagline{color:var(--tinta2);font-size:13.5px;font-weight:500;padding-left:14px;border-left:1px solid var(--fio);white-space:nowrap}
+html[data-viva="flashmed"] body .tabs{display:flex;gap:4px;margin:0 0 0 auto;flex-wrap:nowrap;background:var(--sup2);border:0;border-radius:999px;padding:4px;box-shadow:none!important}
+html[data-viva="flashmed"] body .tabs .tab{flex:0 0 auto;min-width:0;min-height:40px;padding:0 18px;border:0;border-radius:999px;background:none;font-size:14px;font-weight:600;color:var(--tinta2);gap:8px}
+html[data-viva="flashmed"] body .tabs .tab .ti{font-size:18px}
+html[data-viva="flashmed"] body .tabs .tab:hover:not(.active){background:var(--sup);color:var(--tinta)}
+html[data-viva="flashmed"] body .tabs .tab.active{background:var(--ac)!important;color:var(--acTxt)!important;box-shadow:0 6px 14px color-mix(in srgb,var(--ac) 30%,transparent)!important}
+
+/* botões */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 22px;border-radius:999px;font-size:15px;
+  background:var(--ac);color:var(--acTxt);box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 28%,transparent);transition:transform .18s var(--mola),box-shadow .2s,filter .2s}
+.btn:hover{background:var(--ac);filter:brightness(1.07);transform:translateY(-1px);box-shadow:0 10px 22px color-mix(in srgb,var(--ac) 34%,transparent)}
+.btn:disabled{background:var(--sup2);color:var(--tinta3);box-shadow:none;filter:none}
+.btn.sec{background:var(--sup);color:var(--tinta);border:1.5px solid var(--fioF);box-shadow:none}
+.btn.sec:hover{background:var(--acSup);border-color:color-mix(in srgb,var(--ac) 40%,var(--fio));color:var(--acInk);filter:none}
+.btn.sec:disabled{background:var(--sup);color:var(--tinta3);border-color:var(--fio)}
+.ghost{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:0 16px;border-radius:999px;border:1.5px solid var(--fioF);background:var(--sup);
+  color:var(--tinta);font-weight:600;font-size:14px;transition:background-color .15s,border-color .15s,color .15s,transform .18s var(--mola)}
+.ghost:hover{background:var(--acSup);border-color:color-mix(in srgb,var(--ac) 40%,var(--fio));color:var(--acInk)}
+.ghost .ti{font-size:17px}
+.ghost.perigo:hover{background:var(--errSup);border-color:var(--errV);color:var(--errV)}
+.ghost.destaque{border-color:var(--ac);color:var(--acInk);background:var(--acSup)}
+
+/* montador de sessão */
+.topics-intro{font-size:15px;color:var(--tinta2);margin-bottom:16px;line-height:1.55}
+.topics-intro b{color:var(--tinta)}
+#setup{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+#setup>*{grid-column:1/-1;min-width:0}
+#setup>.setup-card.meia{grid-column:auto}
+#setup>.topics-intro,#setup>.avail{margin:0}
+.setup-card{border-radius:var(--rG);padding:18px 20px;margin:0;box-shadow:var(--sombraV)}
+.setup-card h3{display:flex;align-items:center;gap:10px;font-size:15.5px;font-weight:650;letter-spacing:-.01em;margin-bottom:14px}
+.setup-card h3 .hi{--c:var(--ac);width:32px;height:32px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;font-size:17px;
+  background:color-mix(in srgb,var(--c) 14%,var(--sup));color:color-mix(in srgb,var(--c) 78%,var(--tinta))}
+.chip{min-height:38px;padding:0 14px;font-size:14px;font-weight:600;color:var(--tinta);border:1.5px solid var(--fioF);transition:background-color .15s,border-color .15s,color .15s,transform .18s var(--mola)}
+.chip:hover{border-color:var(--ac);color:var(--acInk)}
+.chip:active{transform:scale(.95)}
+/* filtro ligado: pílula tingida (todos vêm ligados; cheio em coral pesaria a tela inteira) */
+html[data-viva="flashmed"] body .chips .chip.on{background:var(--acSup)!important;color:var(--acInk)!important;border-color:color-mix(in srgb,var(--ac) 45%,var(--fio))!important}
+html[data-viva="flashmed"] body .chips .chip.on .dot{background:var(--ac);border-color:var(--ac);color:var(--acTxt)}
+html[data-viva="flashmed"] body .chips .chip.on small{color:var(--acInk);opacity:.85}
+.chip .dot{border-color:var(--fioF)}
+.areas{gap:10px}
+.area-row{min-height:48px;border:1.5px solid var(--fio);border-radius:16px;transition:border-color .15s,background-color .15s,transform .18s var(--mola)}
+.area-row:hover{border-color:color-mix(in srgb,var(--ac) 45%,var(--fio))}
+.area-row:active{transform:scale(.985)}
+.area-row.on{border-color:color-mix(in srgb,var(--ac) 50%,var(--fio));background:var(--acSup)}
+.area-row.on .sw{background:var(--ac)}
+.area-row .ct{color:var(--tinta2)}
+html[data-viva="flashmed"] body .ac-in{min-height:48px;padding:0 16px;font-size:16px;border-radius:999px}
+.ac-list{border-radius:18px;box-shadow:var(--sombraM);border-color:var(--fio);background:var(--sup)}
+.ac-item{border-radius:12px;min-height:40px}
+.pc{border:0;background:var(--acSup);color:var(--acInk);min-height:34px}
+.pc button{color:var(--acInk);width:26px;height:26px;border-radius:50%;display:grid;place-items:center}
+.pc button:hover{background:color-mix(in srgb,var(--ac) 18%,transparent);color:var(--acInk)}
+.hint-line{font-size:13px;color:var(--tinta2);margin-top:10px}
+.qty-val{font-family:inherit;font-variant-numeric:tabular-nums;font-weight:700;font-size:17px;color:var(--acTxt);background:var(--ac);border-radius:999px;padding:6px 14px;min-width:60px}
+.avail{font-size:14.5px;color:var(--tinta2);text-align:center;padding:4px 0}
+.avail b{color:var(--acInk);font-size:17px}
+html[data-viva="flashmed"] body .build{display:flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:0 24px;border-radius:999px;font-size:17px;font-weight:650;
+  background:var(--ac);color:var(--acTxt);box-shadow:0 10px 24px color-mix(in srgb,var(--ac) 32%,transparent);transition:transform .18s var(--mola),box-shadow .2s,filter .2s}
+html[data-viva="flashmed"] body .build:hover:not(:disabled){filter:brightness(1.07);transform:translateY(-1px)}
+html[data-viva="flashmed"] body .build:disabled{background:var(--sup3);color:var(--tinta2);box-shadow:none}
+.setup-actions{gap:8px;margin-top:0}
+.setup-actions .ghost{flex:1 1 180px}
+.perf-panel{border-radius:var(--rG);padding:18px 20px;margin:0!important;box-shadow:var(--sombraV)}
+.perf-head{font-size:15.5px;font-weight:650;margin-bottom:14px;display:flex;flex-direction:column;gap:2px}
+.perf-sub{font-size:13px}
+.perf-row{min-height:40px;border-radius:12px}
+.perf-bar-wrap{height:8px;background:var(--sup3)}
+.perf-bar{transition:width .9s var(--suave)}
+.perf-tema{font-size:14px}
+.perf-pct{font-size:13px}
+.perf-focus{display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;border-radius:999px;border:0;background:var(--errSup);color:color-mix(in srgb,var(--errV) 70%,var(--tinta));font-size:14.5px}
+.perf-focus:hover{background:var(--errV);color:#fff}
+.focus-banner{border-radius:18px;border:0;background:var(--errSup)}
+.focus-banner button{border-radius:999px;min-height:36px}
+
+/* sessão: indicadores e progresso */
+.stats{display:grid;grid-template-columns:auto repeat(3,minmax(0,1fr));gap:12px;align-items:stretch;background:none;border:0;box-shadow:none;padding:0;margin-bottom:14px}
+.ring{width:84px;height:84px;align-self:center;background:var(--sup);border-radius:50%;box-shadow:var(--sombraV);padding:6px}
+.ring text{font-family:inherit!important;font-variant-numeric:tabular-nums}
+#ringFill{transition:stroke-dasharray .9s var(--suave),stroke .3s}
+.metrics{display:contents}
+.metric{padding:14px 16px;display:flex;flex-direction:column;justify-content:center}
+.metric .v{font-family:inherit;font-variant-numeric:tabular-nums;font-size:26px;font-weight:750;letter-spacing:-.03em}
+.metric .l{font-size:13px;font-weight:600;text-transform:none;letter-spacing:0;color:var(--tinta2);margin-top:4px}
+.controls{gap:8px;margin-bottom:14px}
+.qProg{height:8px;border-radius:999px;background:var(--sup3);overflow:hidden;margin:0 0 18px}
+.qProg i{display:block;height:100%;border-radius:999px;background:var(--ac);transition:width .8s var(--suave)}
+
+/* questão */
+.card{border-radius:26px;padding:28px 30px;box-shadow:var(--sombraV)}
+.src-line,.qhead{gap:8px;margin-bottom:16px}
+.num{background:var(--acSup);color:var(--acInk);border-radius:999px;padding:6px 14px;font-size:13.5px;font-weight:650}
+.badge{text-transform:none;letter-spacing:0;font-size:13px;font-weight:600;border:0;background:var(--sup2);color:var(--tinta2);padding:5px 12px}
+.src{border-radius:999px;padding:4px 11px;font-size:12.5px;font-weight:600;letter-spacing:0}
+.src.tema{background:var(--okSup);color:color-mix(in srgb,var(--okV) 65%,var(--tinta))}
+.src.anul{background:var(--avSup);color:color-mix(in srgb,var(--avV) 62%,var(--tinta))}
+.enun{font-size:17px;line-height:1.75;margin-bottom:18px}
+.opts-hint{display:block;font-size:13px;margin:0 2px 12px}
+.opts-hint .ti{vertical-align:-2px;margin-right:4px}
+.opts{gap:12px}
+.opt{align-items:center;gap:14px;border-radius:18px;border:1.5px solid var(--fio);padding:13px 16px;font-size:15.5px;line-height:1.5;background:var(--sup);
+  transition:transform .18s var(--mola),border-color .15s,background-color .15s,box-shadow .2s}
+.opt .key{width:34px;height:34px;min-width:34px;border-radius:50%;border:0;background:var(--sup2);color:var(--tinta2);font-size:14px;font-weight:700;
+  transition:background-color .2s,color .2s,transform .25s var(--mola)}
+.opt .txt{padding-top:0}
+.opt:hover:not(:disabled){border-color:var(--ac);background:var(--acSup);transform:translateX(4px);box-shadow:0 6px 18px color-mix(in srgb,var(--ac) 14%,transparent)}
+.opt:hover:not(:disabled) .key{background:var(--ac);color:var(--acTxt);transform:scale(1.08)}
+.opt:active:not(:disabled){transform:scale(.985)}
+.opt.sel{border-color:var(--ac);background:var(--acSup)}
+.opt.sel .key{background:var(--ac);color:var(--acTxt);border:0}
+.opt.right{border-color:var(--okV);background:var(--okSup);animation:fmAcerto .55s var(--mola);opacity:1}
+.opt.wrong{border-color:var(--errV);background:var(--errSup);animation:fmTreme .45s;opacity:1}
+/* letra em círculo cheio: tons escurecidos para o branco passar 4,5:1 */
+.opt.right .key{background:color-mix(in srgb,var(--okV) 65%,#000);color:#fff;font-size:0;position:relative}
+.opt.right .key::before{content:"";width:14px;height:8px;border-left:3px solid #fff;border-bottom:3px solid #fff;transform:translateY(-2px) rotate(-45deg);animation:fmMarca .45s var(--mola) .1s both}
+.opt.wrong .key{background:color-mix(in srgb,var(--errV) 70%,#000);color:#fff}
+/* a folha deixa todo botão desabilitado a 50%: a alternativa respondida tem de ficar legível */
+html[data-viva="flashmed"] body .opt:disabled{opacity:1}
+html[data-viva="flashmed"] body .opt.dim{opacity:.62}
+html[data-viva="flashmed"] body .opt.struck{border-style:dashed;opacity:.6}
+html[data-viva="flashmed"] body .opt.struck.right,html[data-viva="flashmed"] body .opt.struck.wrong{opacity:1}
+.feedback{border-radius:20px;padding:16px 18px;font-size:15px;margin-top:18px}
+.feedback.show{animation:fmDesliza .4s var(--suave) both}
+.feedback.ok{background:var(--okSup);border:1px solid color-mix(in srgb,var(--okV) 30%,transparent)}
+.feedback.no{background:var(--errSup);border:1px solid color-mix(in srgb,var(--errV) 30%,transparent)}
+.feedback .verdict{font-size:16px;gap:8px}
+.feedback .verdict .ti{font-size:21px}
+.feedback.ok .verdict{color:color-mix(in srgb,var(--okV) 65%,var(--tinta))}
+.feedback.no .verdict{color:color-mix(in srgb,var(--errV) 68%,var(--tinta))}
+.feedback .body b{color:var(--tinta)}
+.ref-line{border-top:1px dashed color-mix(in srgb,var(--tinta) 18%,transparent);font-size:13px}
+.cond-xlink{min-height:40px;border-radius:999px!important;border:0!important;background:var(--sup)!important;color:var(--acInk)!important;padding:0 16px!important}
+.cond-xlink:hover{background:var(--acSup)!important}
+.nav{margin-top:20px}
+.foot{font-size:13px;color:var(--tinta2)}
+
+/* simulado */
+.topics{gap:14px}
+.topic{border-radius:22px;padding:18px;gap:8px;box-shadow:var(--sombraV);transition:transform .2s var(--mola),box-shadow .2s,border-color .2s}
+.topic:hover{transform:translateY(-4px);box-shadow:var(--sombraM);border-color:color-mix(in srgb,var(--ac) 35%,var(--fio))}
+.topic .kind{display:inline-flex;align-items:center;gap:7px;text-transform:none;letter-spacing:0;font-size:13px;font-weight:600;color:var(--acInk)}
+.topic .kind .ti{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--ac);color:var(--acTxt);font-size:16px}
+.topic h3{font-size:16.5px;letter-spacing:-.01em}
+.topic p{font-size:13.5px}
+.topic .n{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 11px;font-size:12.5px;font-weight:600;letter-spacing:0}
+.topic .n.feito{background:var(--okSup);color:color-mix(in srgb,var(--okV) 65%,var(--tinta))}
+.simBar{display:block;height:6px;border-radius:999px;background:var(--sup3);overflow:hidden;margin-top:4px}
+.simBar i{display:block;height:100%;border-radius:999px;background:var(--ac)}
+.sim-topbar{gap:8px;margin-bottom:14px}
+.sim-topbar .vt{font-size:15px;color:var(--tinta)}
+.sim-palette{border-radius:20px;padding:12px;gap:8px;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));box-shadow:var(--sombraV)}
+.sim-cell{border-radius:50%;aspect-ratio:1;padding:0;display:grid;place-items:center;border:1.5px solid var(--fio);font-variant-numeric:tabular-nums;transition:transform .18s var(--mola)}
+.sim-cell:hover{transform:scale(1.08);border-color:var(--ac)}
+.sim-cell.ans{background:var(--acSup);border-color:color-mix(in srgb,var(--ac) 50%,var(--fio));color:var(--acInk)}
+.sim-cell.cur{outline:0;background:var(--ac);border-color:var(--ac);color:var(--acTxt)}
+.sim-score{font-family:inherit;font-variant-numeric:tabular-nums;font-size:52px;font-weight:750;letter-spacing:-.04em;color:var(--acInk)}
+.simNota{font-size:14px;font-weight:600;color:var(--tinta2);margin-top:4px}
+.simConta{display:flex;flex-wrap:wrap;gap:8px}
+.simConta span{--k:var(--c-azul);display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 12px;font-size:13.5px;font-weight:600;
+  background:color-mix(in srgb,var(--k) 12%,var(--sup));color:color-mix(in srgb,var(--k) 62%,var(--tinta));font-variant-numeric:tabular-nums}
+.simConta .c1{--k:var(--okV)}.simConta .c2{--k:var(--errV)}.simConta .c3{--k:var(--c-cinza)}.simConta .c4{--k:var(--avV)}
+.sim-rev .it{border-radius:16px;min-height:48px;border-width:1.5px}
+.sim-rev .it.an{border-color:var(--avV);background:var(--avSup)}
+.sim-rev .it .chev{font-size:18px}
+
+/* caneta */
+/* a caneta é ferramenta de apoio: botão claro, para não competir com a ação principal */
+.pen-fab{width:48px;height:48px;background:var(--sup);color:var(--acInk);border:1px solid var(--fio);box-shadow:var(--sombraM);font-size:22px;transition:transform .2s var(--mola),background-color .2s}
+.pen-fab:hover{transform:scale(1.06)}
+.pen-fab.on{background:var(--errV);color:#fff}
+.pen-tools{border-radius:999px;padding:8px 12px;box-shadow:var(--sombraM);border-color:var(--fio)}
+.pen-btn{border-radius:999px;min-height:34px;padding:0 13px}
+
+.avisos{position:fixed;left:0;right:0;bottom:24px;z-index:9995;display:flex;justify-content:center;pointer-events:none;padding:0 16px}
+html[data-viva="flashmed"] body .toast{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;font-size:14px;font-weight:600;max-width:100%}
+.soPc{display:none}
+@media (pointer:fine){.soPc{display:inline}}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:fmGira .7s linear infinite;vertical-align:-3px}
+
+@keyframes fmAcerto{0%{transform:scale(1)}35%{transform:scale(1.025)}100%{transform:scale(1)}}
+@keyframes fmTreme{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(2px)}}
+@keyframes fmMarca{0%{transform:translateY(-2px) rotate(-45deg) scale(.2);opacity:0}100%{transform:translateY(-2px) rotate(-45deg) scale(1);opacity:1}}
+@keyframes fmDesliza{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes fmGira{to{transform:rotate(360deg)}}
+
+@media (max-width:980px){.tagline{display:none}}
+@media (max-width:720px){#setup{grid-template-columns:minmax(0,1fr)}#setup>.setup-card.meia{grid-column:1/-1}}
+/* celular: abas na barra inferior, ícone ativo em pílula */
+@media (max-width:640px){
+  /* sem desfoque no cabeçalho: ele prenderia a barra inferior (position:fixed) dentro dele */
+  html[data-viva="flashmed"] body header{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--sup)!important;margin-bottom:16px}
+  html[data-viva="flashmed"] body{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+  html[data-viva="flashmed"] body .tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;margin:0;border-radius:0!important;padding:6px 12px calc(6px + env(safe-area-inset-bottom));gap:6px;
+    background:var(--sup)!important;border-top:1px solid var(--fio)!important;box-shadow:0 -6px 20px rgba(20,24,39,.06)!important}
+  html[data-viva="flashmed"] body .tabs .tab{flex:1;flex-direction:column;gap:3px;min-height:54px;padding:4px 0;font-size:12px;background:none!important;box-shadow:none!important;color:var(--tinta2)!important}
+  html[data-viva="flashmed"] body .tabs .tab .ti{width:52px;height:30px;border-radius:999px;display:grid;place-items:center;font-size:20px;transition:background-color .2s,color .2s,transform .25s var(--mola)}
+  html[data-viva="flashmed"] body .tabs .tab.active{color:var(--acInk)!important;background:none!important;box-shadow:none!important}
+  html[data-viva="flashmed"] body .tabs .tab.active .ti{background:var(--ac);color:var(--acTxt);transform:translateY(-1px)}
+  .penbar{bottom:calc(84px + env(safe-area-inset-bottom))}
+  .avisos{bottom:calc(84px + env(safe-area-inset-bottom))}
+  .card{padding:20px 16px;border-radius:22px}
+  .stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .ring{display:none}
+  .metric{padding:12px}
+  .metric .v{font-size:22px}
+  .metric .l{font-size:12px}
+  .controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .controls .ghost{padding:4px 8px;min-height:44px;font-size:13px;line-height:1.2;white-space:normal;text-align:center}
+  .controls .ghost .ti{display:none}
+  .enun{font-size:16px}
+  .opt{padding:12px 13px;gap:12px;font-size:15px}
+  .opt:hover:not(:disabled){transform:none}
+  .chip,.ghost,.area-row{min-height:44px}
+  .sim-score{font-size:44px}
+  .perf-tema{flex:0 0 40%}
+  .perf-pct{flex:0 0 auto}
+  .sim-topbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .sim-topbar .vt{grid-column:1/-1;grid-row:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;font-size:15.5px}
+  .sim-topbar .ghost,.sim-topbar .btn{min-height:44px;padding:0 10px;font-size:13.5px}
+}
+@media (prefers-reduced-motion:reduce){.opt.right,.opt.wrong,.feedback.show,.opt.right .key::before{animation:none!important}.qProg i,#ringFill,.perf-bar{transition:none}}
+</style>
+</head>
+<body>
+<header><div class="wrap top">
+  <div class="logo"><span class="mark"><i class="ti ti-cards" aria-hidden="true"></i></span><span>FlashMed</span></div>
+  <span class="tagline">Questões e simulados de residência</span>
+  <nav class="tabs" role="tablist" aria-label="Seções">
+    <button class="tab active" id="tabBtnQ" data-tab="questoes" role="tab"><i class="ti ti-list-check" aria-hidden="true"></i><span>Questões</span></button>
+    <button class="tab" id="tabBtnSim" data-tab="simulado" role="tab"><i class="ti ti-clipboard-check" aria-hidden="true"></i><span>Simulado</span></button>
+  </nav>
+</div></header>
+>>>>>>> Stashed changes
 
 <div class="wrap">
 
@@ -736,6 +990,7 @@ html[data-astra] .topic .kind,html[data-astra] .topic .n{color:var(--k)!importan
 
   <!-- ===== Montador de sessão ===== -->
   <div id="setup">
+<<<<<<< Updated upstream
     <section class="fm-hero" id="fmHero" aria-label="Seu progresso no banco">
       <span class="bola b1" aria-hidden="true"></span><span class="bola b2" aria-hidden="true"></span>
       <div class="txt">
@@ -759,49 +1014,52 @@ html[data-astra] .topic .kind,html[data-astra] .topic .n{color:var(--k)!importan
       <div class="ind" style="--k:var(--c-vinho)"><i><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8" stroke-dasharray="3 3.3"/></svg></i><div><b id="indNovas">0</b><span>ainda não vistas</span></div></div>
     </div>
     <p class="topics-intro">Monte a sessão do jeito que você quer estudar. São <b id="poolTotal">0</b> questões comentadas no banco — provas oficiais de residência e Revalida, além das autorais MedTech.</p>
+=======
+    <p class="topics-intro">Monte a sessão do jeito que você quer estudar. São <b id="poolTotal">0</b> questões comentadas: provas oficiais de residência e Revalida, além das autorais MedTech.</p>
+>>>>>>> Stashed changes
 
-    <div class="setup-card">
-      <h3>Questões de concursos específicos</h3>
+    <div class="setup-card meia">
+      <h3><span class="hi" style="--c:var(--c-azul)"><i class="ti ti-building-hospital" aria-hidden="true"></i></span> Concursos</h3>
       <div class="chips" id="cTipo"></div>
     </div>
 
-    <div class="setup-card">
-      <h3>Questões de anos específicos</h3>
+    <div class="setup-card meia">
+      <h3><span class="hi" style="--c:var(--c-violeta)"><i class="ti ti-calendar" aria-hidden="true"></i></span> Anos</h3>
       <div class="chips" id="cAno"></div>
     </div>
 
     <div class="setup-card">
-      <h3>Questões de áreas específicas</h3>
+      <h3><span class="hi" style="--c:var(--c-verde)"><i class="ti ti-category" aria-hidden="true"></i></span> Áreas</h3>
       <div class="areas" id="cArea"></div>
     </div>
 
-    <div class="setup-card">
-      <h3>Questões apenas de temas específicos</h3>
+    <div class="setup-card meia">
+      <h3><span class="hi" style="--c:var(--c-laranja)"><i class="ti ti-tags" aria-hidden="true"></i></span> Temas</h3>
       <div class="ac-wrap">
-        <input class="ac-in" id="acTema" placeholder="Buscar… (exemplo: asma, sepse, pré-natal…)" autocomplete="off" enterkeyhint="done">
+        <input class="ac-in" id="acTema" placeholder="Buscar tema: asma, sepse, pré-natal" autocomplete="off" enterkeyhint="done">
         <div class="ac-list" id="acTemaList" hidden></div>
       </div>
       <div class="picked" id="pkTema"></div>
       <div class="hint-line" id="hintTema">Temas escolhidos: <b>todos</b></div>
     </div>
 
-    <div class="setup-card">
-      <h3>Questões de provas específicas</h3>
+    <div class="setup-card meia">
+      <h3><span class="hi" style="--c:var(--c-ciano)"><i class="ti ti-file-certificate" aria-hidden="true"></i></span> Provas</h3>
       <div class="ac-wrap">
-        <input class="ac-in" id="acProva" placeholder="Buscar… (exemplo: ENARE, Revalida, USP…)" autocomplete="off" enterkeyhint="done">
+        <input class="ac-in" id="acProva" placeholder="Buscar prova: ENARE, Revalida, USP" autocomplete="off" enterkeyhint="done">
         <div class="ac-list" id="acProvaList" hidden></div>
       </div>
       <div class="picked" id="pkProva"></div>
       <div class="hint-line" id="hintProva">Provas escolhidas: <b>todas</b></div>
     </div>
 
-    <div class="setup-card">
-      <h3>Outros</h3>
+    <div class="setup-card meia">
+      <h3><span class="hi" style="--c:var(--c-cinza)"><i class="ti ti-adjustments" aria-hidden="true"></i></span> Outros</h3>
       <div class="chips" id="cOutros"></div>
     </div>
 
-    <div class="setup-card">
-      <h3>Quantidade de questões</h3>
+    <div class="setup-card meia">
+      <h3><span class="hi" style="--c:var(--c-rosa)"><i class="ti ti-list-numbers" aria-hidden="true"></i></span> Quantidade</h3>
       <div class="qty-row">
         <input type="range" id="qty" min="5" max="120" step="5" value="20" aria-label="Quantidade de questões">
         <span class="qty-val" id="qtyVal">20</span>
@@ -810,18 +1068,22 @@ html[data-astra] .topic .kind,html[data-astra] .topic .n{color:var(--k)!importan
     </div>
 
     <div class="avail" id="avail"></div>
-    <button class="build" id="build">Gerar questões</button>
+    <button class="build" id="build"><i class="ti ti-player-play" aria-hidden="true"></i> Gerar questões</button>
     <div class="setup-actions">
-      <button class="ghost" id="resumeBtn" hidden>↩︎ Continuar a última sessão</button>
-      <button class="ghost" id="iaGerar">Criar questões com IA</button>
-      <button class="ghost" id="clearFilters">Limpar filtros</button>
-      <button class="ghost" id="perfToggle">Meu desempenho</button>
+      <button class="ghost destaque" id="resumeBtn" hidden><i class="ti ti-player-track-next" aria-hidden="true"></i> Continuar a última sessão</button>
+      <button class="ghost" id="iaGerar"><i class="ti ti-wand" aria-hidden="true"></i> Criar questões com IA</button>
+      <button class="ghost" id="clearFilters"><i class="ti ti-filter-off" aria-hidden="true"></i> Limpar filtros</button>
+      <button class="ghost" id="perfToggle"><i class="ti ti-chart-bar" aria-hidden="true"></i> Meu desempenho</button>
     </div>
 
     <div class="perf-panel" id="perfPanel" hidden style="margin-top:12px">
-      <div class="perf-head">Desempenho por tema <span class="perf-sub">— toque num tema fraco pra montar uma sessão só dele</span></div>
+      <div class="perf-head">Desempenho por especialidade <span class="perf-sub">Toque numa especialidade para treinar só ela.</span></div>
       <div class="perf-list" id="perfList"><!-- via JS --></div>
+<<<<<<< Updated upstream
       <button class="perf-focus" id="focusBtn" hidden>Montar sessão com meus pontos fracos</button>
+=======
+      <button class="perf-focus" id="focusBtn" hidden><i class="ti ti-target-arrow" aria-hidden="true"></i> Montar sessão com meus pontos fracos</button>
+>>>>>>> Stashed changes
     </div>
   </div>
 
@@ -842,9 +1104,9 @@ html[data-astra] .topic .kind,html[data-astra] .topic .n{color:var(--k)!importan
     </div>
 
     <div class="controls">
-      <button class="ghost" id="backSetup">← Nova sessão</button>
-      <button class="ghost" id="shuffle">Embaralhar</button>
-      <button class="ghost" id="reset">Zerar desempenho</button>
+      <button class="ghost" id="backSetup"><i class="ti ti-arrow-left" aria-hidden="true"></i> Nova sessão</button>
+      <button class="ghost" id="shuffle"><i class="ti ti-arrows-shuffle" aria-hidden="true"></i> Embaralhar</button>
+      <button class="ghost perigo" id="reset"><i class="ti ti-trash" aria-hidden="true"></i> Zerar desempenho</button>
     </div>
 
     <div class="card" id="card"><!-- preenchido via JS --></div>
@@ -857,15 +1119,15 @@ html[data-astra] .topic .kind,html[data-astra] .topic .n{color:var(--k)!importan
 
   <div id="panel-simulado" class="panel" hidden>
     <div class="sim-list" data-view="list">
-      <p class="topics-intro">Simulados no formato da <b>prova real (FGV/ENARE)</b>: você responde tudo <b>sem ver o gabarito</b> e, ao finalizar, recebe a <b>nota final</b>. O progresso fica salvo — dá para pausar e continuar depois.</p>
+      <p class="topics-intro">Simulados no formato da <b>prova real (FGV/ENARE)</b>: você responde tudo <b>sem ver o gabarito</b> e, ao finalizar, recebe a <b>nota final</b>. O progresso fica salvo, então dá para pausar e continuar depois.</p>
       <div class="topics" data-simgrid><!-- via JS --></div>
     </div>
     <div class="sim-run" data-view="run" hidden>
       <div class="sim-topbar">
-        <button class="ghost" data-simback>← Sair</button>
+        <button class="ghost" data-simback><i class="ti ti-arrow-left" aria-hidden="true"></i> Sair</button>
         <span class="vt" data-simtitle></span>
-        <button class="ghost" data-simpalette>Nº das questões</button>
-        <button class="btn" data-simfinish>Finalizar</button>
+        <button class="ghost" data-simpalette><i class="ti ti-grid-dots" aria-hidden="true"></i> Ir para questão</button>
+        <button class="btn" data-simfinish><i class="ti ti-flag-check" aria-hidden="true"></i> Finalizar</button>
       </div>
       <div class="sim-palette" data-palette hidden></div>
       <div class="card" data-simcard></div>
@@ -985,11 +1247,11 @@ function promptGerar(tema, esp, area, n){
 }
 async function gerarQuestoesIA(btn){
   const tema = (F.temas.size ? [...F.temas][0] : "").trim();
-  if(!tema){ alert("Escolha um tema primeiro (campo “Questões apenas de temas específicos”) — a IA escreve questões novas daquele tema."); return; }
+  if(!tema){ fmAviso("Escolha um tema primeiro no campo Temas: a IA escreve questões novas daquele tema.","erro"); const ac=$("acTema"); if(ac){ ac.scrollIntoView({block:"center",behavior:"smooth"}); setTimeout(()=>ac.focus({preventScroll:true}),350); } return; }
   const base = POOL.find(q=>q.tema===tema) || {};
   const n = 3;
   const antes = btn.innerHTML;
-  btn.disabled = true; btn.innerHTML = "Escrevendo " + n + " questões de “" + tema + "”…";
+  btn.disabled = true; btn.innerHTML = '<span class="spin" aria-hidden="true"></span> Escrevendo ' + n + " questões de “" + tema + "”";
   try{
     if(!window.MT || !MT.user) throw new Error("Entre na conta MedTech para usar a IA.");
     const txt = await MT.ai(promptGerar(tema, base.esp, base.area, n), "gemini-2.5-pro");
@@ -1022,11 +1284,15 @@ async function gerarQuestoesIA(btn){
     reindexar(); renderTipos(); renderAnos(); renderAreas(); drawTemasPicked(); drawProvasPicked();
     $("poolTotal").textContent = POOL.length;
     countAvailable();
-    btn.innerHTML = "✓ " + criadas + " questão(ões) criada(s) — já entram nos filtros";
+    btn.innerHTML = '<i class="ti ti-circle-check" aria-hidden="true"></i> ' + criadas + " questão(ões) criada(s), já nos filtros";
     setTimeout(()=>{ btn.innerHTML = antes; btn.disabled = false; }, 2600);
     return;
   }catch(e){
+<<<<<<< Updated upstream
     alert((e.message || "Não consegui gerar agora."));
+=======
+    fmAviso((e.message || "Não consegui gerar agora.") + " Tente de novo em alguns segundos.","erro");
+>>>>>>> Stashed changes
   }
   btn.innerHTML = antes; btn.disabled = false;
 }
@@ -1349,7 +1615,7 @@ function countAvailable(){
   rng.max = String(max);
   if(+rng.value > max){ rng.value = String(max); F.qty = max; $("qtyVal").textContent = max; }
   if(n === 0){
-    av.innerHTML = `Nenhuma questão passa nesses filtros. <br>Solte algum filtro acima — ou toque em <b>Limpar filtros</b>.`;
+    av.innerHTML = `Nenhuma questão passa nesses filtros. <br>Solte algum filtro acima ou toque em <b>Limpar filtros</b>.`;
     btn.disabled = true;
   } else {
     av.innerHTML = `<b>${n}</b> ${n===1?"questão disponível":"questões disponíveis"} · a sessão vai usar <b>${Math.min(F.qty,n)}</b>`;
@@ -1410,15 +1676,23 @@ function render(){
 
   const fonte = q.tipo === "autoral" ? "Autoral MedTech" : `${q.inst} ${q.ano}`;
   card.innerHTML = `
+    <div class="qProg" aria-hidden="true"><i style="width:${Math.round((session.pos+1)/session.ids.length*100)}%"></i></div>
     <div class="src-line">
       <span class="num">Questão ${session.pos+1} de ${session.ids.length}</span>
       <span class="src prova">${escapeAttr(fonte)}</span>
       ${q.esp?`<span class="src esp">${escapeAttr(ESP_LABEL[q.esp]||q.esp)}</span>`:""}
       ${q.tema?`<span class="src tema">${escapeAttr(q.tema)}</span>`:""}
+<<<<<<< Updated upstream
       ${q.anulada?`<span class="src anul">ANULADA</span>`:""}
       <span class="opts-hint">↔ Arraste uma alternativa para o lado para riscá-la</span>
     </div>
     <div class="enun">${q.q}</div>
+=======
+      ${q.anulada?`<span class="src anul">Anulada</span>`:""}
+    </div>
+    <div class="enun">${q.q}</div>
+    <div class="opts-hint"><i class="ti ti-arrows-horizontal" aria-hidden="true"></i> Arraste uma alternativa para o lado para riscá-la<span class="soPc">. Teclas de A a E respondem; as setas mudam de questão.</span></div>
+>>>>>>> Stashed changes
     <div class="opts" id="opts">
       ${q.ops.map((o,j)=>`
         <button class="opt" data-j="${j}">
@@ -1431,8 +1705,8 @@ function render(){
       <div class="body" id="fbbody"></div>
     </div>
     <div class="nav">
-      <button class="btn sec" id="prev" ${session.pos===0?"disabled":""}>← Anterior</button>
-      <button class="btn" id="next" ${session.pos>=session.ids.length-1?"disabled":""}>Próxima →</button>
+      <button class="btn sec" id="prev" ${session.pos===0?"disabled":""}><i class="ti ti-arrow-left" aria-hidden="true"></i> Anterior</button>
+      <button class="btn" id="next" ${session.pos>=session.ids.length-1?"disabled":""}>Próxima <i class="ti ti-arrow-right" aria-hidden="true"></i></button>
     </div>`;
 
   const struck = new Set(strikes[qid] || []);
@@ -1510,15 +1784,19 @@ function revealState(qid, sel){
   const fb = $("fb");
   fb.className = "feedback show " + (ok ? "ok" : "no");
   $("verdict").innerHTML = q.anulada
-    ? "⚖︎ Questão anulada pela banca — pontua para todos"
-    : ok ? "✓ Resposta correta"
-         : `✗ Resposta incorreta — gabarito: ${LETTERS[q.correct]}`;
+    ? '<i class="ti ti-scale" aria-hidden="true"></i> Questão anulada pela banca: pontua para todos'
+    : ok ? '<i class="ti ti-circle-check" aria-hidden="true"></i> Resposta correta'
+         : `<i class="ti ti-circle-x" aria-hidden="true"></i> Resposta incorreta. Gabarito: ${LETTERS[q.correct]}`;
   const fonte = q.tipo === "autoral"
-    ? `<b>Autoral MedTech</b> — escrita a partir da diretriz citada acima.`
-    : `<b>${escapeAttr(q.prova)}</b> · ${escapeAttr(q.banca)} · ${q.ano} — gabarito oficial.`;
+    ? `<b>Autoral MedTech</b>, escrita a partir da diretriz citada acima.`
+    : `<b>${escapeAttr(q.prova)}</b> · ${escapeAttr(q.banca)} · ${q.ano} · gabarito oficial.`;
   $("fbbody").innerHTML = q.c +
     `<div class="ref-line">Fonte: ${fonte}</div>` +
+<<<<<<< Updated upstream
     `<a class="cond-xlink" href="condutai.html?busca=${encodeURIComponent(q.tema||ESP_LABEL[q.esp]||"")}" target="_blank" rel="noopener">Revisar a conduta no CondutAI →</a>`;
+=======
+    `<a class="cond-xlink" href="condutai.html?busca=${encodeURIComponent(q.tema||ESP_LABEL[q.esp]||"")}" target="_blank" rel="noopener"><i class="ti ti-clipboard-text" aria-hidden="true"></i> Revisar a conduta no CondutAI <i class="ti ti-arrow-up-right" aria-hidden="true"></i></a>`;
+>>>>>>> Stashed changes
 }
 
 /* ============================================================
@@ -1540,7 +1818,7 @@ function perfByEsp(){
 function renderPerfPanel(){
   const list = $("perfList"), perf = perfByEsp();
   if(!perf.length){
-    list.innerHTML = `<div class="hint-line">Você ainda não respondeu nenhuma questão. Monte uma sessão e volte aqui — o painel mostra sua taxa de acerto por especialidade.</div>`;
+    list.innerHTML = `<div class="hint-line">Você ainda não respondeu nenhuma questão. Monte uma sessão e volte aqui: o painel mostra sua taxa de acerto por especialidade.</div>`;
     $("focusBtn").hidden = true; return;
   }
   list.innerHTML = perf.map(p=>{
@@ -1694,11 +1972,12 @@ document.getElementById("tabBtnSim").onclick = ()=> setTab("simulado");
     window.SIMULADOS.forEach(sim=>{
       const st=loadState(sim.id), total=sim.questions.length;
       const answered = st ? Object.keys(st.answers||{}).length : 0;
-      const status = (st&&st.finished) ? "✓ Concluído — toque para ver a nota"
+      const fim=!!(st&&st.finished);
+      const status = fim ? '<i class="ti ti-circle-check" aria-hidden="true"></i> Concluído: toque para ver a nota'
                     : answered ? `Em andamento · ${answered}/${total} respondidas`
                     : `${total} questões · toque para começar`;
       const b=document.createElement("button"); b.className="topic"; b.type="button";
-      b.innerHTML=`<span class="kind">Simulado</span><h3>${sim.title}</h3><p>${sim.sub}</p><span class="n">${status}</span>`;
+      b.innerHTML=`<span class="kind"><i class="ti ti-clipboard-check" aria-hidden="true"></i> Simulado</span><h3>${sim.title}</h3><p>${sim.sub}</p><span class="n${fim?' feito':''}">${status}</span>${answered&&!fim?`<span class="simBar" aria-hidden="true"><i style="width:${Math.round(answered/total*100)}%"></i></span>`:''}`;
       b.onclick=()=>openSim(sim);
       grid.appendChild(b);
     });
@@ -1714,15 +1993,20 @@ document.getElementById("tabBtnSim").onclick = ()=> setTab("simulado");
   function renderQuestion(){
     const {sim,state}=cur, n=sim.questions.length, q=sim.questions[state.pos], sel=state.answers[state.pos];
     card.innerHTML=`
+      <div class="qProg" aria-hidden="true"><i data-simprog style="width:${Math.round(Object.keys(state.answers).length/n*100)}%"></i></div>
       <div class="qhead"><span class="num">Questão ${state.pos+1} de ${n}</span>
         <span class="badge">${Object.keys(state.answers).length}/${n} respondidas</span>
         <span class="opts-hint">↔ Arraste uma alternativa para o lado para riscá-la</span></div>
       <div class="enun">${q.q}</div>
       ${q.img?`<figure class="qfig"><img src="${q.img}" alt="Figura da questão"></figure>`:""}
+<<<<<<< Updated upstream
+=======
+      <div class="opts-hint"><i class="ti ti-arrows-horizontal" aria-hidden="true"></i> Arraste uma alternativa para o lado para riscá-la<span class="soPc">. Teclas de A a E respondem; as setas mudam de questão.</span></div>
+>>>>>>> Stashed changes
       <div class="opts">${q.ops.map((o,j)=>`<button class="opt${sel===j?' sel':''}" data-j="${j}"><span class="key">${LET[j]}</span><span class="txt">${o}</span></button>`).join("")}</div>
       <div class="nav">
-        <button class="btn sec" data-prev ${state.pos===0?"disabled":""}>← Anterior</button>
-        ${state.pos>=n-1?'<button class="btn" data-finish2>Finalizar prova</button>':'<button class="btn" data-next>Próxima →</button>'}
+        <button class="btn sec" data-prev ${state.pos===0?"disabled":""}><i class="ti ti-arrow-left" aria-hidden="true"></i> Anterior</button>
+        ${state.pos>=n-1?'<button class="btn" data-finish2><i class="ti ti-flag-check" aria-hidden="true"></i> Finalizar prova</button>':'<button class="btn" data-next>Próxima <i class="ti ti-arrow-right" aria-hidden="true"></i></button>'}
       </div>`;
     const skey = "S:"+sim.id+":"+state.pos;          // risco isolado por simulado+questão
     const sStruck = window.getStruck ? window.getStruck(skey) : new Set();
@@ -1735,6 +2019,7 @@ document.getElementById("tabBtnSim").onclick = ()=> setTab("simulado");
         state.answers[state.pos]=parseInt(btn.dataset.j); saveState();
         card.querySelectorAll(".opt").forEach(o=>o.classList.remove("sel")); btn.classList.add("sel");
         card.querySelector(".badge").textContent=`${Object.keys(state.answers).length}/${n} respondidas`;
+        const pg=card.querySelector("[data-simprog]"); if(pg) pg.style.width=Math.round(Object.keys(state.answers).length/n*100)+"%";
       };
     });
     const p=card.querySelector("[data-prev]"); if(p) p.onclick=()=>{ if(state.pos>0){state.pos--;saveState();simDir=-1;renderQuestion();} };
@@ -1773,19 +2058,18 @@ document.getElementById("tabBtnSim").onclick = ()=> setTab("simulado");
     show("result");
     const {sim,state}=cur, g=grade(), pct=Math.round(100*g.correct/g.total);
     const rev = sim.questions.map((q,i)=>{
-      if(q.correct===-1) return `<div class="it an" data-qidx="${i}"><span><b>Q${i+1}</b> · Anulada (ponto para todos)</span><span class="chev">›</span></div>`;
+      if(q.correct===-1) return `<div class="it an" data-qidx="${i}"><span><b>Q${i+1}</b> · Anulada (ponto para todos)</span><i class="ti ti-chevron-right chev" aria-hidden="true"></i></div>`;
       const sel=state.answers[i], ok=sel===q.correct, yours = sel==null? "em branco" : LET[sel];
-      return `<div class="it ${ok?'ok':'no'}" data-qidx="${i}"><span><b>Q${i+1}</b> · sua resposta: <b>${yours}</b> — gabarito: <b>${LET[q.correct]}</b></span><span class="chev">›</span></div>`;
+      return `<div class="it ${ok?'ok':'no'}" data-qidx="${i}"><span><b>Q${i+1}</b> · sua resposta: <b>${yours}</b> · gabarito: <b>${LET[q.correct]}</b></span><i class="ti ti-chevron-right chev" aria-hidden="true"></i></div>`;
     }).join("");
     resCard.innerHTML=`
       <div class="qhead"><span class="num">Resultado</span><span class="badge">${sim.title}</span></div>
       <div class="sim-scewrap">
         <div><div class="sim-score">${g.correct}<span style="font-size:1.1rem;color:var(--ink-soft)">/${g.total}</span></div>
-        <div style="font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft)">Nota final · ${pct}%</div></div>
-        <div style="font-size:.86rem;color:var(--ink-soft);line-height:1.7">
-          ✓ ${g.correct-g.annul} certas &nbsp;·&nbsp; ✗ ${g.wrong} erradas<br>— ${g.blank} em branco &nbsp;·&nbsp; ⦿ ${g.annul} anuladas</div>
+        <div class="simNota">Nota final · ${pct}%</div></div>
+        <div class="simConta"><span class="c1"><i class="ti ti-circle-check" aria-hidden="true"></i> ${g.correct-g.annul} certas</span><span class="c2"><i class="ti ti-circle-x" aria-hidden="true"></i> ${g.wrong} erradas</span><span class="c3"><i class="ti ti-circle-dashed" aria-hidden="true"></i> ${g.blank} em branco</span><span class="c4"><i class="ti ti-scale" aria-hidden="true"></i> ${g.annul} anuladas</span></div>
       </div>
-      <div class="nav"><button class="btn sec" data-redo>Refazer do zero</button><button class="btn" data-toplist>Voltar aos simulados</button></div>
+      <div class="nav"><button class="btn sec" data-redo><i class="ti ti-rotate" aria-hidden="true"></i> Refazer do zero</button><button class="btn" data-toplist><i class="ti ti-layout-list" aria-hidden="true"></i> Voltar aos simulados</button></div>
       <div class="sim-rev">${rev}</div>`;
     const sc = resCard.querySelector(".sim-score"); if(sc && sc.firstChild) { sc.firstChild.textContent = "0"; conta(sc.firstChild, g.correct); }
     resCard.querySelector("[data-redo]").onclick=()=>{ if(confirm("Refazer este simulado do zero? Suas respostas serão apagadas.")){ cur.state={answers:{},pos:0,finished:false}; saveState(); startRun(); } };
@@ -1799,8 +2083,8 @@ document.getElementById("tabBtnSim").onclick = ()=> setTab("simulado");
     show("run");
     const {sim,state}=cur, n=sim.questions.length, q=sim.questions[i], sel=state.answers[i];
     const annul=q.correct===-1, ok=sel===q.correct;
-    const verdict = annul ? "⦿ Questão anulada — ponto para todos"
-      : ok ? "✓ Você acertou" : `✗ Você marcou ${sel==null?"em branco":LET[sel]} — gabarito: ${LET[q.correct]}`;
+    const verdict = annul ? '<i class="ti ti-scale" aria-hidden="true"></i> Questão anulada: ponto para todos'
+      : ok ? '<i class="ti ti-circle-check" aria-hidden="true"></i> Você acertou' : `<i class="ti ti-circle-x" aria-hidden="true"></i> Você marcou ${sel==null?"em branco":LET[sel]}. Gabarito: ${LET[q.correct]}`;
     titleEl.textContent=sim.title; paletteEl.hidden=true;
     card.innerHTML=`
       <div class="qhead"><span class="num">Revisão · Questão ${i+1} de ${n}</span>
@@ -1819,9 +2103,9 @@ document.getElementById("tabBtnSim").onclick = ()=> setTab("simulado");
         ${q.c?`<div class="body">${q.c}</div>`:`<div class="body" style="color:var(--ink-soft)">Comentário em preparação para esta questão.</div>`}
       </div>
       <div class="nav">
-        <button class="btn sec" data-rprev ${i===0?"disabled":""}>← Anterior</button>
+        <button class="btn sec" data-rprev ${i===0?"disabled":""}><i class="ti ti-arrow-left" aria-hidden="true"></i> Anterior</button>
         <button class="btn sec" data-rback>Voltar ao resultado</button>
-        <button class="btn" data-rnext ${i>=n-1?"disabled":""}>Próxima →</button>
+        <button class="btn" data-rnext ${i>=n-1?"disabled":""}>Próxima <i class="ti ti-arrow-right" aria-hidden="true"></i></button>
       </div>`;
     const rp=card.querySelector("[data-rprev]"); if(rp) rp.onclick=()=>{ if(i>0){ simDir=-1; renderReview(i-1); } };
     const rn=card.querySelector("[data-rnext]"); if(rn) rn.onclick=()=>{ if(i<n-1) renderReview(i+1); };
@@ -1851,7 +2135,11 @@ document.getElementById("tabBtnSim").onclick = ()=> setTab("simulado");
     <button class="pen-btn" id="penEraser" type="button">Borracha</button>
     <button class="pen-btn" id="penClear" type="button">Limpar</button>
   </div>
+<<<<<<< Updated upstream
   <button class="pen-fab" id="penFab" type="button" aria-label="Escrever com a caneta"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="m13.5 6.5 4 4"/></svg></button>
+=======
+  <button class="pen-fab" id="penFab" type="button" aria-label="Escrever com a caneta"><i class="ti ti-pencil" aria-hidden="true"></i></button>
+>>>>>>> Stashed changes
 </div>
 
 <script>
@@ -1903,7 +2191,11 @@ document.getElementById("tabBtnSim").onclick = ()=> setTab("simulado");
     canvas.classList.toggle("active", on);
     tools.hidden = !on;
     fab.classList.toggle("on", on);
+<<<<<<< Updated upstream
     fab.innerHTML = on ? "✕" : FM_PEN_SVG;
+=======
+    fab.innerHTML = on ? '<i class="ti ti-x" aria-hidden="true"></i>' : '<i class="ti ti-pencil" aria-hidden="true"></i>';
+>>>>>>> Stashed changes
     fab.setAttribute("aria-label", on ? "Sair do modo caneta" : "Escrever com a caneta");
   }
   fab.onclick = ()=> setMode(!penMode);
@@ -1980,6 +2272,23 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").then(reg => { try{ reg.update(); }catch(e){} }).catch(() => {});
   });
 }
+</script>
+<div class="avisos" id="fmAvisos" aria-live="polite"></div>
+<script>
+/* camada viva (23/09/2026): avisos curtos no lugar de alert() e atalhos de teclado */
+function fmAviso(msg,tipo){const box=document.getElementById("fmAvisos");if(!box)return;box.innerHTML="";const t=document.createElement("div");t.className="toast"+(tipo==="erro"?" erro":"");
+  t.innerHTML='<i class="ti '+(tipo==="erro"?"ti-alert-triangle":"ti-check")+'" aria-hidden="true"></i><span></span>';t.lastChild.textContent=msg;box.appendChild(t);clearTimeout(fmAviso._t);fmAviso._t=setTimeout(()=>t.remove(),3200);}
+/* A a E (ou 1 a 5) respondem; setas mudam de questão, na sessão e no simulado */
+document.addEventListener("keydown",e=>{
+  const t=e.target,dig=t&&(t.tagName==="INPUT"||t.tagName==="TEXTAREA"||t.tagName==="SELECT"||t.isContentEditable);
+  if(dig||e.metaKey||e.ctrlKey||e.altKey)return;
+  const card=[document.getElementById("card"),document.querySelector("[data-simcard]")].find(c=>c&&c.offsetParent!==null);
+  if(!card)return;
+  const k=e.key.length===1?e.key.toLowerCase():"";
+  const i=k?("abcde".indexOf(k)>=0?"abcde".indexOf(k):"12345".indexOf(k)):-1;
+  if(i>=0){const b=card.querySelectorAll(".opt")[i];if(b&&!b.disabled){e.preventDefault();b.click();}}
+  else if(e.key==="ArrowRight"||e.key==="ArrowLeft"){const b=card.querySelector(e.key==="ArrowRight"?"#next,[data-next],[data-rnext]":"#prev,[data-prev],[data-rprev]");if(b&&!b.disabled){e.preventDefault();b.click();}}
+});
 </script>
 </body>
 </html>
