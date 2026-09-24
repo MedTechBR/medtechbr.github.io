@@ -1,0 +1,290 @@
+/* ============================================================
+   CondutAI · didática da leitura (24/09/2026) — par do condutai-didatica.js
+   Só apresentação. Tokens do _mtviva.css (--ac, --acSup, --acInk, --c-*,
+   --sup*, --tinta*, --fio*, --errV/--errSup, --avV/--avSup, --okV/--okSup).
+   Sem gradiente, sem versalete, sem emoji. prefers-reduced-motion respeitado.
+   ============================================================ */
+@media screen {
+
+/* ---------- nada meu aparece quando está hidden ---------- */
+html[data-viva="condutai"] body :is(.cvd-passo,.cvd-doses,.cvd-prog,.cvd-legenda,.mermaid-scroll)[hidden]{display:none!important}
+
+/* ============ 1. FLUXOGRAMA ============ */
+html[data-viva="condutai"] body .mermaid-wrap{scroll-margin-top:calc(var(--cvTopo,60px) + 16px)}
+html[data-viva="condutai"] body .mermaid-wrap .mermaid-label{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;min-height:52px;padding:8px 10px 8px 14px}
+html[data-viva="condutai"] body .mermaid-label>span{display:inline-flex;align-items:center;gap:7px}
+html[data-viva="condutai"] .cvd-fctl{display:flex;align-items:center;gap:8px;margin-left:auto}
+html[data-viva="condutai"] .cvd-seg{display:inline-flex;padding:3px;gap:2px;background:var(--sup);border:1px solid var(--fio);border-radius:999px}
+html[data-viva="condutai"] body .cvd-seg button{min-height:34px;padding:0 14px;border:0;border-radius:999px;background:none;color:var(--tinta2);
+  font:600 13px/1 'Inter',system-ui,sans-serif;cursor:pointer;white-space:nowrap}
+html[data-viva="condutai"] body .cvd-seg button:hover{color:var(--tinta);background:var(--sup2)}
+html[data-viva="condutai"] body .cvd-seg button[aria-pressed="true"]{background:var(--ac);color:#fff;box-shadow:0 4px 12px color-mix(in srgb,var(--ac) 26%,transparent)}
+html[data-viva="condutai"] body .cvd-amplia{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px 0 11px;border-radius:999px;
+  border:1px solid var(--fioF);background:var(--sup);color:var(--tinta);font:600 13px/1 'Inter',system-ui,sans-serif;cursor:pointer}
+html[data-viva="condutai"] body .cvd-amplia .ti{font-size:16px;color:var(--acInk)}
+html[data-viva="condutai"] body .cvd-amplia:hover{background:var(--acSup);border-color:color-mix(in srgb,var(--ac) 40%,var(--fio));color:var(--acInk)}
+/* o diagrama reduzido fica centrado; abaixo do mínimo, rola de lado */
+html[data-viva="condutai"] body .mermaid-scroll .mermaid svg{display:block;margin:0 auto}
+html[data-viva="condutai"] body .mermaid-scroll.cvd-rola .mermaid{text-align:left}
+/* legenda */
+html[data-viva="condutai"] .cvd-legenda{display:flex;flex-wrap:wrap;gap:6px 18px;padding:10px 14px;border-top:1px solid var(--fio);background:var(--sup);
+  font-size:12.5px;font-weight:500;line-height:1.3;color:var(--tinta2)}
+html[data-viva="condutai"] .cvd-legenda span{display:inline-flex;align-items:center;gap:7px}
+html[data-viva="condutai"] .cvd-cor{width:16px;height:12px;border-radius:4px;border:1.5px solid;flex:0 0 auto}
+html[data-viva="condutai"] .cvd-cor-c{background:#FFECEC;border-color:#E5484D}
+html[data-viva="condutai"] .cvd-cor-a{background:#EEF3FE;border-color:#2563EB}
+
+/* ---------- Passo a passo ---------- */
+html[data-viva="condutai"] body .content .cvd-passo{padding:14px 16px 16px;background:var(--sup);border-top:1px solid var(--fio)}
+html[data-viva="condutai"] body .content .cvd-passo :is(p,li,ol){margin:0;padding:0;font-size:inherit;line-height:inherit}
+html[data-viva="condutai"] .cvd-trilha{margin:0 0 12px}
+html[data-viva="condutai"] body .content .cvd-trilha ol{display:flex;align-items:center;gap:4px;list-style:none;overflow-x:auto;scrollbar-width:none;padding:2px 2px 4px}
+html[data-viva="condutai"] .cvd-trilha ol::-webkit-scrollbar{display:none}
+html[data-viva="condutai"] body .content .cvd-trilha li{display:flex;align-items:center;gap:4px;flex:0 0 auto;color:var(--tinta3)}
+html[data-viva="condutai"] body .content .cvd-trilha li::marker{content:none}
+html[data-viva="condutai"] .cvd-trilha li>.ti{font-size:14px;color:var(--tinta3)}
+html[data-viva="condutai"] body .cvd-trilha button,html[data-viva="condutai"] .cvd-t-at{display:inline-flex;align-items:center;gap:6px;min-height:34px;max-width:220px;padding:0 12px 0 5px;
+  border-radius:999px;border:1px solid var(--fio);background:var(--sup);color:var(--tinta2);font:500 12.5px/1.2 'Inter',system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+html[data-viva="condutai"] body .cvd-trilha button:hover{border-color:color-mix(in srgb,var(--ac) 40%,var(--fio));color:var(--tinta);background:var(--acSup)}
+html[data-viva="condutai"] :is(.cvd-trilha button,.cvd-t-at) b{flex:0 0 auto;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:11.5px;font-weight:700;
+  background:var(--sup2);color:var(--tinta2);font-variant-numeric:tabular-nums}
+html[data-viva="condutai"] .cvd-t-at{cursor:default;background:var(--acSup);border-color:color-mix(in srgb,var(--ac) 35%,var(--fio));color:var(--acInk);font-weight:600}
+html[data-viva="condutai"] .cvd-t-at b{background:var(--ac);color:#fff}
+/* cartão do passo atual: a cor segue a classe do nó no diagrama */
+html[data-viva="condutai"] .cvd-no{border-radius:18px;padding:14px 16px 16px;border:1.5px solid var(--fioF);background:var(--sup2);outline:none}
+html[data-viva="condutai"] .cvd-no[data-tipo="critical"]{background:var(--errSup);border-color:color-mix(in srgb,var(--errV) 55%,var(--fio))}
+html[data-viva="condutai"] .cvd-no[data-tipo="action"]{background:var(--acSup);border-color:color-mix(in srgb,var(--ac) 50%,var(--fio))}
+html[data-viva="condutai"] .cvd-no:focus-visible{box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 28%,transparent)}
+html[data-viva="condutai"] .cvd-no-topo{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;margin:0 0 6px}
+html[data-viva="condutai"] .cvd-no-n{font-size:12.5px;font-weight:600;color:var(--tinta2);font-variant-numeric:tabular-nums}
+html[data-viva="condutai"] .cvd-no-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px 3px 8px;border-radius:999px;font-size:12.5px;font-weight:650;background:var(--sup)}
+html[data-viva="condutai"] .cvd-no-tag .ti{font-size:14px}
+html[data-viva="condutai"] .cvd-no[data-tipo="critical"] .cvd-no-tag{color:color-mix(in srgb,var(--errV) 72%,var(--tinta))}
+html[data-viva="condutai"] .cvd-no[data-tipo="action"] .cvd-no-tag{color:var(--acInk)}
+html[data-viva="condutai"] body .content .cvd-passo .cvd-no-tx{font-size:17px;line-height:1.45;font-weight:600;color:var(--tinta);letter-spacing:-.01em}
+html[data-viva="condutai"] .cvd-no-ini{background:var(--sup2)}
+/* saídas */
+html[data-viva="condutai"] .cvd-saidas{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin:14px 0 0}
+html[data-viva="condutai"] body .content .cvd-passo .cvd-saidas-rot{font-size:13px;font-weight:600;color:var(--tinta2)}
+html[data-viva="condutai"] body .cvd-saida{display:flex;align-items:center;gap:12px;width:100%;min-width:0;min-height:52px;padding:10px 14px 10px 14px;text-align:left;border-radius:16px;
+  border:1.5px solid var(--fio);background:var(--sup);color:var(--tinta);font:inherit;cursor:pointer;transition:border-color .2s,background-color .2s,transform .18s var(--mola)}
+html[data-viva="condutai"] body .cvd-saida::before{content:"";flex:0 0 auto;width:10px;height:10px;border-radius:50%;background:var(--fioF)}
+html[data-viva="condutai"] body .cvd-saida[data-tipo="critical"]::before{background:var(--errV)}
+html[data-viva="condutai"] body .cvd-saida[data-tipo="action"]::before{background:var(--ac)}
+html[data-viva="condutai"] body .cvd-saida:hover{border-color:color-mix(in srgb,var(--ac) 55%,var(--fio));background:var(--acSup)}
+html[data-viva="condutai"] body .cvd-saida:hover>.ti{transform:translateX(3px)}
+html[data-viva="condutai"] .cvd-s-txt{flex:1;min-width:0}
+html[data-viva="condutai"] .cvd-s-txt b{display:block;font-size:15px;font-weight:650;line-height:1.35;color:var(--tinta)}
+html[data-viva="condutai"] .cvd-s-txt small{display:block;margin-top:2px;font-size:13px;line-height:1.35;color:var(--tinta2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-viva="condutai"] .cvd-saida>.ti{flex:0 0 auto;font-size:19px;color:var(--acInk);transition:transform .2s var(--mola)}
+html[data-viva="condutai"] .cvd-fim{display:flex;align-items:center;gap:10px;margin:14px 0 0;padding:12px 16px;border-radius:16px;background:var(--okSup);
+  color:color-mix(in srgb,var(--okV) 62%,var(--tinta));font-weight:650;font-size:15px}
+html[data-viva="condutai"] .cvd-fim .ti{font-size:20px}
+html[data-viva="condutai"] .cvd-pacoes{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0}
+html[data-viva="condutai"] body .cvd-pacoes button{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 16px 0 12px;border-radius:999px;border:1.5px solid var(--fioF);
+  background:var(--sup);color:var(--tinta);font:600 13.5px/1 'Inter',system-ui,sans-serif;cursor:pointer}
+html[data-viva="condutai"] body .cvd-pacoes button .ti{font-size:17px;color:var(--tinta2)}
+html[data-viva="condutai"] body .cvd-pacoes button:not(:disabled):hover{background:var(--acSup);border-color:color-mix(in srgb,var(--ac) 40%,var(--fio));color:var(--acInk)}
+html[data-viva="condutai"] body .cvd-pacoes button:disabled{opacity:.45;cursor:default}
+html[data-viva="condutai"] .cvd-entra{animation:cvdEntra .32s var(--suave) both}
+@keyframes cvdEntra{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ---------- Ampliar: tela cheia sobre papel claro (como o diagrama) ---------- */
+html.cvd-travado,html.cvd-travado body{overflow:hidden!important}
+html[data-viva="condutai"] .cvd-zoom{position:fixed;inset:0;z-index:400;display:flex;flex-direction:column;background:#F5F6FB;color:#141827;color-scheme:light;
+  font-family:'Inter',system-ui,sans-serif;animation:cvdEntra .25s var(--suave) both}
+html[data-viva="condutai"] .cvd-zbarra{display:flex;align-items:center;gap:10px;padding:max(8px,env(safe-area-inset-top)) 12px 8px 16px;background:#fff;border-bottom:1px solid #E6E9F2;flex:0 0 auto}
+html[data-viva="condutai"] .cvd-ztit{flex:1;min-width:0;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:650;color:#141827}
+html[data-viva="condutai"] .cvd-ztit>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-viva="condutai"] .cvd-ztit .ti{font-size:18px;color:#1E40AF;flex:0 0 auto}
+html[data-viva="condutai"] .cvd-zctl{display:flex;align-items:center;gap:6px}
+html[data-viva="condutai"] body .cvd-zoom button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:44px;min-height:44px;padding:0;border-radius:999px;
+  border:1.5px solid #D3D8E5;background:#fff;color:#141827;font:600 14px/1 'Inter',system-ui,sans-serif;cursor:pointer}
+html[data-viva="condutai"] body .cvd-zoom button .ti{font-size:19px}
+html[data-viva="condutai"] body .cvd-zoom button:hover{background:#EEF3FE;border-color:#9DB7F5;color:#1E40AF}
+html[data-viva="condutai"] body .cvd-zoom .cvd-zaj{padding:0 16px}
+html[data-viva="condutai"] body .cvd-zoom .cvd-zfecha{padding:0 18px 0 14px;background:#141827;border-color:#141827;color:#fff;margin-left:4px}
+html[data-viva="condutai"] body .cvd-zoom .cvd-zfecha:hover{background:#2A3045;border-color:#2A3045;color:#fff}
+html[data-viva="condutai"] body .cvd-zoom :is(button,.cvd-zarea):focus-visible{outline:none;box-shadow:0 0 0 4px rgba(37,99,235,.35)!important}
+html[data-viva="condutai"] .cvd-zpct{min-width:52px;text-align:center;font-size:14px;font-weight:600;color:#5D6579;font-variant-numeric:tabular-nums}
+html[data-viva="condutai"] .cvd-zarea{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;cursor:grab;-webkit-overflow-scrolling:touch}
+html[data-viva="condutai"] .cvd-zarea.cvd-arrasta{cursor:grabbing;user-select:none}
+html[data-viva="condutai"] .cvd-zin{display:flex;box-sizing:border-box;min-width:100%;min-height:100%;width:max-content;padding:24px}
+html[data-viva="condutai"] .cvd-zin>svg{margin:auto;flex:0 0 auto;max-width:none!important;background:#fff;border-radius:16px;
+  box-shadow:0 1px 2px rgba(20,24,39,.06),0 8px 24px rgba(20,24,39,.08)}
+/* dentro da tela cheia o desenho sai da conduta: repete a blindagem que o app faz em .content .mermaid */
+html[data-viva="condutai"] .cvd-zoom svg :is(p,span,div,li,b,strong,em){color:inherit;font-size:inherit;line-height:1.5;margin:0;letter-spacing:normal;max-width:none}
+html[data-viva="condutai"] .cvd-zoom svg :is(.nodeLabel,.edgeLabel){color:#141827}
+html[data-viva="condutai"] .cvd-zoom svg :is(.edgeLabel,.labelBkg){background:#fff}
+html[data-viva="condutai"] .cvd-zoom svg foreignObject{overflow:visible}
+
+/* ============ 2. GUIA RÁPIDO ============ */
+html[data-viva="condutai"] .cvd-guia{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin:0 0 18px}
+html[data-viva="condutai"] .cvd-atalhos{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+html[data-viva="condutai"] .cvd-ir{font-size:13px;font-weight:600;color:var(--tinta2);margin-right:2px}
+html[data-viva="condutai"] body .cvd-pilula{--k:var(--c-azul);display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 15px 0 6px;border-radius:999px;
+  border:1px solid var(--fio);background:var(--sup);color:var(--tinta);font:500 13.5px/1 'Inter',system-ui,sans-serif;cursor:pointer;white-space:nowrap;
+  transition:border-color .2s,background-color .2s,transform .18s var(--mola)}
+html[data-viva="condutai"] body .cvd-pilula .ti{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:15px;
+  background:color-mix(in srgb,var(--k) 14%,var(--sup));color:color-mix(in srgb,var(--k) 72%,var(--tinta))}
+html[data-viva="condutai"] body .cvd-pilula:hover{border-color:color-mix(in srgb,var(--k) 42%,var(--fio));background:color-mix(in srgb,var(--k) 7%,var(--sup));transform:translateY(-1px)}
+html[data-viva="condutai"] body .cvd-dosesbt{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 16px 0 8px;border-radius:999px;
+  border:1px solid color-mix(in srgb,var(--ac) 28%,var(--fio));background:var(--acSup);color:var(--acInk);font:600 14.5px/1.2 'Inter',system-ui,sans-serif;cursor:pointer;text-align:left}
+html[data-viva="condutai"] body .cvd-dosesbt>.ti:first-child{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:18px;background:var(--ac);color:#fff;flex:0 0 auto}
+html[data-viva="condutai"] body .cvd-dosesbt .cvd-n{font-variant-numeric:tabular-nums;font-weight:600}
+html[data-viva="condutai"] body .cvd-dosesbt .cvd-chev{font-size:18px;margin-left:4px;transition:transform .25s var(--mola)}
+html[data-viva="condutai"] body .cvd-dosesbt[aria-expanded="true"] .cvd-chev{transform:rotate(180deg)}
+html[data-viva="condutai"] body .cvd-dosesbt:hover{border-color:color-mix(in srgb,var(--ac) 50%,var(--fio));filter:brightness(1.02)}
+html[data-viva="condutai"] .cvd-doses{align-self:stretch;max-height:min(62vh,560px);overflow:auto;overscroll-behavior:contain;padding:4px 6px 8px;
+  border:1px solid var(--fio);border-radius:20px;background:var(--sup);box-shadow:var(--sombraV);animation:cvdEntra .25s var(--suave) both}
+html[data-viva="condutai"] .cvd-dgrupo{--k:var(--c-azul)}
+html[data-viva="condutai"] .cvd-dgrupo h4{display:flex;align-items:center;gap:8px;margin:12px 10px 4px;font-size:13.5px;font-weight:650;color:var(--tinta);line-height:1.3}
+html[data-viva="condutai"] .cvd-dgrupo h4 .ti{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:14px;flex:0 0 auto;
+  background:color-mix(in srgb,var(--k) 14%,var(--sup));color:color-mix(in srgb,var(--k) 72%,var(--tinta))}
+html[data-viva="condutai"] .cvd-dgrupo ul{list-style:none;margin:0;padding:0}
+html[data-viva="condutai"] .cvd-dgrupo li+li{border-top:1px solid var(--fio)}
+html[data-viva="condutai"] body .cvd-dgrupo button{display:block;width:100%;text-align:left;padding:9px 12px 9px 44px;border:0;border-radius:12px;background:none;
+  color:var(--tinta);font:400 14px/1.55 'Inter',system-ui,sans-serif;cursor:pointer}
+html[data-viva="condutai"] body .cvd-dgrupo button:hover{background:var(--sup2)}
+html[data-viva="condutai"] .cvd-dgrupo button b{font-weight:650;color:var(--acInk);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* destaque ao chegar no trecho */
+html[data-viva="condutai"] body .content .cvd-pisca{animation:cvdPisca 2.2s var(--suave) both;border-radius:10px}
+html[data-viva="condutai"] body .content tr.cvd-pisca{animation:none}
+html[data-viva="condutai"] body .content tr.cvd-pisca>td{animation:cvdPiscaTd 2.2s var(--suave) both}
+@keyframes cvdPisca{0%,55%{box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 50%,transparent);background-color:var(--acSup)}}
+@keyframes cvdPiscaTd{0%,55%{background-color:var(--acSup)}}
+::highlight(cvd-trecho){background-color:rgba(242,160,7,.34)}
+
+/* ============ 3. SEÇÕES: ícone e cor por tipo, meta, Próxima ============ */
+html[data-viva="condutai"] body .content:not(.cv-guia)>.wb-acc.cvd-tip>summary::before{content:none;display:none}
+html[data-viva="condutai"] body .content .wb-acc.cvd-tip>summary>.cvd-sic{flex:0 0 auto;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:16px;
+  background:color-mix(in srgb,var(--k) 14%,var(--sup));color:color-mix(in srgb,var(--k) 72%,var(--tinta));transition:background-color .2s,color .2s,transform .25s var(--mola)}
+html[data-viva="condutai"] body .content .wb-acc.cvd-tip[open]>summary>.cvd-sic{background:color-mix(in srgb,var(--k) 80%,#1a1206);color:#fff}
+html[data-viva="condutai"] body .content .wb-acc.cvd-tip>summary:hover>.cvd-sic{transform:scale(1.08) rotate(-6deg)}
+html[data-viva="condutai"] body .content .wb-acc.cvd-tip[open]{border-color:color-mix(in srgb,var(--k) 32%,var(--fio))}
+html[data-viva="condutai"] .cvd-st{display:flex;flex-direction:column;gap:1px;min-width:0}
+html[data-viva="condutai"] .cvd-st::after{content:attr(data-meta);font-size:12.5px;font-weight:500;line-height:1.3;color:var(--tinta2);font-variant-numeric:tabular-nums;letter-spacing:0}
+html[data-viva="condutai"] .cvd-st:not([data-meta])::after{content:none}
+/* sumário lateral com o mesmo ícone */
+html[data-viva="condutai"] body .cv-sumario button i.cvd-sumic{font-size:13px;background:color-mix(in srgb,var(--k) 14%,var(--sup));color:color-mix(in srgb,var(--k) 72%,var(--tinta))}
+html[data-viva="condutai"] body .cv-sumario button.on i.cvd-sumic{background:var(--ac);color:#fff}
+/* Próxima */
+html[data-viva="condutai"] .cvd-prox{display:flex;justify-content:flex-end;margin:20px 0 2px;padding-top:14px;border-top:1px solid var(--fio)}
+html[data-viva="condutai"] body .cvd-prox button{display:inline-flex;align-items:center;gap:8px;max-width:100%;min-height:42px;padding:0 14px 0 16px;border-radius:999px;border:0;
+  background:var(--sup2);color:var(--tinta);font:500 13.5px/1.2 'Inter',system-ui,sans-serif;cursor:pointer}
+html[data-viva="condutai"] .cvd-prox button>span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-viva="condutai"] .cvd-prox button b{font-weight:650}
+html[data-viva="condutai"] .cvd-prox button .ti{font-size:17px;color:var(--acInk);flex:0 0 auto;transition:transform .2s var(--mola)}
+html[data-viva="condutai"] body .cvd-prox button:hover{background:var(--acSup);color:var(--acInk)}
+html[data-viva="condutai"] body .cvd-prox button:hover .ti{transform:translateX(3px)}
+/* barra de progresso de leitura */
+html[data-viva="condutai"] .cvd-prog{position:fixed;left:0;right:0;top:0;height:3px;z-index:70;pointer-events:none}
+html[data-viva="condutai"] .cvd-prog>i{display:block;height:100%;background:var(--ac);transform-origin:0 50%;transform:scaleX(0);transition:transform .12s linear;border-radius:0 3px 3px 0}
+@media (min-width:900px){html[data-viva="condutai"] .cvd-prog{left:var(--cvLado,256px)}}
+
+/* ============ 4. PÉROLAS e avisos ============ */
+html[data-viva="condutai"] body .content ul.cvd-perolas,html[data-viva="condutai"] body .content ol.cvd-perolas{list-style:none;padding:0;margin:12px 0;display:grid;gap:10px}
+html[data-viva="condutai"] body .content .cvd-perola{position:relative;margin:10px 0;padding:12px 16px 12px 54px;border-radius:16px;border:1px solid var(--fio);background:var(--sup)}
+html[data-viva="condutai"] body .content .cvd-perolas>.cvd-perola{margin:0}
+html[data-viva="condutai"] body .content .cvd-perola::marker{content:none}
+html[data-viva="condutai"] body .content .cvd-p-alerta{background:color-mix(in srgb,var(--errV) 6%,var(--sup));border-color:color-mix(in srgb,var(--errV) 24%,var(--fio))}
+html[data-viva="condutai"] body .content .cvd-p-dica{background:color-mix(in srgb,var(--c-ambar) 6%,var(--sup));border-color:color-mix(in srgb,var(--c-ambar) 24%,var(--fio))}
+html[data-viva="condutai"] .cvd-pic,html[data-viva="condutai"] .cvd-aic{position:absolute;left:12px;top:12px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:16px}
+html[data-viva="condutai"] .cvd-p-alerta>.cvd-pic{background:color-mix(in srgb,var(--errV) 15%,var(--sup));color:color-mix(in srgb,var(--errV) 78%,var(--tinta))}
+html[data-viva="condutai"] .cvd-p-dica>.cvd-pic{background:color-mix(in srgb,var(--c-ambar) 20%,var(--sup));color:color-mix(in srgb,var(--c-ambar) 55%,var(--tinta))}
+html[data-viva="condutai"] body .content .cvd-aviso{position:relative;list-style:none;margin:12px 0;padding:12px 16px 12px 52px;border-radius:16px;background:var(--avSup);
+  border:1px solid color-mix(in srgb,var(--avV) 32%,transparent)}
+html[data-viva="condutai"] body .content li.cvd-aviso::marker{content:none}
+html[data-viva="condutai"] .cvd-aviso>.cvd-aic{background:color-mix(in srgb,var(--avV) 22%,var(--sup));color:var(--avTx,var(--avV))}
+
+/* ============ 5. doses em destaque ============ */
+html[data-viva="condutai"] body .content strong.cvd-dose{background:var(--acSup);color:var(--acInk);border-radius:6px;padding:1px 5px;font-variant-numeric:tabular-nums;
+  -webkit-box-decoration-break:clone;box-decoration-break:clone}
+
+/* ============ 6. TABELAS ============ */
+html[data-viva="condutai"] body .content .cvd-tbl{position:relative;margin:14px 0}
+html[data-viva="condutai"] body .content .cvd-tbl>.tbl-scroll{margin:0;max-height:min(72vh,640px);overflow:auto;overscroll-behavior-x:contain}
+html[data-viva="condutai"] body .content .cvd-tbl table{border-collapse:separate;border-spacing:0;width:100%}
+html[data-viva="condutai"] body .content .cvd-tbl thead th{position:sticky;top:0;z-index:2;background:var(--sup2);box-shadow:0 1px 0 var(--fio)}
+html[data-viva="condutai"] body .content .cvd-tbl tbody td{background:var(--sup)}
+html[data-viva="condutai"] body .content .cvd-tbl tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--sup2) 60%,var(--sup))}
+/* sombra lateral: há mais tabela para aquele lado */
+html[data-viva="condutai"] .cvd-tbl::before,html[data-viva="condutai"] .cvd-tbl::after{content:"";position:absolute;top:1px;bottom:1px;width:20px;z-index:4;pointer-events:none;opacity:0;transition:opacity .2s}
+html[data-viva="condutai"] .cvd-tbl::before{left:1px;border-radius:15px 0 0 15px;box-shadow:inset 14px 0 12px -12px rgba(20,24,39,.30)}
+html[data-viva="condutai"] .cvd-tbl::after{right:1px;border-radius:0 15px 15px 0;box-shadow:inset -14px 0 12px -12px rgba(20,24,39,.30)}
+html[data-viva="condutai"] .cvd-tbl.cvd-e::before,html[data-viva="condutai"] .cvd-tbl.cvd-d::after{opacity:1}
+html[data-viva="condutai"][data-theme="dark"] .cvd-tbl::before{box-shadow:inset 14px 0 12px -12px rgba(0,0,0,.75)}
+html[data-viva="condutai"][data-theme="dark"] .cvd-tbl::after{box-shadow:inset -14px 0 12px -12px rgba(0,0,0,.75)}
+@media (prefers-color-scheme: dark){
+  html[data-viva="condutai"][data-viva-escuro]:not([data-theme="light"]) .cvd-tbl::before{box-shadow:inset 14px 0 12px -12px rgba(0,0,0,.75)}
+  html[data-viva="condutai"][data-viva-escuro]:not([data-theme="light"]) .cvd-tbl::after{box-shadow:inset -14px 0 12px -12px rgba(0,0,0,.75)}
+}
+
+/* ============ celular ============ */
+@media (max-width:700px){
+  /* 3+ colunas: largura mínima por coluna (em vez de espremer 1 palavra por linha) e rola de lado */
+  html[data-viva="condutai"] body .content .cvd-tbl.cvd-tbl-3 table{min-width:calc(var(--cvd-cols,3) * 128px)}
+  /* 1ª coluna fixa quando a tabela é mais larga que a tela */
+  html[data-viva="condutai"] body .content .cvd-tbl.cvd-larga :is(th,td):first-child{position:sticky;left:0;z-index:1;box-shadow:1px 0 0 var(--fio);min-width:96px;max-width:38vw}
+  html[data-viva="condutai"] body .content .cvd-tbl.cvd-larga thead th:first-child{z-index:3}
+  html[data-viva="condutai"] body .content .cvd-tbl.cvd-larga.cvd-e :is(th,td):first-child{box-shadow:1px 0 0 var(--fio),8px 0 10px -6px rgba(20,24,39,.22)}
+  html[data-viva="condutai"] .cvd-tbl.cvd-larga::before{display:none}
+}
+@media (max-width:640px){
+  html[data-viva="condutai"] body .mermaid-wrap .mermaid-label{padding:10px 10px 10px 12px}
+  html[data-viva="condutai"] .cvd-fctl{width:100%;margin-left:0}
+  html[data-viva="condutai"] .cvd-seg{flex:1}
+  html[data-viva="condutai"] body .cvd-seg button{flex:1;min-height:38px;padding:0 8px}
+  html[data-viva="condutai"] body .cvd-amplia{min-height:44px;min-width:44px;padding:0;justify-content:center;flex:0 0 auto}
+  html[data-viva="condutai"] body .cvd-amplia span{display:none}
+  html[data-viva="condutai"] .cvd-seg{min-width:0}
+  html[data-viva="condutai"] body .content .cvd-passo{padding:12px 12px 14px}
+  html[data-viva="condutai"] body .content .cvd-passo .cvd-no-tx{font-size:16.5px}
+  html[data-viva="condutai"] body .cvd-pacoes button{min-height:44px;flex:1;justify-content:center}
+  html[data-viva="condutai"] body .cvd-trilha button,html[data-viva="condutai"] .cvd-t-at{max-width:170px}
+  html[data-viva="condutai"] .cvd-guia{align-items:stretch}
+  html[data-viva="condutai"] body .cvd-pilula{min-height:44px}
+  html[data-viva="condutai"] .cvd-ir{flex:1 1 100%}
+  html[data-viva="condutai"] body .cvd-dosesbt{border-radius:18px;min-height:52px}
+  html[data-viva="condutai"] body .cvd-dosesbt .cvd-chev{margin-left:auto}
+  html[data-viva="condutai"] body .cvd-dgrupo button{padding-left:12px}
+  html[data-viva="condutai"] body .content .cvd-perola{padding:12px 14px 12px 50px}
+  html[data-viva="condutai"] .cvd-pic,html[data-viva="condutai"] .cvd-aic{left:10px}
+  html[data-viva="condutai"] .cvd-prox{justify-content:stretch}
+  html[data-viva="condutai"] body .cvd-prox button{width:100%;justify-content:space-between;min-height:44px}
+  html[data-viva="condutai"] .cvd-zbarra{padding-left:12px;gap:6px}
+  html[data-viva="condutai"] .cvd-ztit{display:none}
+  html[data-viva="condutai"] .cvd-zctl{flex:1}
+  html[data-viva="condutai"] .cvd-zpct{min-width:46px}
+  html[data-viva="condutai"] body .cvd-zoom .cvd-zfecha{padding:0;width:44px;margin-left:auto}
+  html[data-viva="condutai"] body .cvd-zoom .cvd-zfecha span{display:none}
+  html[data-viva="condutai"] .cvd-zin{padding:14px}
+}
+
+/* ============ menos movimento ============ */
+@media (prefers-reduced-motion:reduce){
+  html[data-viva="condutai"] :is(.cvd-entra,.cvd-zoom,.cvd-doses){animation:none!important}
+  html[data-viva="condutai"] body .content .cvd-pisca{animation:none!important;box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 45%,transparent)}
+  html[data-viva="condutai"] body .content tr.cvd-pisca>td{animation:none!important;background:var(--acSup)!important}
+  html[data-viva="condutai"] :is(.cvd-prog>i,.cvd-saida,.cvd-saida>.ti,.cvd-pilula,.cvd-sic,.cvd-chev,.cvd-prox .ti,.cvd-tbl::before,.cvd-tbl::after){transition:none!important}
+  html[data-viva="condutai"] body .content .wb-acc.cvd-tip>summary:hover>.cvd-sic{transform:none}
+}
+} /* @media screen */
+
+/* ============ impressão (PDF): o diagrama inteiro, sem os controles ============ */
+@media print{
+  .cvd-guia,.cvd-fctl,.cvd-passo,.cvd-prox,.cvd-prog,.cvd-zoom,.cvd-sic{display:none!important}
+  .mermaid-scroll[hidden],.cvd-legenda[hidden]{display:block!important}
+  .cvd-tbl>.tbl-scroll{max-height:none!important;overflow:visible!important}
+  .cvd-tbl::before,.cvd-tbl::after{display:none!important}
+  .cvd-tbl th,.cvd-tbl td{position:static!important}
+  .cvd-st::after{content:none!important}
+  .cvd-pic,.cvd-aic{display:none!important}
+  .cvd-perola,.cvd-aviso{padding-left:12px!important}
+  /* rótulos do fluxograma no PDF: a blindagem do app (.content .mermaid p…) só vale na tela;
+     no papel as regras de parágrafo da conduta entravam na caixa e cortavam o texto ("sem pulso em 10") */
+  .content .mermaid :is(p,span,div,li,b,strong,em){font-size:inherit!important;line-height:1.5!important;margin:0!important;letter-spacing:normal!important;max-width:none!important}
+  .content .mermaid :is(.nodeLabel,.edgeLabel){color:#141827!important}
+  .content .mermaid foreignObject{overflow:visible}
+}

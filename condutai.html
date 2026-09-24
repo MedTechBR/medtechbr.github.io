@@ -7,8 +7,11 @@
 <meta name="theme-color" content="#0D1017" media="(prefers-color-scheme: dark)">
 <title>CondutAI · condutas clínicas baseadas em diretrizes</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%232563EB'/%3E%3Crect x='42' y='24' width='16' height='52' rx='5' fill='white'/%3E%3Crect x='24' y='42' width='52' height='16' rx='5' fill='white'/%3E%3C/svg%3E">
-<script async src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script async src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" onload="try{window.initMermaid?initMermaid():mermaid.initialize({startOnLoad:false})}catch(e){}"></script>
 <script defer src="condutai-banco.js?v=2"></script>
+<script defer src="condutai-didatica.js?v=1"></script>
+<script defer src="condutai-seguranca.js?v=1"></script>
+<script defer src="condutai-presc.js?v=1"></script>
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"condutai",name:"CondutAI"};</script>
 <script type="module" src="_mtauth.js?v=26"></script>
@@ -1506,6 +1509,8 @@ html[data-viva="condutai"] #cvToast[hidden]{display:none}
   .cv-leitura{display:block!important}
 }
 </style>
+<link rel="stylesheet" href="condutai-didatica.css?v=1">
+<link rel="stylesheet" href="condutai-presc.css?v=1">
 </head>
 <body>
 
@@ -1888,22 +1893,59 @@ html[data-viva="condutai"] #cvToast[hidden]{display:none}
     </div>
   </section>
 
-  <!-- ===================== PRESCRIÇÃO INTELIGENTE ===================== -->
+  <!-- ===================== PRESCRIÇÃO COM CONFERÊNCIA ===================== -->
   <section id="prescricaoView" class="wb-view anima" hidden>
-    <div class="wb-view-head" style="--c:var(--c-teal)"><span class="vic"><i class="ti ti-prescription"></i></span><div class="vtx"><h2>Prescrição</h2><p class="wb-view-intro">Informe os dados do paciente. A IA sugere doses ajustadas por peso e função renal, com alertas de interação.</p></div></div>
-    <div class="alert alert-warn" style="margin-bottom:14px"><span><i class="ti ti-alert-triangle"></i></span><div><b>Apoio à decisão clínica.</b> Não substitui o julgamento do médico responsável. Confirme condutas e doses antes de aplicar ao paciente.</div></div>
-    <div class="gaso-form">
-      <label>Idade (anos)<input id="p_idade" type="number" step="1" inputmode="numeric" placeholder="62"></label>
-      <label>Sexo<select id="p_sexo"><option value="">—</option><option value="M">Masculino</option><option value="F">Feminino</option></select></label>
-      <label>Peso (kg)<input id="p_peso" type="number" step="0.1" inputmode="decimal" placeholder="78"></label>
-      <label>Creatinina (mg/dL)<input id="p_creat" type="number" step="0.01" inputmode="decimal" placeholder="opcional"></label>
+    <div class="wb-view-head" style="--c:var(--c-teal)"><span class="vic"><i class="ti ti-prescription"></i></span><div class="vtx"><h2>Prescrição</h2><p class="wb-view-intro">A IA monta a prescrição pela diretriz vigente. Cada item passa por conferência de alergia, dose, rim, fígado, gestação, idade e interações antes de você copiar.</p></div></div>
+    <div class="rx-form">
+      <fieldset class="rx-card">
+        <legend><span class="rx-leg-ic"><i class="ti ti-user-heart"></i></span> Paciente <button type="button" class="rx-lk rx-limpa" id="rxLimpa"><i class="ti ti-eraser"></i> Limpar</button></legend>
+        <div class="rx-campos">
+          <label class="rx-campo"><span>Idade</span><input id="p_idade" type="number" step="1" min="12" max="120" inputmode="numeric" placeholder="anos"></label>
+          <label class="rx-campo"><span>Peso</span><input id="p_peso" type="number" step="0.1" min="20" max="350" inputmode="decimal" placeholder="kg"></label>
+          <label class="rx-campo"><span>Creatinina</span><input id="p_creat" type="number" step="0.01" min="0.1" max="20" inputmode="decimal" placeholder="mg/dL"></label>
+          <label class="rx-campo"><span>Altura <small>opcional</small></span><input id="p_altura" type="number" step="1" min="100" max="230" inputmode="numeric" placeholder="cm"></label>
+        </div>
+        <fieldset class="rx-campo rx-seg"><legend>Sexo</legend>
+          <label><input type="radio" name="p_sexo" value="F" id="p_sexo_f"><span>Feminino</span></label>
+          <label><input type="radio" name="p_sexo" value="M"><span>Masculino</span></label>
+        </fieldset>
+        <div id="rxTfg" class="rx-tfg" hidden></div>
+        <fieldset class="rx-campo rx-seg"><legend>Diálise</legend>
+          <label><input type="radio" name="p_dialise" value="" checked><span>Não</span></label>
+          <label><input type="radio" name="p_dialise" value="hd"><span>Hemodiálise</span></label>
+          <label><input type="radio" name="p_dialise" value="dp"><span>Peritoneal</span></label>
+          <label><input type="radio" name="p_dialise" value="cont"><span>Contínua</span></label>
+        </fieldset>
+        <fieldset class="rx-campo rx-seg"><legend>Fígado</legend>
+          <label><input type="radio" name="p_hep" value="normal" checked><span>Normal</span></label>
+          <label><input type="radio" name="p_hep" value="A"><span>Child A</span></label>
+          <label><input type="radio" name="p_hep" value="B"><span>Child B</span></label>
+          <label><input type="radio" name="p_hep" value="C"><span>Child C</span></label>
+        </fieldset>
+        <fieldset class="rx-campo rx-seg" id="rxGestWrap" hidden><legend>Gestação</legend>
+          <label><input type="radio" name="p_gest" value="" checked><span>Não</span></label>
+          <label><input type="radio" name="p_gest" value="gestante"><span>Gestante</span></label>
+          <label><input type="radio" name="p_gest" value="lactante"><span>Amamentando</span></label>
+        </fieldset>
+        <div class="rx-campo rx-alerg"><label for="p_alergias">Alergias</label>
+          <div class="rx-alerg-linha"><input id="p_alergias" type="text" autocomplete="off" placeholder="Ex.: penicilina (urticária); dipirona"><button type="button" id="p_nega" class="rx-pill" aria-pressed="false"><i class="ti ti-check"></i> Nega alergias</button></div></div>
+        <label class="rx-campo"><span>Medicações em uso</span><textarea id="p_emuso" rows="3" placeholder="Uma por linha. Ex.: Losartana 50 mg 12/12 h"></textarea></label>
+      </fieldset>
+      <fieldset class="rx-card">
+        <legend><span class="rx-leg-ic"><i class="ti ti-clipboard-heart"></i></span> Caso</legend>
+        <label class="rx-campo"><span>Diagnóstico e contexto</span><textarea id="p_dx" rows="4" placeholder="Ex.: pneumonia comunitária com critério de internação, sem choque; DPOC exacerbada; pielonefrite"></textarea></label>
+        <fieldset class="rx-campo rx-seg"><legend>Cenário</legend>
+          <label><input type="radio" name="p_cen" value="emergencia" checked><span>Emergência</span></label>
+          <label><input type="radio" name="p_cen" value="enfermaria"><span>Enfermaria</span></label>
+          <label><input type="radio" name="p_cen" value="uti"><span>UTI</span></label>
+          <label><input type="radio" name="p_cen" value="ambulatorio"><span>Ambulatório</span></label>
+        </fieldset>
+        <label class="rx-campo"><span>Observações</span><textarea id="p_obs" rows="3" placeholder="Gravidade, via oral, culturas, o que já foi feito"></textarea></label>
+        <button id="presGo" class="gaso-btn" data-ocupado="Montando"><i class="ti ti-sparkles"></i> Montar prescrição</button>
+        <p class="rx-nota">Sem nome do paciente. Os dados ficam só nesta aba e somem ao fechá-la.</p>
+      </fieldset>
     </div>
-    <div class="pres-full"><label>Alergias<input id="p_alergias" type="text" autocomplete="off" placeholder="Ex: penicilina, AINE… (ou “nega”)"></label></div>
-    <div class="pres-full"><label><span>Diagnóstico / contexto clínico <span class="cv-obrig" aria-label="obrigatório">*</span></span><textarea id="p_dx" placeholder="Ex: pneumonia comunitária grave; DPOC exacerbada; ITU complicada; CAD…"></textarea></label></div>
-    <div class="pres-full"><label>Cenário<select id="p_cenario"><option value="emergencia">Emergência</option><option value="enfermaria">Enfermaria</option><option value="uti">UTI</option><option value="ambulatorio">Ambulatório</option></select></label></div>
-    <div class="pres-full"><label>Observações adicionais<textarea id="p_obs" placeholder="Comorbidades, gestação, função hepática, medicações em uso…"></textarea></label></div>
-    <button id="presGo" class="gaso-btn" data-ocupado="Gerando a prescrição">Gerar sugestão de prescrição</button>
-    <div id="presResult" style="margin-top:16px"></div>
+    <div id="presResult" aria-live="polite"></div>
   </section>
 
   <!-- ===================== INTERAÇÃO MEDICAMENTOSA ===================== -->
@@ -2893,8 +2935,8 @@ function sanitizeMermaid(code) {
     .replace(/<br\s*\/?>/gi, '@@BR@@')  // protege quebra de linha ANTES de mexer em < e >
     .replace(/[()]/g, ' ')              // parênteses
     .replace(/["'`]/g, '')              // aspas e crase
-    .replace(/≥/g, ' maior ou igual a ')
-    .replace(/≤/g, ' menor ou igual a ')
+    .replace(/≥|>=/g, ' maior ou igual a ')
+    .replace(/≤|<=/g, ' menor ou igual a ')
     .replace(/</g, ' menor que ')       // < vira "tag" no parser → quebra
     .replace(/>/g, ' maior que ')       // > idem
     .replace(/\|/g, ' / ')              // | separa label de aresta
@@ -3290,9 +3332,15 @@ async function callGemini(contents, opts = {}) {
   if (!u) throw new Error('Entre na sua conta MedTech para usar a IA.');
   let idToken;
   try { idToken = await u.getIdToken(); } catch (e) { throw new Error('Sessão expirada — entre novamente.'); }
-  const usedModel = 'gemini-2.5-pro'; // pro p/ análises (conduta/assistente/bula/investigação); gateway já aceita pro
+  // opts: model, system (instrução de sistema), json (esquema → resposta JSON; o gateway desliga a busca nesse modo),
+  //       temperature, maxTokens, grounding:false, maxRetries. Sem opts = comportamento de sempre (pro, texto, com busca).
+  const usedModel = opts.model || 'gemini-2.5-pro'; // pro p/ análises (conduta/assistente/bula/investigação); gateway já aceita pro
   const maxRetries = opts.maxRetries ?? 2;
-  const body = { contents, model: usedModel, generationConfig: { temperature: 0.4, topP: 0.95, maxOutputTokens: 8192 } };
+  const generationConfig = { temperature: opts.temperature ?? 0.4, topP: 0.95, maxOutputTokens: opts.maxTokens || 8192 };
+  if (opts.json) { generationConfig.responseMimeType = 'application/json'; if (typeof opts.json === 'object') generationConfig.responseSchema = opts.json; }
+  const body = { contents, model: usedModel, generationConfig };
+  if (opts.system) body.systemInstruction = opts.system;
+  if (opts.grounding === false) body.grounding = false;
   let lastStatus = 0, lastErrText = '';
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     let res;
@@ -3325,6 +3373,25 @@ async function callGemini(contents, opts = {}) {
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/* JSON estruturado com rede de segurança: se o Vertex recusar o esquema (400/502 que não é login nem cota),
+   tenta de novo só com o modo JSON e o formato descrito no próprio pedido. */
+function descreveEsquema(e) {
+  if (!e) return '';
+  if (e.type === 'OBJECT') return '{' + Object.entries(e.properties || {}).map(([k, v]) => `"${k}": ${descreveEsquema(v)}`).join(', ') + '}';
+  if (e.type === 'ARRAY') return '[' + descreveEsquema(e.items) + ', ...]';
+  return (e.enum ? e.enum.map(x => `"${x}"`).join('|') : ({ STRING: 'texto', NUMBER: 'número', INTEGER: 'inteiro', BOOLEAN: 'true|false' })[e.type] || 'valor') + (e.nullable ? ' ou null' : '');
+}
+async function callGeminiJson(contents, opts = {}) {
+  try { return await callGemini(contents, opts); }
+  catch (err) {
+    if (!opts.json || typeof opts.json !== 'object' || [401, 403, 429].includes(err.status) || !err.status) throw err;
+    const c = contents.map(x => ({ role: x.role, parts: x.parts.map(p => Object.assign({}, p)) }));
+    const u = c[c.length - 1];
+    u.parts[u.parts.length - 1].text += '\n\nResponda SOMENTE com JSON válido neste formato: ' + descreveEsquema(opts.json);
+    return callGemini(c, Object.assign({}, opts, { json: true, maxRetries: 1 }));
+  }
+}
 
 function updateLoadingSub(text) {
   const el = document.querySelector('.loading-sub');
@@ -3631,6 +3698,7 @@ async function renderResultDireto(item) {
   };
   await renderMermaidIn(rc);
   linkifyRelated(rc.querySelector('.content'), protocolMeta);
+  if (window.CVD) CVD.realca(rc, item);
 }
 
 // Sumário lateral + "Abrir todas": usa as próprias seções recolhíveis da conduta
@@ -3679,32 +3747,85 @@ function updateAIPanelContext(item) {
   if (sub) sub.textContent = item.protocolMeta ? item.protocolMeta.name : item.query;
   const chipsBox = document.getElementById('aiPanelChips');
   if (chipsBox) {
-    const chips = ['Critérios diagnósticos', 'Quando internar/UTI', 'Doses e ajuste renal', 'Diagnóstico diferencial', 'Resuma em 3 pontos'];
-    chipsBox.innerHTML = chips.map(c => `<button class="ai-panel-chip">${escapeHtml(c)}</button>`).join('');
+    const chips = [
+      ['ti-list-check', 'Resumo de plantão', 'Faça o resumo de plantão desta conduta: em até 8 linhas, o que reconhecer, o que fazer primeiro (com doses) e quando chamar ajuda ou internar.'],
+      ['ti-school', 'Me teste', null],
+      ['ti-git-fork', 'Explique o fluxograma', 'Explique o fluxograma desta conduta passo a passo, dizendo em cada decisão o que olhar no paciente.'],
+      ['ti-pill', 'Doses e ajuste renal', 'Liste as doses desta conduta com via, intervalo e o ajuste renal de cada uma.'],
+      ['ti-prescription', 'Montar prescrição', 'presc']
+    ];
+    chipsBox.innerHTML = chips.map((c, i) => `<button class="ai-panel-chip" data-i="${i}"><i class="ti ${c[0]}"></i> ${escapeHtml(c[1])}</button>`).join('');
     chipsBox.querySelectorAll('.ai-panel-chip').forEach(btn => {
-      btn.onclick = () => sendAIPanelMessage(btn.textContent);
+      const c = chips[+btn.dataset.i];
+      btn.onclick = () => {
+        if (c[2] === null) return aiPanelQuiz();
+        if (c[2] === 'presc') { closeAIPanel(); if (window.CVPresc) CVPresc.abrirCom(item.protocolMeta ? item.protocolMeta.name : item.query); return; }
+        sendAIPanelMessage(c[2], c[1]);
+      };
     });
   }
   renderAIPanelMessages();
 }
-function buildAIPanelContents(newQuestion) {
+function aiPanelSistema() {
   const item = aiPanelContext;
   const titulo = item.protocolMeta ? item.protocolMeta.name : item.query;
-  const systemMsg = `Você é um assistente clínico dentro do CondutAI, respondendo dúvidas sobre UMA conduta específica que o usuário está lendo agora. Responda com base principalmente no texto da conduta abaixo; pode complementar com conhecimento médico geral quando fizer sentido, mas avise quando a informação não vier do texto. Seja direto — respostas curtas, sem saudação, sem repetir a pergunta, sem inventar seção de referências.
+  const paciente = (window.CVPresc && CVPresc.resumoPaciente()) || '';
+  return `Você é o assistente clínico do CondutAI e responde dúvidas de um MÉDICO sobre UMA conduta que ele está lendo agora. Baseie-se principalmente no texto da conduta abaixo; pode complementar com conhecimento atual (cite diretriz e ano), mas diga quando a informação não vem do texto. Comece pela resposta em 1 a 3 linhas; depois, o detalhe útil. Negrito nos números e doses. Sem saudação, sem repetir a pergunta, sem inventar referência.${paciente ? `\n\nPACIENTE EM FOCO (se a pergunta for sobre um paciente, use): ${paciente}` : ''}
 
 CONDUTA: ${titulo}
 
 TEXTO DA CONDUTA:
 ${item.text}`;
-  const contents = [
-    { role: 'user', parts: [{ text: systemMsg }] },
-    { role: 'model', parts: [{ text: 'Entendido. Pode perguntar sobre esta conduta.' }] }
-  ];
-  for (const m of aiPanelHistory) {
-    contents.push({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.display }] });
+}
+function buildAIPanelContents(newQuestion) {
+  const contents = [];
+  const hist = aiPanelHistory.slice();
+  const ult = hist[hist.length - 1];
+  if (ult && ult.role === 'user' && (ult.pergunta || ult.display) === newQuestion) hist.pop(); // a pergunta nova já entra no fim
+  for (const m of hist) {
+    if (m.quiz || m.quizPedido) continue;
+    contents.push({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.pergunta || m.display }] });
   }
   contents.push({ role: 'user', parts: [{ text: newQuestion }] });
   return contents;
+}
+/* "Me teste": 3 questões da própria conduta, com as alternativas embaralhadas aqui (Fisher-Yates)
+   e pedido explícito de alternativas de tamanho parecido (a IA tende a deixar a correta mais longa). */
+const ESQ_QUIZ = { type: 'OBJECT', properties: { questoes: { type: 'ARRAY', items: { type: 'OBJECT', properties: {
+  enunciado: { type: 'STRING' }, correta: { type: 'STRING' }, erradas: { type: 'ARRAY', items: { type: 'STRING' } }, explicacao: { type: 'STRING' } },
+  required: ['enunciado', 'correta', 'erradas', 'explicacao'] } } }, required: ['questoes'] };
+function embaralha(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+async function aiPanelQuiz() {
+  if (!aiPanelContext) return;
+  aiPanelHistory.push({ role: 'user', display: 'Me teste com 3 questões', quizPedido: true });
+  renderAIPanelMessages(); showAIPanelTyping(true);
+  const sendBtn = document.getElementById('aiPanelSend'); if (sendBtn) sendBtn.disabled = true;
+  try {
+    const { text } = await callGeminiJson([{ role: 'user', parts: [{ text: 'Crie 3 questões de múltipla escolha sobre os pontos PRÁTICOS mais importantes desta conduta (decisão, dose, critério de gravidade, armadilha), baseadas SOMENTE no texto dela. Caso curto no enunciado quando couber. Uma correta e três erradas plausíveis, todas com tamanho e nível de detalhe parecidos. Explicação de 1 a 2 frases citando o ponto da conduta.' }] }],
+      { model: 'gemini-2.5-flash', system: aiPanelSistema(), json: ESQ_QUIZ, temperature: 0.6, maxTokens: 8192 });
+    let dados; try { dados = JSON.parse(text); } catch (e) { const a = text.indexOf('{'), b = text.lastIndexOf('}'); dados = JSON.parse(text.slice(a, b + 1)); }
+    const quiz = (dados.questoes || []).filter(q => q && q.correta && Array.isArray(q.erradas) && q.erradas.length >= 2).slice(0, 3).map(q => {
+      const alts = embaralha([{ t: q.correta, ok: true }, ...q.erradas.slice(0, 3).map(t => ({ t, ok: false }))]);
+      return { enunciado: q.enunciado, alts, explicacao: q.explicacao, resp: null };
+    });
+    if (!quiz.length) throw new Error('não veio nenhuma questão válida');
+    aiPanelHistory.push({ role: 'model', quiz });
+  } catch (err) {
+    aiPanelHistory.push({ role: 'model', display: 'Não consegui montar as questões: ' + (err.message || 'erro na IA') + '.' });
+  }
+  showAIPanelTyping(false); if (sendBtn) sendBtn.disabled = false;
+  renderAIPanelMessages();
+}
+function htmlQuiz(m, mi) {
+  const acertos = m.quiz.filter(q => q.resp != null && q.alts[q.resp].ok).length, feitas = m.quiz.filter(q => q.resp != null).length;
+  return `<div class="ai-panel-msg assistant cv-quiz">${m.quiz.map((q, qi) => `<div class="cv-q">
+      <p class="cv-q-en"><b>${qi + 1}.</b> ${escapeHtml(q.enunciado)}</p>
+      <div class="cv-q-alts">${q.alts.map((a, ai) => {
+        const est = q.resp == null ? '' : a.ok ? ' certa' : (q.resp === ai ? ' errada' : ' apagada');
+        return `<button type="button" class="cv-q-alt${est}" data-m="${mi}" data-q="${qi}" data-a="${ai}" ${q.resp != null ? 'disabled' : ''}><span>${'ABCD'[ai]}</span>${escapeHtml(a.t)}</button>`; }).join('')}</div>
+      ${q.resp != null ? `<p class="cv-q-exp"><i class="ti ${q.alts[q.resp].ok ? 'ti-circle-check' : 'ti-info-circle'}"></i> ${escapeHtml(q.explicacao)}</p>` : ''}
+    </div>`).join('')}
+    ${feitas === m.quiz.length ? `<p class="cv-q-placar">Você acertou ${acertos} de ${m.quiz.length}. <button type="button" class="cv-q-mais">Mais 3 questões</button></p>` : ''}</div>`;
 }
 function renderAIPanelMessages() {
   const box = document.getElementById('aiPanelMessages');
@@ -3713,10 +3834,15 @@ function renderAIPanelMessages() {
     box.innerHTML = '<div class="ai-panel-empty">Tire dúvidas específicas sobre esta conduta — critérios, doses, diferenciais. Respondo com base no texto que você está lendo.</div>';
     return;
   }
-  box.innerHTML = aiPanelHistory.map(m => m.role === 'user'
+  box.innerHTML = aiPanelHistory.map((m, mi) => m.quiz ? htmlQuiz(m, mi) : m.role === 'user'
     ? `<div class="ai-panel-msg user">${escapeHtml(m.display)}</div>`
     : `<div class="ai-panel-msg assistant">${md(m.display)}</div>`
   ).join('');
+  box.querySelectorAll('.cv-q-alt').forEach(b => { b.onclick = () => {
+    const q = aiPanelHistory[+b.dataset.m].quiz[+b.dataset.q]; if (q.resp != null) return;
+    q.resp = +b.dataset.a; const topo = box.scrollTop; renderAIPanelMessages(); box.scrollTop = topo;
+  }; });
+  box.querySelectorAll('.cv-q-mais').forEach(b => { b.onclick = () => aiPanelQuiz(); });
   box.scrollTop = box.scrollHeight;
 }
 function showAIPanelTyping(show) {
@@ -3730,10 +3856,10 @@ function showAIPanelTyping(show) {
     existing.remove();
   }
 }
-async function sendAIPanelMessage(text) {
+async function sendAIPanelMessage(text, rotulo) {
   const q = (text || '').trim();
   if (!q || !aiPanelContext) return;
-  aiPanelHistory.push({ role: 'user', display: q });
+  aiPanelHistory.push({ role: 'user', display: rotulo || q, pergunta: q });
   renderAIPanelMessages();
   const input = document.getElementById('aiPanelInput');
   if (input) { input.value = ''; input.style.height = 'auto'; }
@@ -3741,7 +3867,7 @@ async function sendAIPanelMessage(text) {
   if (sendBtn) sendBtn.disabled = true;
   showAIPanelTyping(true);
   try {
-    const { text: resp } = await callGemini(buildAIPanelContents(q));
+    const { text: resp } = await callGemini(buildAIPanelContents(q), { system: aiPanelSistema() });
     aiPanelHistory.push({ role: 'model', display: resp });
   } catch (err) {
     aiPanelHistory.push({ role: 'model', display: 'Não consegui responder: ' + (err.message || 'erro ao consultar a IA.') });
@@ -3802,15 +3928,23 @@ async function renderSocratic(item) {
 async function renderChatMessages() {
   const container = document.getElementById('chatContainer');
   if (!container || !currentConversation) return;
-  container.innerHTML = currentConversation.messages.map((m, i) => `
+  const assist = currentConversation.mode === 'assistente';
+  const visiveis = currentConversation.messages.map((m, i) => ({ m, i })).filter(x => !x.m.hidden); // "hidden" = instrução interna do modo socrático
+  const ult = visiveis.length ? visiveis[visiveis.length - 1].i : -1;
+  container.innerHTML = visiveis.map(({ m, i }) => `
     <div class="chat-message ${m.role === 'user' ? 'user' : 'ai'}">
       <div class="chat-avatar">${m.role === 'user' ? '<i class="ti ti-user"></i>' : '<i class="ti ti-stethoscope"></i>'}</div>
       <div class="chat-bubble">
         <div class="content">${m.role === 'user' ? `<p>${escapeHtml(m.text).replace(/\n/g,'<br>')}</p>` : md(m.text)}</div>
         ${m.role === 'ai' && m.sources?.length ? renderSourcesHtml(m.sources) : ''}
+        ${assist && m.role === 'ai' ? `<div class="cv-msg-acoes"><button type="button" class="cv-msg-bt" data-copia="${i}"><i class="ti ti-copy"></i> Copiar</button><button type="button" class="cv-msg-bt" data-presc="${i}"><i class="ti ti-prescription"></i> Montar prescrição</button></div>` : ''}
       </div>
     </div>
+    ${assist && i === ult && m.role === 'ai' && m.sugestoes && m.sugestoes.length ? `<div class="cv-sugestoes" aria-label="Perguntas sugeridas">${m.sugestoes.map(q => `<button type="button" class="cv-sug">${escapeHtml(q)}</button>`).join('')}</div>` : ''}
   `).join('');
+  container.querySelectorAll('.cv-sug').forEach(b => { b.onclick = () => continueAssistente(b.textContent.trim()); });
+  container.querySelectorAll('[data-copia]').forEach(b => { b.onclick = () => cvCopia(currentConversation.messages[+b.dataset.copia].text, 'Resposta copiada'); });
+  container.querySelectorAll('[data-presc]').forEach(b => { b.onclick = () => { const q = currentConversation.messages.find(x => x.role === 'user'); if (window.CVPresc) CVPresc.abrirCom(q ? q.text : ''); }; });
   await renderMermaidIn(container);
   // scroll para o último
   setTimeout(() => container.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 50);
@@ -3921,27 +4055,38 @@ async function continueSocratic(userText, isFinishing = false) {
 }
 
 // ============ MODO ASSISTENTE (tira-dúvidas prático, conversacional) ============
-function buildAssistentePrompt(ctx, cenario) {
+function buildAssistentePrompt(ctx, cenario, paciente) {
   const { ctxLabel, cenLabel } = ctxLabels(ctx || 'adulto', cenario || 'emergencia');
-  return `Você é o ASSISTENTE CLÍNICO do CondutAI, falando com um MÉDICO no Brasil (contexto: ${ctxLabel}, ${cenLabel}). Responda dúvidas PRÁTICAS de plantão/beira-leito de forma DIRETA e ACIONÁVEL, como um colega experiente — não como professor, sem rodeios.
+  return `Você é o assistente clínico do CondutAI, conversando com um MÉDICO no Brasil (contexto: ${ctxLabel}, ${cenLabel}). Pense como um colega sênior de plantão: direto, preciso e honesto sobre a incerteza.
 
-COMO RESPONDER:
-- Português do Brasil, markdown enxuto: negrito nos números/doses, bullets curtos. Vá direto ao ponto (sem introdução longa).
-- PRESCRIÇÃO: dê droga, dose, via, frequência/duração e, quando houver, a apresentação comercial brasileira (ex.: ampola 0,1 mg/mL).
-- DILUIÇÃO / INFUSÃO / BIC: MOSTRE O CÁLCULO passo a passo — quantos mL/ampolas aspirar, em qual soro e volume, a concentração final e a VAZÃO da bomba em mL/h para a dose-alvo. Confira a conta antes de responder.
-- Ajuste por PESO, idade e função renal/hepática quando relevante. Se faltar um dado essencial (peso, apresentação disponível, gravidade), faça a conta com uma suposição explícita ("assumindo X") E pergunte o dado ao final para refinar.
-- Conversa de VÁRIOS TURNOS: lembre do que já foi dito (paciente, peso, apresentação, soro disponível) e refaça as contas conforme o médico corrige.
-- Cite a base (diretriz/sociedade/bula) quando souber; NUNCA invente referência, número de estudo ou dose.
-- Segurança: em 1 linha, sinalize dose máxima, contraindicação ou red flag relevante quando houver. Você apoia a decisão; a conduta final e a checagem são do médico.
-
-Responda agora à dúvida do médico.`;
+COMO RESPONDER
+1. Comece pela resposta em 1 a 3 linhas: o que fazer, a dose, o diagnóstico mais provável. Depois, só o detalhe que ajuda a agir.
+2. Se faltar um dado que MUDA a resposta (peso, função renal, gravidade, gestação, alergia, apresentação disponível), responda com a suposição explícita ("assumindo X") e pergunte o dado no fim, em uma linha.
+3. Dose: fármaco, dose, via, intervalo, duração e apresentação brasileira. Diluição e bomba: mostre a conta passo a passo (quantos mL aspirar, em qual soro e volume, concentração final e vazão em mL/h) e confira antes de responder. Ajuste por peso, TFG (CKD-EPI 2021) e fígado quando for relevante.
+4. Segurança: em uma linha, dose máxima, contraindicação, interação ou sinal de alarme que importe.
+5. Evidência: cite a diretriz ou sociedade e o ano quando existir; prefira a brasileira e a mais recente (use a busca). Nunca invente referência, estudo, número ou dose; se não souber, diga.
+6. Conversa de vários turnos: lembre do paciente e refaça as contas quando o médico corrigir.
+7. Formato: markdown enxuto, negrito nos números, listas curtas, sem saudação, sem repetir a pergunta.
+${paciente ? `
+PACIENTE EM FOCO (dados que o médico preencheu; use-os): ${paciente}
+` : ''}
+No fim de TODA resposta, numa linha separada, escreva exatamente:
+SUGESTOES: pergunta 1 | pergunta 2 | pergunta 3
+São três perguntas curtas (até 60 caracteres cada) que o médico provavelmente faria em seguida sobre este caso.`;
+}
+function separaSugestoes(texto) {
+  const m = String(texto || '').match(/\n?[ \t*_]*SUGEST(?:Õ|O)ES:?[ \t*_]*([^\n]+)\s*$/i);
+  if (!m) return { texto, sugestoes: [] };
+  const sugestoes = m[1].split('|').map(x => x.replace(/[*_`]/g, '').trim()).filter(x => x && x.length <= 90).slice(0, 3);
+  return { texto: texto.slice(0, m.index).trim(), sugestoes };
 }
 
 async function startAssistente(query, ctx, cenario, ctxLabel, cenarioLabel) {
   const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const paciente = (window.CVPresc && CVPresc.resumoPaciente()) || '';
   const item = {
     id, mode: 'assistente', query, ctx, cenario, ctxLabel, cenarioLabel,
-    date: new Date().toISOString(), starred: false,
+    date: new Date().toISOString(), starred: false, paciente, usarPaciente: !!paciente,
     messages: [{ role: 'user', text: query }]
   };
   history.unshift(item);
@@ -3971,12 +4116,13 @@ async function assistenteRespond() {
 
   const msgs = currentConversation.messages.filter(m => !m.hidden);
   const contents = msgs.map(m => ({ role: m.role === 'ai' ? 'model' : 'user', parts: [{ text: m.text }] }));
-  const firstUser = contents.find(c => c.role === 'user');
-  if (firstUser) firstUser.parts[0].text = buildAssistentePrompt(currentConversation.ctx, currentConversation.cenario) + '\n\n--- DÚVIDA DO MÉDICO ---\n' + firstUser.parts[0].text;
+  const cc = currentConversation;
+  const sistema = buildAssistentePrompt(cc.ctx, cc.cenario, cc.usarPaciente ? cc.paciente : '');
 
   try {
-    const { text } = await callGemini(contents);
-    currentConversation.messages.push({ role: 'ai', text });
+    const bruto = (await callGemini(contents, { system: sistema })).text;
+    const { texto: text, sugestoes } = separaSugestoes(bruto);
+    currentConversation.messages.push({ role: 'ai', text, sugestoes });
     const idx = history.findIndex(h => h.id === currentConversation.id);
     if (idx >= 0) history[idx] = currentConversation;
     saveHistory();
@@ -4007,6 +4153,7 @@ async function renderAssistente(item) {
         <button class="action-btn" id="homeBtn2"><i class="ti ti-plus"></i> Nova conversa</button>
       </div>
     </div>
+    ${item.paciente ? `<div class="cv-foco${item.usarPaciente ? '' : ' desligado'}" style="max-width:900px;margin:0 auto 12px"><i class="ti ti-user-heart"></i><span><b>Paciente em foco:</b> ${escapeHtml(item.paciente)}</span><button type="button" id="cvFocoBt">${item.usarPaciente ? 'Não usar' : 'Usar'}</button></div>` : ''}
     <div class="chat-container" id="chatContainer"></div>
     <div class="followup-box" id="followupBox">
       <div class="followup-label">Continue perguntando (ex.: e se for 0,1 mg/mL? qual a vazão da BIC?)</div>
@@ -4019,6 +4166,8 @@ async function renderAssistente(item) {
     </div>`;
   await renderChatMessages();
   bindAssistenteFollowup();
+  const fb = document.getElementById('cvFocoBt');
+  if (fb) fb.onclick = () => { item.usarPaciente = !item.usarPaciente; saveHistory(); renderAssistente(item); aviso(item.usarPaciente ? 'A IA vai considerar o paciente em foco' : 'A IA vai ignorar o paciente em foco', 'ok'); };
   document.getElementById('printBtn').onclick = () => window.print();
   document.getElementById('homeBtn2').onclick = () => { currentId = null; currentConversation = null; const si = document.getElementById('searchInput'); if (si) si.value = ''; setMode('assistente'); showView('ia'); if (si) si.focus(); };
 }
@@ -4128,24 +4277,7 @@ async function run(query) {
   }
 }
 
-// Filtrar mensagens "hidden" na renderização do chat
-const _origRenderChat = renderChatMessages;
-renderChatMessages = async function() {
-  const container = document.getElementById('chatContainer');
-  if (!container || !currentConversation) return;
-  const visible = currentConversation.messages.filter(m => !m.hidden);
-  container.innerHTML = visible.map(m => `
-    <div class="chat-message ${m.role === 'user' ? 'user' : 'ai'}">
-      <div class="chat-avatar">${m.role === 'user' ? '<i class="ti ti-user"></i>' : '<i class="ti ti-stethoscope"></i>'}</div>
-      <div class="chat-bubble">
-        <div class="content">${m.role === 'user' ? `<p>${escapeHtml(m.text).replace(/\n/g,'<br>')}</p>` : md(m.text)}</div>
-        ${m.role === 'ai' && m.sources?.length ? renderSourcesHtml(m.sources) : ''}
-      </div>
-    </div>
-  `).join('');
-  await renderMermaidIn(container);
-  setTimeout(() => container.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 50);
-};
+// (a renderização do chat já esconde as mensagens "hidden": ver renderChatMessages)
 
 // ============ Eventos ============
 function bindSend(inputId, btnId) {
@@ -5606,70 +5738,7 @@ function estimarTFG({ idade, sexo, creat }) {
   const v = 142 * Math.pow(Math.min(creat / k, 1), al) * Math.pow(Math.max(creat / k, 1), -1.200) * Math.pow(0.9938, idade) * (f ? 1.012 : 1);
   return (isFinite(v) && v > 0) ? Math.round(v) : null;
 }
-function buildPromptPrescricao(d) {
-  const L = [];
-  L.push(`Diagnóstico / contexto clínico: ${d.dx}`);
-  if (d.cenario) L.push(`Cenário de atendimento: ${d.cenario}`);
-  if (d.idade) L.push(`Idade: ${d.idade} anos`);
-  if (d.sexo) L.push(`Sexo: ${d.sexo === 'F' ? 'feminino' : 'masculino'}`);
-  if (d.peso) L.push(`Peso: ${d.peso} kg`);
-  if (d.creat) L.push(`Creatinina sérica: ${d.creat} mg/dL`);
-  if (d.tfg != null) L.push(`TFG estimada (CKD-EPI 2021): ≈ ${d.tfg} mL/min/1,73m² — AJUSTE TODAS as doses a esta função renal.`);
-  L.push(`Alergias: ${d.alergias || 'não relatadas'}`);
-  if (d.obs) L.push(`Observações adicionais: ${d.obs}`);
-  return `Você é médico assistente experiente e farmacêutico clínico. Com base nos DADOS DO PACIENTE abaixo e nas DIRETRIZES vigentes (cite a diretriz/sociedade e o ano quando aplicável), elabore uma SUGESTÃO DE PRESCRIÇÃO inicial, prática e segura, para uso no Brasil. Responda em português do Brasil, em Markdown, com números concretos (mg, mg/kg, mL, gotas, mL/h) e ajustando as doses ao PESO e à FUNÇÃO RENAL informados.
-
-DADOS DO PACIENTE:
-${L.join('\n')}
-
-REGRAS:
-- NUNCA prescreva um fármaco ao qual o paciente é alérgico; verifique reação cruzada (ex.: penicilina × cefalosporina) e sinalize de forma destacada.
-- Para CADA medicação: nome genérico (comercial entre parênteses quando útil), DOSE (ajustada por peso/função renal), VIA, FREQUÊNCIA, DURAÇÃO e — quando endovenoso — DILUIÇÃO e TEMPO DE INFUSÃO. Ofereça ALTERNATIVA quando relevante.
-- Priorize o que muda desfecho; não encha de itens supérfluos. Indique nível de evidência/diretriz quando houver.
-- Se faltarem dados essenciais (peso, função renal, gestação), ASSUMA o cenário mais provável e DEIXE EXPLÍCITO o que assumiu.
-
-ESTRUTURA OBRIGATÓRIA (use EXATAMENTE estes cabeçalhos começando com "## "):
-
-# Sugestão de prescrição — ${d.dx}
-
-## Resumo do caso
-## Hipóteses e racional terapêutico
-## Medicações sugeridas
-## Ajuste por função renal
-## Alertas de interação e segurança
-## Medidas de suporte e não-farmacológicas
-## Evidência / diretrizes
-
-Em "Medicações sugeridas", agrupe por classe/objetivo e use bullets no formato: "- **Fármaco** — dose, via, frequência, duração — (diluição/infusão se EV; alternativa; evidência)". Em "Ajuste por função renal", se houver ClCr informado, diga EXPLICITAMENTE quais fármacos foram ajustados e como; se não houver, oriente o que monitorar. Seja objetivo e use negrito nos números/doses.`;
-}
-async function runPrescricao() {
-  const dxEl = document.getElementById('p_dx');
-  const box = document.getElementById('presResult');
-  const dx = (dxEl.value || '').trim();
-  if (!dx) { box.innerHTML = '<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Informe ao menos o <b>diagnóstico / contexto clínico</b>.</div></div>'; dxEl.focus(); return; }
-  const numId = id => { const x = parseFloat((document.getElementById(id).value || '').replace(',', '.')); return isNaN(x) ? null : x; };
-  const idade = numId('p_idade'), peso = numId('p_peso'), creat = numId('p_creat');
-  const sexo = document.getElementById('p_sexo').value || '';
-  const cenario = document.getElementById('p_cenario').value || '';
-  const alergias = (document.getElementById('p_alergias').value || '').trim();
-  const obs = (document.getElementById('p_obs').value || '').trim();
-  const tfg = estimarTFG({ idade, sexo, creat });
-  if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
-  box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Elaborando prescrição…</strong></div><div class="loading-sub">Doses por peso e função renal, alertas e evidência…</div></div>`;
-  const prompt = buildPromptPrescricao({ dx, idade, sexo, peso, creat, tfg, alergias, obs, cenario });
-  try {
-    const { text } = await callGemini([{ role: 'user', parts: [{ text: prompt }] }]);
-    const tfgChip = tfg != null ? `<div class="cv-selo azul"><i class="ti ti-droplet"></i> TFG estimada ≈ ${tfg} mL/min/1,73m² (CKD-EPI 2021)</div>` : '';
-    box.innerHTML = `<div class="result content">${tfgChip}${accordionize(md(text))}<div class="alert alert-warn" style="margin-top:14px"><span><i class="ti ti-alert-triangle"></i></span><div><b>Apoio à decisão — não substitui o julgamento médico.</b> Confira doses, ajustes, interações e contraindicações antes de prescrever; a responsabilidade é do médico assistente.</div></div></div>`;
-    await renderMermaidIn(box);
-    cvMostra(box);
-  } catch (err) {
-    box.innerHTML = `<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Não foi possível gerar agora: ${escapeHtml(err.message || 'erro')}.</div></div>`;
-    const r = document.createElement('button'); r.className = 'btn-primary'; r.style.marginTop = '10px'; r.textContent = 'Tentar de novo'; r.onclick = () => runPrescricao(); box.appendChild(r);
-  }
-}
-const _pg = document.getElementById('presGo');
-if (_pg) _pg.onclick = () => runPrescricao();
+/* a prescrição agora vive em condutai-presc.js (IA estruturada + conferência de segurança em condutai-seguranca.js) */
 
 // ============================================================
 //  INTERAÇÃO MEDICAMENTOSA · DIAGNÓSTICO DIFERENCIAL · ANÁLISE DE EXAMES (IA)
@@ -5690,15 +5759,28 @@ Sob cada cabeçalho use bullets curtos: "- **Fármaco A + Fármaco B** — efeit
 MEDICAMENTOS:
 ${meds}`;
 }
+/* conferência por regra (condutai-seguranca.js): sai na hora, antes da IA, e não depende dela */
+function conferenciaInteracoes(meds) {
+  if (!window.CVSeg) return '';
+  const linhas = meds.split(/\n|;/).map(l => l.trim()).filter(Boolean);
+  const r = CVSeg.conferir(linhas.map(l => ({ farmaco: l, via: '' })), {}, '');
+  const fora = r.itens.filter(x => !x.farmacos.length).map(x => linhas[x.i]);
+  const ic = { grave: 'ti-alert-octagon', atencao: 'ti-alert-triangle', info: 'ti-info-circle' };
+  const lis = r.conjunto.map(a => `<li class="rx-al ${a.nivel}"><i class="ti ${ic[a.nivel]}"></i><span>${escapeHtml(a.msg)}</span></li>`).join('');
+  return `<section class="rx-bloco rx-geral" style="margin-bottom:14px"><h4><i class="ti ti-shield-check"></i> Conferência por regra</h4>
+    ${lis ? `<ul class="rx-alertas">${lis}</ul>` : '<p style="margin:0;color:var(--tinta2);font-size:14.5px">Nenhuma interação da base de regras entre estes fármacos. A análise da IA abaixo cobre o restante.</p>'}
+    ${fora.length ? `<p style="margin:10px 0 0;color:var(--tinta2);font-size:13.5px">Fora da base de regras: ${escapeHtml(fora.join(', '))}.</p>` : ''}</section>`;
+}
 async function runInteracoes() {
   const meds = (document.getElementById('it_meds').value || '').trim();
   const box = document.getElementById('itResult');
   if (!meds) { box.innerHTML = '<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Liste ao menos <b>dois medicamentos</b> (um por linha).</div></div>'; return; }
   if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
   const obs = (document.getElementById('it_obs').value || '').trim();
-  box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Verificando interações…</strong></div><div class="loading-sub">Gravidade, mecanismo e manejo…</div></div>`;
+  const regras = conferenciaInteracoes(meds);
+  box.innerHTML = `${regras}<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Verificando interações…</strong></div><div class="loading-sub">Gravidade, mecanismo e manejo…</div></div>`;
   try { const { text } = await callGemini([{ role: 'user', parts: [{ text: buildPromptInteracoes(meds, obs) }] }]);
-    box.innerHTML = `<div class="result content">${accordionize(md(text))}<div class="alert alert-info" style="margin-top:14px"><span><i class="ti ti-info-circle"></i></span><div>Gerado por IA — confirme em fonte de interações (bula/UpToDate/Micromedex) antes de decidir.</div></div></div>`;
+    box.innerHTML = `${regras}<div class="result content">${accordionize(md(text))}<div class="alert alert-info" style="margin-top:14px"><span><i class="ti ti-info-circle"></i></span><div>Análise da IA: confirme em fonte de interações (bula, UpToDate, Micromedex) antes de decidir.</div></div></div>`;
     cvMostra(box);
   } catch (err) { box.innerHTML = `<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Não foi possível analisar agora: ${escapeHtml(err.message || 'erro')}.</div></div>`; const r = document.createElement('button'); r.className = 'btn-primary'; r.style.marginTop = '10px'; r.textContent = 'Tentar de novo'; r.onclick = () => runInteracoes(); box.appendChild(r); }
 }
@@ -6415,7 +6497,7 @@ function cvComOcupado(nome, ids) {
     try { return await f.apply(this, arguments); } finally { bts.forEach(b => cvOcupa(b, false)); }
   };
 }
-[['run', ['sendBtn', 'sendBtn2']], ['runBula', ['bulaGo']], ['runInv', ['invGo']], ['runPrescricao', ['presGo']],
+[['run', ['sendBtn', 'sendBtn2']], ['runBula', ['bulaGo']], ['runInv', ['invGo']],
  ['runInteracoes', ['itGo']], ['runDDx', ['ddGo']], ['runExames', ['exGo']], ['runProc', ['procGo']],
  ['runVacIA', ['vacGo']], ['runOrient', ['orGo']]].forEach(([n, ids]) => cvComOcupado(n, ids));
 
