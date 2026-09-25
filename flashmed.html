@@ -17,9 +17,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="_mtfb.js?v=1"></script>
-<script>window.MT_APP={id:"flashmed",name:"FlashMed"};</script>
-<script type="module" src="_mtauth.js?v=26"></script>
+<!-- conta + sincronização (cópia de ~/Documents/Claude/_mtsync/mtsync.js). Síncrono no <head>:
+     o portão cobre a tela antes do primeiro pixel do app e só sai com a conta confirmada. -->
+<script src="mtsync.js?v=1"></script>
 <style>
   :root{
     --bg:#FAFAF8;
@@ -957,6 +957,7 @@ function lerGeradas(){
 }
 function gravarGeradas(arr){
   try{ localStorage.setItem(IA_KEY, JSON.stringify(arr)); }catch(e){}
+  if(typeof MTS!=="undefined") MTS.mudou("geradas");
 }
 function limparIA(t){                    // texto puro: sem tags, sem entidade quebrada
   return String(t==null?"":t)
@@ -991,8 +992,8 @@ async function gerarQuestoesIA(btn){
   const antes = btn.innerHTML;
   btn.disabled = true; btn.innerHTML = "Escrevendo " + n + " questões de “" + tema + "”…";
   try{
-    if(!window.MT || !MT.user) throw new Error("Entre na conta MedTech para usar a IA.");
-    const txt = await MT.ai(promptGerar(tema, base.esp, base.area, n), "gemini-2.5-pro");
+    if(typeof MTS==="undefined" || !MTS.usuario) throw new Error("Entre na conta MedTech para usar a IA.");
+    const txt = await MTS.ai(promptGerar(tema, base.esp, base.area, n), "gemini-2.5-pro");
     const arr = extrairArray(txt);
     if(!arr || !arr.length) throw new Error("A IA não devolveu questões em formato utilizável. Tente de novo.");
     const geradas = lerGeradas();
@@ -1064,49 +1065,85 @@ function loadStrikes(){
 }
 function saveAnswers(){
   try{ localStorage.setItem(STORE_KEY, JSON.stringify(answers)); }catch(e){}
-  cloudSave();
+  MTS.mudou("resp");
 }
-function saveStrikesAll(){ try{ localStorage.setItem(STRIKE_KEY, JSON.stringify(strikes)); }catch(e){} }
+function saveStrikesAll(){ try{ localStorage.setItem(STRIKE_KEY, JSON.stringify(strikes)); }catch(e){} MTS.mudou("riscos"); }
 
-/* nuvem: cada resposta é uma entidade {id, sel, ok, updatedAt} — merge por id,
-   last-edit-wins (mesmo contrato do Foco/Granaê). */
-let _cloudBusy = false;
-function cloudSave(){
-  if(!window.MT || !MT.save || _cloudBusy) return;
-  const resp = Object.keys(answers).map(id=>({id, sel:answers[id].sel, ok:!!answers[id].ok, updatedAt: answers[id].t || Date.now()}));
-  try{ MT.save({resp, geradas: lerGeradas()}); }catch(e){}
+/* ============================================================
+   CONTA E SINCRONIZAÇÃO (25/09/2026)
+   mtsync.js (cópia de ~/Documents/Claude/_mtsync): o app só abre logado, cada resposta
+   sobe sozinha (um documento por item em users/{uid}/apps/flashmed/sync), o que vem de
+   outro aparelho entra em tempo real, e sem internet a fila do Firestore guarda tudo.
+   Sincronizam: respostas, alternativas riscadas, questões geradas e os simulados.
+   Não sincronizam (tela deste aparelho): sessão em andamento, filtros e aba aberta.
+   ============================================================ */
+const SIM_PREF = "enareSim_";
+function lerSims(){
+  const o = {};
+  Object.keys(localStorage).forEach(k=>{ if(k.startsWith(SIM_PREF)){ try{ o[k.slice(SIM_PREF.length)] = JSON.parse(localStorage.getItem(k)); }catch(e){} } });
+  return o;
 }
-function applyCloud(d){
-  if(!d) return;
-  if(Array.isArray(d.geradas)){                      // questões criadas em outro aparelho
+function gravarSims(m){
+  Object.keys(localStorage).filter(k=>k.startsWith(SIM_PREF) && !(k.slice(SIM_PREF.length) in m)).forEach(k=>localStorage.removeItem(k));
+  Object.keys(m).forEach(id=>{ try{ localStorage.setItem(SIM_PREF+id, JSON.stringify(m[id])); }catch(e){} });
+}
+function integraGeradas(){
+  const novas = lerGeradas().filter(q=> q && q.id && !BY_ID.has(q.id));
+  if(!novas.length) return;
+  novas.forEach(q=>{ POOL.push(q); BY_ID.set(q.id,q); });
+  reindexar();
+  if($("setup") && !$("setup").hidden){ renderTipos(); renderAreas(); $("poolTotal").textContent = POOL.length; countAvailable(); }
+}
+/* formato antigo (até 24/09): um pacote só em users/{uid}/apps/flashmed = {json:{resp:[...], geradas:[...]}} */
+async function fmLegado(ctx){
+  const snap = await Promise.race([ctx.db.collection("users").doc(ctx.uid).collection("apps").doc("flashmed").get({source:"server"}),
+    new Promise((_,f)=>setTimeout(()=>f(new Error("tempo")),9000))]);
+  if(!snap.exists) return true;
+  let d; try{ d = JSON.parse(snap.data().json||"null"); }catch(e){ return true; }
+  if(!d) return true;
+  const tomb = d._tomb || {};
+  (d.resp||[]).forEach(r=>{
+    if(!r || !r.id || (tomb[r.id]||0) >= (r.updatedAt||0)) return;
+    const cur = answers[r.id];
+    if(!cur || (r.updatedAt||0) > (cur.t||0)) answers[r.id] = {sel:r.sel, ok:!!r.ok, t:r.updatedAt||Date.now()};
+  });
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(answers)); }catch(e){}
+  if(Array.isArray(d.geradas)){
     const tenho = new Set(lerGeradas().map(q=>q.id));
     const novas = d.geradas.filter(q=> q && q.id && !tenho.has(q.id));
-    if(novas.length){
-      const todas = lerGeradas().concat(novas);
-      gravarGeradas(todas);
-      novas.forEach(q=>{ if(!BY_ID.has(q.id)){ POOL.push(q); BY_ID.set(q.id,q); } });
-      reindexar();
-      if($("setup") && !$("setup").hidden){ renderTipos(); renderAreas(); $("poolTotal").textContent = POOL.length; countAvailable(); }
-    }
+    if(novas.length){ try{ localStorage.setItem(IA_KEY, JSON.stringify(lerGeradas().concat(novas))); }catch(e){} integraGeradas(); }
   }
-  if(!Array.isArray(d.resp)) return;
-  let changed = false;
-  d.resp.forEach(r=>{
-    if(!r || !r.id) return;
-    const cur = answers[r.id];
-    if(!cur || (r.updatedAt||0) > (cur.t||0)){ answers[r.id] = {sel:r.sel, ok:!!r.ok, t:r.updatedAt||Date.now()}; changed = true; }
-  });
-  if(changed){
-    _cloudBusy = true;
-    try{ localStorage.setItem(STORE_KEY, JSON.stringify(answers)); }catch(e){}
-    _cloudBusy = false;
-    if(!document.getElementById("run").hidden) render(); else countAvailable();
-  }
+  return true;
 }
-function fmMergeFn(remote, local){ return MT.mergeState(remote, local, ["resp","geradas"]); }
-(function waitMT(){
-  if(window.MT){ MT.mergeFn = fmMergeFn; MT.onData(applyCloud); }
-  else setTimeout(waitMT, 40);
+function fmLimparLocal(){
+  try{ Object.keys(localStorage).filter(k=>k.startsWith("fm_")||k.startsWith(SIM_PREF)||k.startsWith("mt_flashmed")||k==="enareTab"||k==="enareFarmaProgress_v1").forEach(k=>localStorage.removeItem(k)); }catch(e){}
+}
+/* quem estava logado no login antigo (chave mt_flashmed_<uid>): a conta nova não herda o progresso de outra pessoa */
+(function(){ try{
+  if(localStorage.getItem("fm_mts_uid")) return;
+  const antigos = Object.keys(localStorage).filter(k=>/^mt_flashmed_.+/.test(k)).map(k=>k.slice("mt_flashmed_".length));
+  if(antigos.length===1) localStorage.setItem("fm_mts_uid", antigos[0]);
+}catch(e){} })();
+(function(){
+  const cs = getComputedStyle(document.documentElement), g = n => cs.getPropertyValue(n).trim();
+  MTS.iniciar({
+    app:"flashmed", nome:"FlashMed", pref:"fm_", vendor:"vendor/firebase/",
+    cores:{cor:g("--teal-btn")||"#96671D", fundo:g("--bg")||"#FAFAF8", texto:g("--ink")||"#23272E", suave:g("--ink-soft")||"#5E646B",
+      borda:g("--line-strong")||"#DDDDD5", campo:g("--paper")||"#fff"},
+    colecoes:{ resp:{tipo:"mapa"}, riscos:{tipo:"mapa"}, geradas:{tipo:"lista", id:"id"}, sims:{tipo:"mapa"} },
+    ler: c => c==="resp" ? answers : c==="riscos" ? strikes : c==="geradas" ? lerGeradas() : lerSims(),
+    gravar(c, v){
+      if(c==="resp"){ answers = v; try{ localStorage.setItem(STORE_KEY, JSON.stringify(v)); }catch(e){} }
+      else if(c==="riscos"){ strikes = v; try{ localStorage.setItem(STRIKE_KEY, JSON.stringify(v)); }catch(e){} }
+      else if(c==="geradas"){ try{ localStorage.setItem(IA_KEY, JSON.stringify(v)); }catch(e){} }
+      else gravarSims(v);
+    },
+    aoReceber(cols){
+      if(cols.includes("geradas")) integraGeradas();
+      if(cols.includes("resp") || cols.includes("riscos")){ if(!$("run").hidden) render(); else countAvailable(); }
+    },
+    legado: fmLegado, limparLocal: fmLimparLocal
+  });
 })();
 
 /* ============================================================
@@ -1680,7 +1717,7 @@ document.getElementById("tabBtnSim").onclick = ()=> setTab("simulado");
   let cur = null;
   const key = (id)=> "enareSim_"+id;
   const loadState = (id)=>{ try{ return JSON.parse(localStorage.getItem(key(id))||"null"); }catch(e){ return null; } };
-  const saveState = ()=>{ if(cur){ try{ localStorage.setItem(key(cur.sim.id), JSON.stringify(cur.state)); }catch(e){} } };
+  const saveState = ()=>{ if(cur){ try{ localStorage.setItem(key(cur.sim.id), JSON.stringify(cur.state)); }catch(e){} MTS.mudou("sims"); } };
   let simInk = "tela:sim-list";   // chave de tinta da tela visível do Simulado (lida pelo setTab)
   const inkTo = (k)=>{ simInk = k; if(window.QuizInk && typeof window.QuizInk.switchTo==="function") window.QuizInk.switchTo(k); };
   window.__simInkKey = ()=> simInk;
