@@ -124,10 +124,12 @@
       }
       return d;
     }
-    let rodando = false;
+    let rodando = false, deNovo = false;
     async function esvazia() {
-      if (rodando || (typeof navigator !== "undefined" && navigator.onLine === false)) return;
-      rodando = true;
+      if (typeof navigator !== "undefined" && navigator.onLine === false) return;
+      if (rodando) { deNovo = true; return; }          /* entrou algo com a varredura em curso: repete no fim */
+      rodando = true; deNovo = false;
+      let parouPorFalha = false;
       try {
         const fila = leFila();
         for (const chave of Object.keys(fila)) {
@@ -138,15 +140,18 @@
             headers: Object.assign({"Content-Type": "application/json"}, tok ? {Authorization: "Bearer " + tok} : {}),
             body: JSON.stringify({data: Object.assign({app: c.app, chave, dispositivo: dispositivo()}, item)})
           }).catch(() => null);
-          if (!r) break;                                   /* sem rede: tenta depois */
+          if (!r) { parouPorFalha = true; break; }          /* sem rede: tenta depois */
           const j = await r.json().catch(() => ({}));
           const st = j && j.error && j.error.status;
           /* sucesso, ou recusa definitiva (dado inválido): sai da fila. Sem login/limite/servidor fora: fica */
           if (r.ok || st === "INVALID_ARGUMENT" || st === "NOT_FOUND") {
             const f = leFila(); if (JSON.stringify(f[chave]) === JSON.stringify(item)) { delete f[chave]; gravaFila(f); }
-          } else if (st === "UNAUTHENTICATED" || st === "RESOURCE_EXHAUSTED" || r.status >= 500 || r.status === 404) break;
+          } else if (st === "UNAUTHENTICATED" || st === "RESOURCE_EXHAUSTED" || r.status >= 500 || r.status === 404) { parouPorFalha = true; break; }
         }
-      } finally { rodando = false; }
+      } finally {
+        rodando = false;
+        if (deNovo && !parouPorFalha) setTimeout(esvazia, 0);
+      }
     }
     function poe(chave, item) {
       const f = leFila();
@@ -272,7 +277,7 @@
         const itens = Object.entries(le()).sort((a, b) => (b[1].ts || 0) - (a[1].ts || 0));
         cont.innerHTML = `
           <div class="msn-cab"><span class="msn-cont">${itens.length ? `${itens.length} ${itens.length === 1 ? "questão sinalizada" : "questões sinalizadas"}` : ""}</span>
-            ${itens.length ? `<button type="button" class="msn-ok" data-msn="copia">Copiar relatório</button>` : ""}</div>
+            ${itens.length ? `<button type="button" class="msn-ok msn-copiar" data-msn="copia">Copiar relatório</button>` : ""}</div>
           ${itens.length ? itens.map(([ch, it]) => `
             <div class="msn-item" data-ch="${esc(ch)}">
               <div class="msn-tipo">${esc(NOME_TIPO[it.tipo] || it.tipo)}${it.tema ? ` · <span style="font-weight:600;color:var(--msn-tinta);opacity:.8">${esc(it.tema)}</span>` : ""}</div>
