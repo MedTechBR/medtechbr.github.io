@@ -518,7 +518,15 @@ html[data-astra] .setup-card .pc,html[data-astra] .setup-card .pc button{color:v
 .tema-lista,.mtt-pai{--mtt-cor:var(--c-petroleo);--mtt-sobre:var(--on-c);--mtt-superficie:var(--paper);--mtt-texto:var(--ink);
   --mtt-borda:var(--line-strong);--mtt-campo:var(--panel2);--mtt-realce:color-mix(in srgb,var(--c-petroleo) 12%,transparent);--mtt-raio:22px;--mtt-raio-btn:999px}
 html[data-astra] .mtt-pai{--mtt-superficie:#0F0F0F;--mtt-texto:#fff;--mtt-borda:rgba(255,255,255,.16);--mtt-campo:rgba(255,255,255,.06)}
-body:has(.mtt-pai) .penbar{visibility:hidden}   /* a caneta (z 9999) cobria o "Mostrar N questões" da folha no celular */
+body:has(.mtt-pai) .penbar{visibility:hidden}
+/* bandeira de erro (mtsinal.js): no cabeçalho da questão, depois do número; formulário e lista com fundo opaco */
+.src-line>.msn-btn,.qhead>.msn-btn{flex:none;min-width:34px;min-height:34px;padding:0 6px;border-radius:999px}
+body,.msn-pai,.msn-lista{--msn-sobre:var(--on-c);--msn-cor-alerta:var(--wrong)}
+.msn-pai{--msn-superficie:var(--paper);--msn-texto:var(--ink);--msn-borda:var(--line-strong)}
+.msn-lista{--msn-superficie:var(--paper);--msn-texto:var(--ink);--msn-borda:var(--fm-linha)}
+html[data-astra] .msn-pai{--msn-superficie:#0F0F0F;--msn-texto:#fff;--msn-borda:rgba(255,255,255,.16)}
+html[data-astra] .msn-lista{--msn-superficie:rgba(255,255,255,.04);--msn-texto:#fff;--msn-borda:rgba(255,255,255,.14)}
+html[data-astra] body,html[data-astra] .msn-pai,html[data-astra] .msn-lista{--msn-cor-alerta:#F87171}   /* a caneta (z 9999) cobria o "Mostrar N questões" da folha no celular */
 @media(min-width:900px){
   #setup{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px 16px;align-items:start}
   #setup>*{grid-column:1/-1;margin-bottom:0!important}
@@ -825,6 +833,12 @@ html[data-astra] .topic .kind,html[data-astra] .topic .n{color:var(--k)!importan
       <button class="ghost" id="iaGerar">Criar questões com IA</button>
       <button class="ghost" id="clearFilters">Limpar filtros</button>
       <button class="ghost" id="perfToggle">Meu desempenho</button>
+      <button class="ghost" id="sinalToggle">Questões sinalizadas</button>
+    </div>
+
+    <div class="perf-panel" id="sinalPanel" hidden style="margin-top:12px">
+      <div class="perf-head">Questões sinalizadas <span class="perf-sub">— as que você marcou com a bandeira por erro; a equipe que revisa as questões recebe cada uma</span></div>
+      <div id="sinalLista"></div>
     </div>
 
     <div class="perf-panel" id="perfPanel" hidden style="margin-top:12px">
@@ -888,6 +902,8 @@ html[data-astra] .topic .kind,html[data-astra] .topic .n{color:var(--k)!importan
 
 <!-- filtro de vários temas (cópia de ~/Documents/Claude/_mtfiltro/mtfiltro.js) -->
 <script src="mtfiltro.js?v=2"></script>
+<!-- sinalizar questão com erro (cópia de ~/Documents/Claude/_mtsinal/mtsinal.js) -->
+<script src="mtsinal.js?v=1"></script>
 <script src="flashmed-provas.js?v=3"></script>
 <script src="flashmed-medbank.js?v=2"></script>
 <script>
@@ -1129,7 +1145,7 @@ async function fmLegado(ctx){
   return true;
 }
 function fmLimparLocal(){
-  try{ Object.keys(localStorage).filter(k=>k.startsWith("fm_")||k.startsWith(SIM_PREF)||k.startsWith("mt_flashmed")||k==="enareTab"||k==="enareFarmaProgress_v1").forEach(k=>localStorage.removeItem(k)); }catch(e){}
+  try{ Object.keys(localStorage).filter(k=>k.startsWith("fm_")||k.startsWith(SIM_PREF)||k.startsWith("mt_flashmed")||k==="enareTab"||k==="enareFarmaProgress_v1"||k==="msn_fila:flashmed").forEach(k=>localStorage.removeItem(k)); }catch(e){}
 }
 /* quem estava logado no login antigo (chave mt_flashmed_<uid>): a conta nova não herda o progresso de outra pessoa */
 (function(){ try{
@@ -1137,23 +1153,55 @@ function fmLimparLocal(){
   const antigos = Object.keys(localStorage).filter(k=>/^mt_flashmed_.+/.test(k)).map(k=>k.slice("mt_flashmed_".length));
   if(antigos.length===1) localStorage.setItem("fm_mts_uid", antigos[0]);
 }catch(e){} })();
+/* ============================================================
+   SINALIZAR QUESTÃO COM ERRO (26/09/2026, mtsinal.js)
+   sinal = {id da questão: {tipo, nota, ts, q, tema, extra, resolvido}} — mesma chave do progresso.
+   Sincroniza como coleção "sinal" (mapa, com lápide) e cada mudança também vai para a caixa
+   central da administração (função mtSinal; fila em msn_fila:flashmed até dar para enviar).
+   ============================================================ */
+const SINAL_KEY = "fm_sinal_v1";
+let sinal = (()=>{ try{ return JSON.parse(localStorage.getItem(SINAL_KEY)||"{}") || {}; }catch(e){ return {}; } })();
+const sinalVistos = new Set();                 // chaves com bandeira desenhada (para repintar o que chega de outro aparelho)
+const SINAL = window.MTSinal ? MTSinal.cria({
+  app: "FlashMed",
+  le: ()=> sinal,
+  grava: obj=>{ sinal = obj; try{ localStorage.setItem(SINAL_KEY, JSON.stringify(obj)); }catch(e){} MTS.mudou("sinal"); atualizaSinalBtn(); },
+  central: { app:"flashmed", token: ()=> MTS.usuario && MTS.usuario.getIdToken() }
+}) : null;
+function atualizaSinalBtn(){
+  const b = document.getElementById("sinalToggle"); if(!b) return;
+  const n = Object.keys(sinal).length;
+  b.textContent = n ? "Questões sinalizadas (" + n + ")" : "Questões sinalizadas";
+}
+/* dados da bandeira: tema/área e, no "extra", de onde a questão veio e o gabarito */
+function sinalInfo(q){
+  const m = /:(\d+)$/.exec(q.id), letra = q.anulada ? "anulada" : (["A","B","C","D","E"][q.correct] || "?");
+  const origem = q.tipo === "ia" ? "gerada por IA"
+    : q.tipo === "autoral" ? "autoral MedTech"
+    : [q.prova, [q.banca, q.ano].filter(Boolean).join(" "), m && q.provaId !== "autoral" ? "item " + (+m[1] + 1) + " no app" : ""].filter(Boolean).join(" · ");
+  sinalVistos.add(q.id);
+  return { chave: q.id, q: String(q.q||"").replace(/<[^>]+>/g," "), tema: q.tema || AREA_LABEL[q.area] || "",
+           extra: origem + " · gabarito: " + letra };
+}
 (function(){
   const cs = getComputedStyle(document.documentElement), g = n => cs.getPropertyValue(n).trim();
   MTS.iniciar({
     app:"flashmed", nome:"FlashMed", pref:"fm_", vendor:"vendor/firebase/",
     cores:{cor:g("--teal-btn")||"#96671D", fundo:g("--bg")||"#FAFAF8", texto:g("--ink")||"#23272E", suave:g("--ink-soft")||"#5E646B",
       borda:g("--line-strong")||"#DDDDD5", campo:g("--paper")||"#fff"},
-    colecoes:{ resp:{tipo:"mapa"}, riscos:{tipo:"mapa"}, geradas:{tipo:"lista", id:"id"}, sims:{tipo:"mapa"} },
-    ler: c => c==="resp" ? answers : c==="riscos" ? strikes : c==="geradas" ? lerGeradas() : lerSims(),
+    colecoes:{ resp:{tipo:"mapa"}, riscos:{tipo:"mapa"}, geradas:{tipo:"lista", id:"id"}, sims:{tipo:"mapa"}, sinal:{tipo:"mapa"} },
+    ler: c => c==="resp" ? answers : c==="riscos" ? strikes : c==="geradas" ? lerGeradas() : c==="sinal" ? sinal : lerSims(),
     gravar(c, v){
       if(c==="resp"){ answers = v; try{ localStorage.setItem(STORE_KEY, JSON.stringify(v)); }catch(e){} }
       else if(c==="riscos"){ strikes = v; try{ localStorage.setItem(STRIKE_KEY, JSON.stringify(v)); }catch(e){} }
       else if(c==="geradas"){ try{ localStorage.setItem(IA_KEY, JSON.stringify(v)); }catch(e){} }
+      else if(c==="sinal"){ sinal = v || {}; try{ localStorage.setItem(SINAL_KEY, JSON.stringify(sinal)); }catch(e){} }
       else gravarSims(v);
     },
     aoReceber(cols){
       if(cols.includes("geradas")) integraGeradas();
       if(cols.includes("resp") || cols.includes("riscos")){ if(!$("run").hidden) render(); else countAvailable(); }
+      if(cols.includes("sinal") && SINAL){ new Set([...sinalVistos, ...Object.keys(sinal), ""]).forEach(k=> SINAL.repinta(k)); atualizaSinalBtn(); }
     },
     legado: fmLegado, limparLocal: fmLimparLocal
   });
@@ -1490,6 +1538,7 @@ function render(){
   card.innerHTML = `
     <div class="src-line">
       <span class="num">Questão ${session.pos+1} de ${session.ids.length}</span>
+      <span class="fm-sinal" id="fmSinalQ"></span>
       <span class="src prova">${escapeAttr(fonte)}</span>
       ${q.esp?`<span class="src esp">${escapeAttr(ESP_LABEL[q.esp]||q.esp)}</span>`:""}
       ${q.tema?`<span class="src tema">${escapeAttr(q.tema)}</span>`:""}
@@ -1513,6 +1562,7 @@ function render(){
       <button class="btn" id="next" ${session.pos>=session.ids.length-1?"disabled":""}>Próxima →</button>
     </div>`;
 
+  if(SINAL) SINAL.botao($("fmSinalQ"), sinalInfo(q));
   const struck = new Set(strikes[qid] || []);
   card.querySelectorAll(".opt").forEach(btn=>{
     const j = parseInt(btn.dataset.j);
@@ -1663,6 +1713,21 @@ $("clearFilters").onclick = ()=>{
   renderTipos(); renderAnos(); renderAreas(); renderOutros();
   drawTemasPicked(); drawProvasPicked(); countAvailable();
 };
+$("sinalToggle").onclick = ()=>{
+  const sp = $("sinalPanel"); sp.hidden = !sp.hidden;
+  if(!sp.hidden) sp.scrollIntoView({behavior: FM_CALMO ? "auto" : "smooth", block:"start"});
+};
+/* "Abrir questão": sessão com as sinalizadas (mais recentes primeiro), já na escolhida */
+function abreSinalizada(chave){
+  if(!BY_ID.has(chave)){ alert("Esta questão não está no banco deste aparelho."); return; }
+  const ids = Object.entries(sinal).sort((a,b)=>(b[1].ts||0)-(a[1].ts||0)).map(e=>e[0]).filter(id=>BY_ID.has(id));
+  session = { ids, pos: Math.max(0, ids.indexOf(chave)), label: "questões sinalizadas" };
+  saveSession();
+  if(document.body.dataset.aba !== "questoes") setTab("questoes");
+  showRun();
+}
+if(SINAL){ SINAL.lista($("sinalLista"), { abreQuestao: abreSinalizada }); atualizaSinalBtn(); }
+else $("sinalToggle").hidden = true;
 $("perfToggle").onclick = ()=>{
   const pp = $("perfPanel"); pp.hidden = !pp.hidden;
   if(!pp.hidden) renderPerfPanel();
@@ -1884,6 +1949,7 @@ document.getElementById("tabBtnSim").onclick = ()=> setTab("simulado");
     titleEl.textContent=sim.title; paletteEl.hidden=true;
     card.innerHTML=`
       <div class="qhead"><span class="num">Revisão · Questão ${i+1} de ${n}</span>
+        <span class="fm-sinal" data-sinal></span>
         <span class="badge">${annul?"Anulada":(ok?"Acertou":"Errou")}</span></div>
       <div class="enun">${q.q}</div>
       ${q.img?`<figure class="qfig"><img src="${q.img}" alt="Figura da questão"></figure>`:""}
@@ -1906,6 +1972,8 @@ document.getElementById("tabBtnSim").onclick = ()=> setTab("simulado");
     const rp=card.querySelector("[data-rprev]"); if(rp) rp.onclick=()=>{ if(i>0){ simDir=-1; renderReview(i-1); } };
     const rn=card.querySelector("[data-rnext]"); if(rn) rn.onclick=()=>{ if(i<n-1) renderReview(i+1); };
     card.querySelector("[data-rback]").onclick=()=>renderResult();
+    const qp = BY_ID.get(q.id || (sim.id+":"+i));      // mesma questão (e mesma chave) do banco de questões
+    if(SINAL && qp) SINAL.botao(card.querySelector("[data-sinal]"), sinalInfo(qp));
     inkTo("R:"+sim.id+":"+i);
     window.scrollTo({top:0,behavior:"instant"});
     entraQuestao(card, simDir); simDir = 1;
