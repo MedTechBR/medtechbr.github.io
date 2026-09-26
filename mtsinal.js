@@ -7,6 +7,7 @@
      app: "TráfegoTítulo",
      le: () => objeto,                 // {chave: {tipo, nota, ts, q, tema, resolvido?}}
      grava: obj => {...},              // grava o objeto inteiro
+     exemplo: "Ex.: …",                // opcional: texto de exemplo no campo "Detalhe"
      gravaItem: (chave, itemOuNull),   // opcional: grava só um item (para sincronizar item a item)
      central: {app: "trafego-titulo",  // opcional: também envia à CAIXA CENTRAL da administração (função mtSinal)
                token: () => idToken}   //   (apps sem conta MedTech: sem token; o aparelho ganha um id aleatório)
@@ -199,7 +200,7 @@
           ${TIPOS.map(([id, nome]) => `<label class="msn-op"><input type="radio" name="msn-tipo" value="${id}" ${atual && atual.tipo === id ? "checked" : ""}> ${esc(nome)}</label>`).join("")}
         </fieldset>
         <label class="msn-rot" for="msn-nota">Detalhe (opcional)</label>
-        <textarea id="msn-nota" maxlength="600" placeholder="Ex.: a correta seria a C, pelo art. 147 do CTB">${esc(atual ? atual.nota : "")}</textarea>
+        <textarea id="msn-nota" maxlength="600" placeholder="${esc(cfg.exemplo || "Ex.: a correta seria a C, porque… (se souber, diga a fonte)")}">${esc(atual ? atual.nota : "")}</textarea>
         <p class="msn-aviso">${cfg.central ? "Vai para a equipe que revisa as questões e fica também na sua lista de sinalizadas." : "Fica guardado na sua lista de questões sinalizadas, para revisão."}</p>
         <div class="msn-pe">
           ${atual ? `<button type="button" class="msn-tira">Tirar sinalização</button>` : ""}

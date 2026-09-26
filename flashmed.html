@@ -1162,7 +1162,7 @@ function fmLimparLocal(){
 const SINAL_KEY = "fm_sinal_v1";
 let sinal = (()=>{ try{ return JSON.parse(localStorage.getItem(SINAL_KEY)||"{}") || {}; }catch(e){ return {}; } })();
 const sinalVistos = new Set();                 // chaves com bandeira desenhada (para repintar o que chega de outro aparelho)
-const SINAL = window.MTSinal ? MTSinal.cria({
+const SINAL = window.MTSinal ? MTSinal.cria({exemplo:"Ex.: a correta seria a C, pela diretriz vigente (qual, se souber)",
   app: "FlashMed",
   le: ()=> sinal,
   grava: obj=>{ sinal = obj; try{ localStorage.setItem(SINAL_KEY, JSON.stringify(obj)); }catch(e){} MTS.mudou("sinal"); atualizaSinalBtn(); },
