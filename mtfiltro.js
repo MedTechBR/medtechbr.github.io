@@ -31,8 +31,8 @@
   font-size:.8em;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
 .mtt-btn svg{flex:none;width:16px;height:16px;opacity:.7}
 .mtt-btn.mtt-ativo{border-color:var(--mtt-ac);box-shadow:0 0 0 1px var(--mtt-ac) inset}
-.mtt-fundo{position:fixed;inset:0;z-index:9990;background:rgba(10,12,20,.38)}
-.mtt-pai{box-sizing:border-box;position:fixed;z-index:9991;display:flex;flex-direction:column;background:var(--mtt-sup);color:var(--mtt-tinta);
+.mtt-fundo{position:fixed;inset:0;z-index:100000;background:rgba(10,12,20,.38)}
+.mtt-pai{box-sizing:border-box;position:fixed;z-index:100001;display:flex;flex-direction:column;background:var(--mtt-sup);color:var(--mtt-tinta);
   border:1px solid var(--mtt-fio);border-radius:var(--mtt-raio,18px);box-shadow:0 18px 50px rgba(0,0,0,.28);
   width:min(440px,calc(100vw - 24px));max-height:min(620px,calc(100vh - 40px));overflow:hidden;font-size:15px}
 .mtt-cab{display:flex;align-items:center;gap:8px;padding:14px 14px 8px}
