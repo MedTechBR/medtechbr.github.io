@@ -510,6 +510,15 @@ html[data-astra] .setup-card .chip.on{color:var(--k)!important}
 html[data-astra] .setup-card .pc,html[data-astra] .setup-card .pc button{color:var(--k)}
 .setup-card .qty-row input[type=range]{accent-color:var(--k)}
 .setup-card .qty-val{background:var(--k)!important}
+/* lista de temas com caixas (mtfiltro.js): cor do bloco de temas; o painel mora no <body>, por isso os tokens também em .mtt-pai */
+.tema-lista{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:10px}
+.tema-lista[hidden]{display:none}
+.tema-lista .hint-line{margin:0}
+.tema-lista .mtt-btn{background:var(--fm-sup2)}
+.tema-lista,.mtt-pai{--mtt-cor:var(--c-petroleo);--mtt-sobre:var(--on-c);--mtt-superficie:var(--paper);--mtt-texto:var(--ink);
+  --mtt-borda:var(--line-strong);--mtt-campo:var(--panel2);--mtt-realce:color-mix(in srgb,var(--c-petroleo) 12%,transparent);--mtt-raio:22px;--mtt-raio-btn:999px}
+html[data-astra] .mtt-pai{--mtt-superficie:#0F0F0F;--mtt-texto:#fff;--mtt-borda:rgba(255,255,255,.16);--mtt-campo:rgba(255,255,255,.06)}
+body:has(.mtt-pai) .penbar{visibility:hidden}   /* a caneta (z 9999) cobria o "Mostrar N questões" da folha no celular */
 @media(min-width:900px){
   #setup{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px 16px;align-items:start}
   #setup>*{grid-column:1/-1;margin-bottom:0!important}
@@ -782,7 +791,7 @@ html[data-astra] .topic .kind,html[data-astra] .topic .n{color:var(--k)!importan
         <div class="ac-list" id="acTemaList" hidden></div>
       </div>
       <div class="picked" id="pkTema"></div>
-      <div class="hint-line" id="hintTema">Temas escolhidos: <b>todos</b></div>
+      <div class="tema-lista"><span class="hint-line">ou marque vários na lista, por especialidade:</span><span id="fmTemas"></span></div>
     </div>
 
     <div class="setup-card">
@@ -877,6 +886,8 @@ html[data-astra] .topic .kind,html[data-astra] .topic .n{color:var(--k)!importan
 
 </div>
 
+<!-- filtro de vários temas (cópia de ~/Documents/Claude/_mtfiltro/mtfiltro.js) -->
+<script src="mtfiltro.js?v=1"></script>
 <script src="flashmed-provas.js?v=3"></script>
 <script src="flashmed-medbank.js?v=2"></script>
 <script>
@@ -987,6 +998,7 @@ function promptGerar(tema, esp, area, n){
 async function gerarQuestoesIA(btn){
   const tema = (F.temas.size ? [...F.temas][0] : "").trim();
   if(!tema){ alert("Escolha um tema primeiro (campo “Questões apenas de temas específicos”) — a IA escreve questões novas daquele tema."); return; }
+  if(F.temas.size > 1 && !confirm("A IA escreve um tema por vez. Criar questões de “" + tema + "” (o primeiro dos " + F.temas.size + " escolhidos)?")) return;
   const base = POOL.find(q=>q.tema===tema) || {};
   const n = 3;
   const antes = btn.innerHTML;
@@ -1020,7 +1032,7 @@ async function gerarQuestoesIA(btn){
        usuário gera as questões e não vê nada mudar na contagem. */
     F.tipos.add("ia"); F.anos.add(String(new Date().getFullYear()));
     if(base.area) F.areas.add(base.area);
-    reindexar(); renderTipos(); renderAnos(); renderAreas(); drawTemasPicked(); drawProvasPicked();
+    reindexar(); renderTipos(); renderAnos(); renderAreas(); montaTemas(); drawTemasPicked(); drawProvasPicked();
     $("poolTotal").textContent = POOL.length;
     countAvailable();
     btn.innerHTML = "✓ " + criadas + " questão(ões) criada(s) — já entram nos filtros";
@@ -1092,6 +1104,7 @@ function integraGeradas(){
   if(!novas.length) return;
   novas.forEach(q=>{ POOL.push(q); BY_ID.set(q.id,q); });
   reindexar();
+  if(temasCtl) montaTemas();
   if($("setup") && !$("setup").hidden){ renderTipos(); renderAreas(); $("poolTotal").textContent = POOL.length; countAvailable(); }
 }
 /* formato antigo (até 24/09): um pacote só em users/{uid}/apps/flashmed = {json:{resp:[...], geradas:[...]}} */
@@ -1149,6 +1162,7 @@ function fmLimparLocal(){
 /* ============================================================
    FILTROS DA SESSÃO
    ============================================================ */
+const listaTemas = v => window.MTTemas ? MTTemas.lista(v) : (Array.isArray(v) ? v.map(String) : (v ? [String(v)] : []));
 const F = {
   tipos: new Set(TIPOS),
   anos:  new Set(ANOS.map(String)),
@@ -1165,7 +1179,8 @@ try{
     if(Array.isArray(sv.tipos) && sv.tipos.length) F.tipos = new Set(sv.tipos.filter(t=>TIPOS.includes(t)));
     if(Array.isArray(sv.anos) && sv.anos.length)   F.anos  = new Set(sv.anos.filter(a=>ANOS.map(String).includes(a)));
     if(Array.isArray(sv.areas) && sv.areas.length) F.areas = new Set(sv.areas.filter(a=>AREA_ORDER.includes(a)));
-    if(Array.isArray(sv.temas))  F.temas  = new Set(sv.temas.filter(t=>TEMAS.some(x=>x.tema===t)));
+    /* temas: lista (vazia = todos); MTTemas.lista também aceita um tema só gravado como texto */
+    if(sv.temas != null) F.temas = new Set(listaTemas(sv.temas).filter(t=>TEMA_COUNT.has(t)));
     if(Array.isArray(sv.provas)) F.provas = new Set(sv.provas.filter(p=>PROVAS.some(x=>x.id===p)));
     if(sv.modo) F.modo = sv.modo;
     if(typeof sv.semAnuladas === "boolean") F.semAnuladas = sv.semAnuladas;
@@ -1320,14 +1335,15 @@ function renderOutros(){
 }
 
 /* --- autocomplete multi-seleção (temas e provas) --- */
-function setupAC(inputId, listId, pickedId, hintId, source, key, labelOf, countOf, plural){
+function setupAC(inputId, listId, pickedId, hintId, source, key, labelOf, countOf, plural, depois){
   const inp = $(inputId), list = $(listId), picked = $(pickedId), hint = $(hintId);
   let cur = -1;
   function drawPicked(){
     const sel = [...F[key]];
     picked.innerHTML = sel.map(v=>`<span class="pc">${escapeAttr(labelOf(v))}<button data-v="${escapeAttr(v)}" aria-label="Remover">×</button></span>`).join("");
     picked.querySelectorAll("button").forEach(b=> b.onclick = ()=>{ F[key].delete(b.dataset.v); drawPicked(); countAvailable(); });
-    hint.innerHTML = sel.length ? `${plural} escolhid${plural==="Provas"?"a":"o"}s: <b>${sel.length}</b>` : `${plural} escolhid${plural==="Provas"?"a":"o"}s: <b>${plural==="Provas"?"todas":"todos"}</b>`;
+    if(depois) depois(sel);
+    if(hint) hint.innerHTML = sel.length ? `${plural} escolhid${plural==="Provas"?"a":"o"}s: <b>${sel.length}</b>` : `${plural} escolhid${plural==="Provas"?"a":"o"}s: <b>${plural==="Provas"?"todas":"todos"}</b>`;
   }
   function close(){ list.hidden = true; cur = -1; }
   function draw(){
@@ -1365,6 +1381,31 @@ function setupAC(inputId, listId, pickedId, hintId, source, key, labelOf, countO
   return drawPicked;
 }
 let drawTemasPicked, drawProvasPicked;
+
+/* --- lista de temas com caixas de marcar (25/09/2026, mtfiltro.js) ---
+   Convive com a busca acima: a busca acha pelo enunciado ("sepse" → "Choque séptico"),
+   a lista mostra todos os temas agrupados pela especialidade, com "marcar grupo".
+   As duas mexem no mesmo F.temas (vazio = todos). */
+var temasCtl = null;   // var: integraGeradas() pode consultar antes desta linha rodar
+function montaTemas(){
+  const slot = $("fmTemas") || (temasCtl && temasCtl.botao);
+  if(!window.MTTemas || !slot){ const r = document.querySelector(".tema-lista"); if(r) r.hidden = true; return; }
+  const espDe = new Map();                               // tema → especialidade mais frequente
+  POOL.forEach(q=>{ if(!q.tema) return; let o = espDe.get(q.tema); if(!o) espDe.set(q.tema, o = {}); o[q.esp||""] = (o[q.esp||""]||0) + 1; });
+  const opcoes = TEMAS.map(t=>{
+    const o = espDe.get(t.tema) || {};
+    const esp = Object.keys(o).sort((a,b)=> o[b]-o[a])[0] || "";
+    return {id:t.tema, nome:t.tema, n:t.n, grupo: ESP_LABEL[esp] || "Outros"};
+  }).sort((a,b)=> a.grupo.localeCompare(b.grupo,"pt-BR") || b.n-a.n || a.nome.localeCompare(b.nome,"pt-BR"));
+  let alvo = slot;
+  if(temasCtl){ alvo = document.createElement("span"); alvo.id = "fmTemas"; temasCtl.botao.replaceWith(alvo); }  // remontar sem somar cliques
+  temasCtl = MTTemas.monta(alvo, {
+    opcoes, selecionados: [...F.temas],
+    rotuloTodos: "Todos os temas", titulo: "Temas por especialidade",
+    conta: ids=>{ const antes = F.temas; F.temas = new Set(ids); const n = pool().length; F.temas = antes; return n; },
+    aoMudar: ids=>{ F.temas = new Set(ids); drawTemasPicked(); countAvailable(); }
+  });
+}
 
 /* --- disponibilidade + montagem --- */
 function filtersSummary(){
@@ -1644,7 +1685,9 @@ $("poolTotal").textContent = POOL.length;
 $("qty").value = F.qty; $("qtyVal").textContent = F.qty;
 renderTipos(); renderAnos(); renderAreas(); renderOutros();
 drawTemasPicked = setupAC("acTema","acTemaList","pkTema","hintTema",
-  ()=> TEMAS.map(t=>({v:t.tema, n:t.n, blob:TEMA_BLOB.get(t.tema)||""})), "temas", v=>v, x=>TEMA_COUNT.get(x.v)||0, "Temas");
+  ()=> TEMAS.map(t=>({v:t.tema, n:t.n, blob:TEMA_BLOB.get(t.tema)||""})), "temas", v=>v, x=>TEMA_COUNT.get(x.v)||0, "Temas",
+  sel=>{ if(temasCtl) temasCtl.define(sel); });
+montaTemas();
 drawProvasPicked = setupAC("acProva","acProvaList","pkProva","hintProva",
   ()=> PROVAS.map(p=>({v:p.id, n:p.n})), "provas", v=>PROVA_LABEL.get(v)||v,
   x=>(PROVAS.find(p=>p.id===x.v)||{}).n||0, "Provas");
