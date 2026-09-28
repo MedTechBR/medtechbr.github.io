@@ -23,6 +23,10 @@
 (() => {
   const FN = 'https://southamerica-east1-medtech-c658c.cloudfunctions.net/';
   const CONNECT_JS = 'https://cdn.pluggy.ai/pluggy-connect/latest/pluggy-connect.js';
+  /* Só o MeuPluggy (id 200) é gratuito: conector direto de banco exige plano pago
+     do Pluggy e recusa com "contas de teste só podem conectar sandbox". Abrir já
+     nele evita escolher o banco errado. Com plano pago, basta esvaziar a lista. */
+  const CONECTORES = [200];
   const CORES = ['#820AD1', '#EC7000', '#CC092F', '#0070AF', '#00A868', '#FFB400', '#1F4E9C', '#00B1EA'];
   const DIA = 86400000;
 
@@ -247,6 +251,7 @@
       const pc = new window.PluggyConnect({
         connectToken: accessToken,
         updateItem: itemId || undefined,
+        ...(!itemId && CONECTORES.length ? { connectorIds: CONECTORES, selectedConnectorId: CONECTORES[0] } : {}),
         onSuccess: async (d) => {
           const id = (d && d.item && d.item.id) || (d && d.id);
           if (!id) return;
