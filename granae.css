@@ -1186,3 +1186,73 @@ html[data-viva=granae] .bottom-nav .nav-ico,html[data-viva=granae] .mais-menu .n
 .of-msg{display:flex;align-items:center;gap:6px;margin:0 0 8px}
 .of-gira{animation:of-gira 1s linear infinite}
 @keyframes of-gira{to{transform:rotate(360deg)}}
+
+/* ============================================================
+   VISÃO GERAL (granae.banco.js): a foto de hoje, somando todas as contas.
+   Mesmo vocabulário da camada viva: herói na cor do app, cartões de 22 px,
+   ícone em círculo com uma cor por assunto, números em tabular-nums.
+   ============================================================ */
+html[data-viva=granae] #dashBanco{display:flex;flex-direction:column;gap:14px;animation:bkEntra .45s var(--suave,ease) both}
+@keyframes bkEntra{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+html[data-viva=granae] .bk-hero{position:relative;overflow:hidden;padding:20px 22px 18px;border-radius:26px;background:var(--acF);color:#fff;
+  box-shadow:0 14px 30px color-mix(in srgb,var(--ac) 30%,transparent)}
+html[data-viva=granae] .bk-hero::before{content:"";position:absolute;width:240px;height:240px;right:-80px;top:-110px;border-radius:50%;background:#fff;opacity:.09;pointer-events:none}
+html[data-viva=granae] .bk-hero-top{position:relative;display:flex;justify-content:space-between;align-items:center;gap:10px}
+html[data-viva=granae] .bk-chip{font-size:12.5px;font-weight:600;background:rgba(0,0,0,.16);padding:5px 12px;border-radius:999px}
+html[data-viva=granae] .bk-sync{display:inline-flex;align-items:center;gap:6px;min-height:34px;border:0;border-radius:999px;padding:4px 12px;background:rgba(255,255,255,.16);color:#fff;font:600 12.5px 'Inter',system-ui,sans-serif;cursor:pointer}
+html[data-viva=granae] .bk-sync:hover{background:rgba(255,255,255,.26)}
+html[data-viva=granae] .bk-total{position:relative;display:block;margin:10px 0 6px;font:800 clamp(2.1rem,7vw,2.9rem)/1.05 'Inter',system-ui,sans-serif;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+html[data-viva=granae] .bk-bancos{position:relative;display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;opacity:.92;font-variant-numeric:tabular-nums}
+html[data-viva=granae] .bk-bancos b{font-weight:650}
+html[data-viva=granae] .bk-patrimonio{position:relative;display:grid;grid-template-columns:1fr auto;gap:2px 12px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.22)}
+html[data-viva=granae] .bk-patrimonio span{font-size:14px;font-weight:600}
+html[data-viva=granae] .bk-patrimonio strong{font-size:17px;font-weight:750;font-variant-numeric:tabular-nums}
+html[data-viva=granae] .bk-patrimonio small{grid-column:1/-1;font-size:12px;opacity:.85}
+
+html[data-viva=granae] .bk-mes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+html[data-viva=granae] .bk-tile{display:flex;flex-direction:column;gap:4px;padding:14px;border-radius:20px;background:var(--sup);border:1px solid var(--fio);box-shadow:var(--sombraV)}
+html[data-viva=granae] .bk-tile>span:not(.bk-ic){font-size:12.5px;color:var(--tinta2);font-weight:600}
+html[data-viva=granae] .bk-tile strong{font-size:17px;font-weight:750;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+html[data-viva=granae] .bk-tile.in strong{color:var(--income)}
+html[data-viva=granae] .bk-tile.out strong,html[data-viva=granae] .bk-tile.neg strong{color:var(--expense-2)}
+html[data-viva=granae] .bk-tile.in .bk-ic{background:var(--c-verde)}
+html[data-viva=granae] .bk-tile.out .bk-ic{background:var(--c-laranja)}
+html[data-viva=granae] .bk-tile.ok .bk-ic,html[data-viva=granae] .bk-tile.neg .bk-ic{background:var(--c-indigo)}
+
+html[data-viva=granae] .bk-ic{display:inline-grid;place-items:center;flex:none;width:34px;height:34px;border-radius:50%;color:#fff;font-size:18px;background:var(--ac)}
+html[data-viva=granae] .bk-ic.azul{background:var(--c-azul)}
+html[data-viva=granae] .bk-ic.laranja{background:var(--c-laranja)}
+html[data-viva=granae] .bk-ic.violeta{background:var(--c-violeta)}
+html[data-viva=granae] .bk-ic.ambar{background:var(--c-ambar)}
+html[data-viva=granae] .bk-ic.verde{background:var(--c-verde)}
+html[data-viva=granae] .bk-ic.ciano{background:var(--c-ciano)}
+
+html[data-viva=granae] .bk-grade{display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:860px){html[data-viva=granae] .bk-grade{grid-template-columns:1fr 1fr}}
+html[data-viva=granae] .bk-card{display:flex;flex-direction:column;gap:8px;padding:16px 18px;border-radius:22px;background:var(--sup);border:1px solid var(--fio);box-shadow:var(--sombraV)}
+html[data-viva=granae] .bk-card header{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+html[data-viva=granae] .bk-card h3{flex:1;margin:0;font-size:16px;font-weight:700;letter-spacing:-.01em}
+html[data-viva=granae] .bk-card header strong{font-size:16px;font-weight:750;font-variant-numeric:tabular-nums}
+html[data-viva=granae] .bk-linha{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:7px 0;border-top:1px solid var(--fio);font-size:14px}
+html[data-viva=granae] .bk-linha span{min-width:0;overflow-wrap:anywhere}
+html[data-viva=granae] .bk-linha strong{flex:none;font-weight:650;font-variant-numeric:tabular-nums}
+html[data-viva=granae] .bk-linha.apagada{color:var(--tinta3)}
+html[data-viva=granae] .bk-cartao,html[data-viva=granae] .bk-fin{display:flex;flex-direction:column;gap:5px}
+html[data-viva=granae] .bk-cartao+.bk-cartao,html[data-viva=granae] .bk-fin+.bk-fin{margin-top:4px}
+html[data-viva=granae] .bk-barra{height:8px;border-radius:999px;background:var(--sup3);overflow:hidden}
+html[data-viva=granae] .bk-barra>i{display:block;height:100%;border-radius:inherit;background:var(--ac);transition:width .8s var(--mola,ease)}
+html[data-viva=granae] .bk-barra.alerta>i{background:var(--c-laranja)}
+html[data-viva=granae] .bk-kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 12px;border-radius:14px;background:var(--sup2)}
+html[data-viva=granae] .bk-kpis b{display:block;font-size:16px;font-weight:750;font-variant-numeric:tabular-nums}
+html[data-viva=granae] .bk-atraso{color:var(--expense-2)}
+html[data-viva=granae] .bk-nota{margin:2px 0 0}
+html[data-viva=granae] .bk-card .link{align-self:flex-start;min-height:36px;padding:4px 0}
+html[data-viva=granae] .bk-informar{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:14px;background:var(--acSup)}
+html[data-viva=granae] .bk-informar .row{display:flex;gap:8px;flex-wrap:wrap}
+html[data-viva=granae] .bk-informar input{flex:1;min-width:120px;font-size:16px}
+@media (max-width:520px){
+  html[data-viva=granae] .bk-mes{grid-template-columns:1fr 1fr}
+  html[data-viva=granae] .bk-mes .bk-tile:last-child{grid-column:1/-1}
+  html[data-viva=granae] .bk-hero{padding:18px 18px 16px}
+}
+@media (prefers-reduced-motion:reduce){html[data-viva=granae] #dashBanco,html[data-viva=granae] .bk-barra>i{animation:none;transition:none}}

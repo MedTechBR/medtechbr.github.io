@@ -1989,6 +1989,7 @@ function renderDashLateral() {
 
 function refreshAll() {
   renderDashboard();
+  if (window.renderBanco) window.renderBanco();
   renderDashLateral();
   renderProjecao();
   if (!document.querySelector('[data-view=transacoes]').classList.contains('hidden')) { renderTransactions(); aplicarTabelaTx(); }
@@ -2034,15 +2035,35 @@ function limparFiltrosTx() {
 }
 window.limparFiltrosTx = limparFiltrosTx;
 
-// ====== Abas do dashboard (Resumo | Gráficos) ======
+// ====== Abas do dashboard (Visão geral | Resumo do mês | Gráficos) ======
+/* Visão geral é a foto de hoje (todas as contas), então some o seletor de mês.
+   A aba escolhida fica lembrada no aparelho. Sem conta cadastrada, abre no Resumo. */
+function abrirAbaDash(aba) {
+  const b = document.querySelector(`#dashTabs button[data-dtab="${aba}"]`);
+  if (!b) return;
+  document.querySelectorAll('#dashTabs button').forEach(x => x.classList.toggle('on', x === b));
+  document.getElementById('dashResumo').hidden = aba !== 'resumo';
+  document.getElementById('dashGraficos').hidden = aba !== 'graficos';
+  const banco = document.getElementById('dashBanco');
+  if (banco) banco.hidden = aba !== 'banco';
+  const ms = document.querySelector('[data-view=dashboard] .month-switcher');
+  if (ms) ms.style.display = aba === 'banco' ? 'none' : '';
+  try { localStorage.setItem('granae_dtab', aba); } catch {}
+  if (aba === 'banco' && window.renderBanco) window.renderBanco();
+}
 document.querySelectorAll('#dashTabs button').forEach(b => {
-  b.addEventListener('click', () => {
-    document.querySelectorAll('#dashTabs button').forEach(x => x.classList.toggle('on', x === b));
-    const g = b.dataset.dtab === 'graficos';
-    document.getElementById('dashResumo').hidden = g;
-    document.getElementById('dashGraficos').hidden = !g;
-  });
+  b.addEventListener('click', () => abrirAbaDash(b.dataset.dtab));
 });
+(function () {
+  let salva = null;
+  try { salva = localStorage.getItem('granae_dtab'); } catch {}
+  const temContas = () => (state.accounts || []).length > 0;
+  abrirAbaDash(salva || (temContas() ? 'banco' : 'resumo'));
+  /* os dados da nuvem chegam depois: sem escolha salva, quem tem contas cai na Visão geral */
+  if (!salva) setTimeout(function tenta(n = 0) {
+    if (temContas()) abrirAbaDash('banco'); else if (n < 20) setTimeout(() => tenta(n + 1), 500);
+  }, 500);
+})();
 
 // ====== Busca ======
 document.getElementById('txSearch')?.addEventListener('input', () => renderTransactions());

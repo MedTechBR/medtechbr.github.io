@@ -110,6 +110,25 @@ function proximaPagina(next, accountId) {
   return q;
 }
 
+async function produtosExtras(itemId, pi) {
+  const out = [];
+  try {
+    const r = await pluggy('GET', `/loans?itemId=${encodeURIComponent(itemId)}`);
+    for (const l of r.results || []) out.push({ tipo: 'loan', v: N.emprestimo(l, pi) });
+  } catch (e) { logger.info('sem financiamentos', { item: itemId, erro: e.message }); }
+  try {
+    for (let pagina = 1; pagina <= 5; pagina++) {
+      const r = await pluggy('GET', `/investments?itemId=${encodeURIComponent(itemId)}&pageSize=100&page=${pagina}`);
+      for (const i of r.results || []) {
+        const v = N.investimento(i, pi);
+        if (v.balance || v.gross) out.push({ tipo: 'inv', v });  // resgatado (saldo zero) não entra
+      }
+      if (!r.totalPages || pagina >= r.totalPages) break;
+    }
+  } catch (e) { logger.info('sem investimentos', { item: itemId, erro: e.message }); }
+  return out;
+}
+
 const ymd = (ms) => new Date(ms).toISOString().slice(0, 10);
 
 /* ---------------- Sincronização ---------------- */
@@ -118,12 +137,12 @@ async function sincronizar(uid, { atualizar = false } = {}) {
   const snap = await ref.get();
   const itens = (snap.exists && snap.data().items) || [];
   const agora = Date.now();
-  const feed = { v: 1, syncedAt: agora, items: [], accounts: [], transactions: [] };
+  const feed = { v: 1, syncedAt: agora, items: [], accounts: [], transactions: [], loans: [], investments: [] };
   const mudancas = {}; // itemId → campos a atualizar na lista (refreshedAt, bank)
   /* No MeuPluggy cada banco é uma conexão, todas com o mesmo login. Se o mesmo
      banco for ligado duas vezes, as contas chegam com ids novos e os lançamentos
      entrariam em dobro: a primeira conexão vence e a repetida é ignorada. */
-  const contasVistas = new Set();
+  const contasVistas = new Set(), extrasVistos = new Set();
   const chaveConta = (a) => [a.type, a.subtype, a.number, a.marketingName || a.name].map(x => String(x || '').toLowerCase().trim()).join('|');
 
   for (const it of itens) {
@@ -149,6 +168,14 @@ async function sincronizar(uid, { atualizar = false } = {}) {
       // no MeuPluggy o conector de todas as conexões se chama "MeuPluggy": mostra o banco
       if (/meu ?pluggy/i.test(resumo.bank) && (contas[0] || todas[0])) resumo.bank = `${(contas[0] || todas[0]).name} · MeuPluggy`;
       feed.items.push(resumo);
+      // financiamentos e investimentos (inclui previdência): produto à parte no
+      // Pluggy; se não vier, o resto da conexão segue normal
+      for (const e of await produtosExtras(it.id, pi)) {
+        const chave = e.tipo + '|' + [e.v.name, e.v.contract || '', e.v.subtype || '', e.v.bank].join('|').toLowerCase();
+        if (extrasVistos.has(chave)) continue;
+        extrasVistos.add(chave);
+        (e.tipo === 'loan' ? feed.loans : feed.investments).push(e.v);
+      }
       contas.forEach((a, i) => {
         feed.accounts.push({ ...N.conta(a, pi), from: desde });
         for (const t of lotes[i]) {

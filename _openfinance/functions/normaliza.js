@@ -88,6 +88,60 @@ function item(it) {
   };
 }
 
+const num = (...v) => { for (const x of v) if (x != null && x !== '' && !isNaN(+x)) return +x; return null; };
+const dia = (v) => (v ? String(v).slice(0, 10) : null);
+const r2 = (v) => (v == null ? null : Math.round(v * 100) / 100);
+
+/* Financiamento / empréstimo (Open Finance: GET /loans). O saldo devedor é o
+   que quita a dívida hoje; as parcelas vêm aninhadas em "installments" em
+   algumas instituições e soltas em outras. */
+function emprestimo(l, item) {
+  const p = l.installments || {};
+  const pagamentos = ((l.payments && l.payments.releases) || []).filter(x => x && x.paidDate);
+  const ultimo = pagamentos.sort((a, b) => String(b.paidDate).localeCompare(String(a.paidDate)))[0];
+  return {
+    id: l.id,
+    itemId: l.itemId || (item && item.id),
+    bank: (item && item.connector && item.connector.name) || '',
+    name: l.productName || l.type || 'Financiamento',
+    kind: l.kind || l.type || '',
+    contract: l.contractNumber ? String(l.contractNumber).slice(-4) : '',
+    amount: r2(num(l.contractAmount)),
+    outstanding: r2(num(l.contractOutstandingBalance, l.outstandingBalance)),
+    total: num(p.totalNumberOfInstallments, l.totalNumberOfInstallments),
+    paid: num(p.paidInstallments, l.paidInstallments),
+    due: num(p.dueInstallments, l.dueInstallments),
+    pastDue: num(p.pastDueInstallments, l.pastDueInstallments),
+    installment: r2(num(ultimo && ultimo.instalmentAmount, ultimo && ultimo.installmentAmount, ultimo && ultimo.amount)),
+    cet: num(l.CET, l.cet),
+    start: dia(l.contractDate),
+    end: dia(l.dueDate),
+    system: l.amortizationScheduled || '',
+  };
+}
+
+/* Investimento (GET /investments). Previdência (PGBL/VGBL) vem como
+   investimento; fica marcada à parte porque o Granaê mostra separado. */
+const RE_PREVIDENCIA = /previd|retirement|pgbl|vgbl/i;
+function investimento(i, item) {
+  const saldo = num(i.balance, i.amount);
+  return {
+    id: i.id,
+    itemId: i.itemId || (item && item.id),
+    bank: (item && item.connector && item.connector.name) || '',
+    name: i.name || 'Investimento',
+    type: i.type || '',
+    subtype: i.subtype || '',
+    balance: r2(saldo),
+    gross: r2(num(i.amount)),
+    rate12m: num(i.lastTwelveMonthsRate),
+    due: dia(i.dueDate),
+    date: dia(i.date),
+    status: i.status || '',
+    previdencia: RE_PREVIDENCIA.test([i.type, i.subtype, i.name].join(' ')),
+  };
+}
+
 /* O documento do Firestore tem teto de 1 MiB. Se passar, corta os lançamentos
    mais antigos até caber. */
 function cabeNoDocumento(feed, limite = 900000) {
@@ -105,4 +159,4 @@ function cabeNoDocumento(feed, limite = 900000) {
   return JSON.stringify({ ...feed, transactions: [] });
 }
 
-module.exports = { dataBR, transacao, conta, item, cabeNoDocumento };
+module.exports = { dataBR, transacao, conta, item, emprestimo, investimento, cabeNoDocumento };
