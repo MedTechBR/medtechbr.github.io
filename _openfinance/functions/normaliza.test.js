@@ -49,4 +49,10 @@ const cortado = JSON.parse(json);
 assert(cortado.transactions.length > 0 && cortado.transactions.length < 20000);
 assert(cortado.transactions.every(x => x.date >= cortado.from));
 
+// pagamento de fatura dos dois lados (formato do Sicredi): transferência, fora dos totais
+const cc = { type: 'CREDIT' }, corrente = { type: 'BANK' };
+assert.strictEqual(N.transacao({ id: 'f1', amount: 14218.68, type: 'CREDIT', description: 'PAGAMENTO 031037041', date: '2026-09-15T00:00:00Z' }, cc).transfer, true);
+assert.strictEqual(N.transacao({ id: 'f2', amount: -14218.68, type: 'DEBIT', description: 'PAGTO FATURA MASTER 72257793000130 SICREDI', date: '2026-09-15T00:00:00Z' }, corrente).transfer, true);
+assert.strictEqual(N.transacao({ id: 'f3', amount: -50, type: 'DEBIT', description: 'PAGAMENTO PIX 123 Fulano', date: '2026-09-15T00:00:00Z' }, corrente).transfer, undefined);
+
 console.log('normaliza: ok');

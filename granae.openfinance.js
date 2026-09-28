@@ -84,6 +84,21 @@
   const r2 = (v) => Math.round(v * 100) / 100;
   const dias = (a, b) => Math.abs(new Date(a + 'T00:00:00') - new Date(b + 'T00:00:00')) / DIA;
   const descricao = (t) => t.desc + (t.inst ? ` (${t.inst[0]}/${t.inst[1]})` : '');
+  const parcela = (s) => { const m = String(s || '').match(/(\d+)\s*\/\s*(\d+)/); return m ? m[1] + '/' + m[2] : ''; };
+
+  /* O lançamento do banco é o mesmo que foi digitado à mão? O cartão lança na
+     data da fatura, dias depois da compra, e à mão o valor costuma sair
+     arredondado. Valor exato: o banco pode vir de 3 dias antes a 10 depois.
+     Valor até 1% (no máximo R$ 1) diferente: só no mesmo dia (±1). Parcela
+     "x/y" diferente dos dois lados não é o mesmo lançamento. */
+  function mesmoLancamento(x, t) {
+    const dv = Math.abs((+x.amount || 0) - t.amount);
+    const dt = (new Date(t.date + 'T00:00:00') - new Date(x.date + 'T00:00:00')) / DIA;
+    const ok = (dv < 0.005 && dt >= -3 && dt <= 10) || (dv <= Math.min(1, t.amount * 0.01) && Math.abs(dt) <= 1);
+    if (!ok) return false;
+    const px = parcela(x.description), pt = t.inst ? t.inst.join('/') : parcela(t.desc);
+    return !(px && pt && px !== pt);
+  }
 
   /* ---------- importação: resumo do banco → state ---------- */
   function importar() {
@@ -121,7 +136,11 @@
     const porId = new Map();
     state.transactions.forEach(t => { porId.set(t.id, t); if (t.ofId) porId.set(t.ofId, t); });
     const noResumo = new Set();
-    for (const t of feed.transactions) {
+    // Pix e transferência entre as contas do próprio titular (CPF/CNPJ/nome em
+    // profile.ofProprios, dado privado do usuário): fora dos totais
+    const proprios = ((state.profile && state.profile.ofProprios) || []).map(p => String(p).toLowerCase()).filter(Boolean);
+    for (const t0 of feed.transactions) {
+      const t = (!t0.transfer && proprios.some(p => String(t0.desc || '').toLowerCase().includes(p))) ? { ...t0, transfer: true } : t0;
       const id = 'of_' + t.id;
       noResumo.add(id);
       if (mortos.has(id) || t.date < desde) continue;
@@ -139,10 +158,10 @@
       }
       const conta = contaOk.has(t.accountId) ? 'of_' + t.accountId : null;
       // já digitado à mão?
-      const manual = !t.transfer && state.transactions.find(x =>
+      const manual = !t.transfer && state.transactions.filter(x =>
         !x.of && !x.ofId && !x.transferId && !x.pending && x.type === t.type &&
-        Math.abs((+x.amount || 0) - t.amount) < 0.005 && dias(x.date, t.date) <= 3 &&
-        (!x.accountId || !conta || x.accountId === conta));
+        (!x.accountId || !conta || x.accountId === conta) && mesmoLancamento(x, t))
+        .sort((a, b) => (Math.abs((+a.amount || 0) - t.amount) - Math.abs((+b.amount || 0) - t.amount)) || (dias(a.date, t.date) - dias(b.date, t.date)))[0];
       if (manual) {
         manual.ofId = id;
         if (!manual.accountId && conta) manual.accountId = conta;

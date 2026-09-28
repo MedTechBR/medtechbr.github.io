@@ -23,7 +23,9 @@ function diaDoMes(iso) {
    gasto nem ganho: o gasto já entrou pelo cartão. Marcados como transferência,
    ficam fora dos totais do mês no Granaê. */
 const RE_TRANSF_CAT = /credit card payment|same person transfer|pagamento de fatura|transfer[eê]ncia (entre|mesma) (contas|titularidade)/i;
-const RE_PGTO_CARTAO = /pagamento (recebido|efetuado|de fatura|fatura)|pgto\.? fatura|pag fatura/i;
+const RE_PGTO_CARTAO = /pagamento (recebido|efetuado|de fatura|fatura)|pa?gto\.? ?fatura|pag fatura|^pagamento \d+$/i;
+// lado da conta corrente: "PAGTO FATURA MASTER ..." (Sicredi), "PAGAMENTO DE FATURA"...
+const RE_PGTO_FATURA_CONTA = /pa?gto\.? ?fatura|pagamento de fatura|pag fatura/i;
 
 function transacao(t, conta) {
   const cartao = conta && conta.type === 'CREDIT';
@@ -35,7 +37,10 @@ function transacao(t, conta) {
   const cc = t.creditCardMetadata || {};
   const desc = (t.merchant && t.merchant.name) || t.description || t.descriptionRaw || 'Lançamento';
   const cat = t.category || '';
-  const transfer = RE_TRANSF_CAT.test(cat) || (cartao && tipo === 'income' && RE_PGTO_CARTAO.test(t.description || ''));
+  const d0 = String(t.description || '').trim();
+  const transfer = RE_TRANSF_CAT.test(cat)
+    || (cartao && tipo === 'income' && RE_PGTO_CARTAO.test(d0))
+    || (!cartao && tipo === 'expense' && RE_PGTO_FATURA_CONTA.test(d0));
   const out = {
     id: t.id,
     accountId: t.accountId,
