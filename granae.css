@@ -1164,3 +1164,25 @@ html[data-viva=granae] .section-title{flex-wrap:wrap;gap:8px}
 html[data-viva=granae] .section-title h2{margin-right:auto}
 /* a regra antiga ".bottom-nav button span" dessaturava o ícone (grayscale) */
 html[data-viva=granae] .bottom-nav .nav-ico,html[data-viva=granae] .mais-menu .nav-ico{filter:none;opacity:1}
+/* Open Finance: faixa "banco ao vivo" no Resumo e painel em Contas */
+.of-bar{display:flex;align-items:center;gap:8px;width:100%;margin:0 0 12px;padding:8px 12px;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--tinta2,var(--muted));font:inherit;font-size:12.5px;text-align:left;cursor:pointer}
+.of-bar[hidden]{display:none}
+.of-bar span:nth-child(2){flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.of-bar .ti{opacity:.7}
+.of-dot{width:8px;height:8px;border-radius:50%;background:var(--income);flex:0 0 auto;box-shadow:0 0 0 0 color-mix(in srgb,var(--income) 50%,transparent);animation:of-pulso 2.4s infinite}
+.of-bar.erro .of-dot{background:var(--expense-2);animation:none}
+@keyframes of-pulso{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--income) 45%,transparent)}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
+@media (prefers-reduced-motion:reduce){.of-dot{animation:none}}
+.of-lista{margin-top:0}
+.of-item{padding:12px 14px;border:1px solid var(--border);border-radius:16px;background:var(--surface)}
+.of-item-top{display:flex;align-items:center;gap:8px}
+.of-item-top strong{flex:1;min-width:0}
+.of-item-top button.small{padding:4px 10px;font-size:12px}
+.of-st{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--sup2,rgba(0,0,0,.05))}
+.of-st.ok{color:var(--income)}
+.of-st.alerta{color:var(--expense-2)}
+.of-conta{display:flex;justify-content:space-between;gap:12px;padding:6px 0 0}
+.of-erro{color:var(--expense-2);margin:6px 0 0}
+.of-msg{display:flex;align-items:center;gap:6px;margin:0 0 8px}
+.of-gira{animation:of-gira 1s linear infinite}
+@keyframes of-gira{to{transform:rotate(360deg)}}
