@@ -26,13 +26,15 @@ const publicados = [];
 Object.assign(process.env, { PLUGGY_CLIENT_ID: 'cid', PLUGGY_CLIENT_SECRET: 'sec', PLUGGY_WEBHOOK_KEY: 'k'.repeat(48), OF_EMAILS: 'eu@x.com', GCLOUD_PROJECT: 'medtech-c658c' });
 // Pluggy falso
 const chamadas = [];
+let ultimoConnect = null;
 global.fetch = async (url, o = {}) => {
   const u = new URL(url); chamadas.push(o.method + ' ' + u.pathname + u.search);
   const J = (b, s = 200) => ({ ok: s < 300, status: s, json: async () => b, text: async () => JSON.stringify(b) });
   if (u.pathname === '/auth') return J({ apiKey: 'AK' });
   if (o.headers['X-API-KEY'] !== 'AK') return J({ message: 'no key' }, 401);
-  if (u.pathname === '/connect_token') { const b = JSON.parse(o.body); return J({ accessToken: 'CT', echo: b }); }
+  if (u.pathname === '/connect_token') { ultimoConnect = JSON.parse(o.body); return J({ accessToken: 'CT' }); }
   if (u.pathname === '/items/item-12345678') return J({ id: 'item-12345678', clientUserId: 'uid1', status: 'UPDATED', connector: { name: 'MeuPluggy' } });
+  if (u.pathname === '/items/item-87654321') return J({ id: 'item-87654321', clientUserId: 'uid1', status: 'UPDATED', connector: { name: 'MeuPluggy' } });
   if (u.pathname === '/items/item-alheio00') return J({ id: 'item-alheio00', clientUserId: 'outro', connector: { name: 'X' } });
   if (u.pathname === '/accounts') return J({ results: [{ id: 'acc1', type: 'BANK', name: 'Conta', balance: 10, number: '0001-9' }] });
   if (u.pathname === '/transactions') return J({ message: 'This endpoint is deprecated. Use GET /v2/transactions with cursor pagination instead.' }, 410);
@@ -55,6 +57,7 @@ const req = (data, email = 'eu@x.com', uid = 'uid1') => ({ data, auth: { uid, to
   await assert.rejects(f.openfinance.run(semVerif('custom')), /não está liberado/);
   const ct = await f.openfinance.run(req({ action: 'connectToken' }));
   assert.strictEqual(ct.accessToken, 'CT');
+  assert.strictEqual(ultimoConnect.options.avoidDuplicates, false); // MeuPluggy: 2º banco usa o mesmo login
   await assert.rejects(f.openfinance.run(req({ action: 'addItem', itemId: 'item-alheio00' })), /não é sua/);
   const r = await f.openfinance.run(req({ action: 'addItem', itemId: 'item-12345678' }));
   assert.deepStrictEqual(r, { contas: 1, lancamentos: 2 });
@@ -74,6 +77,13 @@ const req = (data, email = 'eu@x.com', uid = 'uid1') => ({ data, auth: { uid, to
   await f.openfinance.run(req({ action: 'sync', refresh: true }));
   assert(chamadas.some(c => c.startsWith('PATCH /items/item-12345678')));
   assert(banco.get('openfinance_users/uid1').items[0].refreshedAt > 0);
+  // mesmo banco ligado duas vezes: as contas repetidas não entram em dobro
+  const r2 = await f.openfinance.run(req({ action: 'addItem', itemId: 'item-87654321' }));
+  assert.deepStrictEqual(r2, { contas: 1, lancamentos: 2 });
+  const feed2 = JSON.parse(banco.get('users/uid1/apps/granae_of').json);
+  assert.strictEqual(feed2.items.length, 2);
+  assert.strictEqual(feed2.items[0].bank, 'Conta · MeuPluggy');
+  await f.openfinance.run(req({ action: 'removeItem', itemId: 'item-87654321' }));
   await f.openfinance.run(req({ action: 'removeItem', itemId: 'item-12345678' }));
   assert(!banco.has('openfinance_items/item-12345678'));
   assert.strictEqual(JSON.parse(banco.get('users/uid1/apps/granae_of').json).items.length, 0);
