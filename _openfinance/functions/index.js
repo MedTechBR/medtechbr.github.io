@@ -120,6 +120,11 @@ async function sincronizar(uid, { atualizar = false } = {}) {
   const agora = Date.now();
   const feed = { v: 1, syncedAt: agora, items: [], accounts: [], transactions: [] };
   const mudancas = {}; // itemId → campos a atualizar na lista (refreshedAt, bank)
+  /* No MeuPluggy cada banco é uma conexão, todas com o mesmo login. Se o mesmo
+     banco for ligado duas vezes, as contas chegam com ids novos e os lançamentos
+     entrariam em dobro: a primeira conexão vence e a repetida é ignorada. */
+  const contasVistas = new Set();
+  const chaveConta = (a) => [a.type, a.subtype, a.number, a.marketingName || a.name].map(x => String(x || '').toLowerCase().trim()).join('|');
 
   for (const it of itens) {
     try {
@@ -134,10 +139,16 @@ async function sincronizar(uid, { atualizar = false } = {}) {
 
       const dias = agora < (it.backfillUntil || 0) ? JANELA_INICIAL_DIAS : JANELA_DIAS;
       const desde = ymd(agora - dias * DIA);
-      const contas = (await pluggy('GET', `/accounts?itemId=${encodeURIComponent(it.id)}`)).results || [];
+      const todas = (await pluggy('GET', `/accounts?itemId=${encodeURIComponent(it.id)}`)).results || [];
+      const contas = todas.filter(a => !contasVistas.has(chaveConta(a)));
+      if (contas.length < todas.length) logger.info('contas repetidas ignoradas', { item: it.id, repetidas: todas.length - contas.length });
+      contas.forEach(a => contasVistas.add(chaveConta(a)));
       const lotes = await Promise.all(contas.map(a => todasTransacoes(a.id, desde)));
       // só entra no resumo depois de tudo buscado: item pela metade não vai
-      feed.items.push(N.item(pi));
+      const resumo = N.item(pi);
+      // no MeuPluggy o conector de todas as conexões se chama "MeuPluggy": mostra o banco
+      if (/meu ?pluggy/i.test(resumo.bank) && (contas[0] || todas[0])) resumo.bank = `${(contas[0] || todas[0]).name} · MeuPluggy`;
+      feed.items.push(resumo);
       contas.forEach((a, i) => {
         feed.accounts.push({ ...N.conta(a, pi), from: desde });
         for (const t of lotes[i]) {
@@ -208,7 +219,9 @@ exports.openfinance = onCall({ secrets: SECRETS, timeoutSeconds: 120, memory: '2
         if (d.itemId) await donoDoItem(uid, d.itemId);
         const r = await pluggy('POST', '/connect_token', {
           itemId: d.itemId || undefined,
-          options: { clientUserId: uid, webhookUrl: urlWebhook(), avoidDuplicates: true },
+          // avoidDuplicates recusava o 2º banco do MeuPluggy (mesmo login para todos);
+          // conta repetida é filtrada na sincronização
+          options: { clientUserId: uid, webhookUrl: urlWebhook(), avoidDuplicates: false },
         });
         return { accessToken: r.accessToken };
       }
