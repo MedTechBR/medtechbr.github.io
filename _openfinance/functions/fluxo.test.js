@@ -46,6 +46,10 @@ const f = require(path.join(dir, 'index.js'));
 const req = (data, email = 'eu@x.com', uid = 'uid1') => ({ data, auth: { uid, token: { email, email_verified: true } } });
 (async () => {
   await assert.rejects(f.openfinance.run(req({ action: 'sync' }, 'intruso@x.com')), /não está liberado/);
+  // conta de e-mail/senha sem verificação passa (o e-mail é único entre contas de senha); outro provedor não
+  const semVerif = (provedor) => ({ data: { action: 'connectToken' }, auth: { uid: 'uid1', token: { email: 'eu@x.com', email_verified: false, firebase: { sign_in_provider: provedor } } } });
+  assert.strictEqual((await f.openfinance.run(semVerif('password'))).accessToken, 'CT');
+  await assert.rejects(f.openfinance.run(semVerif('custom')), /não está liberado/);
   const ct = await f.openfinance.run(req({ action: 'connectToken' }));
   assert.strictEqual(ct.accessToken, 'CT');
   await assert.rejects(f.openfinance.run(req({ action: 'addItem', itemId: 'item-alheio00' })), /não é sua/);
