@@ -158,7 +158,13 @@ async function sincronizar(uid, { atualizar = false } = {}) {
 function autorizado(token) {
   const lista = String(OF_EMAILS.value() || '').toLowerCase().split(/[,;\s]+/).filter(Boolean);
   const email = String(token.email || '').toLowerCase();
-  return !!email && token.email_verified !== false && lista.includes(email);
+  /* Conta de e-mail/senha costuma ficar com email_verified=false, mas o Firebase
+     não deixa duas contas de senha com o mesmo e-mail: se ela existe, é do dono.
+     Por isso OF_EMAILS só deve ter e-mails que JÁ têm conta MedTech; um e-mail
+     sem conta poderia ser registrado por outra pessoa. */
+  const provedor = token.firebase && token.firebase.sign_in_provider;
+  const confiavel = token.email_verified === true || provedor === 'password';
+  return !!email && confiavel && lista.includes(email);
 }
 
 async function donoDoItem(uid, itemId) {
