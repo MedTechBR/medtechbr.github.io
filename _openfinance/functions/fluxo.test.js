@@ -36,6 +36,8 @@ global.fetch = async (url, o = {}) => {
   if (u.pathname === '/items/item-12345678') return J({ id: 'item-12345678', clientUserId: 'uid1', status: 'UPDATED', connector: { name: 'MeuPluggy' } });
   if (u.pathname === '/items/item-87654321') return J({ id: 'item-87654321', clientUserId: 'uid1', status: 'UPDATED', connector: { name: 'MeuPluggy' } });
   if (u.pathname === '/items/item-alheio00') return J({ id: 'item-alheio00', clientUserId: 'outro', connector: { name: 'X' } });
+  if (u.pathname === '/loans') return J({ results: [{ id: 'l1', productName: 'Crédito pessoal', contractNumber: '123456789', contractAmount: 100000, contractOutstandingBalance: 61234.5, installments: { totalNumberOfInstallments: 24, paidInstallments: 9, dueInstallments: 15 }, CET: 0.21, dueDate: '2027-12-10T00:00:00Z' }] });
+  if (u.pathname === '/investments') return J({ totalPages: 1, results: [{ id: 'i1', name: 'Sicredi Previdência VGBL', type: 'SECURITY', subtype: 'RETIREMENT', balance: 50000 }, { id: 'i2', name: 'CDB', type: 'FIXED_INCOME', balance: 1000.456 }, { id: 'i3', name: 'Resgatado', type: 'FIXED_INCOME', balance: 0 }] });
   if (u.pathname === '/accounts') return J({ results: [{ id: 'acc1', type: 'BANK', name: 'Conta', balance: 10, number: '0001-9' }] });
   if (u.pathname === '/transactions') return J({ message: 'This endpoint is deprecated. Use GET /v2/transactions with cursor pagination instead.' }, 410);
   if (u.pathname === '/v2/transactions') {
@@ -63,6 +65,9 @@ const req = (data, email = 'eu@x.com', uid = 'uid1') => ({ data, auth: { uid, to
   assert.deepStrictEqual(r, { contas: 1, lancamentos: 2 });
   assert.strictEqual(banco.get('openfinance_items/item-12345678').uid, 'uid1');
   const feed = JSON.parse(banco.get('users/uid1/apps/granae_of').json);
+  assert.strictEqual(feed.loans.length, 1);
+  assert.deepStrictEqual([feed.loans[0].outstanding, feed.loans[0].total, feed.loans[0].paid, feed.loans[0].contract, feed.loans[0].end], [61234.5, 24, 9, '6789', '2027-12-10']);
+  assert.deepStrictEqual(feed.investments.map(i => [i.name, i.balance, i.previdencia]), [['Sicredi Previdência VGBL', 50000, true], ['CDB', 1000.46, false]]);
   assert.strictEqual(feed.accounts[0].from, new Date(Date.now() - 90 * 864e5).toISOString().slice(0, 10)); // janela inicial
   assert.deepStrictEqual(feed.transactions.map(t => t.id), ['tx1', 'tx2']);
   // outro usuário não remove nem reconecta o item
@@ -82,6 +87,8 @@ const req = (data, email = 'eu@x.com', uid = 'uid1') => ({ data, auth: { uid, to
   assert.deepStrictEqual(r2, { contas: 1, lancamentos: 2 });
   const feed2 = JSON.parse(banco.get('users/uid1/apps/granae_of').json);
   assert.strictEqual(feed2.items.length, 2);
+  assert.strictEqual(feed2.loans.length, 1); // mesmo contrato por duas conexões não duplica
+  assert.strictEqual(feed2.investments.length, 2);
   assert.strictEqual(feed2.items[0].bank, 'Conta · MeuPluggy');
   await f.openfinance.run(req({ action: 'removeItem', itemId: 'item-87654321' }));
   await f.openfinance.run(req({ action: 'removeItem', itemId: 'item-12345678' }));

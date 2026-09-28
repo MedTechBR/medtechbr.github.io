@@ -235,6 +235,7 @@
       catch { feed = null; }
       importar();
       render();
+      document.dispatchEvent(new Event('granae:of')); // Visão geral redesenha
     }, (err) => { console.warn('Open Finance: sem acesso ao resumo', err && err.message); });
   }
 
@@ -376,5 +377,5 @@
   render();
 
   // para testes
-  window.GranaeOF = { importar, categoriaDoBanco, _setFeed: (f) => { feed = f; dadosProntos = true; importar(); } };
+  window.GranaeOF = { feed: () => feed, importar, categoriaDoBanco, _setFeed: (f) => { feed = f; dadosProntos = true; importar(); } };
 })();
