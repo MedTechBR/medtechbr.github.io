@@ -35,9 +35,12 @@ global.fetch = async (url, o = {}) => {
   if (u.pathname === '/items/item-12345678') return J({ id: 'item-12345678', clientUserId: 'uid1', status: 'UPDATED', connector: { name: 'MeuPluggy' } });
   if (u.pathname === '/items/item-alheio00') return J({ id: 'item-alheio00', clientUserId: 'outro', connector: { name: 'X' } });
   if (u.pathname === '/accounts') return J({ results: [{ id: 'acc1', type: 'BANK', name: 'Conta', balance: 10, number: '0001-9' }] });
-  if (u.pathname === '/transactions') {
-    const pg = +u.searchParams.get('page');
-    return J({ totalPages: 2, page: pg, results: [{ id: 'tx' + pg, accountId: 'acc1', date: '2026-09-20T00:00:00Z', description: 'Coisa ' + pg, amount: -5, type: 'DEBIT' }] });
+  if (u.pathname === '/transactions') return J({ message: 'This endpoint is deprecated. Use GET /v2/transactions with cursor pagination instead.' }, 410);
+  if (u.pathname === '/v2/transactions') {
+    // 1ª página devolve só o cursor em "next" (sem accountId); a 2ª encerra com null
+    if (u.searchParams.get('accountId') !== 'acc1') return J({ message: 'accountId obrigatório' }, 400);
+    const pg = u.searchParams.get('after') === 'CUR2' ? 2 : 1;
+    return J({ next: pg === 1 ? 'after=CUR2' : null, results: [{ id: 'tx' + pg, accountId: 'acc1', date: '2026-09-20T00:00:00Z', description: 'Coisa ' + pg, amount: -5, type: 'DEBIT' }] });
   }
   return J({ message: 'nf' }, 404);
 };
