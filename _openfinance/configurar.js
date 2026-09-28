@@ -57,6 +57,15 @@ function firebase() {
   return ['npx', ['-y', 'firebase-tools@latest']];
 }
 
+// Colar num campo oculto confunde (nada aparece). Enter vazio = ler o que foi copiado.
+function areaDeTransferencia() {
+  const [c, a] = WIN ? ['powershell', ['-NoProfile', '-Command', 'Get-Clipboard']]
+    : process.platform === 'darwin' ? ['pbpaste', []]
+    : ['sh', ['-c', 'wl-paste 2>/dev/null || xclip -o -selection clipboard 2>/dev/null || xsel -ob']];
+  try { return (spawnSync(c, a, { encoding: 'utf8' }).stdout || '').trim(); } catch { return ''; }
+}
+const ehId = (s) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s || '');
+
 async function testarPluggy(clientId, clientSecret) {
   if (SECO) return true;
   const r = await fetch('https://api.pluggy.ai/auth', {
@@ -78,15 +87,24 @@ async function testarPluggy(clientId, clientSecret) {
   passo(2, 'Credenciais do Pluggy');
   console.log(`  1. Entre em https://dashboard.pluggy.ai com o mesmo e-mail do MeuPluggy.
   2. Crie uma Application (Development) e deixe o conector "MeuPluggy" ativo.
-  3. Copie o CLIENT_ID e o CLIENT_SECRET e cole aqui.`);
+  3. Em Aplicações, na linha da sua Application, ficam o Client ID e o Client Secret.`);
   abrir('https://dashboard.pluggy.ai');
   let clientId, clientSecret;
+  console.log('  Não precisa colar: copie no painel e tecle Enter aqui, que eu leio da área de transferência.');
   for (let t = 0; ; t++) {
     // oculto: quem cola o ID e o Secret juntos numa linha não expõe o Secret na tela
-    const linha = await perguntar('  CLIENT_ID (ou o ID e o Secret juntos, separados por espaço; não aparece ao colar)', { oculto: true });
+    let linha = await perguntar('\n  Copie o Client ID (ícone de copiar) e tecle Enter', { oculto: true });
+    if (!linha) linha = areaDeTransferencia();
     [clientId, clientSecret = ''] = linha.split(/\s+/).filter(Boolean);
-    if (!clientSecret) clientSecret = await perguntar('  CLIENT_SECRET (não aparece ao colar)', { oculto: true });
-    console.log(`  recebido: ID ${clientId ? clientId.slice(0, 8) + '…' : '(vazio)'} · Secret ${clientSecret ? clientSecret.length + ' caracteres' : '(vazio)'}`);
+    if (!ehId(clientId)) { console.log('  ✗ Isso não parece um Client ID (formato 1234abcd-…). Copie de novo.'); continue; }
+    console.log(`  ✓ Client ID ${clientId.slice(0, 8)}…`);
+    while (!clientSecret) {
+      let s = await perguntar('  Agora copie o Client Secret (clique no olho e copie) e tecle Enter', { oculto: true });
+      if (!s) s = areaDeTransferencia();
+      if (!s || s === clientId) { console.log('  ✗ A área de transferência ainda tem o Client ID. Copie o Secret e tecle Enter.'); continue; }
+      clientSecret = s.split(/\s+/).filter(Boolean).pop();
+    }
+    console.log(`  ✓ Client Secret (${clientSecret.length} caracteres)`);
     if (clientId && clientSecret && await testarPluggy(clientId, clientSecret)) { console.log('  ✓ Credenciais válidas'); break; }
     if (t >= 2) falha('O Pluggy recusou as credenciais três vezes. Confira no painel e rode de novo.');
     console.log('  ✗ O Pluggy recusou. Confira e cole de novo.');
