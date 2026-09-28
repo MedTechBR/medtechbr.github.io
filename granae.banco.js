@@ -140,7 +140,11 @@
       if (meses.size < 2) continue;
       txs.sort((a, b) => b.date.localeCompare(a.date));
       const acc = state.accounts.find(a => a.id === txs[0].accountId);
-      out.push({ chave: 'rec:' + k, nome: nomeBonito(txs[0].description), banco: acc ? nomeBanco(acc.name) : '', parcela: +txs[0].amount, ultima: txs[0].date, vezes: txs.length });
+      const bancoRec = acc ? nomeBanco(acc.name) : '';
+      /* "LIQUIDACAO DE PARCELA" é como o Sicredi (e outros) descrevem no extrato
+         a parcela de empréstimo: na tela vira "Empréstimo Sicredi" */
+      const nomeRec = /liquida[cç][aã]o de parcela/i.test(txs[0].description || '') ? ('Empréstimo ' + bancoRec).trim() : nomeBonito(txs[0].description);
+      out.push({ chave: 'rec:' + k, nome: nomeRec, banco: /^Empréstimo /.test(nomeRec) ? '' : bancoRec, parcela: +txs[0].amount, ultima: txs[0].date, vezes: txs.length });
     }
     return out;
   }
