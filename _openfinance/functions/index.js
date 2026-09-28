@@ -86,15 +86,28 @@ async function pluggy(metodo, caminho, corpo) {
   return txt ? JSON.parse(txt) : {};
 }
 
+/* GET /transactions (por página) foi desativado pelo Pluggy (410). O /v2 pagina
+   por cursor: cada resposta traz "next", um trecho de query pronto para a
+   próxima página (ou null). Aceita as formas "?a=b", "a=b", URL ou só o cursor. */
 async function todasTransacoes(accountId, desde) {
   const out = [];
-  for (let pagina = 1; pagina <= 20; pagina++) {
-    const q = new URLSearchParams({ accountId, from: desde, pageSize: '500', page: String(pagina) });
-    const r = await pluggy('GET', '/transactions?' + q);
+  let q = new URLSearchParams({ accountId, dateFrom: desde });
+  for (let pagina = 0; q && pagina < 40; pagina++) {
+    const r = await pluggy('GET', '/v2/transactions?' + q);
     out.push(...(r.results || []));
-    if (!r.totalPages || pagina >= r.totalPages) break;
+    q = proximaPagina(r.next, accountId);
   }
   return out;
+}
+
+function proximaPagina(next, accountId) {
+  if (!next) return null;
+  let s = String(next).trim();
+  if (/^https?:/.test(s)) s = new URL(s).search;
+  s = s.replace(/^.*\?/, '');
+  const q = /(^|&)(after|accountId)=/.test(s) ? new URLSearchParams(s) : new URLSearchParams({ after: s });
+  if (!q.get('accountId')) q.set('accountId', accountId);
+  return q;
 }
 
 const ymd = (ms) => new Date(ms).toISOString().slice(0, 10);
