@@ -82,8 +82,11 @@ async function testarPluggy(clientId, clientSecret) {
   abrir('https://dashboard.pluggy.ai');
   let clientId, clientSecret;
   for (let t = 0; ; t++) {
-    clientId = await perguntar('  CLIENT_ID');
-    clientSecret = await perguntar('  CLIENT_SECRET (não aparece ao digitar)', { oculto: true });
+    // oculto: quem cola o ID e o Secret juntos numa linha não expõe o Secret na tela
+    const linha = await perguntar('  CLIENT_ID (ou o ID e o Secret juntos, separados por espaço; não aparece ao colar)', { oculto: true });
+    [clientId, clientSecret = ''] = linha.split(/\s+/).filter(Boolean);
+    if (!clientSecret) clientSecret = await perguntar('  CLIENT_SECRET (não aparece ao colar)', { oculto: true });
+    console.log(`  recebido: ID ${clientId ? clientId.slice(0, 8) + '…' : '(vazio)'} · Secret ${clientSecret ? clientSecret.length + ' caracteres' : '(vazio)'}`);
     if (clientId && clientSecret && await testarPluggy(clientId, clientSecret)) { console.log('  ✓ Credenciais válidas'); break; }
     if (t >= 2) falha('O Pluggy recusou as credenciais três vezes. Confira no painel e rode de novo.');
     console.log('  ✗ O Pluggy recusou. Confira e cole de novo.');
