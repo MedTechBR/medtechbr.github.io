@@ -24,6 +24,14 @@ Banco ──Open Finance──▶ MeuPluggy ──▶ Pluggy ──webhook──
 
 ## 3. Publicar a função
 
+**Jeito rápido:** um comando faz tudo o que está abaixo. Ele testa as credenciais antes de publicar, gera a senha do webhook e grava os segredos. Funciona no Windows, macOS e Linux.
+
+```bash
+node _openfinance/configurar.js
+```
+
+Jeito manual, passo a passo:
+
 O projeto já usa Cloud Functions em `southamerica-east1` (plano Blaze), então nada muda na conta.
 
 ```bash
