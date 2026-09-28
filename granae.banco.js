@@ -159,11 +159,22 @@
     const dividas = compromissos().filter(c => c.kind === 'divida' && !c.quitado).map(c => ({
       chave: 'div:' + c.id, nome: c.descricao, banco: c.credor || '', fonte: 'cadastro', devedor: c.aPagar, pagas: null, total: null, pago: c.pago, valorTotal: c.total,
     }));
-    return [...doBanco, ...recorrentes, ...dividas];
+    /* financiamento cadastrado em Parcelas (casa, apartamento...): o que falta é
+       parcela × restantes, sem descontar juros futuros; saldo informado vence */
+    const informados2 = saldosInformados();
+    const cadastrados = compromissos().filter(c => c.kind === 'financiamento' && !c.quitado).map(c => {
+      const inf = informados2['fin:' + c.id];
+      return {
+        chave: 'fin:' + c.id, nome: c.descricao, banco: c.credor || '', fonte: 'financiamento',
+        devedor: inf ? inf.valor : c.aPagar, estimado: !inf, informadoEm: inf && inf.em,
+        parcela: c.valorParcela, pagas: c.pagas, total: c.n, fim: c.ultima,
+      };
+    });
+    return [...doBanco, ...cadastrados, ...recorrentes, ...dividas];
   }
 
   function parcelas() {
-    const abertos = compromissos().filter(c => !c.quitado && c.kind !== 'divida' && c.type === 'expense');
+    const abertos = compromissos().filter(c => !c.quitado && c.kind !== 'divida' && c.kind !== 'financiamento' && c.type === 'expense');
     return {
       lista: abertos.sort((a, b) => b.aPagar - a.aPagar),
       porMes: soma(abertos, c => c.valorParcela),
@@ -277,6 +288,9 @@
               <div class="bk-linha"><span>${esc(x.nome)} <small class="muted">${esc(x.banco)}</small></span><strong>${x.devedor != null ? brl(x.devedor) : '<span class="muted small">saldo ?</span>'}</strong></div>
               ${x.total ? barra(x.pagas || 0, x.total) + `<small class="muted">${x.pagas || 0} de ${x.total} parcelas pagas${x.atraso ? ` · <b class="bk-atraso">${x.atraso} em atraso</b>` : ''}${x.fim ? ' · termina ' + new Date(x.fim + 'T00:00:00').toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }) : ''}</small>` : ''}
               ${x.valorTotal ? barra(x.pago || 0, x.valorTotal) + `<small class="muted">${brl(x.pago)} pagos de ${brl(x.valorTotal)}</small>` : ''}
+              ${x.fonte === 'financiamento' ? `<small class="muted">Parcela de ${brl(x.parcela)} por mês${x.estimado ? ' · saldo estimado pelas parcelas que faltam' : ' · saldo informado em ' + new Date(x.informadoEm + 'T00:00:00').toLocaleDateString('pt-BR')}</small>
+                <button type="button" class="link small" data-bk-abre="${esc(x.chave)}">${x.estimado ? 'Informar saldo devedor do banco' : 'Atualizar saldo devedor'}</button>
+                ${formInformar(x.chave, 'Saldo devedor hoje (veja no app do banco)', x.estimado ? null : x.devedor)}` : ''}
               ${x.fonte === 'lancamentos' ? `<small class="muted">Parcela de ${brl(x.parcela)} por mês · última em ${new Date(x.ultima + 'T00:00:00').toLocaleDateString('pt-BR')}${x.informadoEm ? ' · saldo informado em ' + new Date(x.informadoEm + 'T00:00:00').toLocaleDateString('pt-BR') : ''}</small>
                 <button type="button" class="link small" data-bk-abre="${esc(x.chave)}">${x.devedor != null ? 'Atualizar saldo devedor' : 'Informar saldo devedor'}</button>
                 ${formInformar(x.chave, 'Saldo devedor hoje (veja no app do banco)', x.devedor)}` : ''}
