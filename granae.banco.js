@@ -251,8 +251,8 @@
         <strong class="bk-total" id="bkTotal">${brl(saldoContas)}</strong>
         <div class="bk-bancos">${bancos.filter(x => x.s).map(x => `<span><b>${esc(x.b)}</b> ${brl(x.s)}</span>`).join('')}</div>
         <div class="bk-patrimonio">
-          <span>Patrimônio líquido</span><strong>${brl(patrimonio)}</strong>
-          <small>contas${totInv ? ' + investimentos' : ''}${prev.saldo ? ' + previdência' : ''}${faturas ? ' − faturas' : ''}${devedor ? ' − financiamentos' : ''}${semSaldo ? ` · ${semSaldo} financiamento${semSaldo > 1 ? 's' : ''} sem saldo devedor` : ''}</small>
+          <span>Patrimônio financeiro</span><strong>${brl(patrimonio)}</strong>
+          <small>contas${totInv ? ' + investimentos' : ''}${prev.saldo ? ' + previdência' : ''}${faturas ? ' − faturas' : ''}${devedor ? ' − financiamentos' : ''}${semSaldo ? ` · ${semSaldo} financiamento${semSaldo > 1 ? 's' : ''} sem saldo devedor` : ''} · não conta imóveis e bens</small>
         </div>
       </section>
 
