@@ -10,8 +10,10 @@
 <script async src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" onload="try{window.initMermaid?initMermaid():mermaid.initialize({startOnLoad:false})}catch(e){}"></script>
 <script defer src="condutai-banco.js?v=2"></script>
 <script defer src="condutai-didatica.js?v=1"></script>
-<script defer src="condutai-seguranca.js?v=1"></script>
-<script defer src="condutai-presc.js?v=1"></script>
+<script defer src="condutai-seguranca.js?v=2"></script>
+<script defer src="condutai-presc.js?v=2"></script>
+<script defer src="condutai-prescricoes.js?v=1"></script>
+<script defer src="condutai-ligacoes.js?v=1"></script>
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"condutai",name:"CondutAI"};</script>
 <script type="module" src="_mtauth.js?v=26"></script>
@@ -1561,7 +1563,8 @@ html[data-viva="condutai"] #cvToast[hidden]{display:none}
 }
 </style>
 <link rel="stylesheet" href="condutai-didatica.css?v=1">
-<link rel="stylesheet" href="condutai-presc.css?v=1">
+<link rel="stylesheet" href="condutai-presc.css?v=2">
+<link rel="stylesheet" href="condutai-ligacoes.css?v=1">
 </head>
 <body>
 
@@ -1987,6 +1990,7 @@ html[data-viva="condutai"] #cvToast[hidden]{display:none}
           <label><input type="radio" name="p_cen" value="ambulatorio"><span>Ambulatório</span></label>
         </fieldset>
         <label class="rx-campo"><span>Observações</span><textarea id="p_obs" rows="3" placeholder="Gravidade, via oral, culturas, o que já foi feito"></textarea></label>
+        <div id="rxPend" class="rx-aviso rx-pend" hidden></div>
         <button id="presGo" class="gaso-btn" data-ocupado="Montando"><i class="ti ti-sparkles"></i> Montar prescrição</button>
         <p class="rx-nota">Sem nome do paciente. Os dados ficam só nesta aba e somem ao fechá-la.</p>
       </fieldset>
@@ -3745,6 +3749,7 @@ async function renderResultDireto(item) {
   await renderMermaidIn(rc);
   linkifyRelated(rc.querySelector('.content'), protocolMeta);
   if (window.CVD) CVD.realca(rc, item);
+  if (window.CVL) CVL.liga(rc, item);
 }
 
 // Sumário lateral + "Abrir todas": usa as próprias seções recolhíveis da conduta
