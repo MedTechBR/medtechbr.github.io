@@ -200,6 +200,38 @@ Revise criticamente esta prescrição para ESTE paciente, como farmacêutico cl�
     return `<ol class="rx-etapas" aria-label="Andamento">${E.map((e, i) => `<li class="${i < idx ? 'feito' : i === idx ? 'agora' : ''}">${i < idx ? '<i class="ti ti-check"></i>' : i === idx ? '<span class="cv-spin"></span>' : '<i class="ti ti-circle"></i>'}<span>${e[1]}</span></li>`).join('')}</ol>${extra ? `<p class="rx-etapa-sub">${extra}</p>` : ''}`;
   }
 
+  /* itens escolhidos num modelo do banco (aba Prescrição da conduta): pulam a geração pela IA */
+  let PEND = null;
+  function pintaPend() {
+    const bt = $('presGo'), av = $('rxPend');
+    if (bt && !bt.classList.contains('ocupado')) bt.innerHTML = PEND ? '<i class="ti ti-shield-check"></i> Conferir para este paciente' : '<i class="ti ti-sparkles"></i> Montar prescrição';
+    if (av) {
+      av.hidden = !PEND;
+      if (PEND) av.innerHTML = `<i class="ti ti-list-check"></i><div><b>${PEND.itens.length} ${PEND.itens.length === 1 ? 'item' : 'itens'} do modelo do Banco MedTech</b><span>Preencha o paciente e confira. A IA não gera nada nesta etapa.</span></div><button type="button" class="rx-lk" id="rxPendX"><i class="ti ti-x"></i> Descartar</button>`;
+      const x = $('rxPendX'); if (x) x.onclick = () => { PEND = null; pintaPend(); };
+    }
+  }
+  function usarModelo(dx, itens, fontes) {
+    if (typeof showView === 'function') showView('prescricao');
+    PEND = { dx, itens: itens.map(it => Object.assign({ grupo: 'Modelo do banco', justificativa: it.obs || 'Item do modelo de prescrição do Banco MedTech.', referencia: (fontes || []).join('; '), alternativa: '', ajuste_renal: '', ajuste_renal_aplicado: false }, JSON.parse(JSON.stringify(it)))), fontes: fontes || [] };
+    $('p_dx').value = dx; guarda(); pintaPend();
+    box().innerHTML = '';
+    setTimeout(() => { const alvo = !$('p_idade').value ? $('p_idade') : !$('p_peso').value ? $('p_peso') : $('presGo'); alvo.focus(); }, 80);
+  }
+  function conferePend(p) {
+    const presc = { resumo: 'Itens escolhidos no modelo do Banco MedTech para ' + PEND.dx + '.', raciocinio: '', suposicoes: [], itens: PEND.itens,
+      nao_farmacologico: [], monitorizacao: [], reavaliar: [], alertas_gerais: [], referencias: PEND.fontes };
+    EST = { p, presc: null, conf: null, rev: null, revEstado: 'aguarda', incl: [], edit: [], respostas: [], brief: '', contents: [{ role: 'user', parts: [{ text: 'Prescrição a partir do modelo do banco para:\n' + blocoPaciente(p) }] }, { role: 'model', parts: [{ text: JSON.stringify(presc) }] }] };
+    presc.itens = presc.itens.map(it => Object.assign({}, it));
+    EST.presc = presc; EST.edit = presc.itens.map(() => false);
+    EST.conf = S.conferir(presc.itens, p, p.emUso);
+    EST.incl = EST.conf.itens.map(c => c.nivel !== 'grave');
+    const logado = !!(window.MT && window.MT.user);
+    EST.revEstado = logado ? 'rodando' : 'semlogin';
+    render();
+    if (logado) revisar();
+  }
+
   async function iniciar() {
     const p = coleta();
     const faltas = valida(p);
@@ -208,6 +240,7 @@ Revise criticamente esta prescrição para ESTE paciente, como farmacêutico cl�
       const el = $(faltas[0].id); if (el && el.focus) el.focus();
       return;
     }
+    if (PEND) { guarda(); conferePend(p); return; }
     if (!(window.MT && window.MT.user)) { box().innerHTML = '<div class="rx-aviso"><i class="ti ti-lock"></i><div>Entre na sua conta MedTech para usar a IA.</div></div>'; return; }
     guarda();
     EST = { p, presc: null, conf: null, rev: null, revEstado: 'aguarda', incl: [], edit: [], respostas: [], brief: '' };
@@ -383,7 +416,7 @@ Revise criticamente esta prescrição para ESTE paciente, como farmacêutico cl�
     const rsm = { grave: 0, atencao: 0, info: 0 };
     conf.itens.forEach((c, i) => { const rv = revDoItem(i); const n = rv ? (rv.veredito === 'erro' ? 'grave' : 'atencao') : null; const ORD = { ok: 0, info: 1, atencao: 2, grave: 3 }; const f = n && ORD[n] > ORD[c.nivel] ? n : c.nivel; if (rsm[f] != null) rsm[f]++; });
     const gerais = (EST.rev && Array.isArray(EST.rev.gerais) ? EST.rev.gerais : []).filter(g => g && g.observacao);
-    const revTxt = EST.revEstado === 'rodando' ? '<span class="cv-spin"></span> Revisão independente da IA em andamento' : EST.revEstado === 'pronta' ? '<i class="ti ti-shield-check"></i> Revisada por uma segunda IA no papel de farmacêutico' : EST.revEstado === 'falhou' ? '<i class="ti ti-alert-circle"></i> A revisão da IA não respondeu; a conferência por regra continua valendo' : '';
+    const revTxt = EST.revEstado === 'rodando' ? '<span class="cv-spin"></span> Revisão independente da IA em andamento' : EST.revEstado === 'pronta' ? '<i class="ti ti-shield-check"></i> Revisada por uma segunda IA no papel de farmacêutico' : EST.revEstado === 'falhou' ? '<i class="ti ti-alert-circle"></i> A revisão da IA não respondeu; a conferência por regra continua valendo' : EST.revEstado === 'semlogin' ? '<i class="ti ti-lock"></i> Conferência por regra feita. Entre na conta para a revisão da IA' : '';
     const grupos = [];
     presc.itens.forEach((it, i) => { let g = grupos.find(x => x.nome === it.grupo); if (!g) grupos.push(g = { nome: it.grupo, idx: [] }); g.idx.push(i); });
     const aberto = document.activeElement && box().contains(document.activeElement) ? document.activeElement : null;
@@ -464,7 +497,7 @@ Revise criticamente esta prescrição para ESTE paciente, como farmacêutico cl�
       if (!txt) { aviso('Nenhum item incluído', 'erro'); return; }
       cvCopia(txt, 'Prescrição copiada', () => { copia.innerHTML = '<i class="ti ti-check"></i> Copiada'; setTimeout(() => { copia.innerHTML = '<i class="ti ti-copy"></i> Copiar prescrição'; }, 1800); });
     };
-    $('rxNova').onclick = () => { EST = null; box().innerHTML = ''; $('p_dx').focus(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+    $('rxNova').onclick = () => { EST = null; PEND = null; pintaPend(); box().innerHTML = ''; $('p_dx').focus(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
     const aj = $('rxAjuste'), ajGo = $('rxAjusteGo');
     const pedir = () => { const t = aj.value.trim(); if (t) ajustar(t, ajGo); };
     ajGo.onclick = pedir;
@@ -514,13 +547,14 @@ Revise criticamente esta prescrição para ESTE paciente, como farmacêutico cl�
       try { sessionStorage.removeItem(PK); } catch (e) {}
       $('prescricaoView').querySelectorAll('input[type="text"],input[type="number"],textarea').forEach(el => { el.value = ''; });
       $('prescricaoView').querySelectorAll('input[type="radio"]').forEach(r => { r.checked = r.defaultChecked; });
-      marcaNega(false); pintaTfg(); box().innerHTML = ''; EST = null; window.dispatchEvent(new CustomEvent('cv-paciente'));
+      marcaNega(false); pintaTfg(); box().innerHTML = ''; EST = null; PEND = null; pintaPend(); window.dispatchEvent(new CustomEvent('cv-paciente'));
       aviso('Dados do paciente apagados desta aba', 'ok');
     };
     window.runPrescricao = iniciar;
+    pintaPend();
   }
   window.CVPresc = { resumoPaciente: () => { try { const p = coleta(); if (!(p.idade || p.peso || p.alergiaRespondida)) return ''; return resumoPaciente(p); } catch (e) { return ''; } },
     abrirCom: (dx) => { if (typeof showView === 'function') showView('prescricao'); if (dx) { $('p_dx').value = dx; guarda(); } setTimeout(() => { const alvo = !$('p_idade').value ? $('p_idade') : $('p_dx'); alvo.focus(); }, 80); },
-    _estado: () => EST, _coleta: coleta, _aplica: aplica, _render: render };
+    usarModelo, _estado: () => EST, _coleta: coleta, _aplica: aplica, _render: render };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
