@@ -1,0 +1,302 @@
+{
+  "id": "hipona",
+  "fontes": [
+    "ESE/ESICM/ERBP — Clinical practice guideline on diagnosis and treatment of hyponatraemia, 2014",
+    "SALSA — bolus intermitente vs. infusão contínua de salina 3%, JAMA Intern Med 2021"
+  ],
+  "cenarios": [
+    {
+      "id": "ps",
+      "titulo": "Sintomas graves",
+      "sub": "Vômitos, sonolência importante, convulsão, coma ou desconforto respiratório",
+      "blocos": [
+        {
+          "tipo": "orientacao",
+          "titulo": "Orientações ao prescritor",
+          "itens": [
+            "Trate antes de fechar a causa. O bolus de salina 3% reduz o edema cerebral.",
+            "Meta: subir 5 mEq/L na primeira hora. Com melhora, pare a salina e mantenha a veia com o mínimo de SF 0,9%.",
+            "Teto de 10 mEq/L nas primeiras 24 h e 8 mEq/L a cada 24 h seguintes, até 130 mEq/L. Etilista, desnutrido, hipocalêmico, hepatopata ou Na ≤ 105 mEq/L: não passe de 8 mEq/L em 24 h.",
+            "Sódio a cada 20 min durante os bolus; depois com 6 e 12 h e 1 vez ao dia até estabilizar.",
+            "Diurese clara e abundante avisa correção rápida. Dose o sódio na hora.",
+            "Repor potássio também sobe o sódio. Conte isso no teto."
+          ]
+        },
+        {
+          "tipo": "esquema",
+          "titulo": "1. Salina 3% em bolus",
+          "regra": "Faça I e dose o sódio. Repita até 2 vezes enquanto não subir 5 mEq/L ou os sintomas não melhorarem. Com melhora, passe a II.",
+          "partes": [
+            {
+              "rotulo": "I. Bolus",
+              "opcoes": [
+                {
+                  "farmaco": "Cloreto de sódio 3%",
+                  "apresentacao": "bolsa pronta ou preparo com NaCl 20% (ampola 10 mL, 3,4 mEq/mL)",
+                  "posologia": "150 mL EV em 20 min",
+                  "duracao": "repetir até 2 vezes, total de 3 bolus",
+                  "diluicao": "Sem bolsa pronta: retire 55 mL de uma bolsa de SF 0,9% 500 mL e acrescente 55 mL de NaCl 20%. Fica em cerca de 3% (513 mEq/L). Rotule e confira em dupla. Correr em bomba a 450 mL/h.",
+                  "dose_valor": 150,
+                  "dose_unidade": "mL",
+                  "via": "EV",
+                  "intervalo_horas": null,
+                  "continuo": false,
+                  "dose_unica": false,
+                  "se_necessario": false,
+                  "dose_por_kg": null,
+                  "obs": "Peso fora do habitual: 2 mL/kg por bolus. Pode ir em veia periférica calibrosa."
+                }
+              ]
+            },
+            {
+              "rotulo": "II. Após a melhora",
+              "opcoes": [
+                {
+                  "farmaco": "Cloreto de sódio 0,9%",
+                  "apresentacao": "bolsa 250 mL ou 500 mL",
+                  "posologia": "10 mL/h EV para manter a veia",
+                  "duracao": "até iniciar o tratamento da causa",
+                  "diluicao": "",
+                  "dose_valor": 10,
+                  "dose_unidade": "mL/h",
+                  "via": "EV",
+                  "intervalo_horas": null,
+                  "continuo": true,
+                  "dose_unica": false,
+                  "se_necessario": false,
+                  "dose_por_kg": null,
+                  "obs": "O menor volume possível. Não é para corrigir sódio."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tipo": "esquema",
+          "titulo": "2. Se passar do teto",
+          "regra": "Pare a salina e toda fonte de sódio. Associe I e II, com nefrologista ou intensivista.",
+          "partes": [
+            {
+              "rotulo": "I. Água livre",
+              "opcoes": [
+                {
+                  "farmaco": "Glicose 5%",
+                  "apresentacao": "bolsa 500 mL ou 1.000 mL",
+                  "posologia": "10 mL/kg EV em 1 h",
+                  "duracao": "repetir conforme o sódio",
+                  "diluicao": "",
+                  "dose_valor": 10,
+                  "dose_unidade": "mL/kg",
+                  "via": "EV",
+                  "intervalo_horas": null,
+                  "continuo": false,
+                  "dose_unica": false,
+                  "se_necessario": true,
+                  "dose_por_kg": {
+                    "valor": 10,
+                    "unidade": "mL/kg"
+                  },
+                  "obs": "Controle a diurese e o balanço. Dose o sódio ao fim da infusão."
+                }
+              ]
+            },
+            {
+              "rotulo": "II. Antidiurético",
+              "opcoes": [
+                {
+                  "farmaco": "Desmopressina",
+                  "apresentacao": "ampola 4 mcg/mL",
+                  "posologia": "2 mcg EV ou SC",
+                  "duracao": "",
+                  "diluicao": "",
+                  "dose_valor": 2,
+                  "dose_unidade": "mcg",
+                  "via": "EV",
+                  "intervalo_horas": 8,
+                  "continuo": false,
+                  "dose_unica": false,
+                  "se_necessario": true,
+                  "dose_por_kg": null,
+                  "obs": "Não repita antes de 8 h. Sem ela, a água dada sai na urina e o sódio volta a subir."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "enf",
+      "titulo": "Sintomas moderados",
+      "sub": "Náusea sem vômito, confusão ou cefaleia",
+      "blocos": [
+        {
+          "tipo": "orientacao",
+          "titulo": "Orientações ao prescritor",
+          "itens": [
+            "Suspenda soro hipotônico, tiazídico e outras drogas que baixam o sódio.",
+            "Um bolus único de salina 3% e investigação imediata da causa.",
+            "Meta: subir 5 mEq/L em 24 h. Teto de 10 mEq/L no primeiro dia e 8 mEq/L nos seguintes.",
+            "Sódio com 1, 6 e 12 h.",
+            "Se o sódio continuar caindo apesar do tratamento da causa, siga o cenário de sintomas graves."
+          ]
+        },
+        {
+          "tipo": "esquema",
+          "titulo": "Salina 3%",
+          "regra": "Dose única. Depois trate conforme a causa (cenário de hiponatremia crônica).",
+          "partes": [
+            {
+              "rotulo": "",
+              "opcoes": [
+                {
+                  "farmaco": "Cloreto de sódio 3%",
+                  "apresentacao": "bolsa pronta ou preparo com NaCl 20% (ampola 10 mL, 3,4 mEq/mL)",
+                  "posologia": "150 mL EV em 20 min",
+                  "duracao": "",
+                  "diluicao": "Sem bolsa pronta: retire 55 mL de uma bolsa de SF 0,9% 500 mL e acrescente 55 mL de NaCl 20%. Fica em cerca de 3% (513 mEq/L). Rotule e confira em dupla. Correr em bomba a 450 mL/h.",
+                  "dose_valor": 150,
+                  "dose_unidade": "mL",
+                  "via": "EV",
+                  "intervalo_horas": null,
+                  "continuo": false,
+                  "dose_unica": true,
+                  "se_necessario": false,
+                  "dose_por_kg": null,
+                  "obs": "Peso fora do habitual: 2 mL/kg."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cronica",
+      "titulo": "Crônica sem sintomas relevantes",
+      "sub": "Tratamento pela causa: hipovolemia, SIADH ou hipervolemia",
+      "blocos": [
+        {
+          "tipo": "orientacao",
+          "titulo": "Orientações ao prescritor",
+          "itens": [
+            "Hiponatremia leve (130 a 134 mEq/L) não se trata só para subir o número. Trate a causa.",
+            "Defina volemia, osmolalidade urinária e sódio urinário antes de escolher.",
+            "Mesmos limites: até 10 mEq/L nas primeiras 24 h e 8 mEq/L a cada 24 h. Sódio a cada 6 h até estabilizar.",
+            "Hipovolêmico que passa a urinar muito e claro após o soro: o ADH desligou e o sódio vai disparar.",
+            "SIADH: restrição hídrica de 800 a 1.000 mL/dia primeiro. Osmolalidade urinária > 500 mOsm/kg costuma pedir ureia ou furosemida com sal.",
+            "A diretriz europeia desaconselha tolvaptana, lítio e demeclociclina."
+          ]
+        },
+        {
+          "tipo": "esquema",
+          "titulo": "Por causa",
+          "regra": "Escolha a parte pela causa. Em II, associe a ureia ou a dupla furosemida com sal à restrição hídrica, se o sódio não subir.",
+          "partes": [
+            {
+              "rotulo": "I. Hipovolemia",
+              "opcoes": [
+                {
+                  "farmaco": "Cloreto de sódio 0,9%",
+                  "apresentacao": "bolsa 500 mL ou 1.000 mL",
+                  "posologia": "0,5 a 1,0 mL/kg/h EV",
+                  "duracao": "até corrigir a volemia",
+                  "diluicao": "",
+                  "dose_valor": 0.5,
+                  "dose_unidade": "mL/kg/h",
+                  "via": "EV",
+                  "intervalo_horas": null,
+                  "continuo": true,
+                  "dose_unica": false,
+                  "se_necessario": false,
+                  "dose_por_kg": {
+                    "valor": 0.5,
+                    "unidade": "mL/kg/h"
+                  },
+                  "obs": "Ringer lactato serve. Com instabilidade, ressuscite primeiro; o limite do sódio vem depois."
+                }
+              ]
+            },
+            {
+              "rotulo": "II. SIADH",
+              "opcoes": [
+                {
+                  "farmaco": "Ureia",
+                  "apresentacao": "sachê manipulado de 15 g",
+                  "posologia": "0,25 a 0,5 g/kg/dia VO, dissolvida em suco",
+                  "duracao": "enquanto persistir a SIADH",
+                  "diluicao": "",
+                  "dose_valor": 0.25,
+                  "dose_unidade": "g/kg",
+                  "via": "VO",
+                  "intervalo_horas": 24,
+                  "continuo": false,
+                  "dose_unica": false,
+                  "se_necessario": false,
+                  "dose_por_kg": {
+                    "valor": 0.25,
+                    "unidade": "g/kg"
+                  },
+                  "obs": "Gosto amargo: dissolva em suco de laranja ou similar. Divida em 2 tomadas se a dose for alta."
+                },
+                {
+                  "farmaco": "Furosemida",
+                  "apresentacao": "comprimido 40 mg",
+                  "posologia": "20 mg VO 1 vez ao dia",
+                  "duracao": "enquanto persistir a SIADH",
+                  "diluicao": "",
+                  "dose_valor": 20,
+                  "dose_unidade": "mg",
+                  "via": "VO",
+                  "intervalo_horas": 24,
+                  "continuo": false,
+                  "dose_unica": false,
+                  "se_necessario": false,
+                  "dose_por_kg": null,
+                  "obs": "Sempre com sal oral. Tira do rim a capacidade de concentrar a urina."
+                },
+                {
+                  "farmaco": "Cloreto de sódio",
+                  "apresentacao": "cápsula manipulada 1 g",
+                  "posologia": "1 g VO de 8/8 h",
+                  "duracao": "enquanto usar furosemida",
+                  "diluicao": "",
+                  "dose_valor": 1,
+                  "dose_unidade": "g",
+                  "via": "VO",
+                  "intervalo_horas": 8,
+                  "continuo": false,
+                  "dose_unica": false,
+                  "se_necessario": false,
+                  "dose_por_kg": null,
+                  "obs": "Ajuste pelo sódio e pela volemia."
+                }
+              ]
+            },
+            {
+              "rotulo": "III. Hipervolemia",
+              "opcoes": [
+                {
+                  "farmaco": "Furosemida",
+                  "apresentacao": "ampola 10 mg/mL (2 mL)",
+                  "posologia": "20 a 40 mg EV de 12/12 h",
+                  "duracao": "até tirar a congestão",
+                  "diluicao": "EV direto em 1 a 2 min.",
+                  "dose_valor": 20,
+                  "dose_unidade": "mg",
+                  "via": "EV",
+                  "intervalo_horas": 12,
+                  "continuo": false,
+                  "dose_unica": false,
+                  "se_necessario": false,
+                  "dose_por_kg": null,
+                  "obs": "Na IC congesta, com restrição de água. Na cirrose, o manejo do diurético é do hepatologista. Nunca SF 0,9% para subir o sódio."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
