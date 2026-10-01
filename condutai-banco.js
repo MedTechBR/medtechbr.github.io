@@ -11274,13 +11274,13 @@ Sintomas precoces e inespecíficos de magnesemia subindo: calor e rubor durante 
 
 **Manejo da intoxicação:** suspender a infusão; administrar **gluconato de cálcio a 10%, 1 g (10 mL) IV em 3 a 5 minutos**, que antagoniza o magnésio na junção neuromuscular e no miocárdio; oxigênio e suporte ventilatório, com intubação se houver apneia; monitorização cardíaca; e checar função renal, porque a oligúria é quase sempre a causa do acúmulo. Em anúria com intoxicação grave, a hemodiálise remove magnésio.
 
-Ajuste na disfunção renal: com creatinina acima de 1,1 a 1,2 mg/dL ou clearance pela CKD-EPI 2021 abaixo de 30 mL/min/1,73 m², mantenha a **dose de ataque plena** (o volume de distribuição não muda) e **reduza a manutenção** para cerca de 1 g/h, com vigilância horária mais rigorosa. Nunca omita o ataque por medo do rim.
+Ajuste na disfunção renal: com creatinina de 1,2 mg/dL ou mais, mantenha a **dose de ataque plena** (o volume de distribuição não muda) e **reduza a manutenção à metade**: 0,5 g/h no Zuspan ou 2,5 g IM de 4/4 horas no Pritchard, com vigilância horária mais rigorosa. Interrompa a manutenção se a diurese cair abaixo de 25 mL/h. Nunca omita o ataque por medo do rim.
 
 **Corticoide.** Betametasona 12 mg IM a cada 24 horas, 2 doses, ou dexametasona 6 mg IM a cada 12 horas, 4 doses, entre 24 e 34 semanas. Não retarde o parto indicado apenas para completar o ciclo quando há instabilidade materna.
 
-**Prevenção.** Aspirina em dose baixa (100 mg/dia no Brasil; 81 mg/dia nos protocolos norte-americanos), à noite, iniciada entre 12 e 16 semanas e mantida até próximo ao termo, para gestantes de alto risco: pré-eclâmpsia em gestação anterior, gestação múltipla, hipertensão crônica, diabetes tipo 1 ou 2, doença renal crônica e doença autoimune (lúpus, síndrome antifosfolípide). Também para quem soma dois ou mais fatores moderados (nuliparidade, obesidade, história familiar, idade ≥ 35 anos, intervalo interpartal longo). Suplementação de cálcio de 1 a 2 g/dia é recomendada onde a ingestão dietética é baixa — cenário comum no Brasil.
+**Prevenção.** Aspirina em dose baixa (100 mg/dia no Brasil; 81 mg/dia nos protocolos norte-americanos), à noite, iniciada a partir de 12 semanas, de preferência até 16 (ainda há benefício se começada até 20 semanas), e suspensa com 36 semanas, para gestantes de alto risco: pré-eclâmpsia em gestação anterior, gestação múltipla, hipertensão crônica, diabetes tipo 1 ou 2, doença renal crônica e doença autoimune (lúpus, síndrome antifosfolípide). Também para quem soma dois ou mais fatores moderados (nuliparidade, obesidade, história familiar, idade ≥ 35 anos, intervalo interpartal longo). Suplementação de cálcio é recomendada onde a ingestão dietética é baixa (menos de 900 mg/dia), o que inclui a maior parte das brasileiras: 500 mg a 1 g por dia (1 a 2 comprimidos de carbonato de cálcio de 500 mg), do primeiro trimestre ao parto, junto às refeições. Desde 2025 o Ministério da Saúde adota a suplementação como rotina no pré-natal.
 
-A aspirina age inibindo irreversivelmente a COX-1 plaquetária e deslocando o equilíbrio tromboxano/prostaciclina a favor da prostaciclina, o que favorece a remodelação das artérias espiraladas — daí a exigência de iniciar **antes de 16 semanas**, enquanto a placentação ainda está acontecendo. Começar com 24 semanas não previne nada. A tomada noturna tem melhor efeito documentado do que a matinal. A aspirina em dose baixa não aumenta sangramento periparto nem contraindica analgesia neuroaxial, e não precisa ser suspensa antes do parto na maioria dos protocolos.
+A aspirina age inibindo irreversivelmente a COX-1 plaquetária e deslocando o equilíbrio tromboxano/prostaciclina a favor da prostaciclina, o que favorece a remodelação das artérias espiraladas — daí a preferência por iniciar **até 16 semanas**, enquanto a placentação ainda está acontecendo; o protocolo da RBEHG 2025 aceita começar até 20 semanas. Começar com 24 semanas não previne nada. A tomada noturna tem melhor efeito documentado do que a matinal. A aspirina em dose baixa não contraindica analgesia neuroaxial. O protocolo brasileiro a suspende com 36 semanas, pelo risco de sangramento, e também quando a pré-eclâmpsia se instala, porque daí em diante ela não traz benefício.
 
 O cálcio deve ser prescrito como **cálcio elementar**, atenção que se perde na farmácia: 1.250 mg de carbonato de cálcio contêm 500 mg de cálcio elementar. Administre longe do sulfato ferroso, que compete pela absorção.
 
@@ -11298,7 +11298,7 @@ Esta é a tabela que mais se erra no plantão, e o erro tem duas faces opostas: 
 | Metoprolol, pindolol | Permitidos | Alternativas de manutenção |
 | Atenolol | Evitar | Associado a restrição de crescimento fetal, sobretudo no uso precoce e prolongado |
 | Diuréticos (tiazídico, furosemida) | Evitar como anti-hipertensivo | Reservar furosemida para edema agudo de pulmão |
-| Nitroprussiato de sódio | Só em UTI, por curto período | Risco de acúmulo de cianeto no feto |
+| Nitroprussiato de sódio | Só em UTI, por curto período (6 a 12 h) | Risco fetal por cianeto é teórico no uso curto; preferido no edema agudo de pulmão |
 | **IECA (captopril, enalapril, lisinopril)** | **CONTRAINDICADOS** | Fetotoxicidade |
 | **BRA (losartana, valsartana)** e **inibidor de renina (alisquireno)** | **CONTRAINDICADOS** | Fetotoxicidade |
 
@@ -11408,7 +11408,7 @@ Estabilize antes de transferir: a gestante com doença grave deve sair da unidad
 - Creatinina de 1,0 mg/dL em gestante não é normal: na gravidez a creatinina cai, e valor "normal de adulto" já significa perda de função.
 - Manguito pequeno em braço obeso inventa hipertensão; manguito grande em braço fino esconde.
 - Fosfatase alcalina alta na gestante é placentária, não hepática. Use TGO, TGP e bilirrubinas.
-- Aspirina depois de 16 semanas não previne pré-eclâmpsia — a janela é a da placentação. E cálcio deve ser prescrito como cálcio elementar.
+- Aspirina rende mais quando iniciada entre 12 e 16 semanas, a janela da placentação; até 20 semanas ainda vale começar, depois disso não. E cálcio deve ser prescrito como cálcio elementar.
 - Furosemida não trata pré-eclâmpsia — a paciente é hipovolêmica no intravascular apesar do edema. Use apenas se houver edema agudo de pulmão.
 - Oligúria isolada nas primeiras horas de pós-parto é comum e não exige expansão volêmica agressiva, que precipita edema pulmonar.
 - Não suspenda o magnésio para "ver se a paciente convulsiona". Ele fica 24 horas.
@@ -11490,7 +11490,7 @@ A mortalidade materna varia de menos de 1% em centros bem estruturados a mais de
 ## Tratamento (com doses) — prioridades
 
 1. **Proteger e estabilizar** (vias aéreas, O₂, decúbito lateral) — a maioria das crises é autolimitada.
-2. **Sulfato de magnésio** (escolha): ataque **4 g IV** em 15–20 min + manutenção **1 g/h** (Zuspan; alguns serviços usam 2 g/h), ou Pritchard; crise recorrente → mais 2 g IV. Vigiar **reflexos, diurese (> 25 mL/h), FR**; **antídoto = gluconato de cálcio**.
+2. **Sulfato de magnésio** (escolha): ataque **4 g IV** em 15–20 min + manutenção **1 g/h** (Zuspan; alguns serviços usam 2 g/h), ou Pritchard; crise recorrente → mais 2 g IV em cerca de 20 min. Vigiar **reflexos, diurese (> 25 mL/h), FR**; **antídoto = gluconato de cálcio**.
 3. **Controlar a PA se ≥ 160/110** (hidralazina IV ou nifedipino VO; o labetalol IV não está disponível no Brasil).
 4. **Estabilizar a mãe e depois resolver a gestação (parto)** — não é indicação de cesárea imediata sem estabilizar.
 
@@ -11500,7 +11500,7 @@ A mortalidade materna varia de menos de 1% em centros bem estruturados a mais de
 
 Detalhe prático do preparo, porque erro de diluição aqui é fatal: a apresentação brasileira mais comum é a ampola de sulfato de magnésio a 50%, em que **1 mL contém 500 mg**. O ataque de 4 g corresponde a 8 mL da solução a 50%, que devem ser diluídos (tipicamente em 100 a 200 mL de soro fisiológico) e infundidos em 15 a 20 minutos — nunca em bolus rápido. Para o Pritchard, a aplicação intramuscular de 5 g em cada glúteo é dolorosa, e a associação de lidocaína a 2% na seringa é prática consagrada. Confira sempre a concentração da ampola disponível no serviço antes de calcular.
 
-Se a paciente convulsionar novamente já sulfatada, administre **dose adicional de 2 g IV** (a FEBRASGO orienta infundir em cerca de 20 minutos). Persistindo as crises após esse bolus, reavalie o diagnóstico e considere neuroimagem, além de outro anticonvulsivante (benzodiazepínico ou fenitoína) com proteção de via aérea.
+Se a paciente convulsionar novamente já sulfatada, administre **dose adicional de 2 g IV** (a FEBRASGO orienta infundir em 20 minutos, Femina 2025). Persistindo as crises após esse bolus, reavalie o diagnóstico e considere neuroimagem, além de outro anticonvulsivante (benzodiazepínico ou fenitoína) com proteção de via aérea.
 
 **Vigilância da intoxicação**, de hora em hora: reflexo patelar presente, frequência respiratória adequada e diurese ≥ 25 mL/h. O reflexo patelar é o primeiro sinal a desaparecer; a depressão respiratória vem depois e a parada cardíaca é o extremo. Antídoto: **gluconato de cálcio a 10%, 10 mL IV lentos**. Mantenha o magnésio por 24 horas após o parto ou após a última convulsão, o que ocorrer por último.
 
@@ -11557,7 +11557,7 @@ flowchart TD
     D -->|Não| F["Reavaliar mãe e feto<br/>Laboratório completo"]
     E --> F
     F --> G["Nova convulsão<br/>apesar do magnésio?"]
-    G -->|Sim| H["Bolus de 2 g IV<br/>Considerar neuroimagem"]
+    G -->|Sim| H["Mais 2 g IV em 20 min<br/>Considerar neuroimagem"]
     G -->|Não| I["Mãe estável: resolver<br/>a gestação<br/>Magnésio por 24 h"]
     class A critical;
     class G critical;
@@ -18259,7 +18259,7 @@ Dois imitadores merecem atenção especial pela gravidade: **glaucoma agudo de �
 
 ## Tratamento
 
-- **Enxaqueca aguda:** AINE (naproxeno, ibuprofeno) ou **triptano** (sumatriptano 50–100 mg) + antiemético (metoclopramida). **Profilaxia** se crises frequentes: propranolol, amitriptilina, topiramato, candesartana (anti-CGRP em refratários). Trate cedo na crise, com dose plena; triptanos são contraindicados na doença coronariana, no AVC prévio, na hipertensão não controlada, na enxaqueca hemiplégica e na de tronco. Nas crises em emergência, a associação de antiemético parenteral, hidratação e AINE parenteral costuma resolver; evite opioides, que aumentam recorrência e risco de cronificação.
+- **Enxaqueca aguda:** dipirona, AINE (naproxeno, ibuprofeno) ou **triptano** (sumatriptano 50–100 mg) + antiemético (metoclopramida). **Profilaxia** se crises frequentes: propranolol, amitriptilina, topiramato, candesartana (anti-CGRP em refratários). Trate cedo na crise, com dose plena; triptanos são contraindicados na doença coronariana, no AVC prévio, na hipertensão não controlada, na enxaqueca hemiplégica e na de tronco. Nas crises em emergência, a associação de antiemético parenteral, hidratação e AINE parenteral costuma resolver; evite opioides, que aumentam recorrência e risco de cronificação.
 - **Tensional:** analgésico simples/AINE; profilaxia com amitriptilina. Higiene do sono, atividade física regular e manejo do estresse têm efeito real e devem ser prescritos com a mesma seriedade dos fármacos.
 - **Salvas:** **O₂ 100% 12–15 L/min** + sumatriptano SC na crise; **verapamil** como profilaxia. O oxigênio deve ser administrado por máscara não reinalante com reservatório, com o paciente sentado e inclinado à frente — cateter nasal não funciona. O verapamil exige titulação com **ECG seriado** pelo risco de bloqueio, e um curso curto de corticoide pode ser usado como ponte no início do surto.
 - **Novos alvos**: gepantes (antagonistas orais do receptor de CGRP) e ditans para a crise, e **anticorpos monoclonais anti-CGRP** para profilaxia, hoje considerados opção de primeira linha na prevenção da migrânea, sem exigência de falha prévia de outras classes. No **Brasil**, os anti-CGRP estão aprovados pela ANVISA, mas **não estão incorporados ao SUS** e têm custo elevado, de modo que a prática pública segue baseada em propranolol, amitriptilina, topiramato, valproato e candesartana. Toxina botulínica é opção na migrânea crônica, também com acesso restrito.
@@ -18279,7 +18279,7 @@ Organizando a **profilaxia da enxaqueca** por classe, com as faixas de dose usua
 
 Regras que fazem a profilaxia funcionar: **titular até dose eficaz**, manter por pelo menos 8 a 12 semanas antes de julgar falha, medir o resultado pelo **diário** (redução de dias de dor por mês e de incapacidade, não "melhorou um pouco"), e tratar simultaneamente o uso excessivo de analgésico — profilaxia não funciona enquanto o paciente toma analgésico todo dia. Considere indicar profilaxia a partir de cerca de 4 dias de dor por mês, ou antes disso se as crises forem muito incapacitantes ou mal respondedoras.
 
-Na **crise em emergência**, um esquema prático: hidratação venosa, **metoclopramida 10 mg IV** lenta (ou clorpromazina em baixa dose, atenta à hipotensão e ao risco de distonia aguda), AINE parenteral, ambiente escuro e silencioso, e reavaliação em 30 a 60 minutos. Dexametasona em dose única pode reduzir recorrência precoce após a alta. **Opioide não entra** nesse esquema: alivia menos, recorre mais e é o principal fator iatrogênico de cronificação.
+Na **crise em emergência**, o protocolo nacional da ABN e da SBCef (2018) e a AHS convergem: ambiente escuro e silencioso, hidratação venosa se houver desidratação, **dipirona 1 g IV** e/ou AINE parenteral (cetoprofeno 100 mg IV), antiemético (**metoclopramida 10 mg IV** lenta ou dimenidrinato 30 mg IV) e reavaliação em 1 hora. Sem melhora, **sumatriptano 6 mg subcutâneo**, que pode ser repetido após 1 hora (máximo de 12 mg em 24 horas). **Dexametasona 10 mg IV** em dose única reduz a recorrência nos dias seguintes e entra sempre no estado migranoso. Se a dor persistir, **clorpromazina 0,1 a 0,25 mg/kg IM**, repetível após 1 hora até três doses, com atenção à hipotensão e à distonia aguda. **Opioide não entra** nesse esquema: alivia menos, recorre mais e é o principal fator iatrogênico de cronificação.
 
 Na **salvas**, o oxigênio deve ser oferecido a fluxo alto por 15 a 20 minutos com máscara com reservatório, e o **sumatriptano 6 mg subcutâneo** é a via com início mais rápido — a via oral não serve, porque a crise já terminou antes do pico plasmático. Na profilaxia, o **verapamil** é primeira linha, iniciado tipicamente em 240 mg/dia e titulado conforme resposta e tolerância, com **ECG antes de cada aumento** e vigilância de bradicardia, bloqueio atrioventricular, constipação e edema. Como ponte enquanto o verapamil não age, usa-se um curso curto de **corticoide** em dose alta por poucos dias, com redução programada. Bloqueio do nervo occipital maior é opção adicional recomendada. Lítio, topiramato e, na forma episódica, o anticorpo anti-CGRP correspondente, são alternativas quando o verapamil falha ou não é tolerado.
 
@@ -19008,20 +19008,20 @@ Instabilidade hemodinâmica, rebaixamento importante do sensório ou necessidade
 
 ## Tratamento (com doses)
 
-- **Hidratação vigorosa** (pilar): **cristaloide balanceado** ou SF, ~500–1000 mL/h nas primeiras horas, ajustar pelo Na corrigido (0,45% se Na alto); repor déficit em 24–48h. Queda da glicemia ≤ 90–120 mg/dL/h e Na ≤ 10/24h (evitar edema cerebral).
-- **Potássio:** repor se K < 5,2 e diurese presente (manter 4–5).
-- **Insulina regular IV** após iniciar volume e com K ≥ 3,3 (0,05–0,1 U/kg/h); reduzir a glicemia **devagar** (evitar edema cerebral); alvo ~250–300 mg/dL inicialmente.
+- **Hidratação vigorosa** (pilar): **cristaloide balanceado** ou SF, ~500–1000 mL/h nas primeiras 2–4 h; repor déficit em 24–48h. A subida do Na enquanto a glicemia cai é esperada e **não indica salina hipotônica**: 0,45% só se a osmolalidade parar de cair apesar de balanço positivo e insulina adequada. Queda da glicemia ≤ 90–120 mg/dL/h, da osmolalidade entre 3 e 8 mOsm/kg/h e do Na ≤ 10/24h (evitar edema cerebral).
+- **Potássio:** repor se K < 5,0 e diurese presente (manter 4–5).
+- **Insulina regular IV** após iniciar volume e com K ≥ 3,5 (a SBD 2023 usa 3,3): **0,05 U/kg/h** em dose fixa no EHH sem cetoacidose e **0,1 U/kg/h** na forma mista (β-OHB ≥ 3,0, pH < 7,3 ou HCO₃ < 18); reduzir a glicemia **devagar** (evitar edema cerebral); com glicemia < 250 mg/dL, acrescentar glicose 5–10% ao soro e manter a insulina.
 - Tratar o precipitante; profilaxia de TEV.
 
 A sequência prática das primeiras horas é: **(1) volume, (2) potássio, (3) insulina** — nessa ordem, e não simultaneamente no paciente hipotenso. Na primeira hora, corra cristaloide isotônico e reavalie perfusão; só então cheque o potássio e decida sobre insulina. Se o paciente está em choque, a ressuscitação volêmica tem prioridade absoluta sobre qualquer alvo glicêmico.
 
-A escolha do fluido depois da primeira fase segue o **sódio corrigido**: corrigido alto ou normal → salina a 0,45%; corrigido baixo → manter isotônico. Alvo de diurese ≥ 0,5 mL/kg/h. Reponha metade do déficit estimado nas primeiras 12 h e o restante nas 12-24 h seguintes, sempre reavaliando.
+Depois da primeira fase, o fluido continua isotônico na maioria dos casos. O sódio sobe à medida que a glicemia cai (cerca de 1,6 mEq/L para cada 100 mg/dL), e essa subida não é indicação de salina hipotônica: o consenso de 2024 reserva a **salina a 0,45%** para quando a osmolalidade não cai apesar de balanço hídrico positivo e insulina adequada. Alvo de diurese ≥ 0,5 mL/kg/h. Reponha metade do déficit estimado nas primeiras 12 h e o restante nas 12-24 h seguintes, sempre reavaliando.
 
-O consenso ADA/EASD 2024 sugere para o EHH taxa de insulina menor que a da CAD (da ordem de 0,05 U/kg/h), e permite iniciar sem bólus. Muita insulina no EHH desloca água para o intracelular antes da reposição do déficit e agrava o colapso circulatório.
+O consenso ADA/EASD 2024 indica para o EHH insulina em dose fixa de 0,05 U/kg/h, sem bólus, e reserva 0,1 U/kg/h para a forma mista com cetonemia significativa. Parte dos autores (JBDS) prefere só ligar a insulina quando a glicemia parar de cair com a hidratação isolada. Muita insulina no EHH desloca água para o intracelular antes da reposição do déficit e agrava o colapso circulatório.
 
-Como titular sem errar: se a glicemia cai mais rápido que **90-120 mg/dL/h**, reduza a taxa de insulina ou acrescente glicose; se cai devagar demais mesmo com volume adequado, aumente. O parâmetro que manda no EHH não é a glicemia isolada, é a **velocidade de queda da osmolalidade** — mantenha-a abaixo de cerca de 3 mOsm/kg/h.
+Como titular sem errar: se a glicemia cai mais rápido que **90-120 mg/dL/h**, reduza a taxa de insulina ou acrescente glicose; se cai devagar demais mesmo com volume adequado, aumente. O parâmetro que manda no EHH não é a glicemia isolada, é a **velocidade de queda da osmolalidade** — mantenha-a entre 3 e 8 mOsm/kg/h, sem passar de 8.
 
-Assim que a glicemia atingir a faixa-alvo, acrescentar soro glicosado ao esquema de hidratação e reduzir a insulina, mantendo a infusão até que a osmolaridade e o sensório normalizem — não se suspende insulina apenas porque a glicemia caiu.
+Assim que a glicemia cair abaixo de 250 mg/dL, acrescentar soro glicosado a 5–10% ao esquema de hidratação e reduzir a insulina, mantendo a infusão até que a osmolaridade e o sensório normalizem — não se suspende insulina apenas porque a glicemia caiu.
 
 Bicarbonato não tem papel no EHH (o pH é ≥ 7,3 por definição). Fosfato só se houver hipofosfatemia grave com repercussão (fraqueza muscular, disfunção respiratória, hemólise), com monitorização do cálcio.
 
@@ -19040,10 +19040,10 @@ flowchart TD
     A["Glicemia >= 600 mg/dL<br/>rebaixamento + desidratação"] --> B["Osmolalidade efetiva > 300<br/>pH >= 7,3 e beta-OHB < 3,0?"]
     B -->|Sim| C["EHH confirmado"]
     B -->|Não| D["Investigar CAD ou forma mista"]
-    C --> E["Cristaloide 500-1000 mL/h<br/>ajustar pelo Na corrigido"]
-    E --> F["Potássio < 3,3 mEq/L?"]
+    C --> E["Cristaloide 500-1000 mL/h<br/>salina 0,45% só se a osmolalidade não cair"]
+    E --> F["Potássio abaixo de 3,5 mEq/L?"]
     F -->|Sim| G["Repor K antes da insulina"]
-    F -->|Não| H["Insulina IV 0,05-0,1 U/kg/h<br/>queda <= 90-120 mg/dL/h"]
+    F -->|Não| H["Insulina IV 0,05 U/kg/h<br/>0,1 na forma mista<br/>glicemia cai até 90-120 mg/dL/h"]
     H --> I["Tratar precipitante<br/>profilaxia de TEV"]
     class B critical;
     class F critical;
@@ -19129,7 +19129,7 @@ Há ainda uma insuficiência adrenal **relativa**: a depuração acelerada do co
 
 Vale entender por que cada droga funciona, porque isso organiza a ordem de administração. A **tionamida** inibe a tireoperoxidase e bloqueia a organificação do iodo — ou seja, impede a **síntese** de hormônio novo, mas não faz nada contra o hormônio já armazenado no coloide. O **iodo em dose alta** ataca justamente esse estoque, inibindo a liberação hormonal pelo **efeito Wolff-Chaikoff**. Mas o iodo também é substrato: se administrado antes da tionamida, é incorporado e alimenta a síntese (**efeito Jod-Basedow**), piorando a crise. Daí a regra de dar o iodo **pelo menos 1 hora depois** da tionamida — não é superstição, é bioquímica.
 
-O **propranolol** em dose alta e o **corticoide** atacam um terceiro alvo: a conversão periférica de T4 no T3 ativo pela deiodinase tipo 1. O **PTU** compartilha essa propriedade (o metimazol não), e é por isso que ele é preferido na fase aguda.
+O **propranolol** em dose alta e o **corticoide** atacam um terceiro alvo: a conversão periférica de T4 no T3 ativo pela deiodinase tipo 1. O **PTU** compartilha essa propriedade (o metimazol não), e por isso a ATA 2016 o prefere na fase aguda. O consenso europeu de 2026 (ETA/BTA/Society for Endocrinology) considera o metimazol em dose alta equivalente, porque essa vantagem teórica não se traduziu em menor mortalidade nos estudos observacionais.
 
 ## Epidemiologia
 
@@ -19221,17 +19221,17 @@ Marcadores de mau prognóstico: coma ou rebaixamento profundo, icterícia e disf
 
 ## Tratamento (com doses) — nesta ordem
 
-1. **Betabloqueador:** propranolol 60–80 mg VO 4/4–6/6h (ou esmolol IV) — controla os sintomas adrenérgicos.
-2. **Tionamida:** **propiltiouracil (PTU)** 500–1000 mg de ataque, depois 250 mg 4/4h (preferido na crise — bloqueia conversão T4→T3) ou metimazol.
-3. **Iodo (Lugol):** **só ≥ 1h APÓS a tionamida** (senão alimenta a síntese).
-4. **Hidrocortisona 100 mg IV 8/8h** (reduz conversão e trata insuf. adrenal relativa).
+1. **Betabloqueador:** propranolol 60–80 mg VO 4/4h (ou esmolol IV) — controla os sintomas adrenérgicos.
+2. **Tionamida:** **propiltiouracil (PTU)** 500–1000 mg de ataque, depois 250 mg 4/4h (bloqueia também a conversão T4→T3), ou **metimazol 60–80 mg/dia** (20 mg 6/6h), de eficácia semelhante. Prefira metimazol se transaminases acima de 3 vezes o normal ou bilirrubina subindo. Reduza assim que possível para PTU 400 mg/dia ou metimazol 30 mg/dia.
+3. **Iodo:** solução de Lugol 5%, **8 gotas VO de 6/6h** diluídas em leite ou suco, **só ≥ 1h APÓS a tionamida** (senão alimenta a síntese); suspender assim que estabilizar.
+4. **Hidrocortisona** com dose de ataque: **300 mg IV e depois 100 mg 8/8h** (ATA 2016) ou **100 mg IV e depois 50 mg 6/6h** (consenso europeu 2026). Reduz a conversão e trata a insuficiência adrenal relativa.
 5. Suporte: resfriamento (**não** usar AAS — desloca T4), volume, tratar o precipitante.
 
 O propranolol tem a vantagem adicional de reduzir a conversão periférica de T4 em T3 em doses altas. Em insuficiência cardíaca descompensada ou broncoespasmo, preferir esmolol IV, titulável e de meia-vida curta, com monitorização hemodinâmica — a taquicardia na tireotoxicose sustenta parte do débito, e o bloqueio abrupto pode precipitar colapso.
 
 Se houver contraindicação absoluta ao betabloqueio (broncoespasmo grave), alternativas são **diltiazem** para controle de frequência, com a mesma cautela hemodinâmica. Reserpina e guanetidina são recursos históricos, praticamente indisponíveis hoje.
 
-Se não houver via oral, tionamidas podem ser administradas por sonda ou por via retal; metimazol tem apresentação IV em alguns serviços. O iodeto pode ser dado como solução de Lugol ou solução saturada de iodeto de potássio; contraste iodado e carbonato de lítio são alternativas em casos selecionados.
+Se não houver via oral, tionamidas podem ser administradas por sonda ou por via retal; metimazol tem apresentação IV em alguns países europeus. O iodeto pode ser dado como solução de Lugol ou solução saturada de iodeto de potássio; contraste iodado e carbonato de lítio são alternativas em casos selecionados.
 
 O **lítio** merece um parêntese prático: inibe a liberação de hormônio pela glândula e é a alternativa quando há **alergia ao iodo** ou tireotoxicose induzida por amiodarona em que a carga de iodo adicional é indesejada. Exige dosagem sérica e vigilância de toxicidade, sobretudo na disfunção renal.
 
@@ -19239,7 +19239,7 @@ Colestiramina interrompe a circulação êntero-hepática dos hormônios e pode 
 
 Suporte inclui reposição volêmica generosa (as perdas são grandes), reposição de glicose e tiamina, resfriamento externo com paracetamol como antitérmico, correção de eletrólitos, profilaxia de TEV, anticoagulação conforme risco na fibrilação atrial e tratamento do precipitante — antibiótico empírico quando houver qualquer suspeita de infecção.
 
-Alguns detalhes de suporte que mudam desfecho: as perdas insensíveis pela febre e pela sudorese podem chegar a vários litros por dia, e a hidratação precisa contemplar isso; use **glicose nas soluções**, porque o estoque de glicogênio se esgota rapidamente no estado hipermetabólico; reponha **tiamina** antes ou junto da glicose; e no resfriamento externo, se houver calafrios, considere sedação leve, porque o tremor gera mais calor do que a medida remove. **Meperidina** é o fármaco classicamente citado para conter calafrio nesse contexto.
+Alguns detalhes de suporte que mudam desfecho: as perdas insensíveis pela febre e pela sudorese podem chegar a vários litros por dia, e a hidratação precisa contemplar isso; use **glicose nas soluções**, porque o estoque de glicogênio se esgota rapidamente no estado hipermetabólico; reponha **tiamina** junto com a glicose, sem atrasá-la; e no resfriamento externo, se houver calafrios, considere sedação leve, porque o tremor gera mais calor do que a medida remove. **Meperidina** é o fármaco classicamente citado para conter calafrio nesse contexto.
 
 Quanto à anticoagulação na fibrilação atrial da tireotoxicose: a decisão segue a avaliação de risco individual, mas há dois pontos técnicos importantes — a tireotoxicose **aumenta a depuração dos fatores dependentes de vitamina K**, tornando o paciente mais sensível à varfarina, e a reversão ao ritmo sinusal costuma ocorrer espontaneamente quando o eutireoidismo é restaurado, de modo que cardioversão eletiva, quando indicada, é feita **depois** do controle hormonal.
 
@@ -19248,11 +19248,11 @@ flowchart TD
     A["Tireotoxicose + descompensação sistêmica<br/>febre, taquiarritmia, disfunção neurológica"] --> B["Burch-Wartofsky >= 45<br/>ou descompensação evidente?"]
     B -->|Sim| C["Tratar sem esperar exames"]
     B -->|Não| D["Escore 25-44: julgamento clínico<br/>tireotoxicose grave sem tempestade"]
-    C --> E["1 Betabloqueador<br/>propranolol 60-80 mg 4/4-6/6h ou esmolol IV"]
-    E --> F["2 Tionamida<br/>PTU 500-1000 mg ataque, 250 mg 4/4h"]
+    C --> E["1 Betabloqueador<br/>propranolol 60-80 mg 4/4h ou esmolol IV"]
+    E --> F["2 Tionamida<br/>PTU 500-1000 mg ataque, 250 mg 4/4h<br/>ou metimazol 60-80 mg/dia"]
     F --> G["Aguardar pelo menos 1 hora"]
-    G --> H["3 Iodo (Lugol)"]
-    H --> I["4 Hidrocortisona 100 mg IV 8/8h<br/>5 suporte e tratar precipitante"]
+    G --> H["3 Iodo: Lugol 8 gotas 6/6h"]
+    H --> I["4 Hidrocortisona com ataque<br/>300 mg e 100 mg 8/8h ou 100 mg e 50 mg 6/6h<br/>5 suporte e tratar precipitante"]
     class B critical;
     class G critical;
     class I action;
@@ -19309,7 +19309,7 @@ Oriente por escrito, antes da alta: **nunca interromper a tionamida por conta pr
 - Erro clássico: esperar o resultado do T4 livre para iniciar tratamento. O diagnóstico é clínico.
 - Erro clássico: betabloquear com dose plena um paciente já em baixo débito. Preferir esmolol titulado e avaliar função ventricular.
 - Erro clássico: atribuir a febre exclusivamente à tempestade e não procurar infecção. O precipitante mais comum é infeccioso.
-- PTU é preferido na crise pelo bloqueio da conversão periférica, mas tem risco de hepatotoxicidade grave — após a fase aguda, migrar para metimazol.
+- PTU tem a vantagem teórica de bloquear a conversão periférica, mas não reduziu mortalidade frente ao metimazol em dose alta e tem risco de hepatotoxicidade grave. Com disfunção hepática, use metimazol; após a fase aguda, migre para ele.
 - No idoso, fibrilação atrial de início recente com perda de peso e apatia merece dosagem de TSH mesmo sem bócio.
 - Amiodarona pode ser causa e é péssima opção para controlar a arritmia nesse contexto — pela carga de iodo.
 - **Não titule pelo TSH nas primeiras semanas.** Ele permanece suprimido mesmo com T4 livre já normal ou baixo — guie-se por T4 livre e T3.
@@ -19866,7 +19866,7 @@ Qualquer paciente com insuficiência adrenal conhecida e doença aguda deve ser 
 
 ## Tratamento (com doses)
 
-- **Crise:** **hidrocortisona 100 mg IV** em bolus, depois 50 mg 6/6h (ou 200 mg/24h em BIC) + **SF 0,9% vigoroso** + corrigir hipoglicemia; tratar o precipitante.
+- **Crise:** **hidrocortisona 100 mg IV** em bolus, depois 50 mg 6/6h (ou 200 mg/24h em BIC) + **SF 0,9% 1.000 mL na primeira hora**, depois guiado pela volemia, + corrigir hipoglicemia; tratar o precipitante.
 - Manutenção: hidrocortisona VO (15–25 mg/dia divididos) + **fludrocortisona** na primária; orientar **dose de estresse** (dobrar/triplicar em doença/cirurgia) e cartão de alerta.
 
 Não espere confirmação laboratorial. Se houver necessidade absoluta de confirmar o diagnóstico depois, colha cortisol e ACTH **antes** da primeira dose e faça a cobertura inicial com dexametasona, que não interfere no ensaio — mas nunca troque isso por atraso terapêutico.
@@ -19875,7 +19875,7 @@ Vale insistir nesse ponto porque é o erro que mais mata nessa doença: **a hidr
 
 Em doses altas de hidrocortisona, o efeito mineralocorticoide é suficiente e a fludrocortisona é dispensável na fase aguda; ela se reintroduz quando a hidrocortisona cai abaixo de cerca de 50 mg/dia, apenas na forma primária.
 
-No Brasil, a hidrocortisona intravenosa nem sempre está disponível em unidades menores. Alternativas aceitáveis na emergência são metilprednisolona ou dexametasona intravenosas, lembrando que a dexametasona não tem atividade mineralocorticoide e exige atenção redobrada ao volume e ao sódio.
+No Brasil, a hidrocortisona intravenosa nem sempre está disponível em unidades menores. Na falta dela, use metilprednisolona IV em dose equivalente (20 mg de 12/12 h equivalem a 200 mg/dia de hidrocortisona). A Endocrine Society coloca a dexametasona como última opção, só se não houver outro glicocorticoide: ela não tem atividade mineralocorticoide e exige atenção redobrada ao volume e ao sódio.
 
 Na manutenção, fracionar a hidrocortisona para mimetizar o ritmo circadiano (maior dose ao acordar). Onde não há hidrocortisona oral, usa-se prednisona em dose equivalente baixa, com desvantagem de meia-vida mais longa. Ajustar a fludrocortisona pela pressão arterial, pelo edema, pelo potássio e pela renina plasmática.
 
@@ -19903,7 +19903,7 @@ Essa é a parte do tratamento que o paciente executa sozinho, longe do hospital,
 
 **Regra 4 — calor extremo, exercício prolongado e trabalho de parto.** Situações de perda de sal e de estresse fisiológico intenso pedem hidratação, sal e ajuste de dose combinado previamente com o médico assistente. O trabalho de parto é tratado como cirurgia de grande porte.
 
-**Regra 5 — o que não faz parte das regras.** Estresse emocional isolado, viagem sem doença e resfriado sem febre não exigem aumento rotineiro de dose. Aumentar dose por qualquer contrariedade leva a hipercortisolismo iatrogênico — o outro lado do problema.
+**Regra 5 — o que não faz parte das regras.** Contrariedades do dia a dia, viagem sem doença e resfriado sem febre não exigem aumento rotineiro de dose. Estresse emocional intenso é exceção: a diretriz ESE/Endocrine Society de 2024 o inclui entre os estresses menores que pedem dose oral dobrada na insuficiência induzida por glicocorticoide. Aumentar dose por qualquer contrariedade leva a hipercortisolismo iatrogênico — o outro lado do problema.
 
 Itens materiais que o paciente precisa ter, e que devem ser checados em consulta como se checa a prescrição: **cartão ou pulseira de alerta** com o diagnóstico e a conduta de emergência; **ampola de hidrocortisona injetável** em casa e na viagem, com seringa e agulha; **treinamento do paciente e de pelo menos um familiar** para aplicar a injeção; **estoque extra** de comprimidos e receita válida; e um **plano escrito** de dose de estresse, em linguagem simples, para mostrar a qualquer médico que o atenda.
 
@@ -19948,7 +19948,7 @@ flowchart TD
     B -->|Sim| C["Hidrocortisona 100 mg intramuscular em casa<br/>e ir ao pronto-socorro agora"]
     B -->|Não| D["Tem febre ou infecção?"]
     D -->|Sim| E["Dobrar ou triplicar a dose oral<br/>até 24-48h após a melhora"]
-    D -->|Não| F["Manter a dose habitual<br/>estresse emocional não exige aumento"]
+    D -->|Não| F["Manter a dose habitual<br/>contrariedade do dia a dia não exige aumento"]
     E --> G["Piora, tontura, confusão ou não melhora?"]
     G -->|Sim| C
     G -->|Não| H["Retomar dose habitual e avisar o médico"]
@@ -20323,7 +20323,7 @@ Fatores associados a maior risco metastático: mutação em SDHB, tumor volumoso
 
 - **Cirurgia** (ressecção) é curativa.
 - **Preparo pré-operatório obrigatório:** **alfabloqueio primeiro** (fenoxibenzamina ou doxazosina) por 10–14 dias + expansão de volume/sal; **só depois** acrescentar betabloqueador (controlar a taquicardia).
-- Crise hipertensiva: nitroprussiato IV (0,25–0,3 mcg/kg/min, titulado até 10 mcg/kg/min) é a opção prática no Brasil; fentolamina IV, citada nas diretrizes internacionais, não tem apresentação injetável comercializada aqui. Sulfato de magnésio IV é adjuvante.
+- Crise hipertensiva: nitroprussiato IV (0,25–0,3 mcg/kg/min, titulado até 10 mcg/kg/min) é a opção prática no Brasil; fentolamina IV, citada nas diretrizes internacionais, não tem registro ativo na Anvisa (o registro do Regitina injetável venceu). Sulfato de magnésio IV é adjuvante.
 
 No Brasil, a fenoxibenzamina não é comercializada; o preparo é feito na prática com **doxazosina**, começando com 2 mg/dia e titulando a cada poucos dias até o alvo (em geral até 16 mg/dia, podendo chegar a 32 mg/dia). São metas razoáveis de preparo: pressão arterial controlada com hipotensão postural discreta tolerada, frequência cardíaca controlada, ausência de paroxismos e sinais de reexpansão volêmica (aumento de peso e queda do hematócrito). Dieta liberal em sal e hidratação generosa nos dias que antecedem a cirurgia são parte do protocolo, salvo insuficiência cardíaca ou renal.
 
@@ -21157,7 +21157,7 @@ flowchart TD
 
 **Doença renal crônica.** A excreção de potássio está comprometida; metade da dose e o dobro da vigilância. Nunca prescreva reposição "de manutenção" fixa em DRC sem dosagem seriada.
 
-**Cetoacidose diabética.** O potássio sérico inicial engana: costuma estar normal ou alto por acidose e insulinopenia, enquanto o corpo já perdeu 300–600 mEq pela diurese osmótica. A insulina despenca esse valor rapidamente. Por isso a regra: **K < 3,3 mEq/L adia a insulina** e reponha primeiro; entre 3,3 e 5,2, adicione 20–30 mEq de potássio a cada litro de fluido.
+**Cetoacidose diabética.** O potássio sérico inicial engana: costuma estar normal ou alto por acidose e insulinopenia, enquanto o corpo já perdeu 300–600 mEq pela diurese osmótica. A insulina despenca esse valor rapidamente. Por isso a regra do consenso ADA/EASD 2024: **K < 3,5 mEq/L adia a insulina** e reponha primeiro (a SBD 2023 usa 3,3); entre 3,5 e 5,0, adicione 20–30 mEq de potássio a cada litro de fluido.
 
 **Cirrótico.** A hipocalemia aumenta a amoniogênese renal e **precipita encefalopatia hepática** — corrigir potássio é parte do tratamento da encefalopatia, não uma tarefa paralela.
 
@@ -21165,7 +21165,7 @@ flowchart TD
 
 **Transtorno alimentar / uso oculto de laxante e diurético.** Cloro urinário e potássio urinário orientam; a reposição deve vir acompanhada de abordagem do transtorno, ou o quadro recorre indefinidamente.
 
-**Gestante.** Hiperêmese gravídica produz hipocalemia com alcalose; a reposição é a mesma, com atenção redobrada a tiamina antes de qualquer soro glicosado.
+**Gestante.** Hiperêmese gravídica produz hipocalemia com alcalose; a reposição é a mesma, com tiamina junto com o primeiro soro glicosado (ou logo antes), sem atrasar a glicose.
 
 ## Complicações
 
@@ -21203,7 +21203,7 @@ Se a causa foi hiperaldosteronismo primário, o seguimento é endocrinológico e
 
 **Cuidado com a redistribuição.** Na cetoacidose, na paralisia periódica tireotóxica e na intoxicação por beta-agonista, o potássio corporal total pode estar normal — repor agressivamente causa **hipercalemia de rebote** quando o potássio volta do intracelular. Nesses casos, reponha com cautela e monitorize de perto.
 
-**A cetoacidose diabética tem regra própria:** se o K inicial for < 3,3 mEq/L, **adie a insulina** e reponha potássio primeiro — a insulina pode precipitar arritmia fatal.
+**A cetoacidose diabética tem regra própria:** se o K inicial for < 3,5 mEq/L (consenso ADA/EASD 2024; a SBD 2023 usa 3,3), **adie a insulina** e reponha potássio primeiro — a insulina pode precipitar arritmia fatal.
 
 **Não confie no ECG normal.** Ele não exclui hipocalemia grave; e a onda U é sinal tardio.
 
@@ -21695,9 +21695,9 @@ Esse detalhe muda a beira do leito: um paciente que entra com fósforo 4,0 e cai
 
 **Grave/sintomática (< 1,0 ou respiratória):** **fosfato IV** (de potássio ou de sódio) com monitorização de Ca/P/K. Esquemas por peso amplamente usados: **0,08–0,16 mmol/kg** em 6 h para reposições moderadas e **0,16–0,5 mmol/kg** infundidos ao longo de 4–6 h nos déficits maiores, com velocidade habitual de **1–3 mmol/h** até o fósforo passar de 2,0 mg/dL. Redosar o fósforo **4–6 h após** o término e repetir o ciclo conforme necessário — a correção de hipofosfatemia grave costuma exigir várias etapas.
 
-Escolha do sal: use **fosfato de potássio** quando o potássio também estiver baixo (cada mmol de fosfato traz ~1,47 mEq de potássio) e **fosfato de sódio** quando houver hipercalemia ou disfunção renal. Na doença renal crônica, reduza a dose e monitore de perto.
+Escolha do sal: use **fosfato de potássio** quando o potássio também estiver baixo (na ampola brasileira de fosfato de potássio 2 mEq/mL, cada mL traz 2 mEq de potássio e 1,1 mmol de fosfato, ou seja, cerca de 1,8 mEq de potássio por mmol; a proporção de 1,47 mEq/mmol é a do produto americano de 3 mmol/mL) e **fosfato de sódio** quando houver hipercalemia ou disfunção renal. Na doença renal crônica, reduza a dose e monitore de perto.
 
-**Cálculo prático da carga de potássio.** Uma reposição de 30 mmol de fosfato de potássio carrega cerca de 44 mEq de potássio — dose que, em paciente com clearance reduzido, é suficiente para causar hipercalemia perigosa. Sempre some essa carga ao potássio que já está sendo reposto por outra via; o erro de somar duas fontes de potássio sem perceber é causa reconhecida de parada cardíaca hospitalar.
+**Cálculo prático da carga de potássio.** Com a ampola brasileira de 2 mEq/mL, uma reposição de 30 mmol de fosfato corresponde a cerca de 27 mL e carrega cerca de 54 mEq de potássio — dose que, em paciente com clearance reduzido, é suficiente para causar hipercalemia perigosa. Sempre some essa carga ao potássio que já está sendo reposto por outra via; o erro de somar duas fontes de potássio sem perceber é causa reconhecida de parada cardíaca hospitalar.
 
 Riscos da infusão rápida: **hipocalcemia** (quelação e precipitação de fosfato de cálcio), calcificação metastática, lesão renal aguda, hipercalemia (com o sal de potássio), hipernatremia (com o de sódio) e arritmia. Por isso a regra: **diluir, infundir devagar, monitorar cálcio e potássio junto**. Evite reposição IV agressiva quando o cálcio já estiver baixo — corrija o cálcio antes ou em paralelo.
 
@@ -21904,7 +21904,7 @@ O uso indevido do ICH Score é um problema real e documentado: quando a equipe a
 | Antiagregante (AAS, clopidogrel) | **Não transfundir plaquetas de rotina** | O ensaio PATCH mostrou **pior** desfecho com transfusão. Exceção: plaquetopenia real ou necessidade de neurocirurgia iminente |
 | Trombolítico recente | Crioprecipitado 10 U + ácido tranexâmico 1 g EV em 10 min | Repetir o crioprecipitado se fibrinogênio <150 mg/dL |
 
-No Brasil, idarucizumabe e andexanet têm disponibilidade limitada e custo elevado, e os DOAC não foram incorporados ao SUS para fibrilação atrial não valvar — na prática, **a coagulopatia que você mais vai reverter na rede pública é a da varfarina**, com CCP e vitamina K. Onde não há CCP, o plasma fresco congelado é a alternativa disponível, com a ressalva do volume infundido e do tempo de correção.
+No Brasil, idarucizumabe e andexanet têm disponibilidade limitada e custo elevado, e os DOAC não foram incorporados ao SUS para fibrilação atrial não valvar (recomendação contrária da Conitec de 2016, ainda vigente em 2026) — na prática, **a coagulopatia que você mais vai reverter na rede pública é a da varfarina**, com CCP e vitamina K. Onde não há CCP, o plasma fresco congelado é a alternativa disponível, com a ressalva do volume infundido e do tempo de correção.
 
 ### O que a cirurgia resolve e o que não resolve
 
@@ -23534,11 +23534,11 @@ A magnitude do efeito é grande para uma intervenção sem fármaco: no programa
 
 Vale detalhar a higiene do sono hospitalar, porque é a medida mais negligenciada: agrupar coletas e sinais vitais para não acordar o paciente de madrugada, apagar luzes entre 22h e 6h, oferecer tampão de ouvido e máscara ocular, silenciar alarmes desnecessários, evitar banho de leito na madrugada e não prescrever medicação de rotina às 2h. Nenhuma dessas medidas custa dinheiro; todas custam disciplina de equipe.
 
-Na revisão de medicamentos, o alvo prioritário são os anticolinérgicos, muitas vezes invisíveis porque não são pensados como tal: difenidramina e prometazina (frequentes como "para dormir" ou pré-medicação), hioscina, oxibutinina, amitriptilina, ranitidina, ciclobenzaprina. Somam-se benzodiazepínicos, hipnóticos Z, opioides em dose alta (sobretudo meperidina, que deve ser evitada no idoso), corticoide em pulso, anti-histamínicos e relaxantes musculares. Calcule mentalmente a carga anticolinérgica total, não a segurança de cada droga isolada.
+Na revisão de medicamentos, o alvo prioritário são os anticolinérgicos, muitas vezes invisíveis porque não são pensados como tal: difenidramina e prometazina (frequentes como "para dormir" ou pré-medicação), hioscina, oxibutinina, amitriptilina, paroxetina, dexclorfeniramina, ciclobenzaprina. Somam-se benzodiazepínicos, hipnóticos Z, opioides em dose alta (sobretudo meperidina, que deve ser evitada no idoso), corticoide em pulso, anti-histamínicos e relaxantes musculares. Calcule mentalmente a carga anticolinérgica total, não a segurança de cada droga isolada.
 
 Dor mal tratada também precipita delirium — o erro simétrico de sedar o idoso é deixá-lo com dor por medo do opioide. Prefira analgesia multimodal com paracetamol e dipirona em horário fixo, bloqueios regionais quando disponíveis (o bloqueio de fáscia ilíaca na fratura de quadril é exemplar) e opioide em dose baixa e titulada.
 
-Não há evidência que sustente antipsicótico profilático para prevenir delirium. Também não há evidência para melatonina, dexmedetomidina profilática fora de contextos específicos de UTI, ou inibidor de colinesterase — a rivastigmina, testada em UTI, foi associada a maior mortalidade e não deve ser usada com essa finalidade.
+Não há evidência que sustente antipsicótico profilático para prevenir delirium. Também não há evidência para dexmedetomidina profilática fora de contextos específicos de UTI, nem para inibidor de colinesterase: a rivastigmina, testada em UTI, foi associada a maior mortalidade e não deve ser usada com essa finalidade. A melatonina fica num meio-termo. Fora da UTI, a NICE não a inclui na prevenção; na UTI, a atualização PADIS 2025 sugere oferecê-la, em recomendação condicional e de certeza baixa, voltada ao sono.
 
 ## Tratamento
 
@@ -23575,11 +23575,11 @@ Benzodiazepínico só tem indicação de primeira linha na **abstinência alcoó
 
 Contenção física deve ser o último recurso, pelo menor tempo possível, com prescrição, justificativa e reavaliação frequentes: ela aumenta agitação, lesão, imobilidade e a própria duração do delirium.
 
-Sobre a razão de o benzodiazepínico piorar: ele agrava a desatenção, amplifica a sedação diurna e a inversão do ciclo, causa reação paradoxal com agitação no idoso e prolonga a duração do episódio. Em UTI, protocolos que evitam infusão contínua de benzodiazepínico e privilegiam propofol ou dexmedetomidina associam-se a menos delirium. A exceção é rígida e única: **abstinência de álcool ou de benzodiazepínico**, na qual o benzodiazepínico é o tratamento e não a causa.
+Sobre a razão de o benzodiazepínico piorar: ele agrava a desatenção, amplifica a sedação diurna e a inversão do ciclo, causa reação paradoxal com agitação no idoso e prolonga a duração do episódio. Em UTI, protocolos que evitam infusão contínua de benzodiazepínico e privilegiam propofol ou dexmedetomidina associam-se a menos delirium. A atualização PADIS 2025 vai além e sugere dexmedetomidina em vez de propofol no paciente em ventilação mecânica quando sedação leve ou menos delirium são a prioridade. A exceção é rígida e única: **abstinência de álcool ou de benzodiazepínico**, na qual o benzodiazepínico é o tratamento e não a causa.
 
 Na abstinência alcoólica, a conduta é titulada por sintomas (por exemplo, protocolos guiados por escala tipo CIWA-Ar), com tiamina parenteral em dose alta junto de qualquer aporte de glicose, sem atrasar a glicose, reposição de magnésio e de potássio e atenção à hipoglicemia. Diazepam tem meia-vida longa e autotitulação favorável, mas prefira lorazepam por via oral (não há apresentação injetável no Brasil) no hepatopata e no idoso frágil, pela ausência de metabólitos ativos.
 
-Uma nota prática sobre a via: em paciente agitado que recusa medicação oral, o haloperidol pode ser administrado por via intramuscular, mas a via intravenosa exige monitorização de ECG pelo risco de prolongamento de QT e torsades. Cheque potássio e magnésio, revise a prescrição em busca de outros fármacos que prolongam QT (ondansetrona, quinolonas, azitromicina, antidepressivos) e evite doses repetidas em curto intervalo sem reavaliar.
+Uma nota prática sobre a via: em paciente agitado que recusa medicação oral, o haloperidol pode ser administrado por via intramuscular, a única registrada para a ampola no Brasil; a via intravenosa é uso fora da bula e exige monitorização contínua de ECG pelo risco de prolongamento de QT e torsades. Cheque potássio e magnésio, revise a prescrição em busca de outros fármacos que prolongam QT (ondansetrona, quinolonas, azitromicina, antidepressivos) e evite doses repetidas em curto intervalo sem reavaliar.
 
 Nem toda agitação é delirium hiperativo: descarte dor, retenção urinária, hipóxia, hipoglicemia e abstinência **antes** de prescrever antipsicótico. Prescrever haloperidol para um paciente com globo vesical é tratar o alarme e ignorar o incêndio.
 
@@ -27034,16 +27034,16 @@ A **hipoglicemia** merece vigilância ativa e reposição contínua com soluçã
 ## Tratamento (com doses)
 
 - **N-acetilcisteína (NAC)** — antídoto de escolha; repõe/poupa glutationa e tem ação antioxidante e hemodinâmica adicional na falência já estabelecida. Indicações: nível acima da linha de tratamento no nomograma; ingestão de dose potencialmente tóxica com nível indisponível ou apresentação tardia; qualquer paciente com hepatotoxicidade (TGO/TGP elevadas) de causa compatível, mesmo com nível indetectável.
-- **Protocolo IV clássico (3 bolsas, padrão FDA):** 150 mg/kg em 200 mL SG5% em 60 min → 50 mg/kg em 500 mL SG5% em 4h → 100 mg/kg em 1000 mL SG5% em 16h (total 300 mg/kg em 21h). Reações anafilactoides (rash, broncoespasmo) são comuns na 1ª bolsa — desacelerar a infusão e tratar com anti-histamínico costuma bastar, raramente exige suspender.
-- **Protocolo de 2 bolsas** (alternativa off-label cada vez mais adotada, mesma dose total de 300 mg/kg): 200 mg/kg em 3h → 100 mg/kg nas 20h seguintes; menor taxa de reações e erros de programação em séries recentes — o protocolo de 3 bolsas segue sendo o padrão/aprovado.
+- **Protocolo IV clássico (3 bolsas, padrão FDA e o que consta da bula brasileira):** 150 mg/kg em 200 mL SG5% em 60 min → 50 mg/kg em 500 mL SG5% em 4h → 100 mg/kg em 1000 mL SG5% em 16h (total 300 mg/kg em 21h). Reações anafilactoides (rash, broncoespasmo) são comuns na 1ª bolsa — desacelerar a infusão e tratar com anti-histamínico costuma bastar, raramente exige suspender.
+- **Protocolo de 2 bolsas** (padrão da diretriz australiana e neozelandesa de 2020, fora da bula no Brasil, mesma dose total de 300 mg/kg): 200 mg/kg em 500 mL de SG5% em 4h → 100 mg/kg em 1000 mL de SG5% nas 16h seguintes (20h no total); menor taxa de reações e de erros de programação. No Brasil, a bula continua com o esquema de 3 bolsas.
 - **NAC oral** (se IV indisponível): dose de ataque 140 mg/kg, depois 70 mg/kg de 4/4h por 17 doses.
 - **Eficácia:** praticamente 100% de proteção hepática se iniciada em **< 8h** da ingestão; eficácia decrescente após isso, mas ainda benéfica mesmo tardiamente, inclusive na falência hepática já instalada (reduz mortalidade, melhora hemodinâmica e oferta de O2 tecidual).
-- **Carvão ativado 1 g/kg VO** se ingestão < 1–2h (ideal < 1h) e via aérea protegida/paciente colaborativo.
+- **Carvão ativado 1 g/kg VO** (50 g no adulto) se ingestão < 2h (ideal < 1h), ou até 4h se a dose ingerida for de 30 g ou mais, com via aérea protegida/paciente colaborativo.
 - Corrigir coagulopatia apenas se sangramento ativo ou procedimento invasivo (não "profilaticamente", pois o INR é usado para seguir a evolução e os critérios de transplante).
 
 ### NAC intravenosa × oral: qual escolher
 
-A via **intravenosa** é preferida na maioria das situações: garante a dose em paciente com vômitos, permite tratamento em quem tem rebaixamento de consciência e é obrigatória na insuficiência hepática instalada. A via **oral** é uma alternativa legítima quando não há apresentação IV disponível — situação real em muitos serviços brasileiros, onde a acetilcisteína comercializada tem concentração muito abaixo da necessária para uso parenteral.
+A via **intravenosa** é preferida na maioria das situações: garante a dose em paciente com vômitos, permite tratamento em quem tem rebaixamento de consciência e é obrigatória na insuficiência hepática instalada. A via **oral** é uma alternativa legítima quando não há apresentação IV disponível — situação real em muitos serviços brasileiros. A acetilcisteína injetável vendida aqui vem em ampolas de 300 mg (100 mg/mL, 3 mL), e a bula inclui o uso EV como antídoto do paracetamol; o obstáculo é a quantidade: um adulto de 70 kg precisa de cerca de 70 ampolas no esquema de 21 horas, e poucos hospitais têm esse estoque.
 
 O problema prático da via oral é a **tolerância**: o cheiro e o gosto sulfurados provocam náusea e vômito em boa parte dos pacientes. Dilua em suco cítrico ou refrigerante, sirva gelado, use canudo e copo tampado, e associe antiemético (ondansetrona) de rotina. Se o paciente vomitar em até 1 hora após a dose, **repita a dose**.
 
@@ -27065,7 +27065,7 @@ Em concentrações **acima do dobro da linha do nomograma**, a dose padrão de N
 
 Um marcador prático de que a dose está insuficiente: **nível de paracetamol ainda ≥ 100 µg/mL ao final da primeira bolsa**. Nesse cenário, aumente a velocidade de infusão ou a dose.
 
-Em ingestão maciça com acidose lática e coma precoces, existe ainda o uso adjuvante de **fomepizol** (inibe o CYP2E1, reduzindo a formação de NAPQI) e de **hemodiálise** (remove paracetamol e corrige a acidose) — medidas de exceção, sempre com toxicologia.
+Em ingestão maciça com acidose lática e coma precoces, existe ainda o uso adjuvante de **fomepizol** (não comercializado no Brasil) (inibe o CYP2E1, reduzindo a formação de NAPQI) e de **hemodiálise** (remove paracetamol e corrige a acidose) — medidas de exceção, sempre com toxicologia.
 
 ### Quando parar a NAC
 
@@ -41206,7 +41206,7 @@ Na prática, a régua é simples: **quanto pior o grau, mais cedo a drenagem**. 
 
 ## Tratamento com doses e timing
 
-1. **Ressuscitação** + **antibiótico IV precoce** (ceftriaxona + metronidazol; piperacilina-tazobactam se grave/nosocomial). Colher hemoculturas antes, sem atrasar a primeira dose. Culturas de bile no momento da drenagem orientam o descalonamento.
+1. **Ressuscitação** + **antibiótico IV precoce** (ceftriaxona, com metronidazol se houver anastomose biliodigestiva; piperacilina-tazobactam se grave ou associada a cuidados de saúde, somando vancomicina no grau III). Colher hemoculturas antes, sem atrasar a primeira dose. Culturas de bile no momento da drenagem orientam o descalonamento.
 2. **Drenagem biliar** (pilar): **CPRE** (papilotomia + retirada do cálculo/stent); percutânea se CPRE indisponível. Nas formas graves, a drenagem é urgente; nas moderadas, precoce; nas leves que respondem, pode ser programada na mesma internação.
 3. Grave → UTI; colecistectomia eletiva depois.
 
@@ -41214,9 +41214,9 @@ Na prática, a régua é simples: **quanto pior o grau, mais cedo a drenagem**. 
 
 | Cenário | Esquema habitual |
 | --- | --- |
-| Comunitário, grau I–II | Ceftriaxona + metronidazol; ampicilina-sulbactam como alternativa conforme perfil local |
+| Comunitário, grau I–II | Ceftriaxona; somar metronidazol se houver anastomose biliodigestiva. Ampicilina-sulbactam só se a resistência local da *E. coli* for menor que 20% |
 | Grave (grau III), nosocomial, manipulação biliar prévia | Piperacilina-tazobactam ou carbapenêmico, conforme epidemiologia local |
-| Suspeita de enterococo (prótese, anastomose biliodigestiva, imunossuprimido) | Incluir cobertura para enterococo |
+| Grau III comunitário, infecção associada a cuidados de saúde ou suspeita de enterococo (prótese, anastomose biliodigestiva, imunossuprimido) | Somar vancomicina até a cultura; trocar por ampicilina se o enterococo vier sensível |
 | Alergia a betalactâmico | Quinolona + metronidazol, atento à resistência crescente de *E. coli* |
 
 O metronidazol se justifica sobretudo nos pacientes com anastomose biliodigestiva, prótese ou manipulação prévia, em que a flora anaeróbia é mais relevante.
@@ -41266,7 +41266,7 @@ flowchart TD
 
 **Abscesso hepático** — febre persistente apesar de antibiótico e drenagem, com dor e elevação de fosfatase alcalina; tomografia confirma. Abscessos múltiplos e pequenos podem responder só a antibiótico prolongado; os maiores exigem drenagem.
 
-**Pancreatite pós-CPRE** — dor epigástrica com lipase elevada nas horas seguintes ao procedimento. Prevenção com indometacina retal e hidratação; prótese pancreática em pacientes selecionados.
+**Pancreatite pós-CPRE** — dor epigástrica com lipase elevada nas horas seguintes ao procedimento. Prevenção com AINE retal (diclofenaco ou indometacina 100 mg, logo antes ou logo depois da CPRE) e hidratação; prótese pancreática em pacientes selecionados.
 
 **Sangramento pós-papilotomia** — melena ou queda de hemoglobina após o procedimento, maior risco em coagulopatia e uso de antitrombóticos. Costuma ser controlado endoscopicamente.
 
@@ -41483,11 +41483,11 @@ Um ponto que confunde: a **duração dos sintomas acima de 72 horas classifica c
 
 ## Tratamento com doses e timing
 
-- Jejum, hidratação, analgesia; **antibiótico** (ceftriaxona + metronidazol). Analgesia com anti-inflamatório ou opioide conforme intensidade; corrigir eletrólitos e tratar comorbidades descompensadas.
-- **Colecistectomia laparoscópica precoce** (idealmente < 72h) — definitivo. Operar cedo reduz tempo de internação, custo e complicações em comparação com a estratégia de "esfriar e operar depois". Quando a janela ideal foi perdida mas o paciente segue com sintomas e sem sinais de complicação, a decisão é individualizada em serviço experiente.
+- Jejum, hidratação, analgesia; **antibiótico** (ceftriaxona; somar metronidazol se houver anastomose biliodigestiva ou colecistite enfisematosa). Analgesia com anti-inflamatório ou opioide conforme intensidade; corrigir eletrólitos e tratar comorbidades descompensadas.
+- **Colecistectomia laparoscópica precoce** (idealmente < 72h) — definitivo. Operar cedo reduz tempo de internação, custo e complicações em comparação com a estratégia de "esfriar e operar depois". Passada a janela de 72 horas, a WSES 2020 ainda prefere operar na mesma internação, desde que dentro de 7 dias da admissão e 10 dias do início dos sintomas; fora disso, a colecistectomia tardia fica para depois de 6 semanas.
 - Alto risco cirúrgico/grave: colecistostomia percutânea. Ela descomprime a vesícula e permite estabilizar o paciente, com colecistectomia programada depois — ou, em pacientes muito frágeis, manejo definitivo com o dreno.
 
-Sobre a escolha do antimicrobiano, a lógica é a gravidade e a origem da infecção. Nos quadros leves, adquiridos na comunidade, um esquema de espectro estreito cobrindo Gram-negativos entéricos é suficiente. Nos quadros moderados e graves, ou em paciente com uso recente de antibiótico, manipulação biliar prévia ou internação, amplia-se o espectro para incluir *Pseudomonas*, enterococo e anaeróbios, com escalonamento para piperacilina-tazobactam ou carbapenêmico conforme o perfil de resistência local.
+Sobre a escolha do antimicrobiano, a lógica é a gravidade e a origem da infecção. Nos quadros leves, adquiridos na comunidade, um esquema de espectro estreito cobrindo Gram-negativos entéricos é suficiente. No grau II comunitário, a ceftriaxona continua suficiente. No grau III, ou em paciente com uso recente de antibiótico, manipulação biliar prévia ou internação, amplia-se o espectro para incluir *Pseudomonas* e anaeróbios, com piperacilina-tazobactam ou carbapenêmico conforme o perfil de resistência local, e soma-se vancomicina para cobrir enterococo até a cultura.
 
 A cobertura de anaeróbios é obrigatória quando há anastomose biliodigestiva, e sempre justificada nos quadros complicados. Colher **hemoculturas antes do antibiótico** nos graus II e III, e cultura da bile no intraoperatório ou na drenagem, é o que permite descalonar com segurança depois.
 
@@ -41497,7 +41497,7 @@ Aspectos técnicos que importam ao clínico: quando a dissecção do trígono he
 
 O conceito que organiza a segurança da operação é a **visão crítica de segurança**: antes de clipar qualquer estrutura, o cirurgião deve ter o trígono limpo de gordura e tecido fibroso, o terço inferior da vesícula descolado do leito hepático e apenas duas estruturas entrando na vesícula. Se essa visão não puder ser obtida, o caminho é a subtotal, a conversão ou a colangiografia — não a tentativa persistente.
 
-O antibiótico é suspenso precocemente após colecistectomia não complicada. Nas formas complicadas, mantém-se curso curto no pós-operatório, guiado pela evolução e por culturas.
+Nos graus I e II, o antibiótico é suspenso em até 24 horas após a colecistectomia. No grau III, ou quando a cirurgia encontra perfuração, gangrena ou enfisema, mantém-se por 4 a 7 dias após o controle do foco; bacteremia por enterococo ou estreptococo pede 2 semanas.
 
 Elevação de bilirrubinas, fosfatase alcalina ou dilatação de via biliar exigem investigar coledocolitíase antes ou durante a cirurgia — com colangiorressonância, ecoendoscopia, colangiografia intraoperatória ou CPRE.
 
@@ -41566,7 +41566,7 @@ Sobre cálculo assintomático: a conduta padrão é expectante. Indicações de 
 
 ## Contexto SUS e realidade brasileira
 
-Ceftriaxona, metronidazol, ciprofloxacino, ampicilina-sulbactam e piperacilina-tazobactam estão amplamente disponíveis na rede pública, e o esquema de ceftriaxona com metronidazol resolve a maioria dos casos comunitários.
+Ceftriaxona, metronidazol, ciprofloxacino, ampicilina-sulbactam e piperacilina-tazobactam estão amplamente disponíveis na rede pública, e a ceftriaxona, com metronidazol quando há indicação, resolve a maioria dos casos comunitários.
 
 A **cintilografia hepatobiliar é praticamente indisponível** fora de grandes centros. Na prática brasileira, o caso duvidoso é resolvido com repetição da ultrassonografia por examinador experiente, tomografia ou reavaliação clínica seriada — não vale segurar a decisão esperando um exame que não virá.
 
@@ -41581,7 +41581,7 @@ Em serviços sem retaguarda cirúrgica, a conduta correta na colecistite confirm
 ## Pérolas e erros comuns
 
 - Murphy + USG com parede espessada = colecistite.
-- Colecistectomia precoce (< 72h) é melhor que tardia.
+- Colecistectomia precoce (idealmente < 72h, ainda vantajosa até 7 dias da admissão e 10 dias do início dos sintomas) é melhor que tardia.
 - Erro comum: tratar como cólica biliar e dar alta um paciente com dor há mais de 6 horas, febre e leucocitose.
 - Erro comum: adiar a cirurgia com antibiótico prolongado sem indicação — a estratégia de "esfriar" aumenta recidivas e internações.
 - Erro comum: ignorar icterícia — pense em colédoco, colangite ou Mirizzi.
@@ -42535,11 +42535,11 @@ Como diferenciar na prática, em uma frase cada: a **PBE** tem líquido com PMN 
 
 ## Tratamento (com doses)
 
-**Antibiótico IV:** **cefotaxima** (ou ceftriaxona 1 g 12/12h) por 5 dias. Iniciar imediatamente após a paracentese — não aguardar a cultura.
+**Antibiótico IV:** **cefotaxima** (ou ceftriaxona 1 g 12/12h) por 5 a 7 dias. Iniciar imediatamente após a paracentese — não aguardar a cultura.
 
 O tempo até a primeira dose é variável prognóstica: cada hora de atraso em paciente com sepse aumenta mortalidade. A sequência correta é puncionar e prescrever na mesma passagem pelo leito, não puncionar, esperar o resultado da contagem e só então prescrever quando houver sepse evidente.
 
-Em PBE **nosocomial** ou de paciente com exposição prévia a antibióticos/quinolonas, ampliar o espectro conforme o perfil de resistência local (carbapenêmico ± cobertura para gram-positivo resistente), e descalonar assim que a cultura permitir.
+Em PBE **nosocomial** ou de paciente com exposição prévia a antibióticos/quinolonas, ampliar o espectro conforme o perfil de resistência local: piperacilina-tazobactam onde há pouco germe multirresistente; carbapenêmico onde há muita enterobactéria ESBL ou após uso recente de piperacilina-tazobactam; vancomicina se houver MRSA prévio ou colonização, e daptomicina se houver enterococo resistente à vancomicina. Descalonar assim que a cultura permitir.
 
 O descalonamento é parte do tratamento, não uma gentileza: assim que a cultura identifica agente sensível, retorne ao espectro estreito. Em cultura negativa com boa resposta clínica e queda de polimorfonucleares na repunção, também se pode reduzir o espectro.
 
@@ -43064,13 +43064,13 @@ No paciente com rebaixamento importante, evite lactulose por via oral pelo risco
 
 Efeitos adversos que precisam ser antecipados: distensão, flatulência e cólicas, que reduzem adesão; e, sobretudo, a diarreia excessiva com desidratação, hipernatremia e hipocalemia — que é iatrogenia que agrava a própria EH. Se o paciente evacua mais de quatro vezes ao dia, reduza a dose em vez de mantê-la "porque está encefalopático".
 
-**Rifaximina** 550 mg 12/12h (associada e na profilaxia de recorrência). É antibiótico não absorvível que reduz a flora produtora de amônia; o benefício mais robusto é na **prevenção de recorrência** em quem já teve um episódio manifesto, sempre associada à lactulose. No Brasil o custo é a principal barreira; não está amplamente disponível no SUS, e a lactulose segue como base.
+**Rifaximina** 550 mg 12/12h (associada e na profilaxia de recorrência). É antibiótico não absorvível que reduz a flora produtora de amônia; o benefício mais robusto é na **prevenção de recorrência** em quem voltou a ter episódio manifesto apesar da lactulose, sempre associada a ela. No Brasil tem registro na Anvisa (comprimido de 550 mg), mas não está na RENAME; o custo é a principal barreira, e a lactulose segue como base. Sem ela, a SBH aceita associar metronidazol 400 mg de 12/12 h por curto período quando não há resposta à lactulose em 24 a 48 horas.
 
 Sobre a rifaximina, dois esclarecimentos úteis. Ela é derivada da rifamicina, com absorção sistêmica desprezível, o que explica o perfil de segurança favorável e a ausência de ajuste para função renal ou hepática na prática habitual. E o papel demonstrado com mais solidez é a **profilaxia secundária associada à lactulose** — reduz recorrência de EH manifesta e hospitalizações relacionadas. Como monoterapia ou como substituto da lactulose no episódio agudo, o suporte é bem menor.
 
 Onde a rifaximina não está disponível, o neomicina e o metronidazol foram historicamente usados, mas ambos têm toxicidade relevante em uso prolongado — nefrotoxicidade e ototoxicidade no primeiro, neuropatia periférica no segundo — e não são alternativas confortáveis para tratamento crônico.
 
-Suporte; evitar restrição proteica prolongada. Alvo nutricional 1,2–1,5 g/kg/dia de proteína e 30–35 kcal/kg/dia, com refeições fracionadas e **ceia noturna** rica em carboidrato/proteína para reduzir o catabolismo do jejum.
+Suporte; evitar restrição proteica prolongada. Alvo nutricional 1,2–1,5 g/kg/dia de proteína e 35–40 kcal/kg/dia de peso ideal, com refeições fracionadas e **ceia noturna** rica em carboidrato/proteína para reduzir o catabolismo do jejum.
 
 A justificativa da ceia noturna é fisiológica: o cirrótico entra em catabolismo com poucas horas de jejum, porque tem estoque de glicogênio reduzido, e passa a consumir músculo — exatamente o tecido que depura amônia. Um lanche antes de dormir encurta esse jejum e preserva massa muscular.
 
@@ -43144,7 +43144,7 @@ Critérios objetivos de alta: retorno ao estado mental basal, precipitante trata
 
 O ajuste domiciliar é o ponto que mais falha. O paciente e o cuidador precisam sair com a instrução concreta: aumentar a dose se ficar um dia sem evacuar; reduzir se as evacuações passarem de quatro ao dia ou surgir diarreia líquida; procurar atendimento se houver sonolência, confusão, febre, vômitos ou fezes escuras.
 
-Prescreva **profilaxia secundária** após o primeiro episódio manifesto — lactulose contínua, com rifaximina associada quando disponível — e não a suspenda por conta da melhora clínica.
+Prescreva **profilaxia secundária** após o primeiro episódio manifesto com lactulose contínua, e não a suspenda por conta da melhora clínica. Associe rifaximina se houver novo episódio apesar da lactulose.
 
 Revisão obrigatória da prescrição na alta: retirar benzodiazepínicos, revisar opioides e ajustar analgesia, reavaliar necessidade de inibidor de bomba de prótons, ajustar dose de diurético e programar controle de eletrólitos precoce.
 
@@ -43174,7 +43174,7 @@ Erro grave: sedar o cirrótico agitado com benzodiazepínico "para fazer a TC". 
 
 Não esqueça a tiamina no etilista e o rastreio de hematoma subdural no cirrótico que caiu.
 
-Após o primeiro episódio manifesto, prescreva **profilaxia secundária** com lactulose contínua (± rifaximina) — a taxa de recorrência sem profilaxia é alta.
+Após o primeiro episódio manifesto, prescreva **profilaxia secundária** com lactulose contínua (rifaximina associada se houver recorrência) — a taxa de recorrência sem profilaxia é alta.
 
 Erro comum: dar lactulose oral ao paciente sonolento e provocar broncoaspiração. Grau III–IV é enema ou sonda com via aérea protegida.
 
@@ -46612,11 +46612,11 @@ O estágio prediz mortalidade e risco de doença renal crônica residual — mas
 
 Na reposição volêmica, prefira cristaloide balanceado ao soro fisiológico em grandes volumes, pela menor carga de cloreto e menor acidose hiperclorêmica. Reponha guiado por metas e reavalie a cada etapa: balanço hídrico acumulado positivo é fator independente de pior desfecho, e o mesmo paciente que precisava de volume no pronto-socorro pode estar congesto 24 horas depois.
 
-Mantenha pressão arterial média em torno de 65 mmHg (mais alta em hipertensos crônicos), usando vasopressor quando a hipoperfusão persiste após volume — noradrenalina é a primeira escolha na sepse. Corrija hipercalemia e acidose conforme os protocolos específicos, ajuste antimicrobianos e anticoagulantes pela função renal estimada e evite metformina, contraste desnecessário e AINE.
+Mantenha pressão arterial média em torno de 65 mmHg (mais alta em hipertensos crônicos), usando vasopressor quando a hipoperfusão persiste após volume — noradrenalina é a primeira escolha na sepse. Corrija hipercalemia e acidose conforme os protocolos específicos, ajuste antimicrobianos e anticoagulantes pela tendência da creatinina e da diurese, não pela TFG calculada, e evite metformina, contraste desnecessário e AINE.
 
 Sobre o que **não** fazer: diurético não previne nem trata lesão renal aguda, dopamina em "dose renal" foi abandonada, e não há fármaco que acelere a recuperação tubular. O tratamento é remover a agressão e sustentar o paciente enquanto o epitélio se regenera.
 
-Alguns cuidados de prescrição reduzem dano iatrogênico. Reveja diariamente todas as doses ajustáveis pela função renal — antimicrobianos, heparinas de baixo peso, anticoagulantes diretos, gabapentina, opioides — porque a filtração estimada muda a cada dia num quadro dinâmico. Suspenda a metformina pelo risco de acidose láctica e evite preparos de cólon com fosfato. Em rabdomiólise, hidrate cedo e vigorosamente com meta de diurese ampla; a alcalinização urinária é opcional e secundária à volemia.
+Alguns cuidados de prescrição reduzem dano iatrogênico. Reveja diariamente todas as doses ajustáveis pela função renal — antimicrobianos, heparinas de baixo peso, anticoagulantes diretos, gabapentina, opioides — porque a função renal muda a cada dia num quadro dinâmico. Fora do estado estável, a TFG pelo CKD-EPI 2021 não serve para calcular dose: guie-se pela tendência da creatinina e da diurese, com a farmácia clínica. Suspenda a metformina pelo risco de acidose láctica e evite preparos de cólon com fosfato. Em rabdomiólise, hidrate cedo e vigorosamente com meta de diurese ampla; a alcalinização urinária é opcional e secundária à volemia.
 
 ## Prevenção da lesão renal aguda
 
@@ -46916,6 +46916,7 @@ Sinais de exaustão respiratória em paciente que compensa por hiperventilação
 
 - **Tratar a causa** (ressuscitação na sepse/choque, insulina na CAD, hemodiálise/antídotos nas intoxicações).
 - **Bicarbonato de sódio IV:** reservado para acidose **grave (pH < 7,1)** ou hiperclorêmica/ATR com perda; cautela na acidose por lactato/cetoácidos (corrige junto com a causa).
+- **Choque séptico com pH ≤ 7,2 e LRA estágio 2–3:** a SSC 2026 mantém a sugestão fraca de bicarbonato de sódio IV, titulado para pH ≥ 7,30. O BICARICU-2 (JAMA 2025, 627 pacientes) não reduziu a mortalidade em 90 dias (62,1% vs 61,7%), mas reduziu o uso de diálise (35% vs 50%); na metanálise dos dois BICAR-ICU (2026), o benefício de sobrevida apareceu só com pH ≤ 7,10. Na acidose láctica por hipoperfusão sem esse perfil, a SSC sugere não usar bicarbonato para melhorar a hemodinâmica ou poupar vasopressor.
 - Corrigir o potássio associado.
 
 Na prática, o tratamento da causa resolve a maior parte dos casos: volume e antimicrobiano na sepse, insulina e hidratação na cetoacidose, fomepizol ou etanol e hemodiálise nos álcoois tóxicos, suspensão do fármaco na acidose láctica tipo B e diálise na acidose urêmica.
@@ -46953,7 +46954,7 @@ flowchart TD
     D --> F["Gap osmolar alto?<br/>suspeita de alcool toxico"]
     F -->|Sim| G["Antídoto e hemodiálise"]
     F -->|Não| H["Tratar a causa: volume e ATB na sepse<br/>insulina na CAD"]
-    H --> I["pH < 7,1 ou instabilidade?"]
+    H --> I["pH 7,1 ou menos, instabilidade<br/>ou pH 7,2 ou menos com LRA 2-3?"]
     I -->|Sim| J["Bicarbonato de sódio IV<br/>monitorar Na, K e cálcio iônico"]
     I -->|Não| K["Corrigir K e reavaliar gasometria"]
     class F critical;
@@ -53404,10 +53405,10 @@ Exames complementares: cálcio iônico e albumina para confirmar; PTH para divid
 ## Tratamento (com doses) — Ca > 14 ou sintomático
 
 1. **Hidratação:** SF 0,9% **200–300 mL/h** (manter diurese 100–150 mL/h); ajustar em IC/DRC. É a medida que salva e a que age mais rápido — restaura a filtração glomerular e aumenta a excreção de cálcio; espere queda de 1–3 mg/dL em 24–48 h.
-2. **Bisfosfonato:** ácido zoledrônico **4 mg IV** (ou pamidronato 60–90 mg) — pico em 2–4 dias. Infundir em 15 min (zoledrônico) e ajustar dose na disfunção renal; contraindicado/evitado com clearance muito baixo pelo risco de piora renal e de osteonecrose de mandíbula em uso repetido.
+2. **Bisfosfonato:** ácido zoledrônico **4 mg IV** (ou pamidronato 60–90 mg) — pico em 2–4 dias. Infundir em no mínimo 15 min (zoledrônico). Na hipercalcemia da malignidade, a bula dispensa ajuste de dose com creatinina < 4,5 mg/dL; com creatinina maior ou clearance muito baixo, prefira o denosumabe. Osteonecrose de mandíbula é risco do uso repetido, não da dose de emergência.
 3. **Calcitonina** 4 UI/kg SC/IM 12/12h (rápida, transitória, taquifilaxia) — cai o cálcio em 4–6 h, e por isso é a ponte até o bisfosfonato agir; **limitar a 48–72 h**, pois além disso perde o efeito.
 4. **Corticoide** se granulomatose/linfoma (prednisona 20–40 mg/dia) — atua bloqueando a 1-alfa-hidroxilase macrofágica; também útil na intoxicação por vitamina D e no mieloma.
-5. **Denosumabe** 120 mg SC — indicado na **hipercalcemia da malignidade**, especialmente quando **refratária ao bisfosfonato** ou quando há **disfunção renal** (não requer ajuste pelo clearance). A diretriz de hipercalcemia da malignidade posiciona denosumabe ou bisfosfonato IV como tratamento antirreabsortivo para todos, e sugere a associação de **calcitonina + antirreabsortivo** no cálcio > 14 mg/dL. Vigie a **hipocalcemia** tardia após o denosumabe.
+5. **Denosumabe** 120 mg SC — indicado na **hipercalcemia da malignidade**, especialmente quando **refratária ao bisfosfonato** ou quando há **disfunção renal** (não requer ajuste pelo clearance). A diretriz da Endocrine Society (2023) recomenda denosumabe ou bisfosfonato IV para todos, **sugere denosumabe em vez de bisfosfonato** (evidência de baixa certeza), sugere **calcitonina + antirreabsortivo** na hipercalcemia grave (cálcio > 14 mg/dL) e denosumabe na refratária ou recorrente apesar de bisfosfonato. Vigie a **hipocalcemia** tardia após o denosumabe.
 6. Diálise se grave refratária/DRC. **Furosemida apenas após restaurar a volemia** — e não como rotina: usada precocemente, agrava a desidratação e piora a hipercalcemia. Reserve-a à hipervolemia/congestão durante a hidratação.
 
 **Como as medidas se encaixam no tempo** — este é o conceito que organiza toda a conduta:
@@ -53423,7 +53424,7 @@ Exames complementares: cálcio iônico e albumina para confirmar; PTH para divid
 
 **Quanto volume, na prática.** Comece com 200–300 mL/h de SF 0,9% e reavalie de 4/4 h com ausculta, saturação e diurese. Em idoso cardiopata, 100–150 mL/h com reavaliação mais frequente é mais seguro que a taxa cheia — a meta é diurese de 100–150 mL/h sem congestão, não um número fixo de infusão. Volume total nas primeiras 24 h costuma ficar entre 3 e 6 L nos casos graves.
 
-**Ajuste do zoledrônico pela função renal.** Com clearance reduzido, reduz-se a dose e prolonga-se a infusão; com clearance muito baixo (< 30 mL/min/1,73 m²), a recomendação é evitar e preferir o **denosumabe**, que não depende de excreção renal. Calcule a função renal por **CKD-EPI 2021**, e lembre que a creatinina do paciente desidratado superestima a lesão — reavalie depois da hidratação antes de descartar o bisfosfonato.
+**Zoledrônico e função renal.** Na hipercalcemia da malignidade, a bula mantém 4 mg sem ajuste enquanto a creatinina estiver abaixo de 4,5 mg/dL (acima disso os pacientes foram excluídos dos estudos); a tabela de redução pelo clearance vale para mieloma e metástases ósseas, não para a crise hipercalcêmica. Com creatinina ≥ 4,5 mg/dL ou clearance muito baixo (< 30 mL/min/1,73 m²), prefira o **denosumabe**, que não depende de excreção renal. Calcule a função renal por **CKD-EPI 2021**, e lembre que a creatinina do paciente desidratado superestima a lesão — reavalie depois da hidratação antes de descartar o bisfosfonato.
 
 **Cinacalcete** tem papel definido em situações específicas: hipercalcemia do **carcinoma de paratireoide** e do hiperparatireoidismo primário grave sem condição cirúrgica. Age como calcimimético no CaSR, reduzindo a secreção de PTH. Não tem papel na hipercalcemia da malignidade por PTHrP.
 
@@ -54059,7 +54060,7 @@ Após a estabilização hemodinâmica (24–48 h), reavalie o balanço hídrico:
 
 ## Complicações a antecipar
 
-- **Lesão renal aguda:** presente em ~40–50% dos choques sépticos. Não é apenas "necrose tubular por hipoperfusão" — há inflamação intrarrenal e congestão venosa. Suspenda nefrotóxicos (AINE, contraste eletivo, aminoglicosídeo evitável), evite tanto a hipovolemia quanto a hipervolemia congestiva. Diálise por indicação clássica (hipercalemia refratária, acidose grave, uremia sintomática, sobrecarga refratária), não "profilática precoce".
+- **Lesão renal aguda:** presente em ~40–50% dos choques sépticos. Não é apenas "necrose tubular por hipoperfusão" — há inflamação intrarrenal e congestão venosa. Suspenda nefrotóxicos (AINE, contraste eletivo, aminoglicosídeo evitável), evite tanto a hipovolemia quanto a hipervolemia congestiva. Diálise por indicação clássica (hipercalemia refratária, acidose grave, uremia sintomática, sobrecarga refratária), não "profilática precoce". Com acidemia metabólica grave (pH ≤ 7,2) e LRA estágio 2–3, a SSC 2026 mantém a sugestão fraca de bicarbonato de sódio IV, titulado para pH ≥ 7,30: o BICARICU-2 (JAMA 2025) não reduziu a mortalidade em 90 dias, mas reduziu o uso de diálise (35% vs 50%). Fora desse perfil, na acidose láctica por hipoperfusão, a SSC sugere não usar bicarbonato para melhorar a hemodinâmica ou poupar vasopressor.
 - **SDRA:** hipoxemia + infiltrados bilaterais sem explicação cardíaca, tipicamente 24–72 h após o insulto. Ventilação protetora, prona se PaO₂/FiO₂ <150.
 - **CIVD:** plaquetopenia em queda, INR alargado, fibrinogênio baixo, D-dímero alto, sangramento em sítios de punção. O tratamento é o da sepse; hemocomponentes apenas se sangramento ativo ou procedimento.
 - **Íleo e isquemia mesentérica não oclusiva:** distensão, dor desproporcional, acidose que não melhora — pensar antes de atribuir tudo ao "choque".
@@ -54430,7 +54431,7 @@ A sequência mental é sempre a mesma e nesta ordem: **estabilizar a membrana �
    - **Beta-2 nebulizado** (salbutamol 10–20 mg) — dose muito superior à broncodilatadora habitual, início em ~30 minutos; cuidado em coronariopatia e taquiarritmia, e lembre que 20–40% dos pacientes não respondem, sobretudo se em uso de betabloqueador. É adjuvante, não substitui a insulina.
    - Bicarbonato só se acidose metabólica. Não use como medida isolada de shift: o efeito é lento e inconsistente, e a sobrecarga de sódio pode piorar a congestão.
 
-3. **Remover K**: diurético de alça (se volemia/função permitirem); quelante, com **ciclossilicato de zircônio e sódio 10 g VO de 8/8 h por até 72 h** como preferido na hipercalemia grave (UKKA 2023); **diálise** se refratário ou IRA/IRC oligúrica. A furosemida só funciona com fluxo urinário preservado e volemia adequada — em hipovolemia, expandir antes. O ciclossilicato de zircônio e sódio tem registro na Anvisa e é vendido no Brasil desde 2024 (a bula prevê a fase de correção por até 48 h), mas o acesso no SUS ainda é limitado. Onde ele não existir, o quelante disponível é o poliestireno sulfonato de cálcio, de início lento (horas), sem papel na emergência e com risco de necrose intestinal quando associado a sorbitol; evitar em íleo, pós-operatório abdominal e obstrução. O patiromer tem papel no controle crônico, não na emergência.
+3. **Remover K**: diurético de alça (se volemia/função permitirem); quelante, com **ciclossilicato de zircônio e sódio 10 g VO de 8/8 h por até 72 h** como preferido na hipercalemia grave (UKKA 2023); **diálise** se refratário ou IRA/IRC oligúrica. A furosemida só funciona com fluxo urinário preservado e volemia adequada — em hipovolemia, expandir antes. O ciclossilicato de zircônio e sódio tem registro na Anvisa e é vendido no Brasil desde 2024 (a bula brasileira prevê 10 g três vezes ao dia por 48 h, prorrogáveis por mais 24 h se o potássio seguir acima de 5,0 mEq/L, ou seja, até 72 h, o mesmo teto da UKKA 2023), mas o acesso no SUS ainda é limitado. Onde ele não existir, o quelante disponível é o poliestireno sulfonato de cálcio, de início lento (horas), sem papel na emergência e com risco de necrose intestinal quando associado a sorbitol; evitar em íleo, pós-operatório abdominal e obstrução. O patiromer tem papel no controle crônico, não na emergência.
 
 **Sempre**: suspender fontes de K (dieta, IECA/BRA, espironolactona, AINE). Reavaliar K e ECG. Repita o potássio 1–2 horas após as medidas de shift e mantenha o paciente monitorizado — o efeito é transitório e o **rebote é a armadilha clássica**, especialmente em anúria.
 
@@ -54947,7 +54948,7 @@ Consequências operacionais para quem está de plantão:
 2. **Modelo *drip and ship*** é a regra em boa parte do país — e é aqui que a tenecteplase, quando disponível, muda a logística, já que a alteplase exige manter bomba de infusão durante o transporte.
 3. **Telemedicina/telerradiologia** viabiliza a trombólise em serviços sem neurologista de plantão; laudo remoto de TC é prática consolidada.
 4. **Sem tomógrafo, não há trombólise.** Nenhum escore clínico substitui a TC para excluir hemorragia — o paciente precisa ser transferido, não tratado empiricamente.
-5. **Prevenção secundária no SUS**: AAS, clopidogrel, estatinas de alta potência, anti-hipertensivos e **varfarina** estão disponíveis; os anticoagulantes orais diretos não foram incorporados para fibrilação atrial não valvar, o que torna o controle de INR tarefa central da rede básica.
+5. **Prevenção secundária no SUS**: AAS, clopidogrel, estatinas de alta potência, anti-hipertensivos e **varfarina** estão disponíveis; os anticoagulantes orais diretos não foram incorporados para fibrilação atrial não valvar (a Conitec recomendou contra a incorporação em 2016, decisão ainda vigente em 2026), o que torna o controle de INR tarefa central da rede básica.
 
 ## Internação — unidade de AVC vs. UTI
 
