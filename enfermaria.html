@@ -586,10 +586,10 @@ html:root[data-viva="enfermaria"] body .campo-erro{animation:vvTreme .4s}
 </header>
 
 <main>
-  <nav class="tabs" role="tablist" aria-label="Seções">
-    <button id="tab-ativos" class="on" role="tab" aria-selected="true" onclick="setTab('ativos')"><i class="ti ti-bed" aria-hidden="true"></i><span>Internados</span></button>
+  <nav class="tabs" aria-label="Seções">
+    <button id="tab-ativos" class="on" type="button" aria-pressed="true" onclick="setTab('ativos')"><i class="ti ti-bed" aria-hidden="true"></i><span>Internados</span></button>
     <button id="tab-novo" class="tab-novo" type="button" onclick="openForm()"><i class="ti ti-plus" aria-hidden="true"></i><span>Novo</span></button>
-    <button id="tab-saidas" role="tab" aria-selected="false" onclick="setTab('saidas')"><i class="ti ti-door-exit" aria-hidden="true"></i><span>Saídas</span><b class="tab-n" id="nSaidas" hidden></b></button>
+    <button id="tab-saidas" type="button" aria-pressed="false" onclick="setTab('saidas')"><i class="ti ti-door-exit" aria-hidden="true"></i><span>Saídas</span><b class="tab-n" id="nSaidas" hidden></b></button>
   </nav>
   <div id="view"><div class="esq" role="status" aria-label="Carregando os pacientes"><span class="esq-t"><span class="spin"></span> Carregando seus pacientes</span><i></i><i></i><i></i><i></i></div></div>
   <div class="note" id="storenote"><i class="ti ti-loader-2"></i> Conectando</div>
@@ -658,7 +658,7 @@ function renderUser(){const el=document.getElementById('usr');if(!el)return;
   el.innerHTML=`<span class="who">${esc(nm)}</span><button onclick="MT.signOut()">Sair</button>`;}
 
 /* ===== navegação ===== */
-function setTab(t){tab=t;busca='';['ativos','saidas'].forEach(x=>{const b=document.getElementById('tab-'+x);if(b){b.classList.toggle('on',x===t);b.setAttribute('aria-selected',x===t?'true':'false');}});render();}
+function setTab(t){tab=t;busca='';['ativos','saidas'].forEach(x=>{const b=document.getElementById('tab-'+x);if(b){b.classList.toggle('on',x===t);b.setAttribute('aria-pressed',x===t?'true':'false');}});render();}
 function ativos(){return state.pacientes.filter(p=>p.status!=='saida');}
 function saidos(){return state.pacientes.filter(p=>p.status==='saida');}
 function leitoSort(a,b){return String(a.setor||'').localeCompare(String(b.setor||''))||String(a.leito||'').localeCompare(String(b.leito||''),'pt',{numeric:true});}
@@ -696,8 +696,8 @@ document.addEventListener('keydown',e=>{
 function examesFmt(p){return [p.laboratorio,p.culturas,p.imagem].filter(Boolean).join('\n')||p.exames||'';}
 let examOpen=new Set(); let examAllOpen=false;
 let obsOpen=new Set();   /* observações começam recolhidas: o texto da IA é longo */
-function toggleExames(id){const o=examOpen.has(id);o?examOpen.delete(id):examOpen.add(id);const b=document.getElementById('exb-'+id),c=document.getElementById('exc-'+id);if(b)b.style.display=o?'none':'';if(c)c.classList.toggle('on',!o);}
-function toggleObs(id){const o=obsOpen.has(id);o?obsOpen.delete(id):obsOpen.add(id);const b=document.getElementById('obb-'+id),c=document.getElementById('obc-'+id);if(b)b.style.display=o?'none':'';if(c)c.classList.toggle('on',!o);}
+function toggleExames(id){const o=examOpen.has(id);o?examOpen.delete(id):examOpen.add(id);const b=document.getElementById('exb-'+id),c=document.getElementById('exc-'+id);if(b)b.style.display=o?'none':'';if(c)c.classList.toggle('on',!o);const l=document.getElementById('exl-'+id);if(l)l.setAttribute('aria-expanded',!o);}
+function toggleObs(id){const o=obsOpen.has(id);o?obsOpen.delete(id):obsOpen.add(id);const b=document.getElementById('obb-'+id),c=document.getElementById('obc-'+id);if(b)b.style.display=o?'none':'';if(c)c.classList.toggle('on',!o);const l=document.getElementById('obl-'+id);if(l)l.setAttribute('aria-expanded',!o);}
 function toggleAllExames(){examAllOpen=!examAllOpen;examOpen.clear();if(examAllOpen)ativos().forEach(p=>{if(examesFmt(p))examOpen.add(p.id);});render();}
 
 /* O Chrome trata qualquer campo de texto solto como login e injeta o e-mail da conta
@@ -746,7 +746,7 @@ function ptCard(p){
   const exFmt=examesFmt(p);
   const visitHoje=p.visitaEm===ymd();
   const abertasN=pend.filter(x=>!x.done).length;
-  const pendHtml=`<div class="pt-pend"><div class="pt-pend-h"><span class="pt-pend-l"><b><i class="ti ti-list-check" aria-hidden="true"></i> Pendências</b>${pend.length?`<span class="pend-n">${abertasN?abertasN+' em aberto':'todas feitas'}</span>`:''}<button class="mini-ed" onclick="editCampo('${p.id}','pendencias')" aria-label="Editar pendências" title="Editar pendências"><i class="ti ti-pencil"></i></button></span><span class="pt-prev${p.previsaoAlta?'':' empty'}" role="button" tabindex="0" onclick="editPrevAlta('${p.id}')" onkeydown="if(event.key==='Enter'){editPrevAlta('${p.id}')}" title="Previsão de alta: toque para editar"><i class="ti ${p.previsaoAlta?'ti-calendar-event':'ti-calendar-plus'}" aria-hidden="true"></i> ${p.previsaoAlta?('Alta prevista '+esc(fmtData(p.previsaoAlta))):'Previsão de alta'}</span></div>${pend.length?pend.map(it=>`<label class="pend-item${it.done?' done':''}"><input type="checkbox" ${it.done?'checked':''} onclick="togglePend('${p.id}','${it.id}')"><span>${esc(it.t)}</span></label>`).join(''):'<div class="pend-empty">Nenhuma pendência.</div>'}</div>`;
+  const pendHtml=`<div class="pt-pend"><div class="pt-pend-h"><span class="pt-pend-l"><b><i class="ti ti-list-check" aria-hidden="true"></i> Pendências</b>${pend.length?`<span class="pend-n">${abertasN?abertasN+' em aberto':'todas feitas'}</span>`:''}<button class="mini-ed" onclick="editCampo('${p.id}','pendencias')" aria-label="Editar pendências" title="Editar pendências"><i class="ti ti-pencil"></i></button></span><span class="pt-prev${p.previsaoAlta?'':' empty'}" role="button" tabindex="0" onclick="editPrevAlta('${p.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();editPrevAlta('${p.id}')}" title="Previsão de alta: toque para editar"><i class="ti ${p.previsaoAlta?'ti-calendar-event':'ti-calendar-plus'}" aria-hidden="true"></i> ${p.previsaoAlta?('Alta prevista '+esc(fmtData(p.previsaoAlta))):'Previsão de alta'}</span></div>${pend.length?pend.map(it=>`<label class="pend-item${it.done?' done':''}"><input type="checkbox" ${it.done?'checked':''} onclick="togglePend('${p.id}','${it.id}')"><span>${esc(it.t)}</span></label>`).join(''):'<div class="pend-empty">Nenhuma pendência.</div>'}</div>`;
   const barraFechar = (denso && abertos.has(p.id)) ? `<button type="button" class="pt-fechar" onclick="toggleCard('${p.id}')" aria-label="Recolher a ficha de ${esc(p.nome||'paciente')}"><i class="ti ti-chevron-up"></i> Recolher</button>` : '';
   return `<div class="pt-card${denso && abertos.has(p.id) ? ' aberta' : ''}${recemAberto===p.id?' entra':''}">
     ${barraFechar}
@@ -754,9 +754,9 @@ function ptCard(p){
     <div class="pt-main">
       <div class="pt-top"><span class="nome">${esc(p.nome||'Paciente')}</span>${meta?`<span class="meta">${esc(meta)}</span>`:''}${visitHoje?'<span class="chip-hoje"><i class="ti ti-circle-check"></i> Visto hoje</span>':'<span class="chip-wait"><i class="ti ti-clock"></i> Aguarda visita</span>'}</div>
       <div class="pt-field"><b>Dx:</b> <button class="mini-ed" onclick="editCampo('${p.id}','dx')" aria-label="Editar diagnósticos" title="Editar diagnósticos"><i class="ti ti-pencil"></i></button>${p.diagnosticos?('\n'+esc(bullets(p.diagnosticos))):' <span class="pt-muted">—</span>'}</div>
-      <div class="pt-field pt-exwrap">${exFmt?`<div class="pt-exh" onclick="toggleExames('${p.id}')" style="cursor:pointer;display:flex;align-items:center;gap:6px"><b>Exames</b><span class="pt-muted" style="font-weight:400">(${exFmt.split('\n').filter(Boolean).length})</span><button class="mini-ed" onclick="event.stopPropagation();openForm('${p.id}')" aria-label="Editar exames" title="Editar exames"><i class="ti ti-pencil"></i></button><i id="exc-${p.id}" class="ti ti-chevron-down chev${examOpen.has(p.id)?' on':''}" aria-hidden="true"></i></div><div id="exb-${p.id}" style="${examOpen.has(p.id)?'':'display:none;'}white-space:pre-wrap;margin-top:2px">${esc(bullets(exFmt))}</div>`:`<b>Exames:</b> <button class="mini-ed" onclick="openForm('${p.id}')" aria-label="Editar exames" title="Editar exames"><i class="ti ti-pencil"></i></button> <span class="pt-muted">—</span>`}</div>
+      <div class="pt-field pt-exwrap">${exFmt?`<div class="pt-exh" onclick="toggleExames('${p.id}')" style="cursor:pointer;display:flex;align-items:center;gap:6px"><b id="exl-${p.id}" role="button" tabindex="0" aria-expanded="${examOpen.has(p.id)}" aria-controls="exb-${p.id}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleExames('${p.id}')}">Exames</b><span class="pt-muted" style="font-weight:400">(${exFmt.split('\n').filter(Boolean).length})</span><button class="mini-ed" onclick="event.stopPropagation();openForm('${p.id}')" aria-label="Editar exames" title="Editar exames"><i class="ti ti-pencil"></i></button><i id="exc-${p.id}" class="ti ti-chevron-down chev${examOpen.has(p.id)?' on':''}" aria-hidden="true"></i></div><div id="exb-${p.id}" style="${examOpen.has(p.id)?'':'display:none;'}white-space:pre-wrap;margin-top:2px">${esc(bullets(exFmt))}</div>`:`<b>Exames:</b> <button class="mini-ed" onclick="openForm('${p.id}')" aria-label="Editar exames" title="Editar exames"><i class="ti ti-pencil"></i></button> <span class="pt-muted">—</span>`}</div>
       ${pendHtml}
-      ${p.obs?`<div class="pt-field pt-obswrap"><div class="pt-exh" onclick="toggleObs('${p.id}')" style="cursor:pointer;display:flex;align-items:center;gap:6px"><i class="ti ti-note"></i><b>Observações</b><span class="pt-muted" style="font-weight:400">(${p.obs.split('\n').filter(l=>l.trim()).length})</span><button class="mini-ed" onclick="event.stopPropagation();openForm('${p.id}')" aria-label="Editar observações" title="Editar observações"><i class="ti ti-pencil"></i></button><i id="obc-${p.id}" class="ti ti-chevron-down chev${obsOpen.has(p.id)?' on':''}" aria-hidden="true"></i></div><div id="obb-${p.id}" class="pt-obs" style="${obsOpen.has(p.id)?'':'display:none;'}">${esc(p.obs)}</div></div>`:''}
+      ${p.obs?`<div class="pt-field pt-obswrap"><div class="pt-exh" onclick="toggleObs('${p.id}')" style="cursor:pointer;display:flex;align-items:center;gap:6px"><i class="ti ti-note" aria-hidden="true"></i><b id="obl-${p.id}" role="button" tabindex="0" aria-expanded="${obsOpen.has(p.id)}" aria-controls="obb-${p.id}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleObs('${p.id}')}">Observações</b><span class="pt-muted" style="font-weight:400">(${p.obs.split('\n').filter(l=>l.trim()).length})</span><button class="mini-ed" onclick="event.stopPropagation();openForm('${p.id}')" aria-label="Editar observações" title="Editar observações"><i class="ti ti-pencil"></i></button><i id="obc-${p.id}" class="ti ti-chevron-down chev${obsOpen.has(p.id)?' on':''}" aria-hidden="true"></i></div><div id="obb-${p.id}" class="pt-obs" style="${obsOpen.has(p.id)?'':'display:none;'}">${esc(p.obs)}</div></div>`:''}
     </div>
     <div class="pt-acts">
       <button class="visita" onclick="openVisita('${p.id}')"><i class="ti ti-stethoscope"></i> Visita</button>
@@ -771,7 +771,7 @@ function editCampo(pid,campo){
   const M={dx:{l:'Diagnósticos / hipóteses',v:bullets(p.diagnosticos)},pendencias:{l:'Pendências',v:(p.pendencias||[]).map(x=>'- '+x.t).join('\n')}}[campo];
   if(!M)return;
   modal(`<h3>Editar ${M.l}</h3><div class="hint" style="margin-bottom:8px">${esc(p.nome||'Paciente')} · leito ${esc(p.leito||'—')} · um item por linha</div>
-   <div class="field"><textarea id="ec_txt" placeholder="- um por linha">${esc(M.v)}</textarea></div>
+   <div class="field"><textarea id="ec_txt" aria-label="${M.l}" placeholder="- um por linha">${esc(M.v)}</textarea></div>
    <div class="row actions"><button class="btn btn-p" onclick="saveCampo('${pid}','${campo}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
   const t=document.getElementById('ec_txt');if(t){t.focus();t.setSelectionRange(t.value.length,t.value.length);}
 }
@@ -786,7 +786,7 @@ function editPrevAlta(pid){
   const p=state.pacientes.find(x=>x.id===pid);if(!p)return;
   modal(`<h3><i class="ti ti-calendar"></i> Previsão de alta</h3>
    <div class="hint" style="margin-bottom:8px">${esc(p.nome||'Paciente')} · leito ${esc(p.leito||'—')}. Opcional, preenchida à mão.</div>
-   <div class="field"><label>Data prevista para a alta</label><input type="date" id="pa_date" value="${esc(p.previsaoAlta||'')}"></div>
+   <div class="field"><label for="pa_date">Data prevista para a alta</label><input type="date" id="pa_date" value="${esc(p.previsaoAlta||'')}"></div>
    <div class="row actions"><button class="btn btn-p" onclick="savePrevAlta('${pid}')">Salvar</button>${p.previsaoAlta?`<button class="btn btn-g" onclick="savePrevAlta('${pid}',true)">Remover</button>`:''}<button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
 }
 function savePrevAlta(pid,clear){
@@ -903,32 +903,32 @@ function openForm(id){
   modal(`<h3><i class="ti ${id?'ti-clipboard-text':'ti-user-plus'}"></i> ${id?'Editar':'Novo'} paciente</h3>
    <div class="ai-box">
      <div class="ai-h"><i class="ti ti-sparkles"></i> ${id?'Atualizar pela nova evolução':'Cole a evolução ou grave a admissão: a IA preenche a ficha'}</div>
-     <textarea id="f_evol" placeholder="${id?'Cole a evolução nova de hoje. A IA atualiza exames, exame físico, conduta e pendências e mantém os dados de base.':'Cole aqui a evolução ou o prontuário do paciente. A IA extrai idade, comorbidades, HDA, exames, exame físico, conduta e pendências.'}"></textarea>
+     <textarea id="f_evol" aria-label="${id?'Nova evolução para atualizar a ficha':'Evolução ou prontuário para a IA preencher a ficha'}" placeholder="${id?'Cole a evolução nova de hoje. A IA atualiza exames, exame físico, conduta e pendências e mantém os dados de base.':'Cole aqui a evolução ou o prontuário do paciente. A IA extrai idade, comorbidades, HDA, exames, exame físico, conduta e pendências.'}"></textarea>
      <div class="row"><button class="btn btn-p btn-sm" id="extrairBtn" onclick="extrairEvol('${id||''}')">${id?'<i class="ti ti-sparkles"></i> Atualizar dados':'<i class="ti ti-sparkles"></i> Extrair dados'}</button><button class="btn btn-g btn-sm" id="admRecBtn" onclick="gravarAdmissao('${id||''}')"><i class="ti ti-microphone"></i> ${id?'Gravar evolução':'Gravar admissão'}</button></div>
      <div class="hint">Revise sempre o que a IA ${id?'atualizar (ela mescla com os dados atuais)':'preencher. O <b>nome</b> e o <b>leito</b> você informa à mão'}. Para gravar, precisa de microfone e conta MedTech. Grave só com o consentimento do paciente. Nome, documentos e números de prontuário são retirados antes de o texto ir para a IA; na gravação, evite dizer o nome do paciente.${MT.mode==='demo'?' <b>Entre na conta MedTech para usar a IA.</b>':''}</div>
    </div>
    <div class="sec-h">Identificação</div>
-   <div class="three"><div class="field"><label>Leito *</label><input id="f_leito" value="${esc(p.leito)}" placeholder="12A"></div>
-     <div class="field"><label>Nome</label><input id="f_nome" value="${esc(p.nome)}" placeholder="Nome do paciente"></div>
-     <div class="field"><label>Idade</label><input id="f_idade" value="${esc(p.idade)}" placeholder="74 anos"></div></div>
-   <div class="two"><div class="field"><label>Setor / clínica</label><input id="f_setor" value="${esc(p.setor||p.clinica||'')}" placeholder="Clínica Médica, UTI, Cirurgia..."></div>
-     <div class="field"><label>Sexo</label><select id="f_sexo">${sx}</select></div></div>
-   <div class="field"><label>Motivo da internação / hipóteses <span style="color:var(--muted);font-weight:400">(um por linha; vira o "IH POR")</span></label><textarea id="f_dx" placeholder="- um por linha">${esc(bullets(p.diagnosticos))}</textarea></div>
+   <div class="three"><div class="field"><label for="f_leito">Leito *</label><input id="f_leito" value="${esc(p.leito)}" placeholder="12A"></div>
+     <div class="field"><label for="f_nome">Nome</label><input id="f_nome" value="${esc(p.nome)}" placeholder="Nome do paciente"></div>
+     <div class="field"><label for="f_idade">Idade</label><input id="f_idade" value="${esc(p.idade)}" placeholder="74 anos"></div></div>
+   <div class="two"><div class="field"><label for="f_setor">Setor / clínica</label><input id="f_setor" value="${esc(p.setor||p.clinica||'')}" placeholder="Clínica Médica, UTI, Cirurgia..."></div>
+     <div class="field"><label for="f_sexo">Sexo</label><select id="f_sexo">${sx}</select></div></div>
+   <div class="field"><label for="f_dx">Motivo da internação / hipóteses <span style="color:var(--muted);font-weight:400">(um por linha; vira o "IH POR")</span></label><textarea id="f_dx" placeholder="- um por linha">${esc(bullets(p.diagnosticos))}</textarea></div>
    <div class="sec-h">Dados de base</div>
-   <div class="field"><label>Comorbidades</label><textarea id="f_comorb" placeholder="HAS, DM2...">${esc(p.comorbidades||'')}</textarea></div>
-   <div class="two"><div class="field"><label>Alergias</label><input id="f_alergias" value="${esc(p.alergias||'')}" placeholder="Nega / ..."></div>
-     <div class="field"><label>Uso contínuo (MUC)</label><input id="f_muc" value="${esc(p.muc||'')}" placeholder="Losartana 50 mg/dia"></div></div>
-   <div class="field"><label>HDA</label><textarea id="f_hda" placeholder="História da doença atual">${esc(p.hda||'')}</textarea></div>
+   <div class="field"><label for="f_comorb">Comorbidades</label><textarea id="f_comorb" placeholder="HAS, DM2...">${esc(p.comorbidades||'')}</textarea></div>
+   <div class="two"><div class="field"><label for="f_alergias">Alergias</label><input id="f_alergias" value="${esc(p.alergias||'')}" placeholder="Nega / ..."></div>
+     <div class="field"><label for="f_muc">Uso contínuo (MUC)</label><input id="f_muc" value="${esc(p.muc||'')}" placeholder="Losartana 50 mg/dia"></div></div>
+   <div class="field"><label for="f_hda">HDA</label><textarea id="f_hda" placeholder="História da doença atual">${esc(p.hda||'')}</textarea></div>
    <div class="sec-h">Exames</div>
-   <div class="field"><label>Laboratório <span style="color:var(--muted);font-weight:400">(um por linha)</span></label><textarea id="f_lab" placeholder="- investigativos (um por linha)">${esc(bullets(p.laboratorio||p.exames))}</textarea></div>
-   <div class="field"><label>Culturas / sorologias <span style="color:var(--muted);font-weight:400">(um por linha)</span></label><textarea id="f_culturas" placeholder="- hemocultura, urocultura...">${esc(bullets(p.culturas))}</textarea></div>
-   <div class="field"><label>Exames de imagem <span style="color:var(--muted);font-weight:400">(um por linha)</span></label><textarea id="f_imagem" placeholder="- RX, USG, TC, eco...">${esc(bullets(p.imagem))}</textarea></div>
+   <div class="field"><label for="f_lab">Laboratório <span style="color:var(--muted);font-weight:400">(um por linha)</span></label><textarea id="f_lab" placeholder="- investigativos (um por linha)">${esc(bullets(p.laboratorio||p.exames))}</textarea></div>
+   <div class="field"><label for="f_culturas">Culturas / sorologias <span style="color:var(--muted);font-weight:400">(um por linha)</span></label><textarea id="f_culturas" placeholder="- hemocultura, urocultura...">${esc(bullets(p.culturas))}</textarea></div>
+   <div class="field"><label for="f_imagem">Exames de imagem <span style="color:var(--muted);font-weight:400">(um por linha)</span></label><textarea id="f_imagem" placeholder="- RX, USG, TC, eco...">${esc(bullets(p.imagem))}</textarea></div>
    <div class="sec-h">Conduta</div>
-   <div class="field"><label>Conduta do dia <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="f_conduta" placeholder="- dieta livre&#10;- ATB conforme&#10;- HV / analgesia / profilaxia de TEV">${esc(bullets(p.conduta))}</textarea></div>
+   <div class="field"><label for="f_conduta">Conduta do dia <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="f_conduta" placeholder="- dieta livre&#10;- ATB conforme&#10;- HV / analgesia / profilaxia de TEV">${esc(bullets(p.conduta))}</textarea></div>
    <div class="sec-h">Pendências e observações</div>
-   <div class="field"><label>Pendências <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="f_pend" placeholder="- colher hemocultura&#10;- avaliar com a cirurgia">${esc((p.pendencias||[]).map(x=>'- '+x.t).join('\n'))}</textarea></div>
-   <div class="field"><label>Previsão de alta <span style="color:var(--muted);font-weight:400">(opcional, manual)</span></label><input type="date" id="f_prevAlta" value="${esc(p.previsaoAlta||'')}"></div>
-   <div class="field"><label>Observações</label><textarea id="f_obs" placeholder="Anotações livres">${esc(p.obs)}</textarea></div>
+   <div class="field"><label for="f_pend">Pendências <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="f_pend" placeholder="- colher hemocultura&#10;- avaliar com a cirurgia">${esc((p.pendencias||[]).map(x=>'- '+x.t).join('\n'))}</textarea></div>
+   <div class="field"><label for="f_prevAlta">Previsão de alta <span style="color:var(--muted);font-weight:400">(opcional, manual)</span></label><input type="date" id="f_prevAlta" value="${esc(p.previsaoAlta||'')}"></div>
+   <div class="field"><label for="f_obs">Observações</label><textarea id="f_obs" placeholder="Anotações livres">${esc(p.obs)}</textarea></div>
    <textarea id="f_ef" style="display:none">${esc(p.exameFisico||'')}</textarea>
    <div class="row actions"><button class="btn btn-p" onclick="saveForm('${id||''}')">Salvar</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
   draftKey='ficha:'+(id||'nova')+':'+ymd();draftReopen=()=>openForm(id);restoreDraft();
@@ -1057,7 +1057,7 @@ function openVisita(id){
   const efP=parseEF(ef);
   modal(`<h3><i class="ti ti-stethoscope"></i> Visita · ${esc(p.nome||'Paciente')}</h3>
    <div class="hint" style="margin-bottom:6px">Leito ${esc(p.leito||'—')}${p.idade?(' · '+esc(p.idade)):''}. Atualize a evolução do dia. O exame físico vem do dia anterior: edite só o que mudou.</div>
-   <div class="field"><label>Evolução do dia <span style="color:var(--muted);font-weight:400">(queixas / intercorrências)</span></label><textarea id="v_evol" autocapitalize="characters" spellcheck="false" placeholder="PACIENTE ESTÁVEL, SEM QUEIXAS NO PERÍODO..." style="min-height:190px">${esc(p.evolucao||'')}</textarea></div>
+   <div class="field"><label for="v_evol">Evolução do dia <span style="color:var(--muted);font-weight:400">(queixas / intercorrências)</span></label><textarea id="v_evol" autocapitalize="characters" spellcheck="false" placeholder="PACIENTE ESTÁVEL, SEM QUEIXAS NO PERÍODO..." style="min-height:190px">${esc(p.evolucao||'')}</textarea></div>
    <div class="ai-box">
      <div class="ai-h"><i class="ti ti-camera"></i> Parâmetros das últimas 24h (foto)</div>
      <div class="hint">Tire foto do controle hemodinâmico e, se tiver, da folha de diurese/balanço. <b>Uma foto por folha</b>. Para a IA ler os últimos horários: <b>de frente, folha reta, sem sombra atravessada</b> no papel (a sombra da luz do teto some os valores das últimas colunas). <b>Confira sempre a linha transcrita</b> antes de salvar.</div>
@@ -1065,13 +1065,13 @@ function openVisita(id){
      <div id="v_thumbs" class="thumbs"></div>
      <div class="row"><button class="btn btn-p" id="transBtn" style="width:100%" onclick="transcreverParams()"><i class="ti ti-sparkles"></i> Transcrever com IA</button></div>
    </div>
-   <div class="field"><label>Parâmetros</label><textarea id="v_param" autocapitalize="characters" spellcheck="false" placeholder="PA ... // FC ... // FR ... // T ... // SPO2 ... // DX ... // DIURESE ... // BH ..." style="min-height:110px">${esc(p.parametros||'')}</textarea></div>
+   <div class="field"><label for="v_param">Parâmetros</label><textarea id="v_param" autocapitalize="characters" spellcheck="false" placeholder="PA ... // FC ... // FR ... // T ... // SPO2 ... // DX ... // DIURESE ... // BH ..." style="min-height:110px">${esc(p.parametros||'')}</textarea></div>
    <div class="field"><label>Exame físico <span style="color:var(--muted);font-weight:400">(vem do dia anterior; edite o que mudou)</span></label>
-     <div class="ef-grid">${SISTEMAS.map(s=>`<div class="ef-row"><span class="ef-lbl">${s.l}</span><textarea id="ef_${s.k}" rows="1" autocapitalize="characters" spellcheck="false" placeholder="—">${esc(efP.map[s.k]||'')}</textarea></div>`).join('')}</div>
-     <textarea id="ef_outros" class="ef-outros" autocapitalize="characters" spellcheck="false" placeholder="+ OUTROS ACHADOS (OPCIONAL)">${esc(efP.outros||'')}</textarea></div>
-   <div class="field"><label>Conduta <span style="color:var(--muted);font-weight:400">(uma por linha; "EXPLICO PLANO TERAPEUTICO" entra sozinho)</span></label><textarea id="v_conduta" autocapitalize="characters" spellcheck="false" placeholder="- MANTENHO ATB&#10;- SOLICITO NOVA ROTINA&#10;- AGUARDO EXAMES" style="min-height:190px">${esc(p.conduta||'')}</textarea></div>
-   <div class="field"><label>Pendências <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="v_pend" autocapitalize="characters" spellcheck="false" placeholder="- ..." style="min-height:110px">${esc((p.pendencias||[]).map(x=>'- '+x.t).join('\n'))}</textarea></div>
-   <div class="field"><label>Previsão de alta <span style="color:var(--muted);font-weight:400">(opcional)</span></label><input type="date" id="v_prevAlta" value="${esc(p.previsaoAlta||'')}"></div>
+     <div class="ef-grid">${SISTEMAS.map(s=>`<div class="ef-row"><span class="ef-lbl">${s.l}</span><textarea id="ef_${s.k}" aria-label="Exame físico: ${s.l}" rows="1" autocapitalize="characters" spellcheck="false" placeholder="—">${esc(efP.map[s.k]||'')}</textarea></div>`).join('')}</div>
+     <textarea id="ef_outros" class="ef-outros" aria-label="Exame físico: outros achados" autocapitalize="characters" spellcheck="false" placeholder="+ OUTROS ACHADOS (OPCIONAL)">${esc(efP.outros||'')}</textarea></div>
+   <div class="field"><label for="v_conduta">Conduta <span style="color:var(--muted);font-weight:400">(uma por linha; "EXPLICO PLANO TERAPEUTICO" entra sozinho)</span></label><textarea id="v_conduta" autocapitalize="characters" spellcheck="false" placeholder="- MANTENHO ATB&#10;- SOLICITO NOVA ROTINA&#10;- AGUARDO EXAMES" style="min-height:190px">${esc(p.conduta||'')}</textarea></div>
+   <div class="field"><label for="v_pend">Pendências <span style="color:var(--muted);font-weight:400">(uma por linha)</span></label><textarea id="v_pend" autocapitalize="characters" spellcheck="false" placeholder="- ..." style="min-height:110px">${esc((p.pendencias||[]).map(x=>'- '+x.t).join('\n'))}</textarea></div>
+   <div class="field"><label for="v_prevAlta">Previsão de alta <span style="color:var(--muted);font-weight:400">(opcional)</span></label><input type="date" id="v_prevAlta" value="${esc(p.previsaoAlta||'')}"></div>
    <div class="row" style="margin-top:2px"><button class="btn btn-g btn-sm" style="width:100%" onclick="rodarAnalise('${id}',document.getElementById('v_sug'),this)"><i class="ti ti-bulb"></i> Buscar oportunidades de melhoria com IA</button></div>
    <div id="v_sug"></div>
    <div class="row actions"><button class="btn btn-p" onclick="saveVisita('${id}',true)"><i class="ti ti-file-text"></i> Gerar evolução</button><button class="btn btn-g" onclick="saveVisita('${id}',false)">Salvar</button></div>`);
@@ -1125,7 +1125,7 @@ function addParamImgs(input){
 }
 function renderThumbs(){const box=document.getElementById('v_thumbs');if(!box)return;
   let h=(visitaImgs.length?`<div class="thumbs-n"><i class="ti ti-check"></i> ${visitaImgs.length} foto(s) anexada(s)</div>`:'');
-  h+=visitaImgs.map((im,i)=>`<div class="thumb">${im.heic?'<div class="thumb-ph"><i class="ti ti-photo"></i><span>FOTO</span></div>':`<img src="${im.thumb}" onerror="this.style.opacity=0">`}<button onclick="rmThumb(${i})" aria-label="Remover foto"><i class="ti ti-x"></i></button></div>`).join('');
+  h+=visitaImgs.map((im,i)=>`<div class="thumb">${im.heic?'<div class="thumb-ph"><i class="ti ti-photo"></i><span>FOTO</span></div>':`<img src="${im.thumb}" alt="Foto ${i+1} anexada" onerror="this.style.opacity=0">`}<button onclick="rmThumb(${i})" aria-label="Remover foto ${i+1}"><i class="ti ti-x"></i></button></div>`).join('');
   if(visitaImgErrs.length)h+=`<div class="thumbs-err"><i class="ti ti-alert-triangle"></i> Não consegui ler: ${esc(visitaImgErrs.join(', '))}. No Mac, fotos do iPhone podem estar no iCloud sem download — abra a foto no app Fotos (ou arraste pra Mesa) e tente de novo. No celular, tire a foto na hora.</div>`;
   box.innerHTML=h;}
 function rmThumb(i){visitaImgs.splice(i,1);renderThumbs();}
@@ -1248,7 +1248,7 @@ function verEvolucao(id){
   modal(`<h3><i class="ti ti-file-text"></i> Evolução pronta para colar</h3>
    <div class="hint" style="margin-bottom:8px">${esc(p.nome||'Paciente')} · leito ${esc(p.leito||'—')}. Revise antes de colar no sistema do hospital.</div>
    <div class="hint" style="margin:-2px 0 8px">Use o botão <b>Copiar para o sistema</b> e cole no destino. Os cabeçalhos saem marcados com <b>#</b> e os itens com <b>-</b>; as quebras de linha são preservadas no ISGH.</div>
-   <textarea readonly class="evo-out" style="width:100%;box-sizing:border-box;min-height:42vh;max-height:55vh;border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--panel2)">${esc(txt)}</textarea>
+   <textarea readonly class="evo-out" aria-label="Evolução gerada" style="width:100%;box-sizing:border-box;min-height:42vh;max-height:55vh;border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--panel2)">${esc(txt)}</textarea>
    <div class="row actions"><button class="btn btn-p" id="copyEvoBtn" onclick="copyEvoFmt('${id}','copyEvoBtn')"><i class="ti ti-copy"></i> Copiar para o sistema</button><button class="btn btn-g" onclick="openVisita('${id}')"><i class="ti ti-arrow-left"></i> Visita</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
 }
 function copyTa(taId,btnId,label){const t=document.getElementById(taId);if(!t)return;t.focus();t.select();try{document.execCommand('copy');}catch(e){}if(navigator.clipboard){try{navigator.clipboard.writeText(t.value);}catch(e){}}const b=document.getElementById(btnId);if(b){b.innerHTML='<i class="ti ti-check"></i> Copiado';setTimeout(()=>b.innerHTML='<i class="ti ti-copy"></i> '+label,1600);}toast('Resumo copiado.','ok');}
@@ -1266,18 +1266,18 @@ function resumoPlantao(){
       if(pend.length)txt+='Pendências:\n'+pend.map(x=>'- '+x.t).join('\n')+'\n';
       if(p.previsaoAlta)txt+='Previsão de alta: '+fmtData(p.previsaoAlta)+'\n';
       if(p.obs)txt+='Obs: '+oneLine(p.obs)+'\n';});});
-  modal(`<h3><i class="ti ti-clipboard-list"></i> Passar plantão</h3><div class="hint" style="margin-bottom:8px">Resumo dos ${list.length} internado(s), agrupado por setor (só pendências em aberto). Revise e copie.</div><div class="field"><textarea id="resumoTa" class="evo-out" style="min-height:50vh">${esc(txt.toUpperCase())}</textarea></div><div class="row actions"><button class="btn btn-p" id="copyResBtn" onclick="copyTa('resumoTa','copyResBtn','Copiar tudo')"><i class="ti ti-copy"></i> Copiar tudo</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
+  modal(`<h3><i class="ti ti-clipboard-list"></i> Passar plantão</h3><div class="hint" style="margin-bottom:8px">Resumo dos ${list.length} internado(s), agrupado por setor (só pendências em aberto). Revise e copie.</div><div class="field"><textarea id="resumoTa" class="evo-out" aria-label="Resumo da passagem de plantão" style="min-height:50vh">${esc(txt.toUpperCase())}</textarea></div><div class="row actions"><button class="btn btn-p" id="copyResBtn" onclick="copyTa('resumoTa','copyResBtn','Copiar tudo')"><i class="ti ti-copy"></i> Copiar tudo</button><button class="btn btn-g" onclick="closeModal()">Fechar</button></div>`);
 }
 
 /* ===== saída (alta / óbito / transferência) ===== */
 function openSaida(id){
   const p=state.pacientes.find(x=>x.id===id);if(!p)return;
   modal(`<h3><i class="ti ti-door-exit"></i> Registrar saída · ${esc(p.nome||'Paciente')} (leito ${esc(p.leito||'—')})</h3>
-   <div class="field"><label>Tipo de saída</label><select id="s_tipo" onchange="saidaToggle()">
+   <div class="field"><label for="s_tipo">Tipo de saída</label><select id="s_tipo" onchange="saidaToggle()">
      <option value="alta">Alta</option><option value="obito">Óbito</option><option value="transferencia">Transferência</option></select></div>
-   <div class="two"><div class="field"><label>Data</label><input id="s_data" type="date" value="${ymd()}"></div>
-     <div class="field" id="s_destWrap" style="display:none"><label>Destino</label><input id="s_dest" placeholder="Hospital / setor de destino"></div></div>
-   <div class="field"><label>Observações da saída (opcional)</label><textarea id="s_obs" placeholder="Resumo, orientações, motivo..."></textarea></div>
+   <div class="two"><div class="field"><label for="s_data">Data</label><input id="s_data" type="date" value="${ymd()}"></div>
+     <div class="field" id="s_destWrap" style="display:none"><label for="s_dest">Destino</label><input id="s_dest" placeholder="Hospital / setor de destino"></div></div>
+   <div class="field"><label for="s_obs">Observações da saída (opcional)</label><textarea id="s_obs" placeholder="Resumo, orientações, motivo..."></textarea></div>
    <div class="row actions"><button class="btn btn-p" onclick="saveSaida('${id}')">Confirmar saída</button><button class="btn btn-g" onclick="closeModal()">Cancelar</button></div>`);
 }
 function saidaToggle(){const t=document.getElementById('s_tipo').value;const w=document.getElementById('s_destWrap');if(w)w.style.display=(t==='transferencia')?'':'none';}

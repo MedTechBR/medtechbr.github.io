@@ -258,6 +258,8 @@ html[data-viva=foco] .fc-hero h2{color:#fff}
 .ai-resumo .ti{color:var(--acInk);font-size:20px;margin-top:1px}
 .ai-rank{display:flex;gap:12px;padding:10px 8px;border-radius:14px;cursor:pointer;align-items:flex-start}
 .ai-rank:hover{background:var(--sup2)}
+/* linhas clicáveis com role=button (teclado): sem o "afundar" dos botões do tema vivo */
+html[data-viva] body :is(.corpo,.info,.ai-rank)[role=button]:active{transform:none}
 .ai-rank .num{flex:0 0 30px;height:30px;border-radius:50%;background:var(--acSup);color:var(--acInk);font-size:14px;font-weight:750;display:grid;place-items:center;font-variant-numeric:tabular-nums}
 .ai-rank.top .num{background:var(--acF);color:#fff;box-shadow:0 0 0 5px color-mix(in srgb,var(--ac) 16%,transparent)}
 .ai-rank .rt{font-size:14.5px;font-weight:600;line-height:1.3}
@@ -694,7 +696,7 @@ function taskHTML(t){
   const prazoTag = di?`<span class="fc-tag ${di.cls||'neutra'}">${ic('clock',13)}${di.txt}</span>`:'';
   return `<div class="item p-${pr.c} ${t.done?'done':''}" data-id="${t.id}">
     <button class="check ${t.done?'done':''}" onclick="toggleTask('${t.id}')" aria-label="${t.done?'Reabrir':'Concluir'}: ${esc(t.title)}"><i class="ti ti-check"></i></button>
-    <div class="corpo" onclick="editTask('${t.id}')">
+    <div class="corpo" role="button" tabindex="0" onclick="editTask('${t.id}')">
       <div class="t">${esc(t.title)}</div>
       <div class="meta">
         <span class="fc-tag">${pr.l}</span>
@@ -852,7 +854,7 @@ function evHTML(e,dstr){
   return `<div class="ev${hasTime?'':' no-time'}${done?' evdone':''}" data-id="${e.id}">
     <button class="evcheck${done?' done':''}" onclick="toggleEvDone('${e.id}','${dstr}')" title="${done?'Desmarcar':'Marcar como feito'}" aria-label="${done?'Desmarcar':'Marcar como feito'}: ${esc(e.title)}"><i class="ti ti-check"></i></button>
     <div class="hr">${timeHTML}</div>
-    <div class="info" onclick="editEvent('${e.id}')">
+    <div class="info" role="button" tabindex="0" onclick="editEvent('${e.id}')">
       <div class="t">${esc(e.title)}</div>
       ${extra?`<div class="s">${extra}</div>`:''}
     </div>
@@ -905,7 +907,7 @@ function renderAgenda(){
     const chips=evs.slice(0,2).map(e=>`<span class="ch${evDone(e,ds)?' dd':''}">${e.time?esc(e.time):'dia'}</span>`).join('')
       + (evs.length>2?`<span class="ch mais">+${evs.length-2}</span>`:'');
     const cls=['cal-cell', dt.getMonth()!==calCur.getMonth()?'out':'', ds===hoje?'today':'', ds===selDay?'sel':''].filter(Boolean).join(' ');
-    cells+=`<div class="${cls}" role="button" tabindex="0" aria-label="${dt.getDate()}${evs.length?', '+evs.length+' compromisso'+(evs.length>1?'s':''):''}" onclick="selectDayCal('${ds}')" onkeydown="if(event.key==='Enter')selectDayCal('${ds}')"><span class="dn">${dt.getDate()}</span>${evs.length?`<span class="evs">${chips}</span>`:''}</div>`;
+    cells+=`<div class="${cls}" role="button" tabindex="0" aria-label="${dt.getDate()}${evs.length?', '+evs.length+' compromisso'+(evs.length>1?'s':''):''}" onclick="selectDayCal('${ds}')"><span class="dn">${dt.getDate()}</span>${evs.length?`<span class="evs">${chips}</span>`:''}</div>`;
   }
   $('#calGrid').innerHTML=cells;
   const lbl=cap1(new Date(selDay+'T00:00:00').toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}));
@@ -926,7 +928,7 @@ function renderHist(){
     const when=t.doneAt?new Date(t.doneAt).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}):'';
     return `<div class="item p-${(PRIO[t.prio]||PRIO.media).c} done" data-id="${t.id}">
       <button class="check done" onclick="toggleTask('${t.id}')" title="Reabrir" aria-label="Reabrir: ${esc(t.title)}"><i class="ti ti-check"></i></button>
-      <div class="corpo" onclick="editTask('${t.id}')">
+      <div class="corpo" role="button" tabindex="0" onclick="editTask('${t.id}')">
         <div class="t">${esc(t.title)}</div>
         <div class="meta"><span class="fc-tag ok">${ic('circle-check',13)}${when}</span></div>
       </div>
@@ -943,7 +945,7 @@ function renderNotes(){
   $('#notesList').innerHTML = arr.length? arr.map(n=>{
     const when=n.updatedAt?new Date(n.updatedAt).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';
     const preview=(n.text||'').trim() || '(vazia)';
-    return `<div class="note-card" role="button" tabindex="0" onclick="editNote('${n.id}')" onkeydown="if(event.key==='Enter')editNote('${n.id}')">
+    return `<div class="note-card" role="button" tabindex="0" onclick="editNote('${n.id}')">
       ${n.title?`<div class="nt">${esc(n.title)}</div>`:''}
       <div class="nx">${esc(preview)}</div>
       <div class="nd">${ic('clock',13)}${when}</div>
@@ -1118,6 +1120,8 @@ $('#heroCap').onclick=()=>{ const c=$('#capText'); c.focus(); c.scrollIntoView({
 $('#capForm').onsubmit=e=>{ e.preventDefault(); aiQuickText($('#capText'),$('#capBtn')); };
 $('#qaForm').onsubmit=e=>{ e.preventDefault(); aiQuickText($('#qaText'),$('#qaBtn')); };
 /* atalhos no computador: N nova, / buscar, Esc fecha */
+/* teclado em elemento clicável que não é <button> (role=button / role=checkbox): Enter e Espaço acionam */
+document.addEventListener('keydown',e=>{const t=e.target;if((e.key==='Enter'||e.key===' ')&&!e.repeat&&t&&t.matches&&t.matches('[role=button]:not(button):not(a),[role=checkbox]:not(input)')){e.preventDefault();t.click();}});
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){ if($('.overlay.show')){ e.preventDefault(); fecharModais(); } return; }
   const tg=e.target, digitando=tg&&(tg.tagName==='INPUT'||tg.tagName==='TEXTAREA'||tg.tagName==='SELECT'||tg.isContentEditable);
@@ -1408,7 +1412,7 @@ function renderAiFocus(r, pend){
   if(r.resumo) html+=`<div class="ai-resumo">${ic('target',20)}<span>${esc(r.resumo)}</span></div>`;
   r.ordem.forEach((o,i)=>{
     const t=byId[o.id]; if(!t) return;
-    html+=`<div class="ai-rank ${i===0?'top':''}" onclick="editTask('${t.id}')">
+    html+=`<div class="ai-rank ${i===0?'top':''}" role="button" tabindex="0" onclick="editTask('${t.id}')">
       <div class="num">${i+1}</div>
       <div class="rb"><div class="rt">${esc(t.title)}</div><div class="rm">${esc(o.motivo||'')}</div></div>
     </div>`;
