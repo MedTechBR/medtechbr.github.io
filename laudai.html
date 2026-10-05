@@ -12,7 +12,7 @@
 <title>laudAI · Laudos médicos com IA</title>
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="stylesheet" href="vendor/tabler/tabler-icons.min.css?v=3.48.0">
-<link rel="stylesheet" href="laudai.css?v=50">
+<link rel="stylesheet" href="laudai.css?v=51">
 <!-- Login único MedTech (mesma conta dos outros apps). IA + trial/Pro via backend
      radioia-a61ec, autenticado com o token MedTech (generateLaudoHttp/getSubStatusHttp). -->
 <script>window.MT_APP={id:"laudai",name:"LaudAI"};</script>
@@ -43,8 +43,8 @@
 
     <section class="land-hero" id="top">
       <span class="land-hero-badge"><i class="ti ti-bolt"></i> Powered by Google Gemini 2.5</span>
-      <h1>Laudos médicos em <span class="grad">segundos</span>, com IA especialista.</h1>
-      <p class="lead">Análise assistida por IA para radiologia, ECG, laboratório, dermatologia, gasometria, anatomopatológico e muito mais — estruturados como um especialista escreveria.</p>
+      <h1>Rascunho de laudo em <span class="grad">segundos</span>, para você revisar e assinar.</h1>
+      <p class="lead">Para radiologia, ECG, laboratório, dermatologia, gasometria, anatomopatológico e outros exames: a IA organiza achados e hipóteses no formato de laudo, e o médico confere, corrige e assina. Uso exclusivo de médicos.</p>
       <div class="land-hero-ctas">
         <button class="land-btn land-btn-primary land-btn-lg" id="land-cta-1">Usar com a conta MedTech</button>
         <a href="#como-funciona" class="land-btn land-btn-secondary land-btn-lg">Ver como funciona</a>
@@ -60,7 +60,7 @@
           • Opacidade alveolar heterogênea em lobo médio direito, sugestiva de consolidação.<br>
           • Seios costofrênicos livres.<br>
           • Mediastino centralizado; índice cardiotorácico normal.<br><br>
-          <strong>## IMPRESSÃO DIAGNÓSTICA</strong><br>
+          <strong>## HIPÓTESES PARA REVISÃO</strong><br>
           Consolidação pulmonar em lobo médio D — provável pneumonia bacteriana.<br><br>
           <strong>## RECOMENDAÇÕES</strong><br>
           Correlação clínica + hemograma. Controle radiológico em 4 semanas.
@@ -102,7 +102,7 @@
     <section class="land-section land-exams" style="max-width: none;">
       <div style="max-width:1200px; margin: 0 auto;">
         <h2>Suporta praticamente qualquer exame</h2>
-        <p class="land-section-sub">A IA assume o papel certo dependendo do que você manda — radiologista, cardiologista, patologista, intensivista, dermatologista.</p>
+        <p class="land-section-sub">O formato do rascunho acompanha o exame enviado: radiologia, cardiologia, patologia, terapia intensiva, dermatologia.</p>
         <div class="land-exams-grid">
           <div class="land-exam-card"><div class="land-exam-icon"><i class="ti ti-report-medical"></i></div><div><h4>Radiologia</h4><p>RX, TC, RM, US, mamografia, densitometria, PET-CT, angiografia.</p></div></div>
           <div class="land-exam-card"><div class="land-exam-icon"><i class="ti ti-heart"></i></div><div><h4>Cardiologia</h4><p>ECG 12 derivações, Holter 24h, MAPA.</p></div></div>
@@ -168,14 +168,14 @@
         </details>
         <details class="land-faq-item">
           <summary>Preciso ser médico para usar?</summary>
-          <p>Não exigimos comprovação de CRM. Mas a ferramenta é <strong>desenhada para médicos</strong> e a interpretação dos laudos requer conhecimento clínico. Não recomendamos uso por leigos para decisões de saúde próprias.</p>
+          <p><strong>Sim.</strong> O LaudAI é de uso exclusivo de médicos: antes do primeiro rascunho você informa seu CRM e a UF e declara que vai revisar e assinar o que usar. Laudar exame é ato privativo do médico (Lei 12.842/2013, art. 4º); o texto da IA só vale como laudo depois da sua revisão.</p>
         </details>
       </div>
     </section>
 
     <section class="land-cta">
       <h2>Comece em 30 segundos</h2>
-      <p>Entre com sua conta MedTech e comece a laudar. Sem cartão. Sem amarração.</p>
+      <p>Entre com sua conta MedTech e gere o primeiro rascunho. Sem cartão. Sem amarração.</p>
       <button class="land-btn land-btn-lg" id="land-cta-3">Criar conta grátis</button>
     </section>
 
@@ -186,7 +186,7 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4 L6 19 L18 19"/><circle cx="18.5" cy="5" r="1.5" fill="white" stroke="none"/></svg>
             <span class="land-footer-wordmark">laudAI</span>
           </div>
-          <p class="land-footer-tagline">Laudos médicos assistidos por IA. Análise inteligente para o profissional de saúde brasileiro.</p>
+          <p class="land-footer-tagline">Rascunhos de laudo assistidos por IA, para revisão e assinatura do médico.</p>
           <div class="land-footer-disclaimer"><i class="ti ti-alert-triangle"></i> Ferramenta auxiliar de uso médico. Não substitui o laudo de um especialista qualificado. Toda decisão clínica é de responsabilidade do médico assistente.</div>
         </div>
         <div>
@@ -434,6 +434,7 @@
             <div id="output-result" class="hidden">
               <div class="laudo">
                 <div class="laudo-meta" id="laudo-meta"></div>
+                <p class="laudo-aviso" role="note"><i class="ti ti-alert-triangle" aria-hidden="true"></i> Rascunho gerado por IA. Só vale como laudo depois de revisado e assinado pelo médico.</p>
                 <div class="laudo-content" id="laudo-content"></div>
                 <textarea class="textarea laudo-edit hidden" id="laudo-edit" aria-label="Texto do laudo para revisar"></textarea>
               </div>
@@ -509,6 +510,30 @@
         <div class="modal-footer">
           <button class="btn btn-ghost" id="settings-cancel" style="flex: 1;">Cancelar</button>
           <button class="btn btn-primary" id="settings-save" style="flex: 1;"><i class="ti ti-check"></i> Salvar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Declaração de médico (antes do primeiro rascunho) -->
+    <div class="modal-bg hidden" id="modal-crm" role="dialog" aria-modal="true" aria-labelledby="crm-titulo">
+      <div class="modal">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title" id="crm-titulo">Uso exclusivo de médicos</div>
+            <div class="modal-sub">Informe seu registro uma vez. Fica salvo na sua conta.</div>
+          </div>
+          <button class="modal-close" id="crm-close" aria-label="Fechar">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div style="display:flex;gap:10px">
+            <div class="field" style="flex:2"><label class="field-label" for="crm-num">CRM</label><input class="input" id="crm-num" inputmode="numeric" autocomplete="off" placeholder="Ex.: 123456"></div>
+            <div class="field" style="flex:1"><label class="field-label" for="crm-uf">UF</label><select class="select" id="crm-uf"><option value="">—</option></select></div>
+          </div>
+          <label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.5;margin:10px 0 14px"><input type="checkbox" id="crm-ok" style="margin-top:3px"><span>Declaro que sou médico(a) com registro ativo neste CRM e que vou revisar e assinar todo texto do LaudAI antes de usá-lo como laudo.</span></label>
+          <p class="modal-sub" id="crm-erro" role="alert" style="color:#b42318;min-height:1em"></p>
+          <button class="btn btn-primary btn-block" id="crm-salvar">Confirmar e gerar o rascunho</button>
         </div>
       </div>
     </div>
@@ -620,6 +645,6 @@
 
 <script src="laudai.gemini.js?v=3"></script>
 <script src="laudai.dicom.js?v=1"></script>
-<script src="laudai.app.js?v=556"></script>
+<script src="laudai.app.js?v=557"></script>
 </body>
 </html>

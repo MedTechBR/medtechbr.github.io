@@ -40,6 +40,7 @@ let _mtEnteredUid = null;
       if (_mtEnteredUid !== u.uid) { _mtEnteredUid = u.uid; enterApp(u); }
     }
     state._tomb = (d && d._tomb) || {};
+    state.declaracao = (d && d.declaracao) || null;
     state.laudos = (d && Array.isArray(d.laudos) ? d.laudos : []).slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     if (typeof onLaudosAtualizados === 'function') onLaudosAtualizados();
   });
@@ -404,7 +405,7 @@ async function saveLaudoToFirestore(text, ctx) {
     updatedAt: Date.now(),
   });
   state.laudos = list;
-  if (window.MT && window.MT.save) await window.MT.save({ laudos: list, _tomb: state._tomb });
+  if (window.MT && window.MT.save) await window.MT.save({ laudos: list, _tomb: state._tomb, declaracao: state.declaracao || null });
 }
 
 // ===== File handling =====
@@ -605,8 +606,39 @@ function renderThumbs() {
 }
 
 // ===== Generate =====
+/* 05/10/2026: laudar é ato médico (Lei 12.842/2013). Antes do primeiro rascunho o usuário
+   declara CRM e UF; a declaração fica na conta (users/{uid}/apps/laudai.declaracao). */
+const UFS = 'AC AL AM AP BA CE DF ES GO MA MG MS MT PA PB PE PI PR RJ RN RO RR RS SC SE SP TO'.split(' ');
+function declaracaoOk() { const d = state.declaracao; return !!(d && d.crm && d.uf && d.em); }
+function pedirDeclaracao() {
+  const m = $('#modal-crm'); if (!m) return;
+  const uf = $('#crm-uf');
+  if (uf.options.length < 2) UFS.forEach(u => { const o = document.createElement('option'); o.value = o.textContent = u; uf.appendChild(o); });
+  $('#crm-erro').textContent = '';
+  m.classList.remove('hidden');
+  setTimeout(() => $('#crm-num').focus(), 50);
+}
+function fecharDeclaracao() { $('#modal-crm').classList.add('hidden'); }
+async function salvarDeclaracao() {
+  const crm = $('#crm-num').value.replace(/\D/g, ''), uf = $('#crm-uf').value, ok = $('#crm-ok').checked;
+  const erro = $('#crm-erro');
+  if (crm.length < 3 || crm.length > 8) { erro.textContent = 'Informe o número do CRM (só os dígitos).'; $('#crm-num').focus(); return; }
+  if (!uf) { erro.textContent = 'Escolha a UF do CRM.'; uf && $('#crm-uf').focus(); return; }
+  if (!ok) { erro.textContent = 'Marque a declaração para continuar.'; $('#crm-ok').focus(); return; }
+  state.declaracao = { crm, uf, em: new Date().toISOString() };
+  try { if (window.MT && window.MT.save) await window.MT.save({ laudos: state.laudos || [], _tomb: state._tomb, declaracao: state.declaracao }); } catch (e) {}
+  fecharDeclaracao();
+  generate();
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const b = $('#crm-salvar'); if (b) b.addEventListener('click', salvarDeclaracao);
+  const x = $('#crm-close'); if (x) x.addEventListener('click', fecharDeclaracao);
+  const m = $('#modal-crm'); if (m) m.addEventListener('keydown', e => { if (e.key === 'Escape') fecharDeclaracao(); });
+});
+
 async function generate() {
   if (state.generating) return;
+  if (!declaracaoOk()) { pedirDeclaracao(); return; }
   // Sem chave própria o fluxo segue no plano Pro (proxy generateLaudo);
   // exigir chave aqui mataria o modo assinatura.
   const examText = $('#exam-text').value.trim();
@@ -1210,7 +1242,7 @@ async function clearHistoryAll() {
      todos. Cada laudo precisa da própria lápide. */
   (state.laudos || []).forEach(l => { if (l && l.id != null) window.MT.markDeleted(state, l.id); });
   state.laudos = [];
-  if (window.MT && window.MT.save) await window.MT.save({ laudos: [], _tomb: state._tomb });
+  if (window.MT && window.MT.save) await window.MT.save({ laudos: [], _tomb: state._tomb, declaracao: state.declaracao || null });
   toast('Histórico apagado.', 'success');
   onLaudosAtualizados();
   renderHistory();
