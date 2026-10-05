@@ -331,10 +331,13 @@ else {
     try {
       const Fn = await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-functions.js");
       const functions = Fn.getFunctions(app, "southamerica-east1");
-      MT.ai = async (prompt, model = "gemini-2.5-flash") => {
+      /* opts.grounding:false desliga a busca do Google: use sempre que o texto for um caso clínico */
+      MT.ai = async (prompt, model = "gemini-2.5-flash", opts) => {
         if (!MT.user) throw new Error("Entre na sua conta MedTech para usar a IA.");
         const callable = Fn.httpsCallable(functions, "gemini");
-        const res = await callable({ prompt, model, app: APP.id });
+        const dados = { prompt, model, app: APP.id };
+        if (opts && opts.grounding === false) dados.grounding = false;
+        const res = await callable(dados);
         return (res && res.data && res.data.text) || "";
       };
       MT.aiAudio = async (audio, mimeType, prompt, model = "gemini-2.5-flash") => {

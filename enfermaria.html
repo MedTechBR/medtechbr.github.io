@@ -17,7 +17,7 @@
 <meta name="apple-mobile-web-app-title" content="EnfermarIA">
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"enfermaria",name:"EnfermarIA"};</script>
-<script type="module" src="_mtauth.js?v=26"></script>
+<script type="module" src="_mtauth.js?v=27"></script>
 <style>
 :root{--petrol:#3B7BE0;--petrol-btn:#3169CC;--petrol-dark:#2F62B3;--ink:#23272E;--mint:#3B7BE0;--mint-dark:#2F62B3;--bg:#FAFAF8;--soft:rgba(59,123,224,.12);--line:#E8E8E2;--muted:#5E646B;--green:#186139;--green-bg:rgba(29,122,70,.12);--amber:#8A6009;--amber-bg:rgba(163,115,10,.12);--red:#C6453D;--red-bg:rgba(198,69,61,.12);--blue:#3B7BE0;--blue-bg:rgba(59,123,224,.12);--violet:#5B3BC4;--violet-bg:rgba(167,139,250,.14);--violet-btn:#6d4bd8;--surface:#FFFFFF;--card:#FFFFFF;--panel2:#F1F1EC;--line-strong:#DDDDD5;--dim:#767C84;--teal:#0E8A63;--glow:rgba(59,123,224,.42);--disp:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -889,7 +889,7 @@ async function processAdmissaoAudio(id){
     const b64=await blobToB64(blob);
     if(b64.length>9400000){toast('Gravação muito longa (~30–40 min por bloco). Grave em partes menores.','erro');reset();return;}
     const mt=(blob.type||'audio/webm').split(';')[0];
-    const prompt='Você recebeu o ÁUDIO da ADMISSÃO de um paciente sendo INTERNADO (anamnese de admissão — fala do médico e do paciente). Transcreva internamente e organize uma ANAMNESE DE ADMISSÃO clara em português do Brasil, com as seções: Identificação, Queixa principal, História da doença atual, Antecedentes pessoais, Medicações em uso, Alergias, Exame físico e Hipóteses/Conduta inicial. REGRAS: a HDA deve ser TEXTO CORRIDO e CRONOLÓGICO, conectando os sintomas; em Antecedentes use os DIAGNÓSTICOS padronizados (ex.: "pressão alta"→HAS, "colesterol alto"→dislipidemia/DLP, "diabetes"→DM2), não a fala literal; em Medicações em uso liste APENAS os nomes; não invente — escreva "[não informado]" se faltar; texto limpo, SEM markdown (sem # nem *).';
+    const prompt='Você recebeu o ÁUDIO da ADMISSÃO de um paciente sendo INTERNADO (anamnese de admissão — fala do médico e do paciente). Transcreva internamente e organize uma ANAMNESE DE ADMISSÃO clara em português do Brasil, com as seções: Identificação (SÓ idade e sexo — NUNCA escreva nome, documento, endereço, telefone ou nome de familiar, mesmo que sejam ditos no áudio), Queixa principal, História da doença atual, Antecedentes pessoais, Medicações em uso, Alergias, Exame físico e Hipóteses/Conduta inicial. REGRAS: a HDA deve ser TEXTO CORRIDO e CRONOLÓGICO, conectando os sintomas; em Antecedentes use os DIAGNÓSTICOS padronizados (ex.: "pressão alta"→HAS, "colesterol alto"→dislipidemia/DLP, "diabetes"→DM2), não a fala literal; em Medicações em uso liste APENAS os nomes; não invente — escreva "[não informado]" se faltar; texto limpo, SEM markdown (sem # nem *).';
     const text=await MT.aiAudio(b64,mt,prompt);
     const ev=document.getElementById('f_evol');if(ev)ev.value=(text||'').trim();
     if(btn)btn.innerHTML='<span class="spin"></span> Preenchendo a ficha';
@@ -903,9 +903,9 @@ function openForm(id){
   modal(`<h3><i class="ti ${id?'ti-clipboard-text':'ti-user-plus'}"></i> ${id?'Editar':'Novo'} paciente</h3>
    <div class="ai-box">
      <div class="ai-h"><i class="ti ti-sparkles"></i> ${id?'Atualizar pela nova evolução':'Cole a evolução ou grave a admissão: a IA preenche a ficha'}</div>
-     <textarea id="f_evol" placeholder="${id?'Cole a evolução nova de hoje. A IA atualiza exames, exame físico, conduta e pendências e mantém os dados de base.':'Cole aqui a evolução ou o prontuário do paciente. A IA extrai identificação, comorbidades, HDA, exames, exame físico, conduta e pendências.'}"></textarea>
+     <textarea id="f_evol" placeholder="${id?'Cole a evolução nova de hoje. A IA atualiza exames, exame físico, conduta e pendências e mantém os dados de base.':'Cole aqui a evolução ou o prontuário do paciente. A IA extrai idade, comorbidades, HDA, exames, exame físico, conduta e pendências.'}"></textarea>
      <div class="row"><button class="btn btn-p btn-sm" id="extrairBtn" onclick="extrairEvol('${id||''}')">${id?'<i class="ti ti-sparkles"></i> Atualizar dados':'<i class="ti ti-sparkles"></i> Extrair dados'}</button><button class="btn btn-g btn-sm" id="admRecBtn" onclick="gravarAdmissao('${id||''}')"><i class="ti ti-microphone"></i> ${id?'Gravar evolução':'Gravar admissão'}</button></div>
-     <div class="hint">Revise sempre o que a IA ${id?'atualizar (ela mescla com os dados atuais)':'preencher. O <b>leito</b> você informa manualmente'}. Para gravar, precisa de microfone e conta MedTech. Grave só com o consentimento do paciente.${MT.mode==='demo'?' <b>Entre na conta MedTech para usar a IA.</b>':''}</div>
+     <div class="hint">Revise sempre o que a IA ${id?'atualizar (ela mescla com os dados atuais)':'preencher. O <b>nome</b> e o <b>leito</b> você informa à mão'}. Para gravar, precisa de microfone e conta MedTech. Grave só com o consentimento do paciente. Nome, documentos e números de prontuário são retirados antes de o texto ir para a IA; na gravação, evite dizer o nome do paciente.${MT.mode==='demo'?' <b>Entre na conta MedTech para usar a IA.</b>':''}</div>
    </div>
    <div class="sec-h">Identificação</div>
    <div class="three"><div class="field"><label>Leito *</label><input id="f_leito" value="${esc(p.leito)}" placeholder="12A"></div>
@@ -976,7 +976,7 @@ function dadosParaAnalise(p){
   const cd=aberto?getVal('v_conduta'):(p.conduta||'');
   const pd=aberto?getVal('v_pend'):((p.pendencias||[]).map(x=>'- '+x.t).join('\n'));
   const L=[];
-  L.push('PACIENTE: '+(p.nome||'—')+(p.idade?(', '+p.idade):'')+(p.sexo?(' · '+p.sexo):''));
+  L.push('IDADE E SEXO: '+([p.idade,p.sexo].filter(Boolean).join(' · ')||'idade e sexo não informados'));
   if(p.diagnosticos)L.push('MOTIVO DA INTERNAÇÃO:\n'+p.diagnosticos);
   if(p.comorbidades)L.push('COMORBIDADES: '+p.comorbidades);
   if(p.muc)L.push('MEDICAÇÕES DE USO CONTÍNUO: '+p.muc);
@@ -1043,7 +1043,7 @@ async function rodarAnalise(id,alvo,btn){
   try{
     const ack=(p.sugAck||[]);
     const ackBlock=ack.length?('\n\n=== PONTOS JÁ AVALIADOS/DECIDIDOS PELO MÉDICO (NÃO sugerir de novo, salvo piora relevante) ===\n'+ack.map(a=>'- '+a).join('\n')):'';
-    const txt=await MT.ai(PROMPT_ANALISE+'\n\n=== CASO ===\n'+dadosParaAnalise(p)+ackBlock, 'gemini-2.5-pro');
+    const txt=await MT.ai(PROMPT_ANALISE+'\n\n=== CASO ===\n'+semIdentificacao(dadosParaAnalise(p),p.nome)+ackBlock, 'gemini-2.5-pro', {grounding:false});
     renderSugestoes(id,txt,alvo);
   }catch(e){
     alvo.innerHTML='<div class="sug-out sug-erro"><i class="ti ti-alert-triangle"></i> '+esc(e.message||'Falha na IA.')+(MT.mode==='demo'?' Entre na conta MedTech para usar a IA.':' Tente de novo em instantes.')+'</div>';
@@ -1289,14 +1289,31 @@ function saveSaida(id){
 }
 
 /* ===== IA: extrair dados da evolução ===== */
+/* 05/10/2026: nada que identifique o paciente vai para a IA. O nome e o leito ficam só na ficha
+   (no aparelho e na conta do médico); para a IA saem só idade, sexo e dados clínicos. */
+function semIdentificacao(t,nome){
+  if(!t)return '';
+  let x=String(t);
+  x=x.replace(/^\s*(nome( do paciente| social)?|paciente|pcte|pac\.?|m[ãa]e|nome da m[ãa]e|pai|respons[áa]vel|acompanhante|endere[çc]o|telefone|tel\.?|celular|cpf|rg|cns|cart[ãa]o sus|prontu[áa]rio|registro|atendimento|matr[íi]cula|n[ºo°]? ?do atendimento)\s*[:\-–]\s*.*$/gim,(m,k)=>k.trim()+': [omitido]');
+  x=x.replace(/\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/g,'[CPF omitido]');
+  x=x.replace(/\b\d{15}\b/g,'[CNS omitido]');
+  x=x.replace(/\b(prontu[áa]rio|pront\.?|registro|atendimento|matr[íi]cula|ra|rh)\s*(n[ºo°.]*)?\s*:?\s*\d[\d.\-\/]{3,}/gi,'$1 [omitido]');
+  x=x.replace(/\(?\b\d{2}\)?\s?9?\d{4}-?\d{4}\b/g,'[telefone omitido]');
+  x=x.replace(/\b(DN|data de nascimento|nascid[oa] em|nasc\.?)\s*:?\s*\d{1,2}\/\d{1,2}\/\d{2,4}/gi,'$1 [omitida]');
+  const partes=String(nome||'').normalize('NFC').split(/\s+/).filter(w=>w.length>=3&&!/^(das?|dos?|de|e)$/i.test(w));
+  if(partes.length){
+    const esc=w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    x=x.replace(new RegExp('(^|[^\\p{L}])('+[String(nome).trim(),...partes].filter(Boolean).map(esc).join('|')+')(?=[^\\p{L}]|$)','giu'),'$1[nome]');
+  }
+  return x;
+}
 function parseJsonLoose(t){if(!t)return null;t=String(t).trim().replace(/^```[a-z]*\s*/i,'').replace(/```\s*$/,'').trim();const i=t.indexOf('{'),j=t.lastIndexOf('}');if(i>=0&&j>i){try{return JSON.parse(t.slice(i,j+1));}catch(e){}}try{return JSON.parse(t);}catch(e){return null;}}
 async function extrairEvol(id){
-  const raw=getVal('f_evol');
+  const raw=semIdentificacao(getVal('f_evol'),getVal('f_nome'));
   const editar=!!id;
   if(!raw){toast('Cole a evolução do paciente antes de '+(editar?'atualizar.':'extrair.'),'erro');return;}
   const b=document.getElementById('extrairBtn');b.innerHTML='<span class="spin"></span> '+(editar?'Atualizando':'Extraindo');b.disabled=true;
   const KEYS=''
-   +'- "nome" (string)\n'
    +'- "idade" (string, ex.: "78 anos")\n'
    +'- "diagnosticos" (ARRAY de strings): SOMENTE o MOTIVO DA INTERNAÇÃO / hipóteses que justificaram a internação (o "IH POR"). CADA hipótese em um ITEM SEPARADO. NUNCA junte duas no mesmo item.\n'
    +'- "comorbidades" (string): comorbidades/doenças prévias separadas por vírgula. "" se não houver.\n'
@@ -1313,9 +1330,9 @@ async function extrairEvol(id){
   let prompt;
   if(editar){
     const A=[]; const g=(lbl,v)=>{v=(v||'').trim();if(v)A.push(lbl+': '+v);};
-    g('nome',getVal('f_nome'));g('idade',getVal('f_idade'));g('diagnosticos',getVal('f_dx'));g('comorbidades',getVal('f_comorb'));g('alergias',getVal('f_alergias'));g('muc',getVal('f_muc'));g('hda',getVal('f_hda'));g('laboratorio',getVal('f_lab'));g('culturas',getVal('f_culturas'));g('imagem',getVal('f_imagem'));g('exameFisico',getVal('f_ef'));g('conduta',getVal('f_conduta'));g('pendencias',getVal('f_pend'));
+    g('idade',getVal('f_idade'));g('diagnosticos',getVal('f_dx'));g('comorbidades',getVal('f_comorb'));g('alergias',getVal('f_alergias'));g('muc',getVal('f_muc'));g('hda',getVal('f_hda'));g('laboratorio',getVal('f_lab'));g('culturas',getVal('f_culturas'));g('imagem',getVal('f_imagem'));g('exameFisico',getVal('f_ef'));g('conduta',getVal('f_conduta'));g('pendencias',getVal('f_pend'));
     prompt='Você é um assistente clínico ATUALIZANDO a ficha de um paciente INTERNADO. Recebe os DADOS ATUAIS (já no sistema) e uma NOVA EVOLUÇÃO; responda APENAS um objeto JSON válido (sem markdown) com EXATAMENTE as chaves abaixo, já com os dados ATUALIZADOS após esta evolução. REGRAS DE ATUALIZAÇÃO:\n'
-     +'- MANTENHA os dados de base (nome, idade, comorbidades, alergias, muc, hda) — só altere se a evolução claramente corrigir/acrescentar.\n'
+     +'- MANTENHA os dados de base (idade, comorbidades, alergias, muc, hda) — só altere se a evolução claramente corrigir/acrescentar.\n'
      +'- "diagnosticos": mantenha os atuais e ACRESCENTE novas hipóteses que a evolução trouxer (sem duplicar).\n'
      +'- "laboratorio": mantenha as investigações já listadas e ACRESCENTE novos exames investigativos da evolução (mesmas regras; sem duplicar o mesmo exame).\n'
      +'- "culturas" e "imagem": ACRESCENTE os novos resultados aos já existentes (sem duplicar).\n'
@@ -1329,12 +1346,11 @@ async function extrairEvol(id){
      +'Não invente nada; use "" ou [] quando não houver. Português do Brasil.\n\nEvolução:\n'+raw;
   }
   try{
-    const txt=await MT.ai(prompt);
+    const txt=await MT.ai(prompt,undefined,{grounding:false});
     const data=parseJsonLoose(txt);
     if(!data){toast('Não consegui estruturar automaticamente. Confira o texto ou preencha à mão.');}
     else{
       const toLines=v=>Array.isArray(v)?v.filter(Boolean).join('\n'):(v||'');
-      setVal('f_nome',data.nome||'');
       setVal('f_idade',data.idade||'');
       setVal('f_comorb',data.comorbidades||'');
       setVal('f_alergias',data.alergias||'');
