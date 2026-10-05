@@ -12,10 +12,11 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MedProvas">
-<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mammoth@1.7.0/mammoth.browser.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<!-- bibliotecas servidas daqui (vendor/, versão exata, conferidas por hash em jsDelivr e unpkg) -->
+<script src="vendor/pdfjs-3.11.174/pdf.min.js"></script>
+<script src="vendor/mammoth-1.7.0/mammoth.browser.min.js"></script>
+<script src="vendor/html2pdf-0.10.1/html2pdf.bundle.min.js"></script>
+<script src="vendor/jszip-3.10.1/jszip.min.js"></script>
 <link rel="icon" type="image/png" href="favicon.png">
 <!-- Login único MedTech (mesma conta dos outros apps). IA + trial/Pro via backend
      medprovas-app, autenticado com o token MedTech (endpoints callGeminiHttp/getSubStatusHttp). -->
@@ -2137,7 +2138,7 @@
 // PDF.js worker
 // ============================================================
 if (typeof pdfjsLib !== 'undefined') {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'vendor/pdfjs-3.11.174/pdf.worker.min.js';
 }
 
 // ============================================================
@@ -2895,7 +2896,7 @@ async function extrairTextoPdf(source, onPage) {
   if (typeof source === 'string') bytes = Uint8Array.from(atob(source), c => c.charCodeAt(0));
   else if (source && typeof source.arrayBuffer === 'function') bytes = new Uint8Array(await source.arrayBuffer());
   else return '';
-  const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
+  const pdf = await pdfjsLib.getDocument({ data: bytes, isEvalSupported: false }).promise;
   const partes = [];
   for (let p = 1; p <= pdf.numPages; p++) {
     if (onPage) onPage(p, pdf.numPages);
@@ -3457,7 +3458,7 @@ function fecharBuscaImagem() {
 
 async function traduzirTermoParaIngles(termoPt) {
   try {
-    const prompt = `Você é um tradutor de termos médicos. Traduza o termo abaixo de PORTUGUÊS para INGLÊS, usando a terminologia médica padrão internacional (do tipo usada em PubMed, Radiopaedia, Wikipedia médico).
+    const prompt = `Você é um tradutor de termos médicos. Traduza o termo abaixo de PORTUGUÊS para INGLÊS, usando a terminologia médica padrão internacional (a usada em artigos indexados no PubMed e em livros-texto).
 
 Termo em português: "${termoPt}"
 
@@ -3602,7 +3603,7 @@ async function extrairPaginaPdfComoImagem(pdfSource, pagina, maxWidth = 1100) {
   } else {
     throw new Error('Fonte do PDF inválida para extração de página');
   }
-  const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
+  const pdf = await pdfjsLib.getDocument({ data: bytes, isEvalSupported: false }).promise;
   const pageNum = Math.max(1, Math.min(pdf.numPages, parseInt(pagina) || 1));
   const page = await pdf.getPage(pageNum);
   const viewport1 = page.getViewport({ scale: 1 });
