@@ -1,7 +1,8 @@
 // Módulo DICOM: parse, viewer com WW/WL ajustável, presets, scrubber, multi-slice
 const Dicom = (() => {
-  const CDN_DICOM_PARSER = 'https://unpkg.com/dicom-parser@1.8.21/dist/dicomParser.min.js';
-  const CDN_JSZIP = 'https://unpkg.com/jszip@3.10.1/dist/jszip.min.js';
+  // bibliotecas servidas do próprio site (vendor/, versão exata, conferidas por hash em jsDelivr e unpkg)
+  const CDN_DICOM_PARSER = 'vendor/dicom-parser-1.8.21/dicomParser.min.js';
+  const CDN_JSZIP = 'vendor/jszip-3.10.1/jszip.min.js';
 
   // Presets WL/WW (em Hounsfield Units para CT, mas funcionam como aproximação para outras modalidades)
   const PRESETS = [

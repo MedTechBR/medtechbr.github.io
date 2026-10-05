@@ -26,7 +26,11 @@ html, body {
 }
 body { background-color: #FAFAF8; background-image: radial-gradient(1100px 460px at 84% -10%, rgba(65,102,214,.12), transparent 60%), radial-gradient(840px 460px at 4% 110%, rgba(14,138,99,.06), transparent 55%), linear-gradient(rgba(140,160,185,.032) 1px, transparent 1px), linear-gradient(90deg, rgba(140,160,185,.032) 1px, transparent 1px); background-size: auto, auto, 34px 34px, 34px 34px; background-attachment: fixed; }
 button { cursor: pointer; border: none; background: none; color: inherit; font-family: inherit; }
-input, textarea, select { font-family: inherit; outline: none; }
+input, textarea, select { font-family: inherit; }
+/* foco visível para quem navega pelo teclado (o outline:none global escondia onde o foco estava) */
+/* !important: botões com sombra própria (ex.: .land-btn) cobriam o anel de box-shadow do tema vivo */
+html body :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible { outline: 2px solid var(--accent, #4166D6) !important; outline-offset: 2px; }
+html body .busca input:focus-visible { outline: none !important; } /* a caixa .busca já mostra o anel com :focus-within */
 h1, h2, h3, h4, h5 { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
 
 .app { min-height: 100vh; padding-bottom: env(safe-area-inset-bottom); }
@@ -180,6 +184,7 @@ h1, h2, h3, h4, h5 { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sa
 .land-price-features li { padding: 8px 0; font-size: 14px; color: var(--land-text); display: flex; align-items: flex-start; gap: 10px; }
 .land-price-features li::before { content: "✓"; color: var(--land-blue); font-weight: 700; flex-shrink: 0; }
 .land-price-trial { font-size: 13px; color: var(--land-text-dim); margin-top: 14px; }
+.land-price-desc { margin: 0 0 14px; font-size: 15px; line-height: 1.5; color: var(--land-text-dim); }
 
 /* FAQ */
 .land-faq-grid { max-width: 760px; margin: 0 auto; }
