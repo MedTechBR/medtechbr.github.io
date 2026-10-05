@@ -12,7 +12,7 @@
 <title>laudAI · Laudos médicos com IA</title>
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="stylesheet" href="vendor/tabler/tabler-icons.min.css?v=3.48.0">
-<link rel="stylesheet" href="laudai.css?v=51">
+<link rel="stylesheet" href="laudai.css?v=52">
 <!-- Login único MedTech (mesma conta dos outros apps). IA + trial/Pro via backend
      radioia-a61ec, autenticado com o token MedTech (generateLaudoHttp/getSubStatusHttp). -->
 <script>window.MT_APP={id:"laudai",name:"LaudAI"};</script>
@@ -76,7 +76,7 @@
           <div class="land-step-num">1</div>
           <div class="land-step-icon"><i class="ti ti-upload"></i></div>
           <h3>Anexe o exame</h3>
-          <p>Imagem, DICOM, ZIP de série ou texto. Inclui link de PACS Clinux via bookmarklet.</p>
+          <p>Imagem, DICOM, ZIP de série ou texto. Exporta a série de PACS com visualizador web (OHIF) por um favorito do navegador.</p>
         </div>
         <div class="land-step">
           <div class="land-step-num">2</div>
@@ -119,22 +119,20 @@
 
     <section class="land-section land-pricing">
       <h2>Quanto custa</h2>
-      <p class="land-section-sub">Um plano simples. Cancele quando quiser.</p>
+      <p class="land-section-sub">O LaudAI não tem plano próprio: faz parte da conta MedTech.</p>
       <div class="land-price-card">
-        <div class="land-price-badge">Mais popular</div>
-        <div class="land-price-name">Pro</div>
-        <div class="land-price-value"><span class="currency">R$</span>29,90<span class="period">/mês</span></div>
+        <div class="land-price-name">Incluído na conta MedTech</div>
+        <p class="land-price-desc">IA com limite diário de uso justo, o mesmo dos outros apps MedTech.</p>
         <ul class="land-price-features">
-          <li>Laudos ilimitados</li>
           <li>Todos os tipos de exame</li>
           <li>Visualizador DICOM completo (WW/WL, presets, scrubber)</li>
           <li>Modelos Gemini 2.5 Pro / Flash</li>
           <li>Histórico sincronizado entre dispositivos</li>
-          <li>Bookmarklet de integração PACS</li>
+          <li>Favorito de exportação de PACS (OHIF)</li>
           <li>Suporte por email</li>
         </ul>
         <button class="land-btn land-btn-primary land-btn-lg" id="land-cta-2" style="width:100%;">Entrar com a conta MedTech</button>
-        <div class="land-price-trial">Sem cartão para o trial · Pagamento via Kiwify (PIX, cartão, boleto)</div>
+        <div class="land-price-trial">Sem cobrança à parte pelo LaudAI.</div>
       </div>
     </section>
 
@@ -152,15 +150,15 @@
         </details>
         <details class="land-faq-item">
           <summary>Meus dados estão seguros?</summary>
-          <p>Imagens e textos são processados pela API Gemini do Google. Os arquivos enviados são armazenados por até 48h nos servidores Google e depois deletados. <strong>Para dados identificáveis (PHI), remova nome/CPF/data de nascimento antes</strong> — ou use o modo "Chave própria" pra controlar você mesmo o fluxo.</p>
+          <p>Imagens e textos são processados pela IA do Google Cloud (Vertex AI) dentro da conta MedTech e não são usados para treinar modelos. O DICOM vai só como imagem, sem o cabeçalho com nome e ID do paciente. <strong>Antes de enviar, tire nome, CPF e data de nascimento de textos e fotos.</strong></p>
         </details>
         <details class="land-faq-item">
-          <summary>Posso cancelar quando quiser?</summary>
-          <p>Sim. A cobrança é mensal, sem fidelidade. Você cancela no painel do Kiwify com 2 cliques. Acesso continua até o fim do ciclo pago.</p>
+          <summary>Preciso assinar algo à parte?</summary>
+          <p>Não. A IA do LaudAI vem incluída na conta MedTech, com limite diário de uso justo. Não há cobrança separada pelo LaudAI.</p>
         </details>
         <details class="land-faq-item">
           <summary>Como funciona com DICOM e PACS?</summary>
-          <p>Arraste arquivos <code>.dcm</code> ou um <code>.zip</code> da série inteira — abre um visualizador com presets (osso, pulmão, mediastino, cérebro, abdome), scrubber de cortes e seleção de faixa. Para PACS Clinux, oferecemos um <strong>bookmarklet</strong> que exporta a série completa em ZIP direto da página do PACS.</p>
+          <p>Arraste arquivos <code>.dcm</code> ou um <code>.zip</code> da série inteira — abre um visualizador com presets (osso, pulmão, mediastino, cérebro, abdome), scrubber de cortes e seleção de faixa. Para PACS com visualizador web (OHIF), há um <strong>favorito de exportação</strong> que baixa a série completa em ZIP direto da página do PACS.</p>
         </details>
         <details class="land-faq-item">
           <summary>Funciona em celular?</summary>
@@ -200,11 +198,11 @@
         <div>
           <h5>Contato</h5>
           <ul>
-            <li><a href="mailto:contato@laudai.app.br">contato@laudai.app.br</a></li>
+            <li><a href="mailto:medtechbr1@gmail.com">medtechbr1@gmail.com</a></li>
           </ul>
         </div>
       </div>
-      <div class="land-footer-bottom">© 2026 laudAI. Todos os direitos reservados.</div>
+      <div class="land-footer-bottom">© 2026 MedTech. Todos os direitos reservados.</div>
     </footer>
   </div>
 
@@ -366,7 +364,7 @@
             <details class="tip">
               <summary><i class="ti ti-bulb"></i> Dicas para DICOM e PACS <i class="ti ti-chevron-down seta"></i></summary>
               <p><strong>DICOM:</strong> arraste arquivos <code>.dcm</code> ou um <code>.zip</code> com a série inteira. Abre um visualizador com janelas (osso, pulmão, mediastino, cérebro, abdome), rolagem de cortes e escolha dos cortes a enviar.</p>
-              <p><strong>PACS Clinux:</strong> copie o link do exame da barra de endereço e cole acima. Se não funcionar, <button type="button" class="link-btn" id="btn-show-bookmarklet">use o favorito de exportação</button>.</p>
+              <p><strong>PACS (visualizador web OHIF):</strong> copie o link do exame da barra de endereço e cole acima. Se não funcionar, <button type="button" class="link-btn" id="btn-show-bookmarklet">use o favorito de exportação</button>.</p>
               <p><strong>Vídeo:</strong> a análise de vídeo ainda não está disponível. Exporte os cortes principais como imagens.</p>
             </details>
 
@@ -543,35 +541,18 @@
       <div class="modal">
         <div class="modal-header">
           <div>
-            <div class="modal-title">Continue gerando laudos</div>
-            <div class="modal-sub" id="paywall-status">Assine Pro pra acesso ilimitado.</div>
+            <div class="modal-title">IA incluída na conta MedTech</div>
+            <div class="modal-sub" id="paywall-status">Com limite diário de uso justo.</div>
           </div>
-          <button class="modal-close" id="paywall-close">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <button class="modal-close" id="paywall-close" aria-label="Fechar">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
         <div class="modal-body">
-          <div class="paywall-hero">
-            <div class="paywall-price"><span id="paywall-price">R$ 29,90/mês</span></div>
-            <ul class="paywall-features">
-              <li><i class="ti ti-check"></i> Laudos ilimitados</li>
-              <li><i class="ti ti-check"></i> Todos os tipos: imagens, DICOM, ECG, laboratório, gasometria, etc.</li>
-              <li><i class="ti ti-check"></i> Visualizador DICOM completo (WW/WL, presets, scrubber)</li>
-              <li><i class="ti ti-check"></i> Modelos Gemini 2.5 Pro / Flash</li>
-              <li><i class="ti ti-check"></i> Histórico sincronizado em todos os dispositivos</li>
-              <li><i class="ti ti-check"></i> Cancele quando quiser</li>
-            </ul>
-          </div>
-          <a id="paywall-checkout" class="btn btn-primary btn-block" href="#" target="_blank" rel="noopener">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11V7a3 3 0 0 1 6 0v4"/><rect x="5" y="11" width="14" height="10" rx="2"/></svg>
-            Assinar Pro · checkout Kiwify
-          </a>
-          <div style="text-align:center;margin-top:14px;">
-            <button class="link-btn" id="paywall-byok" style="font-size:13px;">Tenho minha chave Gemini: usar o modo avançado</button>
-          </div>
-          <div style="font-size:11px; color: var(--text-faint); margin-top:14px; line-height:1.5;">
-            Pagamento via Kiwify (PIX, cartão, boleto). Após confirmação, seu acesso é liberado em segundos. Para cancelar, acesse o painel do Kiwify.
-          </div>
+          <p style="font-size:13px; color: var(--text-dim); line-height:1.6; margin-bottom: 14px;">
+            O LaudAI não tem plano próprio nem cobrança à parte. A IA vem incluída na sua conta MedTech, com o mesmo limite diário de uso justo dos outros apps. Se o limite do dia acabou, ele volta no dia seguinte.
+          </p>
+          <button type="button" class="btn btn-primary btn-block" id="paywall-ok">Entendi</button>
         </div>
       </div>
     </div>
@@ -581,27 +562,23 @@
       <div class="modal">
         <div class="modal-header">
           <div>
-            <div class="modal-title">Vídeo exige chave Gemini própria</div>
-            <div class="modal-sub">Limitação do plano Pro v1.</div>
+            <div class="modal-title">Vídeo ainda não é analisado</div>
+            <div class="modal-sub">Use imagens dos cortes-chave.</div>
           </div>
-          <button class="modal-close" id="video-byok-close">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <button class="modal-close" id="video-byok-close" aria-label="Fechar">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
         <div class="modal-body">
           <p style="font-size:13px; color: var(--text-dim); line-height:1.6; margin-bottom: 14px;">
-            Análise de vídeo (cine de TC/RM até 2GB) é uma feature pesada de banda. Por enquanto, ela só funciona com sua própria chave Gemini direta: o app não cobra você por isso.
-          </p>
-          <p style="font-size:13px; color: var(--text-dim); line-height:1.6; margin-bottom: 14px;">
-            <strong>Como ativar:</strong> obtenha grátis em <a class="link" href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a>, copie a chave (<code>AIza...</code>) e cole em Configurações.
+            A análise de vídeo (cine de TC/RM) não está disponível nesta versão.
           </p>
           <p style="font-size:13px; color: var(--text-dim); line-height:1.6;">
-            <strong>Alternativa:</strong> exporte cortes-chave da TC/RM como imagens JPG/PNG separadas. Imagens funcionam normalmente no Pro.
+            <strong>Alternativa:</strong> exporte os cortes-chave da TC/RM como imagens JPG/PNG separadas. Imagens e DICOM funcionam normalmente.
           </p>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-ghost" id="video-byok-close-2" style="flex:1;" onclick="document.getElementById('modal-video-byok').classList.add('hidden')">Voltar</button>
-          <button class="btn btn-primary" id="video-byok-settings" style="flex:1;">Configurar chave</button>
+          <button class="btn btn-primary" id="video-byok-close-2" style="flex:1;" onclick="document.getElementById('modal-video-byok').classList.add('hidden')">Voltar</button>
         </div>
       </div>
     </div>
@@ -612,17 +589,17 @@
         <div class="modal-header">
           <div>
             <div class="modal-title">Exportar do PACS para o LaudAI</div>
-            <div class="modal-sub">Baixa a série DICOM inteira em ZIP. Funciona com o Clinux e visualizadores OHIF.</div>
+            <div class="modal-sub">Baixa a série DICOM inteira em ZIP. Funciona com PACS que usam visualizador web OHIF.</div>
           </div>
-          <button class="modal-close" id="bookmarklet-close">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <button class="modal-close" id="bookmarklet-close" aria-label="Fechar">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
         <div class="modal-body">
           <ol style="font-size: 13px; color: var(--text-dim); line-height: 1.7; padding-left: 18px; margin-bottom: 16px;">
             <li><strong>Mostre a barra de favoritos</strong> no Chrome/Safari (⌘⇧B).</li>
             <li><strong>Arraste o botão abaixo</strong> para a barra de favoritos.</li>
-            <li>No PACS Clinux, abra o exame e <strong>clique no favorito</strong>.</li>
+            <li>No PACS, abra o exame e <strong>clique no favorito</strong>.</li>
             <li>Aguarde o download. Um aviso no canto da tela mostra o progresso (ex.: <em>Baixando 47 / 312 DICOMs</em>).</li>
             <li><strong>Arraste o ZIP baixado</strong> para a área de anexos do LaudAI. O visualizador DICOM abre com a série completa para você escolher os cortes.</li>
           </ol>
@@ -633,7 +610,7 @@
             <div style="font-size: 12px; color: var(--text-faint); margin-top: 8px;">Arraste este botão para a barra de favoritos</div>
           </div>
           <div style="font-size: 12px; color: var(--text-faint); line-height: 1.6; padding: 12px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px;">
-            <strong style="color: var(--text-dim);">Como funciona:</strong> o bookmarklet roda dentro do domínio do PACS, lê o manifesto OHIF da URL (<code>?json=…</code>), baixa todos os arquivos <code>.dcm</code> da série em paralelo (6 simultâneos), e empacota num ZIP. Tudo local, sem envio externo. <strong>Fallback:</strong> se não encontrar manifesto, captura até 30 canvases visíveis como PNG.
+            <strong style="color: var(--text-dim);">Como funciona:</strong> o bookmarklet roda dentro do domínio do PACS, lê o manifesto OHIF da URL (<code>?json=…</code>), baixa todos os arquivos <code>.dcm</code> da série em paralelo (6 simultâneos), e empacota num ZIP no seu computador: nada do exame é enviado para fora. Só a biblioteca de ZIP é baixada de medtechbr.com.br (conferida por hash). <strong>Fallback:</strong> se não encontrar manifesto, captura até 30 canvases visíveis como PNG.
           </div>
         </div>
       </div>
@@ -643,8 +620,8 @@
 
 </div>
 
-<script src="laudai.gemini.js?v=3"></script>
-<script src="laudai.dicom.js?v=1"></script>
-<script src="laudai.app.js?v=557"></script>
+<script src="laudai.gemini.js?v=5"></script>
+<script src="laudai.dicom.js?v=2"></script>
+<script src="laudai.app.js?v=558"></script>
 </body>
 </html>

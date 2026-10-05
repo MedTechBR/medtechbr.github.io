@@ -76,18 +76,19 @@ const Gemini = (() => {
 
   // ===== generateContent =====
   // Modos:
-  //   - BYOK: usuário colou sua própria chave Gemini → chama API direto
-  //   - Pro:  sem chave própria → chama Cloud Function (que valida assinatura + 3 grátis)
+  //   - (chave própria desativada: getKey() devolve sempre vazio)
+  //   - Conta MedTech: IA central (Vertex AI) pelo MT.ai/MT.aiImage, com limite diário de uso justo
   function isByokMode() { return !!getKey(); }
 
   function buildParts(media, ctx) {
     const parts = [];
     media.forEach((m, i) => {
       if (m.kind === 'image' || m.kind === 'dicom') {
-        parts.push({ text: m.kind === 'dicom' ? `Imagem ${i + 1} (DICOM, ${m.label || m.name}):` : `Imagem ${i + 1}: ${m.name}` });
+        // o nome original do arquivo NÃO vai para a IA (costuma trazer nome do paciente, prontuário ou data)
+        parts.push({ text: m.kind === 'dicom' ? `Imagem ${i + 1} (DICOM${m.label ? ', ' + m.label : ''}):` : `Imagem ${i + 1}:` });
         parts.push({ inline_data: { mime_type: m.mimeType, data: m.base64 } });
       } else {
-        parts.push({ text: `Vídeo ${i + 1}: ${m.name}` });
+        parts.push({ text: `Vídeo ${i + 1}:` });
         parts.push({ file_data: { mime_type: m.mimeType, file_uri: m.fileUri } });
       }
     });
@@ -118,7 +119,8 @@ const Gemini = (() => {
     if (images.length > 6) throw new Error('Máximo de 6 imagens por laudo — remova algumas e tente de novo.');
     let text;
     try {
-      text = images.length ? await MT.aiImage(images, prompt, model) : await MT.ai(prompt, model);
+      // grounding:false: o texto é dado de exame/paciente e não pode virar consulta ao Google
+      text = images.length ? await MT.aiImage(images, prompt, model, { grounding: false }) : await MT.ai(prompt, model, { grounding: false });
     } catch (e) {
       const msg = (e && e.message) || 'Falha na IA.';
       if (/unauthenticated|Entre na sua conta/i.test(msg)) throw new Error('Entre na sua conta MedTech para gerar laudos.');

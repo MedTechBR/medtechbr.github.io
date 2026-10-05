@@ -17,10 +17,7 @@ const $$ = (sel) => document.querySelectorAll(sel);
 const LS_LANG = 'laudai_lang';
 const LS_STYLE = 'laudai_style';
 
-// URL do produto no Kiwify (preencha depois de criar o produto no painel)
-// Exemplo: https://pay.kiwify.com.br/seu-id-aqui
-const KIWIFY_CHECKOUT_URL = 'https://pay.kiwify.com.br/REPLACE_ME';
-const SUBSCRIPTION_PRICE_LABEL = 'R$ 29,90/mês';
+// Sem plano próprio: a IA do LaudAI vem incluída na conta MedTech, com limite diário de uso justo.
 
 // ===== Init wiring =====
 // ===== Login central MedTech =====
@@ -230,15 +227,7 @@ async function refreshSubscriptionBadge() {
   const badge = $('#subscription-badge');
   if (!badge) return;
 
-  // BYOK: sem assinatura, badge mostra "Chave própria"
-  if (Gemini.isByokMode()) {
-    badge.innerHTML = '<i class="ti ti-key"></i><span>Chave própria</span>';
-    badge.className = 'subscription-badge byok';
-    badge.title = 'Usando sua API Key Gemini diretamente';
-    return;
-  }
-
-  // Pro: consulta Cloud Function
+  // IA da conta MedTech (getSubscriptionStatus devolve ecosystem quando há login)
   badge.innerHTML = '<span style="opacity:.6">…</span>';
   const sub = await Gemini.getSubscriptionStatus();
   state.subscription = sub;
@@ -357,16 +346,14 @@ function initMainApp() {
   if (!/Mac|Win|Linux/.test(navigator.platform || '') || matchMedia('(pointer:coarse)').matches) { const d = $('#gerarDica'); if (d) d.classList.add('hidden'); }
   else if (/Mac/.test(navigator.platform || '')) { const d = $('#gerarDica'); if (d) d.textContent = 'Atalho: ⌘ + Enter'; }
 
-  // Paywall: com a IA incluída na conta MedTech o selo só informa (o checkout da assinatura avulsa não existe)
+  // Selo da IA: com a IA incluída na conta MedTech o selo só informa (não existe assinatura avulsa)
   const pb = $('#subscription-badge'); if (pb) pb.addEventListener('click', () => {
-    if (Gemini.isByokMode()) return;
     if (state.subscription && (state.subscription.ecosystem || state.subscription.isPaid)) { toast('A IA vem incluída na sua conta MedTech.'); return; }
     openPaywall();
   });
   const pc = $('#paywall-close'); if (pc) pc.addEventListener('click', closePaywall);
-  const pbyok = $('#paywall-byok'); if (pbyok) pbyok.addEventListener('click', () => { closePaywall(); openSettings(); });
+  const pok = $('#paywall-ok'); if (pok) pok.addEventListener('click', closePaywall);
   const vc = $('#video-byok-close'); if (vc) vc.addEventListener('click', closeVideoByokModal);
-  const vbtn = $('#video-byok-settings'); if (vbtn) vbtn.addEventListener('click', () => { closeVideoByokModal(); openSettings(); });
 
   $('#btn-logout').addEventListener('click', async () => {
     if (!confirm('Sair da conta MedTech?')) return;
@@ -639,8 +626,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function generate() {
   if (state.generating) return;
   if (!declaracaoOk()) { pedirDeclaracao(); return; }
-  // Sem chave própria o fluxo segue no plano Pro (proxy generateLaudo);
-  // exigir chave aqui mataria o modo assinatura.
+  // A IA vai pela conta MedTech (proxy generateLaudo); não há chave própria.
   const examText = $('#exam-text').value.trim();
   if (!state.media.some(m => m.kind !== 'video') && !examText) {
     toast('Anexe uma imagem ou cole os resultados do exame em texto.', 'error'); return;
@@ -726,8 +712,7 @@ async function generate() {
       openVideoByokModal();
     } else if (err.code === 'pro-not-deployed' || /PRO_NOT_DEPLOYED/.test(err.message || '')) {
       showOutput('empty');
-      toast('Plano Pro ainda não foi ativado pelo administrador. Use sua própria chave Gemini em Configurações.', 'error');
-      openSettings();
+      toast('A IA não está disponível agora. Tente de novo em alguns minutos.', 'error');
     } else {
       showError(err.message || 'Falha na comunicação com a API.');
     }
@@ -897,7 +882,7 @@ async function fetchExternalUrl(rawUrl) {
   const oldText = btn.textContent;
   btn.textContent = 'Baixando…';
   try {
-    // Detecta padrão OHIF (Clinux, Horos etc.) com ?json=<manifesto>
+    // Detecta padrão OHIF (visualizadores web de PACS) com ?json=<manifesto>
     const jsonParam = url.searchParams.get('json') || url.searchParams.get('url');
     if (jsonParam) {
       toast('Link OHIF reconhecido. Carregando a série.');
@@ -1022,7 +1007,7 @@ async function parseOhifJson(text) {
         } catch {}
       }
     } catch (e) {
-      console.warn('Falha em', u, e.message);
+      console.warn('Falha ao baixar uma imagem do PACS:', e.message); // sem a URL: ela leva ID do exame/token
     }
   }
   return ok;
@@ -1030,15 +1015,18 @@ async function parseOhifJson(text) {
 
 // ===== Bookmarklet =====
 function buildBookmarkletCode() {
-  // Bookmarklet: roda na página do PACS (Clinux, OHIF, qualquer viewer com ?json=manifest).
+  // Bookmarklet: roda na página do PACS (visualizadores web OHIF, qualquer viewer com ?json=manifest).
+  // Privacidade: o log (_LAUDAI_LOG.txt, que entra no ZIP) NÃO grava a URL do PACS, do manifesto nem das
+  // imagens, nem trechos do manifesto: essas URLs costumam levar ID do exame/paciente e token de acesso.
+  // JSZip vem do medtechbr.com.br com integrity (SRI): se o arquivo for alterado, o navegador recusa.
   // Lê o manifesto OHIF, baixa TODOS os DICOMs da série (não apenas a slice na tela)
   // e empacota em ZIP que o usuário arrasta para o LaudAI.
   // Fallback: se não houver manifesto, captura múltiplos canvases visíveis.
   const code = `(async()=>{
 var log=[],push=function(m){log.push('['+(new Date).toISOString()+'] '+m);try{console.log('[RL]',m);}catch(e){}};
-push('Start. URL='+location.href);
+push('Start. Origem='+location.origin);
 try{
-if(!window.JSZip)await new Promise((R,E)=>{var s=document.createElement('script');s.src='https://unpkg.com/jszip@3.10.1/dist/jszip.min.js';s.onload=R;s.onerror=()=>E(new Error('JSZip falhou'));document.head.appendChild(s);});
+if(!window.JSZip)await new Promise((R,E)=>{var s=document.createElement('script');s.src='https://medtechbr.com.br/vendor/jszip-3.10.1/jszip.min.js';s.integrity='sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG';s.crossOrigin='anonymous';s.onload=R;s.onerror=()=>E(new Error('JSZip falhou'));document.head.appendChild(s);});
 push('JSZip loaded');
 var box=document.createElement('div');box.style.cssText='position:fixed;top:20px;right:20px;background:#0a0e1a;color:#e2e8f0;padding:16px 20px;border-radius:12px;border:2px solid #06b6d4;font-family:system-ui;font-size:13px;z-index:2147483647;box-shadow:0 12px 32px rgba(0,0,0,.5);min-width:300px;max-width:400px;line-height:1.5';
 box.innerHTML='<div id="rl-h" style="font-weight:700;margin-bottom:6px">LaudAI — exportando</div><div id="rl-s">Procurando manifesto OHIF…</div><div id="rl-err" style="margin-top:8px;font-size:11px;color:#f59e0b;max-height:120px;overflow-y:auto;display:none"></div>';
@@ -1047,7 +1035,7 @@ var st=box.querySelector('#rl-s'),hd=box.querySelector('#rl-h'),errEl=box.queryS
 function showErr(m){errEl.style.display='block';errEl.innerHTML+='⚠ '+m+'<br>';}
 function finalize(zip,total,label,ok){zip.file('_LAUDAI_LOG.txt',log.join('\\n'));return zip.generateAsync({type:'blob'}).then(b=>{var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='laudai-'+label+'-'+Date.now()+'.zip';a.click();if(ok){hd.textContent='✓ '+total+' arquivo(s) prontos';hd.style.color='#10b981';st.innerHTML='<span style=color:#94a3b8>Arraste o ZIP no LaudAI</span>';}else{hd.textContent='⚠ Exportação parcial / log baixado';hd.style.color='#f59e0b';}setTimeout(()=>box.remove(),30000);});}
 var u=new URL(location.href),jsonUrl=u.searchParams.get('json')||u.searchParams.get('url')||u.searchParams.get('manifest'),urls=[];
-push('jsonUrl='+jsonUrl);
+push('Manifesto na URL: '+(jsonUrl?'sim':'não'));
 if(jsonUrl){
   st.textContent='Baixando manifesto OHIF…';
   try{
@@ -1058,13 +1046,11 @@ if(jsonUrl){
     push('Manifesto content-type: '+ct);
     var text=await mr.text();
     push('Manifesto body length: '+text.length);
-    var data;try{data=JSON.parse(text);}catch(e){showErr('Manifesto não é JSON válido');push('Parse JSON falhou: '+e.message+'. Primeiros 200 chars: '+text.slice(0,200));throw e;}
+    var data;try{data=JSON.parse(text);}catch(e){showErr('Manifesto não é JSON válido');push('Parse JSON falhou: '+e.message);throw e;}
     push('Manifesto keys: '+Object.keys(data).join(','));
     function visit(n){if(!n)return;if(Array.isArray(n))return n.forEach(visit);if(typeof n!=='object')return;['url','wadoUri','wadouri','WadoUriUrl','imageUrl','fileLocation','src','dicomweb','RetrieveURL','retrieveUrl'].forEach(function(k){if(typeof n[k]==='string'){var raw=n[k],x=raw.replace(/^wadouri:/i,'').replace(/^dicomweb:/i,'');if(/^https?:/i.test(x))urls.push(x);}});Object.values(n).forEach(visit);}
     visit(data);urls=Array.from(new Set(urls));
     push('URLs encontradas: '+urls.length);
-    if(urls.length)push('Exemplo URL: '+urls[0].slice(0,150));
-    else push('Manifesto sample: '+JSON.stringify(data).slice(0,500));
   }catch(e){showErr('Manifesto: '+e.message);push('Erro manifesto: '+e.message);}
 }else{
   showErr('URL não tem ?json= (não é OHIF padrão)');
@@ -1099,22 +1085,11 @@ function openBookmarklet() {
 }
 function closeBookmarklet() { $('#modal-bookmarklet').classList.add('hidden'); }
 
-// ===== Paywall / Monetização =====
+// ===== Aviso de uso da IA (sem cobrança à parte) =====
 function openPaywall() {
   if (!$('#modal-paywall')) return;
-  const sub = state.subscription || {};
   const subEl = $('#paywall-status');
-  if (subEl) {
-    if (sub.freeRemaining === 0) subEl.textContent = 'Você usou seus 3 laudos gratuitos.';
-    else subEl.textContent = `${sub.freeRemaining || 0} laudo(s) grátis restante(s).`;
-  }
-  const link = $('#paywall-checkout');
-  if (link) {
-    const uid = window.currentUid || '';
-    const url = `${KIWIFY_CHECKOUT_URL}?s1=${encodeURIComponent(uid)}`;
-    link.setAttribute('href', url);
-  }
-  $('#paywall-price').textContent = SUBSCRIPTION_PRICE_LABEL;
+  if (subEl) subEl.textContent = state.subscription ? 'Com limite diário de uso justo.' : 'Entre na sua conta MedTech para usar a IA.';
   $('#modal-paywall').classList.remove('hidden');
 }
 function closePaywall() { $('#modal-paywall').classList.add('hidden'); }
