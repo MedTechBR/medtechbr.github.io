@@ -1,7 +1,7 @@
 /* CondutAI — Prescrição com conferência de segurança.
    Etapas: (1) dados do paciente com os campos de segurança obrigatórios; (2) a IA pergunta o que falta e,
    em paralelo, busca a diretriz vigente; (3) a IA monta a prescrição ESTRUTURADA (JSON); (4) conferência por
-   regra (condutai-seguranca.js) + revisão independente por uma segunda IA no papel de farmacêutico;
+   regra (condutai-seguranca.js) + conferência independente por uma segunda IA (não substitui revisão farmacêutica);
    (5) o médico revisa item a item, edita, pede ajustes e só copia depois de marcar que conferiu.
    Nada é salvo: os dados do paciente ficam só nesta aba (sessionStorage), sem nome. */
 (function () {
@@ -248,11 +248,13 @@ Revise criticamente esta prescrição para ESTE paciente, como farmacêutico cl�
     box().innerHTML = `<div class="rx-andamento">${etapas('perguntas', 'Vendo se falta alguma informação que muda a conduta')}</div>`;
     cvMostra(box());
     // pesquisa da diretriz roda em paralelo às perguntas
-    const pBrief = ia([{ role: 'user', parts: [{ text: promptPesquisa(p) }] }], { model: 'gemini-2.5-flash', temperature: 0.2, maxTokens: 4096, maxRetries: 1 })
+    // Sem busca do Google em NENHUMA etapa da prescrição (regra perto do callGemini no condutai.html): até a pesquisa
+    // da diretriz leva o campo livre "Diagnóstico e contexto", onde o médico costuma escrever idade, comorbidades etc.
+    const pBrief = ia([{ role: 'user', parts: [{ text: promptPesquisa(p) }] }], { model: 'gemini-2.5-flash', temperature: 0.2, maxTokens: 4096, maxRetries: 1, grounding: false })
       .then(r => r.text).catch(() => '');
     let perguntas = [];
     try {
-      const r = await ia([{ role: 'user', parts: [{ text: promptPerguntas(p) }] }], { model: 'gemini-2.5-flash', system: SIS, json: ESQ_PERGUNTAS, temperature: 0.2, maxTokens: 4096, maxRetries: 1 });
+      const r = await ia([{ role: 'user', parts: [{ text: promptPerguntas(p) }] }], { model: 'gemini-2.5-flash', system: SIS, json: ESQ_PERGUNTAS, temperature: 0.2, maxTokens: 4096, maxRetries: 1, grounding: false });
       perguntas = (jsonDe(r.text).perguntas || []).filter(q => q && q.pergunta).slice(0, 3);
     } catch (e) { perguntas = []; }
     EST.pBrief = pBrief;
@@ -293,7 +295,7 @@ Revise criticamente esta prescrição para ESTE paciente, como farmacêutico cl�
     box().innerHTML = `<div class="rx-andamento">${etapas('prescricao', 'Montando os itens com dose, via, intervalo e duração (costuma levar de 20 a 40 s)')}</div>`;
     const contents = [{ role: 'user', parts: [{ text: promptPrescricao(p, respostas, EST.brief) }] }];
     try {
-      const r = await ia(contents, { model: 'gemini-2.5-pro', system: SIS, json: ESQ_PRESC, temperature: 0.2, maxTokens: 24576 });
+      const r = await ia(contents, { model: 'gemini-2.5-pro', system: SIS, json: ESQ_PRESC, temperature: 0.2, maxTokens: 24576, grounding: false });
       const presc = normaliza(jsonDe(r.text));
       EST.contents = [...contents, { role: 'model', parts: [{ text: JSON.stringify(presc) }] }];
       aplica(presc);
@@ -326,7 +328,7 @@ Revise criticamente esta prescrição para ESTE paciente, como farmacêutico cl�
   async function revisar() {
     const alvo = EST.presc;
     try {
-      const r = await ia([{ role: 'user', parts: [{ text: promptRevisao(EST.p, alvo) }] }], { model: 'gemini-2.5-pro', system: 'Você é farmacêutico clínico hospitalar no Brasil, revisor independente de prescrições. Seja rigoroso, específico e breve.', json: ESQ_REVISAO, temperature: 0, maxTokens: 16384 });
+      const r = await ia([{ role: 'user', parts: [{ text: promptRevisao(EST.p, alvo) }] }], { model: 'gemini-2.5-pro', system: 'Você é farmacêutico clínico hospitalar no Brasil, revisor independente de prescrições. Seja rigoroso, específico e breve.', json: ESQ_REVISAO, temperature: 0, maxTokens: 16384, grounding: false });
       if (EST.presc !== alvo) return; // o médico pediu outra versão nesse meio-tempo
       EST.rev = jsonDe(r.text); EST.revEstado = 'pronta';
     } catch (e) { if (EST.presc === alvo) EST.revEstado = 'falhou'; }
@@ -416,7 +418,7 @@ Revise criticamente esta prescrição para ESTE paciente, como farmacêutico cl�
     const rsm = { grave: 0, atencao: 0, info: 0 };
     conf.itens.forEach((c, i) => { const rv = revDoItem(i); const n = rv ? (rv.veredito === 'erro' ? 'grave' : 'atencao') : null; const ORD = { ok: 0, info: 1, atencao: 2, grave: 3 }; const f = n && ORD[n] > ORD[c.nivel] ? n : c.nivel; if (rsm[f] != null) rsm[f]++; });
     const gerais = (EST.rev && Array.isArray(EST.rev.gerais) ? EST.rev.gerais : []).filter(g => g && g.observacao);
-    const revTxt = EST.revEstado === 'rodando' ? '<span class="cv-spin"></span> Revisão independente da IA em andamento' : EST.revEstado === 'pronta' ? '<i class="ti ti-shield-check"></i> Revisada por uma segunda IA no papel de farmacêutico' : EST.revEstado === 'falhou' ? '<i class="ti ti-alert-circle"></i> A revisão da IA não respondeu; a conferência por regra continua valendo' : EST.revEstado === 'semlogin' ? '<i class="ti ti-lock"></i> Conferência por regra feita. Entre na conta para a revisão da IA' : '';
+    const revTxt = EST.revEstado === 'rodando' ? '<span class="cv-spin"></span> Revisão independente da IA em andamento' : EST.revEstado === 'pronta' ? '<i class="ti ti-shield-check"></i> Conferida por uma segunda IA (não substitui revisão farmacêutica)' : EST.revEstado === 'falhou' ? '<i class="ti ti-alert-circle"></i> A revisão da IA não respondeu; a conferência por regra continua valendo' : EST.revEstado === 'semlogin' ? '<i class="ti ti-lock"></i> Conferência por regra feita. Entre na conta para a revisão da IA' : '';
     const grupos = [];
     presc.itens.forEach((it, i) => { let g = grupos.find(x => x.nome === it.grupo); if (!g) grupos.push(g = { nome: it.grupo, idx: [] }); g.idx.push(i); });
     const aberto = document.activeElement && box().contains(document.activeElement) ? document.activeElement : null;
@@ -508,7 +510,7 @@ Revise criticamente esta prescrição para ESTE paciente, como farmacêutico cl�
     if (bt) cvOcupa(bt, true);
     const contents = [...EST.contents, { role: 'user', parts: [{ text: `Ajuste pedido pelo médico: ${pedido}\n\nDevolva a prescrição COMPLETA no mesmo formato, já com o ajuste, mantendo as mesmas regras de segurança. Se o ajuste não for seguro, não o faça e explique em alertas_gerais.` }] }];
     try {
-      const r = await ia(contents, { model: 'gemini-2.5-pro', system: SIS, json: ESQ_PRESC, temperature: 0.2, maxTokens: 24576 });
+      const r = await ia(contents, { model: 'gemini-2.5-pro', system: SIS, json: ESQ_PRESC, temperature: 0.2, maxTokens: 24576, grounding: false });
       const presc = normaliza(jsonDe(r.text));
       EST.contents = [...contents, { role: 'model', parts: [{ text: JSON.stringify(presc) }] }];
       if (/hemodi|dialis/i.test(pedido) && !EST.p.dialise) EST.p.dialise = /peritoneal/i.test(pedido) ? 'diálise peritoneal' : 'hemodiálise';

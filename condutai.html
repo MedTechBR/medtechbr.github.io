@@ -7,11 +7,11 @@
 <meta name="theme-color" content="#0D1017" media="(prefers-color-scheme: dark)">
 <title>CondutAI · condutas clínicas baseadas em diretrizes</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%232563EB'/%3E%3Crect x='42' y='24' width='16' height='52' rx='5' fill='white'/%3E%3Crect x='24' y='42' width='52' height='16' rx='5' fill='white'/%3E%3C/svg%3E">
-<script async src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" onload="try{window.initMermaid?initMermaid():mermaid.initialize({startOnLoad:false})}catch(e){}"></script>
+<script async src="vendor/mermaid-11.17.2/mermaid.min.js" onload="try{window.initMermaid?initMermaid():mermaid.initialize({startOnLoad:false})}catch(e){}"></script>
 <script defer src="condutai-banco.js?v=4"></script>
 <script defer src="condutai-didatica.js?v=1"></script>
 <script defer src="condutai-seguranca.js?v=4"></script>
-<script defer src="condutai-presc.js?v=2"></script>
+<script defer src="condutai-presc.js?v=3"></script>
 <script defer src="condutai-prescricoes.js?v=4"></script>
 <script defer src="condutai-ligacoes.js?v=1"></script>
 <script src="_mtfb.js?v=1"></script>
@@ -862,7 +862,7 @@ aside, .aside-backdrop { display: none !important; }
 .pflag.seen{background:var(--success-soft);color:var(--success)}
 .library-tab.saved-toggle{margin-left:auto}
 .library-tab.saved-toggle.active{background:var(--primary);border-color:var(--primary);color:#fff}
-/* ===== Leitura longa (régua: UpToDate/AMBOSS) =====
+/* ===== Leitura longa (régua das plataformas de referência clínica) =====
    A coluna tinha 730px = 98 caracteres por linha; acima de ~75 o olho erra a
    volta de linha. E o corpo estava em 15px. */
 /* 68ch dava 88 caracteres reais (o 'ch' mede o zero, mais largo que a média):
@@ -3053,7 +3053,7 @@ async function renderMermaidIn(container) {
         el.innerHTML = svg;
         success = true;
       } catch (err2) {
-        el.innerHTML = `<div style="color:var(--danger); font-size:12px; text-align:left; padding:8px;"><i class="ti ti-alert-triangle"></i> Não foi possível desenhar o fluxograma. Mostro o código abaixo (você pode copiar e colar em <a href="https://mermaid.live" target="_blank" style="color:var(--primary)">mermaid.live</a> para editar):<br><pre style="margin-top:8px; font-size:11px; max-height:300px; overflow:auto;">${escapeHtml(code)}</pre></div>`;
+        el.innerHTML = `<div style="color:var(--danger); font-size:12px; text-align:left; padding:8px;"><i class="ti ti-alert-triangle"></i> Não foi possível desenhar o fluxograma. Mostro o código abaixo (você pode copiar e colar em <a href="https://mermaid.live" target="_blank" rel="noopener" style="color:var(--primary)">mermaid.live</a> para editar):<br><pre style="margin-top:8px; font-size:11px; max-height:300px; overflow:auto;">${escapeHtml(code)}</pre></div>`;
       }
     }
   }
@@ -3376,6 +3376,10 @@ Lista com ANO. Formato: \`- [Sociedade] Título da diretriz (ANO) — link se po
 // ============ Chamada Gemini com retry ============
 const TRANSIENT_STATUSES = [429, 500, 502, 503, 504];
 
+// REGRA DE PRIVACIDADE: a busca do Google (grounding) fica ligada por padrão só nas consultas GENÉRICAS
+// (conduta por tema, bula, procedimento, vacina, discussão socrática). Toda chamada que leva dados do PACIENTE
+// (evolução/caso, quadro clínico, exames, medicações em uso, paciente em foco, prescrição) passa grounding:false:
+// com a busca ligada, o modelo pode transformar trechos do caso em consultas ao Google.
 async function callGemini(contents, opts = {}) {
   // IA central MedTech (Vertex via gateway seguro, SEM chave) — usa o login MedTech.
   const u = window.MT && window.MT.user;
@@ -3853,7 +3857,7 @@ async function aiPanelQuiz() {
   const sendBtn = document.getElementById('aiPanelSend'); if (sendBtn) sendBtn.disabled = true;
   try {
     const { text } = await callGeminiJson([{ role: 'user', parts: [{ text: 'Crie 3 questões de múltipla escolha sobre os pontos PRÁTICOS mais importantes desta conduta (decisão, dose, critério de gravidade, armadilha), baseadas SOMENTE no texto dela. Caso curto no enunciado quando couber. Uma correta e três erradas plausíveis, todas com tamanho e nível de detalhe parecidos. Explicação de 1 a 2 frases citando o ponto da conduta.' }] }],
-      { model: 'gemini-2.5-flash', system: aiPanelSistema(), json: ESQ_QUIZ, temperature: 0.6, maxTokens: 8192 });
+      { model: 'gemini-2.5-flash', system: aiPanelSistema(), json: ESQ_QUIZ, temperature: 0.6, maxTokens: 8192, grounding: false });
     let dados; try { dados = JSON.parse(text); } catch (e) { const a = text.indexOf('{'), b = text.lastIndexOf('}'); dados = JSON.parse(text.slice(a, b + 1)); }
     const quiz = (dados.questoes || []).filter(q => q && q.correta && Array.isArray(q.erradas) && q.erradas.length >= 2).slice(0, 3).map(q => {
       const alts = embaralha([{ t: q.correta, ok: true }, ...q.erradas.slice(0, 3).map(t => ({ t, ok: false }))]);
@@ -3918,7 +3922,8 @@ async function sendAIPanelMessage(text, rotulo) {
   if (sendBtn) sendBtn.disabled = true;
   showAIPanelTyping(true);
   try {
-    const { text: resp } = await callGemini(buildAIPanelContents(q), { system: aiPanelSistema() });
+    const temPac = !!((window.CVPresc && CVPresc.resumoPaciente()) || '');
+    const { text: resp } = await callGemini(buildAIPanelContents(q), temPac ? { system: aiPanelSistema(), grounding: false } : { system: aiPanelSistema() });
     aiPanelHistory.push({ role: 'model', display: resp });
   } catch (err) {
     aiPanelHistory.push({ role: 'model', display: 'Não consegui responder: ' + (err.message || 'erro ao consultar a IA.') });
@@ -4171,7 +4176,7 @@ async function assistenteRespond() {
   const sistema = buildAssistentePrompt(cc.ctx, cc.cenario, cc.usarPaciente ? cc.paciente : '');
 
   try {
-    const bruto = (await callGemini(contents, { system: sistema })).text;
+    const bruto = (await callGemini(contents, (cc.usarPaciente && cc.paciente) ? { system: sistema, grounding: false } : { system: sistema })).text;
     const { texto: text, sugestoes } = separaSugestoes(bruto);
     currentConversation.messages.push({ role: 'ai', text, sugestoes });
     const idx = history.findIndex(h => h.id === currentConversation.id);
@@ -4273,7 +4278,8 @@ async function run(query) {
       if (currentMode === 'caso') prompt = buildPromptCaso(query, ctx, cenario);
       else if (currentMode === 'protocolo') prompt = buildPromptProtocolo(query, ctx, cenario, currentProtocol);
       else prompt = buildPromptDireto(query, ctx, cenario, profundidade);
-      const { text, sources } = await callGemini([{ role: 'user', parts: [{ text: prompt }] }]);
+      // modo 'caso' leva a evolução do paciente colada pelo preceptor: sem busca no Google
+      const { text, sources } = await callGemini([{ role: 'user', parts: [{ text: prompt }] }], currentMode === 'caso' ? { grounding: false } : {});
       const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
       const item = {
         id, mode: currentMode, query, text, sources, ctx, cenario, ctxLabel, cenarioLabel,
@@ -5852,8 +5858,8 @@ async function runInteracoes() {
   const obs = (document.getElementById('it_obs').value || '').trim();
   const regras = conferenciaInteracoes(meds);
   box.innerHTML = `${regras}<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Verificando interações…</strong></div><div class="loading-sub">Gravidade, mecanismo e manejo…</div></div>`;
-  try { const { text } = await callGemini([{ role: 'user', parts: [{ text: buildPromptInteracoes(meds, obs) }] }]);
-    box.innerHTML = `${regras}<div class="result content">${accordionize(md(text))}<div class="alert alert-info" style="margin-top:14px"><span><i class="ti ti-info-circle"></i></span><div>Análise da IA: confirme em fonte de interações (bula, UpToDate, Micromedex) antes de decidir.</div></div></div>`;
+  try { const { text } = await callGemini([{ role: 'user', parts: [{ text: buildPromptInteracoes(meds, obs) }] }], { grounding: false });
+    box.innerHTML = `${regras}<div class="result content">${accordionize(md(text))}<div class="alert alert-info" style="margin-top:14px"><span><i class="ti ti-info-circle"></i></span><div>Análise da IA: confirme na bula oficial (ANVISA) ou em uma base de interações medicamentosas antes de decidir.</div></div></div>`;
     cvMostra(box);
   } catch (err) { box.innerHTML = `<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Não foi possível analisar agora: ${escapeHtml(err.message || 'erro')}.</div></div>`; const r = document.createElement('button'); r.className = 'btn-primary'; r.style.marginTop = '10px'; r.textContent = 'Tentar de novo'; r.onclick = () => runInteracoes(); box.appendChild(r); }
 }
@@ -5879,7 +5885,7 @@ async function runDDx() {
   if (!caso) { box.innerHTML = '<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Descreva o <b>quadro clínico</b>.</div></div>'; return; }
   if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
   box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Levantando hipóteses…</strong></div><div class="loading-sub">Prováveis, graves e exames…</div></div>`;
-  try { const { text } = await callGemini([{ role: 'user', parts: [{ text: buildPromptDDx(caso) }] }]);
+  try { const { text } = await callGemini([{ role: 'user', parts: [{ text: buildPromptDDx(caso) }] }], { grounding: false });
     box.innerHTML = `<div class="result content">${accordionize(md(text))}<div class="alert alert-info" style="margin-top:14px"><span><i class="ti ti-info-circle"></i></span><div>Apoio ao raciocínio — correlacione sempre com a clínica e reavalie.</div></div></div>`;
     cvMostra(box);
   } catch (err) { box.innerHTML = `<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Não foi possível gerar agora: ${escapeHtml(err.message || 'erro')}.</div></div>`; const r = document.createElement('button'); r.className = 'btn-primary'; r.style.marginTop = '10px'; r.textContent = 'Tentar de novo'; r.onclick = () => runDDx(); box.appendChild(r); }
@@ -5907,7 +5913,7 @@ async function runExames() {
   if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
   const ctx = (document.getElementById('ex_ctx').value || '').trim();
   box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Interpretando exames…</strong></div><div class="loading-sub">Alterações, hipóteses e conduta…</div></div>`;
-  try { const { text } = await callGemini([{ role: 'user', parts: [{ text: buildPromptExames(lab, ctx) }] }]);
+  try { const { text } = await callGemini([{ role: 'user', parts: [{ text: buildPromptExames(lab, ctx) }] }], { grounding: false });
     box.innerHTML = `<div class="result content">${accordionize(md(text))}<div class="alert alert-info" style="margin-top:14px"><span><i class="ti ti-info-circle"></i></span><div>Interpretação por IA — correlacione com a clínica e com os valores de referência do seu laboratório.</div></div></div>`;
     cvMostra(box);
   } catch (err) { box.innerHTML = `<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Não foi possível interpretar agora: ${escapeHtml(err.message || 'erro')}.</div></div>`; const r = document.createElement('button'); r.className = 'btn-primary'; r.style.marginTop = '10px'; r.textContent = 'Tentar de novo'; r.onclick = () => runExames(); box.appendChild(r); }
@@ -6221,7 +6227,7 @@ async function runOrient() {
   const det = (document.getElementById('or_det').value || '').trim();
   box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Gerando orientações…</strong></div><div class="loading-sub">Linguagem simples para o paciente…</div></div>`;
   try {
-    const { text } = await callGemini([{ role: 'user', parts: [{ text: buildPromptOrient(tema, det) }] }]);
+    const { text } = await callGemini([{ role: 'user', parts: [{ text: buildPromptOrient(tema, det) }] }], det ? { grounding: false } : {});
     window.__orTxt = (text || '').trim();
     box.innerHTML = `<div class="result content">${accordionize(md(text))}<div class="row" style="margin-top:12px"><button class="cv-bt sec" onclick="cvCopia(window.__orTxt||'','Orientações copiadas')"><i class="ti ti-copy"></i> Copiar orientações</button></div><div class="alert alert-info" style="margin-top:10px"><span><i class="ti ti-info-circle"></i></span><div>Material educativo gerado por IA — revise antes de entregar ao paciente.</div></div></div>`;
     cvMostra(box);
