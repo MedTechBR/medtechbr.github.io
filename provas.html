@@ -92,6 +92,14 @@ html[data-viva^=portal][lang] body .sug-box :is(select,input,textarea){width:100
 .sug-box .ok:hover{filter:brightness(1.08);transform:translateY(-1px)}
 .sug-box .cancel{background:var(--sup);color:var(--tinta);border-color:var(--fioF)}
 .sug-box .cancel:hover{background:var(--acSup);color:var(--acInk)}
+.sug-box .perigo{background:var(--errSup);color:color-mix(in srgb,var(--errV) 70%,var(--tinta))}
+.sug-box .perigo:hover{filter:brightness(.97)}
+/* .cfg-msg.ok dentro do modal herdava o fundo do botão .ok */
+.sug-box .cfg-msg.ok{background:none;box-shadow:none;filter:none;transform:none}
+.sug-row.dados .b{flex:1 1 170px}
+.sug-box ul.lista{margin:4px 0 10px 20px;font-size:13.5px;color:var(--tinta2);line-height:1.5}
+.sug-box ul.lista li{margin-bottom:3px}
+.cfg-sec .desc a,.sug-box p.sub a{color:var(--acInk);font-weight:600}
 .cfg-sec{border-radius:20px;padding:16px;margin-bottom:12px;background:var(--sup2)}
 .cfg-sec h4{font-size:15px;font-weight:650;margin-bottom:4px;display:flex;align-items:center;gap:10px}
 .cfg-sec h4 i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--sup);color:var(--acInk);font-size:16px}
@@ -141,8 +149,8 @@ html[data-viva^=portal][lang] body .sug-box :is(select,input,textarea){width:100
   <div class="wrap top">
     <span class="wm"><span class="mk" aria-hidden="true"><i class="ti ti-apps"></i></span><span>MedTech <b>Provas</b></span></span>
     <div class="top-r">
-      <button class="ghost" id="btnApps" onclick="openMeusApps()" title="Escolher quais apps aparecem aqui"><i class="ti ti-layout-grid-add" aria-hidden="true"></i><span class="lbl">Meus apps</span></button>
-      <button class="ghost" id="btnSug" onclick="openSug()"><i class="ti ti-bulb" aria-hidden="true"></i><span class="lbl">Sugestão</span></button>
+      <button class="ghost" id="btnApps" onclick="openMeusApps()" title="Escolher quais apps aparecem aqui" aria-label="Meus apps"><i class="ti ti-layout-grid-add" aria-hidden="true"></i><span class="lbl">Meus apps</span></button>
+      <button class="ghost" id="btnSug" onclick="openSug()" aria-label="Sugestão"><i class="ti ti-bulb" aria-hidden="true"></i><span class="lbl">Sugestão</span></button>
       <button class="install" id="btnInstall" hidden aria-label="Instalar o app" title="Instalar o app"><i class="ti ti-download" aria-hidden="true"></i><span class="lbl">Instalar</span></button>
       <div class="usr" id="usr"></div>
     </div>
@@ -287,9 +295,9 @@ function openSug(){
   wrap.innerHTML = `<div class="sug-box">
     <h3><i class="ti ti-bulb" aria-hidden="true"></i>Sugerir uma função</h3>
     <p class="sub">Conte o que você gostaria de ver nos apps MedTech. Sua ideia vai direto para a equipe.</p>
-    <label>App</label><select id="sugApp">${opts}</select>
-    <label>Sua sugestão</label><textarea id="sugTxt" placeholder="Ex.: no EnfermarIA, poder ordenar os leitos por gravidade"></textarea>
-    <label>Seu contato (opcional)</label><input id="sugContato" value="${esc((u&&u.email)||'')}" placeholder="e-mail ou WhatsApp para retorno">
+    <label for="sugApp">App</label><select id="sugApp">${opts}</select>
+    <label for="sugTxt">Sua sugestão</label><textarea id="sugTxt" placeholder="Ex.: no EnfermarIA, poder ordenar os leitos por gravidade"></textarea>
+    <label for="sugContato">Seu contato (opcional)</label><input id="sugContato" value="${esc((u&&u.email)||'')}" placeholder="e-mail ou WhatsApp para retorno">
     <div class="sug-row"><button class="b ok" onclick="enviarSug()">Enviar sugestão</button><button class="b cancel" onclick="closeSug()">Cancelar</button></div>
   </div>`;
   wrap.onclick = e => { if(e.target===wrap) closeSug(); };
@@ -323,20 +331,20 @@ function openCfg(){
     <div class="cfg-sec">
       <h4><i class="ti ti-user" aria-hidden="true"></i>Perfil e cadastro</h4>
       <div class="desc">Seu nome aparece em todos os apps MedTech.</div>
-      <label>Nome</label><input id="cfgNome" value="${esc(u.displayName||'')}" placeholder="Seu nome">
-      <label>E-mail (login)</label><input value="${esc(u.email||'')}" disabled style="opacity:.65">
-      <label>Telefone / WhatsApp</label><input id="cfgFone" value="${esc(perfil.fone||'')}" placeholder="(11) 99999-9999">
-      <label>CRM</label><input id="cfgCrm" value="${esc(perfil.crm||'')}" placeholder="Ex.: 123456/SP">
-      <label>Especialidade</label><input id="cfgEsp" value="${esc(perfil.esp||'')}" placeholder="Ex.: Clínica Médica">
-      <label>Instituição</label><input id="cfgInst" value="${esc(perfil.inst||'')}" placeholder="Hospital / faculdade">
+      <label for="cfgNome">Nome</label><input id="cfgNome" value="${esc(u.displayName||'')}" placeholder="Seu nome">
+      <label for="cfgEmail">E-mail (login)</label><input id="cfgEmail" value="${esc(u.email||'')}" disabled style="opacity:.65">
+      <label for="cfgFone">Telefone / WhatsApp</label><input id="cfgFone" value="${esc(perfil.fone||'')}" placeholder="(11) 99999-9999">
+      <label for="cfgCrm">CRM</label><input id="cfgCrm" value="${esc(perfil.crm||'')}" placeholder="Ex.: 123456/SP">
+      <label for="cfgEsp">Especialidade</label><input id="cfgEsp" value="${esc(perfil.esp||'')}" placeholder="Ex.: Clínica Médica">
+      <label for="cfgInst">Instituição</label><input id="cfgInst" value="${esc(perfil.inst||'')}" placeholder="Hospital / faculdade">
       <div class="sug-row"><button class="b ok" onclick="salvarPerfil()">Salvar perfil</button></div>
       <div class="cfg-msg" id="cfgPerfilMsg"></div>
     </div>
     <div class="cfg-sec">
       <h4><i class="ti ti-lock" aria-hidden="true"></i>Senha</h4>
       <div class="desc">Defina uma nova senha (mín. 6 caracteres) ou receba um link de redefinição por e-mail.</div>
-      <label>Nova senha</label><input id="cfgPass1" type="password" placeholder="Nova senha" autocomplete="new-password">
-      <label>Confirmar nova senha</label><input id="cfgPass2" type="password" placeholder="Repita a nova senha" autocomplete="new-password">
+      <label for="cfgPass1">Nova senha</label><input id="cfgPass1" type="password" placeholder="Nova senha" autocomplete="new-password">
+      <label for="cfgPass2">Confirmar nova senha</label><input id="cfgPass2" type="password" placeholder="Repita a nova senha" autocomplete="new-password">
       <div class="sug-row"><button class="b ok" onclick="alterarSenha()">Alterar senha</button><button class="b cancel" onclick="enviarResetSenha()">Link por e-mail</button></div>
       <div class="cfg-msg" id="cfgSenhaMsg"></div>
     </div>
@@ -345,6 +353,12 @@ function openCfg(){
       <div class="desc" id="cfgAssin">Carregando a sua assinatura</div>
       <div class="sug-row" id="cfgAssinBt"><button class="b ok" onclick="abrirPlanos()">Ver planos</button><button class="b cancel" onclick="abrirPagamento()">Gerenciar pagamento</button></div>
       <div class="cfg-msg" id="cfgPagMsg"></div>
+    </div>
+    <div class="cfg-sec">
+      <h4><i class="ti ti-shield-lock" aria-hidden="true"></i>Seus dados</h4>
+      <div class="desc">Baixe uma cópia do que a sua conta guarda na nuvem MedTech ou peça a exclusão da conta. Veja a <a href="privacidade.html#direitos">Política de Privacidade</a>.</div>
+      <div class="sug-row dados"><button class="b ok" id="btBaixarDados" onclick="baixarMeusDados()"><i class="ti ti-download" aria-hidden="true"></i> Baixar meus dados</button><button class="b perigo" onclick="abrirExcluirConta()"><i class="ti ti-trash" aria-hidden="true"></i> Excluir minha conta</button></div>
+      <div class="cfg-msg" id="cfgDadosMsg" role="status"></div>
     </div>
     <div class="sug-row"><button class="b cancel" onclick="window.MT.signOut()"><i class="ti ti-logout" aria-hidden="true"></i> Sair da conta</button><button class="b cancel" onclick="closeCfg()">Fechar</button></div>
   </div>`;
@@ -395,6 +409,128 @@ async function enviarResetSenha(){
   if (!(window.MT && MT._fb && MT.user)){ msg.className='cfg-msg err'; msg.textContent='Sessão indisponível.'; return; }
   try{ await MT._fb.A.sendPasswordResetEmail(MT._fb.auth, MT.user.email); msg.className='cfg-msg ok'; msg.textContent='Link enviado para '+MT.user.email+'.'; }
   catch(e){ msg.className='cfg-msg err'; msg.textContent='Erro: '+(e.message||e); }
+}
+/* ---------- Seus dados: baixar (LGPD art. 18, II e V) e pedir exclusão ----------
+   Só LEITURA no Firestore: users/{uid} e users/{uid}/apps/{app} de cada app conhecido,
+   mais a subcoleção sync dos apps de estudo (mtsync.js). A exclusão não apaga pelo
+   cliente (deixaria subcoleções órfãs e exige login recente): monta um e-mail pronto. */
+const MEUS_DADOS_APPS = ['portal','portal-provas','enfermaria','condutai','atbguia','calcmed','paliai','guiainterno','pocusai',
+  'laudai','foco','plantaohub','granae','granae_of','logbook','medprovas','flashmed','clinicamed','clinicamed_resumo',
+  'clinicamed_coord','trafego-titulo','radio-titulo'];
+const MEUS_DADOS_SYNC = ['flashmed','clinicamed','trafego-titulo','radio-titulo'];   // users/{uid}/apps/<app>/sync
+function dataLocalISO(d){ d = d || new Date(); const p = n => String(n).padStart(2,'0'); return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
+/* Timestamp do Firestore e afins viram texto ISO; o resto passa igual */
+function limpaFs(v){
+  if (v == null || typeof v !== 'object') return v;
+  if (typeof v.toDate === 'function') { try { return v.toDate().toISOString(); } catch(e) { return String(v); } }
+  if (Array.isArray(v)) return v.map(limpaFs);
+  const o = {}; Object.keys(v).forEach(k => { o[k] = limpaFs(v[k]); }); return o;
+}
+function docDoApp(raw){
+  const r = limpaFs(raw) || {}; const out = {};
+  if (r.updatedAt) out.atualizadoEm = r.updatedAt;
+  if (typeof r.json === 'string') { try { out.dados = JSON.parse(r.json); } catch(e) { out.dados = r.json; } }
+  const resto = Object.keys(r).filter(k => k !== 'json' && k !== 'updatedAt');
+  if (resto.length) { const o = {}; resto.forEach(k => { o[k] = r[k]; }); out[typeof r.json === 'string' ? 'outrosCampos' : 'dados'] = o; }
+  return out;
+}
+async function coletarMeusDados(){
+  const u = window.MT && MT.user, fb = window.MT && MT._fb;
+  if (!u || u.demo || !fb || !fb.db || !fb.F) throw new Error('Entre na sua conta MedTech para baixar seus dados.');
+  const { db, F } = fb, uid = u.uid;
+  const md = u.metadata || {};
+  const out = {
+    formato: 'medtech-meus-dados', versao: 1, geradoEm: new Date().toISOString(),
+    conta: { uid, email: u.email || null, nome: u.displayName || null, emailVerificado: !!u.emailVerified,
+      criadaEm: md.creationTime || null, ultimoAcesso: md.lastSignInTime || null,
+      provedores: (u.providerData || []).map(p => p && p.providerId).filter(Boolean) },
+    perfil: null, registroDaConta: null, apps: {}, naoLidos: []
+  };
+  const falha = (onde, e) => out.naoLidos.push({ onde, erro: (e && (e.code || e.message)) || String(e) });
+  const tarefas = [];
+  tarefas.push((async () => { try { const s = await F.getDoc(F.doc(db, 'users', uid)); if (s.exists()) out.registroDaConta = limpaFs(s.data()); } catch(e) { falha('users/'+uid, e); } })());
+  MEUS_DADOS_APPS.forEach(id => tarefas.push((async () => {
+    try { const s = await F.getDoc(F.doc(db, 'users', uid, 'apps', id)); if (s.exists()) out.apps[id] = Object.assign(out.apps[id] || {}, docDoApp(s.data())); }
+    catch(e) { falha('apps/'+id, e); }
+  })()));
+  MEUS_DADOS_SYNC.forEach(id => tarefas.push((async () => {
+    try {
+      const q = await F.getDocs(F.collection(db, 'users', uid, 'apps', id, 'sync'));
+      if (!q.empty) { const itens = {}; q.forEach(d => { itens[d.id] = limpaFs(d.data()); }); out.apps[id] = Object.assign(out.apps[id] || {}, { sync: itens }); }
+    } catch(e) { falha('apps/'+id+'/sync', e); }
+  })()));
+  await Promise.all(tarefas);
+  const ord = {}; Object.keys(out.apps).sort().forEach(k => { ord[k] = out.apps[k]; }); out.apps = ord;
+  const pdoc = id => out.apps[id] && out.apps[id].dados && out.apps[id].dados.perfil;
+  out.perfil = pdoc('portal') || pdoc('portal-provas') || ((MT._data && MT._data.perfil) || null);
+  return out;
+}
+function baixarArquivo(nome, texto, tipo){
+  const blob = new Blob([texto], { type: tipo || 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = nome; a.rel = 'noopener';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+async function baixarMeusDados(){
+  const msg = document.getElementById('cfgDadosMsg'), bt = document.getElementById('btBaixarDados');
+  if (msg) { msg.className = 'cfg-msg'; msg.textContent = 'Reunindo seus dados'; }
+  if (bt) bt.disabled = true;
+  try {
+    const d = await coletarMeusDados();
+    const nome = 'medtech-meus-dados-' + dataLocalISO() + '.json';
+    baixarArquivo(nome, JSON.stringify(d, null, 2));
+    const n = Object.keys(d.apps).length;
+    if (msg) { msg.className = 'cfg-msg ok'; msg.textContent = 'Arquivo baixado: ' + nome + ' (' + (n === 1 ? '1 app' : n + ' apps') + ' com dados).' + (d.naoLidos.length ? ' Alguns itens não puderam ser lidos; a lista está no arquivo.' : ''); }
+  } catch(e) {
+    if (msg) { msg.className = 'cfg-msg err'; msg.textContent = 'Não foi possível baixar: ' + ((e && e.message) || e); }
+  } finally { if (bt) bt.disabled = false; }
+}
+function abrirEmail(url){ location.href = url; }
+function abrirExcluirConta(){
+  const u = window.MT && MT.user;
+  if (!u || u.demo) { alert('Entre na sua conta MedTech para pedir a exclusão.'); return; }
+  closeCfg();
+  const wrap = document.createElement('div'); wrap.className = 'sug-modal'; wrap.id = 'excModal';
+  wrap.innerHTML = `<div class="sug-box" role="dialog" aria-modal="true" aria-labelledby="excTit">
+    <h3 id="excTit"><i class="ti ti-trash" aria-hidden="true"></i>Excluir minha conta</h3>
+    <p class="sub">A exclusão apaga, sem volta:</p>
+    <ul class="lista">
+      <li>a sua conta de acesso (${esc(u.email || 'e-mail')} e senha);</li>
+      <li>o perfil;</li>
+      <li>os dados de todos os apps MedTech desta conta, inclusive registros de pacientes, laudos, finanças e progresso de estudo;</li>
+      <li>a contagem de uso da IA e as questões que você sinalizou.</li>
+    </ul>
+    <p class="sub">Ficam só os registros de compra que a lei manda guardar. Assinatura ativa deve ser cancelada à parte. Se quiser uma cópia, <a href="#" onclick="event.preventDefault();closeExc();openCfg();">baixe seus dados antes</a>.</p>
+    <p class="sub">Ao confirmar, abrimos um e-mail pronto para ${esc(SUPORTE_EMAIL)}. Envie esse e-mail. Apagamos a conta e todos os dados em até 15 dias e confirmamos por e-mail.</p>
+    <label for="excConf">Para confirmar, digite EXCLUIR</label>
+    <input id="excConf" autocomplete="off" autocapitalize="characters" spellcheck="false">
+    <div class="sug-row"><button class="b perigo" onclick="confirmarExclusao()">Preparar o pedido</button><button class="b cancel" onclick="closeExc()">Cancelar</button></div>
+    <div class="cfg-msg" id="excMsg" role="status"></div>
+  </div>`;
+  wrap.onclick = e => { if (e.target === wrap) closeExc(); };
+  document.body.appendChild(wrap);
+  setTimeout(() => { const i = document.getElementById('excConf'); if (i) i.focus(); }, 50);
+}
+function closeExc(){ const m = document.getElementById('excModal'); if (m) m.remove(); }
+function emailExclusao(u, quando){
+  const q = (quando || new Date()).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+  const corpo = 'Peço a exclusão da minha conta MedTech e de todos os dados ligados a ela.\n\n'
+    + 'E-mail da conta: ' + (u.email || '(sem e-mail)') + '\n'
+    + 'Identificador da conta (uid): ' + u.uid + '\n'
+    + 'Pedido feito em: ' + q + '\n\n'
+    + 'Estou ciente de que a exclusão não pode ser desfeita.';
+  return 'mailto:' + SUPORTE_EMAIL + '?subject=' + encodeURIComponent('Exclusão de conta MedTech') + '&body=' + encodeURIComponent(corpo);
+}
+function confirmarExclusao(){
+  const u = window.MT && MT.user, msg = document.getElementById('excMsg');
+  const v = (document.getElementById('excConf').value || '').trim().toUpperCase();
+  if (v !== 'EXCLUIR') { msg.className = 'cfg-msg err'; msg.textContent = 'Digite EXCLUIR para confirmar.'; return; }
+  if (!u || u.demo) { msg.className = 'cfg-msg err'; msg.textContent = 'Sessão indisponível. Entre de novo na sua conta.'; return; }
+  abrirEmail(emailExclusao(u));
+  msg.className = 'cfg-msg ok';
+  msg.textContent = 'Pedido pronto: envie o e-mail. Apagamos a conta e todos os dados em até 15 dias e confirmamos por e-mail. '
+    + 'Se o e-mail não abriu, escreva para ' + SUPORTE_EMAIL + ' com o assunto "Exclusão de conta MedTech" e o identificador ' + u.uid + '.';
 }
 /* ---------- assinatura: estado, planos, escolha de apps ---------- */
 function preencheAssinatura(){
