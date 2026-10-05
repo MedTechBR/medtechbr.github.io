@@ -192,7 +192,9 @@ const num=id=>{const e=document.getElementById(id);return e?parseFloat(String(e.
 const checked=id=>{const e=document.getElementById(id);return e?e.checked:false};
 function chk(id,label){return `<label class="check"><input type="checkbox" id="${id}" onchange="run()"><span>${label}</span></label>`}
 function sel(id,opts){return `<select id="${id}" onchange="run()">${opts.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('')}</select>`}
-function fld(label,inner){return `<div class="field"><label>${label}</label>${inner}</div>`}
+/* rótulo ligado ao campo (for=) quando o campo é um só e não é caixa de marcar: o leitor de tela lê o nome */
+function fld(label,inner){const cs=String(inner).match(/<(input|select|textarea)\b[^>]*>/g)||[];const m=cs.length===1&&!/type="(checkbox|radio)"/.test(cs[0])&&/\bid="([^"]+)"/.exec(cs[0]);
+  return `<div class="field"><label${m?` for="${m[1]}"`:''}>${label}</label>${inner}</div>`}
 function inp(id,ph='',step=''){return `<input id="${id}" type="number" inputmode="decimal" ${step?'step="'+step+'"':''} placeholder="${ph}" oninput="run()">`}
 
 /* ---- Drogas vasoativas: dados + helpers (dropdowns dependentes) ---- */

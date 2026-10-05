@@ -35,7 +35,7 @@ const APPS=[
  {id:'logbook',nm:'Logbook',ic:'ti-notebook',g:'rotina',img:'logbook-390',url:'logbook.html',d:'Procedimentos e casos do residente, com contadores e exportação em planilha.'}
 ];
 const PROVAS=[
- {id:'clinicamed',nm:'ClínicaMed',ic:'ti-heartbeat',img:'clinicamed-390',url:'clinicamed/',d:'Título de Clínica Médica e acesso ao R+: banco extenso de questões de provas reais, comentadas, leituras longas e acompanhamento de turma pela coordenação.'},
+ {id:'clinicamed',nm:'ClínicaMed',ic:'ti-heartbeat',img:'clinicamed-390',url:'clinicamed/',d:'Título de Clínica Médica e acesso ao R+: 708 questões de provas oficiais, com procedência, e questões autorais comentadas; leituras longas e acompanhamento de turma pela coordenação.'},
  {id:'trafegotitulo',nm:'TráfegoTítulo',ic:'ti-car',img:'trafego-390',url:'trafego-titulo/',d:'Título de Medicina do Tráfego, no formato da prova, com o conteúdo amarrado ao edital e às normas de trânsito vigentes.'},
  {id:'flashmed',nm:'FlashMed',ic:'ti-cards',img:'flashmed-390',url:'flashmed.html',d:'Questões e simulados de residência, com a procedência de cada questão.'},
  {id:'medprovas',nm:'MedProvas',ic:'ti-clipboard-text',img:'medprovas-390',url:'medprovas.html',d:'Para o professor: elabore e corrija provas com IA, a partir do conteúdo da sua disciplina.'}
@@ -129,7 +129,7 @@ function vitrine(el,items,opts){
   function mostra(k,user){i=k;const a=items[k];xfShow(dev,k);
     $$('button',L).forEach(b=>{const on=+b.dataset.k===k;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
     const vs=vis2(),pos=vs.findIndex(b=>+b.dataset.k===k);
-    cap.innerHTML=`<h3>${esc(a.nm)}</h3><p>${esc(a.d)}</p><div class="row"><a class="pill solid" href="${a.url}">Abrir o ${esc(a.nm)}</a>${opts.cta||''}</div><div class="ctr"><button class="ant" aria-label="Anterior">${SVG.esq}</button><button class="prox" aria-label="Próximo">${SVG.dir}</button><span class="cnt">${pos+1} de ${vs.length}</span></div>`;
+    cap.innerHTML=`<h2>${esc(a.nm)}</h2><p>${esc(a.d)}</p><div class="row"><a class="pill solid" href="${a.url}">Abrir o ${esc(a.nm)}</a>${opts.cta||''}</div><div class="ctr"><button class="ant" aria-label="Anterior">${SVG.esq}</button><button class="prox" aria-label="Próximo">${SVG.dir}</button><span class="cnt">${pos+1} de ${vs.length}</span></div>`;
     $('.ant',cap).onclick=()=>passo(-1,true);$('.prox',cap).onclick=()=>passo(1,true);
     const btn=$(`button[data-k="${k}"]`,L);if(user&&btn&&getComputedStyle(L).flexDirection==='row')L.scrollTo({left:btn.offsetLeft-20,behavior:'smooth'});
     if(user){auto=false;el.classList.add('parado')}
@@ -141,7 +141,7 @@ function vitrine(el,items,opts){
   el.addEventListener('pointerenter',()=>clearTimeout(t));el.addEventListener('pointerleave',agenda);
   new IntersectionObserver(es=>es.forEach(x=>{vis=x.isIntersecting;agenda()}),{threshold:.25}).observe(el);
   const fch=opts.chips&&$(opts.chips);
-  if(fch)fch.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$$('button',fch).forEach(x=>x.classList.toggle('on',x===b));const f=b.dataset.f;
+  if(fch)fch.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$$('button',fch).forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-pressed',x===b)});const f=b.dataset.f;
     $$('button',L).forEach(x=>x.classList.toggle('hide',f!=='all'&&x.dataset.g!==f));const vs=vis2();if(vs.length)mostra(+vs[0].dataset.k,true)});
   /* chegada por link do mural: #app=<id> */
   const m=location.hash.match(/app=([a-z0-9-]+)/);const k0=m?items.findIndex(a=>a.id===m[1]):-1;
@@ -171,7 +171,7 @@ if(calc)planos().then(P=>{
   const prods=(P.produtos||[]).filter(p=>p.linha==='clinica'&&!p.interno);if(!prods.length)return;
   let per='mensal',sel=(prods.find(p=>p.destaque)||prods[0]).id,escolha=[];
   const temAnual=prods.some(p=>p.preco&&p.preco.anual);
-  calc.innerHTML=`${temAnual?`<div class="seg" role="tablist" aria-label="Período"><button class="on" data-p="mensal">Mensal</button><button data-p="anual">Anual<small>2 meses grátis</small></button></div>`:''}
+  calc.innerHTML=`${temAnual?`<div class="seg" role="group" aria-label="Período"><button class="on" data-p="mensal" aria-pressed="true">Mensal</button><button data-p="anual" aria-pressed="false">Anual<small>2 meses grátis</small></button></div>`:''}
    <div class="pcs" role="radiogroup" aria-label="Plano"></div><div class="pick" hidden></div><div class="sumr"></div>`;
   const pcs=$('.pcs',calc),pick=$('.pick',calc),sumr=$('.sumr',calc);
   function desenha(){
@@ -187,7 +187,7 @@ if(calc)planos().then(P=>{
     const nomes=n?(escolha.length?escolha.map(id=>APPS.find(a=>a.id===id).nm).join(' + '):'escolha acima'):'os 12 apps';
     sumr.innerHTML=`<div class="t"><b>${esc(p.curto)} · ${per==='anual'?'anual':'mensal'} · ${v!=null?brl(v):''}</b>${esc(nomes)}. Comece com ${P.teste_dias||7} dias grátis de tudo; assine quando fizer sentido.</div><div class="row"><a class="pill solid" href="app.html?${q}">${venda?'Assinar':'Começar grátis'}</a><a class="pill ghost" href="app.html">Criar conta</a></div>`;
   }
-  calc.addEventListener('click',e=>{const s=e.target.closest('.seg button');if(s){per=s.dataset.p;$$('.seg button',calc).forEach(b=>b.classList.toggle('on',b===s));const p=prods.find(x=>x.id===sel);if(p.preco[per]==null)sel=(prods.find(x=>x.preco[per]!=null)||p).id;desenha();return}
+  calc.addEventListener('click',e=>{const s=e.target.closest('.seg button');if(s){per=s.dataset.p;$$('.seg button',calc).forEach(b=>{b.classList.toggle('on',b===s);b.setAttribute('aria-pressed',b===s)});const p=prods.find(x=>x.id===sel);if(p.preco[per]==null)sel=(prods.find(x=>x.preco[per]!=null)||p).id;desenha();return}
     const c=e.target.closest('.pc');if(c&&!c.disabled){sel=c.dataset.id;desenha();return}
     const a=e.target.closest('.ag button');if(a&&!a.disabled){const id=a.dataset.id;escolha=escolha.includes(id)?escolha.filter(x=>x!==id):escolha.concat(id);desenha()}});
   desenha();

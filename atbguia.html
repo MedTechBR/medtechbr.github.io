@@ -1230,8 +1230,8 @@ function renderDrug(d){
    ${RX[d.id]?`<h2>Prescrição sugerida</h2>${md(RX[d.id])}`:''}</div>
    <div class="formcard">
      <h4 class="fc-h"><i class="ti ti-calculator" aria-hidden="true"></i> Calculadora de dose por peso e clearance</h4>
-     <div class="field"><label>Peso (kg)${d.kg?'':' <span class="lbl-dim">(não usado neste antibiótico)</span>'}</label><input type="number" id="dPeso" inputmode="decimal" placeholder="ex.: 70" ${d.kg?'':'disabled style="opacity:.5"'}></div>
-     <div class="field"><label>Clearance / TFG (mL/min)</label><input type="number" id="dClcr" inputmode="numeric" placeholder="ex.: 45"></div>
+     <div class="field"><label for="dPeso">Peso (kg)${d.kg?'':' <span class="lbl-dim">(não usado neste antibiótico)</span>'}</label><input type="number" id="dPeso" inputmode="decimal" placeholder="ex.: 70" ${d.kg?'':'disabled style="opacity:.5"'}></div>
+     <div class="field"><label for="dClcr">Clearance / TFG (mL/min)</label><input type="number" id="dClcr" inputmode="numeric" placeholder="ex.: 45"></div>
      <button class="btn btn-p" onclick="calcDose('${d.id}')">Calcular dose ajustada</button>
      <div id="dOut"></div>
      <div style="font-size:11.5px;color:var(--muted);margin-top:9px">Não sabe a função renal? A <b>Calculadora de dose</b> estima a TFG (CKD-EPI 2021).</div>
@@ -1279,12 +1279,12 @@ function renderEmpirico(){
    <button class="back" onclick="routeHome()"><i class="ti ti-arrow-left" aria-hidden="true"></i> Voltar</button>
    <div class="exam-head"><div class="ei"><i class="ti ti-compass"></i></div><div><h1>Empírico e escalonamento</h1><div class="tags">Monte o contexto: guia curado do foco e sugestão da IA</div></div></div>
    <div class="formcard">
-     <div class="field"><label>Foco / sítio de infecção</label>
+     <div class="field"><label for="empFoco">Foco / sítio de infecção</label>
        <select id="empFoco" onchange="setEmp('foco',this.value)">${FOCOS.map(f=>`<option value="${f.id}" ${f.id===empForm.foco?'selected':''}>${esc(f.nome)}</option>`).join('')}</select></div>
      <div class="field"><label>Contexto</label><div class="segs">${seg('ctx','comunitario','<i class="ti ti-home" aria-hidden="true"></i> Comunitário')}${seg('ctx','hospitalar','<i class="ti ti-building-hospital" aria-hidden="true"></i> Hospitalar/nosocomial')}</div></div>
      <div class="field"><label>Gravidade / local</label><div class="segs">${seg('grav','ambulatorial','Ambulatorial')}${seg('grav','enfermaria','Internado')}${seg('grav','uti','UTI / grave')}</div></div>
      <div class="field"><label>Alergia a penicilina</label><div class="segs">${seg('alergia','nao','Não')}${seg('alergia','leve','Leve (rash)')}${seg('alergia','grave','Grave/anafilaxia')}</div></div>
-     <div class="field"><label>Peso e clearance (para já ajustar as doses)</label><div style="display:flex;gap:8px"><input type="number" id="empPeso" value="${esc(empForm.peso)}" oninput="empForm.peso=this.value" inputmode="decimal" placeholder="Peso (kg)" style="flex:1"><input type="number" id="empClcr" value="${esc(empForm.clcr)}" oninput="empForm.clcr=this.value" inputmode="numeric" placeholder="ClCr (mL/min)" style="flex:1"></div></div>
+     <div class="field"><label for="empPeso">Peso e clearance (para já ajustar as doses)</label><div style="display:flex;gap:8px"><input type="number" id="empPeso" value="${esc(empForm.peso)}" oninput="empForm.peso=this.value" inputmode="decimal" placeholder="Peso (kg)" style="flex:1"><input type="number" id="empClcr" aria-label="Clearance / TFG (mL/min)" value="${esc(empForm.clcr)}" oninput="empForm.clcr=this.value" inputmode="numeric" placeholder="ClCr (mL/min)" style="flex:1"></div></div>
      <div class="field"><label>Fatores de risco para multirresistência</label>
        <div class="checks">
          <label><input type="checkbox" id="r_atb" ${empForm.riscos.atb?'checked':''} onchange="empForm.riscos.atb=this.checked"> Uso de ATB nos últimos 90 dias</label>
@@ -1295,8 +1295,8 @@ function renderEmpirico(){
        </div></div>
      <div class="field"><label>Antibióticos já em uso</label>
        <div class="suggs" id="usadosChips">${PREV_ATBS.map((a,i)=>`<button type="button" class="sugg ${empForm.usados.includes(a)?'on':''}" onclick="toggleUsado(${i})">${esc(a)}</button>`).join('')}</div>
-       <input type="text" id="empUsadosTxt" value="${esc(empForm.detalhe)}" oninput="empForm.detalhe=this.value" placeholder="outros / detalhes: ex. há 3 dias, sem melhora" style="margin-top:8px"></div>
-     <div class="field"><label>Dados extras (opcional)</label>
+       <input type="text" id="empUsadosTxt" aria-label="Outros antibióticos em uso ou detalhes" value="${esc(empForm.detalhe)}" oninput="empForm.detalhe=this.value" placeholder="outros / detalhes: ex. há 3 dias, sem melhora" style="margin-top:8px"></div>
+     <div class="field"><label for="empExtra">Dados extras (opcional)</label>
        <input type="text" id="empExtra" value="${esc(empForm.extra)}" oninput="empForm.extra=this.value" placeholder="ex.: ClCr 35, gestante, peso 90 kg, cultura: E. coli ESBL"></div>
      <button class="btn btn-ai" id="empBtn" onclick="sugerirEmpirico()"><i class="ti ti-sparkles"></i> Sugerir conduta</button>
      <div id="empOut"></div>
@@ -1371,7 +1371,7 @@ function renderDirigida(){
    <button class="back" onclick="routeHome()"><i class="ti ti-arrow-left" aria-hidden="true"></i> Voltar</button>
    <div class="exam-head"><div class="ei" style="--k:var(--c-verde)"><i class="ti ti-microscope"></i></div><div><h1>Terapia dirigida</h1><div class="tags">Do germe isolado no antibiograma às opções dirigidas</div></div></div>
    <div class="formcard">
-     <div class="field"><label>Germe isolado</label><select id="dirSel" onchange="renderDirAlvo()">${opts}</select></div>
+     <div class="field"><label for="dirSel">Germe isolado</label><select id="dirSel" onchange="renderDirAlvo()">${opts}</select></div>
      <div id="dirAlvo"></div>
      <button class="btn btn-ai" id="dirBtn" onclick="sugerirDirigida()" style="margin-top:6px"><i class="ti ti-sparkles"></i> Refinar com a IA (dose, duração, alergia)</button>
      <div id="dirOut"></div>
@@ -1417,14 +1417,14 @@ function renderDose(){
    <button class="back" onclick="routeHome()"><i class="ti ti-arrow-left" aria-hidden="true"></i> Voltar</button>
    <div class="exam-head"><div class="ei" style="--k:var(--c-laranja)"><i class="ti ti-calculator"></i></div><div><h1>Calculadora de dose</h1><div class="tags">Antibiótico, peso e clearance: dose ajustada e prescrição</div></div></div>
    <div class="formcard">
-     <div class="field"><label>Antibiótico</label><select id="doseAtb">${opts}</select></div>
-     <div class="field"><label>Peso (kg)</label><input type="number" id="dosePeso" inputmode="decimal" placeholder="ex.: 60"></div>
-     <div class="field"><label>Clearance / TFG (mL/min)</label><input type="number" id="doseClcr" inputmode="numeric" placeholder="ex.: 30"></div>
+     <div class="field"><label for="doseAtb">Antibiótico</label><select id="doseAtb">${opts}</select></div>
+     <div class="field"><label for="dosePeso">Peso (kg)</label><input type="number" id="dosePeso" inputmode="decimal" placeholder="ex.: 60"></div>
+     <div class="field"><label for="doseClcr">Clearance / TFG (mL/min)</label><input type="number" id="doseClcr" inputmode="numeric" placeholder="ex.: 30"></div>
      <button class="btn btn-p" onclick="calcDoseTool()"><i class="ti ti-calculator" aria-hidden="true"></i> Calcular dose e prescrição</button>
      <div id="doseOut"></div>
      <details style="margin-top:12px"><summary class="sum-tfg"><i class="ti ti-chevron-right" aria-hidden="true"></i> Não sei a função renal: calcular a TFG (CKD-EPI 2021)</summary>
-       <div class="field" style="margin-top:10px"><label>Idade (anos)</label><input type="number" id="rIdade" inputmode="numeric" placeholder="ex.: 68"></div>
-       <div class="field"><label>Creatinina sérica (mg/dL)</label><input type="number" id="rCr" inputmode="decimal" step="0.01" placeholder="ex.: 1.4"></div>
+       <div class="field" style="margin-top:10px"><label for="rIdade">Idade (anos)</label><input type="number" id="rIdade" inputmode="numeric" placeholder="ex.: 68"></div>
+       <div class="field"><label for="rCr">Creatinina sérica (mg/dL)</label><input type="number" id="rCr" inputmode="decimal" step="0.01" placeholder="ex.: 1.4"></div>
        <div class="field"><label>Sexo</label><div class="segs"><button class="seg on" id="sexoM" onclick="setSexo('M')">Homem</button><button class="seg" id="sexoF" onclick="setSexo('F')">Mulher</button></div></div>
        <button class="btn btn-g" onclick="calcClcrFill()">Calcular e preencher o clearance</button>
        <div id="rOut" style="margin-top:8px"></div>

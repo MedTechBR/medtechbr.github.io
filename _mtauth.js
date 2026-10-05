@@ -112,15 +112,18 @@ function injectCSS() {
   .mt-brand b{color:#2B5CE6}
   .mt-sub{color:#5E646B;font-size:13px;margin:4px 0 20px}
   .mt-auth h2{font-size:18px;color:#23272E;font-family:system-ui,sans-serif;margin-bottom:14px}
-  .mt-auth input{width:100%;padding:12px 13px;border:1px solid rgba(140,160,185,.18);background:#F4F4F0;color:#23272E;border-radius:11px;font-size:15px;font-family:inherit;margin-bottom:11px}
-  .mt-auth input:focus{outline:none;border-color:#2B5CE6;box-shadow:0 0 0 3px rgba(43,92,230,.15)}
+  .mt-auth input{width:100%;padding:12px 13px;border:1px solid #80868F;background:#F4F4F0;color:#23272E;border-radius:11px;font-size:15px;font-family:inherit;margin-bottom:11px}
+  .mt-auth input:focus{outline:2px solid #2B5CE6;outline-offset:2px;border-color:#2B5CE6;box-shadow:0 0 0 3px rgba(43,92,230,.15)}
+  .mt-auth button:focus-visible,.mt-auth a:focus-visible{outline:2px solid #2B5CE6;outline-offset:2px}
   .mt-auth input:-webkit-autofill,.mt-auth input:-webkit-autofill:hover,.mt-auth input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 100px #F4F4F0 inset;-webkit-text-fill-color:#23272E;caret-color:#23272E;transition:background-color 99999s ease-in-out 0s}
   .mt-auth .mt-btn{width:100%;padding:13px;border:none;border-radius:11px;background:#2B5CE6;color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;box-shadow:0 8px 22px rgba(43,92,230,.25)}
   .mt-auth .mt-btn:hover{filter:brightness(1.08)}
   .mt-auth .mt-link{background:none;border:none;color:#2B5CE6;font-weight:700;font-size:13.5px;cursor:pointer;margin-top:12px;font-family:inherit;display:block;width:100%}
-  .mt-err{color:#F85149;font-size:13px;margin:2px 0 8px;min-height:16px}
+  .mt-err{color:#C0392B;font-size:13px;margin:2px 0 8px;min-height:16px}
   .mt-consent{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:#5E646B;text-align:left;margin:2px 0 12px}
   .mt-consent a{color:#2B5CE6;font-weight:700}
+  .mt-legal{margin:18px 0 0;text-align:center;font-size:12px;color:#5E646B}
+  .mt-legal a{color:#5E646B;text-decoration:underline;text-underline-offset:2px}
   .mt-demobar{position:fixed;left:0;right:0;bottom:0;z-index:9000;background:#F4F4F0;color:#5E646B;font-size:13px;text-align:center;padding:9px 14px;border-top:1px solid #DDDDD5}
   .mt-demobar b{color:#2B5CE6}
   .mt-demobar button{margin-left:8px;background:#2B5CE6;color:#fff;border:none;border-radius:7px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer}
@@ -248,29 +251,46 @@ function mountSplash() {
 function removeSplash() { const s = document.getElementById('mt-splash'); if (s) s.remove(); }
 const LOGO = `<span class="mk"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
 
+/* Camada de login como diálogo modal de verdade: o resto da página fica inerte (fora do Tab e do
+   leitor de tela) enquanto ela está aberta. Marca só o que ela mesma tornou inerte, para não
+   desfazer um inert que o app tenha posto por conta própria. */
+let _mtInertObs = null;
+function _mtInerte(el) { if (el.nodeType === 1 && el.id !== 'mt-auth' && !el.inert) { el.inert = true; el.setAttribute('data-mt-inert', ''); } }
+function travaFundo() {
+  Array.from(document.body.children).forEach(_mtInerte);
+  if (!_mtInertObs && window.MutationObserver) {
+    _mtInertObs = new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(_mtInerte)));
+    _mtInertObs.observe(document.body, { childList: true });
+  }
+}
+function soltaFundo() {
+  if (_mtInertObs) { _mtInertObs.disconnect(); _mtInertObs = null; }
+  document.querySelectorAll('[data-mt-inert]').forEach(el => { el.inert = false; el.removeAttribute('data-mt-inert'); });
+}
 function authMarkup() {
-  return `<div class="mt-auth" id="mt-auth"><div class="mt-card">
-    <div class="mt-brand">${LOGO}<span>${APP.name.replace(/AI$/,'')}<b>${/AI$/.test(APP.name)?'AI':''}</b></span></div>
-    <div class="mt-sub">Acesse sua conta MedTech</div>
-    <form id="mt-login">
-      <h2>Entrar</h2>
-      <input name="email" type="email" placeholder="E-mail" autocomplete="username" required>
-      <input name="password" type="password" placeholder="Senha" autocomplete="current-password" required>
-      <p class="mt-err" id="mt-err-l"></p>
+  return `<div class="mt-auth" id="mt-auth" role="dialog" aria-modal="true" aria-labelledby="mt-auth-nm" aria-describedby="mt-auth-sub"><div class="mt-card">
+    <div class="mt-brand">${LOGO}<span id="mt-auth-nm">${APP.name.replace(/AI$/,'')}<b>${/AI$/.test(APP.name)?'AI':''}</b></span></div>
+    <div class="mt-sub" id="mt-auth-sub">Acesse sua conta MedTech</div>
+    <form id="mt-login" aria-labelledby="mt-h-l">
+      <h2 id="mt-h-l">Entrar</h2>
+      <input name="email" type="email" placeholder="E-mail" aria-label="E-mail" autocomplete="username" required>
+      <input name="password" type="password" placeholder="Senha" aria-label="Senha" autocomplete="current-password" required>
+      <p class="mt-err" id="mt-err-l" role="alert"></p>
       <button class="mt-btn" type="submit">Entrar</button>
       <button class="mt-link" type="button" id="mt-go-reg">Não tem conta? Criar conta</button>
       <button class="mt-link" type="button" id="mt-go-reset">Esqueci minha senha</button>
     </form>
-    <form id="mt-register" hidden>
-      <h2>Criar conta</h2>
-      <input name="name" type="text" placeholder="Seu nome" autocomplete="name" required>
-      <input name="email" type="email" placeholder="E-mail" autocomplete="username" required>
-      <input name="password" type="password" placeholder="Senha (mín. 6 caracteres)" minlength="6" autocomplete="new-password" required>
+    <form id="mt-register" aria-labelledby="mt-h-r" hidden>
+      <h2 id="mt-h-r">Criar conta</h2>
+      <input name="name" type="text" placeholder="Seu nome" aria-label="Seu nome" autocomplete="name" required>
+      <input name="email" type="email" placeholder="E-mail" aria-label="E-mail" autocomplete="username" required>
+      <input name="password" type="password" placeholder="Senha (mín. 6 caracteres)" aria-label="Senha (mínimo 6 caracteres)" minlength="6" autocomplete="new-password" required>
       <label class="mt-consent"><input type="checkbox" required style="margin-top:2px"><span>Li e aceito os <a href="https://medtechbr.com.br/termos.html" target="_blank" rel="noopener">Termos</a> e a <a href="https://medtechbr.com.br/privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a> (LGPD).</span></label>
-      <p class="mt-err" id="mt-err-r"></p>
+      <p class="mt-err" id="mt-err-r" role="alert"></p>
       <button class="mt-btn" type="submit">Criar conta</button>
       <button class="mt-link" type="button" id="mt-go-login">Já tenho conta</button>
     </form>
+    <p class="mt-legal"><a href="https://medtechbr.com.br/privacidade.html" target="_blank" rel="noopener">Privacidade</a> · <a href="https://medtechbr.com.br/termos.html" target="_blank" rel="noopener">Termos</a></p>
   </div></div>`;
 }
 function errMsg(code) {
@@ -359,7 +379,7 @@ else {
       MT.user = u;
       MT._uid = u ? u.uid : null;
       if (u) {
-        const el = document.getElementById('mt-auth'); if (el) el.remove();
+        const el = document.getElementById('mt-auth'); if (el) { el.remove(); soltaFundo(); }
         injectHomeButton();
         MT.verificarAcesso().catch(e => console.warn('verificação de acesso falhou', e));
         const ref = F.doc(db, 'users', u.uid, 'apps', APP.id);
@@ -438,10 +458,12 @@ else {
       if (document.getElementById('mt-auth')) return;
       const wrap = document.createElement('div'); wrap.innerHTML = authMarkup();
       document.body.appendChild(wrap.firstChild);
+      travaFundo();
       const loginF = document.getElementById('mt-login');
       const regF = document.getElementById('mt-register');
-      document.getElementById('mt-go-reg').onclick = () => { loginF.hidden = true; regF.hidden = false; };
-      document.getElementById('mt-go-login').onclick = () => { regF.hidden = true; loginF.hidden = false; };
+      setTimeout(() => { try { loginF.email.focus(); } catch (e) {} }, 50);
+      document.getElementById('mt-go-reg').onclick = () => { loginF.hidden = true; regF.hidden = false; regF.name.focus(); };
+      document.getElementById('mt-go-login').onclick = () => { regF.hidden = true; loginF.hidden = false; loginF.email.focus(); };
       document.getElementById('mt-go-reset').onclick = async () => {
         const email = loginF.email.value.trim();
         const er = document.getElementById('mt-err-l');
@@ -451,7 +473,7 @@ else {
       };
       loginF.onsubmit = async (e) => {
         e.preventDefault();
-        const er = document.getElementById('mt-err-l'); er.textContent = '';
+        const er = document.getElementById('mt-err-l'); er.textContent = ''; er.style.color = '';
         try { await A.signInWithEmailAndPassword(auth, loginF.email.value.trim(), loginF.password.value); }
         catch (err) { er.textContent = errMsg(err.code); }
       };

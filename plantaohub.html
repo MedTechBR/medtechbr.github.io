@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="vendor/tabler/tabler-icons.min.css?v=3.48.0">
 <link rel="icon" type="image/png" href="favicon.png">
 <script src="_mtfb.js?v=1"></script>
-<script src="_mtui.js?v=1"></script>
+<script src="_mtui.js?v=2"></script>
 <script>window.MT_APP={id:"plantaohub",name:"PlantãoHub"};</script>
 <script type="module" src="_mtauth.js?v=27"></script>
 <style>
@@ -116,6 +116,7 @@ html[data-viva=plantaohub][lang] body .kpi.k-verde{--k:var(--c-verde)}html[data-
 .shift .day .d{font-size:17px;font-weight:800;font-variant-numeric:tabular-nums}
 .shift .day .w{font-size:11px;font-weight:600;margin-top:2px}
 .shift .mid{min-width:0;cursor:pointer}
+html[data-viva] body .shift .mid[role=button]:active{transform:none}   /* linha clicável (teclado): sem o "afundar" dos botões */
 .shift .mid .loc{font-weight:650;font-size:15px;overflow-wrap:anywhere}
 .shift .mid .det{color:var(--tinta2);font-size:13px;margin-top:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
 .shift .mid .det .ti{font-size:14px}
@@ -468,7 +469,7 @@ function shiftHTML(s){
   const dt=new Date(s.date+'T00:00:00'), pg=s.status==='pago';
   return `<div class="shift ${pg?'pago':''}" data-id="${s.id}">
     <div class="day" aria-hidden="true"><span class="d">${String(dt.getDate()).padStart(2,'0')}</span><span class="w">${WD[dt.getDay()]}</span></div>
-    <div class="mid" onclick="openForm('${s.id}')"><div class="loc">${esc(s.local)}</div>
+    <div class="mid" role="button" tabindex="0" onclick="openForm('${s.id}')"><div class="loc">${esc(s.local)}</div>
       <div class="det"><i class="ti ti-clock" aria-hidden="true"></i>${esc(s.start)} às ${esc(s.end)}, ${hnum(hoursOf(s))}h</div>
       ${s.note?`<div class="obs"><i class="ti ti-note" aria-hidden="true"></i>${esc(s.note)}</div>`:''}
     </div>
@@ -738,7 +739,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='n'||e.key==='N'){e.preventDefault();openForm();}
   else if(e.key==='ArrowLeft'){tab==='ano'?moveYear(-1):moveComp(-1);}
   else if(e.key==='ArrowRight'){tab==='ano'?moveYear(1):moveComp(1);}
-  else if(e.key==='Enter'&&tg&&tg.classList&&tg.classList.contains('chip')) tg.click();
+  else if((e.key==='Enter'||e.key===' ')&&tg&&tg.matches&&tg.matches('[role=button]:not(button):not(a)')){e.preventDefault();tg.click();}   /* chip do calendário e linha do plantão */
 });
 </script>
 </body>
