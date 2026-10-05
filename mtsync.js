@@ -380,6 +380,7 @@ html.mts-trava,html.mts-trava body{overflow:hidden!important}
 #mtsPortao .msg.ok{color:var(--mts-ok,#067647)}
 #mtsPortao .lgpd{display:flex;gap:8px;align-items:flex-start;font-size:13px;font-weight:400;color:var(--mts-suave,#5b6475)}
 #mtsPortao .lgpd input{margin-top:3px}
+#mtsPortao .lgpd a{color:var(--mts-cor,#2563eb);font-weight:600}
 #mtsPortao .giro{width:28px;height:28px;border-radius:50%;border:3px solid var(--mts-borda,#d5d9e0);border-top-color:var(--mts-cor,#2563eb);animation:mtsgiro .8s linear infinite;margin:0 auto 14px}
 #mtsPortao .centro{text-align:center}
 @keyframes mtsgiro{to{transform:rotate(360deg)}}
@@ -393,7 +394,7 @@ let CFG = null, portaoEl = null;
 function portao(html) {
   if (!portaoEl) {
     portaoEl = document.createElement("div"); portaoEl.id = "mtsPortao";
-    portaoEl.setAttribute("role", "dialog"); portaoEl.setAttribute("aria-modal", "true");
+    portaoEl.setAttribute("role", "dialog"); portaoEl.setAttribute("aria-modal", "true"); portaoEl.setAttribute("aria-labelledby", "mtsTit");
     const poe = () => document.body.appendChild(portaoEl);
     if (document.body) poe(); else document.addEventListener("DOMContentLoaded", poe, { once: true });
   }
@@ -405,10 +406,10 @@ const nomeApp = () => (CFG && CFG.nome) || "MedTech";
 /* enquanto o app ainda não chamou iniciar(), a tela não fica em branco */
 document.addEventListener("DOMContentLoaded", () => { if (H.classList.contains("mts-trava") && !portaoEl) telaEspera() }, { once: true });
 function telaEspera(txt) {
-  portao(`<div class="centro"><div class="giro" aria-hidden="true"></div><p class="sub" style="margin:0">${esc(txt || "Abrindo sua conta…")}</p></div>`);
+  portao(`<div class="centro"><div class="giro" aria-hidden="true"></div><p class="sub" id="mtsTit" style="margin:0">${esc(txt || "Abrindo sua conta…")}</p></div>`);
 }
 function telaAviso(titulo, txt, botao) {
-  const p = portao(`<h1>${esc(titulo)}</h1><p class="sub">${esc(txt)}</p>${botao ? `<button class="bt" id="mtsBt">${esc(botao)}</button>` : ""}`);
+  const p = portao(`<h1 id="mtsTit">${esc(titulo)}</h1><p class="sub">${esc(txt)}</p>${botao ? `<button class="bt" id="mtsBt">${esc(botao)}</button>` : ""}`);
   const b = p.querySelector("#mtsBt"); if (b) b.onclick = () => location.reload();
 }
 
@@ -429,13 +430,13 @@ function telaEntrar(auth, modo, avisoInicial) {
   modo = modo || "entrar";
   const criar = modo === "criar", esqueci = modo === "esqueci";
   const p = portao(`
-    <h1>${esc(nomeApp())}</h1>
+    <h1 id="mtsTit">${esc(nomeApp())}</h1>
     <p class="sub">${criar ? "Crie sua conta MedTech. É a mesma conta de todos os apps MedTech." : esqueci ? "Enviaremos um link para você criar uma nova senha." : "Entre com sua conta MedTech. Seu progresso fica salvo nela e aparece em qualquer aparelho."}</p>
     <form id="mtsForm" novalidate>
       ${criar ? `<label for="mtsNome">Nome</label><input id="mtsNome" type="text" autocomplete="name" required>` : ""}
       <label for="mtsEmail">E-mail</label><input id="mtsEmail" type="email" autocomplete="email" inputmode="email" required>
       ${esqueci ? "" : `<label for="mtsSenha">Senha</label><input id="mtsSenha" type="password" autocomplete="${criar ? "new-password" : "current-password"}" required minlength="6">`}
-      ${criar ? `<label class="lgpd"><input id="mtsLgpd" type="checkbox"> <span>Concordo com o uso dos meus dados para guardar meu progresso de estudo, conforme a LGPD.</span></label>` : ""}
+      ${criar ? `<label class="lgpd"><input id="mtsLgpd" type="checkbox"> <span>Li e aceito os <a href="https://medtechbr.com.br/termos.html" target="_blank" rel="noopener">Termos</a> e a <a href="https://medtechbr.com.br/privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a> (LGPD).</span></label>` : ""}
       <button class="bt" type="submit" id="mtsEnviar">${criar ? "Criar conta" : esqueci ? "Enviar link" : "Entrar"}</button>
     </form>
     <div class="msg" id="mtsMsg" role="status"></div>
