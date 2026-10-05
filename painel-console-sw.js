@@ -1,14 +1,14 @@
-/* Console do Painel de Leitos — service worker
-   Só a casca (html + manifest), rede primeiro; nunca guarda dado da planilha
-   nem toca em script.google.com. Escopo restrito a /painel-console para não
-   disputar com o sw.js do portal. */
-const CACHE = 'painel-console-v13';   /* 24/09: visual no padrão ClínicaMed */
-const CASCA = ['painel-console.html', 'painel-console.webmanifest'];
-self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c => c.addAll(CASCA)).catch(() => {})); });
-self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('painel-console-') && k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
-self.addEventListener('fetch', e => {
-  const u = new URL(e.request.url);
-  if (u.origin !== location.origin || e.request.method !== 'GET') return;          /* ponte, fontes: direto na rede */
-  e.respondWith(fetch(e.request).then(r => { if (r.ok) caches.open(CACHE).then(c => c.put(e.request, r.clone())); return r; })
-    .catch(() => caches.match(e.request)));
+/* 05/10/2026: o console do Painel de Leitos saiu do ar (o fluxo ficou só nas planilhas
+   institucionais e nos PDFs). Este service worker existe só para limpar os aparelhos
+   que tinham o console instalado: apaga o cache, cancela o próprio registro e recarrega
+   as abas abertas (que então caem no 404 do site). */
+self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('activate', e => {
+  e.waitUntil((async () => {
+    const ks = await caches.keys();
+    await Promise.all(ks.filter(k => k.startsWith('painel-console-')).map(k => caches.delete(k)));
+    await self.registration.unregister();
+    const cs = await self.clients.matchAll({ type: 'window' });
+    cs.forEach(c => { try { c.navigate(c.url); } catch (_) {} });
+  })());
 });
