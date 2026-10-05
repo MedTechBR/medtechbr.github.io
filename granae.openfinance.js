@@ -32,7 +32,7 @@
 
   let feed = null;         // último resumo vindo da função
   let dadosProntos = false; // só importa depois que o estado do Granaê chegou da nuvem
-  let unsub = null, uidFeed = null, ocupado = false;
+  let unsub = null, uidFeed = null, ocupado = false, apagando = false;
 
   const $ = (id) => document.getElementById(id);
 
@@ -102,7 +102,7 @@
 
   /* ---------- importação: resumo do banco → state ---------- */
   function importar() {
-    if (!feed || !dadosProntos || typeof state === 'undefined') return;
+    if (apagando || !feed || !dadosProntos || typeof state === 'undefined') return;
     const agora = Date.now();
     const hoje = todayISO();
     const desde = (state.profile && state.profile.ofDesde) || '0000-00-00';
@@ -308,6 +308,32 @@
     finally { ocupado = false; render(); }
   }
 
+  /* "Apagar todos os dados" (Configurações): desconecta cada banco no Pluggy (removeItem na função, que também
+     apaga o registro do item) e só então apaga o resumo users/{uid}/apps/granae_of. Nessa ordem porque o
+     removeItem regrava o resumo. Durante a limpeza a importação fica parada, para não trazer de volta
+     lançamentos de um banco que ainda não foi desconectado. Só roda pelo botão, com a confirmação do usuário. */
+  async function apagarTudo() {
+    const MT = window.MT, u = MT && MT.user;
+    if (!u || u.demo || !MT._fb) return { bancos: 0 };
+    const { db, F } = MT._fb;
+    const ref = F.doc(db, 'users', u.uid, 'apps', 'granae_of');
+    apagando = true; ocupado = true; render('Apagando os dados do Open Finance…');
+    try {
+      let itens = (feed && feed.items) || null;
+      if (!itens) {
+        const snap = await F.getDoc(ref);
+        try { itens = (snap.exists() && (JSON.parse(snap.data().json || 'null') || {}).items) || []; } catch { itens = []; }
+      }
+      for (const i of itens) await chamar('removeItem', { itemId: i.id });
+      await F.deleteDoc(ref);
+      feed = null;
+      return { bancos: itens.length };
+    } finally {
+      apagando = false; ocupado = false; render();
+    }
+  }
+  const temDados = () => !!(feed && ((feed.items || []).length || (feed.transactions || []).length));
+
   /* ---------- interface ---------- */
   function haQuanto(ms) {
     if (!ms) return '';
@@ -377,5 +403,5 @@
   render();
 
   // para testes
-  window.GranaeOF = { feed: () => feed, importar, categoriaDoBanco, _setFeed: (f) => { feed = f; dadosProntos = true; importar(); } };
+  window.GranaeOF = { feed: () => feed, importar, categoriaDoBanco, apagarTudo, temDados, _setFeed: (f) => { feed = f; dadosProntos = true; importar(); } };
 })();

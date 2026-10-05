@@ -1880,8 +1880,18 @@ settingsForm.addEventListener('submit', e => {
   settingsDialog.close();
 });
 
-document.getElementById('wipeData').addEventListener('click', () => {
-  if (!confirm('Apagar TODOS os dados? Esta ação não pode ser desfeita.')) return;
+document.getElementById('wipeData').addEventListener('click', async (ev) => {
+  const OF = window.GranaeOF;
+  const comOF = !!(OF && OF.temDados && OF.temDados());
+  if (!confirm('Apagar TODOS os dados? Esta ação não pode ser desfeita.'
+    + (comOF ? '\n\nOs bancos conectados pelo Open Finance serão desconectados e o resumo importado será apagado da nuvem.' : ''))) return;
+  // Open Finance primeiro (users/{uid}/apps/granae_of): se falhar, nada é apagado e dá para tentar de novo.
+  if (OF && OF.apagarTudo) {
+    const bt = ev.currentTarget; bt.disabled = true;
+    try { await OF.apagarTudo(); }
+    catch (err) { toast('Não consegui apagar os dados do Open Finance (' + (err.message || 'erro') + '). Nada foi apagado; tente de novo.', 6000); return; }
+    finally { bt.disabled = false; }
+  }
   Object.assign(state, defaultState());
   saveState();
   settingsDialog.close();
