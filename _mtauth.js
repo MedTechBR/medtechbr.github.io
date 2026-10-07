@@ -180,6 +180,7 @@ const MT_FUNCS = [
   { id:'medprovas',  nm:'MedProvas',  ic:'ti-clipboard-text', c:'#C07C0A', url:'/medprovas.html',  linha:'provas' },
   { id:'flashmed',   nm:'FlashMed',   ic:'ti-cards',          c:'#D0902A', url:'/flashmed.html',   linha:'provas' },
   { id:'clinicamed',    nm:'ClínicaMed',    ic:'ti-heartbeat', c:'#0B6A72', url:'/clinicamed/',     linha:'provas' },
+  { id:'cirurgiamed',   nm:'CirurgiaMed',   ic:'ti-cut',       c:'#33479E', url:'/cirurgiamed/',    linha:'provas' },
   { id:'trafegotitulo', nm:'TráfegoTítulo', ic:'ti-car',       c:'#23272E', url:'/trafego-titulo/', linha:'provas' }
 ];
 /* A linha do app vem do MT_APP.linha; sem ela, do catálogo pelo id; sem nada, clínica. */
@@ -192,7 +193,7 @@ function linhaAtual() {
    ele escolheu — e sempre o app atual — SEMPRE dentro da própria linha. */
 const FUNCS_PADRAO = {
   clinica: ['condutai','atbguia','enfermaria','pocusai','laudai','paliai','calcmed','guiainterno','foco','plantaohub','granae','logbook'],
-  provas:  ['medprovas','flashmed','clinicamed','trafegotitulo']
+  provas:  ['medprovas','flashmed','clinicamed','cirurgiamed','trafegotitulo']
 };
 function funcsVisiveis() {
   const linha = linhaAtual();
