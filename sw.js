@@ -1,12 +1,11 @@
 /* MedTech Portal — service worker (PWA instalável).
    Network-first no shell do portal; cache só como fallback offline.
    NÃO intercepta apps externos (.web.app) nem APIs (origem diferente). */
-const CACHE = 'medtech-v770';
+const CACHE = 'medtech-v771';
 const SHELL = [
   './app.html',
   './provas.html',
   './provas.webmanifest',
-  './medprovas.webmanifest',
   './flashmed.webmanifest',
   // FlashMed abre offline (antes caía no portal) e leva a conta vendorizada (mtsync + Firebase compat)
   './flashmed.html',
@@ -18,9 +17,7 @@ const SHELL = [
   './vendor/firebase/firebase-app-compat.js',
   './vendor/firebase/firebase-auth-compat.js',
   './vendor/firebase/firebase-firestore-compat.js',
-  './enfermaria.html',
   './manifest.webmanifest',
-  './enfermaria.webmanifest',
   './icone-192.png',
   './icone-512.png',
   './_mtfb.js',
