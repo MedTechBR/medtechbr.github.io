@@ -21,24 +21,16 @@ function imgTag(n,alt,sizes,cls,eager){const s=srcset(n);return `<img${cls?` cla
 
 /* ---------- catálogo usado nas vitrines ---------- */
 const APPS=[
- {id:'enfermaria',nm:'EnfermarIA',ic:'ti-bed',g:'hosp',img:'enfermaria-390',url:'enfermaria.html',d:'Os internados por leito, com as pendências de cada um e a evolução extraída por IA.'},
- {id:'condutai',nm:'CondutAI',ic:'ti-stethoscope',g:'clin',img:'condutai-390',url:'condutai.html',d:'274 condutas completas e aprofundadas, e uma IA que responde com busca em diretrizes atuais.'},
- {id:'atbguia',nm:'ATBguia',ic:'ti-pill',g:'clin',img:'atbguia-390',url:'atbguia.html',d:'Antibioticoterapia empírica e dirigida, ajuste para a função renal e bulário.'},
- {id:'calcmed',nm:'CalcMed',ic:'ti-calculator',g:'clin',img:'calcmed-390',url:'calcmed.html',d:'64 calculadoras e escores clínicos validados, com a interpretação ao lado do resultado.'},
+ {id:'condutai',nm:'CondutAI',ic:'ti-stethoscope',g:'clin',img:'condutai-390',url:'condutai.html',d:'274 condutas completas e aprofundadas, com antibioticoterapia, calculadoras e ultrassom à beira-leito (POCUS) dentro do app, e uma IA que responde com busca em diretrizes atuais.'},
  {id:'paliai',nm:'PaliAI',ic:'ti-heart-handshake',g:'clin',img:'paliai-390',url:'paliai.html',d:'Triagem de cuidados paliativos em 2 minutos e roteiro para a reunião com a família.'},
- {id:'guiainterno',nm:'Guia do Interno',ic:'ti-school',g:'clin',img:'guiainterno-390',url:'guiainterno.html',d:'O manual de bolso do internato: admissão, evolução, plantão e SBAR, com um mentor de IA.'},
- {id:'pocusai',nm:'PocusAI',ic:'ti-scan',g:'hosp',img:'pocusai-390',url:'pocusai.html',d:'Ultrassom à beira-leito, região por região: onde pôr o transdutor, o que ver e o que fazer.'},
  {id:'laudai',nm:'LaudAI',ic:'ti-report-medical',g:'hosp',img:'laudai-390',url:'laudai.html',d:'Laudos estruturados, com a IA como segunda opinião do radiologista.'},
- {id:'foco',nm:'Foco',ic:'ti-target-arrow',g:'rotina',img:'foco-390',url:'foco.html',d:'Demandas e agenda do médico, com priorização por IA.'},
  {id:'plantaohub',nm:'PlantãoHub',ic:'ti-clock',g:'rotina',img:'plantaohub-390',url:'plantaohub.html',d:'Plantões, horas e quanto você tem a receber, mês a mês.'},
- {id:'granae',nm:'Granaê',ic:'ti-wallet',g:'rotina',img:'granae-390',url:'granae.html',d:'As finanças do médico por voz e pela foto da fatura, com leitura por IA.'},
- {id:'logbook',nm:'Logbook',ic:'ti-notebook',g:'rotina',img:'logbook-390',url:'logbook.html',d:'Procedimentos e casos do residente, com contadores e exportação em planilha.'}
+ {id:'granae',nm:'Granaê',ic:'ti-wallet',g:'rotina',img:'granae-390',url:'granae.html',d:'As finanças do médico por voz e pela foto da fatura, com leitura por IA.'}
 ];
 const PROVAS=[
  {id:'clinicamed',nm:'ClínicaMed',ic:'ti-heartbeat',img:'clinicamed-390',url:'clinicamed/',d:'Título de Clínica Médica e acesso ao R+: 708 questões de provas oficiais, com procedência, e questões autorais comentadas; leituras longas e acompanhamento de turma pela coordenação.'},
  {id:'trafegotitulo',nm:'TráfegoTítulo',ic:'ti-car',img:'trafego-390',url:'trafego-titulo/',d:'Título de Medicina do Tráfego, no formato da prova, com o conteúdo amarrado ao edital e às normas de trânsito vigentes.'},
- {id:'flashmed',nm:'FlashMed',ic:'ti-cards',img:'flashmed-390',url:'flashmed.html',d:'Questões e simulados de residência, com a procedência de cada questão.'},
- {id:'medprovas',nm:'MedProvas',ic:'ti-clipboard-text',img:'medprovas-390',url:'medprovas.html',d:'Para o professor: elabore e corrija provas com IA, a partir do conteúdo da sua disciplina.'}
+ {id:'flashmed',nm:'FlashMed',ic:'ti-cards',img:'flashmed-390',url:'flashmed.html',d:'Questões e simulados de residência, com a procedência de cada questão.'}
 ];
 const INST=[
  {nm:'Sistema Hospitalar (HospSys)',ic:'ti-building-hospital',url:'hospsys.html',d:'Prontuário, prescrição, leitos, bloco, farmácia e faturamento, dentro do hospital.'},
@@ -50,7 +42,7 @@ const INST=[
  {nm:'Sob medida',ic:'ti-code',url:'sobmedida.html',d:'Sistemas feitos para o fluxo do seu serviço.'}
 ];
 const BENCH={
- 'Conteúdo clínico':[['Condutas completas',274,300],['Calculadoras e escores',64,300],['Aplicativos com IA',13,300,'dim']],
+ 'Conteúdo clínico':[['Condutas completas',274,300],['Calculadoras e escores',64,300]],
  'Hospital':[['Exames lab + imagem',280,300,'','~280'],['Medicamentos no catálogo',140,300,'','~140'],['Especialidades de interconsulta',44,300],['Módulos do HospSys',13,300,'dim']]
 };
 
@@ -79,11 +71,11 @@ function xfShow(box,i){$$('img',box).forEach((im,k)=>im.classList.toggle('on',k=
 
 /* ---------- herói da home: palco com as três linhas ---------- */
 const LINHAS3=[
- {k:'app',nm:'MedTech App',url:'medtech-app.html',t:'Os apps do médico assistencial, numa conta só.',desk:['portal-1440','condutai-1440','enfermaria-1440','granae-1440'],ph:['enfermaria-390','condutai-390','atbguia-390','plantaohub-390']},
- {k:'provas',nm:'MedTech Provas',url:'medtech-provas.html',t:'Plataformas de estudo construídas em cima do edital.',desk:['clinicamed-1440','provas-1440','medprovas-1440'],ph:['clinicamed-390','trafego-390','flashmed-390']},
+ {k:'app',nm:'MedTech App',url:'medtech-app.html',t:'Os apps do médico assistencial, numa conta só.',desk:['portal-1440','condutai-1440','granae-1440'],ph:['condutai-390','laudai-390','paliai-390','plantaohub-390']},
+ {k:'provas',nm:'MedTech Provas',url:'medtech-provas.html',t:'Plataformas de estudo construídas em cima do edital.',desk:['clinicamed-1440','provas-1440'],ph:['clinicamed-390','trafego-390','flashmed-390']},
  {k:'inst',nm:'MedTech Institucional',url:'institucional.html',t:'Sistema hospitalar, auditoria de faturamento e treinamentos para a instituição.',desk:['hospsys-mapa','auditoria-fat','capacita-painel','hospsys-pront'],ph:['capacita-390']}
 ];
-const ALT={'portal-1440':'MedTech App: a página inicial com os apps do médico','condutai-1440':'CondutAI no computador','enfermaria-1440':'EnfermarIA no computador: internados por leito','granae-1440':'Granaê no computador: finanças do mês','clinicamed-1440':'ClínicaMed no computador','provas-1440':'Portal MedTech Provas','medprovas-1440':'MedProvas: prova montada com IA','hospsys-mapa':'HospSys: mapa de leitos por setor','auditoria-fat':'Auditoria de faturamento: glosa e rejeição por competência','capacita-painel':'Capacita: adesão aos treinamentos por categoria e setor','hospsys-pront':'HospSys: prontuário do paciente','enfermaria-390':'EnfermarIA no celular','condutai-390':'CondutAI no celular','atbguia-390':'ATBguia no celular','plantaohub-390':'PlantãoHub no celular','clinicamed-390':'ClínicaMed no celular','trafego-390':'TráfegoTítulo no celular','flashmed-390':'FlashMed no celular','capacita-390':'Capacita no celular: os treinamentos do colaborador'};
+const ALT={'portal-1440':'MedTech App: a página inicial com os apps do médico','condutai-1440':'CondutAI no computador','granae-1440':'Granaê no computador: finanças do mês','clinicamed-1440':'ClínicaMed no computador','provas-1440':'Portal MedTech Provas','hospsys-mapa':'HospSys: mapa de leitos por setor','auditoria-fat':'Auditoria de faturamento: glosa e rejeição por competência','capacita-painel':'Capacita: adesão aos treinamentos por categoria e setor','hospsys-pront':'HospSys: prontuário do paciente','condutai-390':'CondutAI no celular','laudai-390':'LaudAI no celular','paliai-390':'PaliAI no celular','plantaohub-390':'PlantãoHub no celular','clinicamed-390':'ClínicaMed no celular','trafego-390':'TráfegoTítulo no celular','flashmed-390':'FlashMed no celular','capacita-390':'Capacita no celular: os treinamentos do colaborador'};
 const hero=$('#hero'),stage=$('#stage3');
 if(stage){
   const lsw=$('#lsw'),dk=$('.dk .xf',stage),ph=$('.ph .xf',stage),cap=$('.stcap',stage);
@@ -163,7 +155,7 @@ $$('[data-gal]').forEach(g=>{
 const PLANOS_PADRAO={produtos:[
  {id:'app-1',curto:'1 app',linha:'clinica',apps:1,resumo:'Escolha o app que resolve a sua maior dor. IA incluída.',preco:{mensal:29.9},checkout:{}},
  {id:'app-2',curto:'2 apps',linha:'clinica',apps:2,resumo:'A dupla que você usa todo dia. IA incluída.',preco:{mensal:49.9},checkout:{}},
- {id:'app-tudo',curto:'Tudo',linha:'clinica',apps:'tudo',destaque:true,resumo:'Os 12 apps do MedTech App, com a IA incluída. No anual, 2 meses grátis.',preco:{mensal:89.9,anual:899},checkout:{}}],teste_dias:7};
+ {id:'app-tudo',curto:'Tudo',linha:'clinica',apps:'tudo',destaque:true,resumo:'Os 5 apps do MedTech App, com a IA incluída. No anual, 2 meses grátis.',preco:{mensal:89.9,anual:899},checkout:{}}],teste_dias:7};
 const brl=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 async function planos(){try{const r=await fetch('planos.json',{cache:'no-cache'});if(r.ok)return await r.json()}catch(e){}return PLANOS_PADRAO}
 const calc=$('#calc');
@@ -184,7 +176,7 @@ if(calc)planos().then(P=>{
     else pick.hidden=true;
     const v=p.preco[per];const venda=p.checkout&&p.checkout[per];
     const q=new URLSearchParams({plano:p.id,periodo:per});if(n&&escolha.length)q.set('apps',escolha.join(','));
-    const nomes=n?(escolha.length?escolha.map(id=>APPS.find(a=>a.id===id).nm).join(' + '):'escolha acima'):'os 12 apps';
+    const nomes=n?(escolha.length?escolha.map(id=>APPS.find(a=>a.id===id).nm).join(' + '):'escolha acima'):'os 5 apps';
     sumr.innerHTML=`<div class="t"><b>${esc(p.curto)} · ${per==='anual'?'anual':'mensal'} · ${v!=null?brl(v):''}</b>${esc(nomes)}. Comece com ${P.teste_dias||7} dias grátis de tudo; assine quando fizer sentido.</div><div class="row"><a class="pill solid" href="app.html?${q}">${venda?'Assinar':'Começar grátis'}</a><a class="pill ghost" href="app.html">Criar conta</a></div>`;
   }
   calc.addEventListener('click',e=>{const s=e.target.closest('.seg button');if(s){per=s.dataset.p;$$('.seg button',calc).forEach(b=>{b.classList.toggle('on',b===s);b.setAttribute('aria-pressed',b===s)});const p=prods.find(x=>x.id===sel);if(p.preco[per]==null)sel=(prods.find(x=>x.preco[per]!=null)||p).id;desenha();return}

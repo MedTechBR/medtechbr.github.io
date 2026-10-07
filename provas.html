@@ -170,32 +170,24 @@ const BASE = 'https://medtechbr.com.br/';
 /* Catálogo de TUDO que o MedTech oferece. O id é o mesmo do trocador de funções (_mtauth.js).
    O que aparece na página é a escolha do usuário (salva na conta, sincroniza entre aparelhos). */
 const CATALOGO = [
-  { id:'enfermaria',    nm:'EnfermarIA',       ic:'ti-bed',              url:BASE+'enfermaria.html',       cat:'Atendimento',          linha:'clinica' , c:'var(--c-indigo)' },
   { id:'condutai',      nm:'CondutAI',         ic:'ti-stethoscope',      url:BASE+'condutai.html',         cat:'Referência clínica',   linha:'clinica' , c:'var(--c-azul)' },
-  { id:'atbguia',       nm:'ATBguia',          ic:'ti-pill',             url:BASE+'atbguia.html',          cat:'Referência clínica',   linha:'clinica' , c:'color-mix(in srgb,var(--c-ciano) 80%,#000)' },
-  { id:'calcmed',       nm:'CalcMed',          ic:'ti-calculator',       url:BASE+'calcmed.html',          cat:'Referência clínica',   linha:'clinica' , c:'color-mix(in srgb,var(--c-laranja) 86%,#000)' },
   { id:'paliai',        nm:'PaliAI',           ic:'ti-heart-handshake',  url:BASE+'paliai.html',           cat:'Referência clínica',   linha:'clinica' , c:'var(--c-rosa)' },
-  { id:'guiainterno',   nm:'Guia do Interno',  ic:'ti-school',           url:BASE+'guiainterno.html',      cat:'Referência clínica',   linha:'clinica' , c:'var(--c-ambar)', t:'#231500' },
-  { id:'pocusai',       nm:'PocusAI',          ic:'ti-scan',             url:BASE+'pocusai.html',          cat:'Hospital e imagem',    linha:'clinica' , c:'var(--c-teal)' },
   { id:'laudai',        nm:'LaudAI',           ic:'ti-report-medical',   url:BASE+'laudai.html',           cat:'Hospital e imagem',    linha:'clinica' , c:'var(--c-cobalto)' },
-  { id:'foco',          nm:'Foco',             ic:'ti-target-arrow',     url:BASE+'foco.html',             cat:'Rotina do médico',     linha:'clinica' , c:'#0B7A54' },
   { id:'plantaohub',    nm:'PlantãoHub',       ic:'ti-clock',            url:BASE+'plantaohub.html',       cat:'Rotina do médico',     linha:'clinica' , c:'#4D7C0F' },
   { id:'granae',        nm:'Granaê',           ic:'ti-wallet',           url:BASE+'granae.html',           cat:'Rotina do médico',     linha:'clinica' , c:'#7C4DE8' },
-  { id:'logbook',       nm:'Logbook',          ic:'ti-notebook',         url:BASE+'logbook.html',          cat:'Rotina do médico',     linha:'clinica' , c:'var(--c-terracota)' },
   { id:'clinicamed',    nm:'ClínicaMed',       ic:'ti-heartbeat',        url:BASE+'clinicamed/',           cat:'Prova de título',      linha:'provas', sub:'título de Clínica Médica (TECM) e acesso R+' , c:'var(--c-indigo)' },
   { id:'cirurgiamed',   nm:'CirurgiaMed',      ic:'ti-cut',              url:BASE+'cirurgiamed/',          cat:'Prova de título',      linha:'provas', sub:'título de Cirurgia Geral (CBC), R+ cirúrgico e concursos' , c:'#33479E' },
   { id:'trafegotitulo', nm:'TráfegoTítulo',    ic:'ti-car',              url:BASE+'trafego-titulo/',       cat:'Prova de título',      linha:'provas', sub:'título de Medicina do Tráfego' , c:'var(--c-teal)' },
-  { id:'medprovas',     nm:'MedProvas',        ic:'ti-clipboard-text',   url:BASE+'medprovas.html',        cat:'Residência e concursos', linha:'provas' , c:'var(--c-ambar)', t:'#231500' },
   { id:'flashmed',      nm:'FlashMed',         ic:'ti-cards',            url:BASE+'flashmed.html',         cat:'Residência e concursos', linha:'provas' , c:'var(--c-coral)' }
 ];
 /* Linha deste portal. provas.html é GERADO deste arquivo por _gera_provas.py — editar aqui. */
 const LINHA = 'provas';
 const CATALOGO_LINHA = CATALOGO.filter(a => a.linha === LINHA);
-const CATEGORIAS = LINHA === 'provas' ? ['Prova de título','Residência e concursos'] : ['Atendimento','Referência clínica','Hospital e imagem','Rotina do médico'];
+const CATEGORIAS = LINHA === 'provas' ? ['Prova de título','Residência e concursos'] : ['Referência clínica','Hospital e imagem','Rotina do médico'];
 /* Quem nunca escolheu vê o conjunto padrão da linha. */
 const PADRAO = LINHA === 'provas'
-  ? ['clinicamed','cirurgiamed','trafegotitulo','medprovas','flashmed']
-  : ['condutai','atbguia','enfermaria','pocusai','laudai','paliai','calcmed','guiainterno','foco','plantaohub','granae','logbook'];
+  ? ['clinicamed','cirurgiamed','trafegotitulo','flashmed']
+  : ['condutai','laudai','paliai','plantaohub','granae'];
 const CACHE_APPS = 'mt.portal.apps.' + LINHA;   // lido também pelo trocador de funções (_mtauth.js), mesmo domínio
 const CAMPO_SEL = LINHA === 'provas' ? 'appsProvas' : 'apps';   // no doc da conta, um campo por linha
 
@@ -297,7 +289,7 @@ function openSug(){
     <h3><i class="ti ti-bulb" aria-hidden="true"></i>Sugerir uma função</h3>
     <p class="sub">Conte o que você gostaria de ver nos apps MedTech. Sua ideia vai direto para a equipe.</p>
     <label for="sugApp">App</label><select id="sugApp">${opts}</select>
-    <label for="sugTxt">Sua sugestão</label><textarea id="sugTxt" placeholder="Ex.: no EnfermarIA, poder ordenar os leitos por gravidade"></textarea>
+    <label for="sugTxt">Sua sugestão</label><textarea id="sugTxt" placeholder="Ex.: no CondutAI, poder salvar condutas por especialidade"></textarea>
     <label for="sugContato">Seu contato (opcional)</label><input id="sugContato" value="${esc((u&&u.email)||'')}" placeholder="e-mail ou WhatsApp para retorno">
     <div class="sug-row"><button class="b ok" onclick="enviarSug()">Enviar sugestão</button><button class="b cancel" onclick="closeSug()">Cancelar</button></div>
   </div>`;

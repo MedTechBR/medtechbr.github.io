@@ -83,7 +83,7 @@ const MT = {
 };
 window.MT = MT;
 /* A IA central decide o acesso pelo app que chama (acesso por produto). As chamadas HTTP
-   diretas ao aigateway/geminiDocHttp (Foco, CondutAI, Granaê) ganham o id do app aqui, num
+   diretas ao aigateway/geminiDocHttp (CondutAI, Granaê) ganham o id do app aqui, num
    ponto só. Prefixa sem reescrever o corpo: se o app já mandou "app", o JSON.parse do
    servidor fica com a última ocorrência, que é a do app. */
 (function () {
@@ -159,25 +159,18 @@ function injectCSS() {
    o botão de início e o portal só mostram a própria linha. Público diferente não se mistura —
    quem estuda para o TECM não vê ambulatório; quem atende não vê prova. Farmácia saiu do
    ecossistema (os apps seguem no ar para quem já usa, sem trocador); institucional não entra no
-   PWA (vendido por contrato). */
+   PWA (vendido por contrato). Catálogo enxugado em 07/10/2026: EnfermarIA, Logbook, AltaEnf, Guia do
+   Interno, MedProvas e Foco descontinuados; ATBguia, CalcMed e PocusAI passaram para dentro do CondutAI. */
 const LINHAS = {
   clinica: { nm: 'MedTech App', home: '/app.html' },
   provas:  { nm: 'MedTech Provas',  home: '/provas.html' }
 };
 const MT_FUNCS = [
   { id:'condutai',   nm:'CondutAI',   ic:'ti-stethoscope',    c:'#1D6FD0', url:'/condutai.html',   linha:'clinica' },
-  { id:'atbguia',    nm:'ATBguia',    ic:'ti-pill',           c:'#0E8A9C', url:'/atbguia.html',    linha:'clinica' },
-  { id:'enfermaria', nm:'EnfermarIA', ic:'ti-bed',            c:'#3B7BE0', url:'/enfermaria.html', linha:'clinica' },
-  { id:'pocusai',    nm:'PocusAI',    ic:'ti-scan',           c:'#2456B8', url:'/pocusai.html',    linha:'clinica' },
   { id:'laudai',     nm:'LaudAI',     ic:'ti-report-medical', c:'#4166D6', url:'/laudai.html',     linha:'clinica' },
   { id:'paliai',     nm:'PaliAI',     ic:'ti-heart-handshake',c:'#B84A86', url:'/paliai.html',     linha:'clinica' },
-  { id:'calcmed',    nm:'CalcMed',    ic:'ti-calculator',     c:'#4C7A99', url:'/calcmed.html',    linha:'clinica' },
-  { id:'guiainterno',nm:'Guia do Interno', ic:'ti-school',    c:'#A8730F', url:'/guiainterno.html',linha:'clinica' },
-  { id:'foco',       nm:'Foco',       ic:'ti-target-arrow',   c:'#0E8A63', url:'/foco.html',       linha:'clinica' },
   { id:'plantaohub', nm:'PlantãoHub', ic:'ti-clock',          c:'#15966F', url:'/plantaohub.html', linha:'clinica' },
   { id:'granae',     nm:'Granaê',     ic:'ti-wallet',         c:'#6D46D8', url:'/granae.html',     linha:'clinica' },
-  { id:'logbook',    nm:'Logbook',    ic:'ti-notebook',       c:'#B0532F', url:'/logbook.html',    linha:'clinica' },
-  { id:'medprovas',  nm:'MedProvas',  ic:'ti-clipboard-text', c:'#C07C0A', url:'/medprovas.html',  linha:'provas' },
   { id:'flashmed',   nm:'FlashMed',   ic:'ti-cards',          c:'#D0902A', url:'/flashmed.html',   linha:'provas' },
   { id:'clinicamed',    nm:'ClínicaMed',    ic:'ti-heartbeat', c:'#0B6A72', url:'/clinicamed/',     linha:'provas' },
   { id:'cirurgiamed',   nm:'CirurgiaMed',   ic:'ti-cut',       c:'#33479E', url:'/cirurgiamed/',    linha:'provas' },
@@ -192,8 +185,8 @@ function linhaAtual() {
 /* O Portal guarda a escolha do usuário em localStorage (mesmo domínio): o trocador mostra só o que
    ele escolheu — e sempre o app atual — SEMPRE dentro da própria linha. */
 const FUNCS_PADRAO = {
-  clinica: ['condutai','atbguia','enfermaria','pocusai','laudai','paliai','calcmed','guiainterno','foco','plantaohub','granae','logbook'],
-  provas:  ['medprovas','flashmed','clinicamed','cirurgiamed','trafegotitulo']
+  clinica: ['condutai','laudai','paliai','plantaohub','granae'],
+  provas:  ['flashmed','clinicamed','cirurgiamed','trafegotitulo']
 };
 function funcsVisiveis() {
   const linha = linhaAtual();
