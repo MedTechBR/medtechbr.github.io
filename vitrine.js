@@ -30,7 +30,7 @@ const APPS=[
 const PROVAS=[
  {id:'clinicamed',nm:'ClínicaMed',ic:'ti-heartbeat',img:'clinicamed-390',url:'clinicamed/',d:'Título de Clínica Médica e acesso ao R+: 708 questões de provas oficiais, com procedência, e questões autorais comentadas; leituras longas e acompanhamento de turma pela coordenação.'},
  {id:'trafegotitulo',nm:'TráfegoTítulo',ic:'ti-car',img:'trafego-390',url:'trafego-titulo/',d:'Título de Medicina do Tráfego, no formato da prova, com o conteúdo amarrado ao edital e às normas de trânsito vigentes.'},
- {id:'flashmed',nm:'FlashMed',ic:'ti-cards',img:'flashmed-390',url:'flashmed.html',d:'Questões e simulados de residência, com a procedência de cada questão.'}
+ {id:'flashmed',nm:'FlashMed',ic:'ti-cards',img:'flashmed-390',url:'flashmed/',d:'Preparatório ENARE e ENAMED: questões de provas reais comentadas, simulados no formato da prova e leituras por área.'}
 ];
 const INST=[
  {nm:'Sistema Hospitalar (HospSys)',ic:'ti-building-hospital',url:'hospsys.html',d:'Prontuário, prescrição, leitos, bloco, farmácia e faturamento, dentro do hospital.'},
