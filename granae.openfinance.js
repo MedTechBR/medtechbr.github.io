@@ -139,13 +139,41 @@
     // Pix e transferência entre as contas do próprio titular (CPF/CNPJ/nome em
     // profile.ofProprios, dado privado do usuário): fora dos totais
     const proprios = ((state.profile && state.profile.ofProprios) || []).map(p => String(p).toLowerCase()).filter(Boolean);
+
+    /* Transferência só quando as DUAS pontas estão em contas conectadas (saiu de
+       uma, entrou noutra, mesmo valor, até 3 dias). Salário que passa da
+       conta-salário (fora do Open Finance) para a corrente vem marcado pelo banco
+       como "mesma titularidade", mas para quem vê só as contas conectadas é
+       dinheiro entrando: conta como receita. */
+    const DIA3 = 3 * DIA;
+    const temPar = (t) => feed.transactions.some(o => o !== t && o.accountId !== t.accountId && o.type !== t.type
+      && Math.abs(o.amount - t.amount) < 0.01 && Math.abs(new Date(o.date) - new Date(t.date)) <= DIA3);
+
+    /* Recuperação (uma vez): a regra antiga apagava com lápide o pendente que
+       sumia por uma sincronização e ele nunca mais voltava, mesmo reaparecendo
+       no banco com o mesmo id. Solta a lápide dos pendentes que estão no banco. */
+    if (!(state.profile && state.profile.ofRecupPend1)) {
+      const pendNoBanco = new Set(feed.transactions.filter(t => t.pending).map(t => 'of_' + t.id));
+      const soltar = (state.tombstones || []).filter(x => pendNoBanco.has(x.id) && !porId.has(x.id)).map(x => x.id);
+      if (soltar.length) {
+        const s = new Set(soltar);
+        state.tombstones = state.tombstones.filter(x => !s.has(x.id));
+        soltar.forEach(i => mortos.delete(i));
+      }
+      state.profile = { ...(state.profile || {}), ofRecupPend1: agora };
+      mudou = true;
+    }
+
     for (const t0 of feed.transactions) {
-      const t = (!t0.transfer && proprios.some(p => String(t0.desc || '').toLowerCase().includes(p))) ? { ...t0, transfer: true } : t0;
+      const marcado = t0.transfer || proprios.some(p => String(t0.desc || '').toLowerCase().includes(p));
+      const t = { ...t0, transfer: !!marcado && temPar(t0) };
       const id = 'of_' + t.id;
       noResumo.add(id);
-      if (mortos.has(id) || t.date < desde) continue;
-      const pend = t.date > hoje;
+      if (t.date < desde) continue;
       const ex = porId.get(id);
+      // lápide só vale para o que não está mais aqui (um aparelho pode ter regravado depois)
+      if (!ex && mortos.has(id)) continue;
+      const pend = t.date > hoje;
       if (ex) {
         // o banco confirmou/ajustou: atualiza valor e data, nunca a categoria
         const mud = {};
@@ -186,14 +214,24 @@
       novos++; mudou = true;
     }
 
-    // Pendente que sumiu do banco foi substituído pelo lançamento definitivo
+    /* Pendente que sumiu do banco. Só sai quando o definitivo dele está no
+       resumo (mesma conta e tipo, valor até 2% ou R$ 1, até 10 dias depois): aí
+       ganha lápide. Sem substituto pode ser só uma sincronização incompleta:
+       fica, e depois de 15 dias sai SEM lápide (se voltar, entra de novo). */
     const inicio = new Map(feed.accounts.map(a => ['of_' + a.id, a.from]));
+    const limiteVelho = new Date(Date.now() - 15 * DIA).toISOString().slice(0, 10);
+    const definitivos = feed.transactions.filter(t => !t.pending);
+    const substituto = (p) => definitivos.some(d => 'of_' + d.accountId === p.accountId && d.type === p.type
+      && Math.abs(d.amount - (+p.amount || 0)) <= Math.max(1, (+p.amount || 0) * 0.02)
+      && (new Date(d.date) - new Date(p.date)) >= -DIA3 && (new Date(d.date) - new Date(p.date)) <= 10 * DIA);
     const sumiram = state.transactions.filter(t => t.of && t.ofPend && !noResumo.has(t.id)
       && inicio.has(t.accountId) && t.date >= inicio.get(t.accountId));
-    if (sumiram.length) {
-      const fora = new Set(sumiram.map(t => t.id));
+    const trocados = sumiram.filter(substituto);
+    const velhos = sumiram.filter(t => !trocados.includes(t) && t.date < limiteVelho);
+    if (trocados.length || velhos.length) {
+      const fora = new Set([...trocados, ...velhos].map(t => t.id));
       state.transactions = state.transactions.filter(t => !fora.has(t.id));
-      sumiram.forEach(t => tombstone('tombstones', t.id));
+      trocados.forEach(t => tombstone('tombstones', t.id));
       mudou = true;
     }
 

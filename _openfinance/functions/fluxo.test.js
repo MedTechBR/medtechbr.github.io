@@ -26,7 +26,7 @@ const publicados = [];
 Object.assign(process.env, { PLUGGY_CLIENT_ID: 'cid', PLUGGY_CLIENT_SECRET: 'sec', PLUGGY_WEBHOOK_KEY: 'k'.repeat(48), OF_EMAILS: 'eu@x.com', GCLOUD_PROJECT: 'medtech-c658c' });
 // Pluggy falso
 const chamadas = [];
-let ultimoConnect = null;
+let ultimoConnect = null, webhookCriado = null, webhookApagado = null;
 global.fetch = async (url, o = {}) => {
   const u = new URL(url); chamadas.push(o.method + ' ' + u.pathname + u.search);
   const J = (b, s = 200) => ({ ok: s < 300, status: s, json: async () => b, text: async () => JSON.stringify(b) });
@@ -36,6 +36,8 @@ global.fetch = async (url, o = {}) => {
   if (u.pathname === '/items/item-12345678') return J({ id: 'item-12345678', clientUserId: 'uid1', status: 'UPDATED', connector: { name: 'MeuPluggy' } });
   if (u.pathname === '/items/item-87654321') return J({ id: 'item-87654321', clientUserId: 'uid1', status: 'UPDATED', connector: { name: 'MeuPluggy' } });
   if (u.pathname === '/items/item-alheio00') return J({ id: 'item-alheio00', clientUserId: 'outro', connector: { name: 'X' } });
+  if (u.pathname === '/webhooks') { if (o.method === 'POST') { webhookCriado = JSON.parse(o.body); return J({ id: 'w1' }); } return J({ results: [{ id: 'w0', event: 'all', url: 'https://southamerica-east1-medtech-c658c.cloudfunctions.net/pluggyWebhook?k=antiga' }] }); }
+  if (u.pathname.startsWith('/webhooks/') && o.method === 'DELETE') { webhookApagado = u.pathname; return J({}); }
   if (u.pathname === '/loans') return J({ results: [{ id: 'l1', productName: 'Crédito pessoal', contractNumber: '123456789', contractAmount: 100000, contractOutstandingBalance: 61234.5, installments: { totalNumberOfInstallments: 24, paidInstallments: 9, dueInstallments: 15 }, CET: 0.21, dueDate: '2027-12-10T00:00:00Z' }] });
   if (u.pathname === '/investments') return J({ totalPages: 1, results: [{ id: 'i1', name: 'Sicredi Previdência VGBL', type: 'SECURITY', subtype: 'RETIREMENT', balance: 50000 }, { id: 'i2', name: 'CDB', type: 'FIXED_INCOME', balance: 1000.456 }, { id: 'i3', name: 'Resgatado', type: 'FIXED_INCOME', balance: 0 }] });
   if (u.pathname === '/accounts') return J({ results: [{ id: 'acc1', type: 'BANK', name: 'Conta', balance: 10, number: '0001-9' }] });
@@ -80,6 +82,10 @@ const req = (data, email = 'eu@x.com', uid = 'uid1') => ({ data, auth: { uid, to
   await f.openfinanceSyncJob.run({ data: { message: { json: { uid: 'uid1' } } } });
   // sync manual com refresh chama PATCH
   await f.openfinance.run(req({ action: 'sync', refresh: true }));
+  // aviso da aplicação: troca o de senha antiga por um "all" com a senha atual
+  assert.strictEqual(webhookApagado, '/webhooks/w0');
+  assert.strictEqual(webhookCriado.event, 'all');
+  assert(webhookCriado.url.endsWith('?k=' + 'k'.repeat(48)));
   assert(chamadas.some(c => c.startsWith('PATCH /items/item-12345678')));
   assert(banco.get('openfinance_users/uid1').items[0].refreshedAt > 0);
   // mesmo banco ligado duas vezes: as contas repetidas não entram em dobro

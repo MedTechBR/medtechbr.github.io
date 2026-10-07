@@ -228,6 +228,29 @@ function urlWebhook() {
   return `https://southamerica-east1-${proj}.cloudfunctions.net/pluggyWebhook?k=${encodeURIComponent(PLUGGY_WEBHOOK_KEY.value())}`;
 }
 
+/* Aviso no nível da APLICAÇÃO (POST /webhooks). O webhookUrl do connect token
+   só cobre eventos daquela conexão no momento da criação; as atualizações
+   diárias do MeuPluggy não chegavam por ele (logs: nenhum aviso desde 28/09) e
+   o Granaê só via o banco na varredura. Garante um aviso "all" apontando para
+   cá; roda no máximo uma vez por instância. */
+let _webhookOk = false;
+async function garantirWebhook() {
+  if (_webhookOk) return;
+  try {
+    const url = urlWebhook();
+    const base = url.split('?')[0];
+    const r = await pluggy('GET', '/webhooks');
+    const lista = (r && (r.results || r)) || [];
+    const meus = (Array.isArray(lista) ? lista : []).filter(w => String(w.url || '').split('?')[0] === base);
+    if (!meus.some(w => w.url === url && w.event === 'all')) {
+      for (const w of meus) { try { await pluggy('DELETE', `/webhooks/${w.id}`); } catch {} } // senha antiga
+      await pluggy('POST', '/webhooks', { event: 'all', url });
+      logger.info('webhook da aplicação registrado');
+    }
+    _webhookOk = true;
+  } catch (e) { logger.warn('não consegui registrar o webhook da aplicação', { erro: e.message }); }
+}
+
 function paraHttps(e) {
   if (e instanceof HttpsError) return e;
   logger.error(e);
@@ -272,6 +295,7 @@ exports.openfinance = onCall({ secrets: SECRETS, timeoutSeconds: 120, memory: '2
         return await sincronizar(uid);
       }
       case 'sync':
+        await garantirWebhook();
         return await sincronizar(uid, { atualizar: !!d.refresh });
       case 'removeItem': {
         const itemId = String(d.itemId || '');
@@ -328,7 +352,8 @@ exports.openfinanceSyncJob = onMessagePublished({ topic: TOPICO, secrets: SECRET
   logger.info('sincronizado via webhook', { uid, ...r });
 });
 
-exports.openfinanceCron = onSchedule({ schedule: 'every 6 hours', timeZone: 'America/Sao_Paulo', secrets: SECRETS, timeoutSeconds: 540 }, async () => {
+exports.openfinanceCron = onSchedule({ schedule: 'every 3 hours', timeZone: 'America/Sao_Paulo', secrets: SECRETS, timeoutSeconds: 540 }, async () => {
+  await garantirWebhook();
   const docs = await db.collection('openfinance_users').listDocuments();
   for (const d of docs) {
     try { await sincronizar(d.id); }
