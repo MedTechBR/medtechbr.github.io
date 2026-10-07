@@ -14,6 +14,7 @@
 <script defer src="condutai-presc.js?v=3"></script>
 <script defer src="condutai-prescricoes.js?v=4"></script>
 <script defer src="condutai-ligacoes.js?v=1"></script>
+<script defer src="condutai-areas.js?v=1"></script>
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"condutai",name:"CondutAI"};</script>
 <script type="module" src="_mtauth.js?v=29"></script>
@@ -1565,6 +1566,7 @@ html[data-viva="condutai"] #cvToast[hidden]{display:none}
 <link rel="stylesheet" href="condutai-didatica.css?v=1">
 <link rel="stylesheet" href="condutai-presc.css?v=2">
 <link rel="stylesheet" href="condutai-ligacoes.css?v=1">
+<link rel="stylesheet" href="condutai-areas.css?v=1">
 </head>
 <body>
 
@@ -1611,7 +1613,9 @@ html[data-viva="condutai"] #cvToast[hidden]{display:none}
   <button class="nv-d nv-f" data-go="vacinas" style="--c:var(--c-lima)" title="Vacinação"><span class="nic"><i class="ti ti-vaccine"></i></span><span class="nl">Vacinação</span></button>
   <button class="nv-d nv-f" data-go="orientacoes" style="--c:var(--c-ambar)" title="Orientações ao paciente"><span class="nic"><i class="ti ti-users"></i></span><span class="nl">Orientações ao paciente</span></button>
   <button class="nv-d nv-f" data-go="cid" style="--c:var(--c-cinza)" title="CID-10"><span class="nic"><i class="ti ti-hash"></i></span><span class="nl">CID-10</span></button>
-  <a class="nv-d nv-f" href="pocusai.html" style="--c:var(--c-indigo)" title="POCUS"><span class="nic"><i class="ti ti-wave-sine"></i></span><span class="nl">POCUS</span></a>
+  <button class="nv-d nv-f" data-go="atb" style="--c:var(--c-ciano)" title="Antibióticos"><span class="nic"><i class="ti ti-pills"></i></span><span class="nl">Antibióticos</span></button>
+  <button class="nv-d nv-f" data-go="calc" style="--c:var(--c-laranja)" title="Calculadoras"><span class="nic"><i class="ti ti-calculator"></i></span><span class="nl">Calculadoras</span></button>
+  <button class="nv-d nv-f" data-go="pocus" style="--c:var(--c-teal)" title="POCUS"><span class="nic"><i class="ti ti-wave-sine"></i></span><span class="nl">POCUS</span></button>
 </nav>
 
 <main id="main">
@@ -1632,6 +1636,8 @@ html[data-viva="condutai"] #cvToast[hidden]{display:none}
         <div class="vFers">
           <button class="vFer" data-go="prescricao" style="--k:var(--c-teal)"><span class="ic"><i class="ti ti-prescription"></i></span><span>Prescrição</span></button>
           <button class="vFer" data-go="bulas" style="--k:var(--c-verde)"><span class="ic"><i class="ti ti-pill"></i></span><span>Bulas</span></button>
+          <button class="vFer" data-go="atb" style="--k:var(--c-ciano)"><span class="ic"><i class="ti ti-pills"></i></span><span>Antibióticos</span></button>
+          <button class="vFer" data-go="calc" style="--k:var(--c-laranja)"><span class="ic"><i class="ti ti-calculator"></i></span><span>Calculadoras</span></button>
           <button class="vFer" data-go="interacoes" style="--k:var(--c-laranja)"><span class="ic"><i class="ti ti-alert-triangle"></i></span><span>Interações</span></button>
           <button class="vFer" data-go="ddx" style="--k:var(--c-rosa)"><span class="ic"><i class="ti ti-brain"></i></span><span>Diferencial</span></button>
           <button class="vFer" data-go="exames" style="--k:var(--c-ciano)"><span class="ic"><i class="ti ti-flask"></i></span><span>Exames</span></button>
@@ -1643,7 +1649,7 @@ html[data-viva="condutai"] #cvToast[hidden]{display:none}
           <button class="vFer" data-go="vacinas" style="--k:var(--c-lima)"><span class="ic"><i class="ti ti-vaccine"></i></span><span>Vacinas</span></button>
           <button class="vFer" data-go="orientacoes" style="--k:var(--c-ambar)"><span class="ic"><i class="ti ti-users"></i></span><span>Orientações</span></button>
           <button class="vFer" data-go="cid" style="--k:var(--c-cinza)"><span class="ic"><i class="ti ti-hash"></i></span><span>CID-10</span></button>
-          <a class="vFer" href="pocusai.html" style="--k:var(--c-indigo)"><span class="ic"><i class="ti ti-wave-sine"></i></span><span>POCUS</span></a>
+          <button class="vFer" data-go="pocus" style="--k:var(--c-teal)"><span class="ic"><i class="ti ti-wave-sine"></i></span><span>POCUS</span></button>
         </div>
       </section>
       <section class="vBloco" aria-labelledby="hEsp">
@@ -2062,6 +2068,40 @@ html[data-viva="condutai"] #cvToast[hidden]{display:none}
     </div>
     <div id="cidResult" class="cv-res"></div>
     <div class="wb-quick" id="cidQuick"></div>
+  </section>
+
+  <!-- ===================== ANTIBIÓTICOS (ex-ATBguia, absorvido em 07/10/2026; conteúdo em condutai-atb.js) ===================== -->
+  <section id="atbView" class="wb-view anima" hidden>
+    <div class="wb-view-head" style="--c:var(--c-ciano)"><span class="vic"><i class="ti ti-pills"></i></span><div class="vtx"><h2>Antibióticos</h2><p class="wb-view-intro">Empírico por foco e escalonamento, terapia dirigida, cobertura, dose com ajuste renal e troca de IV para VO.</p></div></div>
+    <nav class="tabs atb-nav" id="atbNav" aria-label="Seções de Antibióticos">
+      <button type="button" data-v="home" onclick="CVX.nav('atb','home')"><i class="ti ti-home-2" aria-hidden="true"></i><span>Início</span></button>
+      <button type="button" data-v="emp" onclick="CVX.nav('atb','emp')"><i class="ti ti-compass" aria-hidden="true"></i><span>Empírico</span></button>
+      <button type="button" data-v="dir" onclick="CVX.nav('atb','dir')"><i class="ti ti-microscope" aria-hidden="true"></i><span>Dirigida</span></button>
+      <button type="button" data-v="cob" onclick="CVX.nav('atb','cob')"><i class="ti ti-target-arrow" aria-hidden="true"></i><span>Cobertura</span></button>
+      <button type="button" data-v="dose" onclick="CVX.nav('atb','dose')"><i class="ti ti-calculator" aria-hidden="true"></i><span>Dose</span></button>
+      <button type="button" data-v="ivvo" onclick="CVX.nav('atb','ivvo')"><i class="ti ti-arrows-exchange" aria-hidden="true"></i><span>IV para VO</span></button>
+      <button type="button" data-v="ai" onclick="CVX.nav('atb','ai')"><i class="ti ti-message-chatbot" aria-hidden="true"></i><span>Assistente</span></button>
+    </nav>
+    <div id="atbRoot" class="cvx-raiz"></div>
+    <p class="cvx-disc">Esta área é uma ferramenta de <b>apoio à decisão</b> para profissionais de saúde. As sugestões são <b>empíricas e gerais</b>. Sempre ajuste à <b>função renal</b>, <b>alergias</b>, gestação, ao <b>antibiograma</b> e ao <b>protocolo/perfil de resistência da sua instituição</b>. Não substitui o julgamento clínico. Confira doses antes de prescrever.</p>
+  </section>
+
+  <!-- ===================== CALCULADORAS (ex-CalcMed, absorvido em 07/10/2026; conteúdo em condutai-calc.js) ===================== -->
+  <section id="calcView" class="wb-view anima" hidden>
+    <div class="wb-view-head" style="--c:var(--c-laranja)"><span class="vic"><i class="ti ti-calculator"></i></span><div class="vtx"><h2>Calculadoras</h2><p class="wb-view-intro">Calculadoras e escores clínicos: nefrologia, cardiologia, emergência, hepatologia, obstetrícia, pediatria e mais. O cálculo é feito aqui mesmo, sem IA.</p></div></div>
+    <div id="calcRoot" class="cvx-raiz"></div>
+  </section>
+
+  <!-- ===================== POCUS (ex-PocusAI, absorvido em 07/10/2026; conteúdo em condutai-pocus.js) ===================== -->
+  <section id="pocusView" class="wb-view anima" hidden>
+    <div class="wb-view-head" style="--c:var(--c-teal)"><span class="vic"><i class="ti ti-wave-sine"></i></span><div class="vtx"><h2>POCUS</h2><p class="wb-view-intro">Ultrassom à beira do leito por região e protocolo: sonda, posição, cortes, técnica, achados e imagens de referência com crédito.</p></div></div>
+    <nav class="tabs pc-nav" id="pcNav" aria-label="Seções de POCUS">
+      <button type="button" data-v="home" onclick="CVX.nav('pocus','home')"><i class="ti ti-layout-grid" aria-hidden="true"></i><span>Exames</span></button>
+      <button type="button" data-v="proto" onclick="CVX.nav('pocus','proto')"><i class="ti ti-bolt" aria-hidden="true"></i><span>Protocolos</span></button>
+      <button type="button" data-v="ai" onclick="CVX.nav('pocus','ai')"><i class="ti ti-message-chatbot" aria-hidden="true"></i><span>Assistente</span></button>
+    </nav>
+    <div id="pocusRoot" class="cvx-raiz"></div>
+    <p class="cvx-disc">Esta área é uma ferramenta de <b>apoio à decisão e ensino</b>. Não substitui treinamento prático supervisionado em ultrassonografia nem o julgamento clínico. Sempre correlacione com a clínica e confirme achados com profissional habilitado.</p>
   </section>
 
   <!-- ===================== HISTÓRICO / FAVORITOS ===================== -->
@@ -3754,6 +3794,7 @@ async function renderResultDireto(item) {
   linkifyRelated(rc.querySelector('.content'), protocolMeta);
   if (window.CVD) CVD.realca(rc, item);
   if (window.CVL) CVL.liga(rc, item);
+  if (window.CVX) CVX.liga(rc, item);
 }
 
 // Sumário lateral + "Abrir todas": usa as próprias seções recolhíveis da conduta
@@ -4378,10 +4419,10 @@ document.getElementById('newBtn').onclick = () => {
 // O botão Voltar do aparelho e o "Voltar" da conduta usam a mesma pilha (history.pushState).
 let cvAtual = 'home', cvOrigem = 'home';
 const cvScroll = {};
-const CV_NOMES = { home: 'Início', condutas: 'Condutas', ia: 'IA', favoritos: 'Favoritos', historico: 'Histórico', bulas: 'Bulas', investigacao: 'Investigação', prescricao: 'Prescrição', interacoes: 'Interações', ddx: 'Diagnóstico diferencial', exames: 'Análise de exames', procedimentos: 'Procedimentos', vacinas: 'Vacinação', orientacoes: 'Orientações', cid: 'CID-10', gaso: 'Gasometria', ecg: 'ECG', vm: 'Ventilação mecânica' };
+const CV_NOMES = { home: 'Início', condutas: 'Condutas', ia: 'IA', favoritos: 'Favoritos', historico: 'Histórico', bulas: 'Bulas', investigacao: 'Investigação', prescricao: 'Prescrição', interacoes: 'Interações', ddx: 'Diagnóstico diferencial', exames: 'Análise de exames', procedimentos: 'Procedimentos', vacinas: 'Vacinação', orientacoes: 'Orientações', cid: 'CID-10', gaso: 'Gasometria', ecg: 'ECG', vm: 'Ventilação mecânica', atb: 'Antibióticos', calc: 'Calculadoras', pocus: 'POCUS' };
 function showView(name, opt) {
   opt = opt || {};
-  const map = { home:'homeView', condutas:'condutasView', ia:'iaView', bulas:'bulasView', investigacao:'investigacaoView', prescricao:'prescricaoView', interacoes:'interacoesView', ddx:'ddxView', exames:'examesView', procedimentos:'proceduresView', vacinas:'vacinasView', orientacoes:'orientacoesView', cid:'cidView', gaso:'gasoView', ecg:'ecgView', vm:'vmView', favoritos:'listView', historico:'listView', result:'resultView' };
+  const map = { home:'homeView', condutas:'condutasView', ia:'iaView', bulas:'bulasView', investigacao:'investigacaoView', prescricao:'prescricaoView', interacoes:'interacoesView', ddx:'ddxView', exames:'examesView', procedimentos:'proceduresView', vacinas:'vacinasView', orientacoes:'orientacoesView', cid:'cidView', gaso:'gasoView', ecg:'ecgView', vm:'vmView', atb:'atbView', calc:'calcView', pocus:'pocusView', favoritos:'listView', historico:'listView', result:'resultView' };
   if (!map[name]) name = 'home';
   const id = map[name];
   const vinhaDe = cvAtual;
@@ -4412,7 +4453,9 @@ function showView(name, opt) {
   if (name === 'cid') renderCidQuick();
   cvAtual = name;
   document.documentElement.dataset.tela = name; // o Início tem o próprio campo de busca/IA; a busca do topo some só lá
-  if (!opt.pop && name !== vinhaDe) { try { window.history.pushState({ cv: name }, ''); } catch (e) {} }
+  if (!opt.pop && name !== vinhaDe) { try { window.history.pushState(opt.sub ? { cv: name, sub: opt.sub } : { cv: name }, ''); } catch (e) {} }
+  // Antibióticos, Calculadoras e POCUS (condutai-areas.js): abre a área pedida e esvazia a que ficou para trás
+  if (window.CVX) CVX.view(name, vinhaDe, opt);
   if (opt.pop && cvScroll[name] != null) window.scrollTo(0, cvScroll[name]);
   else window.scrollTo(0, 0);
 }
@@ -4424,7 +4467,7 @@ function cvVoltar() {
 window.addEventListener('popstate', e => {
   const v = (e.state && e.state.cv) || 'home';
   if (document.getElementById('aiPanel').classList.contains('open')) closeAIPanel();
-  showView(v, { pop: true });
+  showView(v, { pop: true, estado: e.state });
 });
 try { window.history.replaceState({ cv: 'home' }, ''); } catch (e) {}
 document.getElementById('cvVoltar').onclick = () => cvVoltar();
@@ -4474,7 +4517,10 @@ function renderInicio() {
       if (!termos.every(w => nome.includes(w) || resto.includes(w))) return null;
       return { p, pts: (nome.startsWith(t) ? 3 : 0) + (nome.includes(t) ? 2 : 0) + termos.filter(w => nome.includes(w)).length };
     }).filter(Boolean).sort((a, b) => b.pts - a.pts).slice(0, 5);
+    // calculadoras, antibióticos e POCUS (o clique é tratado em condutai-areas.js pelo data-cvx)
+    const extras = window.CVX ? CVX.busca(q.value, achar) : [];
     box.innerHTML = hits.map(({ p }) => `<button type="button" class="vAchado" data-pid="${p.id}"><i class="ti ti-${SPEC_ICON[p.specialty] || 'stethoscope'}" style="--k:${specCor(p.specialty)}"></i><span>${escapeHtml(p.name)}</span><small>Conduta</small></button>`).join('')
+      + extras.map(x => `<button type="button" class="vAchado" data-cvx="${escapeHtml(x.area + '|' + x.sub)}"><i class="ti ${x.ic}" style="--k:${x.cor}"></i><span>${escapeHtml(x.nome)}</span><small>${escapeHtml(x.rot)}</small></button>`).join('')
       + `<button type="button" class="vAchado ia" data-ia="1"><i class="ti ti-sparkles"></i><span>Perguntar à IA: <b>${escapeHtml(q.value.trim().slice(0, 80))}</b></span></button>`;
     box.querySelectorAll('[data-pid]').forEach(b => b.onclick = () => runProtocol(b.dataset.pid));
     box.querySelector('[data-ia]').onclick = perguntar;

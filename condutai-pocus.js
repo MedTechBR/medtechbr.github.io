@@ -1,0 +1,848 @@
+/* CondutAI — POCUS (absorveu o PocusAI em 07/10/2026).
+   Carregado sob demanda pela área "POCUS" (condutai-areas.js). Os dados clínicos e as telas vieram do
+   pocusai.html sem mudança de conteúdo (doses, esquemas, critérios, referências, créditos); só o encaixe mudou:
+   desenha em #pocusRoot, handlers no namespace window.CVPOCUS, histórico e atalhos integrados ao CondutAI. */
+(function () {
+var W = window, D = document;
+/* ===================== DADOS ===================== */
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+
+/* diagrama: corpo (tronco anterior) com pontos numerados da sonda */
+function corpo(pontos){
+  const dots=(pontos||[]).map(p=>`<circle cx="${p.x}" cy="${p.y}" r="3.4" fill="#2563eb" stroke="#1e40af" stroke-width=".7"/><text x="${p.x}" y="${p.y+1.4}" font-size="4" text-anchor="middle" fill="#1e40af" font-weight="800">${p.n}</text>`).join('');
+  return `<svg viewBox="0 0 100 124" class="pocus-svg" role="img" aria-label="posição da sonda">
+   <ellipse cx="50" cy="13" rx="8.5" ry="9.5" fill="#dcebe6" opacity=".0"/>
+   <circle cx="50" cy="12" r="8.5" fill="#e7f1f1" stroke="#a9cdd0" stroke-width=".8"/>
+   <path d="M33 22 Q50 18 67 22 L72 40 Q70 44 67 43 L66 70 Q64 100 50 116 Q36 100 34 70 L33 43 Q30 44 28 40 Z" fill="#e7f1f1" stroke="#a9cdd0" stroke-width=".8"/>
+   <line x1="50" y1="24" x2="50" y2="112" stroke="#cfe1e2" stroke-width=".5" stroke-dasharray="2 2"/>
+   <line x1="34" y1="64" x2="66" y2="64" stroke="#cfe1e2" stroke-width=".5" stroke-dasharray="2 2"/>
+   ${dots}
+  </svg>`;
+}
+function svgPerna(){return `<svg viewBox="0 0 100 124" class="pocus-svg" role="img" aria-label="compressão venosa MMII">
+  <path d="M40 6 h20 v30 q0 6 4 22 l3 56 q0 4 -5 4 h-9 q-4 0 -4 -4 l-2 -50 -2 50 q0 4 -4 4 h-9 q-5 0 -5 -4 l3 -56 q4 -16 4 -22 v-30 z" fill="#e7f1f1" stroke="#a9cdd0" stroke-width=".8"/>
+  <circle cx="50" cy="16" r="3.4" fill="#2563eb" stroke="#1e40af" stroke-width=".7"/><text x="50" y="17.4" font-size="4" text-anchor="middle" fill="#1e40af" font-weight="800">1</text>
+  <circle cx="50" cy="64" r="3.4" fill="#2563eb" stroke="#1e40af" stroke-width=".7"/><text x="50" y="65.4" font-size="4" text-anchor="middle" fill="#1e40af" font-weight="800">2</text>
+  <text x="62" y="18" font-size="5" fill="#5B7882">virilha</text><text x="62" y="66" font-size="5" fill="#5B7882">poplítea</text>
+ </svg>`;}
+function svgOlho(){return `<svg viewBox="0 0 100 70" class="pocus-svg" role="img" aria-label="olho">
+  <ellipse cx="50" cy="32" rx="34" ry="20" fill="#e7f1f1" stroke="#a9cdd0" stroke-width=".8"/>
+  <circle cx="50" cy="32" r="11" fill="#dfeeef" stroke="#a9cdd0" stroke-width=".8"/><circle cx="50" cy="32" r="4" fill="#9cc"/>
+  <rect x="44" y="51" width="12" height="3.2" rx="1.5" fill="#2563eb" stroke="#1e40af" stroke-width=".6"/>
+  <text x="50" y="64" font-size="6" text-anchor="middle" fill="#5B7882">sonda linear transversal na pálpebra fechada (gel abundante)</text>
+ </svg>`;}
+
+const EXAMES=[
+{id:'pulmao',icon:'<i class="ti ti-lungs"></i>',cat:'Tórax',nome:'Pulmão (US pulmonar)',tags:'dispneia, B-lines, pneumotórax, derrame, congestão, BLUE',
+ diag:corpo([{x:42,y:40,n:1},{x:58,y:40,n:1},{x:42,y:58,n:2},{x:58,y:58,n:2},{x:34,y:74,n:3},{x:66,y:74,n:3}]),
+ leg:'<b>1</b> BLUE superior (2º EIC) · <b>2</b> BLUE inferior · <b>3</b> PLAPS (linha axilar post., base). Avalie os 2 hemitórax.',
+ md:`## Indicações
+Dispneia aguda, suspeita de edema agudo de pulmão, pneumotórax, derrame pleural, pneumonia/SDRA, controle de congestão.
+## Sonda e preset
+Convexa ou linear (linear vê melhor a pleura/pneumotórax). Preset pulmão ou abdominal; profundidade 6–15 cm. Indicador para a **cabeça**.
+## Posição do paciente
+Semi-sentado ou supino. Avaliar parede anterior, lateral e posterolateral (PLAPS) bilateral.
+## Cortes / janelas
+Sonda **longitudinal**, perpendicular às costelas → **"sinal do morcego"** (2 costelas + linha pleural entre elas). Faça os pontos BLUE bilaterais + PLAPS.
+## Passo a passo
+- Identifique a **linha pleural** (hiperecogênica, entre as costelas).
+- Observe o **deslizamento pleural** (lung sliding) e linhas A vs B.
+- Modo M: padrão "**praia/seashore**" = normal; "**código de barras/estratosfera**" = ausência de sliding.
+- Procure **derrame** na base (PLAPS) e **consolidação** (pulmão "hepatizado").
+## Achados normais
+**Linhas A** (reverberação horizontal) + **lung sliding** presente + ≤2 linhas B por campo. Sinal do "**lung point**" não existe no normal.
+## Achados patológicos
+- **B-lines** (≥3 num campo, "caudas de cometa" verticais até o fim da tela, apagam linhas A) → síndrome intersticial: EAP/congestão (bilateral difuso), pneumonia/SDRA (focal/irregular).
+- **Pneumotórax**: ausência de sliding + linhas A + **ausência de B-lines** + **lung point** (específico).
+- **Derrame pleural**: área anecoica acima do diafragma; sinal do "**plâncton/sinusoide**" no M.
+- **Consolidação**: parênquima "hepatizado", broncogramas aéreos dinâmicos.
+> Perla: EAP cardiogênico = B-lines **bilaterais e simétricas** + VCI cheia; pneumonia tende a ser **focal** com broncogramas.
+> Alarme: pneumotórax hipertensivo é diagnóstico clínico — não atrase a descompressão para fazer US.`},
+{id:'focus',icon:'<i class="ti ti-heart"></i>',cat:'Cardíaco',nome:'FoCUS (eco focado)',tags:'parada, choque, derrame, tamponamento, FE, VD, cardíaco',
+ diag:corpo([{x:46,y:46,n:1},{x:46,y:50,n:2},{x:60,y:62,n:3},{x:50,y:74,n:4}]),
+ leg:'<b>1</b> Paraesternal eixo longo · <b>2</b> Paraesternal eixo curto · <b>3</b> Apical 4 câmaras · <b>4</b> Subcostal (4C + VCI).',
+ md:`## Indicações
+Choque/hipotensão, parada (durante checagem de pulso), dispneia, suspeita de derrame/tamponamento, avaliação de volemia e função de VD/VE.
+## Sonda e preset
+Setorial (phased array). Preset **cardíaco** (indicador costuma inverter — marcador à direita da tela). Profundidade 14–18 cm.
+## Cortes / janelas
+1) **Paraesternal eixo longo** (PLAX) · 2) **eixo curto** (PSAX) · 3) **Apical 4 câmaras** (A4C) · 4) **Subcostal** (4C + **VCI**). Tente ≥2 janelas.
+## Passo a passo
+- PLAX (sonda 3–4º EIC paraesternal E, indicador p/ ombro D): vê VE, VD, aorta, AE, pericárdio.
+- A4C (ápice/ictus, indicador p/ a maca): compara tamanho VD vs VE.
+- Subcostal (sob xifoide, indicador p/ a E): ótima na parada/ventilação; segue para VCI.
+## Achados normais
+Contratilidade simétrica e vigorosa, VE > VD (relação ~0,6), válvulas móveis, pericárdio sem líquido, **VCI** colaba >50% com a inspiração.
+## Achados patológicos
+- **Derrame/tamponamento**: líquido anecoico circunferencial + **colapso diastólico do VD/AD**, VCI pletórica.
+- **Disfunção de VE**: hipocontratilidade global (FE visual reduzida).
+- **Sobrecarga de VD** (TEP, HP): VD ≥ VE, septo retificado ("D-sign" no PSAX), McConnell.
+- **Hipovolemia**: cavidades pequenas, VE "beijando" (kissing walls), VCI colabada.
+> Perla: na parada, faça o subcostal em **<10 s** durante a checagem de pulso (não atrase compressões). Atividade organizada na tela com pulso ausente = AESP "real".
+> Alarme: FoCUS estima função/derrame — não é ecocardiograma formal (não medir valvopatia/gradiente).`},
+{id:'efast',icon:'<i class="ti ti-droplet"></i>',cat:'Abdome',nome:'eFAST (trauma)',tags:'trauma, líquido livre, hemoperitônio, pneumotórax, FAST',
+ diag:corpo([{x:64,y:60,n:1},{x:36,y:58,n:2},{x:50,y:82,n:3},{x:50,y:48,n:4},{x:42,y:38,n:5},{x:58,y:38,n:5}]),
+ leg:'<b>1</b> QSD/Morrison · <b>2</b> QSE/esplenorrenal · <b>3</b> Pelve (suprapúbico) · <b>4</b> Subxifoide (pericárdio) · <b>5</b> Ápices anteriores (pneumotórax).',
+ md:`## Indicações
+Trauma (abdominal/torácico), hipotensão pós-trauma. Pesquisa de **líquido livre** (sangue), derrame pericárdico e pneumotórax.
+## Sonda e preset
+Convexa (abdome) + setorial para o pericárdio; linear ajuda no pneumotórax. Profundidade 14–18 cm.
+## Cortes / janelas (5 pontos)
+1) **QSD — Morrison** (hepatorrenal) · 2) **QSE — esplenorrenal** · 3) **Pelve** (suprapúbico, longitudinal e transversal) · 4) **Subxifoide** (pericárdio) · 5) **Tórax anterior bilateral** (pneumotórax — extensão "e").
+## Passo a passo
+- QSD: sonda linha axilar média D, costelas 8–11 → interface fígado/rim; o líquido aparece na **goteira** (anecoico).
+- QSE: mais **posterior e cefálico** ("knuckles to the bed"); o líquido junta acima do baço (subfrênico).
+- Pelve: melhor com bexiga cheia; líquido atrás/ao redor da bexiga.
+- Subxifoide: fígado como janela para o coração.
+## Achados normais
+Sem coleção anecoica nas goteiras, pericárdio seco, **lung sliding** presente bilateral.
+## Achados patológicos
+- **Líquido livre**: faixa **anecoica** (sangue) em Morrison, esplenorrenal, pelve ou Douglas.
+- **Derrame pericárdico/tamponamento**.
+- **Pneumotórax**: ausência de sliding + lung point.
+> Perla: FAST **negativo não exclui** lesão — repita seriadamente; em instável + FAST positivo → laparotomia. Mínimo detectável ~200 mL.
+> Alarme: gordura perirrenal e o próprio rim podem simular líquido — siga a coleção pela goteira.`},
+{id:'aorta',icon:'<i class="ti ti-scan"></i>',cat:'Abdome',nome:'Aorta / AAA',tags:'aneurisma, aorta, dor abdominal, lombar, síncope',
+ diag:corpo([{x:50,y:50,n:1},{x:50,y:62,n:2},{x:50,y:74,n:3}]),
+ leg:'Varra do <b>1</b> epigástrio (subdiafragmático) até a <b>3</b> bifurcação (umbigo), medindo o maior diâmetro AP (parede a parede).',
+ md:`## Indicações
+Dor abdominal/lombar/flanco em >50 anos, síncope, hipotensão inexplicada, rastreio de aneurisma de aorta abdominal (AAA).
+## Sonda e preset
+Convexa, preset abdominal, profundidade 8–14 cm. Indicador para a direita do paciente (corte transversal).
+## Posição / técnica
+Supino. Comprima gradualmente para afastar gás intestinal. Identifique a **coluna** (sombra) e, à frente e à esquerda, a **aorta** (pulsátil, paredes espessas) — a **VCI** fica à direita, compressível.
+## Cortes / janelas
+Corte **transversal** seriado: subdiafragmática → mesentérica/renal → infrarrenal → **bifurcação** (ilíacas). Confirme no **longitudinal**.
+## Como medir
+Diâmetro **ântero-posterior, de parede externa a parede externa** (inclui trombo mural). Perpendicular ao vaso.
+## Achados normais
+Aorta abdominal **< 3 cm**, afilando distalmente.
+## Achados patológicos
+- **AAA**: diâmetro **≥ 3 cm** (≥5,5 cm = alto risco de ruptura).
+- **Trombo mural** (lúmen menor que o vaso).
+- US **não exclui ruptura/dissecção** — instável + AAA = cirurgia.
+> Perla: meça sempre **parede a parede** (medir só o lúmen subestima por causa do trombo).
+> Alarme: ruptura é frequentemente **retroperitoneal** (FAST pode ser negativo). AAA + dor + hipotensão = emergência cirúrgica, não peça TC se instável.`},
+{id:'vci',icon:'<i class="ti ti-wave-sine"></i>',cat:'Cardíaco',nome:'VCI / volemia',tags:'volemia, fluido-responsividade, choque, congestão, IVC',
+ diag:corpo([{x:50,y:72,n:1}]),
+ leg:'<b>1</b> Subxifoide longitudinal: VCI entrando no átrio direito, medida ~2 cm da junção/veias hepáticas.',
+ md:`## Indicações
+Estimar status volêmico e tolerância a volume no choque; avaliar congestão sistêmica.
+## Sonda e preset
+Setorial ou convexa, preset cardíaco/abdominal. Janela **subxifoide longitudinal**.
+## Técnica
+Identifique a VCI desembocando no **átrio direito**; meça o diâmetro **~2 cm** distal à junção (ou logo após as veias hepáticas), perpendicular. Use modo **M** para a variação respiratória.
+## Interpretação (sempre com a clínica!)
+- **VCI fina (<1,5 cm) e muito colapsável (>50%)** → tende a baixa pressão de AD / provável tolerância a volume.
+- **VCI dilatada (>2,1 cm) e fixa (<50% / <18% em VM)** → pressão de AD alta / congestão; cuidado com volume.
+- Em ventilação espontânea o colapso é **inspiratório**; em ventilação mecânica a lógica **inverte** (distensão inspiratória).
+## Achados patológicos
+VCI pletórica fixa = congestão / tamponamento / TEP / disfunção de VD. VCI virtual = hipovolemia grave.
+> Perla: VCI é **uma peça** do quebra-cabeça — combine com FoCUS, pulmão (B-lines) e clínica. Não decida volume só pela VCI.
+> Alarme: VM, PEEP alta, valsalva e VD insuficiente distorcem a leitura.`},
+{id:'tvp',icon:'<i class="ti ti-walk"></i>',cat:'Vascular',nome:'TVP (compressão)',tags:'trombose, TVP, edema unilateral, perna, compressão',
+ diag:svgPerna(),
+ leg:'<b>1</b> Femoral comum (virilha, até a safena/bifurcação) · <b>2</b> Poplítea (fossa poplítea). Comprima a cada 1–2 cm.',
+ md:`## Indicações
+Suspeita de trombose venosa profunda (edema/dor unilateral de MMII), antes/depois de escore de Wells + D-dímero.
+## Sonda e preset
+**Linear** (alta frequência), preset vascular/partes moles. Profundidade 4–6 cm.
+## Técnica — US de compressão (2 pontos)
+Corte **transversal**. A veia normal **colaba totalmente** sob leve compressão; a artéria (pulsátil, parede espessa) não. Comprima **a cada 1–2 cm**.
+## Pontos
+1) **Femoral comum** (virilha): da junção safeno-femoral até a bifurcação femoral. 2) **Poplítea** (fossa poplítea): até a trifurcação. (Protocolo de 2/3 pontos.)
+## Achados normais
+Veia **totalmente compressível** (paredes se tocam), sem material ecogênico no lúmen.
+## Achados patológicos
+- **TVP**: veia **NÃO compressível** (± trombo ecogênico no lúmen, veia dilatada).
+- Trombo agudo pode ser anecoico — a **incompressibilidade** é o critério-chave.
+## Limitações
+Protocolo de 2 pontos **não avalia veias da panturrilha nem ilíacas**; se alta suspeita e exame negativo, repetir em 5–7 dias ou ampliar.
+> Perla: sempre compare com o lado contralateral. Linfonodo/cisto de Baker podem simular.
+> Alarme: TVP iliofemoral extensa (phlegmasia) é emergência vascular.`},
+{id:'renal',icon:'<i class="ti ti-flask"></i>',cat:'Abdome',nome:'Rim / Bexiga',tags:'hidronefrose, retenção, cólica renal, anúria, volume vesical, bexiga',
+ diag:corpo([{x:66,y:56,n:1},{x:34,y:56,n:1},{x:50,y:88,n:2}]),
+ leg:'<b>1</b> Rins (flancos, linha axilar post.) · <b>2</b> Bexiga (suprapúbico, transversal e longitudinal).',
+ md:`## Indicações
+Cólica renal, anúria/oligúria, suspeita de retenção urinária, lesão renal aguda (pós-renal), avaliar volume vesical.
+## Sonda e preset
+Convexa, preset abdominal/renal. Profundidade 10–16 cm.
+## Técnica
+- **Rins**: flanco, linha axilar posterior; respire fundo. Avalie o **sistema coletor** (central, ecogênico).
+- **Bexiga**: suprapúbico, transversal e longitudinal.
+## Achados normais
+Rim com córtex hipoecoico e seio central ecogênico **sem dilatação**. Bexiga de paredes finas.
+## Achados patológicos
+- **Hidronefrose**: dilatação **anecoica** do sistema coletor (leve → moderada → grave com afilamento cortical).
+- **Retenção urinária**: bexiga distendida; **volume ≈ C × L × A × 0,52** (mL).
+- Cálculo: foco hiperecogênico com **sombra** ± jato ureteral ausente.
+## Integração
+Hidronefrose bilateral / em rim único + LRA = obstrução pós-renal → desobstruir. Pós-miccional elevado (>100–150 mL) sugere retenção/esvaziamento incompleto.
+> Perla: bexiga muito cheia pode causar hidronefrose "fisiológica" — reavalie após esvaziar.
+> Alarme: pielonefrite obstruída/pionefrose é emergência (drenagem).`},
+{id:'biliar',icon:'<i class="ti ti-droplet-half-2"></i>',cat:'Abdome',nome:'Vesícula / vias biliares',tags:'colelitíase, colecistite, murphy ecográfico, dor em HD, colédoco, biliar',
+ diag:corpo([{x:62,y:52,n:1}]),
+ leg:'<b>1</b> Hipocôndrio direito (subcostal, linha hemiclavicular) — varra a vesícula no eixo longo e curto, com inspiração profunda.',
+ md:`## Indicações
+Dor em hipocôndrio direito/epigástrio, suspeita de colelitíase, colecistite aguda e dilatação de vias biliares (icterícia obstrutiva).
+## Sonda e preset
+Convexa, preset abdominal. Profundidade 10–16 cm. Jejum melhora a janela (vesícula distendida).
+## Posição / técnica
+Supino ou decúbito lateral E. Subcostal no HD com **inspiração profunda**; também intercostal. Ache a vesícula (estrutura anecoica "em pera") — sinal do "X"/exclamação (vesícula apontando para a veia porta).
+## Cortes / janelas
+Vesícula no eixo **longo e curto**. Meça a **parede anterior** e procure a **via biliar** (colédoco anterior à veia porta — sinal do "Mickey").
+## Achados normais
+Vesícula anecoica, **parede < 3 mm**, sem cálculos; colédoco **< 6–7 mm** (sobe ~1 mm/década após os 60 anos).
+## Achados patológicos
+- **Colelitíase**: foco **hiperecogênico** com **sombra acústica posterior**, **móvel** ao mudar o decúbito.
+- **Colecistite aguda**: **parede > 3 mm**, líquido perivesicular, **Murphy ecográfico +**, lama/cálculo impactado no colo.
+- **Dilatação biliar**: colédoco **> 6–7 mm** sugere obstrução.
+> Perla: o **Murphy ecográfico** (dor máxima com a sonda sobre a vesícula vista na tela) é mais específico que o Murphy clássico.
+> Alarme: colangite/colecistite com instabilidade = emergência (ATB + drenagem/cirurgia).`},
+{id:'acesso',icon:'<i class="ti ti-vaccine"></i>',cat:'Procedimentos',nome:'Acesso venoso guiado',tags:'punção, acesso central, jugular, periférico difícil, procedimento',
+ diag:corpo([{x:42,y:30,n:1},{x:30,y:40,n:2}]),
+ leg:'<b>1</b> Jugular interna (lateral à carótida) · <b>2</b> Veias do braço (basílica/braquial) p/ acesso periférico difícil.',
+ md:`## Indicações
+Acesso venoso central (jugular interna, femoral) e **acesso periférico difícil** guiado por US — aumenta sucesso e reduz complicações.
+## Sonda e preset
+**Linear** (alta frequência), preset vascular, com **capa estéril** e gel estéril para procedimento.
+## Identificar veia vs artéria
+- **Veia**: compressível, paredes finas, **sem pulso**, varia com a respiração/Valsalva.
+- **Artéria**: pulsátil, não compressível, paredes espessas (Doppler confirma).
+## Técnicas
+- **Eixo curto (transversal)**: vê veia e estruturas adjacentes; siga a ponta da agulha ("in-plane out-of-plane" — confirme a ponta acompanhando o avanço).
+- **Eixo longo (longitudinal)**: vê a **agulha inteira** entrando na veia (melhor controle da ponta).
+## Passo a passo
+- Mapeie, escolha o ponto com a veia mais superficial e calibrosa, longe da artéria.
+- Antissepsia + capa estéril; puncione com visualização contínua da **ponta** da agulha.
+- Confirme o fio-guia **dentro da veia** (eixo longo) antes de dilatar.
+> Perla: confirme sempre a **ponta** da agulha (não o corpo) — "ver a veia entortar" ajuda. Posição/Trendelenburg distende a jugular.
+> Alarme: punção arterial, pneumotórax (ápice), e nunca dilatar sem certeza de estar na veia.`},
+{id:'ocular',icon:'<i class="ti ti-eye"></i>',cat:'Outros',nome:'Ocular / nervo óptico',tags:'PIC, papiledema, descolamento de retina, hemorragia vítrea, olho',
+ diag:svgOlho(),
+ leg:'Sonda linear transversal sobre a pálpebra fechada, com gel abundante. Bainha do nervo óptico medida a 3 mm atrás do globo.',
+ md:`## Indicações
+Suspeita de hipertensão intracraniana (PIC) não invasiva, trauma ocular, perda visual súbita (descolamento de retina, hemorragia vítrea, luxação do cristalino).
+## Sonda e preset
+**Linear** alta frequência, preset oftalmológico/partes moles (baixa potência — segurança). Profundidade ~4 cm.
+## Técnica
+Pálpebra **fechada**, **muito gel**, apoio leve da mão na face (sem pressão sobre o globo). Cortes transversal e longitudinal.
+## Medidas
+- **Bainha do nervo óptico (ONSD)**: medir **3 mm posterior ao globo**, perpendicular. Sugestivo de PIC elevada se **> 5,0–5,9 mm** (adulto).
+- Reflexo pupilar/consensual pode ser avaliado em tempo real.
+## Achados patológicos
+- **PIC alta**: ONSD aumentada (± disco óptico abaulado).
+- **Descolamento de retina**: membrana ondulante hiperecoica ancorada no disco óptico.
+- **Hemorragia vítrea**: ecos móveis na câmara posterior ("tempestade de neve").
+- **Luxação do cristalino**.
+> Perla: avalie os **dois olhos** e compare; ONSD varia — use junto da clínica/TC.
+> Alarme: suspeita de **ruptura do globo** = NÃO fazer US (não comprimir). Encaminhar.`},
+{id:'blue',icon:'<i class="ti ti-circle"></i>',cat:'Protocolos',nome:'Protocolo BLUE (insuf. respiratória)',tags:'dispneia, insuficiência respiratória aguda, lung sliding, perfil A, perfil B, PLAPS, lung point, EAP, TEP, pneumonia, pneumotórax, BLUE',
+ diag:corpo([{x:42,y:42,n:1},{x:58,y:42,n:1},{x:42,y:58,n:2},{x:58,y:58,n:2},{x:32,y:74,n:3},{x:68,y:74,n:3}]),
+ leg:'<b>1</b> BLUE superior (~2º EIC) · <b>2</b> BLUE inferior · <b>3</b> PLAPS (linha axilar post., base). Avalie os <b>dois</b> hemitórax.',
+ flow:`<style>
+.bf{font-size:13px;line-height:1.5;color:#0f3a44;background:#fff;padding:13px 14px;border-radius:11px}
+.bf-q{background:#2563eb;color:#fff;padding:9px 10px;border-radius:8px;font-weight:700;text-align:center}
+.bf-split{display:flex;flex-direction:column;gap:10px;margin-top:9px}
+.bf-lane{border:1px solid #cfe1e2;border-radius:10px;padding:9px;background:#f6fbfb}
+.bf-lh{font-weight:800;color:#2563eb;font-size:11px;letter-spacing:.4px;margin-bottom:6px}
+.bf-lh.x{color:#9a3412}
+.bf-row{padding:5px 0;border-top:1px dashed #e3eded}
+.bf-row.first{border-top:0}
+.bf-prof{display:inline-block;background:#e7f1f1;border:1px solid #b9d6d8;color:#08363f;font-weight:700;border-radius:6px;padding:0 6px;margin-right:3px;font-size:12px}
+.bf-arr{color:#5B7882;font-weight:700;padding:0 2px}
+.bf-branch{margin:5px 0 2px 6px;padding-left:9px;border-left:2px solid #d4e6e6;display:flex;flex-direction:column;gap:4px}
+.bf-dx{display:inline-block;font-weight:800;border-radius:6px;padding:0 7px;font-size:12px}
+.dx-eap{background:#e3f0fb;color:#1b4f86}.dx-pna{background:#fde9d6;color:#9a3412}
+.dx-tep{background:#fde2e2;color:#b3261e}.dx-dpoc{background:#e8f5e9;color:#1f6b34}
+.dx-ptx{background:#fde2e2;color:#b3261e}.dx-inv{background:#eef0f1;color:#566}
+.bf-foot{margin-top:9px;font-size:11px;color:#5B7882;text-align:center}
+</style>
+<div class="bf">
+ <div class="bf-q">① Há <b>lung sliding</b> (deslizamento pleural)?</div>
+ <div class="bf-split">
+  <div class="bf-lane">
+   <div class="bf-lh">✓ SIM — SLIDING PRESENTE → ② qual o perfil?</div>
+   <div class="bf-row first"><span class="bf-prof">Perfil B</span>linhas B bilaterais difusas (lung rockets)<span class="bf-arr">→</span><span class="bf-dx dx-eap">EDEMA / EAP</span></div>
+   <div class="bf-row"><span class="bf-prof">A/B</span>assimétrico (um lado A, outro B)<span class="bf-arr">→</span><span class="bf-dx dx-pna">PNEUMONIA</span></div>
+   <div class="bf-row"><span class="bf-prof">Perfil C</span>consolidação anterior (hepatização)<span class="bf-arr">→</span><span class="bf-dx dx-pna">PNEUMONIA</span></div>
+   <div class="bf-row"><span class="bf-prof">Perfil A</span>linhas A + sliding:
+    <div class="bf-branch">
+     <div>🦵 <b>TVP</b> (veia não compressível)<span class="bf-arr">→</span><span class="bf-dx dx-tep">TEP</span></div>
+     <div>sem TVP, com <b>PLAPS</b> (base)<span class="bf-arr">→</span><span class="bf-dx dx-pna">PNEUMONIA</span></div>
+     <div>sem TVP, sem PLAPS<span class="bf-arr">→</span><span class="bf-dx dx-dpoc">DPOC / ASMA</span></div>
+    </div>
+   </div>
+  </div>
+  <div class="bf-lane">
+   <div class="bf-lh x">✗ NÃO — SLIDING ABOLIDO → qual o perfil?</div>
+   <div class="bf-row first"><span class="bf-prof">Perfil B′</span>linhas B sem sliding<span class="bf-arr">→</span><span class="bf-dx dx-pna">PNEUMONIA</span></div>
+   <div class="bf-row"><span class="bf-prof">Perfil A′</span>linhas A + sliding abolido:
+    <div class="bf-branch">
+     <div>🎯 <b>lung point</b> presente<span class="bf-arr">→</span><span class="bf-dx dx-ptx">PNEUMOTÓRAX</span></div>
+     <div>sem lung point<span class="bf-arr">→</span><span class="bf-dx dx-inv">investigar (TC / clínica)</span></div>
+    </div>
+   </div>
+  </div>
+ </div>
+ <div class="bf-foot">Acurácia diagnóstica global ~90% — Lichtenstein &amp; Mezière, <i>Chest</i> 2008.</div>
+</div>`,
+ md:`## O que é
+O **protocolo BLUE** (Bedside Lung Ultrasound in Emergency) é um algoritmo de US pulmonar à beira-leito para achar rápido a causa da **insuficiência respiratória aguda / dispneia**. Em cada janela avalie **duas coisas**: (1) há **lung sliding**? (2) qual o **perfil** do parênquima? Veja o fluxograma ao lado.
+## Sonda, preset e pontos
+- Sonda **convexa** (visão geral) ou **linear** (vê melhor a pleura e o pneumotórax). Indicador para a **cabeça**.
+- **Pontos BLUE** em cada hemitórax: **BLUE superior** (~2º EIC), **BLUE inferior** e **PLAPS** (cruzamento da linha axilar posterior com a transversal da base, paciente supino).
+- Sinal do **morcego** (bat sign): 2 costelas + a **linha pleural** entre elas = plano certo.
+## 1) Lung sliding (deslizamento)
+"Vai-e-vem" da linha pleural com a respiração. Modo M: "**praia/seashore**" = presente; "**código de barras/estratosfera**" = abolido.
+- Pode estar **ausente** sem ser pneumotórax: apneia/intubação seletiva, pleurodese, consolidação que encosta na pleura, SDRA grave, bolha enfisematosa.
+## 2) Perfis do parênquima
+- **Perfil A** — linhas A horizontais + sliding → pulmão aerado ("seco").
+- **Perfil B** — ≥3 linhas B bilaterais difusas (**lung rockets**) + sliding → síndrome intersticial.
+- **Perfil A/B** — assimetria entre os hemitórax (um A, outro B).
+- **Perfil C** — consolidação anterior, parênquima "**hepatizado**".
+- **Perfil B′** — perfil B **sem** sliding.
+- **Perfil A′** — perfil A **sem** sliding (alerta para pneumotórax).
+- **PLAPS** — alterações alveolares/pleurais no ponto posterolateral (consolidação/derrame de base).
+## Do perfil ao diagnóstico
+- **Perfil B bilateral** → **edema pulmonar (EAP)**.
+- **Perfil A + TVP** (veia não compressível) → **TEP**.
+- **Perfil A, sem TVP, com PLAPS** → **pneumonia**.
+- **Perfil A, sem TVP, sem PLAPS** → **DPOC / asma**.
+- **Perfil A/B, C ou B′** → **pneumonia**.
+- **Perfil A′ + lung point** → **pneumotórax** (o **lung point** é o sinal mais específico).
+> Perla: o **lung point** confirma pneumotórax; a ausência dele não exclui, mas torna improvável um PTX extenso naquela janela.
+> Alarme: **pneumotórax hipertensivo** é diagnóstico clínico — descomprima já, não espere o US. E ausência de sliding **não** é sinônimo de pneumotórax (vários diferenciais).
+## Referência
+Lichtenstein DA, Mezière GA. *Relevance of Lung Ultrasound in the Diagnosis of Acute Respiratory Failure: The BLUE Protocol.* Chest 2008;134(1):117–125.`},
+{id:'rush',icon:'<i class="ti ti-bolt"></i>',cat:'Protocolos',nome:'RUSH (choque indiferenciado)',tags:'choque, hipotensão, protocolo, bomba tanque tubos',
+ diag:corpo([{x:50,y:48,n:1},{x:64,y:60,n:2},{x:36,y:58,n:2},{x:50,y:82,n:2},{x:42,y:40,n:3},{x:58,y:40,n:3},{x:50,y:66,n:4}]),
+ leg:'"Bomba–Tanque–Tubos": <b>1</b> coração · <b>2</b> abdome/pelve (tanque "vazando") · <b>3</b> pulmão · <b>4</b> VCI/aorta.',
+ md:`## O que é
+**RUSH** (Rapid Ultrasound in SHock): protocolo para o **choque indiferenciado**, organizado em **Bomba – Tanque – Tubos**.
+## 1) Bomba (coração)
+FoCUS: **derrame/tamponamento?** contratilidade (boa/ruim)? **VD dilatado** (TEP)?
+## 2) Tanque (volume)
+- "Enchimento": **VCI** (fina e colapsável vs cheia e fixa).
+- "Vazamentos": **FAST** (líquido livre — hemorragia), **pulmão** (B-lines = tanque "transbordando"/EAP; pneumotórax).
+## 3) Tubos (vasos)
+**Aorta** (AAA/dissecção) e **veias** (TVP de MMII → fonte de TEP).
+## Padrões típicos
+- **Hipovolêmico/hemorrágico**: VE hipercontrátil pequeno, VCI colabada, FAST+ ou AAA.
+- **Cardiogênico**: VE hipocontrátil, VCI cheia, B-lines bilaterais.
+- **Obstrutivo**: tamponamento (derrame + colapso de câmaras) **ou** VD dilatado (TEP) **ou** pneumotórax hipertensivo.
+- **Distributivo/séptico**: coração híper ou hipodinâmico, VCI variável, sem líquido livre → buscar foco.
+> Perla: faça rápido e **integre os 3 compartimentos** — o padrão aponta a causa e guia a ressuscitação.
+> Alarme: achado de US não substitui reavaliação clínica seriada.`},
+{id:'pcr',icon:'<i class="ti ti-activity"></i>',cat:'Protocolos',nome:'USG na PCR (parada)',tags:'parada, PCR, AESP, causas reversíveis, subcostal, FoCUS',
+ diag:corpo([{x:50,y:62,n:1},{x:42,y:40,n:2},{x:58,y:40,n:2},{x:64,y:60,n:3}]),
+ leg:'<b>1</b> Subcostal (4 câmaras + VCI) — janela principal na parada · <b>2</b> Pulmões (pneumotórax/B-lines) · <b>3</b> FAST/abdome (hipovolemia/sangramento).',
+ md:`## Objetivo
+Integrar o POCUS ao ACLS para (1) diferenciar **AESP "real" de pseudo-AESP**, (2) buscar **causas reversíveis** (4H/4T) e (3) reduzir o tempo sem compressão.
+## Regra de ouro (não atrapalhar o ACLS)
+- Faça a imagem **só durante a checagem de pulso**, em **≤ 10 segundos**. Posicione a sonda ANTES de parar as compressões e **grave um clipe** para analisar com o tórax já comprimindo de novo.
+- Designe alguém para cronometrar; a prioridade é compressão de qualidade e desfibrilação.
+## Sonda e janela
+Setorial (cardíaco). **Subcostal** é a janela de escolha (não interfere nas compressões/pás); alternativa apical/paraesternal.
+## Causas reversíveis (4H/4T) no US
+- **Tamponamento**: derrame pericárdico + colapso de câmaras → pericardiocentese.
+- **TEP maciço**: VD muito dilatado/hipocontrátil → considerar trombólise.
+- **Hipovolemia**: câmaras pequenas/colabadas + VCI fina → volume; ver FAST/aorta.
+- **Pneumotórax hipertensivo**: ausência de lung sliding + lung point → descomprimir.
+## Atividade cardíaca
+- **Contratilidade organizada na tela + sem pulso** = pseudo-AESP (melhor prognóstico) → otimizar perfusão.
+- **Standstill** (sem qualquer movimento) após RCP adequada: mau prognóstico — integrar à decisão de cessar esforços, **nunca isoladamente**.
+## Passo a passo
+- Antes de parar: sonda no subcostal.
+- "Checar pulso" → captura o clipe (≤10 s) → **retomar compressões**.
+- Analise o clipe gravado fora do tempo de compressão.
+## Integração
+Combine com **pulmão** (pneumotórax), **FAST** (hemorragia) e **VCI/aorta** (hipovolemia, AAA roto).
+> Perla: grave um **clipe** no subcostal e interprete com o tórax já sendo comprimido — assim o US nunca prolonga a pausa.
+> Alarme: ausência de atividade ao US é UM dado entre vários — a decisão de terminar a reanimação é clínica e multifatorial.`},
+{id:'principios',icon:'<i class="ti ti-ruler-2"></i>',cat:'Fundamentos',nome:'Princípios físicos & artefatos',tags:'física, frequência, resolução, modos, doppler, artefatos, fundamentos',
+ md:`## Como a imagem se forma
+O transdutor emite ultrassom e "escuta" os ecos que voltam das interfaces dos tecidos. Quanto maior a diferença de impedância entre dois meios, mais branca (hiperecoica) a interface.
+## Frequência × profundidade (o trade-off central)
+- **Alta frequência** (linear, 7–15 MHz): ótima **resolução**, pouca **penetração** → estruturas superficiais (vasos, pleura, tendões, nervos).
+- **Baixa frequência** (convexa/setorial, 2–5 MHz): mais **penetração**, menos resolução → abdome, coração, estruturas profundas.
+## Ecogenicidade
+- **Anecoico** (preto): líquido (sangue, urina, bile, derrame).
+- **Hiperecoico** (branco): osso, ar, diafragma, cálculos (com sombra).
+- **Iso/hipoecoico**: parênquimas (fígado, baço).
+## Modos
+- **B (2D)**: imagem em escala de cinza (padrão).
+- **M**: uma linha no tempo — movimento (sliding pleural, VCI, função valvar).
+- **Doppler**: fluxo — **color** (direção/velocidade), **PW/CW** (espectro), **power** (sensível a fluxo lento).
+## Artefatos (reconhecer evita erro)
+- **Sombra acústica**: faixa preta atrás de osso/cálculo/ar — ajuda a achar cálculo.
+- **Reforço acústico posterior**: brilho atrás de estruturas cheias de líquido (cisto, bexiga).
+- **Reverberação**: linhas A do pulmão; "cauda de cometa".
+- **Espelho (mirror)**: imagem duplicada além do diafragma.
+- **Anisotropia**: tendão/nervo "somem" se a sonda não está perpendicular — incline a sonda.
+> Perla: na dúvida entre lesão e artefato, **mude o ângulo/janela** — o artefato muda ou some; a estrutura real persiste.
+> Alarme: POCUS é operador-dependente e focado — confirme achados duvidosos com exame formal.`},
+{id:'knobology',icon:'<i class="ti ti-adjustments"></i>',cat:'Fundamentos',nome:'Knobology (manuseio do aparelho)',tags:'preset, ganho, profundidade, foco, doppler, congelar, higiene, fundamentos',
+ md:`## Fluxo básico (do ligar ao salvar)
+1) Ligar e inserir dados (se for documentar). 2) Escolher **sonda** e **preset**. 3) Ajustar **profundidade** e **ganho**. 4) Otimizar **foco/frequência**. 5) **Congelar**, medir e salvar.
+## Escolha da sonda
+- **Linear**: superficial (vascular, pulmão/pleura, partes moles, nervos).
+- **Convexa**: abdome, FAST, obstetrícia.
+- **Setorial (phased array)**: coração e janelas entre costelas.
+## Preset
+Selecione o preset do exame (cardíaco, abdominal, pulmonar, vascular…). Ele ajusta frequência, faixa dinâmica e a **orientação do marcador** — no preset cardíaco o marcador costuma ficar à **direita** da tela.
+## Marcador / orientação
+O ponto na sonda corresponde ao marcador na tela. Convencione: indicador para a **cabeça** (longitudinal) ou para a **direita do paciente** (transversal). Confirme tocando uma extremidade da sonda.
+## Profundidade e foco
+Ajuste a **profundidade** para a estrutura-alvo ocupar ~2/3 da tela. Posicione o **foco** no nível de interesse (melhora a resolução lateral).
+## Ganho e TGC
+- **Ganho** geral: clareia/escurece toda a imagem (líquido deve ficar preto).
+- **TGC**: ajusta o brilho por profundidade (corrige a atenuação).
+## Doppler
+- **Color**: caixa pequena sobre a região de interesse (menor = melhor frame rate).
+- **PW**: espectro num ponto; ângulo < 60° para estimar velocidades.
+## Congelar, medir e documentar
+**Freeze** retém os últimos segundos (role o cine-loop até o melhor quadro). Use **calipers** para medir; salve imagem/clipe se for documentar.
+## Higiene
+Limpe a sonda entre pacientes (desinfetante compatível); use **capa + gel estéreis** em procedimentos guiados.
+> Perla: "líquido preto" é o melhor controle de ganho — se o sangue/urina não está preto, reduza o ganho.
+> Alarme: não force um corte com sonda/preset errados — a troca rápida de sonda evita interpretação equivocada.`},
+{id:'viaaerea',icon:'<i class="ti ti-lungs-filled"></i>',cat:'Procedimentos',nome:'Via aérea / confirmação de intubação',tags:'intubação, tubo, esôfago, cricotireoide, traqueia, capnografia, parada',
+ diag:corpo([{x:50,y:21,n:1},{x:42,y:38,n:2},{x:58,y:38,n:2}]),
+ leg:'<b>1</b> Traqueia cervical / membrana cricotireóidea (transversal, acima da fúrcula) · <b>2</b> Pontos pulmonares anteriores para o deslizamento bilateral.',
+ md:`## Indicações
+Confirmar posição do tubo **durante ou logo após** a intubação, sobretudo quando a capnografia é duvidosa ou indisponível; identificar a **membrana cricotireóidea** antes de via aérea cirúrgica; prever via aérea difícil.
+## Sonda e preset
+**Linear** de alta frequência (7–12 MHz), preset partes moles, profundidade 3–5 cm. Em pescoço muito espesso, convexa.
+## Posição do paciente
+Supino, pescoço em posição neutra. A sonda fica **transversal** na linha média cervical, logo acima da fúrcula esternal.
+## Passo a passo — confirmação do tubo
+- Coloque a sonda **antes** de intubar, se possível: você verá a traqueia como uma estrutura em "ferradura" com sombra acústica posterior.
+- Peça para intubar e **observe em tempo real**. O tubo passando pela traqueia gera um breve turbilhonamento ("flutter") no ar traqueal.
+- **Tubo na traqueia**: permanece **UMA** imagem de via aérea, com sombra única.
+- **Tubo no esôfago**: aparece uma **segunda** estrutura circular com sombra, à esquerda e posterior à traqueia — o **sinal do duplo trato** (double tract sign).
+- Confirme em seguida o **deslizamento pleural bilateral**: presente dos dois lados = ventilação bilateral; ausente à esquerda com presente à direita sugere **intubação seletiva** do brônquio direito.
+## Desempenho
+Metanálises mostram **sensibilidade ~98% e especificidade ~94–97%** para identificar a posição do tubo, com tempo médio de execução em torno de **9 segundos**. Na **parada cardiorrespiratória** o desempenho se mantém alto (sensibilidade ~0,99), situação em que a capnografia perde acurácia por baixo fluxo.
+## Membrana cricotireóidea
+Sonda transversal descendo do mento: identifique a cartilagem tireóide (formato de "V" invertido), a **membrana cricotireóidea** (linha hiperecogênica entre tireóide e cricoide) e a cricoide (arco mais espesso). Marque a pele antes de sedar o paciente de risco.
+## Achados normais
+Traqueia única em ferradura, com artefato de reverberação posterior; deslizamento pleural simétrico nos dois hemitórax.
+## Achados patológicos
+- **Duplo trato** = intubação esofágica até prova em contrário — retire o tubo.
+- **Sliding ausente à esquerda** = seletiva à direita (tracione o tubo) ou pneumotórax.
+- **Sliding ausente bilateral** = tubo fora, apneia ou pneumotórax bilateral.
+> Perla: a US responde "onde está o tubo" **antes** da primeira ventilação; a capnografia responde "o tubo está ventilando". As duas se somam, não se substituem.
+> Alarme: US não substitui capnografia com forma de onda como padrão para confirmação e monitorização contínua. Use como adjunto, principalmente quando a capnografia estiver duvidosa.`},
+{id:'vd',icon:'<i class="ti ti-heartbeat"></i>',cat:'Cardíaco',nome:'VD e TEP (sobrecarga direita)',tags:'TEP, embolia, VD, TAPSE, McConnell, 60/60, D-sign, cor pulmonale',
+ diag:corpo([{x:46,y:46,n:1},{x:46,y:50,n:2},{x:60,y:62,n:3},{x:50,y:74,n:4}]),
+ leg:'<b>1</b> PLAX · <b>2</b> PSAX (procure o D-sign) · <b>3</b> Apical 4 câmaras (relação VD/VE, TAPSE, McConnell) · <b>4</b> Subcostal + VCI.',
+ md:`## Para que serve
+Em choque ou dispneia indiferenciados, procurar **sobrecarga aguda de VD** muda a conduta na hora: sustenta TEP de alto risco, orienta trombólise e explica hipotensão que não responde a volume. **Não serve para excluir TEP** — VD normal não afasta o diagnóstico em paciente estável.
+## Sonda e preset
+Setorial (phased array), preset cardíaco, profundidade 14–18 cm.
+## Cortes / janelas
+Apical 4 câmaras é a janela principal. Complemente com PSAX (septo) e subcostal (VCI). Tente ao menos duas janelas antes de concluir.
+## O que medir
+- **Relação VD/VE** no A4C, na diástole final: **> 0,9–1,0** indica dilatação de VD. No normal o VD ocupa cerca de 2/3 do VE e não forma o ápice.
+- **TAPSE** (modo M no anel tricúspide lateral, A4C): **< 16 mm** indica disfunção sistólica do VD.
+- **Sinal de McConnell**: acinesia da parede livre **média** do VD com **ápice preservado** (hipercontrátil). Bastante sugestivo de sobrecarga **aguda** — ajuda a separar TEP de cor pulmonale crônico.
+- **Sinal do D** (D-sign) no PSAX: septo retificado, VE em "D" por sobrecarga de pressão/volume do VD.
+- **Sinal 60/60**: tempo de aceleração pulmonar **< 60 ms** com gradiente de regurgitação tricúspide **< 60 mmHg**. Sensibilidade baixa a moderada, mas **especificidade alta** e mais sensível em TEP proximal.
+- **VCI** pletórica sem colapso reforça a origem obstrutiva do choque.
+## Agudo vs crônico
+Sobrecarga **aguda** costuma dar VD dilatado com parede fina (< 5 mm) e pressões pulmonares apenas moderadas — o VD não teve tempo de hipertrofiar. Parede espessada, hipertrofia e gradientes altos apontam para doença **crônica**.
+## Integração clínica
+- Hipotensão + VD dilatado + TVP à compressão = TEP de alto risco na prática, mesmo antes da angio-TC.
+- VD dilatado **sem** repercussão hemodinâmica em paciente estável: estratifique, não trombolize por imagem isolada.
+> Perla: no mesmo exame, examine as veias femorais e poplíteas. Achar TVP em quem tem VD sobrecarregado e está chocado encurta muito a decisão.
+> Alarme: McConnell e D-sign também aparecem em infarto de VD e em hipertensão pulmonar descompensada. Leia o coração junto com o quadro clínico, nunca isolado.`},
+{id:'proc-drenagem',icon:'<i class="ti ti-droplet"></i>',cat:'Procedimentos',nome:'Toracocentese e paracentese guiadas',tags:'derrame, ascite, punção, drenagem, agulha, segurança',
+ diag:corpo([{x:36,y:70,n:1},{x:64,y:70,n:1},{x:33,y:86,n:2}]),
+ leg:'<b>1</b> Toracocentese: base posterolateral, acima do diafragma · <b>2</b> Paracentese: quadrante inferior esquerdo, lateral aos vasos epigástricos.',
+ md:`## Por que guiar por US
+A marcação por ultrassom reduz punção seca e complicações em relação à marcação anatômica. O ganho principal é ver **onde termina o líquido e onde começa o órgão** — diafragma, baço, fígado, alça intestinal.
+## Sonda e preset
+Convexa para localizar e medir a profundidade; linear se quiser ver a agulha em tempo real em paciente magro. Preset abdominal.
+## Toracocentese — passo a passo
+- Paciente **sentado**, inclinado para a frente, braços apoiados.
+- Sonda longitudinal na linha axilar posterior, na base: identifique **diafragma**, fígado/baço, o líquido anecoico e o pulmão atelectasiado "boiando".
+- Escolha um espaço com **lâmina de líquido ≥ 15 mm** que persista em **toda a respiração** — o diafragma sobe na expiração e pode entrar no seu trajeto.
+- Puncione **na borda superior da costela inferior**, fugindo do feixe neurovascular que corre na borda inferior de cada costela.
+- Marque a pele e a **profundidade** na tela antes de puncionar.
+## Paracentese — passo a passo
+- Decúbito dorsal, leve inclinação para o lado a puncionar.
+- Local habitual: **quadrante inferior esquerdo**, cerca de 2 dedos medial e cefálico à espinha ilíaca ântero-superior.
+- Confirme bolsão anecoico com **profundidade ≥ 2–3 cm** e **sem alça** entre a parede e o líquido.
+- Use **Doppler colorido** para localizar os **vasos epigástricos inferiores** e desviar deles.
+- Evite cicatrizes cirúrgicas (aderências trazem alça para junto da parede).
+## Achados que contraindicam puncionar ali
+Líquido septado/loculado fino, alça interposta, distância de segurança pequena, ou líquido que desaparece na expiração.
+## Depois do procedimento
+Reavalie com a sonda: líquido residual, e no tórax procure **deslizamento pleural** — sua ausência nova levanta pneumotórax iatrogênico.
+> Perla: marque com o paciente **na mesma posição** em que vai puncionar. Marcar deitado e puncionar sentado desloca o alvo.
+> Alarme: marcação e punção devem ser no **mesmo momento**. Marca feita e punção adiada não vale — o líquido se redistribui.`},
+{id:'gastrico',icon:'<i class="ti ti-bowl"></i>',cat:'Abdome',nome:'Estômago (jejum e risco de aspiração)',tags:'jejum, aspiração, antro, sedação, intubação, Perlas, conteúdo gástrico',
+ diag:corpo([{x:50,y:70,n:1},{x:44,y:72,n:2}]),
+ leg:'<b>1</b> Antro gástrico: epigástrio, sonda sagital/parassagital, entre fígado e pâncreas · <b>2</b> Repetir em decúbito lateral direito.',
+ md:`## Indicações
+Decidir sobre risco de **aspiração** antes de sedação, intubação eletiva ou procedimento, quando o jejum é incerto: emergência, trauma, gestante, diabético com gastroparesia, paciente confuso que não informa.
+## Sonda e preset
+Convexa (2–5 MHz) na maioria; linear em criança ou adulto magro. Preset abdominal, profundidade 8–15 cm.
+## Posição do paciente
+Avalie primeiro em **semi-sentado (45°)** e depois em **decúbito lateral direito** — o líquido migra para o antro e revela volumes que passam despercebidos em supino.
+## Cortes / janelas
+Sonda **sagital/parassagital no epigástrio**, ao lado da linha média. Referências: **lobo esquerdo do fígado** à frente, **pâncreas** atrás e a **aorta** ou a veia cava mais profundas. O antro é a estrutura oval entre eles.
+## Como classificar (grau de Perlas)
+- **Grau 0**: antro vazio em supino **e** em lateral direito — estômago vazio.
+- **Grau 1**: conteúdo líquido só no **lateral direito** — volume baixo.
+- **Grau 2**: líquido nas **duas** posições — volume alto, risco aumentado de aspiração.
+## Medida quantitativa
+Área de secção transversal do antro (ASE) medida entre as camadas serosas. Em adultos não gestantes, **ASE > 340 mm² em semi-sentado** sugere estômago de risco (sensibilidade ~91%, especificidade ~71%). Volume estimado **> 1,5 mL/kg** também indica risco alto.
+## Achados
+- **Vazio**: antro pequeno, colabado, paredes justapostas ("alvo" ou "olho de boi").
+- **Líquido claro**: conteúdo anecoico, antro distendido e arredondado.
+- **Sólido**: conteúdo heterogêneo, hiperecogênico, com artefato "vidro fosco" pelo ar misturado — costuma atrapalhar a medida logo após a refeição.
+## O que muda na conduta
+Estômago cheio em procedimento eletivo: adie, ou trate como estômago cheio (sequência rápida, tubo com balonete, aspiração prévia). Não desmarque nada só pela imagem sem olhar o contexto.
+> Perla: o exame é mais útil quando **nega** conteúdo. Antro vazio nas duas posições tranquiliza; antro cheio confirma o que você já suspeitava.
+> Alarme: conteúdo sólido recente pode ser confundido com ar/gás e subestimar o volume. Na dúvida, trate como estômago cheio.`},
+{id:'partesmoles',icon:'<i class="ti ti-bandage"></i>',cat:'Outros',nome:'Partes moles: abscesso vs celulite',tags:'abscesso, celulite, drenagem, corpo estranho, fasciíte, cobblestone',
+ diag:corpo([{x:33,y:52,n:1},{x:31,y:95,n:1}]),
+ leg:'<b>1</b> Aplique sobre a área de maior flutuação/dor, comparando sempre com o lado contralateral saudável.',
+ md:`## Indicações
+Separar **celulite** de **abscesso** quando o exame físico é duvidoso; localizar coleção e profundidade antes de drenar; procurar **corpo estranho**; levantar suspeita de **infecção necrosante**.
+## Sonda e preset
+**Linear** de alta frequência (7–15 MHz), preset partes moles. Profundidade 2–4 cm. Bastante gel; em área muito dolorosa, use o gel como camada de contato e pressione pouco.
+## Passo a passo
+- Varra a lesão em **dois planos** perpendiculares, de fora para dentro.
+- Compare com o **lado contralateral** no mesmo ponto — é o melhor controle do que é normal naquele paciente.
+- Use **Doppler colorido** antes de puncionar: descarta pseudoaneurisma e mostra vasos no trajeto.
+- Teste a **compressibilidade**: coleção líquida se deforma e o conteúdo se movimenta ("swirling") ao comprimir.
+## Achados
+- **Celulite**: espessamento do subcutâneo com septos hipoecoicos entre lóbulos de gordura — aspecto de **"paralelepípedo"** (cobblestone). Sem coleção drenável.
+- **Abscesso**: coleção **anecoica ou heterogênea**, contornos irregulares, com debris que se movimentam à compressão; costuma ter reforço acústico posterior e halo hiperêmico ao Doppler. Sem fluxo **dentro** da coleção.
+- **Corpo estranho**: foco hiperecogênico com sombra acústica (metal/vidro) ou reverberação; madeira costuma vir com halo hipoecoico ao redor por reação inflamatória.
+- **Sinais de alarme para necrosante**: **ar** no subcutâneo (focos hiperecogênicos com sombra "suja"), espessamento fascial e líquido ao longo da fáscia profunda.
+## O que muda na conduta
+A US muda a conduta em parcela relevante dos casos duvidosos: evita incisão em celulite pura e evita alta com abscesso não drenado. Achou coleção, marque **profundidade** e **trajeto** antes de incisar.
+> Perla: linfonodo reativo engana. Ele é ovalado, tem **hilo hiperecogênico central** e fluxo hilar ao Doppler — abscesso não tem hilo.
+> Alarme: suspeita de fasciíte necrosante é **cirúrgica e clínica**. Imagem normal não afasta; não atrase a avaliação do cirurgião para completar o exame.`}
+];
+const ORDEM_CAT=['Tórax','Cardíaco','Abdome','Vascular','Procedimentos','Outros','Protocolos','Fundamentos'];
+
+/* imagens reais de ultrassom — só com licença aberta verificada (uso comercial + atribuição). Crédito embaixo de cada uma. */
+const IMGS={
+ viaaerea:[
+  {src:'pocusimg/viaaerea-cervical.png',leg:'Corte cervical transversal — tireoide, esôfago (E) e carótida (CA), com a posição da sonda. É esta a janela para ver o tubo passar.',autor:'Osman A, Sum KM. J Intensive Care 2016',lic:'CC BY 4.0',url:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4983796/',mod:'pode ter sido recortada da figura do artigo'},
+  {src:'pocusimg/viaaerea-traqueia.png',leg:'Traqueia cervical ao US: 1 anel traqueal com sombra, 2 lobo da tireoide, 3 istmo, 4 planos musculares.',autor:'Votruba J et al. BioMed Res Int 2015',lic:'CC BY 3.0',url:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4692981/',mod:'pode ter sido recortada da figura do artigo'}
+ ],
+ vd:[
+  {src:'pocusimg/focus-plax-real.png',leg:'Paraesternal eixo longo — US real com VD (RV), VE (LV), via de saída (LVOT) e átrio esquerdo (LA). Compare o tamanho do VD com o do VE.',autor:'Seif D, Perera P, Mailhot T, Riley D, Mandavia D. Crit Care Res Pract 2012',lic:'CC BY 3.0',url:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3485910/',mod:'pode ter sido recortada da figura do artigo'}
+ ],
+ rush:[
+  {src:'pocusimg/focus-plax-real.png',leg:'Bomba — paraesternal eixo longo (US real): VD, VE, via de saída e átrio esquerdo.',autor:'Seif D, Perera P, Mailhot T, Riley D, Mandavia D. Crit Care Res Pract 2012',lic:'CC BY 3.0',url:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3485910/',mod:'pode ter sido recortada da figura do artigo'}
+ ],
+ pulmao:[
+  {src:'pocusimg/blue-batsign.gif',leg:'🎬 Clipe — sinal do morcego (bat sign) + deslizamento pleural (lung sliding): 2 costelas com sombra + linha pleural deslizando.',autor:'Gillman & Kirkpatrick',lic:'CC BY 2.0',url:'https://commons.wikimedia.org/wiki/File:Portable-bedside-ultrasound-the-visual-stethoscope-of-the-21st-century-1757-7241-20-18-S1.ogv',mod:'adaptada (redimensionada)'},
+  {src:'pocusimg/blue-blines.gif',leg:'🎬 Clipe — linhas B (lung rockets): síndrome intersticial / congestão (caudas de cometa que se movem com a respiração).',autor:'Gargani L',lic:'CC BY 2.0',url:'https://commons.wikimedia.org/wiki/File:Lung-ultrasound-a-new-tool-for-the-cardiologist-1476-7120-9-6-S1.ogv',mod:'adaptada (redimensionada)'},
+  {src:'pocusimg/blue-pneumotorax.gif',leg:'🎬 Clipe — sinais de pneumotórax ao US (sonda linear): ausência de deslizamento / lung point.',autor:'Volpicelli G et al.',lic:'CC BY 2.0',url:'https://commons.wikimedia.org/wiki/File:Unusual-new-signs-of-pneumothorax-at-lung-ultrasound-2036-7902-5-10-S3.ogv',mod:'adaptada (redimensionada)'},
+  {src:'pocusimg/pulmao-alinhas.png',leg:'Linhas A + cortina de ar — padrão de pulmão normal.',autor:'Cerevisae',lic:'CC BY-SA 4.0',url:'https://commons.wikimedia.org/wiki/File:Air_curtain_sign_of_a_normal_lung_as_shown_on_ultrasound_in_sagittal_view.png'},
+  {src:'pocusimg/pulmao-blines.jpg',leg:'Linhas B (síndrome intersticial) — caudas de cometa verticais.',autor:'Tinss',lic:'CC BY-SA 4.0',url:'https://commons.wikimedia.org/wiki/File:B_lines_on_a_lung_ultrasound_of_a_patient_with_fibrosis.jpg'},
+  {src:'pocusimg/pulmao-praia.jpg',leg:'Sinal da praia (modo M) — deslizamento pleural normal.',autor:'Tinss',lic:'CC BY-SA 4.0',url:'https://commons.wikimedia.org/wiki/File:Sea_shore_sign_on_a_lung_ultrasound.jpg'}
+ ],
+ blue:[
+  {src:'pocusimg/blue-batsign.gif',leg:'🎬 Clipe — sinal do morcego (bat sign) + deslizamento pleural: 2 costelas com sombra + linha pleural deslizando entre elas.',autor:'Gillman & Kirkpatrick',lic:'CC BY 2.0',url:'https://commons.wikimedia.org/wiki/File:Portable-bedside-ultrasound-the-visual-stethoscope-of-the-21st-century-1757-7241-20-18-S1.ogv',mod:'adaptada (redimensionada)'},
+  {src:'pocusimg/blue-blines.gif',leg:'🎬 Clipe — linhas B (lung rockets), perfil B / EAP: caudas de cometa verticais que se movem com a respiração.',autor:'Gargani L',lic:'CC BY 2.0',url:'https://commons.wikimedia.org/wiki/File:Lung-ultrasound-a-new-tool-for-the-cardiologist-1476-7120-9-6-S1.ogv',mod:'adaptada (redimensionada)'},
+  {src:'pocusimg/blue-pneumotorax.gif',leg:'🎬 Clipe — sinais de pneumotórax ao US (sonda linear), perfil A′ (Volpicelli et al.).',autor:'Volpicelli G et al.',lic:'CC BY 2.0',url:'https://commons.wikimedia.org/wiki/File:Unusual-new-signs-of-pneumothorax-at-lung-ultrasound-2036-7902-5-10-S3.ogv',mod:'adaptada (redimensionada)'},
+  {src:'pocusimg/pulmao-alinhas.png',leg:'Perfil A — linhas A horizontais + lung sliding (pulmão aerado).',autor:'Cerevisae',lic:'CC BY-SA 4.0',url:'https://commons.wikimedia.org/wiki/File:Air_curtain_sign_of_a_normal_lung_as_shown_on_ultrasound_in_sagittal_view.png'},
+  {src:'pocusimg/pulmao-blines.jpg',leg:'Perfil B — linhas B verticais (lung rockets): síndrome intersticial / EAP.',autor:'Tinss',lic:'CC BY-SA 4.0',url:'https://commons.wikimedia.org/wiki/File:B_lines_on_a_lung_ultrasound_of_a_patient_with_fibrosis.jpg'},
+  {src:'pocusimg/pulmao-praia.jpg',leg:'Modo M — sinal da praia (sliding presente). "Código de barras" = sliding abolido.',autor:'Tinss',lic:'CC BY-SA 4.0',url:'https://commons.wikimedia.org/wiki/File:Sea_shore_sign_on_a_lung_ultrasound.jpg'}
+ ],
+ focus:[
+  {src:'pocusimg/focus-plax.jpg',leg:'Janela paraesternal eixo longo (PLAX) — esquema de orientação (anatomia + posição da sonda). Não é US real.',autor:'Balaji.md au',lic:'CC BY-SA 4.0',url:'https://commons.wikimedia.org/wiki/File:Echoparasternallongaxis.jpg'},
+  {src:'pocusimg/focus-a4c-real.gif',leg:'Janela apical 4 câmaras — US REAL (clipe): 4 câmaras + valvas mitral e tricúspide.',autor:'Fruehaufsteher2',lic:'CC BY-SA 3.0',url:'https://commons.wikimedia.org/wiki/File:Ultrasound_of_human_heart_apical_4-cahmber_view.gif'},
+  {src:'pocusimg/focus-derrame.png',leg:'Achado: derrame pericárdico (líquido anecoico ao redor do coração).',autor:'James Heilman, MD',lic:'CC BY-SA 3.0',url:'https://commons.wikimedia.org/wiki/File:PericardialeffusionUS.PNG'}
+ ],
+ vci:[
+  {src:'pocusimg/vci.gif',leg:'VCI (subxifoide) com variação respiratória — clipe.',autor:'Tinss',lic:'CC BY-SA 4.0',url:'https://commons.wikimedia.org/wiki/File:Inferior_vena_cava_ultrasound.gif'}
+ ],
+ aorta:[
+  {src:'pocusimg/aorta-aaa.jpg',leg:'AAA — corte axial (transversal), com medida (anotado).',autor:'Mikael Häggström, MD',lic:'CC0 (domínio público)',url:'https://commons.wikimedia.org/wiki/File:Ultrasonography_of_abdominal_aortic_aneurysm_in_axial_plane,_annotated.jpg'},
+  {src:'pocusimg/aorta-aaa-long.jpg',leg:'AAA — corte longitudinal (sagital), anotado.',autor:'Mikael Häggström, MD',lic:'CC0 (domínio público)',url:'https://commons.wikimedia.org/wiki/File:Ultrasonography_of_abdominal_aortic_aneurysm_in_sagittal_plane,_annotated.jpg'},
+  {src:'pocusimg/aorta-trombo.jpg',leg:'Achado: AAA com trombo mural — lúmen menor que o vaso.',autor:'Mikael Häggström, MD',lic:'CC0 (domínio público)',url:'https://commons.wikimedia.org/wiki/File:Ultrasonography_of_abdominal_aortic_aneurysm_with_mural_thrombus.jpg'}
+ ],
+ renal:[
+  {src:'pocusimg/renal-normal.jpg',leg:'Rim normal — córtex, pirâmides e seio central; medida do comprimento.',autor:'Hansen, Nielsen & Ewertsen',lic:'CC BY 4.0',url:'https://commons.wikimedia.org/wiki/File:Normal_adult_kidney.jpg'},
+  {src:'pocusimg/renal-hidro.jpg',leg:'Achado: hidronefrose moderada — dilatação anecoica do sistema coletor.',autor:'Cerevisae',lic:'CC BY-SA 4.0',url:'https://commons.wikimedia.org/wiki/File:Ultrasound_of_right_kidney_moderate_hydronephrosis.jpg',mod:'adaptada (redimensionada)'},
+  {src:'pocusimg/renal-calculo.jpg',leg:'Achado: cálculo renal — foco hiperecogênico com sombra acústica posterior.',autor:'Hansen, Nielsen & Ewertsen',lic:'CC BY 4.0',url:'https://commons.wikimedia.org/wiki/File:Ultrasonography_of_centrally-located_stone_with_posterior_shadowing.jpg'},
+  {src:'pocusimg/renal-bexiga.jpg',leg:'Bexiga em retenção urinária — distendida, parede trabeculada.',autor:'Mikael Häggström, MD',lic:'CC0 (domínio público)',url:'https://commons.wikimedia.org/wiki/File:Ultrasound_of_trabeculated_urinary_bladder.jpg'}
+ ],
+ tvp:[
+  {src:'pocusimg/tvp-dvt.jpg',leg:'Achado: TVP da veia femoral — veia não compressível com trombo.',autor:'Mikael Häggström, MD',lic:'CC0 (domínio público)',url:'https://commons.wikimedia.org/wiki/File:Ultrasonography_of_deep_vein_thrombosis_of_the_femoral_vein.jpg'}
+ ],
+ efast:[
+  {src:'pocusimg/efast-liquido.jpg',leg:'Líquido livre peritoneal (anecoico) ao redor do fígado/rim — exemplo de ascite; no trauma corresponde a sangue.',autor:'Samir',lic:'CC BY 3.0',url:'https://commons.wikimedia.org/wiki/File:Ascites_ultrasound_2.JPG'}
+ ],
+ ocular:[
+  {src:'pocusimg/ocular-descolamento.jpg',leg:'Achado: descolamento de retina — membrana em V ancorada no disco óptico, sobre vítreo anecoico.',autor:'CheckDO',lic:'CC BY-SA 4.0',url:'https://commons.wikimedia.org/wiki/File:Retinal_Detachment.jpg',mod:'adaptada (redimensionada)'},
+  {src:'pocusimg/ocular-massa.jpg',leg:'Achado: massa intraocular sólida ao B-scan (com traçado A-scan abaixo).',autor:'Natebw',lic:'Domínio público',url:'https://commons.wikimedia.org/wiki/File:Retinoblastoma_ultrasound.jpg'}
+ ],
+ biliar:[
+  {src:'pocusimg/biliar-vesicula.jpg',leg:'Vesícula biliar e colédoco normais ao US abdominal.',autor:'Ptrump16',lic:'CC BY-SA 4.0',url:'https://commons.wikimedia.org/wiki/File:Gallbladder_and_common_bile_duct_ultrasound.jpg'},
+  {src:'pocusimg/biliar-calculo.jpg',leg:'Achado: cálculo na vesícula (colelitíase).',autor:'Michael Macias',lic:'CC BY 4.0',url:'https://commons.wikimedia.org/wiki/File:Ultrasonography_of_a_gallstone.jpg'},
+  {src:'pocusimg/biliar-sludge.jpg',leg:'Achado: lama biliar (sludge) + cálculos (anotado).',autor:'Mikael Häggström, MD',lic:'CC0 (domínio público)',url:'https://commons.wikimedia.org/wiki/File:Ultrasonography_of_sludge_and_gallstones,_annotated.jpg'}
+ ]
+};
+function galeriaHtml(e){
+  const arr=IMGS[e.id];
+  if(arr&&arr.length){
+    return arr.map(im=>`<figure class="ig"><a href="${im.src}" target="_blank" rel="noopener"><img src="${im.src}" alt="${esc(im.leg)}" loading="lazy"></a><figcaption>${esc(im.leg)}<span class="img-cred">${esc(im.autor)} · ${esc(im.lic)}${im.mod?' · '+esc(im.mod):''} · <a href="${im.url}" target="_blank" rel="noopener">fonte</a></span></figcaption></figure>`).join('')
+     +'<div class="img-note">Imagens sob licença aberta (crédito em cada uma). Envie suas próprias captações para complementar.</div>';
+  }
+  return '<div class="img-slot"><i class="ti ti-photo-off" aria-hidden="true"></i><span>Ainda sem imagens de referência neste exame.</span></div>';
+}
+
+/* ===================== MARKDOWN ===================== */
+function md(t){
+  const blocks=String(t||'').split('\n');let html='',inUl=false;
+  const closeUl=()=>{if(inUl){html+='</ul>';inUl=false;}};
+  const inl=s=>esc(s).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\*([^*\n]+)\*/g,'<i>$1</i>').replace(/\b(≥|≤|>|<)\s/g,'$1 ');
+  for(let raw of blocks){
+    const l=raw.trim();
+    if(!l){closeUl();continue;}
+    if(/^## /.test(l)){closeUl();html+='<h2>'+inl(l.slice(3))+'</h2>';}
+    else if(/^### /.test(l)){closeUl();html+='<h3>'+inl(l.slice(4))+'</h3>';}
+    else if(/^> Perla[:：]?/i.test(l)){closeUl();html+='<div class="perla"><i class="ti ti-bulb" aria-hidden="true"></i><span><b>Pérola:</b> '+inl(l.replace(/^> Perla[:：]?\s*/i,''))+'</span></div>';}
+    else if(/^> Alarme[:：]?/i.test(l)){closeUl();html+='<div class="alarme"><i class="ti ti-alert-triangle" aria-hidden="true"></i><span><b>Atenção:</b> '+inl(l.replace(/^> Alarme[:：]?\s*/i,''))+'</span></div>';}
+    else if(/^[-*] /.test(l)){if(!inUl){html+='<ul>';inUl=true;}html+='<li>'+inl(l.slice(2))+'</li>';}
+    else {closeUl();html+='<p>'+inl(l)+'</p>';}
+  }
+  closeUl();return html;
+}
+
+
+/* ===================== ESTADO / NAV ===================== */
+let busca='', catFiltro='', ultimaTela='';
+function whenMT(cb){if(window.MT){cb();}else{setTimeout(()=>whenMT(cb),30);}}
+/* O Chrome trata campo de texto solto como login e injeta o e-mail da conta: valor com "@" nunca é busca. */
+function buscaSuja(q){return String(q||'').indexOf('@')>=0;}
+function camposBusca(){return ['busca','buscaHome'].map(i=>document.getElementById(i)).filter(Boolean);}
+function onBusca(v){
+  if(buscaSuja(v))v='';
+  busca=v;camposBusca().forEach(i=>{if(i.value!==v)i.value=v;});
+  if(curView!=='home'){curView='home';renderHome();window.scrollTo(0,0);}else renderHomeCorpo();
+}
+function limparBusca(foca){busca='';camposBusca().forEach(i=>i.value='');if(curView==='home')renderHomeCorpo();
+  if(foca!==false){const i=camposBusca().find(x=>x.offsetParent);if(i)i.focus();}}
+function perguntarBusca(){const q=busca.trim();limparBusca(false);abrirAssistente();const t=document.getElementById('ask');if(t){t.value=q;growAsk(t);t.focus();}}
+let curView='home', exameAtual=null;
+function routeHome(){curView='home';renderHome();window.scrollTo(0,0);}
+function abrirExame(id){const e=EXAMES.find(x=>x.id===id);if(!e)return;curView='exam';exameAtual=e;renderExam(e);window.scrollTo(0,0);}
+function navIr(v){if(v==='ai'){abrirAssistente();return;}catFiltro=(v==='proto')?'Protocolos':'';routeHome();
+  /* aba Protocolos: abre já na grade filtrada, logo abaixo do cabeçalho */
+  if(v==='proto'){const t=document.querySelector('.pc-cats');if(t)window.scrollTo(0,Math.max(0,t.getBoundingClientRect().top+window.scrollY-(((document.querySelector('header')||{}).offsetHeight||0)+14)));}}
+function marcaNav(){const at=curView==='ai'?'ai':((curView==='home'&&catFiltro==='Protocolos')||(curView==='exam'&&exameAtual&&exameAtual.cat==='Protocolos'))?'proto':'home';
+  document.querySelectorAll('#pcNav button').forEach(b=>{const on=b.dataset.v===at;b.classList.toggle('on',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});}
+const MOV_REDUZIDO=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+function contaNumeros(root){if(MOV_REDUZIDO)return;root.querySelectorAll('[data-conta]').forEach(el=>{const n=+el.getAttribute('data-conta')||0;if(n<3)return;const t0=performance.now();
+  const f=t=>{const k=Math.min(1,(t-t0)/700);el.textContent=Math.round(n*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(f);};requestAnimationFrame(f);});}
+/* cada troca de tela: marca a aba e faz a entrada escalonada (só quando a tela muda, não a cada tecla) */
+new MutationObserver(()=>{marcaNav();const tela=curView+(curView==='exam'&&exameAtual?exameAtual.id:'');if(ultimaTela===tela)return;ultimaTela=tela;const v=RAIZ();contaNumeros(v);
+  if(MOV_REDUZIDO)return;v.classList.remove('cvx-anima');void v.offsetWidth;v.classList.add('cvx-anima');clearTimeout(v._an);v._an=setTimeout(()=>v.classList.remove('cvx-anima'),900);
+}).observe(RAIZ(),{childList:true});
+document.addEventListener('keydown',e=>{if(!ATIVO())return;
+  const tg=e.target;const dig=tg&&(/^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName)||tg.isContentEditable);
+  if(e.key==='Escape'){
+    if(dig&&(tg.id==='busca'||tg.id==='buscaHome')){if(busca)limparBusca();else tg.blur();return;}
+    if(!dig&&curView!=='home')routeHome();
+    return;}
+  if(e.key==='/'&&!dig&&!e.metaKey&&!e.ctrlKey){const i=camposBusca().find(x=>x.offsetParent);if(i){e.preventDefault();i.focus();i.select();}}
+});
+
+/* cor e ícone de cada região: a cor carrega a informação (mesma região, mesma cor) */
+const CAT_VIVA={'Tórax':['--c-azul','ti-lungs'],'Cardíaco':['--c-rosa','ti-heart'],'Abdome':['--c-laranja','ti-bowl'],'Vascular':['--c-violeta','ti-droplet'],
+  'Procedimentos':['--c-verde','ti-vaccine'],'Outros':['--c-ciano','ti-eye'],'Protocolos':['--c-ambar','ti-bolt'],'Fundamentos':['--c-cinza','ti-adjustments']};
+const corCat=c=>(CAT_VIVA[c]||['--ac'])[0];
+function acard(e){return `<button type="button" class="acard" style="--k:var(${corCat(e.cat)})" onclick="CVPOCUS.abrirExame('${e.id}')"><span class="ic" aria-hidden="true">${e.icon}</span><span class="nm">${esc(e.nome)}</span><span class="sb">${esc(e.tags)}</span></button>`;}
+function setCat(c){catFiltro=(catFiltro===c)?'':c;renderHomeCorpo();marcaNav();}
+
+function renderHome(){
+  RAIZ().innerHTML=`<label class="busca-home"><i class="ti ti-search" aria-hidden="true"></i><input id="buscaHome" type="search" name="filtro-pocus-2" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" data-1p-ignore data-lpignore="true" aria-label="Buscar exame ou região" placeholder="Buscar região ou exame" value="${esc(busca)}" oninput="CVPOCUS.onBusca(this.value)"></label><div id="homeCorpo"></div>`;
+  renderHomeCorpo();
+}
+function renderHomeCorpo(){
+  const box=document.getElementById('homeCorpo');if(!box)return;
+  const q=buscaSuja(busca)?'':busca.trim().toLowerCase();
+  const filt=EXAMES.filter(e=>!q||(e.nome+' '+e.tags+' '+e.cat).toLowerCase().includes(q));
+  let html='';
+  if(!q){
+    html+=`<section class="pc-hero"><span class="bola b1"></span><span class="bola b2"></span>
+      <div class="txt"><small><i class="ti ti-zoom-scan" aria-hidden="true"></i> Guia prático de POCUS</small>
+      <h2>Da sonda ao achado, região por região</h2>
+      <p>Cada exame traz sonda, posição, cortes, técnica e achados. Na dúvida, pergunte ao assistente.</p>
+      <div class="acoes"><button type="button" class="bt-hero" onclick="CVPOCUS.navIr('proto')"><i class="ti ti-bolt" aria-hidden="true"></i> Protocolos de emergência</button><button type="button" class="bt-hero sec" onclick="CVPOCUS.abrirAssistente()"><i class="ti ti-message-chatbot" aria-hidden="true"></i> Perguntar ao assistente</button></div></div>
+      <span class="hero-ic" aria-hidden="true"><i class="ti ti-zoom-scan"></i></span></section>`;
+    if((window.MT||{}).mode==='demo')html+=`<div class="note"><i class="ti ti-info-circle" aria-hidden="true"></i><span>Os guias funcionam sem conta. <b>Entre na conta MedTech para usar a IA.</b></span></div>`;
+  }
+  const cats=ORDEM_CAT.map(c=>[c,filt.filter(e=>e.cat===c).length]);
+  if(filt.length){
+    html+=`<div class="pc-cats" role="group" aria-label="Filtrar por região">${cats.map(([c,n])=>`<button type="button" class="pc-cat${catFiltro===c?' on':''}" style="--k:var(${corCat(c)})" aria-pressed="${catFiltro===c}" onclick="CVPOCUS.setCat('${c}')" ${n?'':'disabled'}><span class="ic" aria-hidden="true"><i class="ti ${CAT_VIVA[c][1]}"></i></span><span class="tx"><b>${c}</b><small><span data-conta="${n}">${n}</span> ${n===1?'exame':'exames'}</small></span></button>`).join('')}</div>`;
+    if(catFiltro)html+=`<div class="filtro-info"><i class="ti ti-filter" aria-hidden="true"></i><span>${esc(catFiltro)}: <b>${cats.find(c=>c[0]===catFiltro)[1]}</b></span><button type="button" onclick="CVPOCUS.setCat('${catFiltro}')"><i class="ti ti-x" aria-hidden="true"></i> Mostrar todos</button></div>`;
+    ORDEM_CAT.forEach(cat=>{
+      if(catFiltro&&cat!==catFiltro)return;
+      const list=filt.filter(e=>e.cat===cat);if(!list.length)return;
+      html+=`<section class="asec"><h2 class="sec-title"><span class="dot" style="--k:var(${corCat(cat)})"></span>${esc(cat)}<span class="n">${list.length}</span></h2><div class="agrid">${list.map(acard).join('')}</div></section>`;
+    });
+    if(catFiltro&&!cats.find(c=>c[0]===catFiltro)[1])html+=`<div class="empty"><span class="ei"><i class="ti ti-filter" aria-hidden="true"></i></span><h3>Nada em ${esc(catFiltro)} para esta busca</h3><button class="btn btn-g" onclick="CVPOCUS.setCat('${catFiltro}')">Mostrar todas as regiões</button></div>`;
+  } else {
+    html+=`<div class="empty"><span class="ei"><i class="ti ti-search" aria-hidden="true"></i></span><h3>Nada encontrado para "${esc(busca.trim())}"</h3><p>Busque pela região, pelo exame ou pelo achado. Ou leve a dúvida ao assistente.</p><div class="acoes-v"><button class="btn btn-p" onclick="CVPOCUS.perguntarBusca()"><i class="ti ti-message-chatbot" aria-hidden="true"></i> Perguntar ao assistente</button><button class="btn btn-g" onclick="CVPOCUS.limparBusca()"><i class="ti ti-x" aria-hidden="true"></i> Limpar busca</button></div></div>`;
+  }
+  box.innerHTML=html;
+}
+
+function renderExam(e){
+  const mais=EXAMES.filter(x=>x.cat===e.cat&&x.id!==e.id);
+  RAIZ().innerHTML=`
+   <button class="back" onclick="CVPOCUS.routeHome()"><i class="ti ti-arrow-left" aria-hidden="true"></i> Voltar</button>
+   <div class="exam-head"><div class="ei" style="--k:var(${corCat(e.cat)})">${e.icon}</div><div><h1>${esc(e.nome)}</h1><div class="tags">${esc(e.cat)} · ${esc(e.tags)}</div></div></div>
+   <div class="layout">
+     <div><div class="cvx-content">${md(e.md)}</div>
+       <div class="panel" style="margin-top:18px"><h4><i class="ti ti-sparkles" aria-hidden="true"></i> Aprofundar com IA</h4>
+         <button class="btn btn-ai" id="aprBtn" onclick="CVPOCUS.aprofundar('${e.id}')"><i class="ti ti-sparkles"></i> Pedir casos e detalhes à IA</button>
+         <div id="aprOut"></div>
+       </div>
+     </div>
+     <div class="aside">
+       ${e.diag?`<div class="panel"><h4><i class="ti ti-map-pin" aria-hidden="true"></i> Posição da sonda</h4>${e.diag}<div class="diag-leg">${e.leg||''}</div></div>`:''}
+       ${e.flow?`<div class="panel"><h4><i class="ti ti-git-branch" aria-hidden="true"></i> Fluxograma de decisão</h4>${e.flow}</div>`:''}
+       <div class="panel"><h4><i class="ti ti-photo" aria-hidden="true"></i> Imagens de ultrassom</h4>${galeriaHtml(e)}</div>
+     </div>
+   </div>
+   ${mais.length?`<section class="asec pc-mais"><h2 class="sec-title"><span class="dot" style="--k:var(${corCat(e.cat)})"></span>Mais em ${esc(e.cat)}<span class="n">${mais.length}</span></h2><div class="agrid">${mais.map(acard).join('')}</div></section>`:''}`;
+}
+
+/* ===================== IA ===================== */
+async function callIA(prompt){
+  if(!(window.MT&&MT.user))throw new Error('Entre na sua conta MedTech para usar a IA.');
+  return await MT.ai(prompt, 'gemini-2.5-pro');
+}
+const SYS_POCUS='Você é um instrutor experiente de POCUS (ultrassom point-of-care) para médicos no Brasil. Responda de forma PRÁTICA e ACIONÁVEL, em português, markdown com seções "## " e bullets curtos. Cubra, quando fizer sentido: indicação, sonda/preset, posição do paciente, cortes/janelas, técnica passo a passo, achados normais vs patológicos e integração clínica. Use medidas e pontos de corte quando houver. Seja objetivo. Lembre que POCUS é exame focado, complementar — sinalize limitações e quando encaminhar para exame formal. NÃO invente referências.';
+
+async function aprofundar(id){
+  const e=EXAMES.find(x=>x.id===id);if(!e)return;
+  const b=document.getElementById('aprBtn'),out=document.getElementById('aprOut');
+  b.disabled=true;b.innerHTML='<span class="spin"></span> Gerando';
+  try{
+    const prompt=SYS_POCUS+`\n\nO médico está vendo o guia de "${e.nome}" (POCUS). Aprofunde com: dicas avançadas de técnica e otimização de imagem, erros/armadilhas comuns, 2-3 cenários clínicos com a interpretação esperada, e como integrar com outros pontos do exame. Não repita o básico já óbvio; agregue valor.`;
+    const txt=await callIA(prompt);
+    out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
+  }catch(err){out.innerHTML='<div class="ai-out erro"><i class="ti ti-alert-triangle" aria-hidden="true"></i> '+esc(err.message||'Falha na IA')+'</div>';}
+  b.disabled=false;b.innerHTML='<i class="ti ti-sparkles"></i> Pedir casos e detalhes à IA';
+}
+
+let chat=[];
+function abrirAssistente(){curView='ai';chat=[];renderAssistente();window.scrollTo(0,0);}
+function renderAssistente(){
+  const suggs=['Como faço POCUS pulmonar na dispneia?','Diferenciar EAP de pneumonia no US','Como avalio volemia com VCI?','Protocolo para parada (FoCUS)','Acesso venoso periférico difícil guiado'];
+  let html=`<button class="back" onclick="CVPOCUS.routeHome()"><i class="ti ti-arrow-left" aria-hidden="true"></i> Voltar</button>
+   <div class="exam-head"><div class="ei"><i class="ti ti-message-chatbot"></i></div><div><h1>Assistente POCUS</h1><div class="tags">Pergunte sobre qualquer região, técnica ou achado</div></div></div>`;
+  if(!chat.length){html+=`<div class="suggs-h">Comece por uma pergunta</div><div class="suggs">`+suggs.map(s=>`<button class="sugg" onclick="CVPOCUS.enviarSug(this)">${esc(s)}</button>`).join('')+`</div>`;}
+  html+=`<div class="chat" id="chat">`+chat.map(m=>`<div class="msg ${m.role==='user'?'u':'a'}${m.err?' erro':''}"><div class="av" aria-hidden="true"><i class="ti ${m.role==='user'?'ti-user':(m.err?'ti-alert-triangle':'ti-scan')}"></i></div><div class="bub">${m.role==='user'?'<p>'+esc(m.text).replace(/\n/g,'<br>')+'</p>':md(m.text)}</div></div>`).join('')+`</div>
+   <div class="ask"><textarea id="ask" rows="1" placeholder="Sua pergunta sobre POCUS" aria-label="Sua pergunta" oninput="CVPOCUS.growAsk(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();CVPOCUS.enviar();}"></textarea><button id="askBtn" onclick="CVPOCUS.enviar()" aria-label="Enviar pergunta"><i class="ti ti-send" aria-hidden="true"></i></button></div>
+   ${(window.MT||{}).mode==='demo'?'<div class="note" style="margin-top:12px"><i class="ti ti-lock" aria-hidden="true"></i><span>Entre na conta MedTech para usar a IA.</span></div>':''}`;
+  RAIZ().innerHTML=html;
+  scrollChat();
+}
+function growAsk(t){t.style.height='auto';t.style.height=Math.min(130,t.scrollHeight)+'px';}
+function enviarSug(b){const t=document.getElementById('ask');if(t){t.value=b.textContent;enviar();}}
+function scrollChat(){const c=document.getElementById('chat');if(c&&c.lastElementChild)c.lastElementChild.scrollIntoView({behavior:'smooth',block:'end'});}
+async function enviar(){
+  const t=document.getElementById('ask');const q=(t.value||'').trim();if(!q)return;
+  chat.push({role:'user',text:q});renderAssistente();
+  const bt=document.getElementById('askBtn');if(bt)bt.disabled=true;
+  const c=document.getElementById('chat');
+  const typ=document.createElement('div');typ.className='msg a';typ.innerHTML='<div class="av" aria-hidden="true"><i class="ti ti-scan"></i></div><div class="bub" aria-label="Escrevendo a resposta"><span class="typing"><span></span><span></span><span></span></span></div>';c.appendChild(typ);typ.scrollIntoView({block:'end'});
+  try{
+    const hist=chat.filter(m=>!m.err).slice(-8).map(m=>(m.role==='user'?'MÉDICO: ':'POCUSAI: ')+m.text).join('\n\n');
+    const prompt=SYS_POCUS+'\n\nConversa até aqui:\n'+hist+'\n\nResponda à última pergunta do médico de forma prática.';
+    const txt=await callIA(prompt);
+    chat.push({role:'ai',text:txt});renderAssistente();
+  }catch(err){
+    typ.remove();
+    chat.push({role:'ai',err:true,text:(err.message||'Falha na IA. Tente novamente.')});renderAssistente();
+  }
+}
+/* ===================== ENCAIXE NO CONDUTAI (07/10/2026) ===================== */
+/* A área ocupa #pocusRoot dentro da seção #pocusView. Cada exame aberto entra no histórico do CondutAI
+   e o conteúdo some quando a área é fechada (ids das telas nunca repetem com os de outra área). */
+function RAIZ() { return D.getElementById('pocusRoot'); }
+function ATIVO() { var v = D.getElementById('pocusView'); return !!(v && !v.hidden); }
+function temExame(id) { return EXAMES.some(function (x) { return x.id === id; }); }
+function subAtual() {
+  if (curView === 'exam' && exameAtual) return 'exam:' + exameAtual.id;
+  if (curView === 'ai') return 'ai';
+  return catFiltro === 'Protocolos' ? 'proto' : '';
+}
+function normaliza(sub) {
+  sub = String(sub || '').replace(/^#/, '').trim();
+  if (!sub) return '';
+  var m = /^exam:(.+)$/.exec(sub);
+  if (m) return temExame(m[1]) ? sub : '';
+  if (sub === 'ai' || sub === 'proto') return sub;
+  if (temExame(sub)) return 'exam:' + sub;
+  return '';
+}
+function vai(sub) {
+  sub = normaliza(sub);
+  var m = /^exam:(.+)$/.exec(sub);
+  if (m) { abrirExame(m[1]); return; }
+  if (sub === 'ai') { abrirAssistente(); return; }
+  if (sub === 'proto') { navIr('proto'); return; }
+  catFiltro = ''; routeHome();
+}
+var ultimoSub = null;
+new MutationObserver(function () {
+  if (!ATIVO()) return;
+  var s = subAtual();
+  if (s === ultimoSub) return;
+  var antes = ultimoSub; ultimoSub = s;
+  if (antes !== null && W.CVX) W.CVX.empilha('pocus', s);
+}).observe(RAIZ(), { childList: true });
+function entrar(sub) {
+  var alvo = normaliza(sub);
+  ultimoSub = alvo;
+  vai(alvo);
+  if (!RAIZ().childElementCount) { ultimoSub = ''; catFiltro = ''; routeHome(); }
+}
+function sair() {
+  ultimoSub = null;
+  var r = RAIZ(); if (r) r.innerHTML = '';
+}
+function voltar() {
+  var st = W.history.state;
+  if (st && st.cv === 'pocus' && st.sub) W.history.back(); else { catFiltro = ''; routeHome(); }
+}
+/* itens para a busca do Início do CondutAI */
+function indice() {
+  return EXAMES.map(function (e) {
+    return { sub: 'exam:' + e.id, nome: e.nome, rot: 'POCUS · ' + e.cat, chave: e.nome + ' ' + (e.tags || '') + ' ' + e.cat };
+  });
+}
+
+W.CVPOCUS = {
+  abrirAssistente: abrirAssistente,
+  abrirExame: abrirExame,
+  aprofundar: aprofundar,
+  enviar: enviar,
+  enviarSug: enviarSug,
+  growAsk: growAsk,
+  limparBusca: limparBusca,
+  navIr: navIr,
+  onBusca: onBusca,
+  perguntarBusca: perguntarBusca,
+  setCat: setCat,
+  routeHome: voltar, entrar: entrar, sair: sair, vai: vai, sub: subAtual, indice: indice,
+  _dados: { EXAMES: EXAMES, IMGS: IMGS }
+};
+})();
