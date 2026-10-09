@@ -153,7 +153,7 @@ $$('[data-gal]').forEach(g=>{
 
 /* ---------- calculadora de planos (preços vêm do planos.json) ---------- */
 const PLANOS_PADRAO={produtos:[
- {id:'app-tudo',curto:'MedTech App',linha:'clinica',apps:'tudo',destaque:true,resumo:'Os 5 apps (CondutAI, PaliAI, LaudAI, PlantãoHub e Granaê), com a IA incluída. No anual, 2 meses grátis.',preco:{mensal:39.9,anual:399},checkout:{}}],teste_dias:7};
+ {id:'app-tudo',curto:'MedTech App',linha:'clinica',apps:'tudo',destaque:true,resumo:'Os 5 apps (CondutAI, PaliAI, LaudAI, PlantãoHub e Granaê), com a IA incluída.',preco:{mensal:39.9,anual:399},checkout:{}}],teste_dias:7};
 const brl=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 async function planos(){try{const r=await fetch('planos.json',{cache:'no-cache'});if(r.ok)return await r.json()}catch(e){}return PLANOS_PADRAO}
 const calc=$('#calc');
@@ -162,11 +162,12 @@ if(calc)planos().then(P=>{
   let per='mensal',sel=(prods.find(p=>p.destaque)||prods[0]).id,escolha=[];
   const temAnual=prods.some(p=>p.preco&&p.preco.anual);
   calc.innerHTML=`${temAnual?`<div class="seg" role="group" aria-label="Período"><button class="on" data-p="mensal" aria-pressed="true">Mensal</button><button data-p="anual" aria-pressed="false">Anual<small>2 meses grátis</small></button></div>`:''}
-   <div class="pcs" role="radiogroup" aria-label="Plano"></div><div class="pick" hidden></div><div class="sumr"></div>`;
+   <div class="pcs"${prods.length>1?' role="radiogroup" aria-label="Plano"':''}></div><div class="pick" hidden></div><div class="sumr"></div>`;
   const pcs=$('.pcs',calc),pick=$('.pick',calc),sumr=$('.sumr',calc);
   function desenha(){
     pcs.innerHTML=prods.map(p=>{const v=p.preco[per];const ok=v!=null;
       const eq=per==='anual'&&ok?`equivale a ${brl(v/12)} por mês`:(per==='anual'?'só no plano mensal':'');
+      if(prods.length===1)return `<div class="pc on"><span class="nm">${esc(p.curto)}</span><span class="vl">${ok?brl(v):'—'}${ok?`<small>/${per==='anual'?'ano':'mês'}</small>`:''}</span><span class="eq">${eq}</span></div>`;
       return `<button class="pc${p.id===sel?' on':''}" role="radio" aria-checked="${p.id===sel}" data-id="${p.id}"${ok?'':' disabled'}><span class="nm">${esc(p.curto)}${p.destaque&&prods.length>1?'<span class="chip">mais escolhido</span>':''}</span><span class="vl">${ok?brl(v):'—'}${ok?`<small>/${per==='anual'?'ano':'mês'}</small>`:''}</span><span class="eq">${eq}</span><span class="ds">${esc(p.resumo||'')}</span></button>`}).join('');
     const p=prods.find(x=>x.id===sel);const n=typeof p.apps==='number'?p.apps:0;
     if(n){escolha=escolha.slice(0,n);pick.hidden=false;
@@ -175,7 +176,11 @@ if(calc)planos().then(P=>{
     const v=p.preco[per];const venda=p.checkout&&p.checkout[per];
     const q=new URLSearchParams({plano:p.id,periodo:per});if(n&&escolha.length)q.set('apps',escolha.join(','));
     const nomes=n?(escolha.length?escolha.map(id=>APPS.find(a=>a.id===id).nm).join(' + '):'escolha acima'):'os 5 apps';
-    sumr.innerHTML=`<div class="t"><b>${esc(p.curto)} · ${per==='anual'?'anual':'mensal'} · ${v!=null?brl(v):''}</b>${esc(nomes)}. Comece com ${P.teste_dias||7} dias grátis de tudo; assine quando fizer sentido.</div><div class="row"><a class="pill solid" href="app.html?${q}">${venda?'Assinar':'Começar grátis'}</a><a class="pill ghost" href="app.html">Criar conta</a></div>`;
+    const td=P.teste_dias||7;
+    /* um produto só: o cartão já mostra nome e preço; aqui fica só o que falta (o que inclui e o próximo passo) */
+    sumr.innerHTML=prods.length===1
+      ?`<div class="t">${esc(p.resumo||'')} Teste ${td} dias grátis, sem cartão.</div><div class="row"><a class="pill solid" href="app.html?${q}">${venda?'Assinar':'Começar grátis'}</a>${venda?`<a class="pill ghost" href="app.html">Testar ${td} dias grátis</a>`:''}</div>`
+      :`<div class="t"><b>${esc(p.curto)} · ${per==='anual'?'anual':'mensal'} · ${v!=null?brl(v):''}</b>${esc(nomes)}. Comece com ${td} dias grátis de tudo; assine quando fizer sentido.</div><div class="row"><a class="pill solid" href="app.html?${q}">${venda?'Assinar':'Começar grátis'}</a><a class="pill ghost" href="app.html">Criar conta</a></div>`;
   }
   calc.addEventListener('click',e=>{const s=e.target.closest('.seg button');if(s){per=s.dataset.p;$$('.seg button',calc).forEach(b=>{b.classList.toggle('on',b===s);b.setAttribute('aria-pressed',b===s)});const p=prods.find(x=>x.id===sel);if(p.preco[per]==null)sel=(prods.find(x=>x.preco[per]!=null)||p).id;desenha();return}
     const c=e.target.closest('.pc');if(c&&!c.disabled){sel=c.dataset.id;desenha();return}
