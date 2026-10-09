@@ -19,7 +19,7 @@ if (G.MTAcesso) return;
 var FN = 'https://southamerica-east1-medtech-c658c.cloudfunctions.net/';
 var PORTAIS = ['portal', 'portal-provas'];
 var DIA = 86400;
-var NOMES = { condutai:'CondutAI', atbguia:'ATBguia', enfermaria:'EnfermarIA', pocusai:'PocusAI', laudai:'LaudAI', paliai:'PaliAI', calcmed:'CalcMed', guiainterno:'Guia do Interno', foco:'Foco', plantaohub:'PlantãoHub', granae:'Granaê', logbook:'Logbook', medprovas:'MedProvas', flashmed:'FlashMed', clinicamed:'ClínicaMed', trafegotitulo:'TráfegoTítulo' };
+var NOMES = { condutai:'CondutAI', atbguia:'ATBguia', enfermaria:'EnfermarIA', pocusai:'PocusAI', laudai:'LaudAI', paliai:'PaliAI', calcmed:'CalcMed', guiainterno:'Guia do Interno', foco:'Foco', plantaohub:'PlantãoHub', granae:'Granaê', logbook:'Logbook', medprovas:'MedProvas', flashmed:'FlashMed (ENARE/ENAMED)', clinicamed:'ClínicaMed', cirurgiamed:'CirurgiaMed', trafegotitulo:'TráfegoTítulo' };
 var num = function (v) { return (typeof v === 'number' && isFinite(v)) ? v : 0; };
 var agoraS = function () { return Math.floor(Date.now() / 1000); };
 var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]; }); };
