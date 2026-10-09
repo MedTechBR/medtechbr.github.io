@@ -153,9 +153,7 @@ $$('[data-gal]').forEach(g=>{
 
 /* ---------- calculadora de planos (preços vêm do planos.json) ---------- */
 const PLANOS_PADRAO={produtos:[
- {id:'app-1',curto:'1 app',linha:'clinica',apps:1,resumo:'Escolha o app que resolve a sua maior dor. IA incluída.',preco:{mensal:29.9},checkout:{}},
- {id:'app-2',curto:'2 apps',linha:'clinica',apps:2,resumo:'A dupla que você usa todo dia. IA incluída.',preco:{mensal:49.9},checkout:{}},
- {id:'app-tudo',curto:'Tudo',linha:'clinica',apps:'tudo',destaque:true,resumo:'Os 5 apps do MedTech App, com a IA incluída. No anual, 2 meses grátis.',preco:{mensal:89.9,anual:899},checkout:{}}],teste_dias:7};
+ {id:'app-tudo',curto:'MedTech App',linha:'clinica',apps:'tudo',destaque:true,resumo:'Os 5 apps (CondutAI, PaliAI, LaudAI, PlantãoHub e Granaê), com a IA incluída. No anual, 2 meses grátis.',preco:{mensal:39.9,anual:399},checkout:{}}],teste_dias:7};
 const brl=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 async function planos(){try{const r=await fetch('planos.json',{cache:'no-cache'});if(r.ok)return await r.json()}catch(e){}return PLANOS_PADRAO}
 const calc=$('#calc');
@@ -169,7 +167,7 @@ if(calc)planos().then(P=>{
   function desenha(){
     pcs.innerHTML=prods.map(p=>{const v=p.preco[per];const ok=v!=null;
       const eq=per==='anual'&&ok?`equivale a ${brl(v/12)} por mês`:(per==='anual'?'só no plano mensal':'');
-      return `<button class="pc${p.id===sel?' on':''}" role="radio" aria-checked="${p.id===sel}" data-id="${p.id}"${ok?'':' disabled'}><span class="nm">${esc(p.curto)}${p.destaque?'<span class="chip">mais escolhido</span>':''}</span><span class="vl">${ok?brl(v):'—'}${ok?`<small>/${per==='anual'?'ano':'mês'}</small>`:''}</span><span class="eq">${eq}</span><span class="ds">${esc(p.resumo||'')}</span></button>`}).join('');
+      return `<button class="pc${p.id===sel?' on':''}" role="radio" aria-checked="${p.id===sel}" data-id="${p.id}"${ok?'':' disabled'}><span class="nm">${esc(p.curto)}${p.destaque&&prods.length>1?'<span class="chip">mais escolhido</span>':''}</span><span class="vl">${ok?brl(v):'—'}${ok?`<small>/${per==='anual'?'ano':'mês'}</small>`:''}</span><span class="eq">${eq}</span><span class="ds">${esc(p.resumo||'')}</span></button>`}).join('');
     const p=prods.find(x=>x.id===sel);const n=typeof p.apps==='number'?p.apps:0;
     if(n){escolha=escolha.slice(0,n);pick.hidden=false;
       pick.innerHTML=`<div class="ph"><span>Escolha ${n===1?'o app':'os '+n+' apps'} do plano</span><b>${escolha.length} de ${n}</b></div><div class="ag">${APPS.map(a=>`<button data-id="${a.id}" class="${escolha.includes(a.id)?'on':''}"${!escolha.includes(a.id)&&escolha.length>=n?' disabled':''} aria-pressed="${escolha.includes(a.id)}"><span class="k"><i class="ti ${a.ic}"></i></span>${esc(a.nm)}</button>`).join('')}</div>`}
