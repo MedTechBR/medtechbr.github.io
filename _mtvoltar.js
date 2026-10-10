@@ -5,15 +5,23 @@
    aparece um botão discreto no canto de baixo à esquerda que volta para o portal.
    Sem a marca (app aberto direto, ou instalado como app próprio), nada aparece. */
 (function () {
-  var destino = null;
+  var OK = /^\/(app|provas)\.html$/, destino = null;
   try { destino = sessionStorage.getItem('mt.voltar'); } catch (e) {}
-  if (!destino || !/^\/(app|provas)\.html$/.test(destino)) return;
+  /* reserva 1: marca em localStorage (o iPhone às vezes perde o sessionStorage no app instalado), vale 12 h */
+  if (!destino || !OK.test(destino)) {
+    try { var m = JSON.parse(localStorage.getItem('mt.voltar') || 'null'); if (m && OK.test(m.d) && Date.now() - m.t < 12 * 3600e3) destino = m.d; } catch (e) {}
+  }
+  /* reserva 2: veio direto de um portal */
+  if (!destino || !OK.test(destino)) {
+    try { var r = new URL(document.referrer); if (r.origin === location.origin && OK.test(r.pathname)) destino = r.pathname; } catch (e) {}
+  }
+  if (!destino || !OK.test(destino)) return;
   var nome = destino === '/app.html' ? 'MedTech App' : 'MedTech Provas';
   function monta() {
     if (document.getElementById('mt-voltar')) return;
     var st = document.createElement('style');
     st.textContent =
-      '.mt-voltar{position:fixed;z-index:9400;left:calc(env(safe-area-inset-left) + 12px);bottom:calc(env(safe-area-inset-bottom) + 84px);' +
+      '.mt-voltar{position:fixed;z-index:2147482000;left:calc(env(safe-area-inset-left) + 12px);bottom:calc(env(safe-area-inset-bottom) + 84px);' +
       'display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 14px 0 11px;border-radius:999px;border:0;' +
       'background:rgba(15,23,42,.86);color:#fff;font:600 13px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;text-decoration:none;' +
       'box-shadow:0 6px 18px rgba(0,0,0,.28);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:.88}' +

@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="MedTech Provas">
 <script>window.MT_APP={id:"portal-provas",name:"MedTech Provas",linha:"provas"};</script>
 <script src="_mtfb.js?v=1"></script>
-<script type="module" src="_mtauth.js?v=43"></script>
+<script type="module" src="_mtauth.js?v=44"></script>
 <style>
 /* ============================================================
    Portal no tema vivo (23/09/2026), modelo ClínicaMed "camada viva".
@@ -349,6 +349,11 @@ function itemAdmin(){
     <span class="nm">Administração</span>
   </a>`;
 }
+/* de onde o app foi aberto (lido por /_mtvoltar.js nos apps de estudo): sessão + reserva de 12 h */
+function marcaVolta(){
+  try { sessionStorage.setItem('mt.voltar', location.pathname); } catch(_){}
+  try { localStorage.setItem('mt.voltar', JSON.stringify({ d: location.pathname, t: Date.now() })); } catch(_){}
+}
 /* cor do app: círculo na cor dele, com o ícone em branco (ou escuro, no âmbar) */
 function corApp(a){ return a.c ? `--c:${a.c};--t:${a.t||'#fff'}` : ''; }
 let _gradeAnimada=false;
@@ -377,7 +382,7 @@ function renderGrid(){
   g.innerHTML = itemAdmin() + (lista.length ? lista.map(appItem).join('')
     : `<div class="apps-vazio">Nenhum app na sua página ainda.<br><button class="b" onclick="openMeusApps()"><i class="ti ti-layout-grid-add" aria-hidden="true"></i> Escolher apps</button></div>`);
   /* de onde o app foi aberto: os apps de estudo mostram "Início" para voltar (/_mtvoltar.js) */
-  g.onclick = e => { if (e.target.closest && e.target.closest('a.app')) { try { sessionStorage.setItem('mt.voltar', location.pathname); } catch(_){} } };
+  g.onclick = e => { if (e.target.closest && e.target.closest('a.app')) marcaVolta(); };
   /* entrada escalonada só na primeira pintura (os re-render da nuvem não piscam) */
   if (!_gradeAnimada && lista.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) { _gradeAnimada = true; [...g.children].forEach((c,k)=>c.style.setProperty('--i',k)); g.classList.add('anima'); }
   try { localStorage.setItem(CACHE_APPS, JSON.stringify([...sel])); } catch(e){}

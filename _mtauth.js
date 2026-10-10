@@ -446,7 +446,13 @@ else {
       }
     });
 
-    MT.save = async (d) => {
+    /* "The client has already been terminated" (10/10/2026): o Firestore desta página foi
+       encerrado (sair da conta, ou a página voltou do cache do navegador/app instalado).
+       Recarrega a página para nascer um cliente novo, em vez de deixar o salvar falhar. */
+    const recarregaSeEncerrado = e => { if (/terminated/i.test((e && e.message) || '')) { try { location.reload(); } catch (_) {} return true; } return false; };
+    window.addEventListener('pageshow', ev => { if (ev.persisted) { try { location.reload(); } catch (_) {} } });
+    MT.save = async (d) => { try { return await _salvar(d); } catch (e) { if (recarregaSeEncerrado(e)) throw new Error('Recarregando a página para salvar. Tente de novo em instantes.'); throw e; } };
+    const _salvar = async (d) => {
       MT.localSet(d); MT._emit(d);
       if (MT.user) {
         const ref = F.doc(db, 'users', MT.user.uid, 'apps', APP.id);
