@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="MedTech Provas">
 <script>window.MT_APP={id:"portal-provas",name:"MedTech Provas",linha:"provas"};</script>
 <script src="_mtfb.js?v=1"></script>
-<script type="module" src="_mtauth.js?v=35"></script>
+<script type="module" src="_mtauth.js?v=36"></script>
 <style>
 /* ============================================================
    Portal no tema vivo (23/09/2026), modelo ClínicaMed "camada viva".
@@ -700,7 +700,7 @@ function preencheAssinatura(){
     <a class="b cancel" href="${RECIBOS_URL}" target="_blank" rel="noopener"><i class="ti ti-receipt" aria-hidden="true"></i>Ver recibos e pagamentos</a>
     ${temCompra ? `<button type="button" class="b cancel" onclick="pedirDesistencia()"><i class="ti ti-arrow-back-up" aria-hidden="true"></i>Desistir em até 7 dias (reembolso total)</button>` : ''}
   </div>
-  <p class="as-mini">Sem fidelidade · desistência em 7 dias com reembolso total. O pagamento é feito na página segura do Mercado Pago; a MedTech nunca pede o número do cartão aqui. Os recibos ficam na sua conta do Mercado Pago, em Atividade. Dúvidas: <a href="ajuda.html" target="_blank" rel="noopener">ajuda</a> ou <a href="mailto:${SUPORTE_EMAIL}?subject=${encodeURIComponent('Assinatura MedTech')}">${SUPORTE_EMAIL}</a>.</p>`);
+  <p class="as-mini">Sem fidelidade · desistência em 7 dias com reembolso total. O pagamento é processado pelo Mercado Pago: no mensal, o cartão é digitado nos campos seguros dele; o anual e o Pix abrem a página do Mercado Pago. A MedTech não vê nem guarda o número do cartão. Os recibos ficam na sua conta do Mercado Pago, em Atividade. Dúvidas: <a href="ajuda.html" target="_blank" rel="noopener">ajuda</a> ou <a href="mailto:${SUPORTE_EMAIL}?subject=${encodeURIComponent('Assinatura MedTech')}">${SUPORTE_EMAIL}</a>.</p>`);
   el.innerHTML = B.join('');
   el.querySelectorAll('[data-op]').forEach(b => b.onclick = () => abrirCompra(OPS[Number(b.dataset.op)], b, document.getElementById('cfgPagMsg')));
   el.querySelectorAll('[data-cancelar]').forEach(b => b.onclick = () => cancelarAssinatura(b.dataset.cancelar, b.dataset.nome, b));
@@ -748,13 +748,27 @@ function pedirDesistencia(){
   const msg = document.getElementById('cfgPagMsg');
   if (msg) { msg.className = 'cfg-msg ok'; msg.textContent = 'Abrimos um e-mail pronto. Envie e devolvemos o valor total pelo Mercado Pago, no mesmo meio de pagamento. Se o e-mail não abriu, escreva para ' + SUPORTE_EMAIL + '.'; }
 }
-/* botão Assinar do Mercado Pago: o servidor cria o link e o portal redireciona */
+/* botão Assinar do Mercado Pago: anual e Pix = o servidor cria o link e o portal redireciona;
+   mensal no cartão = formulário do Mercado Pago num diálogo aqui mesmo (MTAcesso.assinarCartao) */
 async function abrirCompra(op, bt, msgEl){
   if (!op) return;
   if (bt) bt.disabled = true;
-  const diz = (t, err) => { if (msgEl) { msgEl.className = 'cfg-msg' + (err ? ' err' : ''); msgEl.textContent = t; } else aviso(t); };
-  diz('Abrindo o pagamento seguro do Mercado Pago…');
-  try { await MTAcesso.comprar(op, MT.user); }
+  const diz = (t, err) => { if (msgEl) { msgEl.className = 'cfg-msg' + (err ? ' err' : ''); msgEl.textContent = t; } else if (t) aviso(t); };
+  const cartao = MTAcesso.ehCartao && MTAcesso.ehCartao(op);
+  diz(cartao ? 'Abrindo o formulário do cartão…' : 'Abrindo o pagamento seguro do Mercado Pago…');
+  try {
+    const res = await MTAcesso.comprar(op, MT.user);
+    if (!res || typeof res !== 'object') return;              // redirecionou ao Mercado Pago
+    if (bt) bt.disabled = false;
+    if (res.cancelado) { diz(''); return; }
+    ACESSO.mt = res.mt || await MTAcesso.lerMt(MT.user, true).catch(() => ACESSO.mt);
+    const doModal = !!(msgEl && msgEl.closest('#cpModal'));
+    ASSIN_MP = null; document.getElementById('cpModal')?.remove();
+    renderGrid(); preencheAssinatura();
+    const t = `Assinatura mensal de ${op.prod.nome || op.produto} ativa. Ela renova sozinha todo mês; dá para cancelar em Minha assinatura.`;
+    const m = doModal ? null : (msgEl || document.getElementById('cfgPagMsg'));
+    if (m && document.body.contains(m)) { m.className = 'cfg-msg ok'; m.textContent = t; } else aviso(t);
+  }
   catch(e) { if (bt) bt.disabled = false; diz((e && e.message) || 'Não foi possível abrir o pagamento.', true); }
 }
 function escolherAppsPlano(){
@@ -855,7 +869,7 @@ function confirmarCompra(op){
     <div class="sug-row"><button type="button" class="b ok cp-ir" id="cpIr">Ir para o pagamento<i class="ti ti-arrow-right" aria-hidden="true"></i></button></div>
     <div class="cfg-msg" id="cpMsg" role="status"></div>
     <div class="sug-row"><button type="button" class="b cancel" id="cpOutras">Ver outras opções</button><button type="button" class="b cancel" data-fecha>Agora não</button></div>
-    <p class="sub cp-fino">Você vai para a página segura do Mercado Pago. A MedTech não vê os dados do cartão.</p>`);
+    <p class="sub cp-fino">${MTAcesso.ehCartao && MTAcesso.ehCartao(op) ? 'O cartão é digitado nos campos seguros do Mercado Pago, aqui mesmo. A MedTech não vê os dados do cartão.' : 'Você vai para a página segura do Mercado Pago. A MedTech não vê os dados do cartão.'}</p>`);
   w.querySelector('#cpIr').onclick = e => abrirCompra(op, e.currentTarget, w.querySelector('#cpMsg'));
   w.querySelector('#cpOutras').onclick = () => { w.remove(); openAssinatura(); };
 }
