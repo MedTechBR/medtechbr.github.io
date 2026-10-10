@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="MedTech App">
 <script>window.MT_APP={id:"portal",name:"MedTech App",linha:"clinica"};</script>
 <script src="_mtfb.js?v=1"></script>
-<script type="module" src="_mtauth.js?v=33"></script>
+<script type="module" src="_mtauth.js?v=34"></script>
 <style>
 /* ============================================================
    Portal no tema vivo (23/09/2026), modelo ClínicaMed "camada viva".
@@ -88,6 +88,7 @@ html[data-viva^=portal][lang] body .sug-box :is(select,input,textarea){width:100
 .sug-box .b{border:1.5px solid transparent;border-radius:999px;padding:10px 16px;min-height:44px;font-weight:600;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;
   transition:filter .2s,transform .18s var(--mola),background-color .2s}
 .sug-row .b{flex:1}
+.sug-box a.b{text-decoration:none}
 .sug-box .ok{background:var(--ac);color:var(--acTxt);box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 28%,transparent)}
 .sug-box .ok:hover{filter:brightness(1.08);transform:translateY(-1px)}
 .sug-box .cancel{background:var(--sup);color:var(--tinta);border-color:var(--fioF)}
@@ -130,7 +131,6 @@ html[data-viva^=portal][lang] body .sug-box :is(select,input,textarea){width:100
 .apps-tools .b{flex:0 0 auto;min-height:40px;padding:0 16px;font-size:13px}
 .apps-vazio{grid-column:1/-1;text-align:center;color:var(--tinta2);padding:34px 16px;background:var(--sup);border:1px solid var(--fio);border-radius:var(--rG);font-size:14px;line-height:1.5;box-shadow:var(--sombraV)}
 .apps-vazio .b{display:inline-flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;min-height:44px;padding:0 20px;border-radius:999px;background:var(--ac);color:var(--acTxt);border:0;font-weight:600;font-size:14px;cursor:pointer}
-#cfgAssinBt{flex-wrap:wrap}#cfgAssinBt .b{flex:1 1 150px}
 .aviso{position:fixed;left:0;right:0;margin:0 auto;width:max-content;bottom:calc(20px + env(safe-area-inset-bottom));z-index:90;max-width:min(520px,calc(100vw - 32px));padding:12px 18px;border-radius:18px;
   background:var(--tinta);color:var(--sup);font-size:14px;line-height:1.45;box-shadow:var(--sombraM);animation:vvSobe .35s var(--suave) both}
 @media(max-width:560px){
@@ -139,7 +139,95 @@ html[data-viva^=portal][lang] body .sug-box :is(select,input,textarea){width:100
   .grid{grid-template-columns:repeat(4,1fr);gap:22px 6px;padding:0 12px}.app .ic{width:60px;height:60px;font-size:27px}.app .nm{font-size:11.5px}
   .hello{margin-bottom:28px}.hello h1{font-size:26px}main{padding-top:30px}.usr .who{display:none}
 }
-@media(prefers-reduced-motion:reduce){*{transition:none!important}.grid.anima>*,.aviso{animation:none!important}}
+
+/* ---------- faixa do plano (sob a saudação) ---------- */
+.faixa{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:12px}
+.faixa:empty{display:none}
+.fx{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 16px;border-radius:999px;border:1.5px solid var(--fioF);background:var(--sup);color:var(--tinta);font-weight:600;font-size:13.5px;text-decoration:none;cursor:pointer}
+.fx i{font-size:17px}
+.fx:hover{background:var(--acSup);color:var(--acInk)}
+.fx.ok i{color:color-mix(in srgb,var(--okV) 75%,var(--tinta))}
+.fx.pend{background:var(--avSup);border-color:transparent;color:color-mix(in srgb,var(--avV) 55%,var(--tinta))}
+.fx.cta{background:var(--ac);border-color:var(--ac);color:var(--acTxt);box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 28%,transparent)}
+.fx.cta:hover{filter:brightness(1.08);color:var(--acTxt);background:var(--ac)}
+.fx.adm{border-color:var(--tinta);color:var(--tinta)}
+.fx:focus-visible,.of-o:focus-visible,.inst-x:focus-visible,.sug-box .b:focus-visible,.sug-box a:focus-visible,.link:focus-visible{outline:3px solid var(--anel,var(--ac));outline-offset:2px}
+
+/* ---------- Minha assinatura ---------- */
+.cfg-sec.assin{background:var(--sup);border:1.5px solid var(--fioF)}
+.cfg-sec h4[tabindex]{outline:none}
+.as-txt{font-size:14px;color:var(--tinta2);line-height:1.5}
+.as-st{border-radius:16px;background:var(--sup2);padding:12px 14px;margin-top:10px}
+.as-st h5{font-size:15.5px;font-weight:700;margin:6px 0 0;color:var(--tinta)}
+.as-st p{font-size:14px;color:var(--tinta2);margin-top:4px;line-height:1.5}
+.as-st p b{color:var(--tinta)}
+.as-st .sug-row{margin-top:10px}
+.as-st > .b{margin-top:10px;width:100%;text-decoration:none}
+.sel{display:inline-flex;align-items:center;font-size:12px;font-weight:700;letter-spacing:.02em;padding:3px 10px;border-radius:999px;background:var(--sup3);color:var(--tinta)}
+.sel.ok{background:var(--okSup);color:color-mix(in srgb,var(--okV) 60%,var(--tinta))}
+.sel.pend{background:var(--avSup);color:color-mix(in srgb,var(--avV) 50%,var(--tinta))}
+.as-mini{font-size:12.5px!important;color:var(--tinta2);margin-top:10px;line-height:1.5}
+.as-mini a{color:var(--acInk);font-weight:600}
+.as-of{margin-top:16px}
+.as-of > h5{font-size:15px;font-weight:700;margin-bottom:2px}
+.of{margin-top:10px}
+.of + .of{padding-top:12px;border-top:1px solid var(--fio)}
+.of-h b{display:block;font-size:15px;font-weight:700}
+.of-h small{display:block;font-size:13px;color:var(--tinta2);line-height:1.45;margin-top:1px}
+.of-g{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+@media(max-width:430px){.of-g{grid-template-columns:1fr}}
+.sug-box .of-o{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;padding:12px 14px;border-radius:16px;border:1.5px solid var(--fioF);background:var(--sup);color:var(--tinta);cursor:pointer;min-height:44px;font:inherit}
+.sug-box .of-o:hover{border-color:var(--ac);background:var(--acSup)}
+.sug-box .of-o.dest{border-color:color-mix(in srgb,var(--ac) 55%,var(--fioF))}
+.of-o .t{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--tinta2);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.of-o .t em{font-style:normal;text-transform:none;letter-spacing:0;background:var(--okSup);color:color-mix(in srgb,var(--okV) 60%,var(--tinta));border-radius:999px;padding:1px 8px}
+.of-o .v{font-size:20px;font-weight:750;letter-spacing:-.01em}
+.of-o .v small{font-size:12.5px;font-weight:500;color:var(--tinta2)}
+.of-o .pm{font-size:12.5px;font-weight:600;color:color-mix(in srgb,var(--okV) 60%,var(--tinta))}
+.of-o .c{font-size:12.5px;color:var(--tinta2);line-height:1.4}
+.of-o .cta{margin-top:6px;align-self:stretch;text-align:center;padding:9px 12px;border-radius:999px;background:var(--ac);color:var(--acTxt);font-weight:700;font-size:13.5px}
+.of-o:not(.dest) .cta{background:var(--sup2);color:var(--tinta);border:1.5px solid var(--fioF)}
+.of-sec{margin-top:4px;padding:10px 4px;min-height:44px;font-size:13px}
+.as-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.as-links .b{flex:1 1 200px;text-decoration:none;font-size:13.5px}
+
+/* ---------- confirmação de compra e volta do pagamento ---------- */
+.sug-box h3[tabindex]{outline:none}
+html[data-viva] body .sug-box :is(h3,h4)[tabindex]:focus{outline:none!important;box-shadow:none!important}
+.cp-res{display:flex;flex-direction:column;gap:2px;border-radius:16px;background:var(--acSup);padding:14px 16px;margin:10px 0 8px}
+.cp-res .t{font-size:13.5px;font-weight:700;color:var(--acInk)}
+.cp-res .v{font-size:26px;font-weight:750;letter-spacing:-.02em;color:var(--tinta)}
+.cp-res .v small{font-size:14px;font-weight:500;color:var(--tinta2)}
+.cp-res .pm{font-size:13px;font-weight:600;color:var(--tinta2)}
+.cp-aviso{background:var(--sup2);border-radius:12px;padding:10px 12px}
+.sug-box .cp-ir{font-size:15.5px;min-height:50px}
+.cp-fino{font-size:12.5px!important;margin-top:12px}
+.sug-box .ret-ok .ti{background:var(--okSup);color:color-mix(in srgb,var(--okV) 65%,var(--tinta))}
+.ret-big{font-size:17px;font-weight:650;color:var(--tinta);margin:4px 0 6px}
+.ret-apps{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:12px 6px;margin:14px 0 4px}
+.ret-apps .app .ic{width:52px;height:52px;font-size:24px}
+.ret-apps .app .nm{font-size:12px}
+.spin{width:30px;height:30px;border-radius:50%;border:3px solid var(--acSup);border-top-color:var(--ac);flex:0 0 auto;animation:giro .8s linear infinite}
+@keyframes giro{to{transform:rotate(360deg)}}
+
+/* ---------- instalar no celular ---------- */
+#instCard{max-width:560px;margin:28px auto 0;padding:0 16px}
+#instCard:empty{display:none}
+.inst{border-radius:20px;background:var(--sup);border:1px solid var(--fio);padding:14px 16px;box-shadow:var(--sombraV);text-align:left}
+.sug-box .inst{margin-top:16px;background:var(--sup2);border:0;box-shadow:none}
+.inst-h{display:flex;align-items:center;gap:10px}
+.inst-ic{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--acSup);color:var(--acInk);font-size:19px;flex:0 0 auto}
+.inst h4{flex:1;font-size:15px;font-weight:700;margin:0;display:block}
+.inst-x{width:44px;height:44px;border-radius:50%;border:0;background:none;color:var(--tinta2);font-size:18px;display:grid;place-items:center;cursor:pointer;flex:0 0 auto;margin:-8px -10px -8px 0}
+.inst-x:hover{background:var(--sup2);color:var(--tinta)}
+.inst p{font-size:14px;color:var(--tinta2);margin-top:6px}
+.inst-p{margin:8px 0 0 20px;font-size:14px;color:var(--tinta2);line-height:1.6}
+.inst-p b{color:var(--tinta)}
+.inst-p .ti{font-size:16px;vertical-align:-2px;color:var(--acInk)}
+.inst-r{margin-top:10px}
+.inst-r .b{min-width:150px}
+#instCard .inst-r .b{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:0 20px;border-radius:999px;border:0;background:var(--ac);color:var(--acTxt);font-weight:600;font-size:14px;cursor:pointer}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}.grid.anima>*,.aviso,.spin{animation:none!important}}
 </style>
 <link rel="stylesheet" href="_mttokens.css?v=4">
 <link rel="stylesheet" href="_mtviva.css?v=2">
@@ -158,9 +246,10 @@ html[data-viva^=portal][lang] body .sug-box :is(select,input,textarea){width:100
 </header>
 
 <main>
-  <div class="hello"><h1 id="hello">Bem-vindo</h1><div class="dt" id="issueDate"></div></div>
+  <div class="hello"><h1 id="hello">Bem-vindo</h1><div class="dt" id="issueDate"></div><div class="faixa" id="faixa"></div></div>
   <div class="grid" id="grid"></div>
   <div class="fine"><button class="link" onclick="openMeusApps()"><i class="ti ti-layout-grid-add" aria-hidden="true"></i> Escolher quais apps aparecem aqui</button></div>
+  <div id="instCard"></div>
 </main>
 
 <footer>© 2026 <a href="index.html">MedTech</a> · <a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a></footer>
@@ -318,9 +407,15 @@ function openCfg(){
   const u = window.MT && window.MT.user;
   if (!u || u.demo){ alert('Entre na sua conta MedTech para acessar as configurações.'); return; }
   const perfil = (window.MT && MT._data && MT._data.perfil) || {};
-  const wrap = document.createElement('div'); wrap.className='sug-modal'; wrap.id='cfgModal';
-  wrap.innerHTML = `<div class="sug-box">
-    <h3><i class="ti ti-settings" aria-hidden="true"></i>Configurações</h3>
+  closeCfg();
+  const wrap = document.createElement('div'); wrap.className='sug-modal'; wrap.id='cfgModal'; wrap.dataset.fechavel='1';
+  wrap.innerHTML = `<div class="sug-box" role="dialog" aria-modal="true" aria-labelledby="cfgTit">
+    <h3 id="cfgTit"><i class="ti ti-settings" aria-hidden="true"></i>Configurações</h3>
+    <div class="cfg-sec assin" id="secAssin">
+      <h4 id="assinTit" tabindex="-1"><i class="ti ti-credit-card" aria-hidden="true"></i>Minha assinatura</h4>
+      <div id="cfgAssin"></div>
+      <div class="cfg-msg" id="cfgPagMsg" role="status"></div>
+    </div>
     <div class="cfg-sec">
       <h4><i class="ti ti-user" aria-hidden="true"></i>Perfil e cadastro</h4>
       <div class="desc">Seu nome aparece em todos os apps MedTech.</div>
@@ -340,13 +435,6 @@ function openCfg(){
       <label for="cfgPass2">Confirmar nova senha</label><input id="cfgPass2" type="password" placeholder="Repita a nova senha" autocomplete="new-password">
       <div class="sug-row"><button class="b ok" onclick="alterarSenha()">Alterar senha</button><button class="b cancel" onclick="enviarResetSenha()">Link por e-mail</button></div>
       <div class="cfg-msg" id="cfgSenhaMsg"></div>
-    </div>
-    <div class="cfg-sec">
-      <h4><i class="ti ti-credit-card" aria-hidden="true"></i>Assinatura e pagamento</h4>
-      <div class="desc" id="cfgAssin">Carregando a sua assinatura</div>
-      <div id="cfgAssinMP"></div>
-      <div class="sug-row" id="cfgAssinBt"><button class="b ok" onclick="abrirPlanos()">Ver planos</button><button class="b cancel" onclick="abrirPagamento()">Gerenciar pagamento</button></div>
-      <div class="cfg-msg" id="cfgPagMsg"></div>
     </div>
     <div class="cfg-sec">
       <h4><i class="ti ti-shield-lock" aria-hidden="true"></i>Seus dados</h4>
@@ -526,74 +614,148 @@ function confirmarExclusao(){
   msg.textContent = 'Pedido pronto: envie o e-mail. Apagamos a conta e todos os dados em até 15 dias e confirmamos por e-mail. '
     + 'Se o e-mail não abriu, escreva para ' + SUPORTE_EMAIL + ' com o assunto "Exclusão de conta MedTech" e o identificador ' + u.uid + '.';
 }
-/* ---------- assinatura: estado, planos, escolha de apps ---------- */
-function preencheAssinatura(){
-  const el = document.getElementById('cfgAssin'); if (!el) return;
-  if (!ACESSO) { el.textContent = 'Carregando a sua assinatura'; return; }
-  if (!ACESSO.venda) { el.innerHTML = 'As assinaturas abrem em breve. Até lá, <b>todos os apps estão liberados</b> na sua conta.'; return; }
-  if (ACESSO.falha) { el.textContent = 'Não foi possível consultar a assinatura agora. Os apps seguem abertos; tente de novo mais tarde.'; return; }
-  const P = ACESSO.P, mt = ACESSO.mt || {}, ag = Math.floor(Date.now()/1000), L = [];
-  if (mt.adm) L.push('Acesso de administração: todos os apps.');
-  if (mt.t && Number(P.teste_dias) > 0) L.push(mt.t > ag ? `Teste grátis de tudo até <b>${MTAcesso.dataBR(mt.t)}</b>.` : `Teste grátis encerrado em ${MTAcesso.dataBR(mt.t)}.`);
-  Object.entries(mt.p || {}).forEach(([id, ate]) => {
-    const pr = MTAcesso.produtoPorId(P, id); const nm = pr ? (pr.nome || id) : id;
-    L.push(ate > ag ? `<b>${esc(nm)}</b> · válido até ${MTAcesso.dataBR(ate)}` : `${esc(nm)} · venceu em ${MTAcesso.dataBR(ate)}`);
-  });
-  const vg = MTAcesso.vagas(P, mt, LINHA), esc2 = MTAcesso.escolhidos(P, mt, LINHA).slice(0, vg);
-  if (vg) L.push(`Apps do seu plano (${esc2.length} de ${vg}): ${esc2.length ? esc2.map(a => esc(MTAcesso.NOMES[a] || a)).join(', ') : 'nenhum escolhido ainda'}.`);
-  if (!L.length) L.push('Nenhuma assinatura ativa nesta conta.');
-  el.innerHTML = L.join('<br>') + '<br><span style="opacity:.8">Nunca pedimos o número do cartão aqui: o pagamento é feito na página segura do meio de pagamento.</span>';
-  const bt = document.getElementById('cfgAssinBt');
-  if (bt && vg && !document.getElementById('btEscolher')) bt.insertAdjacentHTML('afterbegin', '<button class="b ok" id="btEscolher" onclick="escolherAppsPlano()">Escolher os apps do plano</button>');
-  assinaturasMP();
+/* ---------- Minha assinatura: estado, planos, compra, recibos, desistência ----------
+   Estado vem do servidor (claims `mt` via MTAcesso/ACESSO) e da lista de assinaturas
+   mensais do Mercado Pago (mpCancelar {apenasVer}). O "pendente" (boleto/Pix em análise)
+   não vem nas claims: fica marcado neste aparelho na volta do Mercado Pago e some sozinho
+   quando a liberação chega ou depois de 5 dias. */
+const RECIBOS_URL = 'https://www.mercadopago.com.br/activities';
+const ADMIN_URL = 'admin.html';
+const brl = v => Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const dataBR = s => new Date(s * 1000).toLocaleDateString('pt-BR');
+const agoraS = () => Math.floor(Date.now() / 1000);
+let ASSIN_MP = null;          // null = não carregado; {lista:[...]} depois
+let ASSIN_MP_CARREGANDO = false;
+function lsLer(k){ try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch(e) { return null; } }
+function lsGravar(k, v){ try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
+function prodDaLinha(P){ return (P.produtos || []).filter(p => !p.interno && !p.teste && p.linha === LINHA && Object.values(p.checkout || {}).some(v => String(v || '').trim())); }
+function nomeProd(P, id){ const p = MTAcesso.produtoPorId(P, id); return p ? (p.nome || id) : id; }
+function pendenteValido(){
+  const pd = lsLer('mt.pag.pendente'); if (!pd || !pd.produto) return null;
+  const mt = (ACESSO && ACESSO.mt) || {}, ate = Number((mt.p || {})[pd.produto] || 0);
+  if (Date.now() - (pd.em || 0) > 5 * 86400000 || ate > Number(pd.ate || 0)) { lsGravar('mt.pag.pendente', null); return null; }
+  return pd;
 }
-/* Mercado Pago: assinaturas mensais da conta, com o botão de cancelar */
-function vendeMP(){ return !!(ACESSO && ACESSO.P && (ACESSO.P.produtos || []).some(p => !p.interno && MTAcesso.viaMP && (MTAcesso.viaMP(p,'mensal') || MTAcesso.viaMP(p,'anual')))); }
-async function assinaturasMP(){
-  const box = document.getElementById('cfgAssinMP'); if (!box || !vendeMP() || !MT.user) return;
-  if (box.dataset.carregando) return; box.dataset.carregando = '1';
-  try {
-    const r = await MTAcesso.chamar('mpCancelar', { apenasVer: true }, MT.user);
-    const L = (r && r.assinaturas) || [];
-    box.innerHTML = L.map(a => `<div class="desc" style="margin-top:8px"><b>${esc(a.nome)}</b> · assinatura mensal no cartão${a.proximo ? ', próxima cobrança em ' + MTAcesso.dataBR(a.proximo) : ''}${a.status==='paused' ? ' (pausada)' : ''}.</div>
-      <div class="sug-row"><button class="b cancel" data-cancelar="${esc(a.produto)}" data-nome="${esc(a.nome)}">Cancelar assinatura</button></div>`).join('');
-    box.querySelectorAll('[data-cancelar]').forEach(b => b.onclick = () => cancelarAssinatura(b.dataset.cancelar, b.dataset.nome, b));
-  } catch(e) { console.warn('assinaturas do Mercado Pago', e && e.message); box.innerHTML = ''; }
-  finally { delete box.dataset.carregando; }
+function recorrenteDe(id){ return ASSIN_MP && (ASSIN_MP.lista || []).find(a => a.produto === id) || null; }
+/* cartões de oferta (mensal / anual / 1 mês no Pix) de um produto */
+let OPS = [];
+function htmlOferta(P, p, titulo){
+  const ops = MTAcesso.opcoes(P, p); if (!ops.length) return '';
+  const html = ops.map(op => {
+    const i = OPS.push(op) - 1;
+    if (op.secundaria) return '';
+    const anual = op.periodo === 'anual';
+    return `<button type="button" class="of-o${anual ? ' dest' : ''}" data-op="${i}">
+      <span class="t">${esc(op.titulo)}${op.economia ? `<em>${op.economia}% a menos</em>` : ''}</span>
+      <span class="v">${esc(brl(op.preco))}<small>${anual ? ' por ano' : ' por mês'}</small></span>
+      ${op.porMes ? `<span class="pm">equivale a ${esc(brl(op.porMes))} por mês</span>` : ''}
+      <span class="c">${esc(op.como)}</span>
+      <span class="cta">${esc(op.botao)}</span></button>`;
+  }).join('');
+  const sec = ops.filter(o => o.secundaria).map(op => `<button type="button" class="link of-sec" data-op="${OPS.indexOf(op)}"><i class="ti ti-qrcode" aria-hidden="true"></i>${esc(op.botao)} · ${esc(brl(op.preco))}, sem renovação</button>`).join('');
+  return `<div class="of"><div class="of-h"><b>${esc(titulo || p.nome || p.id)}</b>${p.resumo ? `<small>${esc(p.resumo)}</small>` : ''}</div><div class="of-g">${html}</div>${sec}</div>`;
+}
+function preencheAssinatura(){
+  renderFaixa();
+  const el = document.getElementById('cfgAssin'); if (!el) return;
+  if (!ACESSO) { el.innerHTML = '<p class="as-txt">Carregando a sua assinatura…</p>'; return; }
+  if (!ACESSO.venda) { el.innerHTML = '<p class="as-txt">As assinaturas abrem em breve. Até lá, <b>todos os apps estão liberados</b> na sua conta.</p>'; return; }
+  if (ACESSO.falha) { el.innerHTML = '<p class="as-txt">Não foi possível consultar a assinatura agora. Os apps seguem abertos; tente de novo mais tarde.</p>'; return; }
+  const P = ACESSO.P, mt = ACESSO.mt || {}, ag = agoraS(), B = [];
+  OPS = [];
+  if (!ASSIN_MP && !ASSIN_MP_CARREGANDO) carregaAssinMP();
+  if (mt.adm) B.push(`<div class="as-st adm"><span class="sel ok">Administração</span><p>Conta de administração: todos os apps liberados, sem cobrança.</p><a class="b ok" href="${ADMIN_URL}"><i class="ti ti-shield-cog" aria-hidden="true"></i>Abrir a Administração</a></div>`);
+  if (mt.t && Number(P.teste_dias) > 0 && mt.t > ag) B.push(`<div class="as-st"><span class="sel ok">Teste grátis</span><p>Tudo liberado até <b>${dataBR(mt.t)}</b>.</p></div>`);
+  const pend = pendenteValido();
+  const donos = Object.entries(mt.p || {}).filter(([id]) => MTAcesso.produtoPorId(P, id));
+  const ativos = new Set();
+  donos.sort((a, b) => b[1] - a[1]).forEach(([id, ate]) => {
+    const p = MTAcesso.produtoPorId(P, id), nm = p.nome || id, rec = recorrenteDe(id);
+    const anualOp = MTAcesso.opcoes(P, p).find(o => o.periodo === 'anual' && !o.modo);
+    if (ate > ag) {
+      ativos.add(id);
+      let linha2 = rec ? `Mensal no cartão · ${rec.status === 'paused' ? 'pausada' : (rec.proximo ? 'renova em <b>' + dataBR(rec.proximo) + '</b>' : 'renova todo mês')}.` : `Ativo até <b>${dataBR(ate)}</b> · sem renovação automática.`;
+      const longo = ate - ag > 60 * 86400;
+      if (rec && longo) linha2 += ' Você tem também um período pago longo. Se já pagou o anual, cancele a mensal para não pagar duas vezes.';
+      const bts = [];
+      if (rec && anualOp && !longo) { const i = OPS.push(anualOp) - 1; bts.push(`<button type="button" class="b ok" data-op="${i}" data-troca="1">Trocar para o anual · ${esc(brl(anualOp.preco))}</button>`); }
+      if (rec) bts.push(`<button type="button" class="b cancel" data-cancelar="${esc(id)}" data-nome="${esc(nm)}">Cancelar assinatura</button>`);
+      B.push(`<div class="as-st"><span class="sel ok">Ativo</span><h5>${esc(nm)}</h5><p>${linha2}</p>${rec && anualOp && !longo ? `<p class="as-mini">No anual você paga ${esc(brl(anualOp.preco))} uma vez (equivale a ${esc(brl(anualOp.porMes))} por mês). Os 12 meses somam ao que já está pago. Depois, cancele a mensal aqui.</p>` : ''}${bts.length ? `<div class="sug-row">${bts.join('')}</div>` : ''}${!rec && ate - ag < 30 * 86400 && p.linha === LINHA ? `<p class="as-mini">Vence em breve. Para continuar, renove abaixo.</p>` + htmlOferta(P, p, 'Renovar ' + nm) : ''}</div>`);
+    } else if (!pend || pend.produto !== id) {
+      B.push(`<div class="as-st off"><span class="sel">Vencido</span><h5>${esc(nm)}</h5><p>Venceu em ${dataBR(ate)}. O que você registrou continua salvo.</p></div>`);
+    }
+  });
+  if (pend) B.push(`<div class="as-st pend"><span class="sel pend">Pagamento pendente</span><h5>${esc(nomeProd(P, pend.produto))}${pend.periodo ? ' · ' + esc(pend.periodo) : ''}</h5><p>Recebemos o pedido. Assim que o pagamento compensar (boleto: até 3 dias úteis; Pix: minutos), o acesso libera sozinho e você recebe o recibo do Mercado Pago.</p></div>`);
+  const vg = MTAcesso.vagas(P, mt, LINHA), esc2 = MTAcesso.escolhidos(P, mt, LINHA).slice(0, vg);
+  if (vg) B.push(`<div class="as-st"><p>Apps do seu plano (${esc2.length} de ${vg}): ${esc2.length ? esc2.map(a => esc(MTAcesso.NOMES[a] || a)).join(', ') : 'nenhum escolhido ainda'}.</p><div class="sug-row"><button type="button" class="b ok" onclick="escolherAppsPlano()">Escolher os apps do plano</button></div></div>`);
+  const aVenda = prodDaLinha(P).filter(p => !ativos.has(p.id) && !(pend && pend.produto === p.id));
+  const nadaAtivo = !ativos.size && !mt.adm && !(mt.t && mt.t > ag && Number(P.teste_dias) > 0);
+  if (nadaAtivo && !pend) B.unshift(`<div class="as-st off"><span class="sel">Sem plano</span><p>Você ainda não tem plano ativo nesta conta. Escolha abaixo.</p></div>`);
+  if (aVenda.length) {
+    B.push(`<div class="as-of"><h5>${nadaAtivo ? 'Assinar' : 'Outros planos'}</h5>${aVenda.map(p => htmlOferta(P, p)).join('')}
+      <p class="as-mini">Mensal: cartão de crédito, renova sozinho todo mês. Anual: Pix, cartão em até 12x ou boleto, pagamento único.</p></div>`);
+  }
+  const temCompra = donos.some(([id, ate]) => ate > ag && !MTAcesso.produtoPorId(P, id).interno) || !!pend;
+  B.push(`<div class="as-links">
+    <a class="b cancel" href="${RECIBOS_URL}" target="_blank" rel="noopener"><i class="ti ti-receipt" aria-hidden="true"></i>Ver recibos e pagamentos</a>
+    ${temCompra ? `<button type="button" class="b cancel" onclick="pedirDesistencia()"><i class="ti ti-arrow-back-up" aria-hidden="true"></i>Desistir em até 7 dias (reembolso total)</button>` : ''}
+  </div>
+  <p class="as-mini">Sem fidelidade · desistência em 7 dias com reembolso total. O pagamento é feito na página segura do Mercado Pago; a MedTech nunca pede o número do cartão aqui. Os recibos ficam na sua conta do Mercado Pago, em Atividade. Dúvidas: <a href="ajuda.html" target="_blank" rel="noopener">ajuda</a> ou <a href="mailto:${SUPORTE_EMAIL}?subject=${encodeURIComponent('Assinatura MedTech')}">${SUPORTE_EMAIL}</a>.</p>`);
+  el.innerHTML = B.join('');
+  el.querySelectorAll('[data-op]').forEach(b => b.onclick = () => abrirCompra(OPS[Number(b.dataset.op)], b, document.getElementById('cfgPagMsg')));
+  el.querySelectorAll('[data-cancelar]').forEach(b => b.onclick = () => cancelarAssinatura(b.dataset.cancelar, b.dataset.nome, b));
+}
+/* Mercado Pago: assinaturas mensais vigentes da conta (para "renova em" e Cancelar) */
+async function carregaAssinMP(){
+  if (!ACESSO || !ACESSO.venda || !MT.user || ASSIN_MP_CARREGANDO) return;
+  ASSIN_MP_CARREGANDO = true;
+  try { const r = await MTAcesso.chamar('mpCancelar', { apenasVer: true }, MT.user); ASSIN_MP = { lista: (r && r.assinaturas) || [] }; }
+  catch(e) { console.warn('assinaturas do Mercado Pago', e && e.message); ASSIN_MP = { lista: [], falhou: true }; }
+  finally { ASSIN_MP_CARREGANDO = false; }
+  preencheAssinatura();
 }
 async function cancelarAssinatura(produto, nome, bt){
   const msg = document.getElementById('cfgPagMsg');
   if (!confirm(`Cancelar a assinatura mensal de ${nome}?\n\nAs próximas cobranças param. O acesso continua até o fim do período pago.`)) return;
   if (bt) bt.disabled = true;
-  msg.className = 'cfg-msg'; msg.textContent = 'Cancelando a assinatura';
+  msg.className = 'cfg-msg'; msg.textContent = 'Cancelando a assinatura…';
   try {
     const r = await MTAcesso.chamar('mpCancelar', { produto }, MT.user);
+    ASSIN_MP = null; preencheAssinatura();
     msg.className = 'cfg-msg ok';
-    msg.textContent = 'Assinatura cancelada. Nenhuma nova cobrança será feita.' + (r && r.valeAte ? ` O acesso continua até ${MTAcesso.dataBR(r.valeAte)}.` : ' O acesso continua até o fim do período pago.');
-    assinaturasMP();
+    msg.textContent = 'Assinatura cancelada. Nenhuma nova cobrança será feita.' + (r && r.valeAte ? ` O acesso continua até ${dataBR(r.valeAte)}.` : ' O acesso continua até o fim do período pago.');
   } catch(e) {
     if (bt) bt.disabled = false;
     msg.className = 'cfg-msg err'; msg.textContent = (e && e.message) || 'Não foi possível cancelar agora. Tente de novo ou escreva para ' + SUPORTE_EMAIL + '.';
   }
 }
-function abrirPlanos(){
+/* desistência (arrependimento em 7 dias): e-mail pronto para a MedTech */
+function emailDesistencia(u, produtos, quando){
+  const q = (quando || new Date()).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+  const corpo = 'Quero desistir da compra e receber o reembolso total (direito de arrependimento, até 7 dias da compra).\n\n'
+    + 'Produto: ' + (produtos || '(informe o produto)') + '\n'
+    + 'E-mail da conta: ' + (u.email || '(sem e-mail)') + '\n'
+    + 'Identificador da conta (uid): ' + u.uid + '\n'
+    + 'Data deste pedido: ' + q + '\n';
+  return 'mailto:' + SUPORTE_EMAIL + '?subject=' + encodeURIComponent('Desistência e reembolso — MedTech') + '&body=' + encodeURIComponent(corpo);
+}
+function pedirDesistencia(){
+  const u = MT.user; if (!u || u.demo) return;
+  const P = ACESSO.P, mt = ACESSO.mt || {}, ag = agoraS(), pend = pendenteValido();
+  const nomes = Object.entries(mt.p || {}).filter(([, ate]) => ate > ag).map(([id]) => nomeProd(P, id));
+  if (pend && !nomes.includes(nomeProd(P, pend.produto))) nomes.push(nomeProd(P, pend.produto));
+  abrirEmail(emailDesistencia(u, nomes.join(', ')));
   const msg = document.getElementById('cfgPagMsg');
-  if (!ACESSO || !ACESSO.venda) { location.href = '/index.html#planos'; return; }
-  const prods = (ACESSO.P.produtos || []).filter(p => !p.interno && p.linha === LINHA && Object.values(p.checkout||{}).some(Boolean));
-  const ops = [].concat(...prods.map(p => MTAcesso.opcoes(ACESSO.P, p)));
-  const itens = ops.map((op, i) => op.mp
-    ? `<button class="b ok" data-op="${i}" style="display:flex;justify-content:space-between;gap:12px;text-align:left;height:auto;padding:10px 14px"><span>${esc(op.prod.nome||op.produto)}<br><small style="font-weight:400;opacity:.85">${esc(op.como)}</small></span><span>${esc(op.rotulo)}</span></button>`
-    : `<a class="b ok" style="display:flex;justify-content:space-between;text-decoration:none" href="${esc(MTAcesso.checkoutUrl(op.prod, op.periodo, MT.user))}"><span>${esc(op.prod.nome||op.produto)}</span><span>${MTAcesso.brl(op.preco)}${op.periodo==='anual'?'/ano':'/mês'}</span></a>`).join('');
-  msg.className = 'cfg-msg'; msg.innerHTML = itens ? `<div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">${itens}</div>` : 'Os planos desta linha abrem em breve.';
-  msg.querySelectorAll('[data-op]').forEach(b => b.onclick = () => abrirCompra(ops[Number(b.dataset.op)], b));
+  if (msg) { msg.className = 'cfg-msg ok'; msg.textContent = 'Abrimos um e-mail pronto. Envie e devolvemos o valor total pelo Mercado Pago, no mesmo meio de pagamento. Se o e-mail não abriu, escreva para ' + SUPORTE_EMAIL + '.'; }
 }
 /* botão Assinar do Mercado Pago: o servidor cria o link e o portal redireciona */
-async function abrirCompra(op, bt){
-  const msg = document.getElementById('cfgPagMsg');
+async function abrirCompra(op, bt, msgEl){
+  if (!op) return;
   if (bt) bt.disabled = true;
-  aviso('Abrindo o pagamento seguro do Mercado Pago…');
+  const diz = (t, err) => { if (msgEl) { msgEl.className = 'cfg-msg' + (err ? ' err' : ''); msgEl.textContent = t; } else aviso(t); };
+  diz('Abrindo o pagamento seguro do Mercado Pago…');
   try { await MTAcesso.comprar(op, MT.user); }
-  catch(e) { if (bt) bt.disabled = false; if (msg) { msg.className = 'cfg-msg err'; msg.textContent = (e && e.message) || 'Não foi possível abrir o pagamento.'; } else aviso((e && e.message) || 'Não foi possível abrir o pagamento.'); }
+  catch(e) { if (bt) bt.disabled = false; diz((e && e.message) || 'Não foi possível abrir o pagamento.', true); }
 }
 function escolherAppsPlano(){
   const P = ACESSO.P, mt = ACESSO.mt || {}, vg = MTAcesso.vagas(P, mt, LINHA);
@@ -613,20 +775,220 @@ function escolherAppsPlano(){
     } catch (e) { m.className = 'cfg-msg err'; m.textContent = e.message || 'Não foi possível salvar.'; }
   };
 }
-/* chegada pela calculadora de planos do site: ?plano=<id>&periodo=<mensal|anual>&apps=<ids> */
-function planoDaURL(){
-  const q = new URLSearchParams(location.search), id = q.get('plano');
-  if (!id || !ACESSO) return;
-  history.replaceState(null, '', location.pathname);
-  const per = q.get('periodo') || 'mensal', apps = (q.get('apps') || '').split(',').filter(Boolean);
-  const p = MTAcesso.produtoPorId(ACESSO.P, id);
-  if (apps.length) { try { localStorage.setItem('mt.escolha.pendente', JSON.stringify({ linha: p && p.linha, apps })); } catch(e){} }
-  const op = p ? MTAcesso.opcoes(ACESSO.P, p).find(o => o.periodo === per && !o.modo) : null;
-  if (op && op.mp) { abrirCompra(op); return; }
-  const url = p ? MTAcesso.checkoutUrl(p, per, MT.user) : '';
-  if (url) { location.href = url; return; }
-  aviso('As assinaturas abrem em breve. Enquanto isso, use à vontade: todos os apps estão liberados na sua conta.');
+/* faixa sob a saudação: estado do plano em uma linha + atalho da Administração */
+function renderFaixa(){
+  const f = document.getElementById('faixa'); if (!f) return;
+  const u = window.MT && MT.user;
+  if (!u || u.demo || !ACESSO || !ACESSO.venda || ACESSO.falha) { f.innerHTML = ''; return; }
+  const P = ACESSO.P, mt = ACESSO.mt || {}, ag = agoraS(), C = [];
+  if (mt.adm) C.push(`<a class="fx adm" href="${ADMIN_URL}"><i class="ti ti-shield-cog" aria-hidden="true"></i>Administração</a>`);
+  const linhaIds = new Set(prodDaLinha(P).map(p => p.id));
+  const ativos = Object.entries(mt.p || {}).filter(([id, ate]) => ate > ag && (linhaIds.has(id) || MTAcesso.produtoPorId(P, id)?.apps === '*'));
+  const pend = pendenteValido(), pendAqui = pend && linhaIds.has(pend.produto);
+  if (ativos.length) ativos.slice(0, 2).forEach(([id, ate]) => C.push(`<button type="button" class="fx ok" onclick="openAssinatura()"><i class="ti ti-circle-check" aria-hidden="true"></i>${esc(nomeProd(P, id))} · até ${dataBR(ate)}</button>`));
+  if (pendAqui) C.push(`<button type="button" class="fx pend" onclick="openAssinatura()"><i class="ti ti-hourglass" aria-hidden="true"></i>Pagamento pendente</button>`);
+  if (!ativos.length && !pendAqui && !mt.adm && linhaIds.size) C.push(`<button type="button" class="fx cta" onclick="openAssinatura()"><i class="ti ti-credit-card" aria-hidden="true"></i>${LINHA === 'provas' ? 'Ver planos' : 'Assinar o MedTech App'}</button>`);
+  f.innerHTML = C.join('');
 }
+function openAssinatura(){
+  openCfg();
+  setTimeout(() => { const h = document.getElementById('assinTit'); if (h) { h.scrollIntoView({ block: 'start' }); h.focus({ preventScroll: true }); } }, 40);
+}
+
+/* ---------- Compra pela vitrine: ?plano=<id>&periodo=<mensal|anual>[&apps=<ids>] ----------
+   Sem login: a tela de entrar mostra o que a pessoa está assinando. Depois de entrar ou criar
+   a conta, um clique em "Ir para o pagamento" leva ao Mercado Pago. */
+const Q0 = new URLSearchParams(location.search);
+const PLANO_URL = Q0.get('plano') ? { id: Q0.get('plano'), periodo: Q0.get('periodo') === 'anual' ? 'anual' : 'mensal', apps: (Q0.get('apps') || '').split(',').filter(Boolean) } : null;
+const VOLTA_PAG = Q0.get('pago');
+let CTX_LOGIN = '', _ctxObs = null;
+if (PLANO_URL) {
+  fetch('/planos.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : null).catch(() => null).then(P => {
+    const p = P && (P.produtos || []).find(x => x.id === PLANO_URL.id && !x.interno);
+    /* produto da outra linha: o portal certo (app.html ⇄ provas.html), com os mesmos parâmetros */
+    if (p && p.linha && p.linha !== LINHA) { location.replace((p.linha === 'provas' ? 'provas.html' : 'app.html') + location.search); return; }
+    const v = p && p.preco && p.preco[PLANO_URL.periodo];
+    if (!p || v == null) return;
+    CTX_LOGIN = `<div class="mt-ctx" id="mt-ctx" role="note"><p>Você está assinando <b>${esc(p.nome || p.id)} · ${PLANO_URL.periodo} · ${esc(brl(v))}</b>. Entre ou crie a conta para ir ao pagamento.</p><button type="button" class="mt-ctx-b" id="mt-ctx-reg">Ainda não tenho conta: criar agora</button></div>`;
+    aplicaCtxLogin();
+    if (!_ctxObs && window.MutationObserver) { _ctxObs = new MutationObserver(aplicaCtxLogin); _ctxObs.observe(document.body, { childList: true }); }
+  });
+}
+function aplicaCtxLogin(){
+  if (!CTX_LOGIN) return;
+  const card = document.querySelector('#mt-auth .mt-card'); if (!card || card.querySelector('#mt-ctx')) return;
+  if (!document.getElementById('ctx-css')) {
+    const s = document.createElement('style'); s.id = 'ctx-css';
+    s.textContent = '.mt-ctx{background:#EEF3FF;border:1px solid #BCCBF5;border-radius:14px;padding:12px 14px;margin:0 0 18px;font:14px/1.5 Inter,system-ui,sans-serif;color:#23272E}.mt-ctx p{margin:0}.mt-ctx b{color:#1A3FA8}'
+      + '.mt-ctx .mt-ctx-b{display:block;width:100%;min-height:44px;margin-top:8px;background:#fff;border:1.5px solid #2B5CE6;border-radius:11px;color:#1E4FCB;font:700 14px Inter,system-ui,sans-serif;cursor:pointer}.mt-ctx .mt-ctx-b:hover{background:#F6F8FF}.mt-ctx .mt-ctx-b:focus-visible{outline:2px solid #2B5CE6;outline-offset:2px}';
+    document.head.appendChild(s);
+  }
+  const sub = card.querySelector('.mt-sub');
+  (sub || card.firstElementChild).insertAdjacentHTML('afterend', CTX_LOGIN);
+  const dlg = document.getElementById('mt-auth'); if (dlg) dlg.setAttribute('aria-describedby', 'mt-ctx');
+  const b = document.getElementById('mt-ctx-reg');
+  if (b) b.onclick = () => { const r = document.getElementById('mt-go-reg'); if (r) r.click(); b.hidden = true; };
+}
+/* depois de entrar: confirma o plano escolhido e leva ao pagamento num clique */
+function planoDaURL(){
+  if (!PLANO_URL || !ACESSO || planoDaURL.feito) return;
+  planoDaURL.feito = true;
+  if (_ctxObs) { _ctxObs.disconnect(); _ctxObs = null; }
+  history.replaceState(null, '', location.pathname);
+  if (!ACESSO.venda) { aviso('As assinaturas abrem em breve. Enquanto isso, use à vontade: todos os apps estão liberados na sua conta.'); return; }
+  const P = ACESSO.P, p = MTAcesso.produtoPorId(P, PLANO_URL.id);
+  if (PLANO_URL.apps.length) lsGravar('mt.escolha.pendente', { linha: p && p.linha, apps: PLANO_URL.apps });
+  const op = p ? MTAcesso.opcoes(P, p).find(o => o.periodo === PLANO_URL.periodo && !o.modo) : null;
+  if (!op) { openAssinatura(); return; }
+  if (!op.mp) { const url = MTAcesso.checkoutUrl(p, op.periodo, MT.user); if (url) location.href = url; return; }
+  confirmarCompra(op);
+}
+function confirmarCompra(op){
+  const P = ACESSO.P, mt = ACESSO.mt || {}, p = op.prod, ag = agoraS(), ate = Number((mt.p || {})[p.id] || 0);
+  const anual = op.periodo === 'anual';
+  const jaTem = ate > ag ? `<p class="sub cp-aviso"><i class="ti ti-info-circle" aria-hidden="true"></i> Você já tem o ${esc(p.nome)} ativo até ${dataBR(ate)}. Se pagar agora, o novo período soma ao atual.</p>` : '';
+  const adm = mt.adm ? '<p class="sub cp-aviso"><i class="ti ti-info-circle" aria-hidden="true"></i> Esta é uma conta de administração: ela já tem acesso a tudo.</p>' : '';
+  const w = modal('cpModal', `<h3 id="cpModal-t" tabindex="-1"><i class="ti ti-credit-card" aria-hidden="true"></i>Ir para o pagamento</h3>
+    <div class="cp-res"><span class="t">${esc(p.nome)} · ${anual ? 'anual' : 'mensal'}</span><span class="v">${esc(brl(op.preco))}<small>${anual ? ' por ano' : ' por mês'}</small></span>${op.porMes ? `<span class="pm">equivale a ${esc(brl(op.porMes))} por mês</span>` : ''}</div>
+    <p class="sub">${esc(op.como)}</p>${jaTem}${adm}
+    <p class="sub">Sem fidelidade · desistência em 7 dias com reembolso total.<br>Conta: <b>${esc(MT.user.email || '')}</b></p>
+    <div class="sug-row"><button type="button" class="b ok cp-ir" id="cpIr">Ir para o pagamento<i class="ti ti-arrow-right" aria-hidden="true"></i></button></div>
+    <div class="cfg-msg" id="cpMsg" role="status"></div>
+    <div class="sug-row"><button type="button" class="b cancel" id="cpOutras">Ver outras opções</button><button type="button" class="b cancel" data-fecha>Agora não</button></div>
+    <p class="sub cp-fino">Você vai para a página segura do Mercado Pago. A MedTech não vê os dados do cartão.</p>`);
+  w.querySelector('#cpIr').onclick = e => abrirCompra(op, e.currentTarget, w.querySelector('#cpMsg'));
+  w.querySelector('#cpOutras').onclick = () => { w.remove(); openAssinatura(); };
+}
+
+/* ---------- volta do Mercado Pago: ?pago=1|0 + status/collection_status, payment_id, preapproval_id ---------- */
+function lerRefMP(s){ const p = String(s || '').split('|'); return p.length === 5 && p[0] === 'mt1' ? { produto: p[2], periodo: p[3] } : null; }
+async function chegadaPagamento(){
+  if (!VOLTA_PAG || chegadaPagamento.feito) return;
+  chegadaPagamento.feito = true;
+  const q = Q0, st = (q.get('collection_status') || q.get('status') || '').toLowerCase();
+  history.replaceState(null, '', location.pathname);
+  if (!ACESSO || !ACESSO.venda || !MT.user) return;
+  const P = ACESSO.P, ref = lerRefMP(q.get('external_reference'));
+  const antes = (() => { const a = lsLer('mt.pag.antes'); return a && Date.now() - (a.em || 0) < 3 * 86400000 ? a : null; })();
+  const produto = (ref && ref.produto) || (antes && antes.produto) || '';
+  const periodo = (ref && ref.periodo) || (antes && antes.periodo) || '';
+  const prod = MTAcesso.produtoPorId(P, produto);
+  const nome = prod ? prod.nome : 'seu plano';
+  const tentar = prod ? MTAcesso.opcoes(P, prod).find(o => o.periodo === periodo && (o.modo || '') === ((antes && antes.produto === produto && antes.modo) || '')) : null;
+  if (VOLTA_PAG === '0' || ['rejected', 'cancelled', 'null', 'failure'].includes(st)) { telaNaoConcluido(nome, tentar); return; }
+  if (['pending', 'in_process', 'in_mediation'].includes(st)) {
+    if (produto) lsGravar('mt.pag.pendente', { produto, periodo, em: Date.now(), ate: Number(((ACESSO.mt || {}).p || {})[produto] || 0), tipo: (q.get('payment_type') || '').toLowerCase() });
+    renderFaixa(); telaPendente(nome, (q.get('payment_type') || '').toLowerCase());
+    return;
+  }
+  /* aprovado (ou assinatura mensal, que volta só com preapproval_id): o webhook libera em segundos */
+  const base = (antes && antes.p) || {};
+  const mudou = mt => { const ps = (mt && mt.p) || {}; return produto ? Number(ps[produto] || 0) > Math.max(Number(base[produto] || 0), agoraS()) : Object.entries(ps).some(([id, a]) => a > Math.max(Number(base[id] || 0), agoraS())); };
+  const terminar = mt => { ACESSO.mt = mt; lsGravar('mt.pag.antes', null); lsGravar('mt.pag.pendente', null); ASSIN_MP = null; renderGrid(); preencheAssinatura(); telaAprovado(prod, mt); };
+  if (mudou(ACESSO.mt)) { terminar(ACESSO.mt); return; }
+  const w = modal('retModal', `<h3 id="retModal-t" tabindex="-1"><span class="spin" aria-hidden="true"></span>Confirmando o pagamento</h3>
+    <p class="sub" role="status">Recebemos a sua volta do Mercado Pago. Estamos liberando o acesso ao ${esc(nome)}. Leva alguns segundos.</p>`, { fechavel: false });
+  const pausas = [1500, 2500, 3000, 3000, 4000, 4000, 5000, 5000, 5000, 6000];   // ~40 s
+  for (const ms of pausas) {
+    await new Promise(r => setTimeout(r, ms));
+    if (!document.body.contains(w)) break;
+    try { const mt = await MTAcesso.lerMt(MT.user, true); if (mudou(mt)) { terminar(mt); return; } } catch(e) {}
+  }
+  if (!document.body.contains(w)) return;
+  const w2 = modal('retModal', `<h3 id="retModal-t" tabindex="-1"><i class="ti ti-clock-hour-4" aria-hidden="true"></i>Ainda confirmando</h3>
+    <p class="sub">Ainda não recebemos a confirmação do Mercado Pago. Se você concluiu o pagamento, o acesso libera sozinho em alguns minutos. Se não concluiu, nada foi cobrado.</p>
+    <div class="sug-row"><button type="button" class="b ok" id="retDeNovo"><i class="ti ti-refresh" aria-hidden="true"></i>Conferir de novo</button>${tentar ? '<button type="button" class="b cancel" id="retTentar">Tentar pagar de novo</button>' : ''}</div>
+    <div class="cfg-msg" id="retMsg" role="status"></div>
+    <p class="sub">Se não liberar em 1 hora, escreva para <a href="mailto:${SUPORTE_EMAIL}?subject=${encodeURIComponent('Pagamento sem liberação')}">${SUPORTE_EMAIL}</a>.</p>
+    <div class="sug-row"><button type="button" class="b cancel" data-fecha>Fechar</button></div>`);
+  w2.querySelector('#retDeNovo').onclick = async e => {
+    const m = w2.querySelector('#retMsg'); e.currentTarget.disabled = true; m.className = 'cfg-msg'; m.textContent = 'Conferindo…';
+    try { const mt = await MTAcesso.lerMt(MT.user, true); if (mudou(mt)) { terminar(mt); return; } m.textContent = 'Ainda não chegou. Tente de novo em um minuto.'; }
+    catch(err) { m.className = 'cfg-msg err'; m.textContent = 'Não foi possível conferir agora.'; }
+    e.currentTarget.disabled = false;
+  };
+  const bt = w2.querySelector('#retTentar'); if (bt) bt.onclick = e => abrirCompra(tentar, e.currentTarget, w2.querySelector('#retMsg'));
+}
+function telaAprovado(prod, mt){
+  const ate = prod ? Number(((mt && mt.p) || {})[prod.id] || 0) : 0;
+  const apps = prod ? MTAcesso.appsDoProduto(ACESSO.P, prod) : [];
+  const unicoApp = apps.length === 1 ? CATALOGO.find(a => a.id === apps[0]) : null;
+  const atalhos = apps.length > 1 ? `<div class="ret-apps">${apps.map(id => CATALOGO.find(a => a.id === id)).filter(Boolean).map(a => `<a class="app" href="${a.url}" style="${corApp(a)}"><span class="ic"><i class="ti ${a.ic}" aria-hidden="true"></i></span><span class="nm">${fmtName(a.nm)}</span></a>`).join('')}</div>` : '';
+  const w = modal('retModal', `<h3 id="retModal-t" tabindex="-1" class="ret-ok"><i class="ti ti-circle-check" aria-hidden="true"></i>Pagamento aprovado</h3>
+    <p class="ret-big">Seu acesso está liberado.</p>
+    <p class="sub">${prod ? esc(prod.nome) + (ate ? ' · válido até ' + dataBR(ate) : '') + '. ' : ''}O recibo do Mercado Pago chega no seu e-mail.</p>
+    ${atalhos}
+    <div class="sug-row">${unicoApp ? `<a class="b ok" href="${unicoApp.url}">Abrir o ${esc(unicoApp.nm)}</a>` : '<button type="button" class="b ok" data-fecha>Abrir os apps</button>'}</div>
+    ${htmlInstalar('ret')}`);
+  ligaInstalar(w);
+}
+function telaPendente(nome, tipo){
+  const boleto = tipo === 'ticket' || tipo === 'atm';
+  modal('retModal', `<h3 id="retModal-t" tabindex="-1"><i class="ti ti-hourglass" aria-hidden="true"></i>Recebemos o pedido</h3>
+    <p class="ret-big">${esc(nome)}: pagamento em análise.</p>
+    <p class="sub">Assim que o pagamento compensar (boleto: até 3 dias úteis${boleto ? '' : '; Pix: alguns minutos'}), o acesso libera sozinho e você recebe o recibo do Mercado Pago.</p>
+    ${boleto ? '<p class="sub">Ainda não pagou o boleto? Ele está no seu e-mail e na sua conta do Mercado Pago.</p>' : ''}
+    <div class="sug-row"><button type="button" class="b ok" data-fecha>Entendi</button><a class="b cancel" href="${RECIBOS_URL}" target="_blank" rel="noopener">Ver no Mercado Pago</a></div>`);
+}
+function telaNaoConcluido(nome, tentar){
+  const w = modal('retModal', `<h3 id="retModal-t" tabindex="-1"><i class="ti ti-alert-circle" aria-hidden="true"></i>O pagamento não foi concluído</h3>
+    <p class="sub">Nada foi cobrado pelo ${esc(nome)}. Você pode tentar de novo ou escolher outro meio de pagamento: no anual dá para pagar com Pix, cartão em até 12x ou boleto.</p>
+    <div class="sug-row">${tentar ? '<button type="button" class="b ok" id="retTentar">Tentar de novo</button>' : ''}<button type="button" class="b ${tentar ? 'cancel' : 'ok'}" id="retOutro">Escolher outro meio</button></div>
+    <div class="cfg-msg" id="retMsg" role="status"></div>
+    <div class="sug-row"><button type="button" class="b cancel" data-fecha>Fechar</button></div>`);
+  const bt = w.querySelector('#retTentar'); if (bt) bt.onclick = e => abrirCompra(tentar, e.currentTarget, w.querySelector('#retMsg'));
+  w.querySelector('#retOutro').onclick = () => { w.remove(); openAssinatura(); };
+}
+
+/* ---------- modal acessível: um por vez, foco no título, Tab preso, Esc fecha (se fechável) ---------- */
+function modal(id, inner, opts){
+  opts = opts || {};
+  document.querySelectorAll('.sug-modal').forEach(m => m.remove());
+  const w = document.createElement('div'); w.className = 'sug-modal'; w.id = id;
+  w.innerHTML = `<div class="sug-box" role="dialog" aria-modal="true" aria-labelledby="${id}-t">${inner}</div>`;
+  if (opts.fechavel !== false) { w.dataset.fechavel = '1'; w.onclick = e => { if (e.target === w || e.target.closest('[data-fecha]')) w.remove(); }; }
+  document.body.appendChild(w);
+  setTimeout(() => { const h = w.querySelector('h3'); if (h) h.focus({ preventScroll: true }); }, 30);
+  return w;
+}
+document.addEventListener('keydown', e => {
+  const m = [...document.querySelectorAll('.sug-modal')].pop(); if (!m) return;
+  if (e.key === 'Escape' && m.dataset.fechavel) { m.remove(); return; }
+  if (e.key !== 'Tab') return;
+  const f = [...m.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select,textarea')].filter(x => x.offsetParent !== null);
+  if (!f.length) return;
+  if (!m.contains(document.activeElement)) { e.preventDefault(); f[0].focus(); return; }
+  if (e.shiftKey && (document.activeElement === f[0] || document.activeElement.tagName === 'H3')) { e.preventDefault(); f[f.length - 1].focus(); }
+  else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+});
+
+/* ---------- instalar no celular ----------
+   Android/Chrome: usa o beforeinstallprompt (botão Instalar). iPhone/iPad: passos do Safari.
+   Some se já estiver instalado (display-mode standalone) ou se a pessoa dispensar. */
+let deferredPrompt = null;
+const instalado = () => { try { return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; } catch(e) { return false; } };
+const ehIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const ehCelular = () => ehIOS() || /Android|Mobi/i.test(navigator.userAgent);
+function htmlInstalar(onde){
+  if (instalado() || lsLer('mt.instalar.dispensado')) return '';
+  const nome = (window.MT_APP && MT_APP.name) || 'MedTech';
+  let corpo;
+  if (deferredPrompt) corpo = `<p>Abre como app, em tela cheia, direto da tela inicial.</p><div class="inst-r"><button type="button" class="b ok" data-instalar><i class="ti ti-download" aria-hidden="true"></i>Instalar</button></div>`;
+  else if (ehIOS()) corpo = `<ol class="inst-p"><li>No Safari, toque em <b>Compartilhar</b> <i class="ti ti-share-2" aria-hidden="true"></i> (na barra de baixo ou de cima).</li><li>Toque em <b>Adicionar à Tela de Início</b>.</li><li>Toque em <b>Adicionar</b>.</li></ol>`;
+  else if (ehCelular()) corpo = `<ol class="inst-p"><li>Abra o menu do navegador <i class="ti ti-dots-vertical" aria-hidden="true"></i>.</li><li>Toque em <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</li></ol>`;
+  else return '';
+  return `<section class="inst${onde === 'ret' ? ' no-ret' : ''}" aria-labelledby="inst-t-${onde}"><div class="inst-h"><span class="inst-ic" aria-hidden="true"><i class="ti ti-device-mobile-down"></i></span><h4 id="inst-t-${onde}">Instale o ${esc(nome)} no celular</h4>
+    <button type="button" class="inst-x" data-dispensar aria-label="Dispensar: não mostrar de novo"><i class="ti ti-x" aria-hidden="true"></i></button></div>${corpo}</section>`;
+}
+function ligaInstalar(raiz){
+  (raiz || document).querySelectorAll('[data-instalar]').forEach(b => b.onclick = async () => {
+    if (!deferredPrompt) return; const ev = deferredPrompt; deferredPrompt = null;
+    ev.prompt(); try { await ev.userChoice; } catch(e) {}
+    renderInstalar(); const hb = document.getElementById('btnInstall'); if (hb) hb.hidden = true;
+  });
+  (raiz || document).querySelectorAll('[data-dispensar]').forEach(b => b.onclick = () => { lsGravar('mt.instalar.dispensado', Date.now()); b.closest('.inst').remove(); });
+}
+function renderInstalar(){ const c = document.getElementById('instCard'); if (!c) return; c.innerHTML = htmlInstalar('portal'); ligaInstalar(c); }
 /* apps escolhidos na calculadora do site: aplicados assim que a compra liberar vagas */
 async function escolhaPendente(){
   let pend = null; try { pend = JSON.parse(localStorage.getItem('mt.escolha.pendente') || 'null'); } catch(e){}
@@ -644,38 +1006,7 @@ async function carregaAcesso(){
   if (ACESSO !== null || !window.MT || !MT.user || MT.user.demo) return;
   ACESSO = false;   // em andamento
   try { ACESSO = (await MT.acessoEstado()) || { venda: false }; } catch(e) { ACESSO = { venda: false }; }
-  renderGrid(); preencheAssinatura(); planoDaURL(); escolhaPendente(); chegadaPagamento();
-}
-/* volta do Mercado Pago: ?pago=1 (aprovado ou em processamento) ou ?pago=0.
-   O token é renovado até a liberação chegar (o webhook costuma levar segundos). */
-async function chegadaPagamento(){
-  const q = new URLSearchParams(location.search), pago = q.get('pago');
-  if (!pago) return;
-  history.replaceState(null, '', location.pathname);
-  if (pago === '0') { aviso('O pagamento não foi concluído e nada foi cobrado. Tente de novo quando quiser.'); return; }
-  const st = (q.get('status') || q.get('collection_status') || '').toLowerCase();
-  if (st === 'pending' || st === 'in_process') { aviso('Pagamento em processamento. Pix confirma em minutos; boleto leva até 3 dias úteis. O acesso libera sozinho.'); return; }
-  if (!ACESSO || !ACESSO.venda || !MT.user) return;
-  let antes = {};
-  try { const a = JSON.parse(localStorage.getItem('mt.pag.antes') || 'null'); if (a && Date.now() - a.em < 3 * 86400000) antes = a.p || {}; } catch(e){}
-  const mudou = mt => Object.entries((mt && mt.p) || {}).some(([id, ate]) => ate > (antes[id] || 0));
-  if (mudou(ACESSO.mt)) { try { localStorage.removeItem('mt.pag.antes'); } catch(e){} aviso('Pagamento recebido: acesso liberado.'); return; }
-  aviso('Pagamento recebido, liberando o seu acesso…');
-  for (let i = 0; i < 9; i++) {
-    await new Promise(r => setTimeout(r, i ? 5000 : 2500));
-    try {
-      const mt = await MTAcesso.lerMt(MT.user, true);
-      if (mudou(mt)) { ACESSO.mt = mt; try { localStorage.removeItem('mt.pag.antes'); } catch(e){} renderGrid(); preencheAssinatura(); aviso('Pronto: acesso liberado.'); return; }
-    } catch(e) {}
-  }
-  aviso('Ainda não chegou a confirmação do Mercado Pago. Assim que chegar, o acesso libera sozinho; se demorar, escreva para ' + SUPORTE_EMAIL + '.');
-}
-function abrirPagamento(){
-  const msg=document.getElementById('cfgPagMsg');
-  const AREA_CLIENTE_URL = (ACESSO && ACESSO.P && ACESSO.P.area_cliente) || '';
-  if (AREA_CLIENTE_URL){ window.open(AREA_CLIENTE_URL,'_blank','noopener'); return; }
-  if (vendeMP()) { msg.className='cfg-msg'; msg.innerHTML='Os pagamentos são feitos pelo Mercado Pago. Para parar a assinatura mensal, use <b>Cancelar assinatura</b> acima: o acesso continua até o fim do período pago. Para trocar o cartão ou ver recibos, entre na sua conta do Mercado Pago, em Assinaturas. Arrependimento em até 7 dias e outras dúvidas: <a href="mailto:'+SUPORTE_EMAIL+'?subject=Assinatura%20MedTech" style="color:var(--petrol);font-weight:700">'+SUPORTE_EMAIL+'</a>.'; return; }
-  msg.className='cfg-msg'; msg.innerHTML='A área de assinatura está sendo finalizada. Para trocar pagamento, ver faturas ou cancelar, fale com a gente: <a href="mailto:'+SUPORTE_EMAIL+'?subject=Assinatura%20MedTech" style="color:var(--petrol);font-weight:700">'+SUPORTE_EMAIL+'</a>.';
+  renderGrid(); preencheAssinatura(); renderFaixa(); planoDaURL(); escolhaPendente(); chegadaPagamento();
 }
 
 /* saudação + sair (via login central MedTech) */
@@ -695,15 +1026,15 @@ function refreshUser(){
     hello.textContent = 'Bem-vindo';
   }
 }
-let perfilOferecido = false;
+let perfilOferecido = !!(PLANO_URL || VOLTA_PAG);   // chegando para pagar ou voltando do pagamento: sem o modal de perfis por cima
 document.addEventListener('click', e => {
   const a = e.target.closest('.app.trav'); if (!a) return;
   const r = travado(a.dataset.id); if (!r) return;
   e.preventDefault();
-  MTAcesso.paywall({ P: ACESSO.P, mt: ACESSO.mt, appId: a.dataset.id, motivo: r.motivo, livres: r.livres, user: MT.user, signOut: () => MT.signOut(), onOk: () => { location.href = a.getAttribute('href'); } });
+  MTAcesso.paywall({ P: ACESSO.P, mt: ACESSO.mt, appId: a.dataset.id, motivo: r.motivo, livres: r.livres, user: MT.user, fechavel: true, signOut: () => MT.signOut(), onOk: () => { location.href = a.getAttribute('href'); } });
 });
 (function waitMT(){ if(window.MT){ MT.onData(function(){
-  refreshUser(); renderGrid(); carregaAcesso();
+  refreshUser(); renderGrid(); renderFaixa(); carregaAcesso();
   // primeira vez na conta: ainda não escolheu → oferece os perfis
   const u = MT.user, d = dados();
   if (!perfilOferecido && u && !u.demo && !(d && d[CAMPO_SEL] && Array.isArray(d[CAMPO_SEL].sel))) { perfilOferecido = true; setTimeout(() => { if (!document.getElementById('appsModal')) openMeusApps(); }, 500); }
@@ -713,13 +1044,16 @@ document.addEventListener('click', e => {
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
 }
-let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault(); deferredPrompt = e;
   const b = document.getElementById('btnInstall'); b.hidden = false;
-  b.onclick = async () => { b.hidden = true; deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; };
+  b.onclick = async () => { if (!deferredPrompt) return; const ev = deferredPrompt; deferredPrompt = null; b.hidden = true; ev.prompt(); try { await ev.userChoice; } catch(err) {} renderInstalar(); };
+  renderInstalar();
+  const r = document.querySelector('#retModal .ret-ok') && document.querySelector('#retModal .sug-box');
+  if (r && !r.querySelector('.inst')) { r.insertAdjacentHTML('beforeend', htmlInstalar('ret')); ligaInstalar(r); }
 });
-window.addEventListener('appinstalled', () => { const b=document.getElementById('btnInstall'); if(b) b.hidden=true; });
+window.addEventListener('appinstalled', () => { const b=document.getElementById('btnInstall'); if(b) b.hidden=true; deferredPrompt = null; document.querySelectorAll('.inst').forEach(x => x.remove()); });
+renderInstalar();
 </script>
 </body>
 </html>
