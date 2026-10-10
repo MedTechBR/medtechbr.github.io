@@ -68,7 +68,7 @@ const MT = {
      Enquanto nenhum produto do /planos.json tiver checkout, nada é bloqueado. */
   _acesso: null,
   acessoModulo() {
-    if (!MT._acesso) MT._acesso = import('/_mtacesso.js?v=12').then(() => window.MTAcesso).catch(e => { console.warn('MTAcesso indisponível', e); return null; });
+    if (!MT._acesso) MT._acesso = import('/_mtacesso.js?v=13').then(() => window.MTAcesso).catch(e => { console.warn('MTAcesso indisponível', e); return null; });
     return MT._acesso;
   },
   async acessoEstado() { const M = await MT.acessoModulo(); return M && MT.user && !MT.user.demo ? M.estado(MT.user) : null; },
@@ -160,7 +160,7 @@ function injectCSS() {
 /* LINHAS DE PRODUTO (decisão do Matheus, 07/09/2026): cada app pertence a uma linha e o trocador,
    o botão de início e o portal só mostram a própria linha. Público diferente não se mistura —
    quem estuda para o TECM não vê ambulatório; quem atende não vê prova. Farmácia voltou em 10/10/2026
-   para ser vendida (FarmaUTI e Banca ENARE Farmácia, na linha Provas por causa do retorno do pagamento),
+   para ser vendida (FarmaUTI, Banca ENARE Farmácia e SOS Farmácia Comercial, na linha Provas por causa do retorno do pagamento),
    mas fica fora do padrão dos médicos; institucional não entra no
    PWA (vendido por contrato). Catálogo enxugado em 07/10/2026: EnfermarIA, Logbook, AltaEnf, Guia do
    Interno, MedProvas e Foco descontinuados; ATBguia, CalcMed e PocusAI passaram para dentro do CondutAI. */
@@ -180,7 +180,8 @@ const MT_FUNCS = [
   { id:'trafegotitulo', nm:'TráfegoTítulo', ic:'ti-car',       c:'#23272E', url:'/trafego-titulo/', linha:'provas' },
   /* farmácia (10/10/2026): vendidos na linha Provas, fora do padrão dos médicos (só aparecem para quem os escolhe ou compra) */
   { id:'farmauti',      nm:'FarmaUTI',      ic:'ti-pill',      c:'#4545D8', url:'/farmauti/',       linha:'provas' },
-  { id:'enarefarmacia', nm:'ENARE Farmácia', ic:'ti-vaccine-bottle',    c:'#0A3F3B', url:'/quiz-enare-farmacia/', linha:'provas' }
+  { id:'enarefarmacia', nm:'ENARE Farmácia', ic:'ti-vaccine-bottle',    c:'#0A3F3B', url:'/quiz-enare-farmacia/', linha:'provas' },
+  { id:'sosfarmacia',   nm:'SOS Farmácia',  ic:'ti-first-aid-kit',     c:'#C8373C', url:'/sos-farmacia/',  linha:'provas' }
 ];
 /* A linha do app vem do MT_APP.linha; sem ela, do catálogo pelo id; sem nada, clínica. */
 function linhaAtual() {

@@ -35,7 +35,8 @@ const PROVAS=[
 /* farmácia (10/10/2026): vendidos na linha Provas, mas público diferente; ficam num grupo próprio */
 const FARMA=[
  {id:'farmauti',nm:'FarmaUTI',ic:'ti-pill',url:'farmauti/',d:'Para quem vai começar a residência em Farmácia em Terapia Intensiva: leituras com revisão essencial, interações com mecanismo e conduta, prescrições de UTI para avaliar, casos clínicos, bulário e calculadoras.'},
- {id:'enarefarmacia',nm:'Banca ENARE Farmácia',ic:'ti-vaccine-bottle',url:'quiz-enare-farmacia/',d:'Residência multiprofissional em Farmácia pelo ENARE: questões comentadas por tema do edital, provas anteriores em simulado, flashcards e painel de desempenho.'}
+ {id:'enarefarmacia',nm:'Banca ENARE Farmácia',ic:'ti-vaccine-bottle',url:'quiz-enare-farmacia/',d:'Residência multiprofissional em Farmácia pelo ENARE: questões comentadas por tema do edital, provas anteriores em simulado, flashcards e painel de desempenho.'},
+ {id:'sosfarmacia',nm:'SOS Farmácia Comercial',ic:'ti-prescription',url:'sos-farmacia/',d:'Para alunos do 9º e 10º semestres de Farmácia e farmacêuticos recém-formados que vão trabalhar em farmácia comercial: 11 módulos (MIP, Portaria 344/98, RDC 471/2021, interações, POPs, termolábeis e outros), cada um com resumo, mapa mental e material de apoio, e PDF com marca-d\'água.'}
 ];
 const INST=[
  {nm:'Sistema Hospitalar (HospSys)',ic:'ti-building-hospital',url:'hospsys.html',d:'Prontuário, prescrição, leitos, bloco, farmácia e faturamento, dentro do hospital.'},
@@ -167,7 +168,8 @@ const PLANOS_PADRAO={produtos:[
  {id:'trafegotitulo',curto:'TráfegoTítulo',linha:'provas',resumo:'Título de Medicina do Tráfego.',preco:{mensal:49.9,anual:397}},
  {id:'flashmed',curto:'FlashMed',linha:'provas',resumo:'Preparatório ENARE/ENAMED: questões, simulados e leituras por área.',preco:{mensal:49.9,anual:397}},
  {id:'farmauti',curto:'FarmaUTI',linha:'provas',publico:'farmacia',resumo:'Residência em Farmácia em Terapia Intensiva: leituras, interações, prescrições e casos.',preco:{mensal:49.9,anual:397}},
- {id:'enarefarmacia',curto:'ENARE Farmácia',linha:'provas',publico:'farmacia',resumo:'Residência multiprofissional em Farmácia (ENARE): questões, simulados e revisão pelo edital.',preco:{mensal:49.9,anual:397}}]};
+ {id:'enarefarmacia',curto:'ENARE Farmácia',linha:'provas',publico:'farmacia',resumo:'Residência multiprofissional em Farmácia (ENARE): questões, simulados e revisão pelo edital.',preco:{mensal:49.9,anual:397}},
+ {id:'sosfarmacia',curto:'SOS Farmácia',linha:'provas',publico:'farmacia',resumo:'Para quem vai trabalhar em farmácia comercial: MIP, Portaria 344/98, RDC 471/2021, interações, POPs e termolábeis, em 11 módulos.',preco:{mensal:49.9,anual:397}}]};
 const brl=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:Number.isInteger(v)?0:2});
 async function planos(){try{const r=await fetch('planos.json',{cache:'no-cache'});if(r.ok)return await r.json()}catch(e){}return PLANOS_PADRAO}
 const calcs=$$('.calc[data-linhas]');
@@ -187,7 +189,7 @@ if(calcs.length)planos().then(P=>calcs.forEach(calc=>{
     <p class="pay"><span>Mensal no cartão, renova sozinho</span><span>Anual em Pix, cartão até 12x ou boleto</span></p></div>
     ${app.length?'<div class="papp"></div>':''}
     ${provas.length?`${app.length?'<h3 class="lt">MedTech Provas <span>cada prova é um plano</span></h3>':''}<ul class="plist pmed"></ul>`:''}
-    ${farma.length?`<h3 class="lt" id="planos-farmacia">Farmácia <span>residência em Farmácia, cada app é um plano</span></h3><ul class="plist pfar"></ul>`:''}`;
+    ${farma.length?`<h3 class="lt" id="planos-farmacia">Farmácia <span>cada app é um plano</span></h3><ul class="plist pfar"></ul>`:''}`;
   const pcs=$('.papp',calc),pl=$('.plist.pmed',calc),pf=$('.plist.pfar',calc);
   const itemProva=p=>`<li><div class="pn2"><b>${esc(p.curto)}</b><span>${esc(p.resumo||'')}</span></div><div class="pv">${valor(p)}${per==='anual'?`<span class="eq">${eq(p)}</span>`:''}</div>${p.preco[per]!=null?`<a class="pill ${app.length?'line':'solid'}" href="${link('provas.html',p)}" aria-label="Assinar o ${esc(p.curto)}, plano ${per}">Assinar</a>`:'<span></span>'}</li>`;
   function desenha(){

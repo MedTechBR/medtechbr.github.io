@@ -43,7 +43,11 @@ const APPS = {
   flashmed: { nm: 'FlashMed', ic: 'ti-cards', c: '#A86D12', url: '/flashmed.html' },
   clinicamed: { nm: 'ClínicaMed', ic: 'ti-heartbeat', c: '#0B6A72', url: '/clinicamed/' },
   cirurgiamed: { nm: 'CirurgiaMed', ic: 'ti-cut', c: '#33479E', url: '/cirurgiamed/' },
-  trafegotitulo: { nm: 'TráfegoTítulo', ic: 'ti-car', c: '#23272E', url: '/trafego-titulo/' }
+  trafegotitulo: { nm: 'TráfegoTítulo', ic: 'ti-car', c: '#23272E', url: '/trafego-titulo/' },
+  /* farmácia (linha provas, publico "farmacia" no planos.json) */
+  farmauti: { nm: 'FarmaUTI', ic: 'ti-pill', c: '#4545D8', url: '/farmauti/' },
+  enarefarmacia: { nm: 'Banca ENARE Farmácia', ic: 'ti-vaccine-bottle', c: '#0A3F3B', url: '/quiz-enare-farmacia/' },
+  sosfarmacia: { nm: 'SOS Farmácia Comercial', ic: 'ti-first-aid-kit', c: '#C8373C', url: '/sos-farmacia/' }
 };
 const ROTULO = {
   mp_approved: 'Pagamento aprovado', mp_refunded: 'Reembolso', mp_charged_back: 'Contestação no cartão',
@@ -63,7 +67,7 @@ const E = { planos: null, painel: null, naoPublicado: false, bloqueado: false, c
 /* ---------------- servidor ---------------- */
 async function modulo() {
   if (window.MT && MT.acessoModulo) { const m = await MT.acessoModulo(); if (m) return m; }
-  if (!window.MTAcesso) await import('/_mtacesso.js?v=12');
+  if (!window.MTAcesso) await import('/_mtacesso.js?v=13');
   return window.MTAcesso;
 }
 async function chamar(nome, dados) { const A = await modulo(); return A.chamar(nome, dados || {}, MT.user); }
