@@ -438,7 +438,9 @@ document.getElementById('issueDate').textContent=(s=>s.charAt(0).toUpperCase()+s
 const SUG_EMAIL = 'contato@medtechbr.com.br';
 function openSug(){
   const u = window.MT && window.MT.user;
-  const opts = ['Geral / portal'].concat(CATALOGO_LINHA.map(a=>a.nm)).map(n=>`<option>${esc(n)}</option>`).join('');
+  /* só os apps a que a pessoa tem acesso (inclui os de estudo pagos, no MedTech App) */
+  const comAcesso = disponiveis().filter(a => !travado(a.id)).map(a => a.nm);
+  const opts = ['Geral / portal'].concat([...new Set(comAcesso)]).map(n=>`<option>${esc(n)}</option>`).join('');
   const wrap = document.createElement('div'); wrap.className='sug-modal'; wrap.id='sugModal';
   wrap.innerHTML = `<div class="sug-box">
     <h3><i class="ti ti-bulb" aria-hidden="true"></i>Sugerir uma função</h3>
