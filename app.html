@@ -312,6 +312,15 @@ function appItem(a){
     <span class="nm">${fmtName(a.nm)}</span>
   </a>`;
 }
+/* conta de administração: a Administração entra como o primeiro app da grade (abre na mesma janela do app instalado) */
+function itemAdmin(){
+  const u = window.MT && MT.user;
+  if (!u || u.demo || !ACESSO || !ACESSO.mt || !ACESSO.mt.adm) return '';
+  return `<a class="app" href="admin.html" data-id="admin" style="--c:var(--tinta);--t:var(--papel)">
+    <span class="ic"><i class="ti ti-shield-cog" aria-hidden="true"></i></span>
+    <span class="nm">Administração</span>
+  </a>`;
+}
 /* cor do app: círculo na cor dele, com o ícone em branco (ou escuro, no âmbar) */
 function corApp(a){ return a.c ? `--c:${a.c};--t:${a.t||'#fff'}` : ''; }
 let _gradeAnimada=false;
@@ -319,8 +328,8 @@ function renderGrid(){
   const sel = new Set(selecao());
   const lista = disponiveis().filter(a => sel.has(a.id));
   const g = document.getElementById('grid');
-  g.innerHTML = lista.length ? lista.map(appItem).join('')
-    : `<div class="apps-vazio">Nenhum app na sua página ainda.<br><button class="b" onclick="openMeusApps()"><i class="ti ti-layout-grid-add" aria-hidden="true"></i> Escolher apps</button></div>`;
+  g.innerHTML = itemAdmin() + (lista.length ? lista.map(appItem).join('')
+    : `<div class="apps-vazio">Nenhum app na sua página ainda.<br><button class="b" onclick="openMeusApps()"><i class="ti ti-layout-grid-add" aria-hidden="true"></i> Escolher apps</button></div>`);
   /* entrada escalonada só na primeira pintura (os re-render da nuvem não piscam) */
   if (!_gradeAnimada && lista.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) { _gradeAnimada = true; [...g.children].forEach((c,k)=>c.style.setProperty('--i',k)); g.classList.add('anima'); }
   try { localStorage.setItem(CACHE_APPS, JSON.stringify([...sel])); } catch(e){}
@@ -808,13 +817,12 @@ function escolherAppsPlano(){
     } catch (e) { m.className = 'cfg-msg err'; m.textContent = e.message || 'Não foi possível salvar.'; }
   };
 }
-/* faixa sob a saudação: estado do plano em uma linha + atalho da Administração */
+/* faixa sob a saudação: estado do plano em uma linha (a Administração fica na grade de apps) */
 function renderFaixa(){
   const f = document.getElementById('faixa'); if (!f) return;
   const u = window.MT && MT.user;
   if (!u || u.demo || !ACESSO || !ACESSO.venda || ACESSO.falha) { f.innerHTML = ''; return; }
   const P = ACESSO.P, mt = ACESSO.mt || {}, ag = agoraS(), C = [];
-  if (mt.adm) C.push(`<a class="fx adm" href="${ADMIN_URL}"><i class="ti ti-shield-cog" aria-hidden="true"></i>Administração</a>`);
   const linhaIds = new Set(prodDaLinha(P).map(p => p.id));
   const ativos = Object.entries(mt.p || {}).filter(([id, ate]) => ate > ag && (linhaIds.has(id) || MTAcesso.produtoPorId(P, id)?.apps === '*'));
   const pend = pendenteValido(), pendAqui = pend && linhaIds.has(pend.produto);
