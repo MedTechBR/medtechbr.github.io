@@ -68,7 +68,7 @@ const MT = {
      Enquanto nenhum produto do /planos.json tiver checkout, nada é bloqueado. */
   _acesso: null,
   acessoModulo() {
-    if (!MT._acesso) MT._acesso = import('/_mtacesso.js?v=6').then(() => window.MTAcesso).catch(e => { console.warn('MTAcesso indisponível', e); return null; });
+    if (!MT._acesso) MT._acesso = import('/_mtacesso.js?v=7').then(() => window.MTAcesso).catch(e => { console.warn('MTAcesso indisponível', e); return null; });
     return MT._acesso;
   },
   async acessoEstado() { const M = await MT.acessoModulo(); return M && MT.user && !MT.user.demo ? M.estado(MT.user) : null; },
@@ -120,7 +120,9 @@ function injectCSS() {
   .mt-auth .mt-btn:hover{filter:brightness(1.08)}
   .mt-auth .mt-link{background:none;border:none;color:#2B5CE6;font-weight:700;font-size:13.5px;cursor:pointer;margin-top:12px;font-family:inherit;display:block;width:100%}
   .mt-err{color:#C0392B;font-size:13px;margin:2px 0 8px;min-height:16px}
+  .mt-help{font-size:12px;color:#5E646B;margin:-6px 0 11px;line-height:1.4}
   .mt-consent{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:#5E646B;text-align:left;margin:2px 0 12px}
+  .mt-consent input{width:auto;flex:none;margin:2px 0 0;padding:0}
   .mt-consent a{color:#2B5CE6;font-weight:700}
   .mt-legal{margin:18px 0 0;text-align:center;font-size:12px;color:#5E646B}
   .mt-legal a{color:#5E646B;text-decoration:underline;text-underline-offset:2px}
@@ -278,6 +280,8 @@ function authMarkup() {
       <h2 id="mt-h-r">Criar conta</h2>
       <input name="name" type="text" placeholder="Seu nome" aria-label="Seu nome" autocomplete="name" required>
       <input name="email" type="email" placeholder="E-mail" aria-label="E-mail" autocomplete="username" required>
+      <input name="cpf" type="text" inputmode="numeric" placeholder="CPF" aria-label="CPF" aria-describedby="mt-cpf-h" autocomplete="off" spellcheck="false" maxlength="14" required>
+      <p class="mt-help" id="mt-cpf-h">Usamos o CPF para identificar sua conta, nos pagamentos e na nota fiscal. Ele fica guardado só no servidor.</p>
       <input name="password" type="password" placeholder="Senha (mín. 6 caracteres)" aria-label="Senha (mínimo 6 caracteres)" minlength="6" autocomplete="new-password" required>
       <label class="mt-consent"><input type="checkbox" required style="margin-top:2px"><span>Li e aceito os <a href="https://medtechbr.com.br/termos.html" target="_blank" rel="noopener">Termos</a> e a <a href="https://medtechbr.com.br/privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a> (LGPD).</span></label>
       <p class="mt-err" id="mt-err-r" role="alert"></p>
@@ -286,6 +290,21 @@ function authMarkup() {
     </form>
     <p class="mt-legal"><a href="https://medtechbr.com.br/privacidade.html" target="_blank" rel="noopener">Privacidade</a> · <a href="https://medtechbr.com.br/termos.html" target="_blank" rel="noopener">Termos</a></p>
   </div></div>`;
+}
+/* CPF no cadastro (10/10/2026): validação e máscara locais (o _mtacesso.js carrega depois) */
+const soDig = s => String(s == null ? '' : s).replace(/\D/g, '');
+function cpfOk(s) {
+  const c = soDig(s);
+  if (c.length !== 11 || /^(\d)\1{10}$/.test(c)) return false;
+  const dv = n => { let soma = 0; for (let i = 0; i < n; i++) soma += Number(c[i]) * (n + 1 - i); const r = (soma * 10) % 11; return r === 10 ? 0 : r; };
+  return dv(9) === Number(c[9]) && dv(10) === Number(c[10]);
+}
+function fmtCpf(s) {
+  const c = soDig(s).slice(0, 11);
+  if (c.length > 9) return c.slice(0, 3) + '.' + c.slice(3, 6) + '.' + c.slice(6, 9) + '-' + c.slice(9);
+  if (c.length > 6) return c.slice(0, 3) + '.' + c.slice(3, 6) + '.' + c.slice(6);
+  if (c.length > 3) return c.slice(0, 3) + '.' + c.slice(3);
+  return c;
 }
 function errMsg(code) {
   const m = {
@@ -387,10 +406,8 @@ else {
     } catch (e) { MT.ai = async () => { throw new Error("IA MedTech indisponível no momento."); }; MT.aiAudio = async () => { throw new Error("IA MedTech indisponível no momento."); }; MT.aiImage = async () => { throw new Error("IA MedTech indisponível no momento."); }; }
 
     let unsub = null;
-    A.onAuthStateChanged(auth, (u) => {
-      MT.user = u;
-      MT._uid = u ? u.uid : null;
-      if (u) {
+    /* Conta logada: tira a tela de login, confere CPF e acesso e liga os dados. */
+    function entrar(u) {
         const el = document.getElementById('mt-auth'); if (el) { el.remove(); soltaFundo(); }
         injectHomeButton();
         MT.verificarAcesso().catch(e => console.warn('verificação de acesso falhou', e));
@@ -405,6 +422,16 @@ else {
           removeSplash();   // dados chegaram e o app já renderizou → tira o splash
         }, (err) => { console.error(err); MT._emit(MT.localGet()); removeSplash(); });
         setTimeout(removeSplash, 3500);   // rede de segurança (offline / lento)
+    }
+    /* Cadastro em andamento: a conta acabou de nascer, mas o CPF ainda está sendo
+       salvo. A entrada espera (senão o diálogo "Complete seu cadastro" abriria por cima). */
+    MT._cadastroCpf = false;
+    A.onAuthStateChanged(auth, (u) => {
+      MT.user = u;
+      MT._uid = u ? u.uid : null;
+      if (u && MT._cadastroCpf) return;
+      if (u) {
+        entrar(u);
       } else {
         if (unsub) { unsub(); unsub = null; }
         MT._data = undefined;   // nao vaza dado do usuario anterior para a proxima conta
@@ -489,13 +516,46 @@ else {
         try { await A.signInWithEmailAndPassword(auth, loginF.email.value.trim(), loginF.password.value); }
         catch (err) { er.textContent = errMsg(err.code); }
       };
+      regF.cpf.addEventListener('input', () => { const v = fmtCpf(regF.cpf.value); if (v !== regF.cpf.value) regF.cpf.value = v; regF.cpf.removeAttribute('aria-invalid'); });
+      /* Cadastro com CPF (10/10/2026): cria a conta, salva o CPF no servidor (mtCpf) e só
+         então entra. CPF recusado (já é de outra conta) → a conta recém-criada é desfeita e
+         a mensagem aparece aqui. Servidor fora do ar → entra assim mesmo (falha aberta) e o
+         diálogo "Complete seu cadastro" pede o CPF depois. */
       regF.onsubmit = async (e) => {
         e.preventDefault();
         const er = document.getElementById('mt-err-r'); er.textContent = '';
+        const bt = regF.querySelector('button[type="submit"]');
+        const cpf = soDig(regF.cpf.value);
+        if (!cpfOk(cpf)) {
+          regF.cpf.setAttribute('aria-invalid', 'true');
+          er.textContent = cpf.length !== 11 ? 'Digite os 11 números do CPF.' : 'CPF inválido. Confira os números.';
+          regF.cpf.focus(); return;
+        }
+        let cred;
+        MT._cadastroCpf = true; bt.disabled = true;
         try {
-          const cred = await A.createUserWithEmailAndPassword(auth, regF.email.value.trim(), regF.password.value);
-          if (regF.name.value.trim()) { try { await A.updateProfile(cred.user, { displayName: regF.name.value.trim() }); } catch (e2) {} }
-        } catch (err) { er.textContent = errMsg(err.code); }
+          cred = await A.createUserWithEmailAndPassword(auth, regF.email.value.trim(), regF.password.value);
+        } catch (err) { MT._cadastroCpf = false; bt.disabled = false; er.textContent = errMsg(err.code); return; }
+        if (regF.name.value.trim()) { try { await A.updateProfile(cred.user, { displayName: regF.name.value.trim() }); } catch (e2) {} }
+        let recusa = '';
+        try {
+          const M = await MT.acessoModulo();
+          if (M && M.salvarCpf) await M.salvarCpf(cpf, cred.user);
+        } catch (err) {
+          const st = String((err && err.status) || '');
+          if (['INVALID_ARGUMENT', 'ALREADY_EXISTS', 'FAILED_PRECONDITION', 'RESOURCE_EXHAUSTED'].includes(st)) recusa = (err && err.message) || 'CPF recusado.';
+          else console.warn('CPF não salvo no cadastro (o diálogo pede depois):', err && err.message);
+        }
+        if (recusa) {
+          /* desfaz a conta que acabou de nascer, para a pessoa entrar com a dela */
+          try { await cred.user.delete(); } catch (e3) { try { await A.signOut(auth); } catch (e4) {} }
+          MT._cadastroCpf = false; bt.disabled = false;
+          regF.cpf.setAttribute('aria-invalid', 'true');
+          er.textContent = recusa; regF.cpf.focus();
+          return;
+        }
+        MT._cadastroCpf = false; bt.disabled = false;
+        if (auth.currentUser) entrar(auth.currentUser);
       };
     }
     window.__mtMountAuth = mountAuth;

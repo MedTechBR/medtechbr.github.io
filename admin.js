@@ -1,7 +1,9 @@
 /* ============================================================
    admin.js — Administração MedTech (10/10/2026, abertura das vendas)
    Tudo passa pelo servidor (o navegador não decide nada de acesso):
-     mtAdmin  {acao:'painel'|'assinantes'|'pedidos'|'ver'|'conceder'|'revogar'|'teste'|'geracaoIA'|'testeIA'}
+     mtAdmin  {acao:'painel'|'assinantes'|'pedidos'|'ver'|'conceder'|'revogar'|'vincularCpf'|'teste'|'geracaoIA'|'testeIA'}
+              (10/10/2026: ver/revogar por e-mail ou CPF; conceder com lista mista e ilimitado;
+               o servidor só devolve o CPF mascarado, 039.***.***-08)
      mpCheckout / mpCancelar (compra de teste R$ 5)
      mtSinal  {op:'listar', status:'aberta'}
    Se o servidor ainda não tiver as ações novas (painel, assinantes, pedidos),
@@ -14,7 +16,12 @@ const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&a
 const brl = v => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 const brlCurto = v => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', notation: 'compact', maximumFractionDigits: 1 });
 const inteiro = v => Number(v || 0).toLocaleString('pt-BR');
-const dataS = s => s ? new Date(s * 1000).toLocaleDateString('pt-BR') : '—';
+/* acesso ilimitado = vale até 01/01/2100; tudo a partir de 2099 aparece como "ilimitado" */
+const ILIMITADO = 4102444800;
+const ehIlim = s => Number(s) >= ILIMITADO - 366 * 86400;
+const dataS = s => s ? (ehIlim(s) ? 'ilimitado' : new Date(s * 1000).toLocaleDateString('pt-BR')) : '—';
+const soDig = s => String(s == null ? '' : s).replace(/\D/g, '');
+const fmtCpf = s => { const c = soDig(s).slice(0, 11); return c.length > 9 ? c.slice(0, 3) + '.' + c.slice(3, 6) + '.' + c.slice(6, 9) + '-' + c.slice(9) : c.length > 6 ? c.slice(0, 3) + '.' + c.slice(3, 6) + '.' + c.slice(6) : c.length > 3 ? c.slice(0, 3) + '.' + c.slice(3) : c; };
 const quando = iso => iso ? new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—';
 const ddmm = d => d ? d.slice(8, 10) + '/' + d.slice(5, 7) : '';
 const plural = (n, um, varios) => inteiro(n) + ' ' + (Number(n) === 1 ? um : varios);
@@ -38,7 +45,8 @@ const ROTULO = {
   order_approved: 'Compra aprovada (Kiwify)', subscription_renewed: 'Renovação (Kiwify)', order_refunded: 'Reembolso (Kiwify)',
   chargeback: 'Contestação (Kiwify)', mp_assinatura_cancelada: 'Assinatura cancelada', mp_cancelada_pelo_usuario: 'Cancelada pelo assinante',
   subscription_canceled: 'Assinatura cancelada (Kiwify)', subscription_cancelled: 'Assinatura cancelada (Kiwify)',
-  subscription_late: 'Pagamento atrasado (Kiwify)', admin_conceder: 'Liberação manual', admin_revogar: 'Revogação manual'
+  subscription_late: 'Pagamento atrasado (Kiwify)', admin_conceder: 'Liberação manual', admin_revogar: 'Revogação manual',
+  admin_vincular_cpf: 'CPF vinculado pela administração', cpf_pendente_aplicado: 'Liberação por CPF aplicada no cadastro'
 };
 const METODO = { pix: 'Pix', credit_card: 'cartão de crédito', debit_card: 'cartão de débito', ticket: 'boleto', account_money: 'saldo Mercado Pago', bank_transfer: 'transferência' };
 const GATEWAY = { mp: 'Mercado Pago', kiwify: 'Kiwify', admin: 'manual' };
@@ -50,7 +58,7 @@ const E = { planos: null, painel: null, naoPublicado: false, bloqueado: false, c
 /* ---------------- servidor ---------------- */
 async function modulo() {
   if (window.MT && MT.acessoModulo) { const m = await MT.acessoModulo(); if (m) return m; }
-  if (!window.MTAcesso) await import('/_mtacesso.js?v=6');
+  if (!window.MTAcesso) await import('/_mtacesso.js?v=7');
   return window.MTAcesso;
 }
 async function chamar(nome, dados) { const A = await modulo(); return A.chamar(nome, dados || {}, MT.user); }
@@ -200,7 +208,7 @@ function desenharPainel() {
   ks.push(kpi('Reembolsos em 30 dias', 'ti-receipt-refund', v ? inteiro(v.reembolsos.n) : SEM(erro(p.vendas)),
     v ? brl(v.reembolsos.valor) + ' · ' + plural(v.cancelamentos, 'cancelamento', 'cancelamentos') : ''));
   ks.push(kpi('Contas novas em 7 dias', 'ti-user-plus', c ? inteiro(c.contas.d7) : SEM(erro(p.contas)),
-    c ? 'hoje ' + inteiro(c.contas.hoje) + ' · 30 dias ' + inteiro(c.contas.d30) + ' · total ' + inteiro(c.contas.total) : ''));
+    c ? 'hoje ' + inteiro(c.contas.hoje) + ' · 30 dias ' + inteiro(c.contas.d30) + ' · total ' + inteiro(c.contas.total) + (c.contas.comCpf != null ? ' · com CPF ' + inteiro(c.contas.comCpf) : '') : ''));
   $('vgKpis').innerHTML = ks.join('');
 
   desenharGrafico();
@@ -332,6 +340,7 @@ $('btVg').onclick = () => carregarPainel();
    ASSINANTES
    ============================================================ */
 function faltam(ate) {
+  if (ehIlim(ate)) return '<span class="selo ok">sem fim</span>';
   const d = Math.ceil((ate - agoraS()) / 86400);
   if (d < 0) return `<span class="selo err">venceu há ${plural(-d, 'dia', 'dias')}</span>`;
   if (d === 0) return '<span class="selo av">vence hoje</span>';
@@ -363,13 +372,14 @@ function desenharAssinantes(r) {
   if (!r.origensOk) avisos.push('A origem de cada acesso não pôde ser lida agora.');
   if (r.truncado) avisos.push('Há mais de 20 mil contas: a lista considera só as primeiras 20 mil.');
   if (!r.itens.length) {
-    $('asLista').innerHTML = `<p class="vazio">${r.busca || r.produto ? 'Ninguém com esses filtros.' : (r.situacao === 'vencidos' ? 'Nenhum acesso vencido nos últimos 60 dias.' : 'Ainda não há assinantes.')}</p>`;
+    $('asLista').innerHTML = `<p class="vazio">${r.buscaCpf ? 'Nenhum acesso na conta deste CPF (ou o CPF não está cadastrado). Consulte o CPF em Acessos.' : r.busca || r.produto ? 'Ninguém com esses filtros.' : (r.situacao === 'vencidos' ? 'Nenhum acesso vencido nos últimos 60 dias.' : 'Ainda não há assinantes.')}</p>`;
     return;
   }
   const linhas = r.itens.map((x, i) => `<tr>
       <td data-r="E-mail" class="em cheia">${esc(x.email || '(sem e-mail)')}</td>
       <td data-r="Produto">${esc(x.nome || x.produto)}</td>
-      <td data-r="Válido até"><span>${dataS(x.ate)} ${faltam(x.ate)}</span></td>
+      <td data-r="Válido até"><span>${ehIlim(x.ate) ? '<b>ilimitado</b>' : dataS(x.ate) + ' ' + faltam(x.ate)}</span></td>
+      <td data-r="CPF" class="fraco">${x.cpf === true ? 'sim' : x.cpf === false ? '<span class="selo av">não</span>' : '—'}</td>
       <td data-r="Período" class="fraco">${esc(x.periodo || '—')}</td>
       <td data-r="Origem" class="fraco">${esc(origemTxt(x))}</td>
       <td class="acoes"><div class="acoesL">
@@ -379,7 +389,7 @@ function desenharAssinantes(r) {
       </div></td></tr>`).join('');
   $('asLista').innerHTML = (avisos.length ? `<div class="aviso" style="margin-top:12px"><i class="ti ti-info-circle" aria-hidden="true"></i><div>${avisos.map(esc).join(' ')}</div></div>` : '') +
     `<div class="tblw"><table class="tbl resp"><caption class="sr">Assinantes, página ${r.pagina} de ${r.paginas}</caption><thead><tr>
-      <th scope="col">E-mail</th><th scope="col">Produto</th><th scope="col">Válido até</th><th scope="col">Período</th><th scope="col">Origem</th><th scope="col"><span class="sr">Ações</span></th>
+      <th scope="col">E-mail</th><th scope="col">Produto</th><th scope="col">Válido até</th><th scope="col">CPF cadastrado</th><th scope="col">Período</th><th scope="col">Origem</th><th scope="col"><span class="sr">Ações</span></th>
     </tr></thead><tbody>${linhas}</tbody></table></div>
     <div class="pag"><span>${plural(r.total, 'acesso', 'acessos')} · página ${r.pagina} de ${r.paginas}</span>
       <span class="acoesL"><button class="btn btn-g sm" type="button" id="asAnt" ${r.pagina <= 1 ? 'disabled' : ''}><i class="ti ti-chevron-left" aria-hidden="true"></i>Anterior</button>
@@ -396,32 +406,34 @@ function desenharAssinantes(r) {
 }
 function verDetalhes(email) {
   dialogo(email, carregando('Consultando a conta…'));
-  admin({ acao: 'ver', email }).then(r => { $('dlgCorpo').innerHTML = fichaConta(r); })
+  admin({ acao: 'ver', alvo: email }).then(r => { $('dlgCorpo').innerHTML = fichaConta(r); })
     .catch(e => { $('dlgCorpo').innerHTML = avisoErro(e); });
 }
 function maisDias(x) {
-  dialogo('Liberar mais dias', `<p>${esc(x.nome)} para <b>${esc(x.email)}</b>. Hoje vale até ${dataS(x.ate)}.</p>
+  dialogo('Liberar mais dias', `<p>${esc(x.nome)} para <b>${esc(x.email)}</b>. Hoje vale ${ehIlim(x.ate) ? 'sem data de fim (ilimitado)' : 'até ' + dataS(x.ate)}.</p>
     <div class="campo" style="margin-top:12px"><label for="dlgDias">Dias a acrescentar</label><input id="dlgDias" type="number" min="1" max="3660" value="30" inputmode="numeric"></div>
+    <label class="marca-l" style="margin-top:6px"><input type="checkbox" id="dlgIlim"> Tornar ilimitado</label>
     <div class="chips" style="margin-top:10px" role="group" aria-label="Atalhos de dias"><button class="chip" type="button" data-d="7">7</button><button class="chip" type="button" data-d="30">30</button><button class="chip" type="button" data-d="90">90</button><button class="chip" type="button" data-d="365">365</button></div>
     <p class="sub" style="margin-top:10px">Os dias somam a partir do fim do acesso atual. Não gera cobrança.</p>`,
   [{ rot: 'Cancelar', cls: 'btn-g' }, { rot: 'Liberar', cls: 'btn-p', acao: async () => {
-    const dias = Math.floor(Number($('dlgDias').value));
-    if (!(dias >= 1 && dias <= 3660)) { toast('Informe de 1 a 3660 dias.', 'erro'); return false; }
+    const dias = Math.floor(Number($('dlgDias').value)), ilimitado = $('dlgIlim').checked;
+    if (!ilimitado && !(dias >= 1 && dias <= 3660)) { toast('Informe de 1 a 3660 dias.', 'erro'); return false; }
     try {
-      const r = await admin({ acao: 'conceder', emails: [x.email], produto: x.produto, dias });
+      const r = await admin(Object.assign({ acao: 'conceder', alvos: [x.email], produto: x.produto }, ilimitado ? { ilimitado: true } : { dias }));
       const res = (r.resultado || [])[0] || {};
       if (res.erro) { toast('Não liberou: ' + res.erro, 'erro'); return false; }
-      toast('Liberado até ' + dataS(res.ate) + '.', 'ok');
+      toast(ehIlim(res.ate) ? 'Liberado sem data de fim.' : 'Liberado até ' + dataS(res.ate) + '.', 'ok');
       carregarAssinantes();
     } catch (e) { toast('Não liberou: ' + (e.message || e), 'erro'); return false; }
   } }]);
-  $('dlgCorpo').querySelectorAll('[data-d]').forEach(b => b.onclick = () => { $('dlgDias').value = b.dataset.d; });
+  $('dlgCorpo').querySelectorAll('[data-d]').forEach(b => b.onclick = () => { $('dlgDias').value = b.dataset.d; $('dlgIlim').checked = false; $('dlgDias').disabled = false; });
+  $('dlgIlim').onchange = () => { $('dlgDias').disabled = $('dlgIlim').checked; };
 }
 async function revogarLinha(x) {
   const ok = await confirmar('Revogar acesso', `Tirar <b>${esc(x.nome)}</b> de <b>${esc(x.email)}</b>? O acesso sai na hora. Cobrança mensal no Mercado Pago não é cancelada por aqui.`, 'Revogar', true);
   if (!ok) return;
   try {
-    await admin({ acao: 'revogar', email: x.email, produto: x.produto });
+    await admin({ acao: 'revogar', alvo: x.email, produto: x.produto });
     toast('Acesso revogado.', 'ok');
     carregarAssinantes();
   } catch (e) { toast('Não revogou: ' + (e.message || e), 'erro'); }
@@ -437,9 +449,13 @@ function fichaConta(r) {
   if (!r) return '';
   const agora = r.agora || agoraS();
   const prods = Object.entries((r.mt && r.mt.p) || {}).map(([id, ate]) => ({ id, ate, onde: 'conta' }))
-    .concat(Object.entries((r.pendente && r.pendente.p) || {}).map(([id, ate]) => ({ id, ate, onde: 'pendente' })));
+    .concat(Object.entries((r.pendente && r.pendente.p) || {}).map(([id, ate]) => ({ id, ate, onde: 'pendente' })))
+    .concat(Object.entries((r.pendenteCpf && r.pendenteCpf.p) || {}).map(([id, ate]) => ({ id, ate, onde: 'pendente-cpf' })));
+  const ONDE = { conta: 'na conta', pendente: 'pendente (aguarda a conta com este e-mail)', 'pendente-cpf': 'pendente (aguarda o cadastro deste CPF)' };
   const ficha = [
     ['Conta', r.existe ? 'existe' : 'ainda não existe'],
+    ['E-mail', r.email || (r.existe ? '—' : 'nenhuma conta com este CPF')],
+    ['CPF', r.cpf ? r.cpf + (r.temCpf ? '' : ' (sem conta)') : (r.existe ? 'não cadastrado' : '—')],
     ['Criada em', r.criadoEm ? quando(r.criadoEm) : '—'],
     ['E-mail confirmado', r.existe ? (r.emailVerified ? 'sim' : 'não') : '—'],
     ['Acesso agora', r.existe ? (r.ativo ? 'liberado' : 'sem acesso pago') : '—']
@@ -447,7 +463,7 @@ function fichaConta(r) {
   if (r.mt && r.mt.adm) ficha.push(['Perfil', 'administração']);
   if (r.mt && r.mt.t) ficha.push(['Teste grátis', (r.mt.t > agora ? 'até ' : 'terminou em ') + dataS(r.mt.t)]);
   const tabProd = prods.length ? `<div class="tblw"><table class="tbl"><caption>Produtos</caption><thead><tr><th scope="col">Produto</th><th scope="col">Vale até</th><th scope="col">Onde</th></tr></thead><tbody>
-      ${prods.map(p => `<tr><td>${esc(nomeProd(p.id))}</td><td>${dataS(p.ate)} ${faltam(p.ate)}</td><td class="fraco">${p.onde === 'conta' ? 'na conta' : 'pendente (aguarda a conta)'}</td></tr>`).join('')}</tbody></table></div>`
+      ${prods.map(p => `<tr><td>${esc(nomeProd(p.id))}</td><td>${ehIlim(p.ate) ? '<b>ilimitado</b>' : dataS(p.ate) + ' ' + faltam(p.ate)}</td><td class="fraco">${esc(ONDE[p.onde])}</td></tr>`).join('')}</tbody></table></div>`
     : '<p class="sub" style="margin-top:12px">Nenhum produto nesta conta.</p>';
   const peds = (r.pedidos || []);
   const tabPed = peds.length ? `<div class="tblw"><table class="tbl"><caption>Últimos pedidos</caption><thead><tr><th scope="col">Quando</th><th scope="col">Evento</th><th scope="col">Produto</th></tr></thead><tbody>
@@ -458,51 +474,86 @@ function fichaConta(r) {
 }
 $('fVer').addEventListener('submit', async ev => {
   ev.preventDefault();
-  const email = $('vEmail').value.trim();
-  if (!email) return;
+  const alvo = $('vEmail').value.trim();
+  if (!alvo) return;
   const out = $('outVer'); out.innerHTML = carregando('Consultando…');
-  try { out.innerHTML = fichaConta(await admin({ acao: 'ver', email })); }
+  try { out.innerHTML = fichaConta(await admin({ acao: 'ver', alvo })); }
   catch (e) { out.innerHTML = E.bloqueado ? '' : avisoErro(e); }
 });
-const listaEmails = () => [...new Set($('cEmails').value.split(/[\s,;]+/).map(s => s.trim().toLowerCase()).filter(Boolean))];
+/* e-mails e CPFs misturados: separa por linha, vírgula, ponto e vírgula ou espaço
+   (o CPF "000.000.000-00" não tem espaço; e-mail também não) */
+const listaAlvos = () => [...new Set($('cEmails').value.split(/[\s,;]+/).map(s => s.trim()).filter(Boolean)
+  .map(s => s.includes('@') ? s.toLowerCase() : (soDig(s).length === 11 ? fmtCpf(s) : s)))];
+const contaAlvos = l => { const c = l.filter(s => !s.includes('@') && soDig(s).length === 11).length; return { cpfs: c, emails: l.length - c }; };
+function descreveAlvos(l) {
+  const k = contaAlvos(l);
+  return [k.emails ? plural(k.emails, 'e-mail', 'e-mails') : '', k.cpfs ? plural(k.cpfs, 'CPF', 'CPFs') : ''].filter(Boolean).join(' e ');
+}
 $('cEmails').addEventListener('input', () => {
-  const n = listaEmails().length;
-  $('cConta').textContent = n ? plural(n, 'e-mail', 'e-mails') + (n > 200 ? ' (o máximo é 200 por vez)' : '') : 'Um por linha ou separados por vírgula. Até 200 por vez.';
+  const l = listaAlvos();
+  $('cConta').textContent = l.length ? descreveAlvos(l) + (l.length > 200 ? ' (o máximo é 200 por vez)' : '') : 'Um por linha ou separados por vírgula. Pode misturar e-mails e CPFs. Até 200 por vez.';
 });
-document.querySelectorAll('[data-dias]').forEach(b => b.addEventListener('click', () => { $('cDias').value = b.dataset.dias; }));
+function marcaIlim() {
+  const on = $('cIlim').checked;
+  $('cDias').disabled = on;
+  document.querySelector('#fConceder .chips').classList.toggle('off', on);
+}
+$('cIlim').addEventListener('change', marcaIlim);
+document.querySelectorAll('[data-dias]').forEach(b => b.addEventListener('click', () => { $('cDias').value = b.dataset.dias; $('cIlim').checked = false; marcaIlim(); }));
 $('fConceder').addEventListener('submit', async ev => {
   ev.preventDefault();
-  const emails = listaEmails(), prod = $('cProd').value, dias = Math.floor(Number($('cDias').value));
+  const alvos = listaAlvos(), prod = $('cProd').value, dias = Math.floor(Number($('cDias').value)), ilimitado = $('cIlim').checked;
   const out = $('outConceder');
-  if (!emails.length) { out.innerHTML = avisoErro('Informe ao menos um e-mail.'); return; }
-  if (emails.length > 200) { out.innerHTML = avisoErro('No máximo 200 e-mails por vez.'); return; }
-  if (!(dias >= 1 && dias <= 3660)) { out.innerHTML = avisoErro('Informe de 1 a 3660 dias.'); return; }
-  const ok = await confirmar('Liberar acesso', `Liberar <b>${esc(nomeProd(prod))}</b> por <b>${plural(dias, 'dia', 'dias')}</b> para <b>${plural(emails.length, 'e-mail', 'e-mails')}</b>?`, 'Liberar');
+  if (!alvos.length) { out.innerHTML = avisoErro('Informe ao menos um e-mail ou CPF.'); return; }
+  if (alvos.length > 200) { out.innerHTML = avisoErro('No máximo 200 e-mails ou CPFs por vez.'); return; }
+  if (!ilimitado && !(dias >= 1 && dias <= 3660)) { out.innerHTML = avisoErro('Informe de 1 a 3660 dias, ou marque acesso ilimitado.'); return; }
+  const ok = await confirmar('Liberar acesso', `Liberar <b>${esc(nomeProd(prod))}</b> ${ilimitado ? '<b>sem data de fim (ilimitado)</b>' : 'por <b>' + plural(dias, 'dia', 'dias') + '</b>'} para <b>${esc(descreveAlvos(alvos))}</b>?`, 'Liberar');
   if (!ok) return;
   out.innerHTML = carregando('Liberando…');
   try {
-    const r = await admin({ acao: 'conceder', emails, produto: prod, dias });
+    const r = await admin(Object.assign({ acao: 'conceder', alvos, produto: prod }, ilimitado ? { ilimitado: true } : { dias }));
     const res = r.resultado || [];
     const erros = res.filter(x => x.erro).length;
     out.innerHTML = `<div class="aviso ${erros ? '' : 'info'}" style="margin-top:14px"><i class="ti ${erros ? 'ti-alert-triangle' : 'ti-check'}" aria-hidden="true"></i><div>${plural(res.length - erros, 'liberação feita', 'liberações feitas')}${erros ? ', ' + plural(erros, 'com erro', 'com erro') : ''}.</div></div>
-      <div class="tblw"><table class="tbl resp"><thead><tr><th scope="col">E-mail</th><th scope="col">Resultado</th><th scope="col">Vale até</th></tr></thead><tbody>
-      ${res.map(x => `<tr><td data-r="E-mail" class="em cheia">${esc(x.email)}</td><td data-r="Resultado">${x.erro ? `<span class="selo err">${esc(x.erro)}</span>` : (x.destino === 'conta' ? '<span class="selo ok">na conta</span>' : '<span class="selo av">pendente: entra no primeiro login</span>')}</td><td data-r="Vale até">${x.ate ? dataS(x.ate) : '—'}</td></tr>`).join('')}
+      <div class="tblw"><table class="tbl resp"><thead><tr><th scope="col">E-mail ou CPF</th><th scope="col">Resultado</th><th scope="col">Vale até</th></tr></thead><tbody>
+      ${res.map(x => `<tr><td data-r="E-mail ou CPF" class="em cheia">${x.tipo === 'cpf' ? '<span style="white-space:nowrap">' + esc(x.alvo) + '</span>' : esc(x.alvo || x.email)}${x.tipo === 'cpf' && x.email ? '<br><span class="fraco">' + esc(x.email) + '</span>' : ''}</td><td data-r="Resultado">${x.erro ? `<span class="selo err">${esc(x.erro)}</span>` : (x.destino === 'conta' ? '<span class="selo ok">na conta</span>' : `<span class="selo av">${x.tipo === 'cpf' ? 'pendente: aguarda o CPF' : 'pendente: entra no primeiro login'}</span>`)}</td><td data-r="Vale até">${x.ate ? dataS(x.ate) : '—'}</td></tr>`).join('')}
       </tbody></table></div>`;
     E.carregou.assinantes = false; E.carregou.painel = false;
   } catch (e) { out.innerHTML = avisoErro(e); }
 });
 $('fRevogar').addEventListener('submit', async ev => {
   ev.preventDefault();
-  const email = $('rEmail').value.trim(), prod = $('rProd').value, out = $('outRevogar');
-  if (!email) return;
-  const ok = await confirmar('Revogar acesso', `Tirar <b>${esc(nomeProd(prod))}</b> de <b>${esc(email)}</b>? O acesso sai na hora.`, 'Revogar', true);
+  const alvo = $('rEmail').value.trim(), prod = $('rProd').value, out = $('outRevogar');
+  if (!alvo) return;
+  const ehCpf = !alvo.includes('@');
+  const ok = await confirmar('Revogar acesso', `Tirar <b>${esc(nomeProd(prod))}</b> de <b>${esc(ehCpf ? 'CPF ' + fmtCpf(alvo) : alvo)}</b>? O acesso sai na hora.`, 'Revogar', true);
   if (!ok) return;
   out.innerHTML = carregando('Revogando…');
   try {
-    const r = await admin({ acao: 'revogar', email, produto: prod });
-    const onde = [r.conta ? 'da conta' : '', r.pendente ? 'da compra pendente' : ''].filter(Boolean).join(' e ');
-    out.innerHTML = `<div class="aviso info" style="margin-top:14px"><i class="ti ti-check" aria-hidden="true"></i><div>${onde ? 'Revogado ' + onde + '.' : 'Este e-mail não tinha esse produto. Nada mudou.'}</div></div>`;
+    const r = await admin({ acao: 'revogar', alvo, produto: prod });
+    const onde = [r.conta ? 'da conta' + (ehCpf && r.email ? ' ' + r.email : '') : '', r.pendente ? 'da liberação pendente' : ''].filter(Boolean).join(' e ');
+    out.innerHTML = `<div class="aviso info" style="margin-top:14px"><i class="ti ti-check" aria-hidden="true"></i><div>${onde ? 'Revogado ' + esc(onde) + '.' : (ehCpf ? 'Este CPF' : 'Este e-mail') + ' não tinha esse produto. Nada mudou.'}</div></div>`;
     E.carregou.assinantes = false; E.carregou.painel = false;
+  } catch (e) { out.innerHTML = avisoErro(e); }
+});
+
+$('vcCpf').addEventListener('input', () => { const v = fmtCpf($('vcCpf').value); if (v !== $('vcCpf').value) $('vcCpf').value = v; });
+$('fVincular').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const email = $('vcEmail').value.trim(), cpf = $('vcCpf').value.trim(), motivo = $('vcMotivo').value.trim(), out = $('outVincular');
+  if (!email || !cpf) return;
+  if (soDig(cpf).length !== 11) { out.innerHTML = avisoErro('O CPF precisa dos 11 números.'); return; }
+  if (motivo.length < 5) { out.innerHTML = avisoErro('Escreva o motivo: ele fica registrado.'); return; }
+  const ok = await confirmar('Vincular CPF', `Vincular o CPF <b>${esc(fmtCpf(cpf))}</b> à conta <b>${esc(email)}</b>? Se ele estiver em outra conta, sai de lá. Se esta conta tiver outro CPF, o antigo fica livre.`, 'Vincular');
+  if (!ok) return;
+  out.innerHTML = carregando('Vinculando…');
+  try {
+    const r = await admin({ acao: 'vincularCpf', alvo: email, cpf, motivo });
+    const det = r.jaEstava ? 'Este CPF já era desta conta. Nada mudou.'
+      : 'CPF ' + r.cpf + ' vinculado a ' + r.email + '.' + (r.transferidoDe ? ' Saiu da conta ' + r.transferidoDe + '.' : '') + (r.cpfAnterior ? ' O CPF anterior (' + r.cpfAnterior + ') ficou livre.' : '') + (r.pendenteAplicado ? ' A liberação pendente deste CPF foi aplicada.' : '');
+    out.innerHTML = `<div class="aviso info" style="margin-top:14px"><i class="ti ti-check" aria-hidden="true"></i><div>${esc(det)}</div></div>`;
+    $('vcMotivo').value = '';
+    E.carregou.assinantes = false; E.carregou.pedidos = false;
   } catch (e) { out.innerHTML = avisoErro(e); }
 });
 
@@ -528,7 +579,7 @@ async function carregarPedidos() {
         <td data-r="Quando" class="fraco">${quando(x.em)}</td>
         <td data-r="Evento"><span class="selo ${SELO_TIPO[x.tipo] || ''}">${esc(x.tipo === 'revisar' ? 'A revisar' : x.rotulo)}</span>${x.teste ? ' <span class="selo">teste</span>' : ''}${x.ok ? '' : ' <span class="selo av" title="O servidor ainda não terminou de aplicar este pedido; o Mercado Pago reenvia.">em processamento</span>'}</td>
         <td data-r="Produto">${esc(x.nome || '—')}${x.periodo ? ' <span class="fraco">(' + esc(/^\d+d$/.test(x.periodo) ? x.periodo.slice(0, -1) + ' dias' : x.periodo) + ')</span>' : ''}</td>
-        <td data-r="E-mail" class="em">${esc(x.email || '—')}</td>
+        <td data-r="E-mail" class="em">${esc(x.email || (x.cpf ? 'CPF ' + x.cpf : '—'))}${x.email && x.cpf ? '<br><span class="fraco">CPF ' + esc(x.cpf) + '</span>' : ''}${x.motivo ? '<br><span class="fraco">Motivo: ' + esc(x.motivo) + '</span>' : ''}</td>
         <td data-r="Valor" class="n">${x.valor === null ? '—' : (x.estimado ? '<span title="Estimado pelo preço do catálogo">≈ </span>' : '') + brl(x.valor)}</td>
         <td data-r="Meio" class="fraco">${esc(GATEWAY[x.gateway] || x.gateway)}${x.metodo ? ' · ' + esc(METODO[x.metodo] || x.metodo) : ''}${x.pagamento ? `<br><span title="Número do pagamento no Mercado Pago">nº ${esc(x.pagamento)}</span>` : ''}${x.por ? `<br>por ${esc(x.por)}` : ''}</td>
       </tr>`).join('')}</tbody></table></div>

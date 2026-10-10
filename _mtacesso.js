@@ -18,6 +18,8 @@
    Um link https no checkout continua funcionando como antes (Kiwify).
    Falha de rede ou do servidor também não bloqueia (falha aberta): a trava
    existe para quem não pagou, não para punir quem pagou quando a rede cai.
+   CPF (10/10/2026): conta sem CPF cadastrado (claim mt sem c) vê o diálogo
+   "Complete seu cadastro" antes do app (garantirCpf/pedirCpf, função mtCpf).
    ============================================================ */
 (function () {
 'use strict';
@@ -504,9 +506,155 @@ function paywall(o) {
   });
 }
 
+/* ---------------- CPF da conta (10/10/2026) ----------------
+   O CPF identifica o cliente (pagamento, nota fiscal, liberação pelo painel).
+   Fica só no servidor (função mtCpf); o token traz só o marcador mt.c = 1.
+   Conta sem o marcador: depois do login e antes do app, o diálogo "Complete
+   seu cadastro" pede o CPF. Esc não fecha. Admin é dispensado. Falha do
+   servidor (inclusive função ainda não publicada) libera: falha aberta. */
+var ILIMITADO = 4102444800, LIMIAR_ILIMITADO = ILIMITADO - 366 * DIA;
+function ehIlimitado(ate) { return num(ate) >= LIMIAR_ILIMITADO; }
+/* "até 12/03/2027" ou "ilimitado" */
+function validade(ate) { return ehIlimitado(ate) ? 'ilimitado' : dataBR(ate); }
+function soDigitos(s) { return String(s == null ? '' : s).replace(/\D/g, ''); }
+function cpfValido(s) {
+  var c = soDigitos(s);
+  if (c.length !== 11 || /^(\d)\1{10}$/.test(c)) return false;
+  function dv(n) { var soma = 0; for (var i = 0; i < n; i++) soma += Number(c[i]) * (n + 1 - i); var r = (soma * 10) % 11; return r === 10 ? 0 : r; }
+  return dv(9) === Number(c[9]) && dv(10) === Number(c[10]);
+}
+/* 000.000.000-00 enquanto digita */
+function formatarCpf(s) {
+  var c = soDigitos(s).slice(0, 11);
+  if (c.length > 9) return c.slice(0, 3) + '.' + c.slice(3, 6) + '.' + c.slice(6, 9) + '-' + c.slice(9);
+  if (c.length > 6) return c.slice(0, 3) + '.' + c.slice(3, 6) + '.' + c.slice(6);
+  if (c.length > 3) return c.slice(0, 3) + '.' + c.slice(3);
+  return c;
+}
+/* liga a máscara num campo de CPF (cursor no fim; apagar continua natural) */
+function mascararCampoCpf(inp) {
+  if (!inp || inp._mtCpf) return; inp._mtCpf = true;
+  inp.addEventListener('input', function () { var v = formatarCpf(inp.value); if (v !== inp.value) inp.value = v; });
+}
+/* erros de regra (o que a pessoa precisa corrigir) × falha do servidor (libera) */
+var ERROS_CPF = ['INVALID_ARGUMENT', 'ALREADY_EXISTS', 'FAILED_PRECONDITION', 'RESOURCE_EXHAUSTED', 'invalid-argument', 'already-exists', 'failed-precondition', 'resource-exhausted'];
+function erroDeRegraCpf(e) { return !!e && ERROS_CPF.indexOf(String(e.status || '')) > -1; }
+function salvarCpf(cpf, user) {
+  return chamar('mtCpf', { cpf: soDigitos(cpf) }, user).then(function (r) {
+    return user.getIdToken(true).then(function () { return r; }, function () { return r; });
+  });
+}
+function cssCpf() {
+  css();
+  if (document.getElementById('mtcpf-css')) return;
+  var s = document.createElement('style'); s.id = 'mtcpf-css';
+  s.textContent = '.mta.mtcpf{z-index:99996}.mtcpf .mta-c{max-width:440px}'
+   + '.mtcpf label{display:block;font-size:14px;font-weight:600;color:#1F2329;margin:18px 0 6px}'
+   + '.mtcpf input{width:100%;min-height:48px;padding:10px 14px;border:1.5px solid #8A919A;border-radius:12px;background:#fff;color:#1F2329;font:500 18px Inter,system-ui,sans-serif;letter-spacing:.02em}'
+   + '.mtcpf input:focus{outline:3px solid #1E4FCB;outline-offset:2px;border-color:#1E4FCB}.mtcpf input[aria-invalid="true"]{border-color:#B42318}'
+   + '.mtcpf [hidden]{display:none!important}.mtcpf .mta-r .bt{flex:1 1 100%}.mtcpf .mta-m.e{background:#FDECEA;border-radius:12px;padding:10px 12px}';
+  document.head.appendChild(s);
+}
+/* o = {user, signOut, fechavel, email} → Promise<{ok:true, r} | {adiado:true} | {fechado:true}> */
+function pedirCpf(o) {
+  return new Promise(function (resolver) {
+    cssCpf();
+    var antigo = document.getElementById('mtcpf'); if (antigo) antigo.remove();
+    var user = o.user, email = o.email || (user && user.email) || '';
+    var volta = document.activeElement, overflowAntes = document.documentElement.style.overflow, enviando = false, fim = false;
+    var d = document.createElement('div'); d.className = 'mta mtcpf'; d.id = 'mtcpf';
+    d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-labelledby', 'mtcpf-h'); d.setAttribute('aria-describedby', 'mtcpf-d');
+    d.innerHTML = '<div class="mta-c"><p class="mta-k">Conta MedTech</p>' +
+      '<h2 id="mtcpf-h" tabindex="-1">' + (o.fechavel ? 'Cadastrar CPF' : 'Complete seu cadastro') + '</h2>' +
+      '<p id="mtcpf-d">Usamos o CPF para identificar sua conta, nos pagamentos e na nota fiscal. Ele fica guardado só no servidor.</p>' +
+      '<form novalidate><label for="mtcpf-i">CPF</label>' +
+      '<input id="mtcpf-i" name="cpf" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" maxlength="14" placeholder="000.000.000-00" aria-describedby="mtcpf-m" required>' +
+      '<div class="mta-m" id="mtcpf-m" role="status" aria-live="polite"></div>' +
+      '<div class="mta-r"><button type="submit" class="bt s">Salvar e continuar</button></div></form>' +
+      '<div class="mta-r" data-adiar hidden><button type="button" class="bt g" data-acao="adiar">Continuar e completar depois</button></div>' +
+      (email ? '<p class="mta-who">Conta: ' + esc(email) + '</p>' : '') +
+      '<div class="mta-f"><a href="' + AJUDA_URL + '" target="_blank" rel="noopener">Dúvidas</a>' +
+      (o.fechavel ? '<button type="button" data-acao="fechar">Agora não</button>' : '') +
+      (o.signOut ? '<button type="button" data-acao="sair">Sair da conta</button>' : '') + '</div></div>';
+    Array.prototype.forEach.call(document.body.children, function (el) {
+      if (el !== d && el.nodeType === 1 && el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE' && !el.inert) { el.inert = true; el.setAttribute('data-mtcpf-inert', ''); }
+    });
+    document.body.appendChild(d); document.documentElement.style.overflow = 'hidden';
+    var form = d.querySelector('form'), inp = d.querySelector('#mtcpf-i'), msg = d.querySelector('#mtcpf-m'), bt = form.querySelector('button');
+    mascararCampoCpf(inp);
+    setTimeout(function () { try { inp.focus({ preventScroll: true }); } catch (e) {} }, 40);
+    function aviso(t, erro) { msg.textContent = t; msg.className = 'mta-m' + (erro ? ' e' : ''); msg.setAttribute('role', erro ? 'alert' : 'status'); }
+    function fechar(res) {
+      if (fim) return; fim = true;
+      d.remove(); document.documentElement.style.overflow = overflowAntes;
+      Array.prototype.forEach.call(document.querySelectorAll('[data-mtcpf-inert]'), function (el) { el.inert = false; el.removeAttribute('data-mtcpf-inert'); });
+      if (volta && document.contains(volta)) { try { volta.focus({ preventScroll: true }); } catch (e) {} }
+      resolver(res);
+    }
+    d.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); if (o.fechavel && !enviando) fechar({ fechado: true }); return; }
+      if (e.key !== 'Tab') return;
+      var f = Array.prototype.filter.call(d.querySelectorAll('a[href],button:not([disabled]),input:not([disabled])'), function (x) { return x.offsetParent !== null; });
+      if (!f.length) { e.preventDefault(); return; }
+      var pri = f[0], ult = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === pri) { e.preventDefault(); ult.focus(); }
+      else if (!e.shiftKey && document.activeElement === ult) { e.preventDefault(); pri.focus(); }
+    });
+    d.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-acao]'); if (!b) return;
+      if (b.dataset.acao === 'sair' && o.signOut) { o.signOut(); return; }
+      if (b.dataset.acao === 'fechar' && !enviando) fechar({ fechado: true });
+      if (b.dataset.acao === 'adiar') fechar({ adiado: true });
+    });
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (enviando) return;
+      var c = soDigitos(inp.value);
+      if (c.length !== 11) { inp.setAttribute('aria-invalid', 'true'); aviso('Digite os 11 números do CPF.', true); inp.focus(); return; }
+      if (!cpfValido(c)) { inp.setAttribute('aria-invalid', 'true'); aviso('CPF inválido. Confira os números.', true); inp.focus(); return; }
+      inp.removeAttribute('aria-invalid');
+      enviando = true; bt.disabled = true; aviso('Salvando…');
+      salvarCpf(c, user).then(function (r) {
+        enviando = false; fechar({ ok: true, r: r });
+      }, function (e2) {
+        enviando = false; bt.disabled = false;
+        if (erroDeRegraCpf(e2)) { inp.setAttribute('aria-invalid', /CPF/.test(e2.message || '') ? 'true' : 'false'); aviso(e2.message || 'Não foi possível salvar o CPF.', true); inp.focus(); return; }
+        /* servidor fora do ar: não prende ninguém do lado de fora */
+        aviso('Não conseguimos salvar agora. Você pode continuar e completar o cadastro depois.', true);
+        d.querySelector('[data-adiar]').hidden = false;
+        try { d.querySelector('[data-acao="adiar"]').focus(); } catch (e3) {}
+      });
+    });
+  });
+}
+/* Depois do login: conta sem CPF (claim sem c) recebe o diálogo. Uma vez por página. */
+var _cpfEmCurso = null;
+function garantirCpf(user, signOut) {
+  if (!user || user.demo) return Promise.resolve({ ok: true });
+  if (_cpfEmCurso) return _cpfEmCurso;
+  _cpfEmCurso = lerMt(user, false).catch(function () { return null; }).then(function (mt) {
+    if (mt && (mt.c || mt.adm)) return { ok: true, motivo: mt.c ? 'cpf' : 'admin' };
+    return chamar('mtCpf', { ver: true }, user).then(function (s) {
+      if (s && s.temCpf) return user.getIdToken(true).then(function () { return { ok: true, motivo: 'cpf' }; }, function () { return { ok: true, motivo: 'cpf' }; });
+      if (s && s.dispensa) return { ok: true, motivo: 'admin' };
+      if (!s || typeof s.temCpf !== 'boolean') return { ok: true, motivo: 'falha-aberta' };
+      return pedirCpf({ user: user, signOut: signOut });
+    });
+  }).catch(function (e) {
+    console.warn('MTAcesso: CPF não conferido agora (falha aberta):', e && e.message);
+    return { ok: true, motivo: 'falha-aberta' };
+  }).then(function (r) { _cpfEmCurso = null; return r; });
+  return _cpfEmCurso;
+}
+
 /* ---------------- verificação de entrada no app ---------------- */
-/* o = {appId, user, signOut, onOk}. Resolve com {ok, motivo}. */
+/* o = {appId, user, signOut, onOk}. Resolve com {ok, motivo}.
+   Primeiro o CPF (conta sem CPF completa o cadastro), depois o acesso. */
 function verificar(o) {
+  if (!o.user) return Promise.resolve({ ok: true, motivo: 'portal' });
+  return garantirCpf(o.user, o.signOut).catch(function () { return null; }).then(function () { return verificarAcesso(o); });
+}
+function verificarAcesso(o) {
   var app = o.appId;
   if (!o.user || PORTAIS.indexOf(app) > -1) return Promise.resolve({ ok: true, motivo: 'portal' });
   var voltouDoPagamento = /[?&]pago=1\b/.test(location.search);
@@ -541,6 +689,9 @@ function estado(user) {
   });
 }
 
-G.MTAcesso = { versao: 4, NOMES: NOMES, linhaDoApp: linhaDoApp, cobre: cobre, vendaAtiva: vendaAtiva, algumaVendaAtiva: algumaVendaAtiva, vagas: vagas, escolhidos: escolhidos, liberado: liberado, acessoAtivoQualquer: acessoAtivoQualquer, produtoPorId: produtoPorId, produtosQueCobrem: produtosQueCobrem,
-  carregarPlanos: carregarPlanos, chamar: chamar, lerMt: lerMt, checkoutUrl: checkoutUrl, viaMP: viaMP, opcoes: opcoes, comprar: comprar, ehCartao: ehCartao, assinarCartao: assinarCartao, irPara: irPara, paywall: paywall, fechar: fechar, verificar: verificar, estado: estado, brl: brl, dataBR: dataBR, anualPorMes: anualPorMes, economiaAnual: economiaAnual, appsDoProduto: appsDoProduto, AJUDA_URL: AJUDA_URL, _limparCache: function () { cacheP = null; } };
+G.MTAcesso = { versao: 5, NOMES: NOMES, linhaDoApp: linhaDoApp, cobre: cobre, vendaAtiva: vendaAtiva, algumaVendaAtiva: algumaVendaAtiva, vagas: vagas, escolhidos: escolhidos, liberado: liberado, acessoAtivoQualquer: acessoAtivoQualquer, produtoPorId: produtoPorId, produtosQueCobrem: produtosQueCobrem,
+  carregarPlanos: carregarPlanos, chamar: chamar, lerMt: lerMt, checkoutUrl: checkoutUrl, viaMP: viaMP, opcoes: opcoes, comprar: comprar, ehCartao: ehCartao, assinarCartao: assinarCartao, irPara: irPara, paywall: paywall, fechar: fechar, verificar: verificar, estado: estado, brl: brl, dataBR: dataBR, anualPorMes: anualPorMes, economiaAnual: economiaAnual, appsDoProduto: appsDoProduto, AJUDA_URL: AJUDA_URL,
+  /* CPF e acesso ilimitado (10/10/2026) */
+  cpfValido: cpfValido, formatarCpf: formatarCpf, mascararCampoCpf: mascararCampoCpf, pedirCpf: pedirCpf, salvarCpf: salvarCpf, garantirCpf: garantirCpf, erroDeRegraCpf: erroDeRegraCpf, ILIMITADO: ILIMITADO, ehIlimitado: ehIlimitado, validade: validade,
+  _limparCache: function () { cacheP = null; } };
 })();

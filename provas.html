@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="MedTech Provas">
 <script>window.MT_APP={id:"portal-provas",name:"MedTech Provas",linha:"provas"};</script>
 <script src="_mtfb.js?v=1"></script>
-<script type="module" src="_mtauth.js?v=36"></script>
+<script type="module" src="_mtauth.js?v=37"></script>
 <style>
 /* ============================================================
    Portal no tema vivo (23/09/2026), modelo ClínicaMed "camada viva".
@@ -77,6 +77,7 @@ footer a{text-decoration:none;display:inline-block;padding:10px 2px}
 
 /* ---------- modais ---------- */
 .sug-modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;z-index:80}
+.cfg-cpf{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}.cfg-cpf .lbl{flex:0 0 100%;display:block;font-weight:600;font-size:13px;margin:12px 0 2px;color:var(--tinta2)}.cfg-cpf .val{font-size:16px;font-weight:600;letter-spacing:.02em;color:var(--tinta)}.cfg-cpf .as-mini{flex:1 1 100%;margin-top:2px}.cfg-cpf .b{margin-top:6px}
 .sug-box{padding:24px;max-width:480px;width:100%;max-height:92vh;overflow:auto}
 .sug-box h3{margin-bottom:6px;font-weight:700;font-size:19px;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
 .sug-box h3 .ti{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--acSup);color:var(--acInk);font-size:19px;flex:0 0 auto}
@@ -421,6 +422,7 @@ function openCfg(){
       <div class="desc">Seu nome aparece em todos os apps MedTech.</div>
       <label for="cfgNome">Nome</label><input id="cfgNome" value="${esc(u.displayName||'')}" placeholder="Seu nome">
       <label for="cfgEmail">E-mail (login)</label><input id="cfgEmail" value="${esc(u.email||'')}" disabled style="opacity:.65">
+      <div class="cfg-cpf" id="cfgCpf" aria-live="polite"><span class="lbl">CPF</span><span class="as-txt">Consultando…</span></div>
       <label for="cfgFone">Telefone / WhatsApp</label><input id="cfgFone" value="${esc(perfil.fone||'')}" placeholder="(11) 99999-9999">
       <label for="cfgCrm">CRM</label><input id="cfgCrm" value="${esc(perfil.crm||'')}" placeholder="Ex.: 123456/SP">
       <label for="cfgEsp">Especialidade</label><input id="cfgEsp" value="${esc(perfil.esp||'')}" placeholder="Ex.: Clínica Médica">
@@ -447,6 +449,21 @@ function openCfg(){
   wrap.onclick = e => { if (e.target===wrap) closeCfg(); };
   document.body.appendChild(wrap);
   preencheAssinatura();
+  preencheCpf();
+}
+/* CPF da conta (10/10/2026): vem do servidor já mascarado (mtCpf {ver}); nunca fica no aparelho */
+async function preencheCpf(){
+  const el = document.getElementById('cfgCpf'); if (!el || !window.MTAcesso || !MT.user) return;
+  const lin = h => { el.innerHTML = '<span class="lbl">CPF</span>' + h; };
+  try {
+    const s = await MTAcesso.chamar('mtCpf', { ver: true }, MT.user);
+    if (s && s.temCpf) { lin(`<span class="val">${esc(s.cpf)}</span><span class="as-mini">Para trocar o CPF, fale com <a href="mailto:${SUPORTE_EMAIL}?subject=${encodeURIComponent('Trocar CPF da conta MedTech')}">${SUPORTE_EMAIL}</a>.</span>`); return; }
+    lin('<span class="as-mini">Ainda não cadastrado. Usamos o CPF para identificar sua conta, nos pagamentos e na nota fiscal.</span><button type="button" class="b ok" id="btCpf">Cadastrar CPF</button>');
+    document.getElementById('btCpf').onclick = async () => {
+      const r = await MTAcesso.pedirCpf({ user: MT.user, fechavel: true });
+      if (r && r.ok) preencheCpf();
+    };
+  } catch(e) { lin('<span class="as-mini">Não foi possível consultar o CPF agora.</span>'); }
 }
 function closeCfg(){ const m=document.getElementById('cfgModal'); if (m) m.remove(); }
 async function salvarPerfil(){
@@ -623,6 +640,8 @@ const RECIBOS_URL = 'https://www.mercadopago.com.br/activities';
 const ADMIN_URL = 'admin.html';
 const brl = v => Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 const dataBR = s => new Date(s * 1000).toLocaleDateString('pt-BR');
+/* acesso ilimitado liberado pela administração: vale até 01/01/2100 (exibido "ilimitado") */
+const ehIlim = ate => Number(ate) >= 4102444800 - 366 * 86400;
 const agoraS = () => Math.floor(Date.now() / 1000);
 let ASSIN_MP = null;          // null = não carregado; {lista:[...]} depois
 let ASSIN_MP_CARREGANDO = false;
@@ -674,8 +693,8 @@ function preencheAssinatura(){
     const anualOp = MTAcesso.opcoes(P, p).find(o => o.periodo === 'anual' && !o.modo);
     if (ate > ag) {
       ativos.add(id);
-      let linha2 = rec ? `Mensal no cartão · ${rec.status === 'paused' ? 'pausada' : (rec.proximo ? 'renova em <b>' + dataBR(rec.proximo) + '</b>' : 'renova todo mês')}.` : `Ativo até <b>${dataBR(ate)}</b> · sem renovação automática.`;
-      const longo = ate - ag > 60 * 86400;
+      let linha2 = rec ? `Mensal no cartão · ${rec.status === 'paused' ? 'pausada' : (rec.proximo ? 'renova em <b>' + dataBR(rec.proximo) + '</b>' : 'renova todo mês')}.` : (ehIlim(ate) ? 'Acesso <b>ilimitado</b>, liberado pela MedTech · sem cobrança.' : `Ativo até <b>${dataBR(ate)}</b> · sem renovação automática.`);
+      const longo = ate - ag > 60 * 86400 && !ehIlim(ate);
       if (rec && longo) linha2 += ' Você tem também um período pago longo. Se já pagou o anual, cancele a mensal para não pagar duas vezes.';
       const bts = [];
       if (rec && anualOp && !longo) { const i = OPS.push(anualOp) - 1; bts.push(`<button type="button" class="b ok" data-op="${i}" data-troca="1">Trocar para o anual · ${esc(brl(anualOp.preco))}</button>`); }
@@ -695,7 +714,7 @@ function preencheAssinatura(){
     B.push(`<div class="as-of"><h5>${nadaAtivo ? 'Assinar' : 'Outros planos'}</h5>${aVenda.map(p => htmlOferta(P, p)).join('')}
       <p class="as-mini">Mensal: cartão de crédito, renova sozinho todo mês. Anual: Pix, cartão em até 12x ou boleto, pagamento único.</p></div>`);
   }
-  const temCompra = donos.some(([id, ate]) => ate > ag && !MTAcesso.produtoPorId(P, id).interno) || !!pend;
+  const temCompra = donos.some(([id, ate]) => ate > ag && !ehIlim(ate) && !MTAcesso.produtoPorId(P, id).interno) || !!pend;
   B.push(`<div class="as-links">
     <a class="b cancel" href="${RECIBOS_URL}" target="_blank" rel="noopener"><i class="ti ti-receipt" aria-hidden="true"></i>Ver recibos e pagamentos</a>
     ${temCompra ? `<button type="button" class="b cancel" onclick="pedirDesistencia()"><i class="ti ti-arrow-back-up" aria-hidden="true"></i>Desistir em até 7 dias (reembolso total)</button>` : ''}
@@ -799,7 +818,7 @@ function renderFaixa(){
   const linhaIds = new Set(prodDaLinha(P).map(p => p.id));
   const ativos = Object.entries(mt.p || {}).filter(([id, ate]) => ate > ag && (linhaIds.has(id) || MTAcesso.produtoPorId(P, id)?.apps === '*'));
   const pend = pendenteValido(), pendAqui = pend && linhaIds.has(pend.produto);
-  if (ativos.length) ativos.slice(0, 2).forEach(([id, ate]) => C.push(`<button type="button" class="fx ok" onclick="openAssinatura()"><i class="ti ti-circle-check" aria-hidden="true"></i>${esc(nomeProd(P, id))} · até ${dataBR(ate)}</button>`));
+  if (ativos.length) ativos.slice(0, 2).forEach(([id, ate]) => C.push(`<button type="button" class="fx ok" onclick="openAssinatura()"><i class="ti ti-circle-check" aria-hidden="true"></i>${esc(nomeProd(P, id))} · ${ehIlim(ate) ? 'ilimitado' : 'até ' + dataBR(ate)}</button>`));
   if (pendAqui) C.push(`<button type="button" class="fx pend" onclick="openAssinatura()"><i class="ti ti-hourglass" aria-hidden="true"></i>Pagamento pendente</button>`);
   if (!ativos.length && !pendAqui && !mt.adm && linhaIds.size) C.push(`<button type="button" class="fx cta" onclick="openAssinatura()"><i class="ti ti-credit-card" aria-hidden="true"></i>${LINHA === 'provas' ? 'Ver planos' : 'Assinar o MedTech App'}</button>`);
   f.innerHTML = C.join('');

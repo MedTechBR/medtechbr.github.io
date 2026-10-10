@@ -12,9 +12,9 @@
      algo: o servidor (mtAdmin, mpCheckout, mtSinal) confere o e-mail a cada chamada. -->
 <script>window.MT_APP={id:"admin",name:"Administração",linha:"admin"};</script>
 <script src="_mtfb.js?v=1"></script>
-<script type="module" src="_mtauth.js?v=36"></script>
+<script type="module" src="_mtauth.js?v=37"></script>
 <link rel="stylesheet" href="_mtviva.css?v=2">
-<link rel="stylesheet" href="admin.css?v=2">
+<link rel="stylesheet" href="admin.css?v=3">
 </head>
 <body>
 <a class="sr" href="#conteudo">Pular para o conteúdo</a>
@@ -84,7 +84,7 @@
       <div id="asAviso"></div>
       <div class="card">
         <form class="linhaC" id="asFiltros" role="search" onsubmit="return false">
-          <div class="campo"><label for="asBusca">Buscar por e-mail</label><input id="asBusca" type="search" autocomplete="off" spellcheck="false" placeholder="parte do e-mail"></div>
+          <div class="campo"><label for="asBusca">Buscar por e-mail ou CPF</label><input id="asBusca" type="search" autocomplete="off" spellcheck="false" placeholder="parte do e-mail ou o CPF inteiro"></div>
           <div class="campo"><label for="asProd">Produto</label><select id="asProd"><option value="">Todos</option></select></div>
           <div class="campo"><label for="asSit">Situação</label><select id="asSit"><option value="ativos">Com acesso vigente</option><option value="vencidos">Vencidos (até 60 dias)</option><option value="todos">Todos</option></select></div>
           <div class="campo"><label for="asOrdem">Ordem</label><select id="asOrdem"><option value="vence">Vence primeiro</option><option value="email">E-mail (A a Z)</option></select></div>
@@ -95,11 +95,11 @@
 
     <!-- ===================== ACESSOS ===================== -->
     <section class="sec" id="acessos" data-painel aria-labelledby="h-ac" hidden>
-      <div class="cab"><div><h2 id="h-ac">Acessos</h2><p class="lead">Consultar uma conta, liberar acesso manual (equipes, residências, instituições, cortesias) e revogar.</p></div></div>
+      <div class="cab"><div><h2 id="h-ac">Acessos</h2><p class="lead">Consultar uma conta por e-mail ou CPF, liberar acesso manual (equipes, residências, instituições, cortesias), revogar e corrigir o CPF de uma conta.</p></div></div>
       <div class="card">
         <h3><i class="ti ti-search" aria-hidden="true"></i>Consultar uma conta</h3>
         <form class="linhaC" id="fVer" style="margin-top:12px">
-          <div class="campo"><label for="vEmail">E-mail</label><input id="vEmail" type="email" autocomplete="off" spellcheck="false" placeholder="pessoa@exemplo.com" required></div>
+          <div class="campo"><label for="vEmail">E-mail ou CPF</label><input id="vEmail" type="text" autocomplete="off" spellcheck="false" placeholder="pessoa@exemplo.com ou 000.000.000-00" required></div>
           <div><button class="btn btn-p" type="submit"><i class="ti ti-search" aria-hidden="true"></i>Consultar</button></div>
         </form>
         <div id="outVer" aria-live="polite"></div>
@@ -107,13 +107,14 @@
       <div class="grade2">
         <div class="card">
           <h3><i class="ti ti-gift" aria-hidden="true"></i>Liberar acesso</h3>
-          <p class="sub">Conta que ainda não existe fica pendente e recebe o acesso no primeiro login com esse e-mail.</p>
+          <p class="sub">E-mail ou CPF sem conta fica pendente: o e-mail recebe o acesso no primeiro login; o CPF, quando alguém cadastrar esse CPF.</p>
           <form id="fConceder" style="display:flex;flex-direction:column;gap:12px;margin-top:12px">
-            <div class="campo"><label for="cEmails">E-mails</label><textarea id="cEmails" spellcheck="false" placeholder="residente1@exemplo.com&#10;residente2@exemplo.com" aria-describedby="cConta"></textarea><span class="ajuda" id="cConta">Um por linha ou separados por vírgula. Até 200 por vez.</span></div>
+            <div class="campo"><label for="cEmails">E-mails ou CPFs</label><textarea id="cEmails" spellcheck="false" placeholder="residente1@exemplo.com&#10;000.000.000-00" aria-describedby="cConta"></textarea><span class="ajuda" id="cConta">Um por linha ou separados por vírgula. Pode misturar e-mails e CPFs. Até 200 por vez.</span></div>
             <div class="linhaC">
               <div class="campo"><label for="cProd">Produto</label><select id="cProd"></select></div>
               <div class="campo"><label for="cDias">Dias</label><input id="cDias" type="number" min="1" max="3660" value="30" inputmode="numeric"></div>
             </div>
+            <label class="marca-l"><input type="checkbox" id="cIlim"> Acesso ilimitado (sem data de fim)</label>
             <div class="chips" role="group" aria-label="Atalhos de dias">
               <button class="chip" type="button" data-dias="7">7 dias</button><button class="chip" type="button" data-dias="30">30 dias</button>
               <button class="chip" type="button" data-dias="90">90 dias</button><button class="chip" type="button" data-dias="365">1 ano</button>
@@ -124,14 +125,27 @@
         </div>
         <div class="card">
           <h3><i class="ti ti-ban" aria-hidden="true"></i>Revogar</h3>
-          <p class="sub">Tira o produto da conta (ou da compra pendente) na hora. Não cancela cobrança no Mercado Pago: para isso, reembolse ou cancele lá.</p>
+          <p class="sub">Tira o produto da conta (ou da liberação pendente do e-mail ou CPF) na hora. Não cancela cobrança no Mercado Pago: para isso, reembolse ou cancele lá.</p>
           <form id="fRevogar" style="display:flex;flex-direction:column;gap:12px;margin-top:12px">
-            <div class="campo"><label for="rEmail">E-mail</label><input id="rEmail" type="email" autocomplete="off" spellcheck="false" required></div>
+            <div class="campo"><label for="rEmail">E-mail ou CPF</label><input id="rEmail" type="text" autocomplete="off" spellcheck="false" required></div>
             <div class="campo"><label for="rProd">Produto</label><select id="rProd"></select></div>
             <div><button class="btn btn-dn" type="submit"><i class="ti ti-ban" aria-hidden="true"></i>Revogar este produto</button></div>
           </form>
           <div id="outRevogar" aria-live="polite"></div>
         </div>
+      </div>
+      <div class="card">
+        <h3><i class="ti ti-id" aria-hidden="true"></i>Vincular ou corrigir CPF</h3>
+        <p class="sub">Põe o CPF numa conta, corrige um CPF digitado errado ou transfere o CPF de outra conta para esta (a outra fica sem CPF). Fica registrado em Pagamentos, com o motivo.</p>
+        <form id="fVincular" style="display:flex;flex-direction:column;gap:12px;margin-top:12px">
+          <div class="linhaC">
+            <div class="campo"><label for="vcEmail">E-mail da conta</label><input id="vcEmail" type="email" autocomplete="off" spellcheck="false" required></div>
+            <div class="campo"><label for="vcCpf">CPF</label><input id="vcCpf" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" maxlength="14" placeholder="000.000.000-00" required></div>
+          </div>
+          <div class="campo"><label for="vcMotivo">Motivo</label><input id="vcMotivo" type="text" autocomplete="off" maxlength="300" placeholder="Ex.: titular pediu por e-mail em 10/10; CPF digitado errado" required></div>
+          <div><button class="btn btn-p" type="submit"><i class="ti ti-link" aria-hidden="true"></i>Vincular CPF</button></div>
+        </form>
+        <div id="outVincular" aria-live="polite"></div>
       </div>
     </section>
 
@@ -223,6 +237,6 @@
 </dialog>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="admin.js?v=3" defer></script>
+<script src="admin.js?v=4" defer></script>
 </body>
 </html>
