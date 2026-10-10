@@ -186,6 +186,18 @@ function irPara(url) { location.href = url; }
    nada foi enviado). */
 var MP_SDK = 'https://sdk.mercadopago.com/js/v2';
 var _sdk = null, _pk = null;
+/* Device ID do antifraude do Mercado Pago (security.js): preenche window.MP_DEVICE_SESSION_ID,
+   que vai junto do token do cartão. Sem ele, a validação da assinatura tende a recusar
+   (CC_VAL_433). Falha ao carregar não impede o pagamento. */
+var _seg = null;
+function carregarSeguranca() {
+  if (_seg || G.MP_DEVICE_SESSION_ID) return;
+  _seg = document.createElement('script');
+  _seg.src = 'https://www.mercadopago.com/v2/security.js'; _seg.async = true;
+  _seg.setAttribute('view', 'checkout');
+  _seg.onerror = function () { try { _seg.remove(); } catch (e) {} _seg = null; };
+  document.head.appendChild(_seg);
+}
 function carregarSDK() {
   if (G.MercadoPago) return Promise.resolve(G.MercadoPago);
   if (_sdk) return _sdk;
@@ -297,6 +309,7 @@ function assinarCartao(o) {
       aviso('Autorizando o cartão no Mercado Pago…', false, true);
       var dados = { produto: op.produto, periodo: 'mensal', modo: 'cartao', cartao: { token: String((cd && cd.token) || '') } };
       var em = cd && cd.payer && cd.payer.email; if (em) dados.cartao.email = String(em);
+      var dv = G.MP_DEVICE_SESSION_ID; if (dv) dados.cartao.device = String(dv);
       return chamar('mpCheckout', dados, user).then(function (r) {
         if (!r || r.status !== 'authorized') throw new Error('O servidor de pagamentos está sendo atualizado. Nada foi cobrado; tente de novo em alguns minutos.');
         try { if (ctrl) ctrl.unmount(); } catch (e) {} ctrl = null;
@@ -310,6 +323,7 @@ function assinarCartao(o) {
       });
     }
 
+    carregarSeguranca();
     Promise.all([chavePublicaMP(user), carregarSDK()]).then(function (res) {
       if (fechado) return;
       var mp = new res[1](res[0], { locale: 'pt-BR' });
