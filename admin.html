@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-viva="admin-acessos" data-viva-escuro>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Administração MedTech</title>
+<meta name="theme-color" content="#F5F6FB">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="stylesheet" href="vendor/tabler/tabler-icons.min.css?v=3.48.0">
+<!-- Painel da administração (10/10/2026). Só a conta de administração consegue ler e mudar
+     algo: o servidor (mtAdmin, mpCheckout, mtSinal) confere o e-mail a cada chamada. -->
+<script>window.MT_APP={id:"admin",name:"Administração",linha:"admin"};</script>
+<script src="_mtfb.js?v=1"></script>
+<script type="module" src="_mtauth.js?v=33"></script>
+<link rel="stylesheet" href="_mtviva.css?v=2">
+<link rel="stylesheet" href="admin.css?v=1">
+</head>
+<body>
+<a class="sr" href="#conteudo">Pular para o conteúdo</a>
+<header class="adm-top">
+  <div class="in">
+    <a class="marca" href="#visao" aria-label="Administração MedTech, visão geral">
+      <span class="mk" aria-hidden="true"><i class="ti ti-shield-lock"></i></span>
+      <h1><span>Administração </span><b>MedTech</b></h1>
+    </a>
+    <div class="conta">
+      <span class="quem" id="quem">Entrando…</span>
+      <a class="icbtn" href="app.html" title="Abrir o portal MedTech App"><i class="ti ti-layout-grid" aria-hidden="true"></i><span class="tx">Portal</span></a>
+      <button class="icbtn" id="btSair" type="button" title="Sair da conta"><i class="ti ti-logout" aria-hidden="true"></i><span class="tx">Sair</span></button>
+    </div>
+  </div>
+</header>
+
+<div class="adm">
+  <nav class="menu" aria-label="Seções da administração">
+    <ul>
+      <li><a href="#visao" data-sec="visao"><i class="ti ti-chart-bar" aria-hidden="true"></i>Visão geral</a></li>
+      <li><a href="#assinantes" data-sec="assinantes"><i class="ti ti-users" aria-hidden="true"></i>Assinantes</a></li>
+      <li><a href="#acessos" data-sec="acessos"><i class="ti ti-key" aria-hidden="true"></i>Acessos</a></li>
+      <li><a href="#pagamentos" data-sec="pagamentos"><i class="ti ti-credit-card" aria-hidden="true"></i>Pagamentos</a></li>
+      <li><a href="#planos" data-sec="planos"><i class="ti ti-apps" aria-hidden="true"></i>Aplicativos e planos</a></li>
+      <li><a href="#sinalizacoes" data-sec="sinalizacoes"><i class="ti ti-flag" aria-hidden="true"></i>Sinalizações<span class="cnt" id="cntSinal" hidden></span></a></li>
+      <li><a href="#diagnostico" data-sec="diagnostico"><i class="ti ti-stethoscope" aria-hidden="true"></i>Diagnóstico</a></li>
+    </ul>
+    <p class="rod">Só esta conta vê e muda o que está aqui. Mudança de preço ou abertura de venda: peça ao Claude.</p>
+  </nav>
+
+  <main id="conteudo" tabindex="-1">
+    <div id="bloqueio" class="card bloq" hidden>
+      <i class="ti ti-lock" aria-hidden="true"></i>
+      <h2>Esta conta não é de administração</h2>
+      <p id="bloqTxt">O servidor recusou o acesso. Entre com a conta de administração do MedTech.</p>
+      <p><button class="btn btn-p" id="btTrocar" type="button">Entrar com outra conta</button></p>
+    </div>
+
+    <!-- ===================== VISÃO GERAL ===================== -->
+    <section class="sec" id="visao" data-painel aria-labelledby="h-visao">
+      <div class="cab">
+        <div><h2 id="h-visao">Visão geral</h2><p class="lead">Assinantes, vendas e uso, lidos agora do servidor.</p></div>
+        <div class="atualizado"><span id="vgQuando" aria-live="polite"></span><button class="btn btn-g sm" id="btVg" type="button"><i class="ti ti-refresh" aria-hidden="true"></i>Atualizar</button></div>
+      </div>
+      <div id="vgAviso"></div>
+      <div class="kpis" id="vgKpis" aria-live="polite"><p class="carregando">Carregando os números…</p></div>
+      <div class="card">
+        <div class="cab" style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
+          <div><h3><i class="ti ti-chart-bar" aria-hidden="true"></i>Vendas por dia</h3><p class="sub">Últimos 30 dias, pagamentos aprovados (sem reembolsos e sem a compra de teste).</p></div>
+          <div class="chips" role="group" aria-label="Medida do gráfico">
+            <button class="chip" type="button" data-med="receita" aria-pressed="true">Receita</button>
+            <button class="chip" type="button" data-med="n" aria-pressed="false">Quantidade</button>
+          </div>
+        </div>
+        <div class="graf" id="grafVendas"></div>
+        <details class="tec"><summary>Ver os números do gráfico em tabela</summary><div id="tabVendas"></div></details>
+      </div>
+      <div class="grade3" id="vgMais"></div>
+      <div class="card"><h3><i class="ti ti-user-plus" aria-hidden="true"></i>Contas novas por dia</h3><p class="sub">Últimos 30 dias, todas as contas criadas (com ou sem compra).</p><div class="graf" id="grafContas"></div></div>
+      <div class="card"><h3><i class="ti ti-package" aria-hidden="true"></i>Por produto</h3><p class="sub">Assinantes com acesso vigente e vendas dos últimos 30 dias.</p><div id="vgProdutos"></div></div>
+    </section>
+
+    <!-- ===================== ASSINANTES ===================== -->
+    <section class="sec" id="assinantes" data-painel aria-labelledby="h-ass" hidden>
+      <div class="cab"><div><h2 id="h-ass">Assinantes</h2><p class="lead">Quem tem acesso por produto: compra, liberação manual ou cortesia. Lista paginada, só para a administração.</p></div></div>
+      <div id="asAviso"></div>
+      <div class="card">
+        <form class="linhaC" id="asFiltros" role="search" onsubmit="return false">
+          <div class="campo"><label for="asBusca">Buscar por e-mail</label><input id="asBusca" type="search" autocomplete="off" spellcheck="false" placeholder="parte do e-mail"></div>
+          <div class="campo"><label for="asProd">Produto</label><select id="asProd"><option value="">Todos</option></select></div>
+          <div class="campo"><label for="asSit">Situação</label><select id="asSit"><option value="ativos">Com acesso vigente</option><option value="vencidos">Vencidos (até 60 dias)</option><option value="todos">Todos</option></select></div>
+          <div class="campo"><label for="asOrdem">Ordem</label><select id="asOrdem"><option value="vence">Vence primeiro</option><option value="email">E-mail (A a Z)</option></select></div>
+        </form>
+        <div id="asLista" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- ===================== ACESSOS ===================== -->
+    <section class="sec" id="acessos" data-painel aria-labelledby="h-ac" hidden>
+      <div class="cab"><div><h2 id="h-ac">Acessos</h2><p class="lead">Consultar uma conta, liberar acesso manual (equipes, residências, instituições, cortesias) e revogar.</p></div></div>
+      <div class="card">
+        <h3><i class="ti ti-search" aria-hidden="true"></i>Consultar uma conta</h3>
+        <form class="linhaC" id="fVer" style="margin-top:12px">
+          <div class="campo"><label for="vEmail">E-mail</label><input id="vEmail" type="email" autocomplete="off" spellcheck="false" placeholder="pessoa@exemplo.com" required></div>
+          <div><button class="btn btn-p" type="submit"><i class="ti ti-search" aria-hidden="true"></i>Consultar</button></div>
+        </form>
+        <div id="outVer" aria-live="polite"></div>
+      </div>
+      <div class="grade2">
+        <div class="card">
+          <h3><i class="ti ti-gift" aria-hidden="true"></i>Liberar acesso</h3>
+          <p class="sub">Conta que ainda não existe fica pendente e recebe o acesso no primeiro login com esse e-mail.</p>
+          <form id="fConceder" style="display:flex;flex-direction:column;gap:12px;margin-top:12px">
+            <div class="campo"><label for="cEmails">E-mails</label><textarea id="cEmails" spellcheck="false" placeholder="residente1@exemplo.com&#10;residente2@exemplo.com" aria-describedby="cConta"></textarea><span class="ajuda" id="cConta">Um por linha ou separados por vírgula. Até 200 por vez.</span></div>
+            <div class="linhaC">
+              <div class="campo"><label for="cProd">Produto</label><select id="cProd"></select></div>
+              <div class="campo"><label for="cDias">Dias</label><input id="cDias" type="number" min="1" max="3660" value="30" inputmode="numeric"></div>
+            </div>
+            <div class="chips" role="group" aria-label="Atalhos de dias">
+              <button class="chip" type="button" data-dias="7">7 dias</button><button class="chip" type="button" data-dias="30">30 dias</button>
+              <button class="chip" type="button" data-dias="90">90 dias</button><button class="chip" type="button" data-dias="365">1 ano</button>
+            </div>
+            <div><button class="btn btn-p" type="submit"><i class="ti ti-check" aria-hidden="true"></i>Liberar</button></div>
+          </form>
+          <div id="outConceder" aria-live="polite"></div>
+        </div>
+        <div class="card">
+          <h3><i class="ti ti-ban" aria-hidden="true"></i>Revogar</h3>
+          <p class="sub">Tira o produto da conta (ou da compra pendente) na hora. Não cancela cobrança no Mercado Pago: para isso, reembolse ou cancele lá.</p>
+          <form id="fRevogar" style="display:flex;flex-direction:column;gap:12px;margin-top:12px">
+            <div class="campo"><label for="rEmail">E-mail</label><input id="rEmail" type="email" autocomplete="off" spellcheck="false" required></div>
+            <div class="campo"><label for="rProd">Produto</label><select id="rProd"></select></div>
+            <div><button class="btn btn-dn" type="submit"><i class="ti ti-ban" aria-hidden="true"></i>Revogar este produto</button></div>
+          </form>
+          <div id="outRevogar" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PAGAMENTOS ===================== -->
+    <section class="sec" id="pagamentos" data-painel aria-labelledby="h-pg" hidden>
+      <div class="cab">
+        <div><h2 id="h-pg">Pagamentos</h2><p class="lead">Pedidos registrados pelo servidor (Mercado Pago, Kiwify e liberações manuais). Valores e estornos oficiais ficam no painel do Mercado Pago.</p></div>
+        <a class="btn btn-g" href="https://www.mercadopago.com.br/activities" target="_blank" rel="noopener noreferrer"><i class="ti ti-external-link" aria-hidden="true"></i>Painel do Mercado Pago</a>
+      </div>
+      <div id="pgAviso"></div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+          <h3><i class="ti ti-receipt" aria-hidden="true"></i>Últimos pedidos</h3>
+          <div class="chips" role="group" aria-label="Tipo de pedido" id="pgTipos">
+            <button class="chip" type="button" data-tipo="todos" aria-pressed="true">Todos</button>
+            <button class="chip" type="button" data-tipo="vendas" aria-pressed="false">Vendas</button>
+            <button class="chip" type="button" data-tipo="reembolsos" aria-pressed="false">Reembolsos</button>
+            <button class="chip" type="button" data-tipo="cancelamentos" aria-pressed="false">Cancelamentos</button>
+            <button class="chip" type="button" data-tipo="admin" aria-pressed="false">Manuais</button>
+            <button class="chip" type="button" data-tipo="revisar" aria-pressed="false">A revisar</button>
+          </div>
+        </div>
+        <div id="pgLista" aria-live="polite"></div>
+      </div>
+      <div class="card">
+        <h3><i class="ti ti-test-pipe" aria-hidden="true"></i>Compra de teste (R$ 5)</h3>
+        <p class="sub">Produto escondido: não libera nenhum app e não entra na receita. Serve para conferir o caminho inteiro com a sua conta: pagar, ver o acesso entrar em Acessos, reembolsar no painel do Mercado Pago e ver o acesso sair.</p>
+        <div class="acoesL" style="margin-top:14px">
+          <button class="btn btn-p" id="btTesteMensal" type="button"><i class="ti ti-credit-card" aria-hidden="true"></i>Assinatura mensal no cartão</button>
+          <button class="btn btn-g" id="btTesteAnual" type="button"><i class="ti ti-qrcode" aria-hidden="true"></i>Pagamento único (Pix, cartão ou boleto)</button>
+          <button class="btn btn-g" id="btTesteCancelar" type="button"><i class="ti ti-x" aria-hidden="true"></i>Cancelar a assinatura de teste</button>
+        </div>
+        <div id="outCompra" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- ===================== APLICATIVOS E PLANOS ===================== -->
+    <section class="sec" id="planos" data-painel aria-labelledby="h-pl" hidden>
+      <div class="cab"><div><h2 id="h-pl">Aplicativos e planos</h2><p class="lead">O catálogo que está no ar (planos.json do site). Só leitura.</p></div></div>
+      <div class="aviso info"><i class="ti ti-info-circle" aria-hidden="true"></i><div>Para mudar preço ou abrir e fechar a venda de um plano, peça ao Claude. O catálogo fica no arquivo <code>planos.json</code> do repositório do site e vale para o navegador e para o servidor ao mesmo tempo.</div></div>
+      <div id="plGeral"></div>
+      <div class="grade2" id="plProdutos"><p class="carregando">Carregando o catálogo…</p></div>
+      <div class="card"><h3><i class="ti ti-link" aria-hidden="true"></i>Atalhos</h3><p class="sub">Abrem em nova aba.</p><div class="atalhos" id="plAtalhos"></div></div>
+    </section>
+
+    <!-- ===================== SINALIZAÇÕES ===================== -->
+    <section class="sec" id="sinalizacoes" data-painel aria-labelledby="h-si" hidden>
+      <div class="cab">
+        <div><h2 id="h-si">Sinalizações</h2><p class="lead">Questões que os usuários marcaram com erro nos apps de estudo.</p></div>
+        <a class="btn btn-p" href="sinalizacoes.html"><i class="ti ti-flag" aria-hidden="true"></i>Abrir a caixa de sinalizações</a>
+      </div>
+      <div class="card"><div id="siLista" aria-live="polite"><p class="carregando">Carregando as sinalizações abertas…</p></div></div>
+    </section>
+
+    <!-- ===================== DIAGNÓSTICO ===================== -->
+    <section class="sec" id="diagnostico" data-painel aria-labelledby="h-dg" hidden>
+      <div class="cab"><div><h2 id="h-dg">Diagnóstico do servidor</h2><p class="lead">Confere se o servidor lê o catálogo, as contas e o banco de dados, e se as funções do painel já foram publicadas.</p></div></div>
+      <div class="card">
+        <div class="acoesL"><button class="btn btn-p" id="btTeste" type="button"><i class="ti ti-player-play" aria-hidden="true"></i>Rodar diagnóstico</button></div>
+        <div id="outTeste" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<dialog class="dlg" id="dlg" aria-labelledby="dlgTit">
+  <div class="dc">
+    <h3 id="dlgTit"></h3>
+    <button class="icbtn fecha" type="button" data-fecha aria-label="Fechar"><i class="ti ti-x" aria-hidden="true"></i></button>
+    <div id="dlgCorpo"></div>
+    <div class="rodape" id="dlgRodape"></div>
+  </div>
+</dialog>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="admin.js?v=1" defer></script>
+</body>
+</html>
