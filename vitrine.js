@@ -176,11 +176,11 @@ if(calc)planos().then(P=>{
     const v=p.preco[per];const venda=p.checkout&&p.checkout[per];
     const q=new URLSearchParams({plano:p.id,periodo:per});if(n&&escolha.length)q.set('apps',escolha.join(','));
     const nomes=n?(escolha.length?escolha.map(id=>APPS.find(a=>a.id===id).nm).join(' + '):'escolha acima'):'os 5 apps';
-    const td=P.teste_dias||7;
+    const td=P.teste_dias==null?7:Number(P.teste_dias);
     /* um produto só: o cartão já mostra nome e preço; aqui fica só o que falta (o que inclui e o próximo passo) */
     sumr.innerHTML=prods.length===1
-      ?`<div class="t">${esc(p.resumo||'')} Teste ${td} dias grátis, sem cartão.</div><div class="row"><a class="pill solid" href="app.html?${q}">${venda?'Assinar':'Começar grátis'}</a>${venda?`<a class="pill ghost" href="app.html">Testar ${td} dias grátis</a>`:''}</div>`
-      :`<div class="t"><b>${esc(p.curto)} · ${per==='anual'?'anual':'mensal'} · ${v!=null?brl(v):''}</b>${esc(nomes)}. Comece com ${td} dias grátis de tudo; assine quando fizer sentido.</div><div class="row"><a class="pill solid" href="app.html?${q}">${venda?'Assinar':'Começar grátis'}</a><a class="pill ghost" href="app.html">Criar conta</a></div>`;
+      ?`<div class="t">${esc(p.resumo||'')}${td>0?` Teste ${td} dias grátis, sem cartão.`:' Sem fidelidade; se desistir em até 7 dias, devolvemos o valor.'}</div><div class="row"><a class="pill solid" href="app.html?${q}">${venda?'Assinar':(td>0?'Começar grátis':'Criar conta')}</a>${venda&&td>0?`<a class="pill ghost" href="app.html">Testar ${td} dias grátis</a>`:''}</div>`
+      :`<div class="t"><b>${esc(p.curto)} · ${per==='anual'?'anual':'mensal'} · ${v!=null?brl(v):''}</b>${esc(nomes)}.${td>0?` Comece com ${td} dias grátis de tudo; assine quando fizer sentido.`:''}</div><div class="row"><a class="pill solid" href="app.html?${q}">${venda?'Assinar':'Começar grátis'}</a><a class="pill ghost" href="app.html">Criar conta</a></div>`;
   }
   calc.addEventListener('click',e=>{const s=e.target.closest('.seg button');if(s){per=s.dataset.p;$$('.seg button',calc).forEach(b=>{b.classList.toggle('on',b===s);b.setAttribute('aria-pressed',b===s)});const p=prods.find(x=>x.id===sel);if(p.preco[per]==null)sel=(prods.find(x=>x.preco[per]!=null)||p).id;desenha();return}
     const c=e.target.closest('.pc');if(c&&!c.disabled){sel=c.dataset.id;desenha();return}

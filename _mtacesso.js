@@ -186,7 +186,7 @@ function paywall(o) {
     txt = 'Seu plano tem ' + o.livres + (o.livres > 1 ? ' vagas livres' : ' vaga livre') + '. Escolha o ' + nome + ' para abrir agora. Dá para trocar os apps escolhidos uma vez a cada ' + (P.troca_dias || 30) + ' dias, nas Configurações do portal.';
     corpo = '<div class="mta-r"><button class="bt s" data-acao="escolher">Usar uma vaga com o ' + esc(nome) + '</button></div>';
   } else {
-    var testeAcabou = num(mt.t) && num(mt.t) <= agora;
+    var testeAcabou = num(P.teste_dias) > 0 && num(mt.t) && num(mt.t) <= agora;   /* sem teste grátis (teste_dias 0): nunca fala em teste */
     tit = testeAcabou ? 'Seu teste grátis terminou' : 'Assine para usar o ' + nome;
     txt = testeAcabou ? 'O que você registrou continua salvo na sua conta. Para voltar a usar o ' + nome + ', escolha um plano.' : 'O ' + nome + ' faz parte dos planos abaixo. A IA vem incluída em todos.';
     var prods = produtosQueCobrem(P, app);

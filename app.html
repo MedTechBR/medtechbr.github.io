@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="MedTech App">
 <script>window.MT_APP={id:"portal",name:"MedTech App",linha:"clinica"};</script>
 <script src="_mtfb.js?v=1"></script>
-<script type="module" src="_mtauth.js?v=31"></script>
+<script type="module" src="_mtauth.js?v=32"></script>
 <style>
 /* ============================================================
    Portal no tema vivo (23/09/2026), modelo ClínicaMed "camada viva".
@@ -534,7 +534,7 @@ function preencheAssinatura(){
   if (ACESSO.falha) { el.textContent = 'Não foi possível consultar a assinatura agora. Os apps seguem abertos; tente de novo mais tarde.'; return; }
   const P = ACESSO.P, mt = ACESSO.mt || {}, ag = Math.floor(Date.now()/1000), L = [];
   if (mt.adm) L.push('Acesso de administração: todos os apps.');
-  if (mt.t) L.push(mt.t > ag ? `Teste grátis de tudo até <b>${MTAcesso.dataBR(mt.t)}</b>.` : `Teste grátis encerrado em ${MTAcesso.dataBR(mt.t)}.`);
+  if (mt.t && Number(P.teste_dias) > 0) L.push(mt.t > ag ? `Teste grátis de tudo até <b>${MTAcesso.dataBR(mt.t)}</b>.` : `Teste grátis encerrado em ${MTAcesso.dataBR(mt.t)}.`);
   Object.entries(mt.p || {}).forEach(([id, ate]) => {
     const pr = MTAcesso.produtoPorId(P, id); const nm = pr ? (pr.nome || id) : id;
     L.push(ate > ag ? `<b>${esc(nm)}</b> · válido até ${MTAcesso.dataBR(ate)}` : `${esc(nm)} · venceu em ${MTAcesso.dataBR(ate)}`);
