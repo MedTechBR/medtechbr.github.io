@@ -32,6 +32,11 @@ const PROVAS=[
  {id:'trafegotitulo',nm:'TráfegoTítulo',ic:'ti-car',img:'trafego-390',url:'trafego-titulo/',d:'Título de Medicina do Tráfego, no formato da prova, com o conteúdo amarrado ao edital e às normas de trânsito vigentes.'},
  {id:'flashmed',nm:'FlashMed',ic:'ti-cards',img:'flashmed-390',url:'flashmed/',d:'Preparatório ENARE e ENAMED: questões de provas reais comentadas, simulados no formato da prova e leituras por área.'}
 ];
+/* farmácia (10/10/2026): vendidos na linha Provas, mas público diferente; ficam num grupo próprio */
+const FARMA=[
+ {id:'farmauti',nm:'FarmaUTI',ic:'ti-pill',url:'farmauti/',d:'Para quem vai começar a residência em Farmácia em Terapia Intensiva: leituras com revisão essencial, interações com mecanismo e conduta, prescrições de UTI para avaliar, casos clínicos, bulário e calculadoras.'},
+ {id:'enarefarmacia',nm:'Banca ENARE Farmácia',ic:'ti-vaccine-bottle',url:'quiz-enare-farmacia/',d:'Residência multiprofissional em Farmácia pelo ENARE: questões comentadas por tema do edital, provas anteriores em simulado, flashcards e painel de desempenho.'}
+];
 const INST=[
  {nm:'Sistema Hospitalar (HospSys)',ic:'ti-building-hospital',url:'hospsys.html',d:'Prontuário, prescrição, leitos, bloco, farmácia e faturamento, dentro do hospital.'},
  {nm:'Faturamento',ic:'ti-zoom-money',url:'faturamento.html',d:'A IA cruza prontuário e conta; depois, a equipe é treinada para a glosa não voltar.'},
@@ -109,6 +114,7 @@ const wall=$('#wall');
 if(wall){const it=(a,href)=>`<a href="${href}"><span class="k"><i class="ti ${a.ic}"></i></span>${esc(a.nm)}<span class="tip" role="tooltip"><b>${esc(a.nm)}</b>${esc(a.d)}</span></a>`;
   wall.innerHTML=`<div class="grp">MedTech App</div>`+APPS.map(a=>it(a,'medtech-app.html#app='+a.id)).join('')+
     `<div class="grp">MedTech Provas</div>`+PROVAS.map(a=>it(a,'medtech-provas.html#app='+a.id)).join('')+
+    `<div class="grp">Farmácia</div>`+FARMA.map(a=>it(a,'medtech-provas.html#farmacia')).join('')+
     `<div class="grp">MedTech Institucional</div>`+INST.map(a=>it(a,a.url)).join('')}
 
 /* ---------- vitrine de apps (lista + celular) ---------- */
@@ -159,7 +165,9 @@ const PLANOS_PADRAO={produtos:[
  {id:'clinicamed',curto:'ClínicaMed',linha:'provas',resumo:'Título de Clínica Médica e acesso ao R+.',preco:{mensal:49.9,anual:397}},
  {id:'cirurgiamed',curto:'CirurgiaMed',linha:'provas',resumo:'Título de Cirurgia Geral, R+ cirúrgico e concursos.',preco:{mensal:49.9,anual:397}},
  {id:'trafegotitulo',curto:'TráfegoTítulo',linha:'provas',resumo:'Título de Medicina do Tráfego.',preco:{mensal:49.9,anual:397}},
- {id:'flashmed',curto:'FlashMed',linha:'provas',resumo:'Preparatório ENARE/ENAMED: questões, simulados e leituras por área.',preco:{mensal:49.9,anual:397}}]};
+ {id:'flashmed',curto:'FlashMed',linha:'provas',resumo:'Preparatório ENARE/ENAMED: questões, simulados e leituras por área.',preco:{mensal:49.9,anual:397}},
+ {id:'farmauti',curto:'FarmaUTI',linha:'provas',publico:'farmacia',resumo:'Residência em Farmácia em Terapia Intensiva: leituras, interações, prescrições e casos.',preco:{mensal:49.9,anual:397}},
+ {id:'enarefarmacia',curto:'ENARE Farmácia',linha:'provas',publico:'farmacia',resumo:'Residência multiprofissional em Farmácia (ENARE): questões, simulados e revisão pelo edital.',preco:{mensal:49.9,anual:397}}]};
 const brl=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:Number.isInteger(v)?0:2});
 async function planos(){try{const r=await fetch('planos.json',{cache:'no-cache'});if(r.ok)return await r.json()}catch(e){}return PLANOS_PADRAO}
 const calcs=$$('.calc[data-linhas]');
@@ -167,8 +175,10 @@ if(calcs.length)planos().then(P=>calcs.forEach(calc=>{
   const linhas=calc.dataset.linhas.split(/\s+/);
   const vende=p=>!p.interno&&!p.teste&&p.preco&&(p.preco.mensal||p.preco.anual);
   const app=linhas.includes('clinica')?(P.produtos||[]).filter(p=>p.linha==='clinica'&&vende(p)):[];
-  const provas=linhas.includes('provas')?(P.produtos||[]).filter(p=>p.linha==='provas'&&vende(p)):[];
-  if(!app.length&&!provas.length)return;
+  const daLinha=linhas.includes('provas')?(P.produtos||[]).filter(p=>p.linha==='provas'&&vende(p)):[];
+  /* público diferente: os planos de farmácia vão numa lista própria, depois dos de medicina */
+  const provas=daLinha.filter(p=>p.publico!=='farmacia'),farma=daLinha.filter(p=>p.publico==='farmacia');
+  if(!app.length&&!provas.length&&!farma.length)return;
   let per='mensal';
   const link=(base,p)=>`${base}?${new URLSearchParams({plano:p.id,periodo:per})}`;
   const valor=p=>{const v=p.preco[per];return v==null?'<span class="vl">—</span>':`<span class="vl">${brl(v)}<small>/${per==='anual'?'ano':'mês'}</small></span>`};
@@ -176,11 +186,14 @@ if(calcs.length)planos().then(P=>calcs.forEach(calc=>{
   calc.innerHTML=`<div class="phd"><div class="seg" role="group" aria-label="Período de pagamento"><button type="button" class="on" data-p="mensal" aria-pressed="true">Mensal</button><button type="button" data-p="anual" aria-pressed="false">Anual</button></div>
     <p class="pay"><span>Mensal no cartão, renova sozinho</span><span>Anual em Pix, cartão até 12x ou boleto</span></p></div>
     ${app.length?'<div class="papp"></div>':''}
-    ${provas.length?`${app.length?'<h3 class="lt">MedTech Provas <span>cada prova é um plano</span></h3>':''}<ul class="plist"></ul>`:''}`;
-  const pcs=$('.papp',calc),pl=$('.plist',calc);
+    ${provas.length?`${app.length?'<h3 class="lt">MedTech Provas <span>cada prova é um plano</span></h3>':''}<ul class="plist pmed"></ul>`:''}
+    ${farma.length?`<h3 class="lt" id="planos-farmacia">Farmácia <span>residência em Farmácia, cada app é um plano</span></h3><ul class="plist pfar"></ul>`:''}`;
+  const pcs=$('.papp',calc),pl=$('.plist.pmed',calc),pf=$('.plist.pfar',calc);
+  const itemProva=p=>`<li><div class="pn2"><b>${esc(p.curto)}</b><span>${esc(p.resumo||'')}</span></div><div class="pv">${valor(p)}${per==='anual'?`<span class="eq">${eq(p)}</span>`:''}</div>${p.preco[per]!=null?`<a class="pill ${app.length?'line':'solid'}" href="${link('provas.html',p)}" aria-label="Assinar o ${esc(p.curto)}, plano ${per}">Assinar</a>`:'<span></span>'}</li>`;
   function desenha(){
     if(pcs)pcs.innerHTML=app.map(p=>`<div class="pone"><div class="pc"><span class="nm">${esc(p.curto)}</span>${valor(p)}<span class="eq">${eq(p)}</span></div><p class="t">${esc(p.resumo||'')}</p>${p.preco[per]!=null?`<a class="pill solid lg" href="${link('app.html',p)}" aria-label="Assinar o ${esc(p.curto)}, plano ${per}">Assinar</a>`:''}</div>`).join('');
-    if(pl)pl.innerHTML=provas.map(p=>`<li><div class="pn2"><b>${esc(p.curto)}</b><span>${esc(p.resumo||'')}</span></div><div class="pv">${valor(p)}${per==='anual'?`<span class="eq">${eq(p)}</span>`:''}</div>${p.preco[per]!=null?`<a class="pill ${app.length?'line':'solid'}" href="${link('provas.html',p)}" aria-label="Assinar o ${esc(p.curto)}, plano ${per}">Assinar</a>`:'<span></span>'}</li>`).join('');
+    if(pl)pl.innerHTML=provas.map(itemProva).join('');
+    if(pf)pf.innerHTML=farma.map(itemProva).join('');
   }
   calc.addEventListener('click',e=>{const s=e.target.closest('.seg button');if(!s)return;per=s.dataset.p;
     $$('.seg button',calc).forEach(b=>{b.classList.toggle('on',b===s);b.setAttribute('aria-pressed',b===s)});desenha()});

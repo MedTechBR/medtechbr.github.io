@@ -16,7 +16,7 @@ O gerador confere que todo link local aponta para arquivo existente e que todo
 import io, os, re, sys, glob
 
 RAIZ = os.path.dirname(os.path.abspath(__file__))
-V = '14'   # versão de vitrine.css / vitrine.js (bumpar ao mudar qualquer um dos dois)
+V = '15'   # versão de vitrine.css / vitrine.js (bumpar ao mudar qualquer um dos dois)
 
 def ler(p): return io.open(os.path.join(RAIZ, p), encoding='utf-8').read()
 
@@ -55,7 +55,7 @@ MOLDE = '''<!DOCTYPE html>
 erros = []
 gerados = []
 # projetos publicados como "project pages" de OUTROS repositórios, no mesmo domínio: não existem aqui
-EXTERNOS = {'clinicamed/', 'trafego-titulo/', 'casos-clinicos/', 'clinicar/'}
+EXTERNOS = {'clinicamed/', 'trafego-titulo/', 'casos-clinicos/', 'clinicar/', 'farmauti/', 'quiz-enare-farmacia/'}
 htmls = {}
 for parte in sorted(glob.glob(os.path.join(RAIZ, '_vitrine/paginas/*.html'))):
     nome = os.path.basename(parte)

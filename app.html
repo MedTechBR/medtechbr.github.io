@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="MedTech App">
 <script>window.MT_APP={id:"portal",name:"MedTech App",linha:"clinica"};</script>
 <script src="_mtfb.js?v=1"></script>
-<script type="module" src="_mtauth.js?v=37"></script>
+<script type="module" src="_mtauth.js?v=38"></script>
 <style>
 /* ============================================================
    Portal no tema vivo (23/09/2026), modelo ClínicaMed "camada viva".
@@ -171,6 +171,7 @@ html[data-viva^=portal][lang] body .sug-box :is(select,input,textarea){width:100
 .as-mini a{color:var(--acInk);font-weight:600}
 .as-of{margin-top:16px}
 .as-of > h5{font-size:15px;font-weight:700;margin-bottom:2px}
+.as-of > h6.as-pub{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tinta2);margin:16px 0 0}
 .of{margin-top:10px}
 .of + .of{padding-top:12px;border-top:1px solid var(--fio)}
 .of-h b{display:block;font-size:15px;font-weight:700}
@@ -268,12 +269,15 @@ const CATALOGO = [
   { id:'clinicamed',    nm:'ClínicaMed',       ic:'ti-heartbeat',        url:BASE+'clinicamed/',           cat:'Prova de título',      linha:'provas', sub:'título de Clínica Médica (TECM) e acesso R+' , c:'var(--c-indigo)' },
   { id:'cirurgiamed',   nm:'CirurgiaMed',      ic:'ti-cut',              url:BASE+'cirurgiamed/',          cat:'Prova de título',      linha:'provas', sub:'título de Cirurgia Geral (CBC), R+ cirúrgico e concursos' , c:'#33479E' },
   { id:'trafegotitulo', nm:'TráfegoTítulo',    ic:'ti-car',              url:BASE+'trafego-titulo/',       cat:'Prova de título',      linha:'provas', sub:'título de Medicina do Tráfego' , c:'var(--c-teal)' },
-  { id:'flashmed',      nm:'FlashMed',         ic:'ti-cards',            url:BASE+'flashmed/',         cat:'Residência e concursos', linha:'provas' , c:'var(--c-coral)' }
+  { id:'flashmed',      nm:'FlashMed',         ic:'ti-cards',            url:BASE+'flashmed/',         cat:'Residência e concursos', linha:'provas' , c:'var(--c-coral)' },
+  /* farmácia (10/10/2026): público diferente; fora do PADRAO, aparece para quem escolhe ou compra */
+  { id:'farmauti',      nm:'FarmaUTI',         ic:'ti-pill',             url:BASE+'farmauti/',             cat:'Farmácia',             linha:'provas', sub:'residência em Farmácia em Terapia Intensiva', c:'#4545D8' },
+  { id:'enarefarmacia', nm:'Banca ENARE Farmácia', ic:'ti-vaccine-bottle',        url:BASE+'quiz-enare-farmacia/',  cat:'Farmácia',             linha:'provas', sub:'residência multiprofissional em Farmácia (ENARE)', c:'#0A3F3B' }
 ];
 /* Linha deste portal. provas.html é GERADO deste arquivo por _gera_provas.py — editar aqui. */
 const LINHA = 'clinica';
 const CATALOGO_LINHA = CATALOGO.filter(a => a.linha === LINHA);
-const CATEGORIAS = LINHA === 'provas' ? ['Prova de título','Residência e concursos'] : ['Referência clínica','Hospital e imagem','Rotina do médico'];
+const CATEGORIAS = LINHA === 'provas' ? ['Prova de título','Residência e concursos','Farmácia'] : ['Referência clínica','Hospital e imagem','Rotina do médico'];
 /* Quem nunca escolheu vê o conjunto padrão da linha. */
 const PADRAO = LINHA === 'provas'
   ? ['clinicamed','cirurgiamed','trafegotitulo','flashmed']
@@ -324,8 +328,23 @@ function itemAdmin(){
 /* cor do app: círculo na cor dele, com o ícone em branco (ou escuro, no âmbar) */
 function corApp(a){ return a.c ? `--c:${a.c};--t:${a.t||'#fff'}` : ''; }
 let _gradeAnimada=false;
+/* apps cobertos por compra vigente nesta linha (não conta admin nem cortesia "*") */
+function comprados(){
+  if (!ACESSO || !ACESSO.venda || !ACESSO.mt || !window.MTAcesso) return [];
+  const P = ACESSO.P, ag = Math.floor(Date.now() / 1000), ids = new Set(CATALOGO_LINHA.map(a => a.id)), out = new Set();
+  Object.entries(ACESSO.mt.p || {}).forEach(([id, ate]) => { if (!(Number(ate) > ag)) return;
+    MTAcesso.appsDoProduto(P, MTAcesso.produtoPorId(P, id)).forEach(a => { if (ids.has(a)) out.add(a); }); });
+  return [...out];
+}
+const ehFarmacia = id => (CATALOGO.find(a => a.id === id) || {}).cat === 'Farmácia';
+/* Públicos não se misturam: quem comprou só app de farmácia e nunca escolheu os apps vê só os dele. */
+function soFarmacia(){
+  const d = dados(), c = comprados();
+  return !!c.length && c.every(ehFarmacia) && !(ACESSO.mt && ACESSO.mt.adm) && !(d && d[CAMPO_SEL] && Array.isArray(d[CAMPO_SEL].sel));
+}
 function renderGrid(){
-  const sel = new Set(selecao());
+  const sel = soFarmacia() ? new Set(comprados()) : new Set(selecao());
+  comprados().forEach(id => sel.add(id));
   const lista = disponiveis().filter(a => sel.has(a.id));
   const g = document.getElementById('grid');
   g.innerHTML = itemAdmin() + (lista.length ? lista.map(appItem).join('')
@@ -524,8 +543,8 @@ async function enviarResetSenha(){
    cliente (deixaria subcoleções órfãs e exige login recente): monta um e-mail pronto. */
 const MEUS_DADOS_APPS = ['portal','portal-provas','enfermaria','condutai','atbguia','calcmed','paliai','guiainterno','pocusai',
   'laudai','foco','plantaohub','granae','granae_of','logbook','medprovas','flashmed','flashmed_resumo','clinicamed','clinicamed_resumo',
-  'clinicamed_coord','cirurgiamed','cirurgiamed_resumo','trafego-titulo','radio-titulo'];
-const MEUS_DADOS_SYNC = ['flashmed','clinicamed','cirurgiamed','trafego-titulo','radio-titulo'];   // users/{uid}/apps/<app>/sync
+  'clinicamed_coord','cirurgiamed','cirurgiamed_resumo','trafego-titulo','radio-titulo','farmauti','enare-farmacia'];
+const MEUS_DADOS_SYNC = ['flashmed','clinicamed','cirurgiamed','trafego-titulo','radio-titulo','farmauti','enare-farmacia'];   // users/{uid}/apps/<app>/sync
 function dataLocalISO(d){ d = d || new Date(); const p = n => String(n).padStart(2,'0'); return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
 /* Timestamp do Firestore e afins viram texto ISO; o resto passa igual */
 function limpaFs(v){
@@ -716,11 +735,18 @@ function preencheAssinatura(){
   if (pend) B.push(`<div class="as-st pend"><span class="sel pend">Pagamento pendente</span><h5>${esc(nomeProd(P, pend.produto))}${pend.periodo ? ' · ' + esc(pend.periodo) : ''}</h5><p>Recebemos o pedido. Assim que o pagamento compensar (boleto: até 3 dias úteis; Pix: minutos), o acesso libera sozinho e você recebe o recibo do Mercado Pago.</p></div>`);
   const vg = MTAcesso.vagas(P, mt, LINHA), esc2 = MTAcesso.escolhidos(P, mt, LINHA).slice(0, vg);
   if (vg) B.push(`<div class="as-st"><p>Apps do seu plano (${esc2.length} de ${vg}): ${esc2.length ? esc2.map(a => esc(MTAcesso.NOMES[a] || a)).join(', ') : 'nenhum escolhido ainda'}.</p><div class="sug-row"><button type="button" class="b ok" onclick="escolherAppsPlano()">Escolher os apps do plano</button></div></div>`);
-  const aVenda = prodDaLinha(P).filter(p => !ativos.has(p.id) && !(pend && pend.produto === p.id));
+  let aVenda = prodDaLinha(P).filter(p => !ativos.has(p.id) && !(pend && pend.produto === p.id));
+  /* farmácia × medicina (campo publico do planos.json): quem já tem plano de um público vê só as ofertas dele */
+  const prodFarma = p => p.publico === 'farmacia';
+  const meus = [...ativos].map(id => MTAcesso.produtoPorId(P, id)).filter(p => p && p.linha === LINHA && !p.interno);
+  if (meus.length && meus.every(prodFarma)) aVenda = aVenda.filter(prodFarma);
+  else if (meus.length) aVenda = aVenda.filter(p => !prodFarma(p));
+  const ofertas = l => l.map(p => htmlOferta(P, p)).join('');
+  const aVendaMed = aVenda.filter(p => !prodFarma(p)), aVendaFarma = aVenda.filter(prodFarma);
   const nadaAtivo = !ativos.size && !mt.adm && !(mt.t && mt.t > ag && Number(P.teste_dias) > 0);
   if (nadaAtivo && !pend) B.unshift(`<div class="as-st off"><span class="sel">Sem plano</span><p>Você ainda não tem plano ativo nesta conta. Escolha abaixo.</p></div>`);
   if (aVenda.length) {
-    B.push(`<div class="as-of"><h5>${nadaAtivo ? 'Assinar' : 'Outros planos'}</h5>${aVenda.map(p => htmlOferta(P, p)).join('')}
+    B.push(`<div class="as-of"><h5>${nadaAtivo ? 'Assinar' : 'Outros planos'}</h5>${aVendaMed.length && aVendaFarma.length ? `<h6 class="as-pub">Medicina</h6>${ofertas(aVendaMed)}<h6 class="as-pub">Farmácia</h6>${ofertas(aVendaFarma)}` : ofertas(aVenda)}
       <p class="as-mini">Mensal: cartão de crédito, renova sozinho todo mês. Anual: Pix, cartão em até 12x ou boleto, pagamento único.</p></div>`);
   }
   const temCompra = donos.some(([id, ate]) => ate > ag && !ehIlim(ate) && !MTAcesso.produtoPorId(P, id).interno) || !!pend;
