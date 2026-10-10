@@ -61,7 +61,7 @@ const E = { planos: null, painel: null, naoPublicado: false, bloqueado: false, c
 /* ---------------- servidor ---------------- */
 async function modulo() {
   if (window.MT && MT.acessoModulo) { const m = await MT.acessoModulo(); if (m) return m; }
-  if (!window.MTAcesso) await import('/_mtacesso.js?v=9');
+  if (!window.MTAcesso) await import('/_mtacesso.js?v=10');
   return window.MTAcesso;
 }
 async function chamar(nome, dados) { const A = await modulo(); return A.chamar(nome, dados || {}, MT.user); }

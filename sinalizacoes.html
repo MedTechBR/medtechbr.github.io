@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script>window.MT_APP={id:"admin-sinalizacoes",name:"Sinalizações",linha:"admin"};</script>
 <script src="_mtfb.js?v=1"></script>
-<script type="module" src="_mtauth.js?v=38"></script>
+<script type="module" src="_mtauth.js?v=40"></script>
 <style>
 /* Caixa central das questões sinalizadas pelos apps de estudo (26/09/2026). Mesmo visual do acessos.html.
    Só a administração consegue listar: a função mtSinal confere o e-mail de admin a cada chamada. */
@@ -72,7 +72,7 @@ textarea.rel{width:100%;min-height:200px;margin-top:12px;padding:12px;border-rad
   const TIPO = {gabarito:'Gabarito errado', texto:'Erro no enunciado ou nas alternativas', desatualizada:'Desatualizada (norma ou diretriz mudou)', comentario:'Erro no comentário ou na explicação', outro:'Outro problema'};
   const quando = iso => { try { return new Date(iso).toLocaleString('pt-BR', {dateStyle:'short', timeStyle:'short'}); } catch(e){ return ''; } };
   let TODOS = [], APPS = {};
-  async function A(){ if (!window.MTAcesso) await import('/_mtacesso.js?v=8'); return window.MTAcesso; }
+  async function A(){ if (!window.MTAcesso) await import('/_mtacesso.js?v=10'); return window.MTAcesso; }
   async function chama(dados){ const M = await A(); return M.chamar('mtSinal', dados, MT.user); }
 
   async function carrega(){

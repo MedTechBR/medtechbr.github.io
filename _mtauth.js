@@ -68,7 +68,7 @@ const MT = {
      Enquanto nenhum produto do /planos.json tiver checkout, nada é bloqueado. */
   _acesso: null,
   acessoModulo() {
-    if (!MT._acesso) MT._acesso = import('/_mtacesso.js?v=8').then(() => window.MTAcesso).catch(e => { console.warn('MTAcesso indisponível', e); return null; });
+    if (!MT._acesso) MT._acesso = import('/_mtacesso.js?v=10').then(() => window.MTAcesso).catch(e => { console.warn('MTAcesso indisponível', e); return null; });
     return MT._acesso;
   },
   async acessoEstado() { const M = await MT.acessoModulo(); return M && MT.user && !MT.user.demo ? M.estado(MT.user) : null; },
