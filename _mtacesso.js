@@ -48,7 +48,8 @@ function cobre(prod, P, appId, mt) {
   return false;
 }
 function vendaAtiva(P, appId) { return ((P && P.produtos) || []).some(function (p) { return temCheckout(p) && cobre(p, P, appId); }); }
-function algumaVendaAtiva(P) { return ((P && P.produtos) || []).some(temCheckout); }
+/* produto de teste ("teste": true) é vendável mas não conta como venda aberta (igual ao servidor) */
+function algumaVendaAtiva(P) { return ((P && P.produtos) || []).some(function (p) { return temCheckout(p) && !p.teste; }); }
 function vagas(P, mt, linha, agora) {
   agora = typeof agora === 'number' ? agora : agoraS(); var n = 0; var p = (mt && mt.p) || {};
   Object.keys(p).forEach(function (id) { if (!(num(p[id]) > agora)) return; var prod = produtoPorId(P, id); if (prod && prod.linha === linha && typeof prod.apps === 'number') n += Math.max(0, Math.floor(prod.apps)); });

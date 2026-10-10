@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script>window.MT_APP={id:"admin-acessos",name:"Acessos",linha:"admin"};</script>
 <script src="_mtfb.js?v=1"></script>
-<script type="module" src="_mtauth.js?v=32"></script>
+<script type="module" src="_mtauth.js?v=33"></script>
 <style>
 :root{--fg:#fff;--m:rgba(255,255,255,.62);--l:rgba(255,255,255,.12);--p:rgba(255,255,255,.06)}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -58,6 +58,14 @@ pre{margin-top:14px;padding:14px;border-radius:12px;background:#0B0B0C;border:1p
   </section>
 
   <section>
+    <h2>Compra de teste (R$ 5)</h2>
+    <p class="sub" style="font-size:13px">Produto escondido: não libera nenhum app e não abre as vendas. Serve para conferir o caminho inteiro do Mercado Pago com a sua conta: pagar, ver o acesso entrar em "Consultar", reembolsar no painel do Mercado Pago e ver o acesso sair.</p>
+    <div class="row"><button id="btTesteMensal">Assinatura mensal no cartão</button><button class="g" id="btTesteAnual">Pagamento único (Pix, cartão ou boleto)</button></div>
+    <div class="row"><button class="g" id="btTesteCancelar">Cancelar a assinatura de teste</button></div>
+    <pre id="outCompra"></pre>
+  </section>
+
+  <section>
     <h2>Revogar</h2>
     <div class="row">
       <div><label for="rEmail">E-mail</label><input id="rEmail" type="email" autocomplete="off"></div>
@@ -79,7 +87,7 @@ pre{margin-top:14px;padding:14px;border-radius:12px;background:#0B0B0C;border:1p
     if (out.resultado) out.resultado.forEach(x => { if (x.ate) x.ate = dataS(x.ate); });
     delete out.agora; return out;
   }
-  async function M(){ if (!window.MTAcesso) await import('/_mtacesso.js?v=3'); return window.MTAcesso; }
+  async function M(){ if (!window.MTAcesso) await import('/_mtacesso.js?v=4'); return window.MTAcesso; }
   async function admin(dados, saida){
     saida.hidden = false; saida.textContent = 'Consultando…';
     try { const A = await M(); const r = await A.chamar('mtAdmin', dados, MT.user); mostra(saida, legivel(r)); }
@@ -98,6 +106,18 @@ pre{margin-top:14px;padding:14px;border-radius:12px;background:#0B0B0C;border:1p
   $('btConceder').onclick = () => { const emails = $('cEmails').value.split(/[\s,;]+/).map(s => s.trim()).filter(Boolean);
     if (!confirm(`Liberar "${$('cProd').value}" por ${$('cDias').value} dias para ${emails.length} e-mail(s)?`)) return;
     admin({ acao: 'conceder', emails, produto: $('cProd').value, dias: Number($('cDias').value) }, $('outConceder')); };
+  async function compraTeste(periodo){
+    const out = $('outCompra'); out.hidden = false; out.textContent = 'Abrindo o Mercado Pago…';
+    try { const A = await M(); const r = await A.chamar('mpCheckout', { produto: 'teste-mp', periodo }, MT.user);
+      if (r && r.url) { out.textContent = 'Indo para o pagamento…'; location.href = r.url; } else mostra(out, r); }
+    catch (e) { mostra(out, 'Erro: ' + (e.message || e)); }
+  }
+  $('btTesteMensal').onclick = () => compraTeste('mensal');
+  $('btTesteAnual').onclick = () => compraTeste('anual');
+  $('btTesteCancelar').onclick = async () => { if (!confirm('Cancelar a assinatura mensal de teste?')) return;
+    const out = $('outCompra'); out.hidden = false; out.textContent = 'Cancelando…';
+    try { const A = await M(); mostra(out, await A.chamar('mpCancelar', { produto: 'teste-mp' }, MT.user)); }
+    catch (e) { mostra(out, 'Erro: ' + (e.message || e)); } };
   $('btRevogar').onclick = () => { if (!confirm(`Revogar "${$('rProd').value}" de ${$('rEmail').value}?`)) return;
     admin({ acao: 'revogar', email: $('rEmail').value.trim(), produto: $('rProd').value }, $('outRevogar')); };
 })();
