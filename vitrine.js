@@ -28,7 +28,7 @@ const APPS=[
  {id:'granae',nm:'Granaê',ic:'ti-wallet',g:'rotina',img:'granae-390',url:'granae.html',d:'As finanças do médico por voz e pela foto da fatura, com leitura por IA.'}
 ];
 const PROVAS=[
- {id:'clinicamed',nm:'ClínicaMed',ic:'ti-heartbeat',img:'clinicamed-390',url:'clinicamed/',d:'Título de Clínica Médica e acesso ao R+: 708 questões de provas oficiais, com procedência, e questões autorais comentadas; leituras longas e acompanhamento de turma pela coordenação.'},
+ {id:'clinicamed',nm:'ClínicaMed',ic:'ti-heartbeat',img:'clinicamed-390',url:'clinicamed/',d:'Título de Clínica Médica e acesso ao R+: questões de provas oficiais, com procedência, e questões autorais comentadas; leituras longas e acompanhamento de turma pela coordenação.'},
  {id:'trafegotitulo',nm:'TráfegoTítulo',ic:'ti-car',img:'trafego-390',url:'trafego-titulo/',d:'Título de Medicina do Tráfego, no formato da prova, com o conteúdo amarrado ao edital e às normas de trânsito vigentes.'},
  {id:'flashmed',nm:'FlashMed',ic:'ti-cards',img:'flashmed-390',url:'flashmed/',d:'Preparatório ENARE e ENAMED: questões de provas reais comentadas, simulados no formato da prova e leituras por área.'}
 ];
@@ -151,45 +151,52 @@ $$('[data-gal]').forEach(g=>{
   bts.forEach((b,k)=>{b.setAttribute('role','tab');b.addEventListener('click',()=>vai(k))});vai(0);
 });
 
-/* ---------- calculadora de planos (preços vêm do planos.json) ---------- */
+/* ---------- planos (preços vêm do planos.json; o portal cuida de login e pagamento) ----------
+   <div class="calc" data-linhas="clinica provas"> — um seletor Mensal/Anual vale para tudo o que o bloco mostra:
+   o MedTech App (linha clinica) num cartão e as provas (linha provas) numa lista, cada uma com o seu "Assinar". */
 const PLANOS_PADRAO={produtos:[
- {id:'app-tudo',curto:'MedTech App',linha:'clinica',apps:'tudo',destaque:true,resumo:'Os 5 apps (CondutAI, PaliAI, LaudAI, PlantãoHub e Granaê), com a IA incluída.',preco:{mensal:39.9,anual:399},checkout:{}}],teste_dias:7};
-const brl=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+ {id:'app-tudo',curto:'MedTech App',linha:'clinica',resumo:'Os 5 apps (CondutAI, PaliAI, LaudAI, PlantãoHub e Granaê), com a IA incluída.',preco:{mensal:39.9,anual:399}},
+ {id:'clinicamed',curto:'ClínicaMed',linha:'provas',resumo:'Título de Clínica Médica e acesso ao R+.',preco:{mensal:49.9,anual:397}},
+ {id:'cirurgiamed',curto:'CirurgiaMed',linha:'provas',resumo:'Título de Cirurgia Geral, R+ cirúrgico e concursos.',preco:{mensal:49.9,anual:397}},
+ {id:'trafegotitulo',curto:'TráfegoTítulo',linha:'provas',resumo:'Título de Medicina do Tráfego.',preco:{mensal:49.9,anual:397}},
+ {id:'flashmed',curto:'FlashMed',linha:'provas',resumo:'Preparatório ENARE/ENAMED: questões, simulados e leituras por área.',preco:{mensal:49.9,anual:397}}]};
+const brl=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:Number.isInteger(v)?0:2});
 async function planos(){try{const r=await fetch('planos.json',{cache:'no-cache'});if(r.ok)return await r.json()}catch(e){}return PLANOS_PADRAO}
-const calc=$('#calc');
-if(calc)planos().then(P=>{
-  const prods=(P.produtos||[]).filter(p=>p.linha==='clinica'&&!p.interno);if(!prods.length)return;
-  let per='mensal',sel=(prods.find(p=>p.destaque)||prods[0]).id,escolha=[];
-  const temAnual=prods.some(p=>p.preco&&p.preco.anual);
-  calc.innerHTML=`${temAnual?`<div class="seg" role="group" aria-label="Período"><button class="on" data-p="mensal" aria-pressed="true">Mensal</button><button data-p="anual" aria-pressed="false">Anual<small>2 meses grátis</small></button></div>`:''}
-   <div class="pcs"${prods.length>1?' role="radiogroup" aria-label="Plano"':''}></div><div class="pick" hidden></div><div class="sumr"></div>`;
-  const pcs=$('.pcs',calc),pick=$('.pick',calc),sumr=$('.sumr',calc);
+const calcs=$$('.calc[data-linhas]');
+if(calcs.length)planos().then(P=>calcs.forEach(calc=>{
+  const linhas=calc.dataset.linhas.split(/\s+/);
+  const vende=p=>!p.interno&&!p.teste&&p.preco&&(p.preco.mensal||p.preco.anual);
+  const app=linhas.includes('clinica')?(P.produtos||[]).filter(p=>p.linha==='clinica'&&vende(p)):[];
+  const provas=linhas.includes('provas')?(P.produtos||[]).filter(p=>p.linha==='provas'&&vende(p)):[];
+  if(!app.length&&!provas.length)return;
+  let per='mensal';
+  const link=(base,p)=>`${base}?${new URLSearchParams({plano:p.id,periodo:per})}`;
+  const valor=p=>{const v=p.preco[per];return v==null?'<span class="vl">—</span>':`<span class="vl">${brl(v)}<small>/${per==='anual'?'ano':'mês'}</small></span>`};
+  const eq=p=>{const v=p.preco[per];if(v==null)return 'só no plano mensal';return per==='anual'?`equivale a ${brl(v/12)} por mês`:'cobrado todo mês no cartão'};
+  calc.innerHTML=`<div class="phd"><div class="seg" role="group" aria-label="Período de pagamento"><button type="button" class="on" data-p="mensal" aria-pressed="true">Mensal</button><button type="button" data-p="anual" aria-pressed="false">Anual</button></div>
+    <p class="pay"><span>Mensal no cartão, renova sozinho</span><span>Anual em Pix, cartão até 12x ou boleto</span></p></div>
+    ${app.length?'<div class="papp"></div>':''}
+    ${provas.length?`${app.length?'<h3 class="lt">MedTech Provas <span>cada prova é um plano</span></h3>':''}<ul class="plist"></ul>`:''}`;
+  const pcs=$('.papp',calc),pl=$('.plist',calc);
   function desenha(){
-    pcs.innerHTML=prods.map(p=>{const v=p.preco[per];const ok=v!=null;
-      const eq=per==='anual'&&ok?`equivale a ${brl(v/12)} por mês`:(per==='anual'?'só no plano mensal':'');
-      if(prods.length===1)return `<div class="pc on"><span class="nm">${esc(p.curto)}</span><span class="vl">${ok?brl(v):'—'}${ok?`<small>/${per==='anual'?'ano':'mês'}</small>`:''}</span><span class="eq">${eq}</span></div>`;
-      return `<button class="pc${p.id===sel?' on':''}" role="radio" aria-checked="${p.id===sel}" data-id="${p.id}"${ok?'':' disabled'}><span class="nm">${esc(p.curto)}${p.destaque&&prods.length>1?'<span class="chip">mais escolhido</span>':''}</span><span class="vl">${ok?brl(v):'—'}${ok?`<small>/${per==='anual'?'ano':'mês'}</small>`:''}</span><span class="eq">${eq}</span><span class="ds">${esc(p.resumo||'')}</span></button>`}).join('');
-    const p=prods.find(x=>x.id===sel);const n=typeof p.apps==='number'?p.apps:0;
-    if(n){escolha=escolha.slice(0,n);pick.hidden=false;
-      pick.innerHTML=`<div class="ph"><span>Escolha ${n===1?'o app':'os '+n+' apps'} do plano</span><b>${escolha.length} de ${n}</b></div><div class="ag">${APPS.map(a=>`<button data-id="${a.id}" class="${escolha.includes(a.id)?'on':''}"${!escolha.includes(a.id)&&escolha.length>=n?' disabled':''} aria-pressed="${escolha.includes(a.id)}"><span class="k"><i class="ti ${a.ic}"></i></span>${esc(a.nm)}</button>`).join('')}</div>`}
-    else pick.hidden=true;
-    const v=p.preco[per];const venda=p.checkout&&p.checkout[per];
-    const q=new URLSearchParams({plano:p.id,periodo:per});if(n&&escolha.length)q.set('apps',escolha.join(','));
-    const nomes=n?(escolha.length?escolha.map(id=>APPS.find(a=>a.id===id).nm).join(' + '):'escolha acima'):'os 5 apps';
-    const td=P.teste_dias==null?7:Number(P.teste_dias);
-    /* um produto só: o cartão já mostra nome e preço; aqui fica só o que falta (o que inclui e o próximo passo) */
-    sumr.innerHTML=prods.length===1
-      ?`<div class="t">${esc(p.resumo||'')}${td>0?` Teste ${td} dias grátis, sem cartão.`:' Sem fidelidade; se desistir em até 7 dias, devolvemos o valor.'}</div><div class="row"><a class="pill solid" href="app.html?${q}">${venda?'Assinar':(td>0?'Começar grátis':'Criar conta')}</a>${venda&&td>0?`<a class="pill ghost" href="app.html">Testar ${td} dias grátis</a>`:''}</div>`
-      :`<div class="t"><b>${esc(p.curto)} · ${per==='anual'?'anual':'mensal'} · ${v!=null?brl(v):''}</b>${esc(nomes)}.${td>0?` Comece com ${td} dias grátis de tudo; assine quando fizer sentido.`:''}</div><div class="row"><a class="pill solid" href="app.html?${q}">${venda?'Assinar':'Começar grátis'}</a><a class="pill ghost" href="app.html">Criar conta</a></div>`;
+    if(pcs)pcs.innerHTML=app.map(p=>`<div class="pone"><div class="pc"><span class="nm">${esc(p.curto)}</span>${valor(p)}<span class="eq">${eq(p)}</span></div><p class="t">${esc(p.resumo||'')}</p>${p.preco[per]!=null?`<a class="pill solid lg" href="${link('app.html',p)}" aria-label="Assinar o ${esc(p.curto)}, plano ${per}">Assinar</a>`:''}</div>`).join('');
+    if(pl)pl.innerHTML=provas.map(p=>`<li><div class="pn2"><b>${esc(p.curto)}</b><span>${esc(p.resumo||'')}</span></div><div class="pv">${valor(p)}${per==='anual'?`<span class="eq">${eq(p)}</span>`:''}</div>${p.preco[per]!=null?`<a class="pill ${app.length?'line':'solid'}" href="${link('provas.html',p)}" aria-label="Assinar o ${esc(p.curto)}, plano ${per}">Assinar</a>`:'<span></span>'}</li>`).join('');
   }
-  calc.addEventListener('click',e=>{const s=e.target.closest('.seg button');if(s){per=s.dataset.p;$$('.seg button',calc).forEach(b=>{b.classList.toggle('on',b===s);b.setAttribute('aria-pressed',b===s)});const p=prods.find(x=>x.id===sel);if(p.preco[per]==null)sel=(prods.find(x=>x.preco[per]!=null)||p).id;desenha();return}
-    const c=e.target.closest('.pc');if(c&&!c.disabled){sel=c.dataset.id;desenha();return}
-    const a=e.target.closest('.ag button');if(a&&!a.disabled){const id=a.dataset.id;escolha=escolha.includes(id)?escolha.filter(x=>x!==id):escolha.concat(id);desenha()}});
+  calc.addEventListener('click',e=>{const s=e.target.closest('.seg button');if(!s)return;per=s.dataset.p;
+    $$('.seg button',calc).forEach(b=>{b.classList.toggle('on',b===s);b.setAttribute('aria-pressed',b===s)});desenha()});
   desenha();
-  /* preços das plataformas de prova */
-  const pv=$('#provasPreco');if(pv){const pp=(P.produtos||[]).filter(p=>p.linha==='provas'&&!p.interno);
-    pv.innerHTML=pp.map(p=>{const v=p.preco&&(p.preco.anual||p.preco.mensal);return `<span>${esc(p.curto)}${v?` · ${brl(v)}`:''}</span>`}).join(' · ')}
-});
+}));
+
+/* ---------- ajuda: busca no próprio texto ---------- */
+const busca=$('#ajBusca');
+if(busca){const itens=$$('.ajq'),grupos=$$('.ajg'),nada=$('#ajNada'),cont=$('#ajCont');
+  const norm=t=>t.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+  itens.forEach(q=>q.dataset.txt=norm(q.textContent));
+  busca.addEventListener('input',()=>{const t=norm(busca.value.trim());let n=0;
+    itens.forEach(q=>{const ok=!t||t.split(/\s+/).every(w=>q.dataset.txt.includes(w));q.hidden=!ok;if(ok)n++});
+    grupos.forEach(g=>g.hidden=!$$('.ajq',g).some(q=>!q.hidden));
+    document.body.classList.toggle('aj-buscando',!!t);nada.hidden=n>0;cont.textContent=t?(n?`${n} ${n===1?'resposta encontrada':'respostas encontradas'}`:''):''});
+}
 
 /* ---------- números que contam ao aparecer ---------- */
 function conta(el){const alvo=+el.dataset.n,suf=el.dataset.s||'';if(PARADO){el.textContent=alvo.toLocaleString('pt-BR')+suf;return}const t0=performance.now(),d=1100;
