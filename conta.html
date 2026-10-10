@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Sua conta — MedTech</title>
+<meta name="theme-color" content="#F5F6FB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1017" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="stylesheet" href="vendor/tabler/tabler-icons.min.css?v=3.48.0">
+<script src="_mtfb.js?v=1"></script>
+<style>
+/* ============================================================
+   Página de ações da conta (10/10/2026): é o "URL acionável" dos
+   e-mails do Firebase Authentication. Trata os 4 modos que o Firebase
+   manda (mode=resetPassword | verifyEmail | recoverEmail |
+   verifyAndChangeEmail) com o oobCode do link. Visual do MedTech App
+   (tema vivo, índigo). O código do link sai da barra de endereço
+   assim que é lido e a página não manda referrer.
+   ============================================================ */
+@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/inter-400.woff2) format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/inter-500.woff2) format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/inter-600.woff2) format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/inter-700.woff2) format('woff2')}
+:root{
+  --ac:#5B5BF0;--acTxt:#fff;--papel:#F5F6FB;--sup:#FFFFFF;--sup2:#F1F3F9;
+  --tinta:#141827;--tinta2:#5D6579;--fio:#E6E9F2;--fioCampo:#8A92A6;
+  --ok:#0B7A54;--okSup:#E3F5EC;--erro:#B42318;--erroSup:#FDECEA;
+  --acSup:color-mix(in srgb,var(--ac) 12%,var(--sup));--acInk:color-mix(in srgb,var(--ac) 80%,var(--tinta));
+  --anel:color-mix(in srgb,var(--ac) 65%,var(--tinta));
+  --sombra:0 24px 60px -28px rgba(20,24,40,.28),0 2px 6px rgba(20,24,40,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    color-scheme:dark;
+    --papel:#0D1017;--sup:#161B26;--sup2:#1C2230;--tinta:#EDF0F7;--tinta2:#A3ABBE;--fio:#252C3B;--fioCampo:#6B748B;
+    --ok:#4ADE9B;--okSup:#123326;--erro:#FF8A80;--erroSup:#3A1716;
+    --acSup:color-mix(in srgb,var(--ac) 20%,var(--sup));--acInk:color-mix(in srgb,var(--ac) 62%,#fff);
+    --anel:color-mix(in srgb,var(--ac) 70%,#fff);
+    --sombra:0 24px 60px -28px rgba(0,0,0,.7);
+  }
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{min-height:100%}
+body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--papel);color:var(--tinta);
+  font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:calc(24px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));min-height:100vh}
+main{width:100%;max-width:400px}
+.marca{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:22px;text-decoration:none;color:var(--tinta);font-weight:700;font-size:19px;letter-spacing:-.02em}
+.marca .mk{width:36px;height:36px;border-radius:50%;background:var(--ac);display:grid;place-items:center;box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 35%,transparent)}
+.marca .mk svg{width:22px;height:22px}
+.marca b{color:var(--acInk);font-weight:700}
+.card{background:var(--sup);border:1px solid var(--fio);border-radius:28px;padding:32px 28px 28px;box-shadow:var(--sombra)}
+.ico{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:26px;background:var(--acSup);color:var(--acInk);margin-bottom:18px}
+.ico.ok{background:var(--okSup);color:var(--ok)}
+.ico.erro{background:var(--erroSup);color:var(--erro)}
+h1:focus{outline:none}
+h1{font-size:22px;font-weight:700;letter-spacing:-.025em;line-height:1.25;text-wrap:balance}
+.sub{color:var(--tinta2);margin-top:6px;font-size:14.5px}
+.sub strong{color:var(--tinta);font-weight:600;word-break:break-all}
+form{display:flex;flex-direction:column;gap:14px;margin-top:22px}
+label{font-size:13px;font-weight:600;color:var(--tinta);display:block;margin-bottom:6px}
+.campo{position:relative}
+input{width:100%;font:inherit;font-size:16px;color:var(--tinta);background:var(--sup);border:1.5px solid var(--fioCampo);border-radius:14px;padding:13px 48px 13px 15px;transition:border-color .15s,box-shadow .15s}
+input.semolho{padding-right:15px}
+input:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 18%,transparent)}
+input[aria-invalid="true"]{border-color:var(--erro)}
+.olho{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:44px;height:44px;border:0;background:none;color:var(--tinta2);border-radius:12px;cursor:pointer;display:grid;place-items:center;font-size:20px}
+.olho:hover{color:var(--tinta)}
+.regras{list-style:none;display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--tinta2);margin-top:2px}
+.regras li{display:flex;align-items:center;gap:7px}
+.regras li i{font-size:16px}
+.regras li.ok{color:var(--ok)}
+.msg{font-size:13.5px;border-radius:12px;padding:10px 12px;display:flex;gap:8px;align-items:flex-start}
+.msg:empty{display:none}
+.msg.erro{background:var(--erroSup);color:var(--erro)}
+.msg.ok{background:var(--okSup);color:var(--ok)}
+.msg i{font-size:17px;margin-top:1px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font:inherit;font-size:15px;font-weight:600;padding:14px 18px;border-radius:999px;border:0;cursor:pointer;text-decoration:none;background:var(--ac);color:var(--acTxt);box-shadow:0 10px 22px -8px color-mix(in srgb,var(--ac) 55%,transparent);transition:transform .15s,filter .15s}
+.btn:hover{filter:brightness(1.06)}
+.btn:active{transform:scale(.98)}
+.btn[disabled]{opacity:.55;cursor:default;filter:none;transform:none}
+.btn.sec{background:var(--sup2);color:var(--tinta);box-shadow:none;border:1px solid var(--fio)}
+.acoes{display:flex;flex-direction:column;gap:10px;margin-top:22px}
+:is(.btn,.olho,a):focus-visible{outline:3px solid var(--anel);outline-offset:2px}
+.spin{width:22px;height:22px;border-radius:50%;border:2.5px solid var(--acSup);border-top-color:var(--ac);animation:gira .8s linear infinite}
+.carregando{display:flex;flex-direction:column;align-items:center;gap:14px;padding:18px 0;color:var(--tinta2);font-size:14px}
+@keyframes gira{to{transform:rotate(360deg)}}
+.rodape{margin-top:22px;text-align:center;font-size:12.5px;color:var(--tinta2)}
+.rodape a{color:var(--tinta2);text-decoration:underline;text-underline-offset:2px}
+[hidden]{display:none!important}
+@media (max-width:380px){.card{padding:26px 20px 22px;border-radius:24px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <a class="marca" href="/app.html" aria-label="MedTech App">
+    <span class="mk" aria-hidden="true"><svg viewBox="0 0 96 96"><path d="M18 50 h13 l7 -20 9 38 8 -26 5 8 h13" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    <span>Med<b>Tech</b></span>
+  </a>
+  <section class="card" id="card" aria-live="polite">
+    <div class="carregando" id="carregando"><span class="spin" aria-hidden="true"></span>Conferindo o link…</div>
+  </section>
+  <p class="rodape"><a href="/privacidade.html">Privacidade</a> · <a href="/termos.html">Termos</a> · <a href="/ajuda.html">Ajuda</a></p>
+</main>
+
+<script type="module">
+const $ = s => document.querySelector(s);
+const card = $('#card');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+/* parâmetros do link do Firebase; o código sai da barra de endereço logo após a leitura */
+const Q = new URLSearchParams(location.search);
+const modo = Q.get('mode') || '';
+const codigo = Q.get('oobCode') || '';
+const destino = (() => {
+  try {
+    const u = new URL(Q.get('continueUrl') || '', location.origin);
+    return (u.origin === location.origin) ? u.pathname + u.search : '/app.html';
+  } catch (e) { return '/app.html'; }
+})();
+if (codigo) history.replaceState(null, '', location.pathname);
+
+function tela(html, foco) {
+  card.innerHTML = html;
+  const alvo = foco ? card.querySelector(foco) : card.querySelector('h1');
+  if (alvo) { if (alvo.tagName === 'H1') alvo.setAttribute('tabindex', '-1'); alvo.focus({ preventScroll: true }); }
+}
+const icone = (nome, tipo = '') => `<div class="ico ${tipo}" aria-hidden="true"><i class="ti ti-${nome}"></i></div>`;
+const btnEntrar = (txt = 'Entrar no MedTech') => `<a class="btn" href="${esc(destino)}"><i class="ti ti-login-2" aria-hidden="true"></i>${txt}</a>`;
+
+function erroLink(e) {
+  const c = (e && e.code) || '';
+  if (/expired-action-code/.test(c)) return 'Este link expirou. Por segurança, ele vale por pouco tempo.';
+  if (/invalid-action-code/.test(c)) return 'Este link já foi usado ou não é mais válido.';
+  if (/user-disabled/.test(c)) return 'Esta conta está desativada. Fale com o suporte do MedTech.';
+  if (/user-not-found/.test(c)) return 'Não encontramos a conta deste link.';
+  if (/network/.test(c)) return 'Sem conexão com a internet. Confira a rede e tente de novo.';
+  return 'Não foi possível usar este link.';
+}
+
+/* tela para pedir um link novo (link vencido, usado ou ausente) */
+function telaPedirNovo(motivo, auth, A) {
+  tela(`${icone('link-off', 'erro')}
+    <h1>Link indisponível</h1>
+    <p class="sub">${esc(motivo)} Peça um link novo abaixo.</p>
+    <form id="fNovo" novalidate>
+      <div><label for="emNovo">Seu e-mail</label>
+        <input id="emNovo" class="semolho" type="email" autocomplete="email" inputmode="email" required></div>
+      <p class="msg" id="mNovo" role="alert"></p>
+      <button class="btn" type="submit"><i class="ti ti-mail-forward" aria-hidden="true"></i>Enviar link novo</button>
+    </form>
+    <div class="acoes"><a class="btn sec" href="/app.html">Voltar ao MedTech</a></div>`);
+  const f = $('#fNovo'), m = $('#mNovo');
+  f.onsubmit = async ev => {
+    ev.preventDefault();
+    const email = $('#emNovo').value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { m.className = 'msg erro'; m.innerHTML = '<i class="ti ti-alert-circle" aria-hidden="true"></i>Digite um e-mail válido.'; $('#emNovo').setAttribute('aria-invalid', 'true'); return; }
+    $('#emNovo').removeAttribute('aria-invalid');
+    const b = f.querySelector('button'); b.disabled = true;
+    try {
+      if (auth && A) await A.sendPasswordResetEmail(auth, email);
+    } catch (e) {
+      if (/network/.test(e.code || '')) { m.className = 'msg erro'; m.innerHTML = '<i class="ti ti-wifi-off" aria-hidden="true"></i>Sem conexão. Tente de novo.'; b.disabled = false; return; }
+      /* outros erros (ex.: e-mail sem conta) não são revelados: mesma resposta para todos */
+    }
+    tela(`${icone('mail-check', 'ok')}
+      <h1>Confira seu e-mail</h1>
+      <p class="sub">Se <strong>${esc(email)}</strong> tiver conta no MedTech, o link para criar uma senha nova chega em instantes. Olhe também a caixa de spam.</p>
+      <div class="acoes"><a class="btn sec" href="/app.html">Voltar ao MedTech</a></div>`);
+  };
+}
+
+/* ---- redefinir senha ---- */
+function telaNovaSenha(email, auth, A) {
+  tela(`${icone('lock-password')}
+    <h1>Crie uma senha nova</h1>
+    <p class="sub">Para a conta <strong>${esc(email)}</strong></p>
+    <form id="fSenha" novalidate>
+      <input type="email" autocomplete="username" value="${esc(email)}" hidden aria-hidden="true" tabindex="-1">
+      <div><label for="s1">Senha nova</label>
+        <div class="campo"><input id="s1" type="password" autocomplete="new-password" minlength="6" required aria-describedby="regras">
+        <button class="olho" type="button" data-alvo="s1" aria-label="Mostrar senha" aria-pressed="false"><i class="ti ti-eye" aria-hidden="true"></i></button></div></div>
+      <div><label for="s2">Repita a senha</label>
+        <div class="campo"><input id="s2" type="password" autocomplete="new-password" required>
+        <button class="olho" type="button" data-alvo="s2" aria-label="Mostrar senha" aria-pressed="false"><i class="ti ti-eye" aria-hidden="true"></i></button></div></div>
+      <ul class="regras" id="regras">
+        <li data-r="tam"><i class="ti ti-circle" aria-hidden="true"></i><span>Pelo menos 8 caracteres</span></li>
+        <li data-r="mix"><i class="ti ti-circle" aria-hidden="true"></i><span>Letras e números</span></li>
+        <li data-r="igual"><i class="ti ti-circle" aria-hidden="true"></i><span>As duas senhas iguais</span></li>
+      </ul>
+      <p class="msg" id="mSenha" role="alert"></p>
+      <button class="btn" type="submit" id="bSalvar" disabled><i class="ti ti-check" aria-hidden="true"></i>Salvar senha nova</button>
+    </form>`, '#s1');
+  const s1 = $('#s1'), s2 = $('#s2'), b = $('#bSalvar'), m = $('#mSenha');
+  card.querySelectorAll('.olho').forEach(o => o.onclick = () => {
+    const i = $('#' + o.dataset.alvo), ver = i.type === 'password';
+    i.type = ver ? 'text' : 'password';
+    o.setAttribute('aria-pressed', String(ver)); o.setAttribute('aria-label', ver ? 'Esconder senha' : 'Mostrar senha');
+    o.innerHTML = `<i class="ti ti-${ver ? 'eye-off' : 'eye'}" aria-hidden="true"></i>`;
+  });
+  const confere = () => {
+    const v = s1.value, r = { tam: v.length >= 8, mix: /[a-zA-ZÀ-ÿ]/.test(v) && /\d/.test(v), igual: !!v && v === s2.value };
+    card.querySelectorAll('.regras li').forEach(li => {
+      const ok = r[li.dataset.r]; li.classList.toggle('ok', ok);
+      li.querySelector('i').className = 'ti ti-' + (ok ? 'circle-check' : 'circle');
+    });
+    b.disabled = !(r.tam && r.mix && r.igual);
+    m.className = 'msg'; m.textContent = '';
+  };
+  s1.oninput = confere; s2.oninput = confere;
+  $('#fSenha').onsubmit = async ev => {
+    ev.preventDefault(); if (b.disabled) return;
+    b.disabled = true; b.innerHTML = '<span class="spin" aria-hidden="true" style="width:18px;height:18px;border-color:rgba(255,255,255,.35);border-top-color:#fff"></span>Salvando…';
+    try {
+      await A.confirmPasswordReset(auth, codigo, s1.value);
+      /* entra direto com a senha nova (se falhar, a pessoa entra pela tela de login) */
+      let entrou = false;
+      try { await A.signInWithEmailAndPassword(auth, email, s1.value); entrou = true; } catch (e) {}
+      tela(`${icone('circle-check', 'ok')}
+        <h1>Senha alterada</h1>
+        <p class="sub">${entrou ? 'Pronto, você já está conectado.' : 'Agora é só entrar com a senha nova.'} Use a senha nova em todos os apps MedTech.</p>
+        <div class="acoes">${btnEntrar(entrou ? 'Abrir o MedTech' : 'Entrar no MedTech')}</div>`);
+    } catch (e) {
+      const c = e.code || '';
+      if (/weak-password/.test(c)) { m.className = 'msg erro'; m.innerHTML = '<i class="ti ti-alert-circle" aria-hidden="true"></i>Senha fraca. Use pelo menos 8 caracteres, com letras e números.'; }
+      else if (/action-code/.test(c)) { telaPedirNovo(erroLink(e), auth, A); return; }
+      else { m.className = 'msg erro'; m.innerHTML = '<i class="ti ti-alert-circle" aria-hidden="true"></i>' + esc(erroLink(e)); }
+      b.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i>Salvar senha nova'; confere();
+    }
+  };
+}
+
+async function iniciar() {
+  let A = null, auth = null;
+  try {
+    const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js');
+    A = await import('https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js');
+    auth = A.getAuth(initializeApp(window.MEDTECH_FB, 'conta'));
+    auth.languageCode = 'pt-BR';
+  } catch (e) {
+    tela(`${icone('wifi-off', 'erro')}<h1>Sem conexão</h1><p class="sub">Não conseguimos carregar esta página. Confira a internet e abra o link de novo.</p>
+      <div class="acoes"><button class="btn" type="button" onclick="location.reload()">Tentar de novo</button></div>`);
+    return;
+  }
+  if (!codigo || !modo) { telaPedirNovo('Este endereço não traz um link de e-mail.', auth, A); return; }
+  try {
+    if (modo === 'resetPassword') {
+      const email = await A.verifyPasswordResetCode(auth, codigo);
+      telaNovaSenha(email, auth, A);
+    } else if (modo === 'verifyEmail') {
+      await A.applyActionCode(auth, codigo);
+      tela(`${icone('mail-check', 'ok')}<h1>E-mail confirmado</h1>
+        <p class="sub">Obrigado! Sua conta MedTech está confirmada.</p><div class="acoes">${btnEntrar('Abrir o MedTech')}</div>`);
+    } else if (modo === 'verifyAndChangeEmail') {
+      const info = await A.checkActionCode(auth, codigo);
+      await A.applyActionCode(auth, codigo);
+      const novo = (info.data && info.data.email) || '';
+      tela(`${icone('mail-check', 'ok')}<h1>E-mail alterado</h1>
+        <p class="sub">${novo ? `Agora você entra com <strong>${esc(novo)}</strong>.` : 'Seu e-mail de acesso foi trocado.'}</p><div class="acoes">${btnEntrar()}</div>`);
+    } else if (modo === 'recoverEmail') {
+      const info = await A.checkActionCode(auth, codigo);
+      const antigo = (info.data && info.data.email) || '';
+      await A.applyActionCode(auth, codigo);
+      tela(`${icone('shield-check', 'ok')}<h1>E-mail restaurado</h1>
+        <p class="sub">Desfizemos a troca: a conta volta a usar <strong>${esc(antigo)}</strong>. Se não foi você quem pediu a troca, crie uma senha nova agora.</p>
+        <p class="msg" id="mRec" role="alert"></p>
+        <div class="acoes"><button class="btn" type="button" id="bRec"><i class="ti ti-lock-password" aria-hidden="true"></i>Receber link de senha nova</button>${btnEntrar().replace('class="btn"', 'class="btn sec"')}</div>`);
+      $('#bRec').onclick = async () => {
+        const mm = $('#mRec'); $('#bRec').disabled = true;
+        try { await A.sendPasswordResetEmail(auth, antigo); mm.className = 'msg ok'; mm.innerHTML = '<i class="ti ti-mail-forward" aria-hidden="true"></i>Link enviado para ' + esc(antigo) + '.'; }
+        catch (e) { mm.className = 'msg erro'; mm.textContent = 'Não foi possível enviar agora. Tente de novo.'; $('#bRec').disabled = false; }
+      };
+    } else {
+      telaPedirNovo('Não reconhecemos este link.', auth, A);
+    }
+  } catch (e) {
+    telaPedirNovo(erroLink(e), auth, A);
+  }
+}
+iniciar();
+</script>
+</body>
+</html>
