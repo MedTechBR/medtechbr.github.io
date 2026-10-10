@@ -2165,7 +2165,7 @@ function initMermaid(){
   mermaid.initialize({
   startOnLoad: false,
   theme: 'base',
-  securityLevel: 'loose',
+  securityLevel: 'strict',   /* 10/10/2026: 'loose' deixava a IA pôr HTML/click no fluxograma */
   fontSize: 15,
   themeVariables: (document.documentElement.hasAttribute('data-astra') ? {
     /* tema Astra: fluxograma preto/branco, no vocabulario do app */
@@ -2946,6 +2946,11 @@ function formatDate(d) {
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
+/* Link vindo da IA/da busca: só http(s). javascript:, data:, vbscript: etc. viram "#" (10/10/2026). */
+function urlSegura(u) {
+  const t = String(u == null ? '' : u).trim();
+  return /^https?:\/\//i.test(t) ? t : '#';
+}
 
 // ============ Markdown render com Mermaid ============
 function md(text) {
@@ -2974,7 +2979,8 @@ function md(text) {
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
   html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
   html = html.replace(/^---+$/gm, '<hr>');
-  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  /* links: só http(s) (o texto já foi escapado, então aspas não fecham o atributo) */
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, txt, url) => `<a href="${urlSegura(url)}" target="_blank" rel="noopener noreferrer">${txt}</a>`);
   // Tabelas markdown — tolerante: aceita pipes de borda opcionais, separador com
   // qualquer nº de traços, linhas sem pipe final. Tabela larga vira rolável no mobile.
   const _isSep = l => /^\|?[\s:|-]*-[\s:|-]*\|?$/.test(l); // linha só de separador (---|:--- etc.)
@@ -3533,7 +3539,7 @@ function renderSourcesHtml(sources) {
     <div class="sources">
       <div class="sources-title"><i class="ti ti-world-search"></i> Fontes consultadas</div>
       ${sources.map((s, i) => `
-        <a href="${escapeHtml(s.uri)}" target="_blank" rel="noopener" class="source-item">
+        <a href="${escapeHtml(urlSegura(s.uri))}" target="_blank" rel="noopener noreferrer" class="source-item">
           <span class="src-num">${i+1}</span>${escapeHtml(s.title || s.uri)}
         </a>`).join('')}
     </div>

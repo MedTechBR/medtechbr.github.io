@@ -396,8 +396,19 @@ async function saveLaudoToFirestore(text, ctx) {
 }
 
 // ===== File handling =====
+/* Teto do que o navegador carrega de uma vez (10/10/2026): ZIP/DICOM/imagens somados.
+   Vídeo tem o teto próprio (2 GB, abaixo), porque só alguns quadros são lidos. */
+const MAX_ENVIO_MB = 200;
 async function handleFiles(fileList) {
   let all = Array.from(fileList);
+  {
+    const ehVideo = (f) => (f.type || '').startsWith('video/') || /\.(mp4|mov|webm|m4v|qt|avi|mkv)$/i.test(f.name || '');
+    const soma = all.filter(f => !ehVideo(f)).reduce((t, f) => t + (f.size || 0), 0);
+    if (soma > MAX_ENVIO_MB * 1024 * 1024) {
+      toast(`Arquivos grandes demais: ${Math.round(soma / 1048576)} MB (máximo ${MAX_ENVIO_MB} MB por vez). Envie só a série que interessa ou divida em partes.`, 'error');
+      return;
+    }
+  }
 
   // Expande ZIPs upfront — pode conter DICOM, PNG (do bookmarklet em fallback), MP4 etc.
   const expanded = [];

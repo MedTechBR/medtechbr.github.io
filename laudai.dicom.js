@@ -49,16 +49,33 @@ const Dicom = (() => {
     return false;
   }
 
+  /* Tetos no navegador (10/10/2026): um ZIP pequeno pode descompactar em gigas
+     ("zip bomb") e travar a aba. Confere o tamanho declarado ANTES e o real ao extrair. */
+  const MAX_TOTAL_MB = 200, MAX_ARQUIVOS_ZIP = 5000;
+  const MAX_TOTAL = MAX_TOTAL_MB * 1024 * 1024;
+  const erroTamanho = (nome) => new Error(`"${nome}" passa de ${MAX_TOTAL_MB} MB descompactado. Envie só a série que interessa ou divida em partes menores.`);
+  function conferirZip(zip, nome) {
+    const entries = Object.values(zip.files).filter(e => !e.dir);
+    if (entries.length > MAX_ARQUIVOS_ZIP) throw new Error(`"${nome}" tem ${entries.length} arquivos (máximo ${MAX_ARQUIVOS_ZIP}). Envie só a série que interessa.`);
+    const declarado = entries.reduce((t, e) => t + (Number(e._data && e._data.uncompressedSize) || 0), 0);
+    if (declarado > MAX_TOTAL) throw erroTamanho(nome);
+    return entries;
+  }
+
   // Extrai todos os arquivos de um ZIP sem filtrar — chamado por app.js antes de rotear.
   async function extractZipAll(zipFile) {
     await ensureLibs();
+    if (zipFile.size > MAX_TOTAL) throw erroTamanho(zipFile.name || 'ZIP');
     const zip = await window.JSZip.loadAsync(zipFile);
-    const entries = Object.values(zip.files);
+    const entries = conferirZip(zip, zipFile.name || 'ZIP');
     const files = [];
+    let total = 0;
     for (const entry of entries) {
       if (entry.dir) continue;
       if (entry.name.includes('__MACOSX') || entry.name.includes('.DS_Store')) continue;
       const blob = await entry.async('blob');
+      total += blob.size;
+      if (total > MAX_TOTAL) throw erroTamanho(zipFile.name || 'ZIP');
       const baseName = (entry.name.split('/').pop() || entry.name).trim();
       if (!baseName) continue;
       files.push(new File([blob], baseName, { type: blob.type || guessMime(baseName) }));
@@ -86,14 +103,18 @@ const Dicom = (() => {
     for (const f of files) {
       if ((f.name || '').toLowerCase().endsWith('.zip')) {
         try {
+          if (f.size > MAX_TOTAL) throw erroTamanho(f.name || 'ZIP');
           const zip = await window.JSZip.loadAsync(f);
-          const entries = Object.values(zip.files);
+          const entries = conferirZip(zip, f.name || 'ZIP');
+          let total = 0;
           for (const entry of entries) {
             if (entry.dir) continue;
             if (!isDicomName(entry.name)) continue;
             // Skip macOS metadata
             if (entry.name.includes('__MACOSX') || entry.name.includes('.DS_Store')) continue;
             const blob = await entry.async('blob');
+            total += blob.size;
+            if (total > MAX_TOTAL) throw erroTamanho(f.name || 'ZIP');
             const baseName = entry.name.split('/').pop() || entry.name;
             expanded.push(new File([blob], baseName));
           }

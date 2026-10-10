@@ -573,7 +573,7 @@ function renderDashboard() {
         const fillWidth = hasBudget ? Math.min(100, pct) : 0;
         const status = !hasBudget ? 'no-budget' : (pct > 100 ? 'over' : pct >= 80 ? 'warn' : 'ok');
         const fillStyle = !hasBudget
-          ? `width:${Math.min(100, (r.spent / Math.max(1, total)) * 100)}%;background:${cat.color};opacity:.55`
+          ? `width:${Math.min(100, (r.spent / Math.max(1, total)) * 100)}%;background:${corSegura(cat.color)};opacity:.55`
           : status === 'over' ? `width:100%;background:var(--c-vermelho)`
           : status === 'warn' ? `width:${fillWidth}%;background:var(--c-ambar)`
           : `width:${fillWidth}%;background:var(--c-verde)`;
@@ -588,7 +588,7 @@ function renderDashboard() {
           : `${fmt.format(r.spent)}`;
         return `<div class="bar-item" data-cat="${escapeHTML(r.name)}" role="button" tabindex="0" aria-label="Ver lançamentos de ${escapeHTML(r.name)}">
           <div class="row">
-            <div class="name"><span class="dot" style="background:${cat.color}"></span><span class="emoji">${cat.icon || '🏷️'}</span> ${r.name}</div>
+            <div class="name"><span class="dot" style="background:${corSegura(cat.color)}"></span><span class="emoji">${escapeHTML(cat.icon || '🏷️')}</span> ${escapeHTML(r.name)}</div>
             <div>${right}</div>
           </div>
           <div class="bar-sub">${sub}</div>
@@ -636,7 +636,7 @@ function renderDonut(byCat) {
   let offset = 0;
   const arcs = slices.map(s => {
     const len = s.pct * C;
-    const arc = `<circle cx="${CENTER}" cy="${CENTER}" r="${R}" fill="none" stroke="${s.cat.color}" stroke-width="${STROKE}" stroke-dasharray="${len.toFixed(2)} ${(C - len).toFixed(2)}" stroke-dashoffset="${(-offset).toFixed(2)}" transform="rotate(-90 ${CENTER} ${CENTER})" />`;
+    const arc = `<circle cx="${CENTER}" cy="${CENTER}" r="${R}" fill="none" stroke="${corSegura(s.cat.color)}" stroke-width="${STROKE}" stroke-dasharray="${len.toFixed(2)} ${(C - len).toFixed(2)}" stroke-dashoffset="${(-offset).toFixed(2)}" transform="rotate(-90 ${CENTER} ${CENTER})" />`;
     offset += len;
     return arc;
   }).join('');
@@ -648,7 +648,7 @@ function renderDonut(byCat) {
   const legendItems = [
     ...top.map(s => `
       <li>
-        <span class="dot" style="background:${s.cat.color}"></span>
+        <span class="dot" style="background:${corSegura(s.cat.color)}"></span>
         <span class="name">${escapeHTML(s.name)}</span>
         <span class="val">${fmt.format(s.val)}</span>
         <span class="pct">${Math.round(s.pct * 100)}%</span>
@@ -763,13 +763,13 @@ function renderScheduled() {
     const days = Math.max(0, Math.round((new Date(t.date + 'T00:00:00').getTime() - todayMs) / 86400000));
     const dayLabel = days === 0 ? 'hoje' : days === 1 ? 'amanhã' : `em ${days} dias`;
     const dateBR = t.date.split('-').reverse().slice(0, 2).join('/');
-    return `<li class="tx-item pending" data-tx-id="${t.id}">
-      <div class="icon" style="background:${cat.color}22;color:${cat.color}">${cat.icon}</div>
+    return `<li class="tx-item pending" data-tx-id="${escapeHTML(t.id)}">
+      <div class="icon" style="background:${corSegura(cat.color)}22;color:${corSegura(cat.color)}">${escapeHTML(cat.icon)}</div>
       <div class="meta">
         <span class="desc">${escapeHTML(t.description || cat.name || '—')}</span>
         <span class="sub">${dateBR} · <strong style="color:var(--primary-2)">${dayLabel}</strong> · ${escapeHTML(t.category)}</span>
       </div>
-      <span class="val ${t.type}">${txSign} ${fmt.format(t.amount)}</span>
+      <span class="val ${t.type === 'income' ? 'income' : 'expense'}">${txSign} ${fmt.format(t.amount)}</span>
     </li>`;
   }).join('');
   attachTxClicks('scheduledList');
@@ -881,24 +881,32 @@ function txItemHTML(t, hideDate) {
   // Chip: fundo tonal da cor da categoria + emoji + nome.
   // O texto NÃO pode ser a cor crua — âmbar puro sobre âmbar 12% dava 1,96:1
   // (AA exige 4,5). corLegivel escurece a mesma cor até passar.
-  const chipBg = cat.color + '1F'; // ~12% alpha
-  const chipFg = corLegivel(cat.color, misturar(cat.color, '#FFFFFF', 0.12));
+  const corCat = /^#[0-9a-f]{6}$/i.test(String(cat.color || '')) ? cat.color : '#999999';
+  const chipBg = corCat + '1F'; // ~12% alpha
+  const chipFg = corSegura(corLegivel(corCat, misturar(corCat, '#FFFFFF', 0.12)));
   const conta = (state.accounts || []).find(a => a.id === t.accountId);
-  return `<li class="tx-item${pendingCls}" data-id="${t.id}">
+  return `<li class="tx-item${pendingCls}" data-id="${escapeHTML(t.id)}">
     <span class="txc-date txc-dim">${new Date(t.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}</span>
     <div class="meta">
       <span class="desc">${escapeHTML(t.description)}${pendingBadge}</span>
       ${hideDate ? '' : `<span class="sub">${dayFmt.format(new Date(t.date + 'T00:00:00'))}</span>`}
     </div>
     <span class="tx-cat-chip" style="background:${chipBg};color:${chipFg}">
-      <span class="ico">${cat.icon || '🏷️'}</span> ${escapeHTML(t.category)}
+      <span class="ico">${escapeHTML(cat.icon || '🏷️')}</span> ${escapeHTML(t.category)}
     </span>
     <span class="txc-acc txc-dim">${conta ? escapeHTML(conta.name) : ''}</span>
-    <span class="val ${t.type} txc-r">${sign} ${fmt.format(t.amount)}</span>
+    <span class="val ${t.type === 'income' ? 'income' : 'expense'} txc-r">${sign} ${fmt.format(t.amount)}</span>
   </li>`;
 }
 function escapeHTML(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+/* Cor que vai para style="..." (10/10/2026): vem do banco/sincronização, então só
+   passa formato de cor; o resto vira um cinza neutro (nunca fecha o atributo). */
+function corSegura(c, padrao) {
+  const t = String(c ?? '').trim();
+  if (/^#[0-9a-f]{3,8}$/i.test(t) || /^(rgb|hsl)a?\([\d\s.,%/]+\)$/i.test(t) || /^var\(--[\w-]+\)$/.test(t) || /^[a-z]{3,20}$/i.test(t)) return t;
+  return padrao || '#94a3b8';
 }
 
 function isYesterday(dateStr) {
@@ -1044,7 +1052,7 @@ function openTxDetail(id) {
       <div><span class="muted small">Situação</span><b>${t.pending ? 'Agendado' : 'Efetivado'}</b></div>
       <div><span class="muted small">Data</span><b>${dataFmt}</b></div>
       ${venc}
-      <div><span class="muted small">Categoria</span><b><span style="color:${cat.color}">${escapeHTML(cat.icon || '')}</span> ${escapeHTML(t.category || '—')}</b></div>
+      <div><span class="muted small">Categoria</span><b><span style="color:${corSegura(cat.color)}">${escapeHTML(cat.icon || '')}</span> ${escapeHTML(t.category || '—')}</b></div>
       ${t.sub ? `<div><span class="muted small">Subcategoria</span><b>${escapeHTML(t.sub)}</b></div>` : ''}
       ${conta ? `<div><span class="muted small">${conta.kind === 'cartao' ? 'Cartão' : 'Conta'}</span><b>${escapeHTML(conta.name)}</b></div>` : ''}
     </div>
@@ -1224,11 +1232,11 @@ function cmtItemHTML(c) {
     `<span>${fmt.format(c.pago)} pagos</span>`;
   /* a linha do banco vale mesmo sem extrato oficial (só o nome já situa) */
   const juros = (c.kind === 'financiamento' && (c.valorFinanciado || c.banco))
-    ? `<div class="cmt-juros">${c.banco ? '<b>' + escapeHTML(c.banco) + '</b> · ' : ''}${c.valorFinanciado ? 'financiado ' + fmt.format(c.valorFinanciado) : 'sem extrato oficial ainda'}${c.taxaAnual ? ' · ' + String(c.taxaAnual).replace('.', ',') + '% a.a' : ''}${c.sistema ? ' · ' + escapeHTML(c.sistema) : ''}${c.diaDebito ? ' · debita dia ' + c.diaDebito : ''}</div>`
+    ? `<div class="cmt-juros">${c.banco ? '<b>' + escapeHTML(c.banco) + '</b> · ' : ''}${c.valorFinanciado ? 'financiado ' + fmt.format(c.valorFinanciado) : 'sem extrato oficial ainda'}${c.taxaAnual ? ' · ' + escapeHTML(String(c.taxaAnual).replace('.', ',')) + '% a.a' : ''}${c.sistema ? ' · ' + escapeHTML(c.sistema) : ''}${c.diaDebito ? ' · debita dia ' + escapeHTML(c.diaDebito) : ''}</div>`
     : '';
   return `<li class="cmt-item${c.quitado ? ' quitado' : ''}" data-cmt="${escapeHTML(c.id)}">
     <div class="cmt-top">
-      <span class="cmt-ico" style="background:${cat.color}22;color:${cat.color}">${escapeHTML(cat.icon || '🏷️')}</span>
+      <span class="cmt-ico" style="background:${corSegura(cat.color)}22;color:${corSegura(cat.color)}">${escapeHTML(cat.icon || '🏷️')}</span>
       <div class="cmt-id">
         <strong>${escapeHTML(c.descricao)}</strong>
         <small class="muted">${c.kind === 'financiamento' ? 'Financiamento' : 'Parcelamento'} · ${escapeHTML(c.categoria || '')}</small>
@@ -1254,7 +1262,7 @@ function dividaItemHTML(c, cat) {
   const p = c.total ? pct(c.pago, c.total) : 0;
   return `<li class="cmt-item${c.quitado ? ' quitado' : ''}" data-cmt="${escapeHTML(c.id)}">
     <div class="cmt-top">
-      <span class="cmt-ico" style="background:${cat.color}22;color:${cat.color}">${escapeHTML(cat.icon || '🤝')}</span>
+      <span class="cmt-ico" style="background:${corSegura(cat.color)}22;color:${corSegura(cat.color)}">${escapeHTML(cat.icon || '🤝')}</span>
       <div class="cmt-id">
         <strong>${escapeHTML(c.descricao)}</strong>
         <small class="muted">Dívida${c.credor ? ' · ' + escapeHTML(c.credor) : ''} · sem prazo fixo</small>
@@ -1379,8 +1387,8 @@ function renderCategories() {
 }
 function catItemHTML(c) {
   const count = state.transactions.filter(t => t.category === c.name).length;
-  return `<li class="cat-item" data-id="${c.id}">
-    <div class="icon" style="background:${c.color}22;color:${c.color}">${c.icon}</div>
+  return `<li class="cat-item" data-id="${escapeHTML(c.id)}">
+    <div class="icon" style="background:${corSegura(c.color)}22;color:${corSegura(c.color)}">${escapeHTML(c.icon)}</div>
     <span class="name">${escapeHTML(c.name)}</span>
     <span class="badge">${count} lançamento${count === 1 ? '' : 's'}</span>
   </li>`;
@@ -1496,8 +1504,8 @@ function fixedItemHTML(f) {
   const cat = categoryByName(f.category) || { color: '#888', icon: '🏷️' };
   const isYearly = f.frequency === 'yearly';
   const freqLabel = isYearly ? `1×/ano em ${MONTH_NAMES_PT[f.month] || '—'}` : 'mensal';
-  return `<li class="cat-item" data-fixedid="${f.id}">
-    <div class="icon" style="background:${cat.color}22;color:${cat.color}">${cat.icon}</div>
+  return `<li class="cat-item" data-fixedid="${escapeHTML(f.id)}">
+    <div class="icon" style="background:${corSegura(cat.color)}22;color:${corSegura(cat.color)}">${escapeHTML(cat.icon)}</div>
     <div style="flex:1;min-width:0">
       <div class="name">${escapeHTML(f.name)}</div>
       <div class="badge">${fmt.format(f.amount)} · ${escapeHTML(f.category)} · ${freqLabel}</div>
@@ -1579,10 +1587,18 @@ fixedDelete.addEventListener('click', () => {
 });
 
 // Upload de planilha de fixos
+/* Teto de arquivo enviado à IA (10/10/2026): 10 MB, com mensagem clara antes de ler. */
+const MAX_ARQUIVO_MB = 10;
+function arquivoGrandeDemais(file) {
+  return !!file && file.size > MAX_ARQUIVO_MB * 1024 * 1024;
+}
+const MSG_ARQUIVO_GRANDE = `Arquivo grande demais (máximo ${MAX_ARQUIVO_MB} MB). Envie as páginas em partes ou uma foto/PDF mais leve.`;
+
 document.getElementById('fixedSheet').addEventListener('change', async e => {
   const file = e.target.files?.[0];
   e.target.value = '';
   if (!file) return;
+  if (arquivoGrandeDemais(file)) { toast(MSG_ARQUIVO_GRANDE, 6000); return; }
   toast('Analisando planilha…', 6000);
   try {
     const { items } = await Gemini.analyzeFixedSheet(file, state.categories);
@@ -1688,6 +1704,7 @@ document.getElementById('invoiceFile').addEventListener('change', async e => {
   const file = e.target.files?.[0];
   e.target.value = '';
   if (!file) return;
+  if (arquivoGrandeDemais(file)) { showAIOutput(`<p>${escapeHTML(MSG_ARQUIVO_GRANDE)}</p>`); return; }
   showAIOutput(`<p class="muted">Lendo arquivo… (pode levar até 30s)</p>`);
   try {
     const { items } = await Gemini.analyzeInvoice(file, state.categories);
@@ -2327,7 +2344,7 @@ function renderFaturas() {
     return `<div class="fat-row">
       <span class="dot" style="background:${escapeHTML(c.color || '#6366f1')}"></span>
       <div class="fat-id"><strong>${escapeHTML(c.name)}</strong>
-        <small class="muted">${itens.length} lanç.${c.vencimento ? ' · vence dia ' + c.vencimento : ''}</small></div>
+        <small class="muted">${itens.length} lanç.${c.vencimento ? ' · vence dia ' + escapeHTML(c.vencimento) : ''}</small></div>
       <div class="fat-v"><strong>${fmt.format(total)}</strong>
         ${usoLimite !== null ? `<small class="muted">${usoLimite}% do limite</small>` : ''}</div>
       <button type="button" class="fat-pg ${faturaPaga(c.id, ref) ? 'on' : ''}" data-fat="${escapeHTML(c.id)}">

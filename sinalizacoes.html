@@ -81,7 +81,7 @@ textarea.rel{width:100%;min-height:200px;margin-top:12px;padding:12px;border-rad
       const r = await chama({op:'listar'});          /* traz todas; os filtros são aqui */
       TODOS = r.itens || []; APPS = r.apps || {};
       const ap = $('fApp').value;
-      $('fApp').innerHTML = '<option value="">Todos os apps</option>' + Object.keys(APPS).map(k => `<option value="${k}">${esc(APPS[k].nome)}</option>`).join('');
+      $('fApp').innerHTML = '<option value="">Todos os apps</option>' + Object.keys(APPS).map(k => `<option value="${esc(k)}">${esc(APPS[k].nome)}</option>`).join('');
       $('fApp').value = ap;
       desenha();
     } catch (e) {
