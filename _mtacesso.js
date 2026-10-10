@@ -7,8 +7,12 @@
    TráfegoTítulo) ou por import('/_mtacesso.js') (o _mtauth.js faz isso).
    Expõe window.MTAcesso.
 
-   Enquanto nenhum produto do planos.json tiver link de checkout, NADA é
-   bloqueado: verificar() devolve {ok:true, motivo:'livre'} sem chamar o servidor.
+   Enquanto nenhum produto do planos.json tiver checkout, NADA é bloqueado:
+   verificar() devolve {ok:true, motivo:'livre'} sem chamar o servidor.
+   Checkout "mp" (09/10/2026) = venda pelo Mercado Pago: o botão Assinar pede
+   o link ao servidor (função mpCheckout) e redireciona; mensal = assinatura
+   no cartão, anual = pagamento único (Pix, cartão ou boleto). Um link
+   https no checkout continua funcionando como antes (Kiwify).
    Falha de rede ou do servidor também não bloqueia (falha aberta): a trava
    existe para quem não pagou, não para punir quem pagou quando a rede cai.
    ============================================================ */
@@ -109,17 +113,62 @@ function checkoutUrl(prod, periodo, user) {
 function produtosQueCobrem(P, appId) { return ((P && P.produtos) || []).filter(function (p) { return temCheckout(p) && cobre(p, P, appId); }); }
 function portalDaLinha(linha) { return linha === 'provas' ? '/provas.html' : '/app.html'; }
 
+/* ---------------- compra: Mercado Pago (checkout "mp") ou link antigo ---------------- */
+function viaMP(prod, per) { return String(((prod && prod.checkout) || {})[per] || '').trim().toLowerCase() === 'mp'; }
+/* Opções de compra de um produto: mensal, mensal avulso por Pix (se
+   planos.mp_pix_mensal) e anual. `como` diz o meio de pagamento na tela. */
+function opcoes(P, prod) {
+  var out = [];
+  if (!prod || prod.interno) return out;
+  ['mensal', 'anual'].forEach(function (per) {
+    var c = (prod.checkout || {})[per], v = (prod.preco || {})[per];
+    if (!c || String(c).trim() === '' || v == null) return;
+    var mp = viaMP(prod, per);
+    out.push({ prod: prod, produto: prod.id, periodo: per, modo: '', preco: v, mp: mp, botao: 'Assinar',
+      rotulo: brl(v) + (per === 'anual' ? ' por ano' : ' por mês'),
+      como: mp ? (per === 'anual' ? 'Pix, cartão ou boleto, pagamento único' : 'cartão de crédito, renovação automática') : '' });
+    if (mp && per === 'mensal' && P && P.mp_pix_mensal === true) {
+      out.push({ prod: prod, produto: prod.id, periodo: 'mensal', modo: 'pix', preco: v, mp: true, botao: 'Pagar com Pix',
+        rotulo: brl(v) + ' por 1 mês', como: 'Pix, pagamento único, sem renovação' });
+    }
+  });
+  return out;
+}
+var MP_URL = /^https:\/\/([a-z0-9-]+\.)*mercadopago\.com(\.br)?\//i;
+/* Abre o pagamento. Mercado Pago: o servidor cria o link (preferência ou
+   assinatura) e devolve a URL. Guarda o retrato do mt antes de sair para o
+   portal saber, na volta (?pago=1), quando a liberação chegou. */
+function comprar(op, user) {
+  if (!op || !user) return Promise.reject(new Error('Entre na sua conta para assinar.'));
+  return lerMt(user, false).catch(function () { return null; }).then(function (mt) {
+    try { localStorage.setItem('mt.pag.antes', JSON.stringify({ em: Date.now(), p: (mt && mt.p) || {} })); } catch (e) {}
+    if (!op.mp) {
+      var u = checkoutUrl(op.prod, op.periodo, user);
+      if (!u) throw new Error('Este plano ainda não está à venda.');
+      G.MTAcesso.irPara(u); return u;
+    }
+    var dados = { produto: op.produto, periodo: op.periodo }; if (op.modo) dados.modo = op.modo;
+    return chamar('mpCheckout', dados, user).then(function (r) {
+      var url = r && r.url;
+      if (!url || !MP_URL.test(url)) throw new Error('Não foi possível abrir o pagamento agora. Tente de novo em instantes.');
+      G.MTAcesso.irPara(url); return url;
+    });
+  });
+}
+function irPara(url) { location.href = url; }
+
 /* ---------------- tela de assinatura (tema Astra) ---------------- */
 function css() {
   if (document.getElementById('mta-css')) return;
   var s = document.createElement('style'); s.id = 'mta-css';
   s.textContent = '.mta{position:fixed;inset:0;z-index:99995;background:rgba(0,0,0,.86);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:max(24px,env(safe-area-inset-top)) 16px 32px;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#fff}'
    + '.mta *{box-sizing:border-box}.mta-c{width:100%;max-width:520px;margin:auto;background:#0B0B0C;border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:26px}'
-   + '.mta h2{font-size:22px;font-weight:500;letter-spacing:-.02em;line-height:1.25;margin:0}.mta p{font-size:14.5px;color:rgba(255,255,255,.62);line-height:1.55;margin:10px 0 0}'
+   + '.mta h2{color:#fff;font-size:22px;font-weight:500;letter-spacing:-.02em;line-height:1.25;margin:0}.mta p{font-size:14.5px;color:rgba(255,255,255,.62);line-height:1.55;margin:10px 0 0}'
    + '.mta-l{display:flex;flex-direction:column;gap:8px;margin-top:20px}.mta-o{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.06)}'
    + '.mta-o b{display:block;font-size:15px;font-weight:500}.mta-o small{display:block;font-size:12.5px;color:rgba(255,255,255,.6);margin-top:2px}'
    + '.mta a.bt,.mta button.bt{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 18px;border-radius:999px;border:0;font:500 14px Inter,system-ui,sans-serif;cursor:pointer;text-decoration:none;white-space:nowrap}'
    + '.mta .bt.s{background:#fff;color:#000}.mta .bt.s:hover{background:#e6e6e6}.mta .bt.g{background:rgba(255,255,255,.12);color:#fff}.mta .bt.g:hover{background:rgba(255,255,255,.2)}'
+   + '.mta p.mta-s{font-size:12.5px;margin-top:12px}.mta button.bt:disabled{opacity:.6;cursor:default}'
    + '.mta-r{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}.mta-m{font-size:13px;min-height:18px;margin-top:12px;color:rgba(255,255,255,.62)}.mta-m.e{color:#F87171}'
    + '.mta-f{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:22px;padding-top:16px;border-top:1px solid rgba(255,255,255,.12);font-size:13px}'
    + '.mta-f a,.mta-f button{color:rgba(255,255,255,.62);background:none;border:0;font:inherit;cursor:pointer;padding:8px 0;text-decoration:none}.mta-f a:hover,.mta-f button:hover{color:#fff}';
@@ -131,7 +180,7 @@ function paywall(o) {
   css(); fechar();
   var P = o.P, mt = o.mt || {}, app = o.appId, nome = NOMES[app] || 'este app', linha = linhaDoApp(P, app), agora = agoraS();
   var d = document.createElement('div'); d.className = 'mta'; d.id = 'mta'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true');
-  var tit, txt, corpo = '';
+  var tit, txt, corpo = '', ops = [];
   if (o.motivo === 'escolher') {
     tit = 'Use uma vaga do seu plano com o ' + nome;
     txt = 'Seu plano tem ' + o.livres + (o.livres > 1 ? ' vagas livres' : ' vaga livre') + '. Escolha o ' + nome + ' para abrir agora. Dá para trocar os apps escolhidos uma vez a cada ' + (P.troca_dias || 30) + ' dias, nas Configurações do portal.';
@@ -141,12 +190,15 @@ function paywall(o) {
     tit = testeAcabou ? 'Seu teste grátis terminou' : 'Assine para usar o ' + nome;
     txt = testeAcabou ? 'O que você registrou continua salvo na sua conta. Para voltar a usar o ' + nome + ', escolha um plano.' : 'O ' + nome + ' faz parte dos planos abaixo. A IA vem incluída em todos.';
     var prods = produtosQueCobrem(P, app);
-    corpo = '<div class="mta-l">' + prods.map(function (p) {
-      return Object.keys(p.checkout || {}).filter(function (per) { return p.checkout[per] && p.preco && p.preco[per] != null; }).map(function (per) {
-        var extra = typeof p.apps === 'number' ? ' · você escolhe ' + (p.apps === 1 ? '1 app' : p.apps + ' apps') : '';
-        return '<div class="mta-o"><span><b>' + esc(p.nome || p.id) + '</b><small>' + brl(p.preco[per]) + (per === 'anual' ? ' por ano' : ' por mês') + extra + '</small></span><a class="bt s" href="' + esc(checkoutUrl(p, per, o.user)) + '">Assinar</a></div>';
-      }).join('');
+    ops = [];
+    prods.forEach(function (p) { ops = ops.concat(opcoes(P, p)); });
+    corpo = '<div class="mta-l">' + ops.map(function (op, i) {
+      var p = op.prod, extra = typeof p.apps === 'number' ? ' · você escolhe ' + (p.apps === 1 ? '1 app' : p.apps + ' apps') : '';
+      var bt = op.mp ? '<button class="bt s" data-acao="comprar" data-i="' + i + '">' + esc(op.botao) + '</button>'
+                     : '<a class="bt s" href="' + esc(checkoutUrl(p, op.periodo, o.user)) + '">Assinar</a>';
+      return '<div class="mta-o"><span><b>' + esc(p.nome || p.id) + '</b><small>' + esc(op.rotulo) + extra + '</small>' + (op.como ? '<small>' + esc(op.como) + '</small>' : '') + '</span>' + bt + '</div>';
     }).join('') + '</div>';
+    if (ops.some(function (op) { return op.mp; })) corpo += '<p class="mta-s">Pagamento na página segura do Mercado Pago. A MedTech não vê os dados do cartão.</p>';
     var es = linha ? escolhidos(P, mt, linha) : [];
     if (linha && vagas(P, mt, linha, agora) > 0 && es.length) {
       corpo += '<p>Ou troque um app do seu plano pelo ' + esc(nome) + ':</p><div class="mta-r">' + es.map(function (a) { return '<button class="bt g" data-acao="trocar" data-sai="' + esc(a) + '">Trocar ' + esc(NOMES[a] || a) + '</button>'; }).join('') + '</div>';
@@ -170,6 +222,12 @@ function paywall(o) {
   d.addEventListener('click', function (e) {
     var b = e.target.closest('[data-acao]'); if (!b) return; var a = b.dataset.acao;
     if (a === 'sair') { if (o.signOut) o.signOut(); return; }
+    if (a === 'comprar') {
+      var op = ops[Number(b.dataset.i)]; if (!op) return;
+      b.disabled = true; aviso('Abrindo o pagamento seguro do Mercado Pago…');
+      comprar(op, o.user).catch(function (e3) { b.disabled = false; aviso((e3 && e3.message) || 'Não foi possível abrir o pagamento.', true); });
+      return;
+    }
     if (a === 'atualizar') { aviso('Conferindo a sua assinatura…'); rever().then(function (ok) { if (!ok) aviso('Ainda não encontramos o pagamento. Pix e cartão confirmam em minutos; boleto leva até 3 dias úteis.'); }).catch(function () { aviso('Não foi possível conferir agora. Tente de novo em instantes.', true); }); return; }
     if (a === 'escolher' || a === 'trocar') {
       var atuais = escolhidos(P, o.mt, linha); var novo = a === 'trocar' ? atuais.filter(function (x) { return x !== b.dataset.sai; }).concat(app) : atuais.concat(app);
@@ -217,6 +275,6 @@ function estado(user) {
   });
 }
 
-G.MTAcesso = { versao: 1, NOMES: NOMES, linhaDoApp: linhaDoApp, cobre: cobre, vendaAtiva: vendaAtiva, algumaVendaAtiva: algumaVendaAtiva, vagas: vagas, escolhidos: escolhidos, liberado: liberado, acessoAtivoQualquer: acessoAtivoQualquer, produtoPorId: produtoPorId, produtosQueCobrem: produtosQueCobrem,
-  carregarPlanos: carregarPlanos, chamar: chamar, lerMt: lerMt, checkoutUrl: checkoutUrl, paywall: paywall, fechar: fechar, verificar: verificar, estado: estado, brl: brl, dataBR: dataBR, _limparCache: function () { cacheP = null; } };
+G.MTAcesso = { versao: 2, NOMES: NOMES, linhaDoApp: linhaDoApp, cobre: cobre, vendaAtiva: vendaAtiva, algumaVendaAtiva: algumaVendaAtiva, vagas: vagas, escolhidos: escolhidos, liberado: liberado, acessoAtivoQualquer: acessoAtivoQualquer, produtoPorId: produtoPorId, produtosQueCobrem: produtosQueCobrem,
+  carregarPlanos: carregarPlanos, chamar: chamar, lerMt: lerMt, checkoutUrl: checkoutUrl, viaMP: viaMP, opcoes: opcoes, comprar: comprar, irPara: irPara, paywall: paywall, fechar: fechar, verificar: verificar, estado: estado, brl: brl, dataBR: dataBR, _limparCache: function () { cacheP = null; } };
 })();

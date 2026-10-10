@@ -8,6 +8,8 @@ const ctx = { console, fetch: () => Promise.reject(new Error('sem rede no teste'
 ctx.globalThis = ctx; vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(path.join(__dirname, '_mtacesso.js'), 'utf8'), ctx);
 const cli = ctx.MTAcesso;
+/* venda pelo Mercado Pago: mesma leitura do checkout "mp" no navegador e no servidor */
+let srvMP = null; try { srvMP = require(path.join(path.dirname(require.resolve(process.argv[2] || path.join(os.homedir(), 'Documents/Claude/MedTech/backend/functions/acesso.js'))), 'mercadopago.js')); } catch (e) { console.warn('mercadopago.js não encontrado; paridade do "mp" não conferida'); }
 const base = JSON.parse(fs.readFileSync(path.join(__dirname, 'planos.json'), 'utf8'));
 let seed = 42; const rnd = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
 const pick = a => a[Math.floor(rnd() * a.length)];
@@ -15,7 +17,10 @@ const AG = 1790000000, apps = [].concat(...Object.values(base.linhas)), ids = ba
 let n = 0, dif = [];
 for (let i = 0; i < 6000; i++) {
   const P = JSON.parse(JSON.stringify(base));
-  P.produtos.forEach(p => { if (rnd() < 0.5) { p.checkout = { mensal: rnd() < 0.8 ? 'https://pay.kiwify.com.br/x' + p.id : '' }; } });
+  /* checkout: link antigo (Kiwify), "mp" (Mercado Pago, 09/10/2026) ou vazio */
+  const ck = id => { const r = rnd(); return r < 0.4 ? 'https://pay.kiwify.com.br/x' + id : r < 0.8 ? 'mp' : ''; };
+  P.produtos.forEach(p => { if (rnd() < 0.5) { p.checkout = { mensal: ck(p.id) }; if (rnd() < 0.4) p.checkout.anual = ck(p.id); } });
+  if (rnd() < 0.5) P.mp_pix_mensal = rnd() < 0.5;
   if (rnd() < 0.2) P.gratis = [pick(apps)];
   const mt = rnd() < 0.1 ? null : { v: 1 };
   if (mt) {
@@ -29,6 +34,8 @@ for (let i = 0; i < 6000; i++) {
     const s = srv.liberado(P, mt, a, AG), c = cli.liberado(P, mt, a, AG);
     if (s.ok !== c.ok || s.motivo !== c.motivo || (s.livres || 0) !== (c.livres || 0)) dif.push({ a, s, c, mt, P: P.produtos.filter(p => p.checkout && p.checkout.mensal).map(p => p.id) });
     if (srv.vendaAtiva(P, a) !== cli.vendaAtiva(P, a)) dif.push({ a, venda: true });
+    if (srvMP) for (const p of P.produtos) for (const per of ['mensal', 'anual'])
+      if (srvMP.vendeMP(p, per) !== cli.viaMP(p, per) && !p.interno) dif.push({ a, mp: p.id, per });
   }
   n++; if (srv.acessoAtivoQualquer(P, mt, AG) !== cli.acessoAtivoQualquer(P, mt, AG)) dif.push({ ia: true, mt });
 }

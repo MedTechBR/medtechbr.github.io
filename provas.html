@@ -344,6 +344,7 @@ function openCfg(){
     <div class="cfg-sec">
       <h4><i class="ti ti-credit-card" aria-hidden="true"></i>Assinatura e pagamento</h4>
       <div class="desc" id="cfgAssin">Carregando a sua assinatura</div>
+      <div id="cfgAssinMP"></div>
       <div class="sug-row" id="cfgAssinBt"><button class="b ok" onclick="abrirPlanos()">Ver planos</button><button class="b cancel" onclick="abrirPagamento()">Gerenciar pagamento</button></div>
       <div class="cfg-msg" id="cfgPagMsg"></div>
     </div>
@@ -544,14 +545,55 @@ function preencheAssinatura(){
   el.innerHTML = L.join('<br>') + '<br><span style="opacity:.8">Nunca pedimos o número do cartão aqui: o pagamento é feito na página segura do meio de pagamento.</span>';
   const bt = document.getElementById('cfgAssinBt');
   if (bt && vg && !document.getElementById('btEscolher')) bt.insertAdjacentHTML('afterbegin', '<button class="b ok" id="btEscolher" onclick="escolherAppsPlano()">Escolher os apps do plano</button>');
+  assinaturasMP();
+}
+/* Mercado Pago: assinaturas mensais da conta, com o botão de cancelar */
+function vendeMP(){ return !!(ACESSO && ACESSO.P && (ACESSO.P.produtos || []).some(p => !p.interno && MTAcesso.viaMP && (MTAcesso.viaMP(p,'mensal') || MTAcesso.viaMP(p,'anual')))); }
+async function assinaturasMP(){
+  const box = document.getElementById('cfgAssinMP'); if (!box || !vendeMP() || !MT.user) return;
+  if (box.dataset.carregando) return; box.dataset.carregando = '1';
+  try {
+    const r = await MTAcesso.chamar('mpCancelar', { apenasVer: true }, MT.user);
+    const L = (r && r.assinaturas) || [];
+    box.innerHTML = L.map(a => `<div class="desc" style="margin-top:8px"><b>${esc(a.nome)}</b> · assinatura mensal no cartão${a.proximo ? ', próxima cobrança em ' + MTAcesso.dataBR(a.proximo) : ''}${a.status==='paused' ? ' (pausada)' : ''}.</div>
+      <div class="sug-row"><button class="b cancel" data-cancelar="${esc(a.produto)}" data-nome="${esc(a.nome)}">Cancelar assinatura</button></div>`).join('');
+    box.querySelectorAll('[data-cancelar]').forEach(b => b.onclick = () => cancelarAssinatura(b.dataset.cancelar, b.dataset.nome, b));
+  } catch(e) { console.warn('assinaturas do Mercado Pago', e && e.message); box.innerHTML = ''; }
+  finally { delete box.dataset.carregando; }
+}
+async function cancelarAssinatura(produto, nome, bt){
+  const msg = document.getElementById('cfgPagMsg');
+  if (!confirm(`Cancelar a assinatura mensal de ${nome}?\n\nAs próximas cobranças param. O acesso continua até o fim do período pago.`)) return;
+  if (bt) bt.disabled = true;
+  msg.className = 'cfg-msg'; msg.textContent = 'Cancelando a assinatura';
+  try {
+    const r = await MTAcesso.chamar('mpCancelar', { produto }, MT.user);
+    msg.className = 'cfg-msg ok';
+    msg.textContent = 'Assinatura cancelada. Nenhuma nova cobrança será feita.' + (r && r.valeAte ? ` O acesso continua até ${MTAcesso.dataBR(r.valeAte)}.` : ' O acesso continua até o fim do período pago.');
+    assinaturasMP();
+  } catch(e) {
+    if (bt) bt.disabled = false;
+    msg.className = 'cfg-msg err'; msg.textContent = (e && e.message) || 'Não foi possível cancelar agora. Tente de novo ou escreva para ' + SUPORTE_EMAIL + '.';
+  }
 }
 function abrirPlanos(){
   const msg = document.getElementById('cfgPagMsg');
   if (!ACESSO || !ACESSO.venda) { location.href = '/index.html#planos'; return; }
   const prods = (ACESSO.P.produtos || []).filter(p => !p.interno && p.linha === LINHA && Object.values(p.checkout||{}).some(Boolean));
-  const itens = prods.map(p => Object.keys(p.checkout).filter(per => p.checkout[per] && p.preco && p.preco[per]!=null).map(per =>
-    `<a class="b ok" style="display:flex;justify-content:space-between;text-decoration:none" href="${esc(MTAcesso.checkoutUrl(p, per, MT.user))}"><span>${esc(p.nome||p.id)}</span><span>${MTAcesso.brl(p.preco[per])}${per==='anual'?'/ano':'/mês'}</span></a>`).join('')).join('');
+  const ops = [].concat(...prods.map(p => MTAcesso.opcoes(ACESSO.P, p)));
+  const itens = ops.map((op, i) => op.mp
+    ? `<button class="b ok" data-op="${i}" style="display:flex;justify-content:space-between;gap:12px;text-align:left;height:auto;padding:10px 14px"><span>${esc(op.prod.nome||op.produto)}<br><small style="font-weight:400;opacity:.85">${esc(op.como)}</small></span><span>${esc(op.rotulo)}</span></button>`
+    : `<a class="b ok" style="display:flex;justify-content:space-between;text-decoration:none" href="${esc(MTAcesso.checkoutUrl(op.prod, op.periodo, MT.user))}"><span>${esc(op.prod.nome||op.produto)}</span><span>${MTAcesso.brl(op.preco)}${op.periodo==='anual'?'/ano':'/mês'}</span></a>`).join('');
   msg.className = 'cfg-msg'; msg.innerHTML = itens ? `<div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">${itens}</div>` : 'Os planos desta linha abrem em breve.';
+  msg.querySelectorAll('[data-op]').forEach(b => b.onclick = () => abrirCompra(ops[Number(b.dataset.op)], b));
+}
+/* botão Assinar do Mercado Pago: o servidor cria o link e o portal redireciona */
+async function abrirCompra(op, bt){
+  const msg = document.getElementById('cfgPagMsg');
+  if (bt) bt.disabled = true;
+  aviso('Abrindo o pagamento seguro do Mercado Pago…');
+  try { await MTAcesso.comprar(op, MT.user); }
+  catch(e) { if (bt) bt.disabled = false; if (msg) { msg.className = 'cfg-msg err'; msg.textContent = (e && e.message) || 'Não foi possível abrir o pagamento.'; } else aviso((e && e.message) || 'Não foi possível abrir o pagamento.'); }
 }
 function escolherAppsPlano(){
   const P = ACESSO.P, mt = ACESSO.mt || {}, vg = MTAcesso.vagas(P, mt, LINHA);
@@ -577,8 +619,11 @@ function planoDaURL(){
   if (!id || !ACESSO) return;
   history.replaceState(null, '', location.pathname);
   const per = q.get('periodo') || 'mensal', apps = (q.get('apps') || '').split(',').filter(Boolean);
-  const p = MTAcesso.produtoPorId(ACESSO.P, id), url = p ? MTAcesso.checkoutUrl(p, per, MT.user) : '';
+  const p = MTAcesso.produtoPorId(ACESSO.P, id);
   if (apps.length) { try { localStorage.setItem('mt.escolha.pendente', JSON.stringify({ linha: p && p.linha, apps })); } catch(e){} }
+  const op = p ? MTAcesso.opcoes(ACESSO.P, p).find(o => o.periodo === per && !o.modo) : null;
+  if (op && op.mp) { abrirCompra(op); return; }
+  const url = p ? MTAcesso.checkoutUrl(p, per, MT.user) : '';
   if (url) { location.href = url; return; }
   aviso('As assinaturas abrem em breve. Enquanto isso, use à vontade: todos os apps estão liberados na sua conta.');
 }
@@ -599,12 +644,37 @@ async function carregaAcesso(){
   if (ACESSO !== null || !window.MT || !MT.user || MT.user.demo) return;
   ACESSO = false;   // em andamento
   try { ACESSO = (await MT.acessoEstado()) || { venda: false }; } catch(e) { ACESSO = { venda: false }; }
-  renderGrid(); preencheAssinatura(); planoDaURL(); escolhaPendente();
+  renderGrid(); preencheAssinatura(); planoDaURL(); escolhaPendente(); chegadaPagamento();
+}
+/* volta do Mercado Pago: ?pago=1 (aprovado ou em processamento) ou ?pago=0.
+   O token é renovado até a liberação chegar (o webhook costuma levar segundos). */
+async function chegadaPagamento(){
+  const q = new URLSearchParams(location.search), pago = q.get('pago');
+  if (!pago) return;
+  history.replaceState(null, '', location.pathname);
+  if (pago === '0') { aviso('O pagamento não foi concluído e nada foi cobrado. Tente de novo quando quiser.'); return; }
+  const st = (q.get('status') || q.get('collection_status') || '').toLowerCase();
+  if (st === 'pending' || st === 'in_process') { aviso('Pagamento em processamento. Pix confirma em minutos; boleto leva até 3 dias úteis. O acesso libera sozinho.'); return; }
+  if (!ACESSO || !ACESSO.venda || !MT.user) return;
+  let antes = {};
+  try { const a = JSON.parse(localStorage.getItem('mt.pag.antes') || 'null'); if (a && Date.now() - a.em < 3 * 86400000) antes = a.p || {}; } catch(e){}
+  const mudou = mt => Object.entries((mt && mt.p) || {}).some(([id, ate]) => ate > (antes[id] || 0));
+  if (mudou(ACESSO.mt)) { try { localStorage.removeItem('mt.pag.antes'); } catch(e){} aviso('Pagamento recebido: acesso liberado.'); return; }
+  aviso('Pagamento recebido, liberando o seu acesso…');
+  for (let i = 0; i < 9; i++) {
+    await new Promise(r => setTimeout(r, i ? 5000 : 2500));
+    try {
+      const mt = await MTAcesso.lerMt(MT.user, true);
+      if (mudou(mt)) { ACESSO.mt = mt; try { localStorage.removeItem('mt.pag.antes'); } catch(e){} renderGrid(); preencheAssinatura(); aviso('Pronto: acesso liberado.'); return; }
+    } catch(e) {}
+  }
+  aviso('Ainda não chegou a confirmação do Mercado Pago. Assim que chegar, o acesso libera sozinho; se demorar, escreva para ' + SUPORTE_EMAIL + '.');
 }
 function abrirPagamento(){
   const msg=document.getElementById('cfgPagMsg');
-  const KIWIFY_PORTAL_URL = (ACESSO && ACESSO.P && ACESSO.P.area_cliente) || '';
-  if (KIWIFY_PORTAL_URL){ window.open(KIWIFY_PORTAL_URL,'_blank','noopener'); return; }
+  const AREA_CLIENTE_URL = (ACESSO && ACESSO.P && ACESSO.P.area_cliente) || '';
+  if (AREA_CLIENTE_URL){ window.open(AREA_CLIENTE_URL,'_blank','noopener'); return; }
+  if (vendeMP()) { msg.className='cfg-msg'; msg.innerHTML='Os pagamentos são feitos pelo Mercado Pago. Para parar a assinatura mensal, use <b>Cancelar assinatura</b> acima: o acesso continua até o fim do período pago. Para trocar o cartão ou ver recibos, entre na sua conta do Mercado Pago, em Assinaturas. Arrependimento em até 7 dias e outras dúvidas: <a href="mailto:'+SUPORTE_EMAIL+'?subject=Assinatura%20MedTech" style="color:var(--petrol);font-weight:700">'+SUPORTE_EMAIL+'</a>.'; return; }
   msg.className='cfg-msg'; msg.innerHTML='A área de assinatura está sendo finalizada. Para trocar pagamento, ver faturas ou cancelar, fale com a gente: <a href="mailto:'+SUPORTE_EMAIL+'?subject=Assinatura%20MedTech" style="color:var(--petrol);font-weight:700">'+SUPORTE_EMAIL+'</a>.';
 }
 

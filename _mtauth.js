@@ -64,11 +64,11 @@ const MT = {
   /* ---------- Acesso por produto comprado (23/09/2026) ----------
      As regras e a tela de assinatura moram em /_mtacesso.js (as mesmas do backend,
      functions/acesso.js). O acesso vem das custom claims `mt` do login, que só o
-     servidor grava (webhook do Kiwify, teste grátis, painel de administração).
+     servidor grava (webhook do Mercado Pago, teste grátis, painel de administração).
      Enquanto nenhum produto do /planos.json tiver checkout, nada é bloqueado. */
   _acesso: null,
   acessoModulo() {
-    if (!MT._acesso) MT._acesso = import('/_mtacesso.js?v=1').then(() => window.MTAcesso).catch(e => { console.warn('MTAcesso indisponível', e); return null; });
+    if (!MT._acesso) MT._acesso = import('/_mtacesso.js?v=2').then(() => window.MTAcesso).catch(e => { console.warn('MTAcesso indisponível', e); return null; });
     return MT._acesso;
   },
   async acessoEstado() { const M = await MT.acessoModulo(); return M && MT.user && !MT.user.demo ? M.estado(MT.user) : null; },
