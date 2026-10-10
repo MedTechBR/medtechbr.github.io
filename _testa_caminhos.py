@@ -129,7 +129,7 @@ else:
         P = json.loads(pj)
         for pr in P.get('produtos', []):
             for per, url in (pr.get('checkout') or {}).items():
-                if url and not url.startswith('https://'): erro('planos.json', f'{pr["id"]}.{per}: checkout sem https')
+                if url and url != 'mp' and not url.startswith('https://'): erro('planos.json', f'{pr["id"]}.{per}: checkout sem https')
     except Exception as e: erro('planos.json', f'JSON inválido: {e}')
 
 # ---------- catálogo do portal e trocador de apps ----------
