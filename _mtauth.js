@@ -230,6 +230,27 @@ function injectHomeButton() {
   /* 23/09/2026, pedido do Matheus: os apps de estudo (linha Provas) são produtos separados do
      MedTech App; o selo "MedTech" por cima da marca do app não faz sentido neles. */
   if (linhaAtual() === 'provas') return;
+  if (document.getElementById('mt-home') || document.body.dataset.mtVolta) return;
+  /* 10/10/2026, pedido do Matheus: tocar no ÍCONE do app (o logo no topo) volta ao menu do
+     portal, como nos apps de estudo; sem o botão flutuante "MedTech" por cima do conteúdo.
+     Se o app não tiver um ícone reconhecido em 3 s, cai no botão antigo (rede de segurança). */
+  document.body.dataset.mtVolta = '1';
+  const LV = LINHAS[linhaAtual()];
+  const SEL_ICONE = '.cv-marca .mk, .nv-marca .mk, .top .logo .mark, .topbar .brand .logo, .topbar .brand .brand-mark, .marca .logo';
+  document.addEventListener('click', e => {
+    const el = e.target && e.target.closest && e.target.closest(SEL_ICONE);
+    if (!el || !document.body.dataset.mtVolta) return;
+    e.preventDefault(); e.stopPropagation();
+    location.href = LV.home;
+  }, true);
+  let pend = false;
+  const marcaIcones = () => { pend = false; document.querySelectorAll(SEL_ICONE).forEach(el => {
+    if (el.dataset.mtVolta) return; el.dataset.mtVolta = '1'; el.title = 'Voltar ao ' + LV.nm; el.style.cursor = 'pointer'; }); };
+  marcaIcones();
+  try { new MutationObserver(() => { if (!pend) { pend = true; requestAnimationFrame(marcaIcones); } }).observe(document.body, { childList: true, subtree: true }); } catch (e) {}
+  setTimeout(() => { if (!document.querySelector(SEL_ICONE)) botaoAntigo(); }, 3000);
+}
+function botaoAntigo() {
   if (document.getElementById('mt-home')) return;
   document.body.classList.add('mt-shell');   // reserva uma faixa no topo p/ o botão não cobrir conteúdo
   const a = document.createElement('a');
@@ -239,7 +260,7 @@ function injectHomeButton() {
   a.addEventListener('click', e => { e.preventDefault(); openSwitcher(); });
   document.body.appendChild(a);
 }
-function removeHomeButton() { const h = document.getElementById('mt-home'); if (h) h.remove(); document.body.classList.remove('mt-shell'); }
+function removeHomeButton() { const h = document.getElementById('mt-home'); if (h) h.remove(); document.body.classList.remove('mt-shell'); delete document.body.dataset.mtVolta; }
 
 /* Splash de carregamento — cobre a tela enquanto a sessão MedTech é verificada, para
    NÃO vazar a tela própria de cada app (ex.: login antigo) nem piscar o login ao trocar de app. */
