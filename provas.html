@@ -292,7 +292,19 @@ function dados(){ return (window.MT && MT._data && typeof MT._data==='object') ?
    Sem o campo, tudo está disponível — é onde a cobrança se encaixa quando existir. */
 function disponiveis(){
   const d = dados(); const c = d && Array.isArray(d.contratados) ? d.contratados : null;
-  return c ? CATALOGO_LINHA.filter(a => c.includes(a.id)) : CATALOGO_LINHA;
+  return (c ? CATALOGO_LINHA.filter(a => c.includes(a.id)) : CATALOGO_LINHA).concat(extrasDeEstudo());
+}
+/* MedTech App (10/10/2026): app de estudo que a conta pagou (ou recebeu liberação) também
+   pode ser escolhido para a grade daqui, numa categoria própria. Só entra se a pessoa marcar
+   em "Meus apps"; o portal Provas continua sendo a casa deles. Administração vê todos. */
+const CAT_ESTUDO = 'Seus apps de estudo';
+function extrasDeEstudo(){
+  if (LINHA !== 'clinica' || !ACESSO || !ACESSO.mt || !window.MTAcesso) return [];
+  const mt = ACESSO.mt, P = ACESSO.P, ag = Math.floor(Date.now() / 1000), ids = new Set();
+  if (mt.adm) CATALOGO.forEach(a => { if (a.linha !== LINHA) ids.add(a.id); });
+  Object.entries(mt.p || {}).forEach(([id, ate]) => { if (!(Number(ate) > ag)) return;
+    MTAcesso.appsDoProduto(P, MTAcesso.produtoPorId(P, id)).forEach(x => ids.add(x)); });
+  return CATALOGO.filter(a => a.linha !== LINHA && ids.has(a.id)).map(a => Object.assign({}, a, { cat: CAT_ESTUDO }));
 }
 function selecao(){
   const d = dados();
@@ -357,7 +369,7 @@ function openMeusApps(){
   const sel = new Set(selecao());
   const disp = disponiveis();
   const wrap = document.createElement('div'); wrap.className='sug-modal'; wrap.id='appsModal';
-  const linhas = CATEGORIAS.map(cat => {
+  const linhas = CATEGORIAS.concat(LINHA === 'clinica' ? [CAT_ESTUDO] : []).map(cat => {
     const itens = disp.filter(a => a.cat===cat);
     if (!itens.length) return '';
     return `<div class="apps-cat">${esc(cat)}</div>` + itens.map(a => `
