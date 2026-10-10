@@ -373,6 +373,8 @@ function renderGrid(){
   const g = document.getElementById('grid');
   g.innerHTML = itemAdmin() + (lista.length ? lista.map(appItem).join('')
     : `<div class="apps-vazio">Nenhum app na sua página ainda.<br><button class="b" onclick="openMeusApps()"><i class="ti ti-layout-grid-add" aria-hidden="true"></i> Escolher apps</button></div>`);
+  /* de onde o app foi aberto: os apps de estudo mostram "Início" para voltar (/_mtvoltar.js) */
+  g.onclick = e => { if (e.target.closest && e.target.closest('a.app')) { try { sessionStorage.setItem('mt.voltar', location.pathname); } catch(_){} } };
   /* entrada escalonada só na primeira pintura (os re-render da nuvem não piscam) */
   if (!_gradeAnimada && lista.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) { _gradeAnimada = true; [...g.children].forEach((c,k)=>c.style.setProperty('--i',k)); g.classList.add('anima'); }
   try { localStorage.setItem(CACHE_APPS, JSON.stringify([...sel])); } catch(e){}
