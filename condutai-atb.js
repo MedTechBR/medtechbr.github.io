@@ -816,7 +816,7 @@ async function aprofundarDrug(id){
   b.disabled=true;b.innerHTML='<span class="spin"></span> Gerando';
   try{
     const prompt=SYS_ATB+`\n\nO médico está vendo o antibiótico "${d.nome}" (${d.classe}). Traga: principais indicações/espectro na prática, ajustes especiais (obesidade, diálise, gestação, SNC), erros comuns e 1–2 interações/cuidados que costumam passar batido. Doses de adulto. Conciso, markdown.`;
-    const txt=await callIA(prompt);out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
+    const txt=await callIA(prompt,{cache:true});out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
   }catch(err){out.innerHTML='<div class="ai-out erro"><i class="ti ti-alert-triangle" aria-hidden="true"></i> '+esc(err.message||'Falha na IA')+'</div>';}
   b.disabled=false;b.innerHTML='<i class="ti ti-sparkles"></i> Tirar dúvidas com a IA';
 }
@@ -889,7 +889,7 @@ async function sugerirEmpirico(){
       (extra?`- Dados extras: ${extra}\n`:'')+
       `\n## RESPONDA nas seções (use blocos "### <ATB>" com bullets de Posologia/Prescrição, conforme as regras):\n## Esquema sugerido\n## Alternativas (inclua opção se houver alergia a penicilina)\n## ${usados?'Escalonamento vs. o ATB atual':'Quando escalonar'}\n## Culturas a colher\n## Duração e descalonamento\n`+
       `${(peso||clcr)?'AJUSTE as doses ao peso/ClCr informados.':'Sem peso/ClCr informados: dê a dose habitual e oriente ajustar.'} Inclua a prescrição (diluição/infusão) em cada antibiótico. Priorize o menor espectro eficaz.`;
-    const txt=await callIA(prompt);
+    const txt=await callIA(prompt,{nivel:'forte'});   /* esquema para o caso (peso/ClCr/ATB em uso): modelo forte, sem cache */
     out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
   }catch(err){out.innerHTML='<div class="ai-out erro"><i class="ti ti-alert-triangle" aria-hidden="true"></i> '+esc(err.message||'Falha na IA')+'</div>';}
   b.disabled=false;b.innerHTML='<i class="ti ti-sparkles"></i> Sugerir conduta';
@@ -943,7 +943,7 @@ async function sugerirDirigida(){
   b.disabled=true;b.innerHTML='<span class="spin"></span> Gerando';
   try{
     const prompt=SYS_ATB+`\n\nGerme isolado: ${d.g}. Dê a terapia DIRIGIDA preferencial (menor espectro eficaz) com DOSE e via, alternativas (inclusive para alergia a penicilina), e duração típica por foco. Mencione quando associar 2ª droga (ex.: endocardite). Conciso, markdown.`;
-    const txt=await callIA(prompt);out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
+    const txt=await callIA(prompt,{cache:true});out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
   }catch(err){out.innerHTML='<div class="ai-out erro"><i class="ti ti-alert-triangle" aria-hidden="true"></i> '+esc(err.message||'Falha na IA')+'</div>';}
   b.disabled=false;b.innerHTML='<i class="ti ti-sparkles"></i> Refinar com a IA (dose, duração, alergia)';
 }
@@ -1028,9 +1028,13 @@ function renderIVVO(){
 }
 
 /* ===================== IA ===================== */
-async function callIA(prompt){
+/* Política de custo da IA (10/10/2026): guia/germe/antimicrobiano sem paciente = genérico (Flash + cache
+   compartilhado); esquema empírico com dados do caso = Pro, sem cache e sem busca; chat = Flash, cache só na
+   1ª pergunta. O servidor recusa o cache se o texto tiver cara de caso. */
+async function callIA(prompt,o){
   if(!(window.MT&&MT.user))throw new Error('Entre na sua conta MedTech para usar a IA.');
-  return await MT.ai(prompt, 'gemini-2.5-pro');
+  o=o||{};
+  return await MT.ai(prompt, o.nivel||'padrao', {cache:!!o.cache, grounding:false});
 }
 const SYS_ATB='Você é um médico infectologista brasileiro experiente, consultor de antibioticoterapia e stewardship. Responda em português, PRÁTICO e CONCISO. Baseie TODO o conteúdo (doses, intervalos, condutas, espectro) nas diretrizes vigentes de antibioticoterapia (IDSA, ESCMID e consensos brasileiros, como os da SBI e da AMIB), na versão mais recente; **NÃO cite a fonte na resposta**. Se houver incerteza sobre uma dose, sinalize "confirmar". FORMATO OBRIGATÓRIO em markdown LIMPO: use "## " para as seções; para CADA antibiótico crie um bloco "### <Nome do ATB>" seguido de bullets curtos rotulados em negrito — "- **Posologia:** dose, via e intervalo (já ajustados ao peso/ClCr informados, quando aplicável)", "- **Prescrição:** diluição + tempo de infusão + apresentação (pronta para prescrever)", "- **Obs:** 1 linha". NÃO escreva parágrafos longos nem listas achatadas. SEMPRE que indicar um antibiótico, inclua a prescrição pronta (diluição, infusão, posologia). Em sugestões de esquema, dê opção de 1ª linha com DOSE/via, alternativas (inclusive para alergia a penicilina), quando colher culturas e critérios de descalonamento/duração. Priorize sempre o MENOR espectro eficaz (stewardship) e considere o perfil de resistência (ESBL, KPC, MRSA, Pseudomonas, AmpC). SEMPRE lembre de ajustar à função renal, checar alergias e seguir o antibiograma e o protocolo institucional local. NÃO invente doses nem referências — se houver incerteza, oriente confirmar na bula/protocolo. Sinalize red flags (sepse/choque: não atrasar ATB, colher culturas antes; meningite/neutropenia febril: emergência). Além de condutas, responda também dúvidas CONCEITUAIS e didáticas quando perguntado — fisiopatologia da infecção, microbiologia, mecanismo de ação, mecanismos de resistência (ESBL/AmpC/KPC/MBL/MRSA/VRE) e farmacocinética/farmacodinâmica — cobrindo antibacterianos, **antifúngicos** e **antituberculose** (e noções de antivirais/antiparasitários quando solicitado). Você é apoio à decisão, não substitui o julgamento clínico.';
 
@@ -1040,7 +1044,7 @@ async function aprofundar(id){
   b.disabled=true;b.innerHTML='<span class="spin"></span> Gerando';
   try{
     const prompt=SYS_ATB+`\n\nO médico está lendo o guia de "${e.nome}". Aprofunde com: pontos práticos avançados, doses (adulto, função renal normal) e ajustes, erros/armadilhas comuns, e 1–2 cenários clínicos curtos com a conduta esperada. Não repita o óbvio; agregue valor. Conciso.`;
-    const txt=await callIA(prompt);
+    const txt=await callIA(prompt,{cache:true});
     out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
   }catch(err){out.innerHTML='<div class="ai-out erro"><i class="ti ti-alert-triangle" aria-hidden="true"></i> '+esc(err.message||'Falha na IA')+'</div>';}
   b.disabled=false;b.innerHTML='<i class="ti ti-sparkles"></i> Casos, doses e detalhes com a IA';
@@ -1072,7 +1076,7 @@ async function enviar(){
   try{
     const hist=chat.filter(m=>!m.err).slice(-8).map(m=>(m.role==='user'?'MÉDICO: ':'ATBGUIA: ')+m.text).join('\n\n');
     const prompt=SYS_ATB+'\n\nConversa até aqui:\n'+hist+'\n\nResponda à última pergunta do médico de forma prática e objetiva.';
-    const txt=await callIA(prompt);
+    const txt=await callIA(prompt,{cache:chat.filter(m=>!m.err).length===1});
     chat.push({role:'ai',text:txt});renderAssistente();
   }catch(err){
     typ.remove();

@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" href="favicon.png">
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"paliai",name:"PaliAI"};</script>
-<script type="module" src="_mtauth.js?v=34"></script>
+<script type="module" src="_mtauth.js?v=35"></script>
 <script src="pali-conteudo.js?v=7"></script>
 <link rel="stylesheet" href="_mttokens.css?v=4">
 <link rel="stylesheet" href="_mtviva.css?v=2">
@@ -427,7 +427,8 @@ async function gerarReuniao(){
     : SQ==='sim' ? 'Pergunta Surpresa positiva ("ficaria surpreso"), porém o perfil de indicadores clínicos abaixo sugere doença avançada/deterioração.'
     : 'Pergunta Surpresa não respondida; a triagem baseou-se nos indicadores clínicos abaixo.';
   const prompt='Você é um médico com expertise em cuidados paliativos, ajudando um colega a conduzir uma REUNIÃO FAMILIAR / conversa de objetivos de cuidado (goals of care) de um paciente que a triagem identificou como candidato a avaliação paliativa. Produza um ROTEIRO PRÁTICO em português do Brasil, estruturado, humano e culturalmente adequado ao Brasil, com as seções: 1) Preparação (quem convidar, ambiente, checar o que a família já sabe); 2) Abertura e alinhamento de informação (modelo ask-tell-ask / SPIKES); 3) Comunicação honesta e compassiva do quadro (sem jargão, sem prognóstico numérico falsamente preciso); 4) Exploração de valores e preferências do paciente (protocolo NURSE para emoções); 5) Definição de metas de cuidado e proposta de plano (incluindo conforto, sintomas, local de cuidado, diretivas); 6) Frases-modelo prontas para usar; 7) Próximos passos e registro. REGRAS: não invente dados clínicos; foque em comunicação e tomada de decisão compartilhada; respeite ortotanásia (evitar distanásia/obstinação) conforme as Resoluções CFM. Seja objetivo e acolhedor. FORMATAÇÃO: texto limpo, sem markdown (sem # nem *); use títulos de seção em maiúsculas seguidos de dois-pontos.\n\nCONTEXTO: '+sqTxt+' Doença de base: '+(dn||'[não informada]')+'. Funcional: '+(pps||'[não informado]')+'. Indicadores gerais: '+(ger.join('; ')||'—')+'. Indicadores da doença: '+(esp.join('; ')||'—')+'. Observações: '+(ctx||'—')+'.';
-  try{const t=await MT.ai(prompt,'gemini-2.5-pro');document.getElementById('iaOut').innerHTML='<div class="iaout" id="iaTexto">'+(t||'').replace(/[<>]/g,s=>({'<':'&lt;','>':'&gt;'}[s]))+'</div><div class="iaAcoes"><button type="button" class="btn btn-light" onclick="copiarTexto(document.getElementById(\'iaTexto\').textContent,\'Roteiro copiado\')"><i class="ti ti-copy" aria-hidden="true"></i> Copiar roteiro</button></div>';}
+  /* 10/10/2026: roteiro de comunicação (sem dose) no modelo padrão; leva dados do paciente: sem cache e sem busca */
+  try{const t=await MT.ai(prompt,'padrao',{grounding:false});document.getElementById('iaOut').innerHTML='<div class="iaout" id="iaTexto">'+(t||'').replace(/[<>]/g,s=>({'<':'&lt;','>':'&gt;'}[s]))+'</div><div class="iaAcoes"><button type="button" class="btn btn-light" onclick="copiarTexto(document.getElementById(\'iaTexto\').textContent,\'Roteiro copiado\')"><i class="ti ti-copy" aria-hidden="true"></i> Copiar roteiro</button></div>';}
   catch(e){iaErro((e.message||'A IA não respondeu.')+' Tente de novo em alguns segundos.');}
   b.innerHTML='<i class="ti ti-file-text" aria-hidden="true"></i> Gerar roteiro da reunião';b.disabled=false;
 }

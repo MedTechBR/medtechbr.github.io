@@ -14,10 +14,10 @@
 <script defer src="condutai-presc.js?v=3"></script>
 <script defer src="condutai-prescricoes.js?v=4"></script>
 <script defer src="condutai-ligacoes.js?v=1"></script>
-<script defer src="condutai-areas.js?v=1"></script>
+<script defer src="condutai-areas.js?v=2"></script>
 <script src="_mtfb.js?v=1"></script>
 <script>window.MT_APP={id:"condutai",name:"CondutAI"};</script>
-<script type="module" src="_mtauth.js?v=34"></script>
+<script type="module" src="_mtauth.js?v=35"></script>
 <link rel="stylesheet" href="vendor/tabler/tabler-icons.min.css?v=3.48.0">
 <style>
 :root {
@@ -2810,7 +2810,7 @@ function showOfflineProtocol(p) {
   saveHistory(); renderSide();
   showView('result');
   window.scrollTo({ top: 0, behavior: 'smooth' });
-  renderResultDireto(item);
+  return renderResultDireto(item);
 }
 
 // ============ Mode toggle ============
@@ -3416,25 +3416,37 @@ Lista com ANO. Formato: \`- [Sociedade] Título da diretriz (ANO) — link se po
 // ============ Chamada Gemini com retry ============
 const TRANSIENT_STATUSES = [429, 500, 502, 503, 504];
 
-// REGRA DE PRIVACIDADE: a busca do Google (grounding) fica ligada por padrão só nas consultas GENÉRICAS
-// (conduta por tema, bula, procedimento, vacina, discussão socrática). Toda chamada que leva dados do PACIENTE
-// (evolução/caso, quadro clínico, exames, medicações em uso, paciente em foco, prescrição) passa grounding:false:
-// com a busca ligada, o modelo pode transformar trechos do caso em consultas ao Google.
+// POLÍTICA DE CUSTO E PRIVACIDADE DA IA (10/10/2026, ver backend/functions/ia.js):
+// - nível do modelo por tarefa: 'rapido' (Flash-Lite), 'padrao' (Flash), 'forte' (Pro, só prescrição/revisão/interações);
+// - busca do Google DESLIGADA por padrão: opts.grounding:true só em consulta GENÉRICA de diretriz (conduta por tema, bula, vacina);
+// - opts.cache:true só em chamada GENÉRICA (sem paciente): a resposta vem do cache compartilhado quando outra conta já perguntou.
+// Toda chamada com dado do PACIENTE (caso, paciente em foco, exames, medicações em uso, prescrição) vai sem cache e sem busca;
+// o servidor confere de novo e recusa cache/busca se o texto tiver cara de identificação ou de caso.
+const NIVEL_ID = { rapido: 'gemini-2.5-flash-lite', padrao: 'gemini-2.5-flash', forte: 'gemini-2.5-pro' };
+function nivelDoModelo(m) {
+  if (NIVEL_ID[m]) return m;
+  if (/flash-lite/.test(m || '')) return 'rapido';
+  if (/pro/.test(m || '')) return 'forte';
+  return 'padrao';
+}
 async function callGemini(contents, opts = {}) {
   // IA central MedTech (Vertex via gateway seguro, SEM chave) — usa o login MedTech.
   const u = window.MT && window.MT.user;
   if (!u) throw new Error('Entre na sua conta MedTech para usar a IA.');
   let idToken;
   try { idToken = await u.getIdToken(); } catch (e) { throw new Error('Sessão expirada — entre novamente.'); }
-  // opts: model, system (instrução de sistema), json (esquema → resposta JSON; o gateway desliga a busca nesse modo),
-  //       temperature, maxTokens, grounding:false, maxRetries. Sem opts = comportamento de sempre (pro, texto, com busca).
-  const usedModel = opts.model || 'gemini-2.5-pro'; // pro p/ análises (conduta/assistente/bula/investigação); gateway já aceita pro
+  // opts: nivel ('rapido'|'padrao'|'forte') ou model (id antigo), system (instrução de sistema), json (esquema → resposta JSON),
+  //       temperature, maxTokens, grounding:true (só genérica), cache:true (só genérica), maxRetries.
+  const nivel = opts.nivel || nivelDoModelo(opts.model || 'padrao');
+  const usedModel = NIVEL_ID[nivel];
   const maxRetries = opts.maxRetries ?? 2;
   const generationConfig = { temperature: opts.temperature ?? 0.4, topP: 0.95, maxOutputTokens: opts.maxTokens || 8192 };
   if (opts.json) { generationConfig.responseMimeType = 'application/json'; if (typeof opts.json === 'object') generationConfig.responseSchema = opts.json; }
-  const body = { contents, model: usedModel, generationConfig };
+  // model = id compatível com o servidor antigo; nivel = o que o servidor novo usa.
+  // grounding vai SEMPRE explícito (o servidor antigo ligava a busca quando o campo faltava).
+  const body = { contents, model: usedModel, nivel, generationConfig, grounding: opts.grounding === true };
+  if (opts.cache === true) body.cache = true;
   if (opts.system) body.systemInstruction = opts.system;
-  if (opts.grounding === false) body.grounding = false;
   let lastStatus = 0, lastErrText = '';
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     let res;
@@ -3452,10 +3464,11 @@ async function callGemini(contents, opts = {}) {
       const data = await res.json();
       const text = (data && data.text) || '';
       if (!text) throw new Error('Sem resposta do modelo (resposta vazia).');
-      return { text, sources: [], usedModel };
+      return { text, sources: [], usedModel, nivel: data.nivel || nivel, doCache: !!data.cache, busca: !!data.busca };
     }
     lastStatus = res.status; lastErrText = await res.text().catch(() => '');
-    if ((res.status === 429 || res.status === 502 || res.status === 503) && attempt < maxRetries) {
+    // 429 é o limite diário de uso justo: repetir só gastaria mais (e não passa)
+    if ((res.status === 502 || res.status === 503) && attempt < maxRetries) {
       const wait = Math.min(2000 * Math.pow(2, attempt), 10000);
       updateLoadingSub(`IA sobrecarregada (HTTP ${res.status}). Nova tentativa em ${Math.round(wait/1000)} s.`);
       await sleep(wait); continue;
@@ -3771,7 +3784,7 @@ async function renderResultDireto(item) {
     if (item.offline && protocolMeta) { currentProtocol = protocolMeta; setMode('protocolo'); run(protocolMeta.name); return; }
     setMode(mode || 'direta');
     if (isProto && protocolMeta) currentProtocol = protocolMeta;
-    run(query);
+    run(query, true);
   };
   document.getElementById('aiPanelBtn').onclick = () => { updateAIPanelContext(item); openAIPanel(); };
   if (document.getElementById('aiPanel').classList.contains('open')) updateAIPanelContext(item);
@@ -3844,10 +3857,10 @@ function updateAIPanelContext(item) {
   const chipsBox = document.getElementById('aiPanelChips');
   if (chipsBox) {
     const chips = [
-      ['ti-list-check', 'Resumo de plantão', 'Faça o resumo de plantão desta conduta: em até 8 linhas, o que reconhecer, o que fazer primeiro (com doses) e quando chamar ajuda ou internar.'],
+      ['ti-list-check', 'Resumo de plantão', 'Faça o resumo de plantão desta conduta: em até 8 linhas, o que reconhecer, o que fazer primeiro (com doses) e quando chamar ajuda ou internar.', 'rapido'],
       ['ti-school', 'Me teste', null],
-      ['ti-git-fork', 'Explique o fluxograma', 'Explique o fluxograma desta conduta passo a passo, dizendo em cada decisão o que olhar no paciente.'],
-      ['ti-pill', 'Doses e ajuste renal', 'Liste as doses desta conduta com via, intervalo e o ajuste renal de cada uma.'],
+      ['ti-git-fork', 'Explique o fluxograma', 'Explique o fluxograma desta conduta passo a passo, dizendo em cada decisão o que olhar no paciente.', 'rapido'],
+      ['ti-pill', 'Doses e ajuste renal', 'Liste as doses desta conduta com via, intervalo e o ajuste renal de cada uma.', 'padrao'],
       ['ti-prescription', 'Montar prescrição', 'presc']
     ];
     chipsBox.innerHTML = chips.map((c, i) => `<button class="ai-panel-chip" data-i="${i}"><i class="ti ${c[0]}"></i> ${escapeHtml(c[1])}</button>`).join('');
@@ -3856,7 +3869,7 @@ function updateAIPanelContext(item) {
       btn.onclick = () => {
         if (c[2] === null) return aiPanelQuiz();
         if (c[2] === 'presc') { closeAIPanel(); if (window.CVPresc) CVPresc.abrirCom(item.protocolMeta ? item.protocolMeta.name : item.query); return; }
-        sendAIPanelMessage(c[2], c[1]);
+        sendAIPanelMessage(c[2], c[1], c[3]);
       };
     });
   }
@@ -3898,7 +3911,7 @@ async function aiPanelQuiz() {
   const sendBtn = document.getElementById('aiPanelSend'); if (sendBtn) sendBtn.disabled = true;
   try {
     const { text } = await callGeminiJson([{ role: 'user', parts: [{ text: 'Crie 3 questões de múltipla escolha sobre os pontos PRÁTICOS mais importantes desta conduta (decisão, dose, critério de gravidade, armadilha), baseadas SOMENTE no texto dela. Caso curto no enunciado quando couber. Uma correta e três erradas plausíveis, todas com tamanho e nível de detalhe parecidos. Explicação de 1 a 2 frases citando o ponto da conduta.' }] }],
-      { model: 'gemini-2.5-flash', system: aiPanelSistema(), json: ESQ_QUIZ, temperature: 0.6, maxTokens: 8192, grounding: false });
+      { nivel: 'rapido', system: aiPanelSistema(), json: ESQ_QUIZ, temperature: 0.6, maxTokens: 6144, grounding: false });
     let dados; try { dados = JSON.parse(text); } catch (e) { const a = text.indexOf('{'), b = text.lastIndexOf('}'); dados = JSON.parse(text.slice(a, b + 1)); }
     const quiz = (dados.questoes || []).filter(q => q && q.correta && Array.isArray(q.erradas) && q.erradas.length >= 2).slice(0, 3).map(q => {
       const alts = embaralha([{ t: q.correta, ok: true }, ...q.erradas.slice(0, 3).map(t => ({ t, ok: false }))]);
@@ -3952,9 +3965,10 @@ function showAIPanelTyping(show) {
     existing.remove();
   }
 }
-async function sendAIPanelMessage(text, rotulo) {
+async function sendAIPanelMessage(text, rotulo, nivel) {
   const q = (text || '').trim();
   if (!q || !aiPanelContext) return;
+  const primeira = !aiPanelHistory.some(m => !m.quiz && !m.quizPedido);
   aiPanelHistory.push({ role: 'user', display: rotulo || q, pergunta: q });
   renderAIPanelMessages();
   const input = document.getElementById('aiPanelInput');
@@ -3964,7 +3978,10 @@ async function sendAIPanelMessage(text, rotulo) {
   showAIPanelTyping(true);
   try {
     const temPac = !!((window.CVPresc && CVPresc.resumoPaciente()) || '');
-    const { text: resp } = await callGemini(buildAIPanelContents(q), temPac ? { system: aiPanelSistema(), grounding: false } : { system: aiPanelSistema() });
+    // responde pelo texto da conduta: sem busca. Cache só na 1ª pergunta, sem paciente em foco e fora do modo "caso"
+    // (aí o texto é a análise de um paciente). Ex.: "Explique o fluxograma" da conduta de sepse do banco.
+    const generica = !temPac && primeira && aiPanelContext.mode !== 'caso';
+    const { text: resp } = await callGemini(buildAIPanelContents(q), { nivel: nivel || 'padrao', system: aiPanelSistema(), grounding: false, cache: generica, maxTokens: nivel === 'rapido' ? 4096 : 8192 });
     aiPanelHistory.push({ role: 'model', display: resp });
   } catch (err) {
     aiPanelHistory.push({ role: 'model', display: 'Não consegui responder: ' + (err.message || 'erro ao consultar a IA.') });
@@ -4105,7 +4122,7 @@ async function continueSocratic(userText, isFinishing = false) {
   }
 
   try {
-    const { text, sources } = await callGemini(contents);
+    const { text, sources } = await callGemini(contents, { nivel: 'padrao' });
     currentConversation.messages.push({ role: 'ai', text, sources });
     if (isFinishing || /##\s*\S*\s*Fechamento/i.test(text)) currentConversation.finished = true;
     // Salva no histórico
@@ -4128,7 +4145,7 @@ async function continueSocratic(userText, isFinishing = false) {
     const errEl = document.createElement('div');
     errEl.className = 'alert alert-warn';
     errEl.style.cssText = 'margin-top:12px;';
-    const isOverload = err.status === 503 || err.status === 429;
+    const isOverload = err.status === 503;
     const altModels = ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-2.5-pro'].filter(m => m !== model);
     errEl.innerHTML = `
       <span><i class="ti ti-alert-triangle"></i></span>
@@ -4161,7 +4178,7 @@ COMO RESPONDER
 2. Se faltar um dado que MUDA a resposta (peso, função renal, gravidade, gestação, alergia, apresentação disponível), responda com a suposição explícita ("assumindo X") e pergunte o dado no fim, em uma linha.
 3. Dose: fármaco, dose, via, intervalo, duração e apresentação brasileira. Diluição e bomba: mostre a conta passo a passo (quantos mL aspirar, em qual soro e volume, concentração final e vazão em mL/h) e confira antes de responder. Ajuste por peso, TFG (CKD-EPI 2021) e fígado quando for relevante.
 4. Segurança: em uma linha, dose máxima, contraindicação, interação ou sinal de alarme que importe.
-5. Evidência: cite a diretriz ou sociedade e o ano quando existir; prefira a brasileira e a mais recente (use a busca). Nunca invente referência, estudo, número ou dose; se não souber, diga.
+5. Evidência: cite a diretriz ou sociedade e o ano quando existir; prefira a brasileira e a mais recente. Nunca invente referência, estudo, número ou dose; se não souber, diga.
 6. Conversa de vários turnos: lembre do paciente e refaça as contas quando o médico corrigir.
 7. Formato: markdown enxuto, negrito nos números, listas curtas, sem saudação, sem repetir a pergunta.
 ${paciente ? `
@@ -4217,7 +4234,9 @@ async function assistenteRespond() {
   const sistema = buildAssistentePrompt(cc.ctx, cc.cenario, cc.usarPaciente ? cc.paciente : '');
 
   try {
-    const bruto = (await callGemini(contents, (cc.usarPaciente && cc.paciente) ? { system: sistema, grounding: false } : { system: sistema })).text;
+    // sem busca; cache só na 1ª pergunta sem paciente em foco (pergunta genérica, ex.: dose de noradrenalina)
+    const comPac = !!(cc.usarPaciente && cc.paciente);
+    const bruto = (await callGemini(contents, { nivel: 'padrao', system: sistema, grounding: false, cache: !comPac && contents.length === 1 })).text;
     const { texto: text, sugestoes } = separaSugestoes(bruto);
     currentConversation.messages.push({ role: 'ai', text, sugestoes });
     const idx = history.findIndex(h => h.id === currentConversation.id);
@@ -4300,9 +4319,55 @@ async function loadHistoric(id) {
   }
 }
 
+// ============ Banco primeiro (10/10/2026) ============
+// Antes de gastar IA, a pergunta que o Banco MedTech já responde abre a conduta revisada (e as calculadoras,
+// antibióticos e POCUS que casam). "Perguntar à IA" fica como passo extra (run(query, true)).
+// Só para pergunta curta, com cara de tema (até 5 termos úteis): pergunta específica ("dose de X em 60 kg") vai à IA.
+const BP_VAZIAS = new Set('de do da dos das em no na nos nas o a os as um uma e ou para pra por com sem como qual quais que sobre me fale explique conduta condutas manejo tratamento tratar abordagem protocolo paciente pacientes adulto adultos'.split(' '));
+function bancoPrimeiro(query) {
+  if (typeof OFFLINE === 'undefined') return { condutas: [], extras: [] };
+  const termos = _normKey(query).split(' ').filter(w => w.length > 1 && !BP_VAZIAS.has(w));
+  if (!termos.length || termos.length > 5) return { condutas: [], extras: [] };
+  const frase = termos.join(' ');
+  const condutas = PROTOCOLS.filter(p => OFFLINE[p.id]).map(p => {
+    const nome = _normKey(p.name), resto = _normKey(p.tags + ' ' + p.guideline + ' ' + p.id.replace(/_/g, ' '));
+    if (!termos.every(w => nome.includes(w) || resto.includes(w))) return null;
+    return { p, pts: (nome === frase ? 6 : 0) + (nome.startsWith(frase) ? 3 : 0) + (nome.includes(frase) ? 2 : 0) + termos.filter(w => nome.includes(w)).length };
+  }).filter(Boolean).sort((a, b) => b.pts - a.pts).slice(0, 4);
+  const extras = window.CVX ? (CVX.busca(frase) || []).slice(0, 3) : [];
+  return { condutas, extras };
+}
+async function mostrarBancoPrimeiro(query, achou) {
+  const { condutas, extras } = achou;
+  const perguntar = `<button type="button" class="cv-bt sec" id="bpIA"><i class="ti ti-sparkles"></i> Perguntar à IA: “${escapeHtml(query.trim().slice(0, 80))}”</button>`;
+  const unica = condutas.length && !extras.length && (condutas.length === 1 || condutas[0].pts >= condutas[1].pts + 3);
+  if (unica) {
+    await showOfflineProtocol(condutas[0].p);
+    const rc = document.getElementById('resultContainer');
+    if (rc) rc.insertAdjacentHTML('afterbegin', `<div class="alert alert-info cv-bp" style="max-width:900px;margin:0 auto 14px"><span><i class="ti ti-book-2"></i></span><div><b>Do Banco MedTech, sem gastar IA.</b> Conduta revisada que responde a “${escapeHtml(query.trim().slice(0, 80))}”.<div style="margin-top:8px">${perguntar}</div></div></div>`);
+  } else {
+    showView('result');
+    const rc = document.getElementById('resultContainer');
+    rc.innerHTML = `<div class="result cv-bp" style="max-width:900px;margin:0 auto">
+      <div class="cv-selo"><i class="ti ti-book-2"></i> Banco MedTech</div>
+      <p style="margin:0 0 12px">Encontrei isto no banco revisado: abre na hora, sem gastar IA.</p>
+      ${condutas.length ? `<div class="library-grid">${condutas.map(h => protoCard(h.p, getSavedSet(), getSeenMap())).join('')}</div>` : ''}
+      ${extras.length ? `<div class="cv-bp-extras" style="display:flex;flex-direction:column;gap:6px;margin-top:12px">${extras.map(x => `<button type="button" class="vAchado" data-cvx="${escapeHtml(x.area + '|' + x.sub)}"><i class="ti ${x.ic}" style="--k:${x.cor}"></i><span>${escapeHtml(x.nome)}</span><small>${escapeHtml(x.rot)}</small></button>`).join('')}</div>` : ''}
+      <div style="margin-top:16px">${perguntar}</div>
+    </div>`;
+    bindProtoCards(rc);
+  }
+  const b = document.getElementById('bpIA');
+  if (b) b.onclick = () => run(query, true);
+}
+
 // ============ Run principal ============
-async function run(query) {
+async function run(query, forcarIA) {
   if (!query.trim()) return;
+  if (!forcarIA && ['direta', 'protocolo', 'assistente'].includes(currentMode) && !currentProtocol) {
+    const achou = bancoPrimeiro(query);
+    if (achou.condutas.length || achou.extras.length) { await mostrarBancoPrimeiro(query, achou); return; }
+  }
   if (!(window.MT && window.MT.user)) { cvSemLogin(); return; }
 
   const ctx = document.getElementById('ctxSelect')?.value || 'adulto';
@@ -4319,8 +4384,10 @@ async function run(query) {
       if (currentMode === 'caso') prompt = buildPromptCaso(query, ctx, cenario);
       else if (currentMode === 'protocolo') prompt = buildPromptProtocolo(query, ctx, cenario, currentProtocol);
       else prompt = buildPromptDireto(query, ctx, cenario, profundidade);
-      // modo 'caso' leva a evolução do paciente colada pelo preceptor: sem busca no Google
-      const { text, sources } = await callGemini([{ role: 'user', parts: [{ text: prompt }] }], currentMode === 'caso' ? { grounding: false } : {});
+      // modo 'caso' leva a evolução do paciente colada pelo preceptor: sem busca no Google e sem cache.
+      // Conduta por tema/protocolo é genérica: busca de diretriz vigente + cache compartilhado.
+      const { text, sources } = await callGemini([{ role: 'user', parts: [{ text: prompt }] }],
+        currentMode === 'caso' ? { nivel: 'padrao', grounding: false } : { nivel: 'padrao', grounding: true, cache: true });
       const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
       const item = {
         id, mode: currentMode, query, text, sources, ctx, cenario, ctxLabel, cenarioLabel,
@@ -4338,7 +4405,7 @@ async function run(query) {
     } else {
       // socrática: primeira chamada gera o caso + 1ª pergunta
       const prompt = buildPromptSocraticoInicial(query, ctx, cenario);
-      const { text, sources } = await callGemini([{ role: 'user', parts: [{ text: prompt }] }]);
+      const { text, sources } = await callGemini([{ role: 'user', parts: [{ text: prompt }] }], { nivel: 'padrao' });
       const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
       const item = {
         id, mode: 'socratica', query, ctx, cenario, ctxLabel, cenarioLabel,
@@ -4356,7 +4423,8 @@ async function run(query) {
       await renderSocratic(item);
     }
   } catch (err) {
-    const isOverload = err.status === 503 || err.status === 429;
+    const isOverload = err.status === 503;
+    const isCota = err.status === 429;
     const isAuth = err.status === 401 || err.status === 403;
     document.getElementById('resultContainer').innerHTML = `
       <div class="result">
@@ -4368,9 +4436,9 @@ async function run(query) {
           <button class="btn-primary" id="errRetry">Tentar de novo</button>
           <button class="btn-secondary" id="errVolta">Voltar</button>
         </div>
-        <p style="color: var(--text-mute); font-size:13px; margin-top:14px;">${isOverload ? 'A IA está sobrecarregada agora. Costuma passar em alguns segundos.' : isAuth ? 'Sua sessão pode ter expirado. Entre de novo na conta MedTech.' : 'Confira a conexão e tente de novo.'}</p>
+        <p style="color: var(--text-mute); font-size:13px; margin-top:14px;">${isCota ? 'Enquanto isso, as condutas do banco, as calculadoras e os guias seguem abertos, sem limite.' : isOverload ? 'A IA está sobrecarregada agora. Costuma passar em alguns segundos.' : isAuth ? 'Sua sessão pode ter expirado. Entre de novo na conta MedTech.' : 'Confira a conexão e tente de novo.'}</p>
       </div>`;
-    document.getElementById('errRetry').onclick = () => run(query);
+    document.getElementById('errRetry').onclick = () => run(query, true);
     document.getElementById('errVolta').onclick = () => cvVoltar();
   }
 }
@@ -4504,9 +4572,10 @@ function renderInicio() {
   const f = document.getElementById('homeIA'), q = document.getElementById('homeQ'), box = document.getElementById('homeAchados');
   if (!f || !q || !box) return;
   const norm = t => String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  const perguntar = () => {
+  // Enter: banco primeiro; o botão "Perguntar à IA" da lista é a escolha explícita pela IA
+  const perguntar = forcar => {
     const t = q.value.trim(); if (!t) { q.focus(); return; }
-    setMode('assistente'); run(t);
+    setMode('assistente'); run(t, forcar === true);
   };
   const achar = () => {
     const t = norm(q.value.trim());
@@ -4523,7 +4592,7 @@ function renderInicio() {
       + extras.map(x => `<button type="button" class="vAchado" data-cvx="${escapeHtml(x.area + '|' + x.sub)}"><i class="ti ${x.ic}" style="--k:${x.cor}"></i><span>${escapeHtml(x.nome)}</span><small>${escapeHtml(x.rot)}</small></button>`).join('')
       + `<button type="button" class="vAchado ia" data-ia="1"><i class="ti ti-sparkles"></i><span>Perguntar à IA: <b>${escapeHtml(q.value.trim().slice(0, 80))}</b></span></button>`;
     box.querySelectorAll('[data-pid]').forEach(b => b.onclick = () => runProtocol(b.dataset.pid));
-    box.querySelector('[data-ia]').onclick = perguntar;
+    box.querySelector('[data-ia]').onclick = () => perguntar(true);
     box.hidden = false;
   };
   f.addEventListener('submit', e => { e.preventDefault(); perguntar(); });
@@ -5342,7 +5411,7 @@ async function runBula(q, forceIA) {
   if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
   box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Buscando bula:</strong> ${escapeHtml(q)}</div><div class="loading-sub">Posologia, ajustes e interações…</div></div>`;
   try {
-    const { text } = await callGemini([{ role:'user', parts:[{ text: buildPromptBula(q) }] }]);
+    const { text } = await callGemini([{ role:'user', parts:[{ text: buildPromptBula(q) }] }], { nivel: 'padrao', grounding: true, cache: true });
     box.innerHTML = `<div class="result content">${accordionize(md(text))}<div class="alert alert-info" style="margin-top:14px"><span><i class="ti ti-info-circle"></i></span><div>Gerado por IA — confirme doses e ajustes na bula oficial/ANVISA antes de prescrever.</div></div></div>`;
     await renderMermaidIn(box);
     cvMostra(box);
@@ -5841,7 +5910,7 @@ async function runInv(q, forceIA) {
   if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
   box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Investigando:</strong> ${escapeHtml(q)}</div><div class="loading-sub">Hipóteses, exames e fluxograma…</div></div>`;
   try {
-    const { text } = await callGemini([{ role:'user', parts:[{ text: buildPromptInvestigacao(q) }] }]);
+    const { text } = await callGemini([{ role:'user', parts:[{ text: buildPromptInvestigacao(q) }] }], { nivel: 'padrao', cache: true });
     box.innerHTML = `<div class="result content">${accordionize(md(text))}<div class="alert alert-info" style="margin-top:14px"><span><i class="ti ti-info-circle"></i></span><div>Roteiro gerado por IA — adapte ao contexto do paciente e às diretrizes locais.</div></div></div>`;
     await renderMermaidIn(box);
     await renderMermaidIn(box);
@@ -5904,7 +5973,7 @@ async function runInteracoes() {
   const obs = (document.getElementById('it_obs').value || '').trim();
   const regras = conferenciaInteracoes(meds);
   box.innerHTML = `${regras}<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Verificando interações…</strong></div><div class="loading-sub">Gravidade, mecanismo e manejo…</div></div>`;
-  try { const { text } = await callGemini([{ role: 'user', parts: [{ text: buildPromptInteracoes(meds, obs) }] }], { grounding: false });
+  try { const { text } = await callGemini([{ role: 'user', parts: [{ text: buildPromptInteracoes(meds, obs) }] }], { nivel: 'forte', grounding: false });
     box.innerHTML = `${regras}<div class="result content">${accordionize(md(text))}<div class="alert alert-info" style="margin-top:14px"><span><i class="ti ti-info-circle"></i></span><div>Análise da IA: confirme na bula oficial (ANVISA) ou em uma base de interações medicamentosas antes de decidir.</div></div></div>`;
     cvMostra(box);
   } catch (err) { box.innerHTML = `<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Não foi possível analisar agora: ${escapeHtml(err.message || 'erro')}.</div></div>`; const r = document.createElement('button'); r.className = 'btn-primary'; r.style.marginTop = '10px'; r.textContent = 'Tentar de novo'; r.onclick = () => runInteracoes(); box.appendChild(r); }
@@ -5931,7 +6000,7 @@ async function runDDx() {
   if (!caso) { box.innerHTML = '<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Descreva o <b>quadro clínico</b>.</div></div>'; return; }
   if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
   box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Levantando hipóteses…</strong></div><div class="loading-sub">Prováveis, graves e exames…</div></div>`;
-  try { const { text } = await callGemini([{ role: 'user', parts: [{ text: buildPromptDDx(caso) }] }], { grounding: false });
+  try { const { text } = await callGemini([{ role: 'user', parts: [{ text: buildPromptDDx(caso) }] }], { nivel: 'padrao', grounding: false });
     box.innerHTML = `<div class="result content">${accordionize(md(text))}<div class="alert alert-info" style="margin-top:14px"><span><i class="ti ti-info-circle"></i></span><div>Apoio ao raciocínio — correlacione sempre com a clínica e reavalie.</div></div></div>`;
     cvMostra(box);
   } catch (err) { box.innerHTML = `<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Não foi possível gerar agora: ${escapeHtml(err.message || 'erro')}.</div></div>`; const r = document.createElement('button'); r.className = 'btn-primary'; r.style.marginTop = '10px'; r.textContent = 'Tentar de novo'; r.onclick = () => runDDx(); box.appendChild(r); }
@@ -5959,7 +6028,7 @@ async function runExames() {
   if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
   const ctx = (document.getElementById('ex_ctx').value || '').trim();
   box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Interpretando exames…</strong></div><div class="loading-sub">Alterações, hipóteses e conduta…</div></div>`;
-  try { const { text } = await callGemini([{ role: 'user', parts: [{ text: buildPromptExames(lab, ctx) }] }], { grounding: false });
+  try { const { text } = await callGemini([{ role: 'user', parts: [{ text: buildPromptExames(lab, ctx) }] }], { nivel: 'padrao', grounding: false });
     box.innerHTML = `<div class="result content">${accordionize(md(text))}<div class="alert alert-info" style="margin-top:14px"><span><i class="ti ti-info-circle"></i></span><div>Interpretação por IA — correlacione com a clínica e com os valores de referência do seu laboratório.</div></div></div>`;
     cvMostra(box);
   } catch (err) { box.innerHTML = `<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Não foi possível interpretar agora: ${escapeHtml(err.message || 'erro')}.</div></div>`; const r = document.createElement('button'); r.className = 'btn-primary'; r.style.marginTop = '10px'; r.textContent = 'Tentar de novo'; r.onclick = () => runExames(); box.appendChild(r); }
@@ -6138,7 +6207,7 @@ async function runProc(q, forceIA) {
   if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
   box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Buscando procedimento:</strong> ${escapeHtml(q)}</div><div class="loading-sub">Indicações, técnica e complicações…</div></div>`;
   try {
-    const { text } = await callGemini([{ role:'user', parts:[{ text: buildPromptProc(q) }] }]);
+    const { text } = await callGemini([{ role:'user', parts:[{ text: buildPromptProc(q) }] }], { nivel: 'padrao', cache: true });
     box.innerHTML = `<div class="result content">${accordionize(md(text))}<div class="alert alert-info" style="margin-top:14px"><span><i class="ti ti-info-circle"></i></span><div>Gerado por IA — confirme técnica e material no protocolo institucional antes de executar.</div></div></div>`;
     cvMostra(box);
   } catch (err) {
@@ -6237,7 +6306,7 @@ async function runVacIA(q) {
   if (!(window.MT && window.MT.user)) { box.innerHTML = '<div class="alert alert-warn"><span><i class="ti ti-alert-triangle"></i></span><div>Faça login no MedTech para usar a IA.</div></div>'; return; }
   box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Consultando:</strong> ${escapeHtml(q)}</div><div class="loading-sub">Esquema, doses e intervalos…</div></div>`;
   try {
-    const { text } = await callGemini([{ role:'user', parts:[{ text: buildPromptVac(q) }] }]);
+    const { text } = await callGemini([{ role:'user', parts:[{ text: buildPromptVac(q) }] }], { nivel: 'padrao', grounding: true, cache: true });
     box.innerHTML = `<div class="result content">${accordionize(md(text))}<div class="alert alert-info" style="margin-top:14px"><span><i class="ti ti-info-circle"></i></span><div>Gerado por IA com base no PNI/SBIm — confirme no calendário vigente.</div></div></div>`;
     cvMostra(box);
   } catch (err) {
@@ -6273,7 +6342,7 @@ async function runOrient() {
   const det = (document.getElementById('or_det').value || '').trim();
   box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text"><strong>Gerando orientações…</strong></div><div class="loading-sub">Linguagem simples para o paciente…</div></div>`;
   try {
-    const { text } = await callGemini([{ role: 'user', parts: [{ text: buildPromptOrient(tema, det) }] }], det ? { grounding: false } : {});
+    const { text } = await callGemini([{ role: 'user', parts: [{ text: buildPromptOrient(tema, det) }] }], det ? { nivel: 'padrao', grounding: false } : { nivel: 'padrao', cache: true });
     window.__orTxt = (text || '').trim();
     box.innerHTML = `<div class="result content">${accordionize(md(text))}<div class="row" style="margin-top:12px"><button class="cv-bt sec" onclick="cvCopia(window.__orTxt||'','Orientações copiadas')"><i class="ti ti-copy"></i> Copiar orientações</button></div><div class="alert alert-info" style="margin-top:10px"><span><i class="ti ti-info-circle"></i></span><div>Material educativo gerado por IA — revise antes de entregar ao paciente.</div></div></div>`;
     cvMostra(box);

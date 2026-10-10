@@ -40,9 +40,13 @@ const Gemini = (() => {
       generationConfig.responseMimeType = 'application/json';
       if (responseSchema) generationConfig.responseSchema = responseSchema;
     }
+    // 10/10/2026: extração/categorização de gastos (com thinking 0) vai no nível rápido (Flash-Lite).
+    // Dado financeiro pessoal: sem cache e sem busca (grounding explícito para o servidor antigo também).
     const reqBody = {
       contents: [{ role: 'user', parts }],
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.5-flash-lite',
+      nivel: 'rapido',
+      grounding: false,
       generationConfig,
     };
     if (systemInstruction) reqBody.systemInstruction = { parts: [{ text: systemInstruction }] };

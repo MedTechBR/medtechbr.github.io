@@ -723,9 +723,12 @@ function renderExam(e){
 }
 
 /* ===================== IA ===================== */
-async function callIA(prompt){
+/* Política de custo da IA (10/10/2026): POCUS é didático e genérico — Flash; "aprofundar" e a 1ª pergunta
+   do chat vão com cache compartilhado (o servidor recusa se o texto tiver cara de caso). */
+async function callIA(prompt,o){
   if(!(window.MT&&MT.user))throw new Error('Entre na sua conta MedTech para usar a IA.');
-  return await MT.ai(prompt, 'gemini-2.5-pro');
+  o=o||{};
+  return await MT.ai(prompt, 'padrao', {cache:!!o.cache, grounding:false});
 }
 const SYS_POCUS='Você é um instrutor experiente de POCUS (ultrassom point-of-care) para médicos no Brasil. Responda de forma PRÁTICA e ACIONÁVEL, em português, markdown com seções "## " e bullets curtos. Cubra, quando fizer sentido: indicação, sonda/preset, posição do paciente, cortes/janelas, técnica passo a passo, achados normais vs patológicos e integração clínica. Use medidas e pontos de corte quando houver. Seja objetivo. Lembre que POCUS é exame focado, complementar — sinalize limitações e quando encaminhar para exame formal. NÃO invente referências.';
 
@@ -735,7 +738,7 @@ async function aprofundar(id){
   b.disabled=true;b.innerHTML='<span class="spin"></span> Gerando';
   try{
     const prompt=SYS_POCUS+`\n\nO médico está vendo o guia de "${e.nome}" (POCUS). Aprofunde com: dicas avançadas de técnica e otimização de imagem, erros/armadilhas comuns, 2-3 cenários clínicos com a interpretação esperada, e como integrar com outros pontos do exame. Não repita o básico já óbvio; agregue valor.`;
-    const txt=await callIA(prompt);
+    const txt=await callIA(prompt,{cache:true});
     out.innerHTML='<div class="ai-out">'+md(txt)+'</div>';
   }catch(err){out.innerHTML='<div class="ai-out erro"><i class="ti ti-alert-triangle" aria-hidden="true"></i> '+esc(err.message||'Falha na IA')+'</div>';}
   b.disabled=false;b.innerHTML='<i class="ti ti-sparkles"></i> Pedir casos e detalhes à IA';
@@ -766,7 +769,7 @@ async function enviar(){
   try{
     const hist=chat.filter(m=>!m.err).slice(-8).map(m=>(m.role==='user'?'MÉDICO: ':'POCUSAI: ')+m.text).join('\n\n');
     const prompt=SYS_POCUS+'\n\nConversa até aqui:\n'+hist+'\n\nResponda à última pergunta do médico de forma prática.';
-    const txt=await callIA(prompt);
+    const txt=await callIA(prompt,{cache:chat.filter(m=>!m.err).length===1});
     chat.push({role:'ai',text:txt});renderAssistente();
   }catch(err){
     typ.remove();

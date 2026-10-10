@@ -345,25 +345,43 @@ else {
     try {
       const Fn = await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-functions.js");
       const functions = Fn.getFunctions(app, "southamerica-east1");
-      /* opts.grounding:false desliga a busca do Google: use sempre que o texto for um caso clínico */
-      MT.ai = async (prompt, model = "gemini-2.5-flash", opts) => {
+      /* Política de custo da IA (10/10/2026, backend/functions/ia.js):
+         - model: nível 'rapido' (Flash-Lite, padrão) | 'padrao' (Flash) | 'forte' (Pro), ou um id antigo (gemini-2.5-pro...);
+         - opts.grounding:true liga a busca do Google SÓ em pergunta genérica (desligada por padrão; caso clínico nunca);
+         - opts.cache:true usa o cache compartilhado SÓ em pergunta genérica (sem nenhum dado de paciente);
+         - opts.maxTokens / opts.temperature: o servidor impõe o teto do nível.
+         Vai sempre `model` com id aceito pelo servidor antigo e `grounding` explícito (o antigo ligava a busca sem o campo). */
+      const NIVEL_ID = { rapido: "gemini-2.5-flash-lite", padrao: "gemini-2.5-flash", forte: "gemini-2.5-pro" };
+      const nivelDe = m => NIVEL_ID[m] ? m : /flash-lite/.test(m || "") ? "rapido" : /pro/.test(m || "") ? "forte" : /flash/.test(m || "") ? "padrao" : "rapido";
+      const pedidoIA = (model, opts, extra) => {
+        const nivel = nivelDe(model);
+        const d = Object.assign({ model: NIVEL_ID[nivel], nivel, app: APP.id, grounding: !!(opts && opts.grounding === true) }, extra);
+        if (opts && opts.cache === true) d.cache = true;
+        if (opts && opts.maxTokens) d.maxTokens = opts.maxTokens;
+        if (opts && typeof opts.temperature === "number") d.temperature = opts.temperature;
+        return d;
+      };
+      MT.ai = async (prompt, model = "rapido", opts) => {
         if (!MT.user) throw new Error("Entre na sua conta MedTech para usar a IA.");
         const callable = Fn.httpsCallable(functions, "gemini");
-        const dados = { prompt, model, app: APP.id };
-        if (opts && opts.grounding === false) dados.grounding = false;
-        const res = await callable(dados);
+        const res = await callable(pedidoIA(model, opts, { prompt }));
         return (res && res.data && res.data.text) || "";
       };
-      MT.aiAudio = async (audio, mimeType, prompt, model = "gemini-2.5-flash") => {
+      /* áudio e imagem: sem cache e sem busca (sempre dado do usuário); padrão = Flash (fidelidade) */
+      MT.aiAudio = async (audio, mimeType, prompt, model = "padrao", opts) => {
         if (!MT.user) throw new Error("Entre na sua conta MedTech para usar a IA.");
         const callable = Fn.httpsCallable(functions, "geminiAudio");
-        const res = await callable({ audio, mimeType, prompt, model, app: APP.id });
+        const d = pedidoIA(model, null, { audio, mimeType, prompt }); delete d.grounding;
+        if (opts && opts.maxTokens) d.maxTokens = opts.maxTokens;
+        const res = await callable(d);
         return (res && res.data && res.data.text) || "";
       };
-      MT.aiImage = async (images, prompt, model = "gemini-2.5-flash") => {
+      MT.aiImage = async (images, prompt, model = "padrao", opts) => {
         if (!MT.user) throw new Error("Entre na sua conta MedTech para usar a IA.");
         const callable = Fn.httpsCallable(functions, "geminiImage");
-        const res = await callable({ images, prompt, model, app: APP.id });
+        const d = pedidoIA(model, null, { images, prompt }); delete d.grounding;
+        if (opts && opts.maxTokens) d.maxTokens = opts.maxTokens;
+        const res = await callable(d);
         return (res && res.data && res.data.text) || "";
       };
     } catch (e) { MT.ai = async () => { throw new Error("IA MedTech indisponível no momento."); }; MT.aiAudio = async () => { throw new Error("IA MedTech indisponível no momento."); }; MT.aiImage = async () => { throw new Error("IA MedTech indisponível no momento."); }; }

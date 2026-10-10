@@ -214,9 +214,11 @@ function desenharPainel() {
       <div><b>${inteiro(a.pendentes)}</b><span>iniciadas sem pagar</span></div>${a.pausadas ? `<div><b>${inteiro(a.pausadas)}</b><span>pausadas</span></div>` : ''}</div>`
       : `<p class="vazio">${SEM(erro(p.assinaturas))}</p>`}</div>`);
   mais.push(`<div class="card"><h3><i class="ti ti-sparkles" aria-hidden="true"></i>Uso de IA hoje</h3>
-    <p class="sub">${ia ? plural(ia.contas, 'conta usou', 'contas usaram') + ' a IA hoje. O contador vira às 21h (Brasília).' : 'Chamadas de IA de todas as contas.'}</p>
+    <p class="sub">${ia ? plural(ia.contas, 'conta usou', 'contas usaram') + ' a IA hoje. O contador vira ' + (ia.fuso === 'brasilia' ? 'à meia-noite' : 'às 21h') + ' (Brasília).' : 'Chamadas de IA de todas as contas.'}</p>
     ${ia ? `<div class="mini"><div><b>${inteiro(ia.hoje.texto)}</b><span>texto</span></div><div><b>${inteiro(ia.hoje.imagem)}</b><span>imagem</span></div>
       <div><b>${inteiro(ia.hoje.audio)}</b><span>áudio</span></div><div><b>${inteiro(ia.hoje.doc)}</b><span>documento</span></div></div>
+      ${ia.detalhe ? `<div class="mini" style="margin-top:8px"><div><b>${inteiro(ia.detalhe.cache)}</b><span>do cache (sem custo)</span></div><div><b>${inteiro(ia.detalhe.busca)}</b><span>com busca no Google</span></div>
+      <div><b>${inteiro(ia.detalhe.rapido)}</b><span>Flash-Lite</span></div><div><b>${inteiro(ia.detalhe.padrao)}</b><span>Flash</span></div><div><b>${inteiro(ia.detalhe.forte)}</b><span>Pro</span></div></div>` : ''}
       ${ia.total ? '' : '<p class="sub" style="margin-top:10px">O dia do uso passou a ser gravado com a publicação do servidor de 10/10/2026. Antes disso este número fica zerado.</p>'}`
       : `<p class="vazio">${SEM(erro(p.ia))}</p>`}</div>`);
   const alertas = [];

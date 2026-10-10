@@ -11,9 +11,9 @@
   'use strict';
   var W = window, D = document;
   var AREAS = {
-    atb:   { js: 'condutai-atb.js?v=1',   css: 'condutai-atb.css?v=1',   ns: 'CVATB',   hash: 'antibioticos', ic: 'ti-pill',       cor: 'var(--c-ciano)',   chave: 'atb antibiotico antibioticos antimicrobiano antibioticoterapia' },
+    atb:   { js: 'condutai-atb.js?v=2',   css: 'condutai-atb.css?v=1',   ns: 'CVATB',   hash: 'antibioticos', ic: 'ti-pill',       cor: 'var(--c-ciano)',   chave: 'atb antibiotico antibioticos antimicrobiano antibioticoterapia' },
     calc:  { js: 'condutai-calc.js?v=1',  css: 'condutai-calc.css?v=1',  ns: 'CVCalc',  hash: 'calculadoras', ic: 'ti-calculator', cor: 'var(--c-laranja)', chave: 'calculadora calculo escore score' },
-    pocus: { js: 'condutai-pocus.js?v=1', css: 'condutai-pocus.css?v=1', ns: 'CVPOCUS', hash: 'pocus',        ic: 'ti-wave-sine',  cor: 'var(--c-teal)',    chave: 'pocus ultrassom ultrassonografia us usg' }
+    pocus: { js: 'condutai-pocus.js?v=2', css: 'condutai-pocus.css?v=1', ns: 'CVPOCUS', hash: 'pocus',        ic: 'ti-wave-sine',  cor: 'var(--c-teal)',    chave: 'pocus ultrassom ultrassonografia us usg' }
   };
   var DO_HASH = { antibioticos: 'atb', calculadoras: 'calc', pocus: 'pocus' };
   var promJs = {}, promCss = {};
