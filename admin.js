@@ -9,6 +9,8 @@
      mpCheckout / mpCancelar (compra de teste R$ 5)
      mtSinal  {op:'listar'} | {op:'marcar', id, status, resposta}  (Sinalizações: questão completa lida do
               banco público de cada app, análise pela IA (MT.ai, nível forte, sem busca) e pedido de correção)
+              {op:'errata'|'listarErratas'|'responder'} (10/10/2026: corrigir, tirar do ar e desfazer pelo painel;
+              resposta a quem sinalizou, entregue no app pelo mterrata.js ou por e-mail)
    Se o servidor ainda não tiver as ações novas (painel, assinantes, pedidos),
    a página avisa para publicar (deploy-backend.command) e o resto segue.
    ============================================================ */
@@ -1364,7 +1366,9 @@ const SI_APP = {
 const siCfg = app => SI_APP[app] || { nm: app, c: 'var(--ac)' };
 const siNome = x => (SI_APP[x.app] && SI_APP[x.app].nm) || x.appNome || x.app;
 
-E.si = { itens: [], apps: {}, st: 'aberta', app: '', busca: '', limite: 30, abertos: new Set(), questao: {}, ia: {}, pedido: {}, rascunho: {}, bancos: {} };
+E.si = { itens: [], apps: {}, st: 'aberta', app: '', busca: '', limite: 30, abertos: new Set(), questao: {}, ia: {}, pedido: {}, rascunho: {}, bancos: {},
+  erratas: new Map(), errNaoPublicado: false, errErro: '', editor: {}, resp: {}, modelo: {},
+  fixos: new Set() };   /* resolvida agora pelo painel: fica na lista (para responder) até trocar o filtro */
 
 /* ---- chave estável: a MESMA função dos apps (djb2 + FNV com Math.imul) ---- */
 function hashTxt(s) {
@@ -1500,7 +1504,7 @@ async function carregarSinal() {
   $('siQuando').textContent = 'Atualizando…';
   if (!E.si.itens.length) $('siLista').innerHTML = carregando('Carregando as sinalizações…');
   try {
-    const r = await chamar('mtSinal', { op: 'listar' });
+    const [r] = await Promise.all([chamar('mtSinal', { op: 'listar' }), carregarErratas()]);
     E.si.itens = (r.itens || []).sort((a, b) => String(b.em || '').localeCompare(String(a.em || '')));
     E.si.apps = r.apps || {};
     $('siAviso').innerHTML = '';
@@ -1532,7 +1536,7 @@ function atualizaContadorSinal() {
 }
 function filtradosSinal() {
   const b = normTxt(E.si.busca), bt = E.si.busca.trim().toLowerCase();
-  return E.si.itens.filter(x => (!E.si.st || x.status === E.si.st) && (!E.si.app || x.app === E.si.app) &&
+  return E.si.itens.filter(x => E.si.fixos.has(x.id) || (!E.si.st || x.status === E.si.st) && (!E.si.app || x.app === E.si.app) &&
     (!bt || [x.q, x.nota, x.tema, x.email, x.extra, x.chave, x.resposta, siNome(x)].join(' ').toLowerCase().includes(bt) ||
       (b.length > 2 && normTxt([x.q, x.nota, x.tema].join(' ')).includes(b))));
 }
@@ -1602,10 +1606,13 @@ function corpoSinal(x) {
     <div class="si-out" data-out="questao" aria-live="polite">${Q ? Q.html : ''}</div>
     <div class="si-out" data-out="ia" aria-live="polite">${IA ? IA.html : ''}</div>
     <div class="si-out" data-out="pedido">${P ? P.html : ''}</div>
+    <div data-out="resolver">${htmlResolver(x)}</div>
+    <div class="si-out" data-out="editor">${E.si.editor[id] ? htmlEditor(x, E.si.editor[id]) : ''}</div>
+    ${htmlResposta(x)}
     <div class="si-res">
       <div class="campo"><label for="si-r-${esc(id)}">O que foi feito (resposta curta)</label>
         <textarea id="si-r-${esc(id)}" data-si="resp" maxlength="600" spellcheck="true" placeholder="Ex.: gabarito trocado para C conforme ESC 2024; publicado na versão 179" aria-describedby="si-rh-${esc(id)}">${esc(resp)}</textarea>
-        <span class="ajuda" id="si-rh-${esc(id)}">Fica registrada na sinalização. Até 600 caracteres.</span></div>
+        <span class="ajuda" id="si-rh-${esc(id)}">Anotação interna, só a administração vê. Até 600 caracteres. Para escrever ao usuário, use a resposta acima.</span></div>
       <div class="acoesL">${bts.join('')}</div>
     </div>
     <p class="leg">${cfg.base ? `<a href="${esc(cfg.base)}" target="_blank" rel="noopener">Abrir o ${esc(cfg.nm)}<span class="sr"> em nova aba</span></a> · ` : ''}id <code>${esc(id)}</code></p>`;
@@ -1616,6 +1623,11 @@ function repintaItem(id, focoSel) {
   if (!el || !x) return;
   el.outerHTML = itemSinal(x);
   if (focoSel) { const f = document.getElementById('si-' + id).querySelector(focoSel); if (f) f.focus({ preventScroll: true }); }
+}
+function repintaResolver(id) {
+  const x = itemPorId(id), el = document.querySelector(`#si-${id} [data-out="resolver"]`);
+  if (x && el && !el.contains(document.activeElement)) el.innerHTML = htmlResolver(x);
+  else if (x && el) { const f = document.activeElement && document.activeElement.dataset.si; el.innerHTML = htmlResolver(x); const b = f && el.querySelector(`[data-si="${f}"]`); if (b) b.focus({ preventScroll: true }); }
 }
 function repintaSaida(id, qual, html) {
   const el = document.getElementById('si-' + id);
@@ -1662,6 +1674,7 @@ async function verQuestao(id) {
   repintaSaida(id, 'questao', E.si.questao[id].html);
   const b = document.querySelector(`#si-${id} [data-si="questao"]`);
   if (b && r.it) { b.setAttribute('aria-pressed', 'true'); b.innerHTML = '<i class="ti ti-file-text" aria-hidden="true"></i>Questão carregada'; }
+  repintaResolver(id);
   return r;
 }
 
@@ -1704,7 +1717,10 @@ QUESTÃO:
 ${textoQuestao(x, r)}
 
 Responda APENAS com um objeto JSON válido, sem texto fora dele e sem markdown, neste formato:
-{"razao":"sim" ou "nao" ou "em_parte","resumo":"uma ou duas frases","erro":"o que está errado na questão; escreva nada se estiver correta","correcao":{"enunciado":"texto novo ou vazio","alternativas":"quais alternativas mudam e como, ou vazio","gabarito":"letra correta na ordem do app e o porquê, ou vazio","comentario":"comentário corrigido, curto, ou vazio"},"fonte":"diretriz, norma ou referência vigente, com o ano","confianca":"alta" ou "media" ou "baixa","conferir":"o que o médico deve conferir antes de aplicar"}
+{"razao":"sim" ou "nao" ou "em_parte","resumo":"uma ou duas frases","erro":"o que está errado na questão; escreva nada se estiver correta","correcao":{"enunciado":"texto novo ou vazio","alternativas":"quais alternativas mudam e como, ou vazio","gabarito":"letra correta na ordem do app e o porquê, ou vazio","comentario":"comentário corrigido, curto, ou vazio"},"novo":${r && r.it && r.it.tipo === 'cartao'
+    ? '{"frente":"a frente do cartão inteira já corrigida, ou vazio se não muda","verso":"o verso inteiro já corrigido, ou vazio se não muda"}'
+    : '{"enunciado":"o enunciado INTEIRO já corrigido, ou vazio se não muda","alternativas":["texto INTEIRO da A já corrigido","…da B","…"] na ordem das letras do app e sem a letra na frente, ou [] se nenhuma muda (se só uma muda, repita as outras como estão),"comentarios_alternativas":["comentário da A","…"] ou [] se não mudam,"gabarito":"só a letra correta na ordem do app, ou vazio se não muda","comentario":"o comentário INTEIRO já corrigido, ou vazio se não muda"}'},"fonte":"diretriz, norma ou referência vigente, com o ano","confianca":"alta" ou "media" ou "baixa","conferir":"o que o médico deve conferir antes de aplicar"}
+O campo "novo" vira a correção aplicada no app depois da revisão do médico: escreva texto final, sem comentários entre parênteses, e deixe vazio o que estiver certo. Se o usuário não tiver razão, "novo" vai com tudo vazio.
 Português do Brasil, frases curtas e diretas.`;
 }
 function lerJSON(txt) {
@@ -1740,13 +1756,14 @@ async function analisarIA(id, botao) {
   try {
     const r = await verQuestao(id);
     repintaSaida(id, 'ia', carregando('A IA está analisando a questão (pode levar até 1 minuto)…'));
-    const txt = await MT.ai(promptIA(x, r || {}), 'forte', { grounding: false, maxTokens: 4096, temperature: 0.2 });
+    const txt = await MT.ai(promptIA(x, r || {}), 'forte', { grounding: false, maxTokens: 8192, temperature: 0.2 });
     const j = lerJSON(txt);
     E.si.ia[id] = { ok: true, j, bruto: txt, em: new Date().toISOString() };
     E.si.ia[id].html = htmlIA(j, txt, E.si.ia[id].em);
     repintaSaida(id, 'ia', E.si.ia[id].html);
     E.si.pedido[id] = null; repintaSaida(id, 'pedido', '');
     botao.innerHTML = '<i class="ti ti-sparkles" aria-hidden="true"></i>Analisar de novo com IA';
+    repintaResolver(id);
   } catch (e) {
     const msg = (e && e.message) || String(e);
     E.si.ia[id] = null;
@@ -1826,6 +1843,420 @@ async function gerarPedido(id, botao) {
   } finally { botao.disabled = false; }
 }
 
+/* ============================================================
+   ERRATAS E RESPOSTA (10/10/2026, pacote das Sinalizações): resolver a questão no próprio painel
+   mtSinal {op:'errata', app, qid, tipo: corrige|oculta|restaura, dados?, motivo?, sinalId?, q?}
+           {op:'listarErratas'} → {itens}      {op:'responder', sinalId, texto, status, resolucao}
+   A errata vale pela chave da questão NO BANCO ATUAL (it.ch), que é a que o app usa. `dados` leva só o
+   que muda em relação ao banco, na ordem do BANCO (alternativas[], porAlt[], gabarito = índice no banco).
+   Os apps buscam as erratas ao abrir (mterrata.js) e aplicam antes de desenhar as questões.
+   ============================================================ */
+const APPS_ERRATA = ['clinicamed', 'cirurgiamed', 'flashmed', 'trafego-titulo', 'farmauti', 'quiz-enare-farmacia'];
+const ehOpNova = e => /Operação desconhecida/i.test((e && e.message) || '');
+const chaveErr = (app, qid) => app + '|' + qid;
+const trechoTxt = (t, n) => { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n - 1) + '…' : t; };
+const ROT_CAMPO = { enunciado: 'Enunciado', alternativas: 'Alternativas', porAlt: 'Comentários das alternativas', gabarito: 'Gabarito', comentario: 'Comentário', verso: 'Verso' };
+function errataDe(x, Q) {
+  const r = Q && Q.r;
+  const qid = r && r.it ? r.it.ch : x.chave;
+  return E.si.erratas.get(chaveErr(x.app, qid)) || null;
+}
+async function carregarErratas() {
+  try {
+    const r = await chamar('mtSinal', { op: 'listarErratas' });
+    E.si.erratas = new Map((r.itens || []).filter(e => e && e.ativa).map(e => [chaveErr(e.app, e.qid), e]));
+    E.si.errNaoPublicado = false; E.si.errErro = '';
+  } catch (e) {
+    if (ehNegado(e)) throw e;
+    if (ehOpNova(e)) E.si.errNaoPublicado = true; else E.si.errErro = (e && e.message) || String(e);
+  }
+  desenharErratas();
+}
+
+/* ---- valores de trabalho do editor (ordem da TELA, com o índice no banco junto) ---- */
+function valoresDe(it, errata) {
+  const v = {
+    enunciado: it.enunciado || '', comentario: it.comentario || '', verso: it.verso || '',
+    alts: it.alts.map(a => ({ letra: a.letra, idx: a.idx, txt: a.txt, por: a.por || '' })),
+    gab: it.anulada ? -1 : ((it.alts.find(a => a.certa) || {}).idx ?? -1)
+  };
+  const d = errata && errata.tipo === 'corrige' && errata.dados;
+  if (d) {
+    if (typeof d.enunciado === 'string') v.enunciado = d.enunciado;
+    if (typeof d.comentario === 'string') v.comentario = d.comentario;
+    if (typeof d.verso === 'string') v.verso = d.verso;
+    if (Array.isArray(d.alternativas)) v.alts.forEach(a => { if (typeof d.alternativas[a.idx] === 'string') a.txt = d.alternativas[a.idx]; });
+    if (Array.isArray(d.porAlt)) v.alts.forEach(a => { if (typeof d.porAlt[a.idx] === 'string') a.por = d.porAlt[a.idx]; });
+    if (Number.isInteger(d.gabarito)) v.gab = d.gabarito;
+  }
+  return v;
+}
+/* proposta estruturada da IA (campo "novo", letras na ordem da tela) sobre os valores atuais */
+function valoresIA(base, j) {
+  const n = j && j.novo; if (!n || typeof n !== 'object') return null;
+  const v = JSON.parse(JSON.stringify(base));
+  const cheio = s => typeof s === 'string' && s.trim() && !/^(vazio|nada|-|—|n\/a)$/i.test(s.trim());
+  if (cheio(n.enunciado)) v.enunciado = n.enunciado.trim();
+  if (cheio(n.frente)) v.enunciado = n.frente.trim();
+  if (cheio(n.verso)) v.verso = n.verso.trim();
+  if (cheio(n.comentario)) v.comentario = n.comentario.trim();
+  if (Array.isArray(n.alternativas)) n.alternativas.forEach((t, p) => { if (v.alts[p] && cheio(t)) v.alts[p].txt = String(t).replace(/^\s*[A-E]\s*[).:-]\s+/, '').trim(); });
+  if (Array.isArray(n.comentarios_alternativas)) n.comentarios_alternativas.forEach((t, p) => { if (v.alts[p] && cheio(t)) v.alts[p].por = String(t).trim(); });
+  const L = String(n.gabarito || '').trim().toUpperCase().match(/^([A-E])\b/);
+  if (L && v.alts[LETRAS.indexOf(L[1])]) v.gab = v.alts[LETRAS.indexOf(L[1])].idx;
+  else if (/anulad/i.test(String(n.gabarito || ''))) v.gab = -1;
+  return v;
+}
+/* o que mudou de `a` para `b` (mesmo formato de valores) */
+function camposMudados(a, b, cartao) {
+  const m = [];
+  if (a.enunciado.trim() !== b.enunciado.trim()) m.push('enunciado');
+  if (cartao) { if (a.verso.trim() !== b.verso.trim()) m.push('verso'); return m; }
+  if (a.alts.some((x, i) => x.txt.trim() !== b.alts[i].txt.trim())) m.push('alternativas');
+  if (a.alts.some((x, i) => x.por.trim() !== b.alts[i].por.trim())) m.push('porAlt');
+  if (a.gab !== b.gab) m.push('gabarito');
+  if (a.comentario.trim() !== b.comentario.trim()) m.push('comentario');
+  return m;
+}
+/* `dados` da errata: o estado desejado em relação ao BANCO original, na ordem do banco */
+function dadosDe(orig, novo, cartao) {
+  const d = {};
+  camposMudados(orig, novo, cartao).forEach(k => {
+    if (k === 'enunciado') d.enunciado = novo.enunciado.trim();
+    if (k === 'verso') d.verso = novo.verso.trim();
+    if (k === 'comentario') d.comentario = novo.comentario.trim();
+    if (k === 'gabarito') d.gabarito = novo.gab;
+    if (k === 'alternativas' || k === 'porAlt') {
+      const arr = []; novo.alts.forEach(a => { arr[a.idx] = (k === 'alternativas' ? a.txt : a.por).trim(); });
+      d[k] = Array.from({ length: novo.alts.length }, (_, i) => arr[i] || '');
+    }
+  });
+  return d;
+}
+const letraDoIdx = (v, idx) => idx === -1 ? 'anulada' : ((v.alts.find(a => a.idx === idx) || {}).letra || '?');
+
+/* ---- antes/depois: diferença por palavra (LCS), com teto para textos longos ---- */
+function difPalavras(a, b) {
+  const A = String(a || '').split(/(\s+)/), B = String(b || '').split(/(\s+)/);
+  if (A.length * B.length > 360000) return { antes: `<del>${esc(a)}</del>`, depois: `<ins>${esc(b)}</ins>` };
+  const n = A.length, m = B.length, T = Array.from({ length: n + 1 }, () => new Uint16Array(m + 1));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) T[i][j] = A[i] === B[j] ? T[i + 1][j + 1] + 1 : Math.max(T[i + 1][j], T[i][j + 1]);
+  let i = 0, j = 0, antes = '', depois = '';
+  while (i < n && j < m) {
+    if (A[i] === B[j]) { antes += esc(A[i]); depois += esc(B[j]); i++; j++; }
+    else if (T[i + 1][j] >= T[i][j + 1]) { antes += `<del>${esc(A[i])}</del>`; i++; }
+    else { depois += `<ins>${esc(B[j])}</ins>`; j++; }
+  }
+  while (i < n) antes += `<del>${esc(A[i++])}</del>`;
+  while (j < m) depois += `<ins>${esc(B[j++])}</ins>`;
+  return { antes, depois };
+}
+const textoDoIdx = (v, idx) => idx === -1 ? '' : trechoTxt((v.alts.find(a => a.idx === idx) || {}).txt, 90);
+function htmlAntesDepois(atual, novo, cartao, reordena) {
+  const m = camposMudados(atual, novo, cartao);
+  if (!m.length) return '<p class="sub" role="status">Nada mudou em relação ao que o app mostra hoje.</p>';
+  const linha = (rot, a, b) => { const d = difPalavras(a, b); return `<div class="si-dif"><h5>${esc(rot)}</h5><div class="ad"><p class="an"><span class="sr">Antes: </span>${d.antes || '<i>(vazio)</i>'}</p><p class="de"><span class="sr">Depois: </span>${d.depois || '<i>(vazio)</i>'}</p></div></div>`; };
+  const L = [];
+  if (m.includes('enunciado')) L.push(linha(cartao ? 'Frente' : 'Enunciado', atual.enunciado, novo.enunciado));
+  if (m.includes('verso')) L.push(linha('Verso', atual.verso, novo.verso));
+  if (m.includes('gabarito')) L.push(`<div class="si-dif"><h5>Gabarito</h5><div class="ad"><p class="an"><span class="sr">Antes: </span><del>${esc(letraDoIdx(atual, atual.gab))}</del>${atual.gab >= 0 ? ' · ' + esc(textoDoIdx(atual, atual.gab)) : ''}</p><p class="de"><span class="sr">Depois: </span><ins>${esc(reordena && novo.gab >= 0 ? 'a correta passa a ser' : letraDoIdx(novo, novo.gab))}</ins>${novo.gab >= 0 ? ' · ' + esc(textoDoIdx(novo, novo.gab)) : ''}</p></div>
+    ${reordena && novo.gab >= 0 ? `<p class="sub">Nesta questão autoral o app sempre mostra a correta na letra ${esc(letraDoIdx(atual, atual.gab))} (a posição vem da chave): o texto da alternativa certa é que muda, e as outras mudam de letra.</p>` : ''}</div>`);
+  novo.alts.forEach((a, i) => {
+    if (a.txt.trim() !== atual.alts[i].txt.trim()) L.push(linha('Alternativa ' + a.letra, atual.alts[i].txt, a.txt));
+    if (a.por.trim() !== atual.alts[i].por.trim()) L.push(linha('Comentário da alternativa ' + a.letra, atual.alts[i].por, a.por));
+  });
+  if (m.includes('comentario')) L.push(linha('Comentário', atual.comentario, novo.comentario));
+  return `<p class="si-difleg"><span class="an">riscado = sai</span> <span class="de">grifado = entra</span></p>${L.join('')}`;
+}
+
+/* ---- editor ---- */
+function htmlEditor(x, ed) {
+  const id = x.id, v = ed.novo, cfg = siCfg(x.app), cartao = ed.cartao, p = 'si-e-' + id;
+  const anul = cfg.fmt === 'enare';
+  const temPor = cfg.fmt === 'padrao' || cfg.fmt === 'farmauti';
+  const ta = (nome, rot, val, linhas, extra) => `<div class="campo"><label for="${p}-${nome}">${esc(rot)}</label><textarea id="${p}-${nome}" data-ed="${nome}" rows="${linhas || 3}" maxlength="${nome === 'comentario' ? 8000 : nome === 'enunciado' ? 6000 : 3000}" spellcheck="true"${extra || ''}>${esc(val)}</textarea></div>`;
+  const alts = cartao ? '' : `<fieldset class="si-ed-alts"><legend>Alternativas, na ordem em que o app mostra${ed.reordena ? ' (nas autorais, a posição da correta na tela vem da chave: ao trocar o gabarito, a ordem das letras no app pode mudar)' : ''}. Marque a correta.</legend>
+      ${v.alts.map((a, i) => `<div class="si-ed-alt">
+        <label class="si-ed-gab"><input type="radio" name="${p}-gab" value="${a.idx}" data-ed="gab"${v.gab === a.idx ? ' checked' : ''}><span>${a.letra}<span class="sr">: correta</span></span></label>
+        <div class="si-ed-txts">${ta('alt' + i, 'Alternativa ' + a.letra + (ed.reordena ? ' (posição ' + a.idx + ' no banco)' : ''), a.txt, 2)}
+          ${temPor ? ta('por' + i, 'Comentário da alternativa ' + a.letra + ' (opcional)', a.por, 2) : ''}</div></div>`).join('')}
+      ${anul ? `<label class="si-ed-anul"><input type="radio" name="${p}-gab" value="-1" data-ed="gab"${v.gab === -1 ? ' checked' : ''}> Questão anulada (sem gabarito)</label>` : ''}
+    </fieldset>`;
+  return `<div class="si-editor" role="group" aria-labelledby="${p}-tit">
+    <div class="si-iatopo"><h4 id="${p}-tit"><i class="ti ${ed.modo === 'ia' ? 'ti-sparkles' : 'ti-pencil'}" aria-hidden="true"></i>${ed.modo === 'ia' ? 'Correção sugerida pela IA' : 'Corrigir a questão'}</h4>
+      <span class="si-quando">${esc(cfg.nm)}</span></div>
+    ${ed.modo === 'ia' ? '<p class="si-iaaviso"><i class="ti ti-info-circle" aria-hidden="true"></i>Campos já preenchidos com a sugestão da IA. Confira cada um na diretriz vigente antes de aplicar; dá para editar aqui.</p>' : '<p class="sub">Campos preenchidos com o que o app mostra hoje. Mude só o que está errado: o resto fica como está.</p>'}
+    ${ta('enunciado', cartao ? 'Frente do cartão' : 'Enunciado', v.enunciado, cartao ? 3 : 6)}
+    ${cartao ? ta('verso', 'Verso do cartão', v.verso, 4) : alts}
+    ${cartao ? '' : ta('comentario', 'Comentário (explicação)', v.comentario, 5)}
+    <div class="campo"><label for="${p}-motivo">Motivo (fica no registro da errata)</label><input id="${p}-motivo" data-ed="motivo" maxlength="600" value="${esc(ed.motivo || '')}" placeholder="Ex.: gabarito pela ESC 2024; alternativa C ambígua"></div>
+    <div class="si-ad" aria-live="polite"><h4><i class="ti ti-arrows-diff" aria-hidden="true"></i>Antes e depois</h4><div data-ed-ad>${htmlAntesDepois(ed.atual, v, cartao, ed.reordena)}</div></div>
+    <div class="acoesL"><button class="btn btn-p" type="button" data-si="edAplica"><i class="ti ti-check" aria-hidden="true"></i>Aplicar a correção no app</button>
+      <button class="btn btn-g" type="button" data-si="edCancela">Cancelar</button></div>
+  </div>`;
+}
+function leEditor(id) {
+  const ed = E.si.editor[id], el = document.getElementById('si-' + id);
+  if (!ed || !el) return null;
+  const v = ed.novo, val = n => { const t = el.querySelector(`[data-ed="${n}"]`); return t ? t.value : null; };
+  if (val('enunciado') != null) v.enunciado = val('enunciado');
+  if (val('verso') != null) v.verso = val('verso');
+  if (val('comentario') != null) v.comentario = val('comentario');
+  v.alts.forEach((a, i) => { if (val('alt' + i) != null) a.txt = val('alt' + i); if (val('por' + i) != null) a.por = val('por' + i); });
+  const g = el.querySelector('[data-ed="gab"]:checked'); if (g) v.gab = Number(g.value);
+  ed.motivo = val('motivo') || '';
+  return ed;
+}
+async function abrirEditor(id, modo, botao) {
+  const x = itemPorId(id); if (!x) return;
+  if (botao) botao.disabled = true;
+  try {
+    const r = await verQuestao(id);
+    if (!r || !r.it) { toast('Carregue a questão primeiro: o painel não achou a questão no banco do app.', 'err'); return; }
+    const it = r.it, cartao = it.tipo === 'cartao', er = errataDe(x, E.si.questao[id]);
+    const orig = valoresDe(it, null), atual = valoresDe(it, er);
+    let novo = JSON.parse(JSON.stringify(atual));
+    if (modo === 'ia') {
+      const IA = E.si.ia[id]; novo = IA && IA.ok ? valoresIA(atual, IA.j) : null;
+      if (!novo || !camposMudados(atual, novo, cartao).length) { toast('A análise da IA não trouxe uma correção para aplicar. Use "Corrigir eu mesmo".', 'err'); return; }
+    }
+    E.si.editor[id] = { modo, it, cartao, orig, atual, novo, motivo: modo === 'ia' && E.si.ia[id].j && E.si.ia[id].j.fonte ? String(E.si.ia[id].j.fonte).slice(0, 600) : '', reordena: !!siCfg(x.app).reordena && !it.real && it.alts.length === 5 };
+    E.si.editor[id].html = htmlEditor(x, E.si.editor[id]);
+    repintaSaida(id, 'editor', E.si.editor[id].html);
+    const f = document.querySelector(`#si-${id} [data-out="editor"] textarea`); if (f) f.focus();
+  } finally { if (botao) botao.disabled = false; }
+}
+function atualizaAntesDepois(id) {
+  const ed = leEditor(id); if (!ed) return;
+  const alvo = document.querySelector(`#si-${id} [data-ed-ad]`);
+  if (alvo) alvo.innerHTML = htmlAntesDepois(ed.atual, ed.novo, ed.cartao, ed.reordena);
+}
+function fechaEditor(id) { delete E.si.editor[id]; repintaSaida(id, 'editor', ''); }
+
+async function aplicarEditor(id) {
+  const x = itemPorId(id), ed = leEditor(id); if (!x || !ed) return;
+  const cfg = siCfg(x.app);
+  const mudou = camposMudados(ed.atual, ed.novo, ed.cartao);
+  if (!mudou.length) { toast('Nada mudou em relação ao que o app mostra hoje.', 'err'); return; }
+  if (!ed.cartao && ed.novo.alts.some(a => !a.txt.trim())) { toast('Há alternativa em branco.', 'err'); return; }
+  if (!ed.novo.enunciado.trim()) { toast('O enunciado ficou em branco.', 'err'); return; }
+  const dados = dadosDe(ed.orig, ed.novo, ed.cartao);
+  const voltaAoBanco = !Object.keys(dados).length;
+  const lista = mudou.map(k => k === 'gabarito' ? (ed.reordena && ed.novo.gab >= 0 ? `Gabarito: a correta passa a ser "${textoDoIdx(ed.novo, ed.novo.gab)}"` : `Gabarito: ${letraDoIdx(ed.atual, ed.atual.gab)} → ${letraDoIdx(ed.novo, ed.novo.gab)}`) : (ed.cartao && k === 'enunciado' ? 'Frente' : ROT_CAMPO[k]));
+  const ok = await confirmar(voltaAoBanco ? 'Voltar a questão ao original?' : `Aplicar a correção no ${cfg.nm}?`,
+    voltaAoBanco ? `Do jeito que ficou, a questão é igual à do banco do ${esc(cfg.nm)}: a errata atual será desfeita.`
+      : `Muda: <b>${esc(lista.join('; '))}</b>.</p><p>Vale para todos os usuários do ${esc(cfg.nm)} quando abrirem o app (em até alguns minutos). Ninguém perde progresso; respostas antigas passam a ser conferidas pelo gabarito novo. Dá para desfazer em "Erratas ativas".`,
+    voltaAoBanco ? 'Desfazer a errata' : 'Aplicar a correção');
+  if (!ok) return;
+  await gravarErrata(x, voltaAoBanco ? 'restaura' : 'corrige', voltaAoBanco ? null : dados, ed.motivo, ed.it);
+}
+async function gravarErrata(x, tipo, dados, motivo, it) {
+  const id = x.id, cfg = siCfg(x.app);
+  const qid = it ? it.ch : x.chave;
+  try {
+    const r = await chamar('mtSinal', Object.assign({ op: 'errata', app: x.app, qid, tipo, motivo: motivo || '', q: trechoTxt(it ? it.enunciado : x.q, 200) },
+      dados ? { dados } : {}, tipo !== 'restaura' ? { sinalId: id } : {}));
+    const k = chaveErr(x.app, qid), agora = new Date().toISOString();
+    if (tipo === 'restaura') E.si.erratas.delete(k);
+    else E.si.erratas.set(k, Object.assign({}, E.si.erratas.get(k) || {}, { app: x.app, appNome: cfg.nm, qid, tipo, ativa: true, em: r.em || agora, atualizada: r.em || agora,
+      por: (MT.user && MT.user.email) || '', motivo: motivo || '', sinalId: id, q: trechoTxt(it ? it.enunciado : x.q, 200) }, dados ? { dados } : {}));
+    if (tipo !== 'restaura') {
+      Object.assign(x, { status: 'corrigida', resolucao: tipo, tratadaEm: agora, tratadaPor: (MT.user && MT.user.email) || '' });
+      /* o servidor anota o que mudou quando a sinalização ainda não tinha anotação: espelha aqui */
+      if (!x.resposta) x.resposta = (dados ? 'Corrigido: ' + Object.keys(dados).map(k => (ROT_CAMPO[k] || k).toLowerCase()).join(', ') + '.' : 'Questão retirada do ar.') + (motivo ? ' ' + motivo : '');
+    }
+    delete E.si.editor[id];
+    /* a resposta ao usuário já sai com o modelo da resolução */
+    E.si.modelo[id] = tipo === 'oculta' ? 'retirada' : tipo === 'corrige' ? 'corrigida' : E.si.modelo[id];
+    if (tipo !== 'restaura') E.si.resp[id] = modeloResposta(x, E.si.modelo[id]);
+    desenharErratas();
+    E.si.fixos.add(id);
+    repintaItem(id);
+    atualizaContadorSinal();
+    toast(tipo === 'corrige' ? 'Correção aplicada. Agora responda a quem sinalizou.' : tipo === 'oculta' ? 'Questão tirada do ar. Agora responda a quem sinalizou.' : 'Errata desfeita: a questão voltou a ser a do banco.', 'ok');
+    const alvo = document.getElementById('si-u-' + id) || document.querySelector(`#si-${id} .si-cab`);
+    if (alvo) { alvo.focus({ preventScroll: false }); }
+    return true;
+  } catch (e) {
+    if (ehNegado(e)) { bloquear(e.message); return false; }
+    if (ehOpNova(e)) { toast('Publique o servidor para corrigir pelo painel (deploy-backend.command).', 'err'); return false; }
+    toast('Não gravou: ' + ((e && e.message) || e), 'err');
+    return false;
+  }
+}
+function pedeMotivo(titulo, texto, rotOk, perigo) {
+  return new Promise(res => {
+    let val = null;
+    const d = dialogo(titulo, `<p>${texto}</p><div class="campo"><label for="dlgMotivo">Motivo (fica no registro)</label><input id="dlgMotivo" maxlength="600" placeholder="Ex.: duas alternativas corretas; diretriz mudou"></div>`, [
+      { rot: 'Cancelar', cls: 'btn-g' },
+      { rot: rotOk, cls: perigo ? 'btn-dn' : 'btn-p', acao: () => { val = ($('dlgMotivo').value || '').trim(); } }
+    ]);
+    d.addEventListener('close', () => res(val), { once: true });
+  });
+}
+async function ocultarQuestao(id, botao) {
+  const x = itemPorId(id); if (!x) return;
+  botao.disabled = true;
+  try {
+    const r = await verQuestao(id);
+    if (!r || !r.it) { toast('O painel não achou a questão no banco do app: não dá para tirar do ar por aqui.', 'err'); return; }
+    const cfg = siCfg(x.app);
+    const motivo = await pedeMotivo('Tirar a questão do ar?', `A questão some das listas, simulados, sorteios e contagens do <b>${esc(cfg.nm)}</b> para todos os usuários, quando abrirem o app. As respostas que as pessoas já deram ficam guardadas. Dá para devolver ao ar depois, em "Erratas ativas".`, 'Tirar do ar', true);
+    if (motivo === null) return;
+    await gravarErrata(x, 'oculta', null, motivo, r.it);
+  } finally { if (botao.isConnected) botao.disabled = false; }
+}
+async function desfazerErrata(app, qid, botao) {
+  const e = E.si.erratas.get(chaveErr(app, qid)); if (!e) return;
+  const cfg = siCfg(app);
+  const ok = await confirmar(e.tipo === 'oculta' ? 'Devolver a questão ao ar?' : 'Desfazer a correção?',
+    `A questão volta a ser exatamente a do banco do ${esc(cfg.nm)}${e.tipo === 'oculta' ? ' e reaparece para todos' : ''}, quando os usuários abrirem o app.`,
+    e.tipo === 'oculta' ? 'Devolver ao ar' : 'Desfazer a correção');
+  if (!ok) return;
+  if (botao) botao.disabled = true;
+  try {
+    await chamar('mtSinal', { op: 'errata', app, qid, tipo: 'restaura' });
+    E.si.erratas.delete(chaveErr(app, qid));
+    desenharErratas();
+    E.si.itens.filter(x => x.app === app && E.si.abertos.has(x.id)).forEach(x => repintaItem(x.id));
+    toast(e.tipo === 'oculta' ? 'Questão devolvida ao ar.' : 'Correção desfeita.', 'ok');
+  } catch (er) {
+    if (ehNegado(er)) { bloquear(er.message); return; }
+    toast('Não gravou: ' + ((er && er.message) || er), 'err');
+  } finally { if (botao && botao.isConnected) botao.disabled = false; }
+}
+
+/* ---- lista "Erratas ativas" ---- */
+function desenharErratas() {
+  const n = E.si.erratas.size, el = $('siErrLista'), cnt = $('siErrN');
+  if (!el) return;
+  cnt.textContent = E.si.errNaoPublicado ? '' : inteiro(n);
+  if (E.si.errNaoPublicado) { el.innerHTML = avisoPublicar('as erratas'); return; }
+  if (E.si.errErro) { el.innerHTML = avisoErro(E.si.errErro); return; }
+  if (!n) { el.innerHTML = '<p class="vazio">Nenhuma questão corrigida ou fora do ar pelo painel.</p>'; return; }
+  const porApp = {};
+  [...E.si.erratas.values()].sort((a, b) => String(b.atualizada || b.em || '').localeCompare(String(a.atualizada || a.em || ''))).forEach(e => (porApp[e.app] = porApp[e.app] || []).push(e));
+  el.innerHTML = Object.keys(porApp).map(app => `<div class="si-errapp"><h4><span class="si-app" style="--c:${siCfg(app).c}">${esc(siCfg(app).nm || app)}</span> <span class="sub">${plural(porApp[app].length, 'errata', 'erratas')}</span></h4>
+    <ul class="si-errl">${porApp[app].map(e => `<li>
+      <div class="si-errtx"><p><span class="selo ${e.tipo === 'oculta' ? 'err' : 'ok'}">${e.tipo === 'oculta' ? 'fora do ar' : 'corrigida'}</span> ${esc(e.q || 'questão ' + e.qid)}</p>
+        <p class="sub">${esc(quando(e.atualizada || e.em))}${e.por ? ' · ' + esc(e.por) : ''}${e.dados ? ' · mudou: ' + esc(Object.keys(e.dados).map(k => ROT_CAMPO[k] || k).join(', ').toLowerCase()) : ''}${e.motivo ? ' · ' + esc(e.motivo) : ''} · chave <code>${esc(e.qid)}</code></p></div>
+      <button class="btn btn-g sm" type="button" data-err-desfaz="${esc(app)}" data-qid="${esc(e.qid)}"><i class="ti ti-arrow-back-up" aria-hidden="true"></i>${e.tipo === 'oculta' ? 'Devolver ao ar' : 'Desfazer'}<span class="sr"> a errata de ${esc(trechoTxt(e.q || e.qid, 50))}</span></button></li>`).join('')}</ul></div>`).join('');
+}
+
+/* ---- resposta ao usuário ---- */
+const MODELOS = { corrigida: 'Corrigida', retirada: 'Retirada do ar', correta: 'Está correta' };
+function modeloResposta(x, modelo) {
+  const nm = siNome(x), tr = trechoTxt(String(x.q || '').replace(/…\s*$/, ''), 70);
+  const cab = `Olá! Obrigado por sinalizar a questão "${tr}" do ${nm}.`;
+  if (modelo === 'retirada') return `${cab} Você tinha razão: a questão tinha um problema e saiu do ar até ser revista. As suas respostas continuam guardadas.\n\nEquipe MedTech`;
+  if (modelo === 'correta') {
+    const IA = E.si.ia[x.id], j = IA && IA.ok && IA.j;
+    const pq = j && razaoDe(j.razao) === RAZAO.nao && j.resumo ? ' ' + String(j.resumo).trim() : '';
+    return `${cab} Revisamos com cuidado e a questão está correta.${pq}\n\nContinue sinalizando o que parecer errado: isso melhora o banco para todo mundo.\n\nEquipe MedTech`;
+  }
+  const Q = E.si.questao[x.id], e = errataDe(x, Q), d = e && e.tipo === 'corrige' ? e.dados : null;
+  const partes = [];
+  if (d) {
+    if ('gabarito' in d) {
+      const it = Q && Q.r && Q.r.it, txt = d.gabarito === -1 ? '' : (Array.isArray(d.alternativas) && d.alternativas[d.gabarito]) || (it && (it.alts.find(a => a.idx === d.gabarito) || {}).txt) || '';
+      partes.push(d.gabarito === -1 ? 'a questão foi anulada' : `corrigimos o gabarito: a resposta certa é "${trechoTxt(txt, 80)}"`);
+    }
+    if ('enunciado' in d) partes.push('ajustamos o enunciado');
+    if ('alternativas' in d) partes.push('ajustamos as alternativas');
+    if ('comentario' in d || 'porAlt' in d) partes.push('atualizamos a explicação');
+    if ('verso' in d) partes.push('corrigimos o verso do cartão');
+  }
+  const mud = partes.length ? partes.length > 1 ? partes.slice(0, -1).join(', ') + ' e ' + partes[partes.length - 1] : partes[0] : 'corrigimos a questão';
+  return `${cab} Você tinha razão: ${mud}. A correção já aparece no app${d && 'gabarito' in d ? ', e as respostas que você já deu são conferidas pelo gabarito novo' : ''}.\n\nEquipe MedTech`;
+}
+function modeloPadrao(x) {
+  const e = errataDe(x, E.si.questao[x.id]);
+  if (e) return e.tipo === 'oculta' ? 'retirada' : 'corrigida';
+  if (x.resolucao === 'oculta') return 'retirada';
+  if (x.status === 'descartada') return 'correta';
+  const IA = E.si.ia[x.id];
+  if (IA && IA.ok && IA.j && razaoDe(IA.j.razao) === RAZAO.nao) return 'correta';
+  return 'corrigida';
+}
+function mailtoDe(x, texto) {
+  const assunto = `Sua sinalização no ${siNome(x)}`;
+  return 'mailto:' + encodeURIComponent(x.email) + '?subject=' + encodeURIComponent(assunto) + '&body=' + encodeURIComponent(texto);
+}
+function htmlResposta(x) {
+  const id = x.id, mod = E.si.modelo[id] || (E.si.modelo[id] = modeloPadrao(x));
+  const txt = E.si.resp[id] != null ? E.si.resp[id] : (E.si.resp[id] = modeloResposta(x, mod));
+  const noApp = !!(x.uid || x.dispositivo), hist = Array.isArray(x.respostas) ? x.respostas : [];
+  const quem = x.uid ? 'Quem sinalizou tem conta: a resposta aparece num aviso quando abrir o app.' : x.dispositivo ? 'Quem sinalizou usou um aparelho sem conta: a resposta aparece nesse aparelho quando abrir o app.' : 'Não há como entregar no app.';
+  return `<div class="si-resp" role="group" aria-labelledby="si-uh-${esc(id)}">
+    <h4 id="si-uh-${esc(id)}"><i class="ti ti-message-reply" aria-hidden="true"></i>Resposta para o usuário</h4>
+    <div class="chips" role="group" aria-label="Modelo da resposta">${Object.entries(MODELOS).map(([k, r]) => `<button class="chip" type="button" data-si="modelo" data-mod="${k}" aria-pressed="${mod === k}">${esc(r)}</button>`).join('')}</div>
+    <div class="campo"><label for="si-u-${esc(id)}">Texto (o usuário vê exatamente isto)</label>
+      <textarea id="si-u-${esc(id)}" data-si="utxt" maxlength="1200" rows="6" spellcheck="true" aria-describedby="si-uq-${esc(id)}">${esc(txt)}</textarea>
+      <span class="ajuda" id="si-uq-${esc(id)}">${esc(quem)} Até 1.200 caracteres.</span></div>
+    <div class="acoesL">
+      ${noApp ? `<button class="btn btn-p" type="button" data-si="enviaApp"><i class="ti ti-send" aria-hidden="true"></i>Enviar no app</button>` : ''}
+      ${x.email ? `<a class="btn btn-g" data-si="email" href="${esc(mailtoDe(x, txt))}"><i class="ti ti-mail" aria-hidden="true"></i>Responder por e-mail</a>` : ''}
+    </div>
+    ${hist.length ? `<div class="si-hist"><h5>Respostas enviadas</h5><ul>${hist.slice().reverse().map(h => `<li><span class="si-quando">${esc(quando(h.em))}${h.por ? ' · ' + esc(h.por) : ''} · ${h.entrega === 'app' ? 'entregue no app' : 'só registrada'}</span><p>${esc(h.texto)}</p></li>`).join('')}</ul></div>` : ''}
+  </div>`;
+}
+async function enviarResposta(id, botao) {
+  const x = itemPorId(id); if (!x) return;
+  const ta = document.getElementById('si-u-' + id), texto = (ta ? ta.value : '').trim();
+  if (!texto) { toast('Escreva a resposta antes de enviar.', 'err'); if (ta) ta.focus(); return; }
+  const mod = E.si.modelo[id] || 'corrigida';
+  const ok = await confirmar('Enviar a resposta no app?', `A pessoa vê este texto num aviso no ${esc(siNome(x))} na próxima vez que abrir o app, e a sinalização fica como <b>${mod === 'correta' ? 'descartada (questão correta)' : 'corrigida'}</b>.`, 'Enviar no app');
+  if (!ok) return;
+  botao.disabled = true;
+  try {
+    const status = mod === 'correta' ? 'descartada' : 'corrigida';
+    const resolucao = mod === 'correta' ? 'sem-alteracao' : mod === 'retirada' ? 'oculta' : (x.resolucao || 'corrige');
+    const r = await chamar('mtSinal', { op: 'responder', sinalId: id, texto, status, resolucao });
+    const agora = new Date().toISOString(), por = (MT.user && MT.user.email) || '';
+    x.respostas = (Array.isArray(x.respostas) ? x.respostas : []).concat([{ texto, em: agora, por, entrega: r && r.entregue ? 'app' : 'nenhuma' }]);
+    Object.assign(x, { status, resolucao, tratadaEm: agora, tratadaPor: por, resposta: texto.slice(0, 600) });
+    delete E.si.resp[id];
+    E.si.fixos.add(id);
+    repintaItem(id);
+    atualizaContadorSinal();
+    toast(r && r.entregue ? 'Resposta enviada: aparece no app de quem sinalizou.' : 'Resposta registrada (sem como entregar no app).', 'ok');
+    const b = document.querySelector(`#si-${id} .si-cab`); if (b) b.focus({ preventScroll: true });
+  } catch (e) {
+    if (ehNegado(e)) { bloquear(e.message); return; }
+    if (ehOpNova(e)) { toast('Publique o servidor para responder pelo app (deploy-backend.command).', 'err'); return; }
+    toast('Não enviou: ' + ((e && e.message) || e), 'err');
+  } finally { if (botao.isConnected) botao.disabled = false; }
+}
+
+/* ---- bloco "Resolver no app" de cada sinalização ---- */
+function htmlResolver(x) {
+  const id = x.id, cfg = SI_APP[x.app] || {}, Q = E.si.questao[id], IA = E.si.ia[id];
+  if (!APPS_ERRATA.includes(x.app)) return `<div class="si-resolver"><h4><i class="ti ti-tool" aria-hidden="true"></i>Resolver no app</h4><p class="sub">O ${esc(siNome(x))} ainda não recebe correções pelo painel. Use o pedido de correção.</p></div>`;
+  if (E.si.errNaoPublicado) return `<div class="si-resolver"><h4><i class="ti ti-tool" aria-hidden="true"></i>Resolver no app</h4>${avisoPublicar('corrigir, tirar do ar e responder pelo painel')}</div>`;
+  const e = errataDe(x, Q);
+  const naoAchou = Q && Q.r && !Q.r.it;
+  const temIA = IA && IA.ok && IA.j && IA.j.novo;
+  const iaUtil = (() => {
+    if (!temIA || !Q || !Q.r || !Q.r.it) return false;
+    const atual = valoresDe(Q.r.it, e), v = valoresIA(atual, IA.j);
+    return !!(v && camposMudados(atual, v, Q.r.it.tipo === 'cartao').length);
+  })();
+  const dicaIA = !IA || !IA.ok ? 'Peça a análise da IA primeiro.' : !temIA ? 'Esta análise não trouxe a correção estruturada: analise de novo.'
+    : !iaUtil ? (e && e.tipo === 'corrige' ? 'A correção da IA já está aplicada.' : 'A IA não propôs mudança na questão.') : '';
+  return `<div class="si-resolver" role="group" aria-labelledby="si-rv-${esc(id)}">
+    <h4 id="si-rv-${esc(id)}"><i class="ti ti-tool" aria-hidden="true"></i>Resolver no app</h4>
+    ${e ? `<div class="aviso ${e.tipo === 'oculta' ? 'err' : 'info'}"><i class="ti ${e.tipo === 'oculta' ? 'ti-eye-off' : 'ti-circle-check'}" aria-hidden="true"></i><div><b>${e.tipo === 'oculta' ? 'Esta questão está fora do ar' : 'Esta questão tem correção aplicada'}</b> desde ${esc(quando(e.atualizada || e.em))}${e.dados ? ' (' + esc(Object.keys(e.dados).map(k => ROT_CAMPO[k] || k).join(', ').toLowerCase()) + ')' : ''}.
+      <button class="btn btn-g sm" type="button" data-err-desfaz="${esc(x.app)}" data-qid="${esc(e.qid)}"><i class="ti ti-arrow-back-up" aria-hidden="true"></i>${e.tipo === 'oculta' ? 'Devolver ao ar' : 'Desfazer a correção'}</button></div></div>` : ''}
+    ${naoAchou ? '<p class="sub">A questão não foi achada no banco atual do app: corrigir ou tirar do ar por aqui não é possível. Use o pedido de correção.</p>' : ''}
+    <div class="si-acoes">
+      <button class="btn btn-g" type="button" data-si="corrIA"${iaUtil ? '' : ' aria-disabled="true"'} aria-describedby="si-rvd-${esc(id)}"><i class="ti ti-wand" aria-hidden="true"></i>Aplicar a correção da IA</button>
+      <button class="btn btn-g" type="button" data-si="corrMao"${naoAchou ? ' disabled' : ''}><i class="ti ti-pencil" aria-hidden="true"></i>Corrigir eu mesmo</button>
+      ${e && e.tipo === 'oculta' ? '' : `<button class="btn btn-dn" type="button" data-si="oculta"${naoAchou ? ' disabled' : ''}><i class="ti ti-eye-off" aria-hidden="true"></i>Tirar a questão do ar</button>`}
+    </div>
+    <p class="ajuda" id="si-rvd-${esc(id)}">${esc(dicaIA || 'A IA preenche o editor; você confere o antes e depois e aplica.')}</p>
+  </div>`;
+}
+
 /* ---- dar baixa ---- */
 async function marcarSinal(id, status, botao) {
   const x = itemPorId(id); if (!x) return;
@@ -1859,7 +2290,10 @@ async function marcarSinal(id, status, botao) {
 
 /* ---- eventos (delegados: a lista é redesenhada a cada filtro) ---- */
 $('siLista').addEventListener('click', ev => {
+  const bd = ev.target.closest('[data-err-desfaz]');
+  if (bd) { desfazerErrata(bd.dataset.errDesfaz, bd.dataset.qid, bd); return; }
   const b = ev.target.closest('[data-si]'); if (!b || b.tagName === 'TEXTAREA') return;
+  if (b.dataset.si === 'email') return;   /* o link mailto segue o caminho normal */
   const art = b.closest('.si-item'), id = art && art.dataset.id, ac = b.dataset.si;
   if (ac === 'mais') { E.si.limite += 30; desenharSinal(); return; }
   if (!id) return;
@@ -1869,19 +2303,45 @@ $('siLista').addEventListener('click', ev => {
     return;
   }
   if (ac === 'questao') verQuestao(id);
+  if (ac === 'corrIA') {
+    if (b.getAttribute('aria-disabled') === 'true') { const d = document.getElementById('si-rvd-' + id); toast((d && d.textContent) || 'Peça a análise da IA primeiro.', 'err'); return; }
+    abrirEditor(id, 'ia', b);
+  }
+  if (ac === 'corrMao') abrirEditor(id, 'mao', b);
+  if (ac === 'oculta') ocultarQuestao(id, b);
+  if (ac === 'edAplica') aplicarEditor(id);
+  if (ac === 'edCancela') { fechaEditor(id); const f = document.querySelector(`#si-${id} [data-si="corrMao"]`); if (f) f.focus(); }
+  if (ac === 'enviaApp') enviarResposta(id, b);
+  if (ac === 'modelo') {
+    const x = itemPorId(id); E.si.modelo[id] = b.dataset.mod; E.si.resp[id] = modeloResposta(x, b.dataset.mod);
+    const ta = document.getElementById('si-u-' + id); if (ta) ta.value = E.si.resp[id];
+    b.parentNode.querySelectorAll('[data-mod]').forEach(c => c.setAttribute('aria-pressed', String(c === b)));
+    const m = document.querySelector(`#si-${id} [data-si="email"]`); if (m) m.href = mailtoDe(x, E.si.resp[id]);
+  }
   if (ac === 'ia') analisarIA(id, b);
   if (ac === 'pedido') gerarPedido(id, b);
   if (ac === 'marca') marcarSinal(id, b.dataset.st, b);
 });
+let tAD = 0;
 $('siLista').addEventListener('input', ev => {
-  const t = ev.target; if (t.dataset.si !== 'resp') return;
-  const art = t.closest('.si-item'); if (art) E.si.rascunho[art.dataset.id] = t.value;
+  const t = ev.target, art = t.closest('.si-item'); if (!art) return;
+  const id = art.dataset.id;
+  if (t.dataset.si === 'resp') E.si.rascunho[id] = t.value;
+  if (t.dataset.si === 'utxt') {
+    E.si.resp[id] = t.value;
+    const x = itemPorId(id), m = art.querySelector('[data-si="email"]'); if (x && m) m.href = mailtoDe(x, t.value);
+  }
+  if (t.dataset.ed) { clearTimeout(tAD); tAD = setTimeout(() => atualizaAntesDepois(id), 250); }
 });
-$('siSituacao').querySelectorAll('[data-sist]').forEach(b => b.addEventListener('click', () => { E.si.st = b.dataset.sist; E.si.limite = 30; desenharSinal(); }));
-$('siApp').addEventListener('change', () => { E.si.app = $('siApp').value; E.si.limite = 30; desenharSinal(); });
+$('siLista').addEventListener('change', ev => { const t = ev.target, art = t.closest('.si-item'); if (art && t.dataset.ed === 'gab') atualizaAntesDepois(art.dataset.id); });
+$('siErrLista').addEventListener('click', ev => {
+  const bd = ev.target.closest('[data-err-desfaz]'); if (bd) desfazerErrata(bd.dataset.errDesfaz, bd.dataset.qid, bd);
+});
+$('siSituacao').querySelectorAll('[data-sist]').forEach(b => b.addEventListener('click', () => { E.si.st = b.dataset.sist; E.si.limite = 30; E.si.fixos.clear(); desenharSinal(); }));
+$('siApp').addEventListener('change', () => { E.si.app = $('siApp').value; E.si.limite = 30; E.si.fixos.clear(); desenharSinal(); });
 let tBuscaSi = 0;
-$('siBusca').addEventListener('input', () => { clearTimeout(tBuscaSi); tBuscaSi = setTimeout(() => { E.si.busca = $('siBusca').value; E.si.limite = 30; desenharSinal(); }, 200); });
-$('btSi').onclick = () => carregarSinal();
+$('siBusca').addEventListener('input', () => { clearTimeout(tBuscaSi); tBuscaSi = setTimeout(() => { E.si.busca = $('siBusca').value; E.si.limite = 30; E.si.fixos.clear(); desenharSinal(); }, 200); });
+$('btSi').onclick = () => { E.si.fixos.clear(); carregarSinal(); };
 
 /* ============================================================
    DIAGNÓSTICO

@@ -14,7 +14,7 @@
 <script src="_mtfb.js?v=1"></script>
 <script type="module" src="_mtauth.js?v=40"></script>
 <link rel="stylesheet" href="_mtviva.css?v=2">
-<link rel="stylesheet" href="admin.css?v=6">
+<link rel="stylesheet" href="admin.css?v=7">
 </head>
 <body>
 <!-- isca para o preenchimento automático do Chrome: sem ela, o e-mail do login cai no campo de busca de Usuários -->
@@ -226,7 +226,7 @@
     <!-- ===================== SINALIZAÇÕES ===================== -->
     <section class="sec" id="sinalizacoes" data-painel aria-labelledby="h-si" hidden>
       <div class="cab">
-        <div><h2 id="h-si">Sinalizações</h2><p class="lead">Questões que os usuários marcaram com erro nos apps de estudo. Abra uma sinalização para ver a questão inteira, pedir a análise da IA, gerar o pedido de correção e dar baixa.</p></div>
+        <div><h2 id="h-si">Sinalizações</h2><p class="lead">Questões que os usuários marcaram com erro nos apps de estudo. Abra uma sinalização para ver a questão inteira, pedir a análise da IA, corrigir ou tirar a questão do ar direto no app e responder a quem sinalizou.</p></div>
         <div class="atualizado"><span id="siQuando" aria-live="polite"></span><button class="btn btn-g sm" id="btSi" type="button"><i class="ti ti-refresh" aria-hidden="true"></i>Atualizar</button></div>
       </div>
       <div id="siAviso"></div>
@@ -242,6 +242,11 @@
           <div class="campo"><label for="siBusca">Buscar</label><input id="siBusca" type="search" autocomplete="off" spellcheck="false" placeholder="enunciado, comentário, tema, e-mail ou chave"></div>
         </form>
       </div>
+      <details class="card si-err" id="siErr">
+        <summary><span class="si-errtit"><i class="ti ti-file-pencil" aria-hidden="true"></i>Erratas ativas</span><span class="n" id="siErrN"></span><i class="ti ti-chevron-down si-chev" aria-hidden="true"></i></summary>
+        <p class="sub">Questões corrigidas ou fora do ar pelo painel, por app. Os apps aplicam ao abrir. Quando a correção entrar no banco do app, desfaça a errata aqui.</p>
+        <div id="siErrLista"><p class="carregando">Carregando as erratas…</p></div>
+      </details>
       <p class="si-resumo" id="siResumo" aria-live="polite"></p>
       <div id="siLista"><p class="carregando">Carregando as sinalizações…</p></div>
       <p class="leg"><a href="sinalizacoes.html">Abrir a caixa de sinalizações antiga</a> (mesmos dados, sem a questão completa e sem a IA).</p>
@@ -284,6 +289,6 @@
 </dialog>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="admin.js?v=8" defer></script>
+<script src="admin.js?v=9" defer></script>
 </body>
 </html>
