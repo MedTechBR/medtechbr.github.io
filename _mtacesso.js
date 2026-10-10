@@ -144,8 +144,8 @@ function opcoes(P, prod) {
       como: mp ? (anual ? 'Pix, cartão em até 12x ou boleto. Pagamento único, sem renovação automática.' : 'Cartão de crédito. Renova sozinho todo mês. Cancele quando quiser.') : '' });
     if (mp && per === 'mensal' && P && P.mp_pix_mensal === true) {
       out.push({ prod: prod, produto: prod.id, periodo: 'mensal', modo: 'pix', preco: v, mp: true, secundaria: true,
-        titulo: '1 mês no Pix', botao: 'Pagar 1 mês com Pix', rotulo: brl(v) + ' por 1 mês', porMes: 0, economia: 0,
-        como: 'Pix. Pagamento único de 1 mês, sem renovação.' });
+        titulo: '1 mês (Pix ou cartão)', botao: 'Pagar 1 mês', rotulo: brl(v) + ' por 1 mês', porMes: 0, economia: 0,
+        como: 'Pix ou cartão de crédito à vista. Pagamento único de 1 mês, sem renovação.' });
     }
   });
   return out;
