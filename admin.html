@@ -14,7 +14,7 @@
 <script src="_mtfb.js?v=1"></script>
 <script type="module" src="_mtauth.js?v=37"></script>
 <link rel="stylesheet" href="_mtviva.css?v=2">
-<link rel="stylesheet" href="admin.css?v=3">
+<link rel="stylesheet" href="admin.css?v=4">
 </head>
 <body>
 <a class="sr" href="#conteudo">Pular para o conteúdo</a>
@@ -194,10 +194,25 @@
     <!-- ===================== SINALIZAÇÕES ===================== -->
     <section class="sec" id="sinalizacoes" data-painel aria-labelledby="h-si" hidden>
       <div class="cab">
-        <div><h2 id="h-si">Sinalizações</h2><p class="lead">Questões que os usuários marcaram com erro nos apps de estudo.</p></div>
-        <a class="btn btn-p" href="sinalizacoes.html"><i class="ti ti-flag" aria-hidden="true"></i>Abrir a caixa de sinalizações</a>
+        <div><h2 id="h-si">Sinalizações</h2><p class="lead">Questões que os usuários marcaram com erro nos apps de estudo. Abra uma sinalização para ver a questão inteira, pedir a análise da IA, gerar o pedido de correção e dar baixa.</p></div>
+        <div class="atualizado"><span id="siQuando" aria-live="polite"></span><button class="btn btn-g sm" id="btSi" type="button"><i class="ti ti-refresh" aria-hidden="true"></i>Atualizar</button></div>
       </div>
-      <div class="card"><div id="siLista" aria-live="polite"><p class="carregando">Carregando as sinalizações abertas…</p></div></div>
+      <div id="siAviso"></div>
+      <div class="card si-filtros">
+        <div class="chips" role="group" aria-label="Situação" id="siSituacao">
+          <button class="chip" type="button" data-sist="aberta" aria-pressed="true">Abertas<span class="n" data-n="aberta"></span></button>
+          <button class="chip" type="button" data-sist="corrigida" aria-pressed="false">Corrigidas<span class="n" data-n="corrigida"></span></button>
+          <button class="chip" type="button" data-sist="descartada" aria-pressed="false">Descartadas<span class="n" data-n="descartada"></span></button>
+          <button class="chip" type="button" data-sist="" aria-pressed="false">Todas<span class="n" data-n="todas"></span></button>
+        </div>
+        <form class="linhaC" id="siFiltros" role="search" onsubmit="return false">
+          <div class="campo"><label for="siApp">App</label><select id="siApp"><option value="">Todos os apps</option></select></div>
+          <div class="campo"><label for="siBusca">Buscar</label><input id="siBusca" type="search" autocomplete="off" spellcheck="false" placeholder="enunciado, comentário, tema, e-mail ou chave"></div>
+        </form>
+      </div>
+      <p class="si-resumo" id="siResumo" aria-live="polite"></p>
+      <div id="siLista"><p class="carregando">Carregando as sinalizações…</p></div>
+      <p class="leg"><a href="sinalizacoes.html">Abrir a caixa de sinalizações antiga</a> (mesmos dados, sem a questão completa e sem a IA).</p>
     </section>
 
     <!-- ===================== DIAGNÓSTICO ===================== -->
@@ -237,6 +252,6 @@
 </dialog>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="admin.js?v=4" defer></script>
+<script src="admin.js?v=5" defer></script>
 </body>
 </html>

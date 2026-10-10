@@ -5,7 +5,8 @@
               (10/10/2026: ver/revogar por e-mail ou CPF; conceder com lista mista e ilimitado;
                o servidor só devolve o CPF mascarado, 039.***.***-08)
      mpCheckout / mpCancelar (compra de teste R$ 5)
-     mtSinal  {op:'listar', status:'aberta'}
+     mtSinal  {op:'listar'} | {op:'marcar', id, status, resposta}  (Sinalizações: questão completa lida do
+              banco público de cada app, análise pela IA (MT.ai, nível forte, sem busca) e pedido de correção)
    Se o servidor ainda não tiver as ações novas (painel, assinantes, pedidos),
    a página avisa para publicar (deploy-backend.command) e o resto segue.
    ============================================================ */
@@ -684,24 +685,549 @@ async function desenharPlanos() {
 }
 
 /* ============================================================
-   SINALIZAÇÕES
+   SINALIZAÇÕES (10/10/2026): resolver sem sair do painel
+   mtSinal {op:'listar'} → {itens, apps}   (traz todas; filtros aqui, como no sinalizacoes.html)
+           {op:'marcar', id, status: aberta|corrigida|descartada, resposta}
+   "Ver a questão completa" lê o banco PÚBLICO de cada app (mesmo domínio) com fetch e
+   JSON.parse do literal `window.X = [...]`: nada do arquivo é executado. A chave é a mesma
+   dos apps (chaveTxt do enunciado; no FarmaUTI, o id do item). Se não achar pela chave, procura
+   pelo começo do enunciado guardado na sinalização. RadioTítulo é repositório privado.
    ============================================================ */
-const TIPO_SINAL = { gabarito: 'Gabarito errado', texto: 'Erro no texto', desatualizada: 'Desatualizada', comentario: 'Comentário', outro: 'Outro' };
+const TIPO_SINAL = { gabarito: 'Gabarito errado', texto: 'Erro no enunciado ou nas alternativas', desatualizada: 'Desatualizada (norma ou diretriz mudou)', comentario: 'Erro no comentário ou na explicação', outro: 'Outro problema' };
+const TIPO_CURTO = { gabarito: 'Gabarito errado', texto: 'Erro no texto', desatualizada: 'Desatualizada', comentario: 'Erro no comentário', outro: 'Outro problema' };
+const ST_SINAL = { aberta: { nm: 'aberta', selo: 'err' }, corrigida: { nm: 'corrigida', selo: 'ok' }, descartada: { nm: 'descartada', selo: '' } };
+const LETRAS = 'ABCDE';
+const ONDE_LEVAS = 'lotes-questoes/leva*.json, montado por monta_banco.py em banco.js (o banco.js nunca se edita à mão)';
+const SI_APP = {
+  'trafego-titulo': { nm: 'TráfegoTítulo', c: '#23272E', repo: 'MedTechBR/trafego-titulo', base: '/trafego-titulo/', fmt: 'padrao', arq: [['banco.js', 'BANCO']], onde: ONDE_LEVAS, publico: 'prova de título de especialista em Medicina de Tráfego (ABRAMET)' },
+  clinicamed: { nm: 'ClínicaMed', c: '#0B6A72', repo: 'MedTechBR/clinicamed', base: '/clinicamed/', fmt: 'padrao', reordena: true, arq: [['banco.js', 'BANCO']], onde: ONDE_LEVAS, publico: 'prova de título (TECM) e residência em Clínica Médica' },
+  cirurgiamed: { nm: 'CirurgiaMed', c: '#33479E', repo: 'MedTechBR/cirurgiamed', base: '/cirurgiamed/', fmt: 'padrao', reordena: true, arq: [['banco.js', 'BANCO']], onde: ONDE_LEVAS, publico: 'Cirurgia Geral (prova de título e ENARE R+ cirúrgico)' },
+  flashmed: { nm: 'FlashMed', c: '#A86D12', repo: 'MedTechBR/flashmed', base: '/flashmed/', fmt: 'padrao', reordena: true, peso: 'cerca de 10 MB', arq: [['banco.js', 'BANCO']], onde: ONDE_LEVAS + '; questão importada de outro app (campo orig) se corrige no app de origem e se reimporta com importa.py', publico: 'preparatório ENARE e ENAMED (residência médica, acesso direto)' },
+  'quiz-enare-farmacia': { nm: 'Banca ENARE Farmácia', c: '#0F766E', repo: 'MedTechBR/quiz-enare-farmacia', base: '/quiz-enare-farmacia/', fmt: 'enare', arq: [['banco_edital.js', 'BANCO_EDITAL'], ['simulados.js', 'SIMULADOS']], onde: 'banco_edital.js (banco) e simulados.js (provas reais na íntegra); os simulados diários reaproveitam o banco', publico: 'residência multiprofissional em Farmácia (ENARE)' },
+  farmauti: { nm: 'FarmaUTI', c: '#B4235A', repo: 'MedTechBR/farmauti', base: '/farmauti/', fmt: 'farmauti', arq: [['dados/estudo.js', 'FU_ESTUDO']], onde: 'lotes/*.json, montado por monta.py em dados/estudo.js', publico: 'residência de Farmácia em terapia intensiva' },
+  'radio-titulo': { nm: 'RadioTítulo', c: '#4166D6', privado: true, repo: 'repositório privado do RadioTítulo', publico: 'prova de título de Radiologia (CBR)' }
+};
+const siCfg = app => SI_APP[app] || { nm: app, c: 'var(--ac)' };
+const siNome = x => (SI_APP[x.app] && SI_APP[x.app].nm) || x.appNome || x.app;
+
+E.si = { itens: [], apps: {}, st: 'aberta', app: '', busca: '', limite: 30, abertos: new Set(), questao: {}, ia: {}, pedido: {}, rascunho: {}, bancos: {} };
+
+/* ---- chave estável: a MESMA função dos apps (djb2 + FNV com Math.imul) ---- */
+function hashTxt(s) {
+  let h1 = 5381, h2 = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i); h1 = ((h1 << 5) + h1 + c) >>> 0; h2 = Math.imul(h2 ^ c, 0x01000193) >>> 0; }
+  return (h1.toString(36) + h2.toString(36)).slice(0, 10);
+}
+const normTxt = t => String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const chaveTxt = t => hashTxt(normTxt(t));
+/* FarmaUTI: ordem das alternativas na tela (hash FNV do id, app.js ordemAlts) */
+function fnv(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function ordemFU(id, n) {
+  if (n !== 5) return [...Array(n).keys()];
+  const o = [0, 1, 2, 3, 4]; let h = fnv(String(id));
+  for (let i = 4; i > 0; i--) { h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0; const j = h % (i + 1); [o[i], o[j]] = [o[j], o[i]]; }
+  return o;
+}
+/* ClínicaMed, CirurgiaMed, FlashMed: autoral de 5 alternativas tem a correta numa posição tirada da chave */
+function ordemCM(q, ch) {
+  const n = q.alts.length, idx = [...Array(n).keys()];
+  let alvo = q.gab;
+  if (!q.fonte && n === 5) { let h = 0; for (const c of ch) h = (h * 31 + c.charCodeAt(0)) >>> 0; alvo = h % 5; }
+  const outras = idx.filter(i => i !== q.gab);
+  return [...outras.slice(0, alvo), q.gab, ...outras.slice(alvo)];
+}
+/* comentário com HTML (Banca ENARE): vira texto, sem executar nada (DOMParser não roda script nem carrega imagem) */
+function htmlTxt(h) {
+  const s = String(h || '');
+  if (!/[<&]/.test(s)) return s;
+  const d = new DOMParser().parseFromString(s.replace(/<br\s*\/?>/gi, '\n').replace(/<\/(p|li|div)>/gi, '\n'), 'text/html');
+  return (d.body.textContent || '').replace(/\n{3,}/g, '\n\n').trim();
+}
+function extraiGlobal(txt, nome) {
+  const m = new RegExp('window\\.' + nome + '\\s*=\\s*').exec(txt);
+  if (!m) throw new Error('o arquivo não define ' + nome);
+  const s = txt.slice(m.index + m[0].length);
+  const fim = Math.max(s.lastIndexOf(']'), s.lastIndexOf('}'));
+  return JSON.parse(s.slice(0, fim + 1));
+}
+function procedencia(f) {
+  if (!f) return 'autoral';
+  const partes = [f.banca || f.instituicao || ''];
+  if (f.prova) partes.push(f.prova);
+  else if (f.instituicao && f.instituicao !== f.banca) partes.push(f.instituicao);
+  if (f.ano && !partes.join(' ').includes(String(f.ano))) partes.push(String(f.ano));
+  if (f.n) partes.push('questão ' + f.n);
+  return partes.filter(Boolean).join(' · ');
+}
+
+/* ---- carregadores: devolvem {idx: Map(chave → item normalizado), todos: [...]} ---- */
+function normPadrao(cfg, q, ch) {
+  const ord = cfg.reordena ? ordemCM(q, ch) : q.alts.map((_, i) => i);
+  const extras = [];
+  if (q.sub) extras.push(['Subtema', q.sub]);
+  if (q.nivel) extras.push(['Nível', ({ r1: 'essencial', r2: 'intermediário', r3: 'avançado', tit: 'prova de título ou especialista' })[q.nivel] || q.nivel]);
+  if (q.orig) extras.push(['Importada de', (SI_APP[q.orig] && SI_APP[q.orig].nm) || q.orig]);
+  return {
+    tipo: 'questao', ch, enunciado: q.q, reordenada: ord.some((o, p) => o !== p),
+    alts: ord.map((orig, p) => ({ letra: LETRAS[p], txt: q.alts[orig], idx: orig, certa: orig === q.gab, por: (q.porAlt || [])[orig] || '' })),
+    comentario: q.coment || '', base: q.base || '', proc: procedencia(q.fonte), real: !!q.fonte, orig: q.orig || '', extras
+  };
+}
+function normEnare(cfg, q, ch, onde) {
+  const anulada = q.correct === -1;
+  return {
+    tipo: 'questao', ch, enunciado: q.q, anulada,
+    alts: (q.ops || []).map((t, i) => ({ letra: LETRAS[i], txt: htmlTxt(t), idx: i, certa: i === q.correct, por: '' })),
+    comentario: htmlTxt(q.c), base: '', proc: q.fonte ? procedencia(q.fonte) : (onde || 'autoral'), real: !!q.fonte || !!onde,
+    img: q.img ? cfg.base + q.img : '', extras: q.tema ? [['Tema no banco', q.tema]] : []
+  };
+}
+async function lerArquivo(cfg, arq, nome) {
+  const r = await fetch(cfg.base + arq, { cache: 'no-cache' });
+  if (!r.ok) throw new Error(arq + ' respondeu ' + r.status);
+  return extraiGlobal(await r.text(), nome);
+}
+async function montaBanco(app) {
+  const cfg = SI_APP[app];
+  const idx = new Map(), todos = [];
+  const poe = it => { todos.push(it); if (!idx.has(it.ch)) idx.set(it.ch, it); };
+  if (cfg.fmt === 'padrao') {
+    const B = await lerArquivo(cfg, 'banco.js', 'BANCO');
+    B.forEach(q => { if (q && q.q && Array.isArray(q.alts)) { const ch = chaveTxt(q.q); poe(normPadrao(cfg, q, ch)); } });
+  } else if (cfg.fmt === 'enare') {
+    const [B, S] = await Promise.all([lerArquivo(cfg, 'banco_edital.js', 'BANCO_EDITAL'), lerArquivo(cfg, 'simulados.js', 'SIMULADOS').catch(() => [])]);
+    B.forEach(q => { if (q && q.q) poe(normEnare(cfg, q, chaveTxt(q.q))); });
+    (S || []).forEach(sm => (sm.questions || []).forEach((q, i) => { if (q && q.q) poe(normEnare(cfg, q, chaveTxt(q.q), (sm.title || 'Simulado') + ', questão ' + (i + 1))); }));
+  } else if (cfg.fmt === 'farmauti') {
+    const D = await lerArquivo(cfg, 'dados/estudo.js', 'FU_ESTUDO');
+    const LEIT = {}; (D.leituras || []).forEach(l => LEIT[l.slug] = l);
+    const AREA = {}; (D.areas || []).forEach(a => AREA[a.id] = a.nome);
+    const NIV = { basico: 'básico', intermediario: 'intermediário', avancado: 'avançado' };
+    (D.questoes || []).forEach(q => {
+      const l = LEIT[q.l] || {}, ord = ordemFU(q.id, (q.a || []).length);
+      poe({ tipo: 'questao', ch: q.id, enunciado: q.e, reordenada: true,
+        alts: ord.map((orig, p) => ({ letra: LETRAS[p], txt: q.a[orig], idx: orig, certa: orig === q.g, por: (q.p || [])[orig] || '' })),
+        comentario: q.c || '', base: q.b || '', proc: 'autoral',
+        extras: [['Leitura', l.titulo || q.l], ['Área', AREA[l.area] || '—'], ['Nível', NIV[q.n] || q.n || '—']] });
+    });
+    (D.cartoes || []).forEach(c => {
+      const l = LEIT[c.l] || {};
+      poe({ tipo: 'cartao', ch: c.id, enunciado: c.f, verso: c.v, alts: [], comentario: '', base: (l.fontes || []).join('; '), baseRot: 'Fontes da leitura', proc: 'autoral',
+        extras: [['Leitura', l.titulo || c.l], ['Área', AREA[l.area] || '—']] });
+    });
+  }
+  return { idx, todos };
+}
+function banco(app) {
+  if (!E.si.bancos[app]) E.si.bancos[app] = montaBanco(app).catch(e => { delete E.si.bancos[app]; throw e; });
+  return E.si.bancos[app];
+}
+/* acha a questão de uma sinalização: pela chave; se não bater, pelo começo do enunciado */
+async function achaQuestao(x) {
+  const cfg = SI_APP[x.app];
+  if (!cfg) return { erro: 'App sem banco conhecido pelo painel.' };
+  if (cfg.privado) return { privado: true };
+  const B = await banco(x.app);
+  let it = B.idx.get(x.chave), por = 'chave';
+  if (!it) {
+    const ini = normTxt(String(x.q || '').replace(/…\s*$/, ''));
+    if (ini.length >= 30) {
+      const achados = B.todos.filter(q => normTxt(q.enunciado).startsWith(ini));
+      if (achados.length) { it = achados[0]; por = achados.length > 1 ? 'texto-varias' : 'texto'; }
+    }
+  }
+  return it ? { it, por, total: B.idx.size } : { nao: true, total: B.idx.size };
+}
+
+/* ---- lista ---- */
 async function carregarSinal() {
   E.carregou.sinal = true;
-  const el = $('siLista'); el.innerHTML = carregando('Carregando as sinalizações abertas…');
+  $('btSi').disabled = true;
+  $('siQuando').textContent = 'Atualizando…';
+  if (!E.si.itens.length) $('siLista').innerHTML = carregando('Carregando as sinalizações…');
   try {
-    const r = await chamar('mtSinal', { op: 'listar', status: 'aberta' });
-    const itens = (r.itens || []).filter(x => x.status === 'aberta').sort((a, b) => String(b.em || '').localeCompare(String(a.em || '')));
-    if (!itens.length) { el.innerHTML = '<p class="vazio">Nenhuma sinalização aberta.</p>'; return; }
-    const porApp = {}; itens.forEach(x => porApp[x.appNome || x.app] = (porApp[x.appNome || x.app] || 0) + 1);
-    el.innerHTML = `<h3><i class="ti ti-flag" aria-hidden="true"></i>${plural(itens.length, 'aberta', 'abertas')}</h3>
-      <p class="sub">${Object.entries(porApp).map(([k, n]) => esc(k) + ': ' + n).join(' · ')}</p>
-      <div class="tblw"><table class="tbl resp"><thead><tr><th scope="col">Quando</th><th scope="col">App</th><th scope="col">Problema</th><th scope="col">Questão</th></tr></thead><tbody>
-      ${itens.slice(0, 10).map(x => `<tr><td data-r="Quando" class="fraco">${quando(x.em)}</td><td data-r="App">${esc(x.appNome || x.app)}</td><td data-r="Problema">${esc(TIPO_SINAL[x.tipo] || x.tipo)}</td><td data-r="Questão" class="cheia">${esc(String(x.q || '').slice(0, 140))}${String(x.q || '').length > 140 ? '…' : ''}</td></tr>`).join('')}
-      </tbody></table></div>${itens.length > 10 ? `<p class="leg">Mostrando as 10 mais recentes. A caixa completa tem as ${inteiro(itens.length)}.</p>` : ''}`;
-  } catch (e) { el.innerHTML = avisoErro(e); }
+    const r = await chamar('mtSinal', { op: 'listar' });
+    E.si.itens = (r.itens || []).sort((a, b) => String(b.em || '').localeCompare(String(a.em || '')));
+    E.si.apps = r.apps || {};
+    $('siAviso').innerHTML = '';
+    const ap = $('siApp').value;
+    const ids = [...new Set(Object.keys(E.si.apps).concat(Object.keys(SI_APP)))];
+    $('siApp').innerHTML = '<option value="">Todos os apps</option>' + ids.map(k => `<option value="${esc(k)}">${esc(siCfg(k).nm || (E.si.apps[k] || {}).nome || k)}</option>`).join('');
+    $('siApp').value = ap;
+    desenharSinal();
+    $('siQuando').textContent = 'Atualizado às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  } catch (e) {
+    $('siQuando').textContent = '';
+    if (ehNegado(e)) { bloquear(e.message); return; }
+    $('siAviso').innerHTML = avisoErro(e);
+    if (!E.si.itens.length) $('siLista').innerHTML = '';
+  } finally { $('btSi').disabled = false; }
 }
+function contaSinal() {
+  const c = { aberta: 0, corrigida: 0, descartada: 0, todas: E.si.itens.length };
+  E.si.itens.forEach(x => { c[x.status] = (c[x.status] || 0) + 1; });
+  return c;
+}
+function atualizaContadorSinal() {
+  const c = contaSinal();
+  document.querySelectorAll('#siSituacao [data-n]').forEach(s => { s.textContent = inteiro(c[s.dataset.n] || 0); });
+  const cnt = $('cntSinal');
+  if (c.aberta) { cnt.innerHTML = (c.aberta > 99 ? '99+' : c.aberta) + '<span class="sr"> abertas</span>'; cnt.hidden = false; }
+  else cnt.hidden = true;
+  if (E.painel && E.painel.sinalizacoes && E.painel.sinalizacoes.ok) E.painel.sinalizacoes.abertas = c.aberta;
+}
+function filtradosSinal() {
+  const b = normTxt(E.si.busca), bt = E.si.busca.trim().toLowerCase();
+  return E.si.itens.filter(x => (!E.si.st || x.status === E.si.st) && (!E.si.app || x.app === E.si.app) &&
+    (!bt || [x.q, x.nota, x.tema, x.email, x.extra, x.chave, x.resposta, siNome(x)].join(' ').toLowerCase().includes(bt) ||
+      (b.length > 2 && normTxt([x.q, x.nota, x.tema].join(' ')).includes(b))));
+}
+function desenharSinal() {
+  atualizaContadorSinal();
+  marcarChips('siSituacao', 'sist', E.si.st);
+  const L = filtradosSinal();
+  const porApp = {}; L.forEach(x => { const k = siNome(x); porApp[k] = (porApp[k] || 0) + 1; });
+  const stNm = { aberta: 'aberta', corrigida: 'corrigida', descartada: 'descartada' }[E.si.st];
+  $('siResumo').textContent = L.length
+    ? plural(L.length, 'sinalização' + (stNm ? ' ' + stNm : ''), 'sinalizações' + (stNm ? ' ' + stNm.replace(/a$/, 'as') : '')) + (Object.keys(porApp).length > 1 ? ': ' + Object.entries(porApp).map(([k, n]) => k + ' ' + n).join(' · ') : '')
+    : '';
+  if (!L.length) {
+    $('siLista').innerHTML = `<div class="card"><p class="vazio">${E.si.itens.length ? 'Nenhuma sinalização' + (stNm ? ' ' + stNm : '') + ' com esses filtros.' : 'Nenhuma sinalização recebida ainda.'}</p></div>`;
+    return;
+  }
+  const mostra = L.slice(0, E.si.limite);
+  $('siLista').innerHTML = mostra.map(itemSinal).join('') +
+    (L.length > mostra.length ? `<div class="si-mais"><button class="btn btn-g" type="button" data-si="mais">Mostrar mais ${Math.min(30, L.length - mostra.length)} de ${inteiro(L.length - mostra.length)}</button></div>` : '');
+}
+function itemSinal(x) {
+  const id = x.id, aberto = E.si.abertos.has(id), st = ST_SINAL[x.status] || { nm: x.status || '—', selo: '' };
+  const q = String(x.q || '').trim();
+  return `<article class="si-item${aberto ? ' aberto' : ''}" id="si-${esc(id)}" data-id="${esc(id)}">
+    <button class="si-cab" type="button" data-si="abre" aria-expanded="${aberto}" aria-controls="si-c-${esc(id)}">
+      <span class="si-l1"><span class="si-app" style="--c:${siCfg(x.app).c}">${esc(siNome(x))}</span>
+        <span class="selo ${x.tipo === 'gabarito' ? 'err' : 'av'}">${esc(TIPO_CURTO[x.tipo] || x.tipo)}</span>
+        <span class="selo ${st.selo}">${esc(st.nm)}</span>
+        ${x.vezes > 1 ? `<span class="selo ac">${inteiro(x.vezes)} vezes</span>` : ''}
+        <span class="si-quando">${esc(quando(x.em))}</span></span>
+      <span class="si-qt">${esc(q || '(sem o começo do enunciado)')}</span>
+      ${x.nota ? `<span class="si-nt"><i class="ti ti-message" aria-hidden="true"></i><span>${esc(x.nota)}</span></span>` : ''}
+      <i class="ti ti-chevron-down si-chev" aria-hidden="true"></i>
+    </button>
+    <div class="si-corpo" id="si-c-${esc(id)}"${aberto ? '' : ' hidden'}>${aberto ? corpoSinal(x) : ''}</div>
+  </article>`;
+}
+function corpoSinal(x) {
+  const id = x.id, cfg = siCfg(x.app);
+  const ficha = [
+    ['App', siNome(x)], ['Tema', x.tema || '—'], ['Problema', TIPO_SINAL[x.tipo] || x.tipo || '—'],
+    ['Sinalizada', x.vezes > 1 ? inteiro(x.vezes) + ' vezes' : '1 vez'],
+    ['Primeira vez', quando(x.criada || x.em)], ['Última vez', quando(x.em)],
+    ['Quem', x.email || (x.dispositivo ? 'aparelho sem conta (' + String(x.dispositivo).slice(0, 8) + '…)' : '—')],
+    ['Situação', (ST_SINAL[x.status] || {}).nm || x.status || '—']
+  ];
+  if (x.tratadaEm) ficha.push(['Tratada em', quando(x.tratadaEm) + (x.tratadaPor ? ' por ' + x.tratadaPor : '')]);
+  if (x.retiradaPeloUsuario) ficha.push(['Observação', 'a pessoa tirou a bandeira depois']);
+  const Q = E.si.questao[id], IA = E.si.ia[id], P = E.si.pedido[id];
+  const resp = E.si.rascunho[id] != null ? E.si.rascunho[id] : (x.resposta || '');
+  const bts = [];
+  if (x.status !== 'corrigida') bts.push(`<button class="btn btn-p" type="button" data-si="marca" data-st="corrigida"><i class="ti ti-check" aria-hidden="true"></i>Marcar como corrigida</button>`);
+  if (x.status !== 'descartada') bts.push(`<button class="btn btn-g" type="button" data-si="marca" data-st="descartada"><i class="ti ti-x" aria-hidden="true"></i>Descartar</button>`);
+  if (x.status !== 'aberta') bts.push(`<button class="btn btn-g" type="button" data-si="marca" data-st="aberta"><i class="ti ti-arrow-back-up" aria-hidden="true"></i>Reabrir</button>`);
+  return `
+    <dl class="ficha si-ficha">${ficha.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}
+      <div class="largo"><dt>Chave da questão</dt><dd><code>${esc(x.chave || '—')}</code></dd></div>
+      ${x.extra ? `<div class="largo"><dt>Extra enviado pelo app</dt><dd>${esc(x.extra)}</dd></div>` : ''}</dl>
+    <div class="si-sec"><h4><i class="ti ti-message" aria-hidden="true"></i>Comentário do usuário</h4>
+      ${x.nota ? `<p class="si-nota">${esc(x.nota)}</p>` : '<p class="sub">A pessoa não escreveu comentário.</p>'}</div>
+    ${x.resposta && x.status !== 'aberta' ? `<div class="si-sec"><h4><i class="ti ti-circle-check" aria-hidden="true"></i>Resposta registrada</h4><p class="si-nota">${esc(x.resposta)}</p></div>` : ''}
+    <div class="si-acoes" role="group" aria-label="Ferramentas da sinalização">
+      <button class="btn btn-g" type="button" data-si="questao"${Q && Q.ok ? ' aria-pressed="true"' : ''}><i class="ti ti-file-text" aria-hidden="true"></i>${Q && Q.ok ? 'Questão carregada' : 'Ver a questão completa'}</button>
+      <button class="btn btn-g" type="button" data-si="ia"><i class="ti ti-sparkles" aria-hidden="true"></i>${IA && IA.ok ? 'Analisar de novo com IA' : 'Analisar com IA'}</button>
+      <button class="btn btn-g" type="button" data-si="pedido"><i class="ti ti-clipboard-text" aria-hidden="true"></i>Gerar pedido de correção</button>
+    </div>
+    <div class="si-out" data-out="questao" aria-live="polite">${Q ? Q.html : ''}</div>
+    <div class="si-out" data-out="ia" aria-live="polite">${IA ? IA.html : ''}</div>
+    <div class="si-out" data-out="pedido">${P ? P.html : ''}</div>
+    <div class="si-res">
+      <div class="campo"><label for="si-r-${esc(id)}">O que foi feito (resposta curta)</label>
+        <textarea id="si-r-${esc(id)}" data-si="resp" maxlength="600" spellcheck="true" placeholder="Ex.: gabarito trocado para C conforme ESC 2024; publicado na versão 179" aria-describedby="si-rh-${esc(id)}">${esc(resp)}</textarea>
+        <span class="ajuda" id="si-rh-${esc(id)}">Fica registrada na sinalização. Até 600 caracteres.</span></div>
+      <div class="acoesL">${bts.join('')}</div>
+    </div>
+    <p class="leg">${cfg.base ? `<a href="${esc(cfg.base)}" target="_blank" rel="noopener">Abrir o ${esc(cfg.nm)}<span class="sr"> em nova aba</span></a> · ` : ''}id <code>${esc(id)}</code></p>`;
+}
+function itemPorId(id) { return E.si.itens.find(y => y.id === id); }
+function repintaItem(id, focoSel) {
+  const el = document.getElementById('si-' + id), x = itemPorId(id);
+  if (!el || !x) return;
+  el.outerHTML = itemSinal(x);
+  if (focoSel) { const f = document.getElementById('si-' + id).querySelector(focoSel); if (f) f.focus({ preventScroll: true }); }
+}
+function repintaSaida(id, qual, html) {
+  const el = document.getElementById('si-' + id);
+  const out = el && el.querySelector(`[data-out="${qual}"]`);
+  if (out) out.innerHTML = html;
+}
+
+/* ---- questão completa ---- */
+function htmlQuestao(x, r) {
+  const cfg = siCfg(x.app);
+  if (r.privado) return `<div class="aviso info"><i class="ti ti-lock" aria-hidden="true"></i><div><b>Banco privado: abra o app.</b> O RadioTítulo fica num repositório privado e o painel não lê o banco dele. Use o começo do enunciado e a chave acima para achar a questão no app ou no repositório.</div></div>`;
+  if (r.erro) return `<div class="aviso err"><i class="ti ti-alert-triangle" aria-hidden="true"></i><div><b>Não consegui ler o banco do ${esc(cfg.nm)}.</b> ${esc(r.erro)} O que a sinalização já tem continua acima; o pedido de correção sai com esses dados.</div></div>`;
+  if (r.nao) return `<div class="aviso"><i class="ti ti-search-off" aria-hidden="true"></i><div><b>Questão não encontrada no banco atual do ${esc(cfg.nm)}</b> (${plural(r.total, 'item lido', 'itens lidos')}). Nem a chave nem o começo do enunciado bateram: a questão pode ter sido editada ou retirada depois da sinalização. Se já foi corrigida, dá para marcar como corrigida.</div></div>`;
+  const q = r.it;
+  const selos = [`<span class="selo ${q.real ? 'ac' : ''}">${esc(q.proc)}</span>`];
+  if (q.tipo === 'cartao') selos.push('<span class="selo">cartão de revisão</span>');
+  if (q.anulada) selos.push('<span class="selo av">anulada</span>');
+  selos.push(r.por === 'chave' ? '<span class="selo ok">achada pela chave</span>' : '<span class="selo av">achada pelo começo do enunciado</span>');
+  const avisoTexto = r.por !== 'chave' ? `<p class="sub">A chave não bateu: o enunciado foi editado depois da sinalização${r.por === 'texto-varias' ? ' e há mais de uma questão com o mesmo começo (mostrando a primeira)' : ''}. Confira se é a mesma questão.</p>` : '';
+  const alts = q.tipo === 'cartao'
+    ? `<div class="si-bloco"><h5>Verso (resposta)</h5><p>${esc(q.verso)}</p></div>`
+    : `<ol class="si-alts" aria-label="Alternativas">${q.alts.map(a => `<li class="${a.certa ? 'certa' : ''}"><span class="l" aria-hidden="true">${a.letra}</span>
+        <div><p><span class="sr">${a.letra}) </span>${esc(a.txt)}${a.certa ? ' <span class="gab">gabarito</span>' : ''}</p>
+        ${a.por ? `<p class="por">${esc(a.por)}</p>` : ''}${q.reordenada ? `<p class="pos">posição ${a.idx} no banco</p>` : ''}</div></li>`).join('')}</ol>
+      <p class="leg">Letras na ordem em que o app mostra ao aluno${q.reordenada ? '; o app reordena as alternativas, por isso a posição no banco (de 0 a 4) vai junto' : ''}.${x.app === 'quiz-enare-farmacia' ? ' Nos simulados diários a correta pode trocar de lugar com outra alternativa.' : ''}</p>`;
+  return `<div class="si-questao">
+    <div class="si-sel">${selos.join('')}</div>${avisoTexto}
+    <p class="si-enun">${esc(q.enunciado)}</p>
+    ${q.img ? `<img class="si-img" src="${esc(q.img)}" alt="Figura da questão" loading="lazy">` : ''}
+    ${alts}
+    ${q.comentario ? `<div class="si-bloco"><h5>Comentário</h5><p>${esc(q.comentario)}</p></div>` : ''}
+    ${q.base ? `<div class="si-bloco"><h5>${esc(q.baseRot || 'Base e fonte')}</h5><p>${esc(q.base)}</p></div>` : ''}
+    ${q.extras && q.extras.length ? `<dl class="si-mini">${q.extras.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : ''}
+  </div>`;
+}
+async function verQuestao(id) {
+  const x = itemPorId(id); if (!x) return null;
+  const cfg = SI_APP[x.app];
+  if (E.si.questao[id] && E.si.questao[id].r) return E.si.questao[id].r;
+  repintaSaida(id, 'questao', carregando(cfg && !cfg.privado ? 'Lendo o banco do ' + cfg.nm + (cfg.peso ? ' (' + cfg.peso + ', só na primeira vez)' : '') + '…' : 'Procurando a questão…'));
+  let r;
+  try { r = await achaQuestao(x); } catch (e) { r = { erro: (e && e.message) || String(e) }; }
+  E.si.questao[id] = { r, ok: !!r.it, html: htmlQuestao(x, r) };
+  repintaSaida(id, 'questao', E.si.questao[id].html);
+  const b = document.querySelector(`#si-${id} [data-si="questao"]`);
+  if (b && r.it) { b.setAttribute('aria-pressed', 'true'); b.innerHTML = '<i class="ti ti-file-text" aria-hidden="true"></i>Questão carregada'; }
+  return r;
+}
+
+/* ---- texto da questão para a IA e para o pedido ---- */
+function textoQuestao(x, r) {
+  const L = [];
+  if (r && r.it) {
+    const q = r.it;
+    if (q.tipo === 'cartao') {
+      L.push('Cartão de revisão (frente e verso).', 'Frente: ' + q.enunciado, 'Verso: ' + q.verso);
+    } else {
+      L.push('Enunciado: ' + q.enunciado);
+      L.push(q.reordenada ? 'Alternativas (letra como o app mostra; entre colchetes a posição no banco, de 0 a 4):' : 'Alternativas:');
+      q.alts.forEach(a => L.push(`${a.letra})${q.reordenada ? ' [' + a.idx + ']' : ''} ${a.txt}${a.por ? '\n   Comentário da alternativa: ' + a.por : ''}`));
+      const g = q.alts.find(a => a.certa);
+      L.push('Gabarito atual: ' + (q.anulada ? 'questão anulada' : g ? g.letra + (q.reordenada ? ' (posição ' + g.idx + ' no banco)' : '') : '—'));
+    }
+    if (q.comentario) L.push('Comentário atual: ' + q.comentario);
+    if (q.base) L.push((q.baseRot || 'Base e fonte citadas') + ': ' + q.base);
+    L.push('Procedência: ' + q.proc);
+    (q.extras || []).forEach(([k, v]) => L.push(k + ': ' + v));
+  } else {
+    L.push('(A questão completa não pôde ser carregada. Só há o começo do enunciado guardado na sinalização.)');
+    L.push('Começo do enunciado: ' + (x.q || '—'));
+  }
+  return L.join('\n');
+}
+
+/* ---- análise da IA (sugestão; o médico revisa) ---- */
+function promptIA(x, r) {
+  const cfg = siCfg(x.app);
+  return `Você é um médico revisor de questões de um banco de estudo. App: ${cfg.nm} (${cfg.publico || 'estudo'}).
+Um usuário sinalizou um problema nesta questão. Avalie com rigor técnico, como revisor sênior, usando a diretriz, norma ou referência VIGENTE que você conhece (hoje é ${new Date().toLocaleDateString('pt-BR')}). Não invente fonte nem ano: se não tiver certeza da versão vigente, diga isso no campo "conferir".
+
+PROBLEMA RELATADO: ${TIPO_SINAL[x.tipo] || x.tipo}
+COMENTÁRIO DO USUÁRIO: ${x.nota ? x.nota : '(sem comentário)'}
+${x.extra ? 'INFORMAÇÃO DO APP: ' + x.extra + '\n' : ''}TEMA: ${x.tema || '—'}
+
+QUESTÃO:
+${textoQuestao(x, r)}
+
+Responda APENAS com um objeto JSON válido, sem texto fora dele e sem markdown, neste formato:
+{"razao":"sim" ou "nao" ou "em_parte","resumo":"uma ou duas frases","erro":"o que está errado na questão; escreva nada se estiver correta","correcao":{"enunciado":"texto novo ou vazio","alternativas":"quais alternativas mudam e como, ou vazio","gabarito":"letra correta na ordem do app e o porquê, ou vazio","comentario":"comentário corrigido, curto, ou vazio"},"fonte":"diretriz, norma ou referência vigente, com o ano","confianca":"alta" ou "media" ou "baixa","conferir":"o que o médico deve conferir antes de aplicar"}
+Português do Brasil, frases curtas e diretas.`;
+}
+function lerJSON(txt) {
+  const s = String(txt || '').replace(/```(?:json)?/gi, '');
+  const a = s.indexOf('{'), b = s.lastIndexOf('}');
+  if (a < 0 || b <= a) return null;
+  try { return JSON.parse(s.slice(a, b + 1)); } catch (e) { return null; }
+}
+const RAZAO = { sim: { t: 'Sim, o usuário tem razão', s: 'err' }, nao: { t: 'Não, a questão está certa', s: 'ok' }, em_parte: { t: 'Em parte', s: 'av' } };
+const razaoDe = v => RAZAO[String(v || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().replace(/[\s-]+/g, '_')];
+function htmlIA(j, bruto, quandoIso) {
+  const aviso = `<p class="si-iaaviso"><i class="ti ti-info-circle" aria-hidden="true"></i>Sugestão da IA, sem busca na internet, para o médico revisar. Confira a fonte e o ano antes de aplicar.</p>`;
+  if (!j) return `<div class="si-ia">${aviso}<div class="si-bloco"><h5>Resposta da IA</h5><p>${esc(bruto || '(vazia)')}</p></div></div>`;
+  const rz = razaoDe(j.razao) || { t: j.razao || '—', s: '' };
+  const c = j.correcao || {};
+  const corr = [['Enunciado', c.enunciado], ['Alternativas', c.alternativas], ['Gabarito', c.gabarito], ['Comentário', c.comentario]].filter(([, v]) => v && String(v).trim() && !/^(vazio|nada|-|—)$/i.test(String(v).trim()));
+  return `<div class="si-ia">
+    <div class="si-iatopo"><h4><i class="ti ti-sparkles" aria-hidden="true"></i>Análise da IA</h4><span class="si-quando">${esc(quando(quandoIso))}</span></div>
+    ${aviso}
+    <p class="si-ver"><span class="selo ${rz.s}">O usuário tem razão? ${esc(rz.t)}</span>${j.confianca ? ` <span class="selo">confiança ${esc(String(j.confianca).replace('media', 'média'))}</span>` : ''}</p>
+    ${j.resumo ? `<p class="si-res-ia">${esc(j.resumo)}</p>` : ''}
+    ${j.erro ? `<div class="si-bloco"><h5>O que está errado</h5><p>${esc(j.erro)}</p></div>` : ''}
+    ${corr.length ? `<div class="si-bloco"><h5>Correção proposta</h5><dl class="si-mini">${corr.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></div>` : ''}
+    ${j.fonte ? `<div class="si-bloco"><h5>Fonte vigente indicada</h5><p>${esc(j.fonte)}</p></div>` : ''}
+    ${j.conferir ? `<div class="si-bloco"><h5>Conferir antes de aplicar</h5><p>${esc(j.conferir)}</p></div>` : ''}
+  </div>`;
+}
+async function analisarIA(id, botao) {
+  const x = itemPorId(id); if (!x) return;
+  if (!window.MT || typeof MT.ai !== 'function') { toast('A IA não está disponível nesta página.', 'err'); return; }
+  botao.disabled = true;
+  repintaSaida(id, 'ia', carregando('Carregando a questão…'));
+  try {
+    const r = await verQuestao(id);
+    repintaSaida(id, 'ia', carregando('A IA está analisando a questão (pode levar até 1 minuto)…'));
+    const txt = await MT.ai(promptIA(x, r || {}), 'forte', { grounding: false, maxTokens: 4096, temperature: 0.2 });
+    const j = lerJSON(txt);
+    E.si.ia[id] = { ok: true, j, bruto: txt, em: new Date().toISOString() };
+    E.si.ia[id].html = htmlIA(j, txt, E.si.ia[id].em);
+    repintaSaida(id, 'ia', E.si.ia[id].html);
+    E.si.pedido[id] = null; repintaSaida(id, 'pedido', '');
+    botao.innerHTML = '<i class="ti ti-sparkles" aria-hidden="true"></i>Analisar de novo com IA';
+  } catch (e) {
+    const msg = (e && e.message) || String(e);
+    E.si.ia[id] = null;
+    repintaSaida(id, 'ia', `<div class="aviso err"><i class="ti ti-alert-triangle" aria-hidden="true"></i><div><b>A IA não respondeu.</b> ${esc(msg)}</div></div>`);
+  } finally { botao.disabled = false; }
+}
+
+/* ---- pedido de correção para colar na conversa com o Claude ---- */
+function textoPedido(x) {
+  const cfg = siCfg(x.app), Q = E.si.questao[x.id], r = Q && Q.r, IA = E.si.ia[x.id];
+  const L = [];
+  L.push(`Pedido de correção de questão sinalizada (painel da administração MedTech, ${new Date().toLocaleDateString('pt-BR')})`, '');
+  L.push(`App: ${cfg.nm}`);
+  L.push(`Repositório: ${cfg.repo || '—'}${cfg.base ? ' (no ar em medtechbr.com.br' + cfg.base + ')' : ''}`);
+  if (cfg.onde) L.push(`Onde corrigir: ${cfg.onde}`);
+  if (r && r.it && r.it.orig) L.push(`Atenção: esta questão foi importada do ${(SI_APP[r.it.orig] || {}).nm || r.it.orig}. Corrigir lá e reimportar no ${cfg.nm}.`);
+  L.push(`Chave da questão: ${x.chave}${cfg.fmt === 'farmauti' ? ' (id do item)' : ' (hash do enunciado: mudar o enunciado muda a chave e solta o progresso dos alunos)'}`);
+  L.push(`Sinalização: ${x.id} · ${x.status} · ${x.vezes > 1 ? x.vezes + ' vezes' : '1 vez'} · última em ${quando(x.em)}`);
+  L.push(`Problema relatado: ${TIPO_SINAL[x.tipo] || x.tipo}`);
+  L.push(`Comentário do usuário: ${x.nota ? x.nota.replace(/\s+/g, ' ') : '(sem comentário)'}`);
+  if (x.tema) L.push(`Tema: ${x.tema}`);
+  if (x.extra) L.push(`Extra enviado pelo app: ${x.extra}`);
+  L.push('', 'Questão atual:');
+  if (r && r.privado) L.push('(Banco privado: o painel não lê. Começo do enunciado: ' + (x.q || '—') + ')');
+  else L.push(textoQuestao(x, r));
+  if (r && r.it && r.por !== 'chave') L.push('(Achada pelo começo do enunciado: a chave da sinalização não bateu com a do banco atual.)');
+  if (IA && IA.ok) {
+    const j = IA.j;
+    L.push('', 'Correção sugerida pela IA (sem busca na internet; conferir antes de aplicar):');
+    if (j) {
+      const rz = razaoDe(j.razao);
+      L.push('O usuário tem razão? ' + (rz ? rz.t : (j.razao || '—')) + (j.confianca ? ' (confiança ' + j.confianca + ')' : ''));
+      if (j.resumo) L.push('Resumo: ' + j.resumo);
+      if (j.erro) L.push('O que está errado: ' + j.erro);
+      const c = j.correcao || {};
+      [['Enunciado', c.enunciado], ['Alternativas', c.alternativas], ['Gabarito', c.gabarito], ['Comentário', c.comentario]]
+        .forEach(([k, v]) => { if (v && String(v).trim()) L.push(k + ': ' + v); });
+      if (j.fonte) L.push('Fonte vigente indicada: ' + j.fonte);
+      if (j.conferir) L.push('Conferir: ' + j.conferir);
+    } else L.push(String(IA.bruto || '').trim());
+  }
+  L.push('', 'O que fazer:',
+    '1. Confirmar na diretriz ou norma vigente (fonte e ano) se o usuário tem razão.',
+    '2. Se tiver, corrigir no arquivo de origem do banco, sem mexer no enunciado quando o erro estiver só no gabarito, nas alternativas ou no comentário (para manter a chave).',
+    '3. Rodar o montador e os validadores do app, subir a versão e publicar.',
+    `4. Me dizer o que mudou, para eu marcar a sinalização ${x.id} como corrigida no painel.`);
+  return L.join('\n');
+}
+async function copiar(txt) {
+  try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(txt); return true; } } catch (e) {}
+  const volta = document.activeElement;
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = txt; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand('copy'); ta.remove();
+    if (volta && volta.focus) volta.focus({ preventScroll: true });
+    return ok;
+  } catch (e) { return false; }
+}
+async function gerarPedido(id, botao) {
+  const x = itemPorId(id); if (!x) return;
+  botao.disabled = true;
+  try {
+    if (!E.si.questao[id] || !E.si.questao[id].r) await verQuestao(id);
+    const txt = textoPedido(x);
+    const ok = await copiar(txt);
+    const html = `<div class="si-pedido">
+      <p class="aviso ${ok ? 'info' : ''}" role="status"><i class="ti ${ok ? 'ti-clipboard-check' : 'ti-clipboard-x'}" aria-hidden="true"></i><span>${ok ? 'Copiado. Cole na conversa com o Claude para aplicar a correção no app.' : 'O navegador não deixou copiar sozinho. Selecione o texto abaixo e copie.'}</span></p>
+      <details${ok ? '' : ' open'}><summary>Ver o texto do pedido</summary>
+        <label class="sr" for="si-p-${esc(id)}">Texto do pedido de correção</label>
+        <textarea id="si-p-${esc(id)}" readonly>${esc(txt)}</textarea></details></div>`;
+    E.si.pedido[id] = { html, txt };
+    repintaSaida(id, 'pedido', html);
+    if (ok) toast('Copiado. Cole na conversa com o Claude para aplicar a correção no app.', 'ok');
+    else { const ta = document.getElementById('si-p-' + id); if (ta) { ta.focus(); ta.select(); } }
+  } finally { botao.disabled = false; }
+}
+
+/* ---- dar baixa ---- */
+async function marcarSinal(id, status, botao) {
+  const x = itemPorId(id); if (!x) return;
+  const ta = document.getElementById('si-r-' + id);
+  const resposta = (ta ? ta.value : (x.resposta || '')).trim().slice(0, 600);
+  const art = document.getElementById('si-' + id);
+  art.querySelectorAll('.si-res button').forEach(b => b.disabled = true);
+  try {
+    await chamar('mtSinal', { op: 'marcar', id, status, resposta });
+    Object.assign(x, { status, resposta, tratadaEm: new Date().toISOString(), tratadaPor: (MT.user && MT.user.email) || '' });
+    delete E.si.rascunho[id];
+    const ROT = { corrigida: 'Marcada como corrigida.', descartada: 'Sinalização descartada.', aberta: 'Sinalização reaberta.' };
+    const L0 = filtradosSinal().slice(0, E.si.limite).map(y => y.id);
+    const sai = E.si.st && E.si.st !== status;
+    let proximo = null;
+    if (sai) { const i = L0.indexOf(id); proximo = L0[i + 1] || L0[i - 1] || null; E.si.abertos.delete(id); }
+    desenharSinal();
+    toast(ROT[status] + (sai ? ' Saiu desta lista.' : ''), 'ok');
+    if (sai) {
+      const alvo = proximo && document.querySelector(`#si-${proximo} .si-cab`);
+      if (alvo) alvo.focus({ preventScroll: false }); else { $('h-si').setAttribute('tabindex', '-1'); $('h-si').focus(); }
+    } else {
+      const b = document.querySelector(`#si-${id} .si-cab`); if (b) b.focus({ preventScroll: true });
+    }
+  } catch (e) {
+    if (ehNegado(e)) { bloquear(e.message); return; }
+    toast('Não gravou: ' + ((e && e.message) || e), 'err');
+    art.querySelectorAll('.si-res button').forEach(b => b.disabled = false);
+  }
+}
+
+/* ---- eventos (delegados: a lista é redesenhada a cada filtro) ---- */
+$('siLista').addEventListener('click', ev => {
+  const b = ev.target.closest('[data-si]'); if (!b || b.tagName === 'TEXTAREA') return;
+  const art = b.closest('.si-item'), id = art && art.dataset.id, ac = b.dataset.si;
+  if (ac === 'mais') { E.si.limite += 30; desenharSinal(); return; }
+  if (!id) return;
+  if (ac === 'abre') {
+    if (E.si.abertos.has(id)) E.si.abertos.delete(id); else E.si.abertos.add(id);
+    repintaItem(id, '.si-cab');
+    return;
+  }
+  if (ac === 'questao') verQuestao(id);
+  if (ac === 'ia') analisarIA(id, b);
+  if (ac === 'pedido') gerarPedido(id, b);
+  if (ac === 'marca') marcarSinal(id, b.dataset.st, b);
+});
+$('siLista').addEventListener('input', ev => {
+  const t = ev.target; if (t.dataset.si !== 'resp') return;
+  const art = t.closest('.si-item'); if (art) E.si.rascunho[art.dataset.id] = t.value;
+});
+$('siSituacao').querySelectorAll('[data-sist]').forEach(b => b.addEventListener('click', () => { E.si.st = b.dataset.sist; E.si.limite = 30; desenharSinal(); }));
+$('siApp').addEventListener('change', () => { E.si.app = $('siApp').value; E.si.limite = 30; desenharSinal(); });
+let tBuscaSi = 0;
+$('siBusca').addEventListener('input', () => { clearTimeout(tBuscaSi); tBuscaSi = setTimeout(() => { E.si.busca = $('siBusca').value; E.si.limite = 30; desenharSinal(); }, 200); });
+$('btSi').onclick = () => carregarSinal();
 
 /* ============================================================
    DIAGNÓSTICO
