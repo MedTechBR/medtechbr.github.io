@@ -462,6 +462,8 @@ $('asBusca').addEventListener('input', () => { clearTimeout(tBusca); tBusca = se
    mtAdmin usuarios {filtro, ordem, busca, pagina, porPagina} → {total, contagens, itens, eu}
            usuario {uid} → ficha (mesmos campos do "ver" + pedidos, sinalizações, log, pode)
            editarUsuario {uid, nome?, email?, desativar?} · resetSenha {uid} · papel {uid, papel, ativo}
+           previaExclusao {uid} → {apaga, fica, bloqueios} · excluirConta {uid, email, confirmar:"EXCLUIR"} → {concluido}
+           (exclusão só pela ficha, aba Acesso à conta; a lista não tem botão de excluir)
    CPF: vincularCpf (Acessos). Liberações: o mesmo editor da seção Acessos (prefixo ulib).
    Tudo que vem do servidor passa por esc() antes de ir para o HTML.
    ============================================================ */
@@ -469,7 +471,7 @@ E.us = { filtro: 'todos', ordem: 'recentes', pagina: 1, r: null, ficha: null, ab
 const FILTRO_US = { todos: 'Todas', semCpf: 'Sem CPF', comPlano: 'Com plano', semPlano: 'Sem plano', novos7: 'Novas em 7 dias', desativadas: 'Desativadas' };
 const PROVEDOR = { password: 'e-mail e senha', 'google.com': 'Google', 'apple.com': 'Apple', phone: 'telefone', 'microsoft.com': 'Microsoft' };
 const ABAS_US = [['dados', 'Dados', 'ti-id'], ['liberacoes', 'Liberações', 'ti-checklist'], ['permissoes', 'Permissões', 'ti-shield-check'], ['acesso', 'Acesso à conta', 'ti-key'], ['historico', 'Histórico', 'ti-history']];
-const ACAO_LOG = { editarUsuario: 'Cadastro editado', resetSenha: 'Link de nova senha enviado', papel: 'Permissão alterada' };
+const ACAO_LOG = { editarUsuario: 'Cadastro editado', resetSenha: 'Link de nova senha enviado', papel: 'Permissão alterada', excluirConta: 'Exclusão da conta' };
 const dataC = iso => iso ? new Date(iso).toLocaleDateString('pt-BR') : '—';
 function relativo(iso) {
   if (!iso) return 'nunca';
@@ -519,6 +521,12 @@ async function carregarUsuarios() {
     E.us.r = r; E.us.pagina = r.pagina;
     $('usAviso').innerHTML = '';
     desenharUsuarios(r);
+    /* de volta de uma exclusão: o aviso fica no topo da lista e recebe o foco */
+    if (E.us.aviso) {
+      $('usAviso').innerHTML = `<div class="aviso ok" role="status" tabindex="-1" id="usAvisoEx"><i class="ti ti-circle-check" aria-hidden="true"></i><div><b>Conta excluída.</b> ${esc(E.us.aviso)}</div></div>`;
+      E.us.aviso = '';
+      setTimeout(() => { const a = $('usAvisoEx'); if (a) a.focus(); }, 0);
+    }
     $('usQuando').textContent = 'Atualizado às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   } catch (e) {
     if (E.bloqueado) return;
@@ -581,7 +589,7 @@ async function mostrarFicha(uid) {
   $('usLista').hidden = true; $('usFicha').hidden = false;
   E.us.voltaFoco = uid;
   if (E.us.ficha && E.us.ficha.uid === uid) { desenharFicha(E.us.ficha); return; }
-  E.us.ficha = null; E.us.aba = 'dados';
+  E.us.ficha = null; E.us.aba = 'dados'; E.us.previa = null;
   $('usFicha').innerHTML = barraVoltar() + carregando('Abrindo a ficha…');
   ligaVoltar();
   try {
@@ -602,6 +610,7 @@ async function recarregarFicha(msg) {
   const uid = E.us.ficha && E.us.ficha.uid;
   if (!uid) return;
   E.carregou.usuarios = false; E.carregou.assinantes = false; E.carregou.painel = false;
+  E.us.previa = null;                         // papel, CPF etc. mudam o que a exclusão apagaria ou impediria
   try {
     const r = await admin({ acao: 'usuario', uid });
     E.us.ficha = r;
@@ -640,6 +649,8 @@ function ligaAbas() {
     E.us.aba = t.dataset.aba;
     tabs.forEach(x => { const on = x === t; x.setAttribute('aria-selected', String(on)); x.tabIndex = on ? 0 : -1; $(x.getAttribute('aria-controls')).hidden = !on; });
     if (focar) t.focus();
+    /* a prévia da exclusão só é pedida ao servidor quando a aba Acesso à conta abre */
+    if (E.us.aba === 'acesso' && E.us.ficha) carregarPrevia(E.us.ficha);
   };
   tabs.forEach((t, i) => {
     t.onclick = () => escolhe(t);
@@ -793,7 +804,134 @@ function fichaAcesso(r) {
           ? `<button class="btn btn-p sm" type="button" id="usBtDes" data-des="0"${r.pode.editar ? '' : ' disabled'}><i class="ti ti-player-play" aria-hidden="true"></i>Reativar conta</button>`
           : `<button class="btn btn-dn sm" type="button" id="usBtDes" data-des="1" aria-describedby="usAcDes${porqueDes ? ' usAcDesP' : ''}"${r.pode.desativar ? '' : ' disabled'}><i class="ti ti-user-off" aria-hidden="true"></i>Desativar conta</button>`}
         ${porqueDes ? `<span class="us-porque" id="usAcDesP">${esc(porqueDes)}</span>` : ''}</div></li>
-    </ul>`;
+    </ul>
+    <section class="us-perigo" aria-labelledby="usExTit">
+      <h4 id="usExTit"><i class="ti ti-alert-octagon" aria-hidden="true"></i>Excluir conta</h4>
+      <p class="sub">Para atender o pedido da própria pessoa (LGPD): apaga a conta e os dados dela de vez. <b>Não dá para desfazer.</b> Se a ideia é só impedir o acesso, use "Desativar conta" acima.</p>
+      <div id="usExCorpo">${prontaPrevia(r) ? htmlPrevia(r, E.us.previa.p) : carregando('Conferindo o que seria apagado…')}</div>
+    </section>`;
+}
+
+/* ---------- Excluir conta: prévia (o que sai, o que fica, o que impede) e confirmação ---------- */
+const NOME_GRUPO = { avisos: 'Avisos', 'trafego-titulo': 'TráfegoTítulo', 'radio-titulo': 'RadioTítulo' };
+const nomeGrupo = g => (APPS[g] && APPS[g].nm) || NOME_GRUPO[g] || g;
+const prontaPrevia = r => !!(E.us.previa && E.us.previa.uid === r.uid && E.us.previa.p);
+const mesmoEmail = (a, b) => !!a && String(a).trim().toLowerCase() === String(b || '').trim().toLowerCase();
+async function carregarPrevia(r, forcar) {
+  if (!r || !$('usExCorpo')) return;
+  if (!forcar && prontaPrevia(r)) return;
+  if (!forcar && E.us.previa && E.us.previa.uid === r.uid && E.us.previa.carregando) return;
+  E.us.previa = { uid: r.uid, carregando: true };
+  $('usExCorpo').innerHTML = carregando('Conferindo o que seria apagado…');
+  try {
+    const p = await admin({ acao: 'previaExclusao', uid: r.uid });
+    if (!E.us.previa || E.us.previa.uid !== r.uid) return;
+    E.us.previa = { uid: r.uid, p };
+  } catch (e) {
+    if (E.bloqueado) return;
+    E.us.previa = null;
+    const alvo = $('usExCorpo');
+    if (!alvo || !E.us.ficha || E.us.ficha.uid !== r.uid) return;
+    alvo.innerHTML = ehNaoPublicado(e)
+      ? avisoPublicar('a exclusão de conta')
+      : avisoErro(e) + '<div class="acoesL"><button class="btn btn-g sm" type="button" id="usExDeNovo"><i class="ti ti-refresh" aria-hidden="true"></i>Tentar de novo</button></div>';
+    const b = $('usExDeNovo'); if (b) b.onclick = () => carregarPrevia(r, true);
+    return;
+  }
+  if (E.us.ficha && E.us.ficha.uid === r.uid && $('usExCorpo')) { $('usExCorpo').innerHTML = htmlPrevia(r, E.us.previa.p); ligaPrevia(r, E.us.previa.p); }
+}
+function htmlPrevia(r, p) {
+  const a = p.apaga || {}, f = p.fica || {}, pr = a.progresso || { total: 0, grupos: [] };
+  const grupos = (pr.grupos || []).map(g => `${esc(nomeGrupo(g.nome))}: ${inteiro(g.n)}`).join(' · ');
+  const sai = [
+    `<li><b>Progresso nos apps:</b> ${pr.total ? (pr.maisQue ? 'mais de ' : '') + plural(pr.total, 'documento', 'documentos') : 'nenhum documento'}${grupos ? `<span class="us-ex-det">${grupos}</span>` : ''}</li>`,
+    `<li><b>CPF:</b> ${a.cpf ? `${esc(a.cpf)} <span class="us-ex-det">o cadastro e o índice saem; o CPF fica livre para outra conta</span>` : 'nenhum cadastrado'}</li>`,
+    `<li><b>Uso da IA:</b> ${a.usoIA ? plural(a.usoIA, 'registro diário', 'registros diários') : 'nenhum registro'}</li>`,
+    a.pendentes ? `<li><b>Liberações esperando:</b> ${plural(a.pendentes, 'pendência ligada', 'pendências ligadas')} ao e-mail ou ao CPF</li>` : '',
+    a.perfilClinicamed ? '<li><b>Perfil de aluno do ClínicaMed</b> (nome e turma)</li>' : '',
+    a.sinalizacoes ? `<li><b>Nome e e-mail em ${plural(a.sinalizacoes, 'questão sinalizada', 'questões sinalizadas')}</b>, e as respostas enviadas à pessoa <span class="us-ex-det">a questão sinalizada continua na caixa, sem identificar quem mandou</span></li>` : '',
+    `<li><b>A conta de acesso</b> (${esc(r.email || 'sem e-mail')}): a pessoa não entra mais e o e-mail fica livre para um cadastro novo</li>`
+  ].join('');
+  const fica = [
+    f.pedidos ? `<li><b>${plural(f.pedidos, 'pedido ou pagamento', 'pedidos e pagamentos')}</b> <span class="us-ex-det">registro de compra que a lei manda guardar (LGPD, art. 16, I); ficam marcados como "conta excluída"</span></li>`
+      : '<li><b>Nenhum pedido ou pagamento</b> <span class="us-ex-det">se houvesse, o registro de compra ficaria guardado (LGPD, art. 16, I)</span></li>',
+    f.assinaturas ? `<li><b>${plural(f.assinaturas, 'registro de assinatura', 'registros de assinatura')}</b> do Mercado Pago <span class="us-ex-det">mesma regra, marcados como "conta excluída"</span></li>` : '',
+    '<li><b>O registro desta exclusão</b> <span class="us-ex-det">quem excluiu e quando, com o e-mail mascarado e sem CPF</span></li>'
+  ].join('');
+  const bloq = (p.bloqueios || []);
+  const blocoBloq = bloq.length ? `<div class="aviso err" role="note"><i class="ti ti-lock" aria-hidden="true"></i><div><b>Esta conta não pode ser excluída agora.</b>
+      <ul class="us-ex-bloq">${bloq.map(b => `<li><b>${esc(b.texto)}</b> ${esc(b.comoResolver || '')}</li>`).join('')}</ul></div></div>` : '';
+  const conf = bloq.length ? `<div class="acoesL"><button class="btn btn-g sm" type="button" id="usExReler"><i class="ti ti-refresh" aria-hidden="true"></i>Conferir de novo</button></div>` : `
+    <form class="us-ex-conf" id="usExForm" novalidate>
+      <div class="campo">
+        <label for="usExEmail">Para confirmar, digite o e-mail da conta: <b class="us-ex-alvo">${esc(r.email)}</b></label>
+        <input id="usExEmail" type="email" inputmode="email" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="usExAjuda usExConfere">
+        <span class="ajuda" id="usExAjuda">O botão só funciona quando o e-mail digitado for igual ao da conta.</span>
+        <span class="ajuda us-ex-ok" id="usExConfere" aria-live="polite"></span>
+      </div>
+      <div class="acoesL"><button class="btn btn-ex" type="submit" id="usExBt" disabled aria-describedby="usExAjuda"><i class="ti ti-trash-x" aria-hidden="true"></i>Excluir conta definitivamente</button></div>
+    </form>`;
+  return `${blocoBloq}
+    <div class="us-ex-cols">
+      <div class="us-ex-col"><h5><i class="ti ti-trash" aria-hidden="true"></i>O que será apagado</h5><ul>${sai}</ul></div>
+      <div class="us-ex-col"><h5><i class="ti ti-archive" aria-hidden="true"></i>O que fica, e por quê</h5><ul>${fica}</ul></div>
+    </div>${conf}`;
+}
+function ligaPrevia(r, p) {
+  const reler = $('usExReler'); if (reler) reler.onclick = () => carregarPrevia(r, true);
+  const inp = $('usExEmail'), bt = $('usExBt'), form = $('usExForm');
+  if (!inp || !bt || !form) return;
+  const confere = () => {
+    const ok = mesmoEmail(inp.value, r.email);
+    bt.disabled = !ok;
+    $('usExConfere').textContent = ok ? 'O e-mail confere.' : (inp.value.trim() ? 'Ainda não é igual ao e-mail da conta.' : '');
+    $('usExConfere').classList.toggle('sim', ok);
+  };
+  inp.addEventListener('input', confere);
+  form.onsubmit = ev => { ev.preventDefault(); if (mesmoEmail(inp.value, r.email)) excluirDefinitivo(r, p, inp.value.trim()); };
+}
+async function excluirDefinitivo(r, p, emailDigitado) {
+  const a = p.apaga || {}, f = p.fica || {}, nm = esc(nomeOuEmail(r));
+  const resumo = [
+    (a.progresso && a.progresso.total) ? plural(a.progresso.total, 'documento de progresso', 'documentos de progresso') : '',
+    a.cpf ? 'o CPF ' + esc(a.cpf) : '',
+    a.usoIA ? plural(a.usoIA, 'registro de uso da IA', 'registros de uso da IA') : '',
+    'a conta de acesso'
+  ].filter(Boolean).join(', ');
+  let concluiu = false, tentou = false;
+  const corpo = `<p>Excluir a conta de <b>${nm}</b>${r.nome && r.email ? ' (<b>' + esc(r.email) + '</b>)' : ''}?</p>
+    <p>Sai de vez: ${resumo}.${f.pedidos ? ' ' + plural(f.pedidos, 'pedido fica guardado', 'pedidos ficam guardados') + ', marcados como de conta excluída.' : ''}</p>
+    <p class="us-ex-aviso"><i class="ti ti-alert-triangle" aria-hidden="true"></i><b>Não dá para desfazer.</b></p>`;
+  const d = dialogo('Excluir conta definitivamente', corpo, [
+    { rot: 'Cancelar', cls: 'btn-g' },
+    { rot: '<i class="ti ti-trash-x" aria-hidden="true"></i>Excluir conta', cls: 'btn-ex', acao: async () => {
+      const prog = txt => { $('dlgCorpo').innerHTML = `<p class="carregando" role="status">${esc(txt)}</p>`; };
+      tentou = true;
+      prog('Excluindo a conta…');
+      try {
+        for (let rodada = 1; rodada <= 12; rodada++) {
+          const x = await admin({ acao: 'excluirConta', uid: r.uid, email: emailDigitado, confirmar: 'EXCLUIR' });
+          if (x.concluido) { concluiu = true; break; }
+          prog('Ainda apagando (muitos dados)… parte ' + (rodada + 1));
+        }
+        if (!concluiu) toast('A exclusão foi feita em parte. Abra a ficha e tente de novo para terminar.', 'err');
+      } catch (e) {
+        if (!E.bloqueado) toast('Não excluí: ' + ((e && e.message) || e), 'err');
+      }
+    } }
+  ]);
+  /* foco no Cancelar: o botão perigoso não fica pronto para um Enter distraído */
+  const cancelar = $('dlgRodape').querySelector('button'); if (cancelar) setTimeout(() => cancelar.focus(), 40);
+  await new Promise(res => d.addEventListener('close', res, { once: true }));
+  if (concluiu) {
+    E.us.previa = null; E.us.ficha = null; E.us.r = null; E.us.voltaFoco = '';
+    E.carregou.usuarios = false; E.carregou.assinantes = false; E.carregou.painel = false;
+    E.us.aviso = (r.email || r.uid) + ' não existe mais. Os pedidos dela continuam no registro de compras.';
+    toast('Conta excluída.', 'ok');
+    location.hash = 'usuarios';
+  } else if (tentou && E.us.ficha && E.us.ficha.uid === r.uid) {
+    carregarPrevia(r, true);                  // falhou ou ficou em parte: mostra o que ainda falta (cancelar não muda nada)
+  }
 }
 function ligaAcesso(r) {
   $('usBtSenha').onclick = async () => {
@@ -810,6 +948,8 @@ function ligaAcesso(r) {
     try { await admin({ acao: 'editarUsuario', uid: r.uid, desativar: des }); await recarregarFicha(des ? 'Conta desativada.' : 'Conta reativada.'); }
     catch (e) { if (!E.bloqueado) toast('Não mudei: ' + ((e && e.message) || e), 'err'); }
   };
+  if (prontaPrevia(r)) ligaPrevia(r, E.us.previa.p);
+  else if (E.us.aba === 'acesso') carregarPrevia(r);
 }
 
 /* Histórico: pedidos e pagamentos, sinalizações, pendências e registros da administração */
