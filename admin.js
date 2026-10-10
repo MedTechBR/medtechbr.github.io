@@ -1,7 +1,7 @@
 /* ============================================================
    admin.js — Administração MedTech (10/10/2026, abertura das vendas)
    Tudo passa pelo servidor (o navegador não decide nada de acesso):
-     mtAdmin  {acao:'painel'|'assinantes'|'pedidos'|'usuarios'|'usuario'|'editarUsuario'|'resetSenha'|'papel'|'ver'|'conceder'|'revogar'|'vincularCpf'|'teste'|'geracaoIA'|'testeIA'}
+     mtAdmin  {acao:'painel'|'assinantes'|'pedidos'|'usuarios'|'usuario'|'editarUsuario'|'resetSenha'|'papel'|'ver'|'conceder'|'revogar'|'vincularCpf'|'vincularAssinatura'|'teste'|'geracaoIA'|'testeIA'}
               (10/10/2026: seção Usuários = todas as contas, ficha com dados, liberações, permissões,
                acesso à conta e histórico; o servidor nunca devolve o CPF inteiro nem segredo da conta)
               (10/10/2026: ver/revogar por e-mail ou CPF; conceder com lista mista e ilimitado;
@@ -1382,14 +1382,35 @@ async function carregarPedidos() {
         <td data-r="Produto">${esc(x.nome || '—')}${x.periodo ? ' <span class="fraco">(' + esc(/^\d+d$/.test(x.periodo) ? x.periodo.slice(0, -1) + ' dias' : x.periodo) + ')</span>' : ''}</td>
         <td data-r="E-mail" class="em">${esc(x.email || (x.cpf ? 'CPF ' + x.cpf : '—'))}${x.email && x.cpf ? '<br><span class="fraco">CPF ' + esc(x.cpf) + '</span>' : ''}${x.motivo ? '<br><span class="fraco">Motivo: ' + esc(x.motivo) + '</span>' : ''}</td>
         <td data-r="Valor" class="n">${x.valor === null ? '—' : (x.estimado ? '<span title="Estimado pelo preço do catálogo">≈ </span>' : '') + brl(x.valor)}</td>
-        <td data-r="Meio" class="fraco">${esc(GATEWAY[x.gateway] || x.gateway)}${x.metodo ? ' · ' + esc(METODO[x.metodo] || x.metodo) : ''}${x.pagamento ? `<br><span title="Número do pagamento no Mercado Pago">nº ${esc(x.pagamento)}</span>` : ''}${x.por ? `<br>por ${esc(x.por)}` : ''}</td>
+        <td data-r="Meio" class="fraco">${esc(GATEWAY[x.gateway] || x.gateway)}${x.metodo ? ' · ' + esc(METODO[x.metodo] || x.metodo) : ''}${x.pagamento ? `<br><span title="Número do pagamento no Mercado Pago">nº ${esc(x.pagamento)}</span>` : ''}${x.preapproval ? `<br><span title="Assinatura no Mercado Pago (link de plano)">assinatura ${esc(x.preapproval)}</span>` : ''}${x.por ? `<br>por ${esc(x.por)}` : ''}${x.preapproval && x.tipo === 'revisar' ? `<br><button type="button" class="btn btn-g" data-ligar="${esc(x.preapproval)}" data-email="${esc(x.email || '')}">Ligar a uma conta</button>` : ''}</td>
       </tr>`).join('')}</tbody></table></div>
       ${estimado ? '<p class="leg">≈ valor estimado pelo preço do catálogo (pedido do Kiwify ou gravado antes de o servidor guardar o valor cobrado).</p>' : ''}`;
+    $('pgLista').querySelectorAll('[data-ligar]').forEach(b => b.onclick = () => ligarAssinatura(b.dataset.ligar, b.dataset.email));
   } catch (e) {
     if (E.bloqueado) return;
     $('pgAviso').innerHTML = e.naoPublicado ? avisoPublicar('os pedidos') : avisoErro(e);
     $('pgLista').innerHTML = '';
   }
+}
+/* assinatura do link de plano do Mercado Pago que chegou "sem conta ligada" (10/10/2026):
+   a administração liga à conta certa (mtAdmin vincularAssinatura; fica registrado com o motivo) */
+function ligarAssinatura(preapproval, emailPagador) {
+  dialogo('Ligar assinatura a uma conta', `<p>Assinatura do Mercado Pago <b>${esc(preapproval)}</b>${emailPagador ? ' (pagador: ' + esc(emailPagador) + ')' : ''}. A cobrança já feita passa para a conta escolhida.</p>
+    <div class="campo"><label for="laEmail">E-mail da conta MedTech</label><input id="laEmail" type="email" autocomplete="off" spellcheck="false" value="${esc(emailPagador || '')}"></div>
+    <div class="campo"><label for="laMotivo">Motivo (fica registrado)</label><input id="laMotivo" type="text" autocomplete="off" placeholder="ex.: pediu no suporte, conferido pelo comprovante"></div>
+    <label class="fraco"><input id="laTransf" type="checkbox"> Já está ligada a outra conta: transferir</label>`, [
+    { rot: 'Cancelar', cls: 'btn-g' },
+    { rot: 'Ligar', cls: 'btn-p', acao: async () => {
+      const alvo = $('laEmail').value.trim(), motivo = $('laMotivo').value.trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(alvo)) { toast('Informe o e-mail da conta.', 'err'); return false; }
+      if (motivo.length < 5) { toast('Escreva o motivo: ele fica registrado.', 'err'); return false; }
+      try {
+        const r = await admin({ acao: 'vincularAssinatura', preapproval, alvo, motivo, transferir: $('laTransf').checked });
+        toast('Assinatura ligada a ' + r.email + (r.transferidoDe ? ' (saiu da conta ' + r.transferidoDe + ')' : '') + '.');
+        E.carregou.pedidos = false; carregarPedidos();
+      } catch (e) { if (!E.bloqueado) toast('Não liguei: ' + ((e && e.message) || e), 'err'); return false; }
+    } }
+  ]);
 }
 $('pgTipos').querySelectorAll('[data-tipo]').forEach(b => b.addEventListener('click', () => { E.pgTipo = b.dataset.tipo; carregarPedidos(); }));
 async function compraTeste(periodo) {

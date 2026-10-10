@@ -712,7 +712,7 @@ function htmlOferta(P, p, titulo){
       <span class="c">${esc(op.como)}</span>
       <span class="cta">${esc(op.botao)}</span></button>`;
   }).join('');
-  const sec = ops.filter(o => o.secundaria).map(op => `<button type="button" class="link of-sec" data-op="${OPS.indexOf(op)}"><i class="ti ti-qrcode" aria-hidden="true"></i>${esc(op.botao)} · ${esc(brl(op.preco))}, sem renovação</button>`).join('');
+  const sec = ops.filter(o => o.secundaria).map(op => `<button type="button" class="link of-sec" data-op="${OPS.indexOf(op)}"><i class="ti ${op.modo === 'link' ? 'ti-refresh' : 'ti-qrcode'}" aria-hidden="true"></i>${esc(op.secTexto || (op.botao + ' · ' + brl(op.preco)))}</button>`).join('');
   return `<div class="of"><div class="of-h"><b>${esc(titulo || p.nome || p.id)}</b>${p.resumo ? `<small>${esc(p.resumo)}</small>` : ''}</div><div class="of-g">${html}</div>${sec}</div>`;
 }
 function preencheAssinatura(){
@@ -734,7 +734,7 @@ function preencheAssinatura(){
     const anualOp = MTAcesso.opcoes(P, p).find(o => o.periodo === 'anual' && !o.modo);
     if (ate > ag) {
       ativos.add(id);
-      let linha2 = rec ? `Mensal no cartão · ${rec.status === 'paused' ? 'pausada' : (rec.proximo ? 'renova em <b>' + dataBR(rec.proximo) + '</b>' : 'renova todo mês')}.` : (ehIlim(ate) ? 'Acesso <b>ilimitado</b>, liberado pela MedTech · sem cobrança.' : `Ativo até <b>${dataBR(ate)}</b> · sem renovação automática.`);
+      let linha2 = rec ? `${rec.via === 'plano' ? 'Mensal pela sua conta do Mercado Pago' : 'Mensal no cartão'} · ${rec.status === 'paused' ? 'pausada' : (rec.proximo ? 'renova em <b>' + dataBR(rec.proximo) + '</b>' : 'renova todo mês')}.` : (ehIlim(ate) ? 'Acesso <b>ilimitado</b>, liberado pela MedTech · sem cobrança.' : `Ativo até <b>${dataBR(ate)}</b> · sem renovação automática.`);
       const longo = ate - ag > 60 * 86400 && !ehIlim(ate);
       if (rec && longo) linha2 += ' Você tem também um período pago longo. Se já pagou o anual, cancele a mensal para não pagar duas vezes.';
       const bts = [];
@@ -760,14 +760,14 @@ function preencheAssinatura(){
   if (nadaAtivo && !pend) B.unshift(`<div class="as-st off"><span class="sel">Sem plano</span><p>Você ainda não tem plano ativo nesta conta. Escolha abaixo.</p></div>`);
   if (aVenda.length) {
     B.push(`<div class="as-of"><h5>${nadaAtivo ? 'Assinar' : 'Outros planos'}</h5>${aVendaMed.length && aVendaFarma.length ? `<h6 class="as-pub">Medicina</h6>${ofertas(aVendaMed)}<h6 class="as-pub">Farmácia</h6>${ofertas(aVendaFarma)}` : ofertas(aVenda)}
-      <p class="as-mini">Mensal: cartão de crédito, renova sozinho todo mês. Anual: Pix, cartão em até 12x ou boleto, pagamento único.</p></div>`);
+      <p class="as-mini">Mensal: cartão de crédito aqui mesmo ou pela sua conta do Mercado Pago (ou Mercado Livre), renova sozinho todo mês. Anual: Pix, cartão em até 12x ou boleto, pagamento único.</p></div>`);
   }
   const temCompra = donos.some(([id, ate]) => ate > ag && !ehIlim(ate) && !MTAcesso.produtoPorId(P, id).interno) || !!pend;
   B.push(`<div class="as-links">
     <a class="b cancel" href="${RECIBOS_URL}" target="_blank" rel="noopener"><i class="ti ti-receipt" aria-hidden="true"></i>Ver recibos e pagamentos</a>
     ${temCompra ? `<button type="button" class="b cancel" onclick="pedirDesistencia()"><i class="ti ti-arrow-back-up" aria-hidden="true"></i>Desistir em até 7 dias (reembolso total)</button>` : ''}
   </div>
-  <p class="as-mini">Sem fidelidade · desistência em 7 dias com reembolso total. O pagamento é processado pelo Mercado Pago: no mensal, o cartão é digitado nos campos seguros dele; o anual e o Pix abrem a página do Mercado Pago. A MedTech não vê nem guarda o número do cartão. Os recibos ficam na sua conta do Mercado Pago, em Atividade. Dúvidas: <a href="ajuda.html" target="_blank" rel="noopener">ajuda</a> ou <a href="mailto:${SUPORTE_EMAIL}?subject=${encodeURIComponent('Assinatura MedTech')}">${SUPORTE_EMAIL}</a>.</p>`);
+  <p class="as-mini">Sem fidelidade · desistência em 7 dias com reembolso total. O pagamento é processado pelo Mercado Pago: no mensal, o cartão é digitado nos campos seguros dele; o anual, o Pix e "Assinar pelo Mercado Pago" abrem a página do Mercado Pago. A MedTech não vê nem guarda o número do cartão. Os recibos ficam na sua conta do Mercado Pago, em Atividade. Dúvidas: <a href="ajuda.html" target="_blank" rel="noopener">ajuda</a> ou <a href="mailto:${SUPORTE_EMAIL}?subject=${encodeURIComponent('Assinatura MedTech')}">${SUPORTE_EMAIL}</a>.</p>`);
   el.innerHTML = B.join('');
   el.querySelectorAll('[data-op]').forEach(b => b.onclick = () => abrirCompra(OPS[Number(b.dataset.op)], b, document.getElementById('cfgPagMsg')));
   el.querySelectorAll('[data-cancelar]').forEach(b => b.onclick = () => cancelarAssinatura(b.dataset.cancelar, b.dataset.nome, b));
@@ -822,7 +822,7 @@ async function abrirCompra(op, bt, msgEl){
   if (bt) bt.disabled = true;
   const diz = (t, err) => { if (msgEl) { msgEl.className = 'cfg-msg' + (err ? ' err' : ''); msgEl.textContent = t; } else if (t) aviso(t); };
   const cartao = MTAcesso.ehCartao && MTAcesso.ehCartao(op);
-  diz(cartao ? 'Abrindo o formulário do cartão…' : 'Abrindo o pagamento seguro do Mercado Pago…');
+  diz(cartao ? 'Abrindo o formulário do cartão…' : op.modo === 'link' ? 'Abrindo o Mercado Pago para você assinar…' : 'Abrindo o pagamento seguro do Mercado Pago…');
   try {
     const res = await MTAcesso.comprar(op, MT.user);
     if (!res || typeof res !== 'object') return;              // redirecionou ao Mercado Pago
@@ -948,6 +948,7 @@ async function chegadaPagamento(){
   const q = Q0, st = (q.get('collection_status') || q.get('status') || '').toLowerCase();
   history.replaceState(null, '', location.pathname);
   if (!ACESSO || !ACESSO.venda || !MT.user) return;
+  if (q.get('via') === 'plano') { chegadaPlano(q); return; }
   const P = ACESSO.P, ref = lerRefMP(q.get('external_reference'));
   const antes = (() => { const a = lsLer('mt.pag.antes'); return a && Date.now() - (a.em || 0) < 3 * 86400000 ? a : null; })();
   const produto = (ref && ref.produto) || (antes && antes.produto) || '';
@@ -989,14 +990,73 @@ async function chegadaPagamento(){
   };
   const bt = w2.querySelector('#retTentar'); if (bt) bt.onclick = e => abrirCompra(tentar, e.currentTarget, w2.querySelector('#retMsg'));
 }
-function telaAprovado(prod, mt){
+/* ---------- volta do "Assinar pelo Mercado Pago" (link do plano) ----------
+   ?pago=1&via=plano&produto=<id>&preapproval_id=<id da assinatura no MP>
+   O link do plano não leva a conta MedTech: o portal liga a assinatura à conta
+   logada (mpCheckout {acao:'vincular'}). O endereço já foi limpo acima. */
+const ERRO_DE_REGRA = ['PERMISSION_DENIED', 'FAILED_PRECONDITION', 'INVALID_ARGUMENT', 'UNAUTHENTICATED'];
+const regraDe = e => ERRO_DE_REGRA.includes(String((e && e.status) || '').toUpperCase());
+async function confirmarPlano(pre, produto){
+  const r = await MTAcesso.vincularPlano(MT.user, pre, produto);
+  if (!r || r.status !== 'authorized') return false;
+  lsGravar('mt.pag.plano', null); lsGravar('mt.pag.antes', null);
+  ACESSO.mt = await MTAcesso.lerMt(MT.user, true).catch(() => ACESSO.mt);
+  ASSIN_MP = null; renderGrid(); preencheAssinatura();
+  return true;
+}
+async function chegadaPlano(q){
+  const P = ACESSO.P, produto = q.get('produto') || '';
+  const pre = (q.get('preapproval_id') || q.get('preapproval-id') || '').trim();
+  const prod = MTAcesso.produtoPorId(P, produto), nome = prod ? prod.nome : 'seu plano';
+  lsGravar('mt.pag.plano', { preapproval: pre, produto, em: Date.now() });
+  const w = modal('retModal', `<h3 id="retModal-t" tabindex="-1"><span class="spin" aria-hidden="true"></span>Estamos confirmando com o Mercado Pago…</h3>
+    <p class="sub" role="status">Recebemos a sua volta. Estamos ligando a assinatura do ${esc(nome)} à sua conta MedTech. Leva alguns segundos.</p>`, { fechavel: false });
+  const pausas = [0, 2000, 3000, 4000, 5000, 6000, 8000];   // ~28 s
+  for (const ms of pausas) {
+    if (ms) await new Promise(r => setTimeout(r, ms));
+    if (!document.body.contains(w)) return;
+    try { if (await confirmarPlano(pre, produto)) { telaAprovado(prod, ACESSO.mt, { plano: true }); return; } }
+    catch(e) { if (regraDe(e)) { lsGravar('mt.pag.plano', null); telaPlanoErro(nome, e.message); return; } }
+  }
+  if (!document.body.contains(w)) return;
+  const w2 = modal('retModal', `<h3 id="retModal-t" tabindex="-1"><i class="ti ti-clock-hour-4" aria-hidden="true"></i>Ainda confirmando</h3>
+    <p class="sub">O Mercado Pago ainda não confirmou a assinatura do ${esc(nome)}. Se você concluiu, ela é ligada à sua conta sozinha em alguns minutos. Se não concluiu, nada foi cobrado.</p>
+    <div class="sug-row"><button type="button" class="b ok" id="retDeNovo"><i class="ti ti-refresh" aria-hidden="true"></i>Conferir de novo</button></div>
+    <div class="cfg-msg" id="retMsg" role="status"></div>
+    <p class="sub">Se não liberar em 1 hora, escreva para <a href="mailto:${SUPORTE_EMAIL}?subject=${encodeURIComponent('Assinatura pelo Mercado Pago sem liberação')}">${SUPORTE_EMAIL}</a>.</p>
+    <div class="sug-row"><button type="button" class="b cancel" data-fecha>Fechar</button></div>`);
+  w2.querySelector('#retDeNovo').onclick = async e => {
+    const m = w2.querySelector('#retMsg'), b = e.currentTarget; b.disabled = true; m.className = 'cfg-msg'; m.textContent = 'Conferindo…';
+    try { if (await confirmarPlano(pre, produto)) { telaAprovado(prod, ACESSO.mt, { plano: true }); return; } m.textContent = 'Ainda não chegou. Tente de novo em um minuto.'; }
+    catch(err) { if (regraDe(err)) { lsGravar('mt.pag.plano', null); telaPlanoErro(nome, err.message); return; } m.className = 'cfg-msg err'; m.textContent = 'Não foi possível conferir agora.'; }
+    b.disabled = false;
+  };
+}
+function telaPlanoErro(nome, texto){
+  modal('retModal', `<h3 id="retModal-t" tabindex="-1"><i class="ti ti-alert-circle" aria-hidden="true"></i>Não conseguimos ligar a assinatura</h3>
+    <p class="sub">${esc(texto || 'A assinatura do ' + nome + ' não pôde ser ligada a esta conta.')}</p>
+    <p class="sub">Conta MedTech: <b>${esc(MT.user.email || '')}</b>. Se precisar, escreva para <a href="mailto:${SUPORTE_EMAIL}?subject=${encodeURIComponent('Assinatura pelo Mercado Pago')}">${SUPORTE_EMAIL}</a>.</p>
+    <div class="sug-row"><button type="button" class="b ok" data-fecha>Fechar</button><a class="b cancel" href="${RECIBOS_URL}" target="_blank" rel="noopener">Ver no Mercado Pago</a></div>`);
+}
+/* voltou do Mercado Pago mas a ligação não fechou (aba fechada, rede): tenta de novo em silêncio por 2 dias */
+async function retomarPlano(){
+  if (VOLTA_PAG || retomarPlano.feito || !ACESSO || !ACESSO.venda || !MT.user) return;
+  retomarPlano.feito = true;
+  const pd = lsLer('mt.pag.plano'); if (!pd) return;
+  if (Date.now() - (pd.em || 0) > 2 * 86400000) { lsGravar('mt.pag.plano', null); return; }
+  try { if (await confirmarPlano(pd.preapproval || '', pd.produto || '')) aviso('Assinatura de ' + nomeProd(ACESSO.P, pd.produto) + ' confirmada. Ela renova sozinha todo mês.'); }
+  catch(e) { if (regraDe(e)) lsGravar('mt.pag.plano', null); }
+}
+function telaAprovado(prod, mt, opts){
   const ate = prod ? Number(((mt && mt.p) || {})[prod.id] || 0) : 0;
   const apps = prod ? MTAcesso.appsDoProduto(ACESSO.P, prod) : [];
   const unicoApp = apps.length === 1 ? CATALOGO.find(a => a.id === apps[0]) : null;
   const atalhos = apps.length > 1 ? `<div class="ret-apps">${apps.map(id => CATALOGO.find(a => a.id === id)).filter(Boolean).map(a => `<a class="app" href="${a.url}" style="${corApp(a)}"><span class="ic"><i class="ti ${a.ic}" aria-hidden="true"></i></span><span class="nm">${fmtName(a.nm)}</span></a>`).join('')}</div>` : '';
-  const w = modal('retModal', `<h3 id="retModal-t" tabindex="-1" class="ret-ok"><i class="ti ti-circle-check" aria-hidden="true"></i>Pagamento aprovado</h3>
+  const plano = !!(opts && opts.plano);
+  const w = modal('retModal', `<h3 id="retModal-t" tabindex="-1" class="ret-ok"><i class="ti ti-circle-check" aria-hidden="true"></i>${plano ? 'Assinatura confirmada' : 'Pagamento aprovado'}</h3>
     <p class="ret-big">Seu acesso está liberado.</p>
-    <p class="sub">${prod ? esc(prod.nome) + (ate ? ' · válido até ' + dataBR(ate) : '') + '. ' : ''}O recibo do Mercado Pago chega no seu e-mail.</p>
+    <p class="sub">${plano ? (prod ? 'A assinatura mensal do ' + esc(prod.nome) + ' renova sozinha todo mês pela sua conta do Mercado Pago. ' : '') + 'A cobrança é confirmada em instantes e o recibo chega no seu e-mail. Para cancelar, use Minha assinatura.'
+      : (prod ? esc(prod.nome) + (ate ? ' · válido até ' + dataBR(ate) : '') + '. ' : '') + 'O recibo do Mercado Pago chega no seu e-mail.'}</p>
     ${atalhos}
     <div class="sug-row">${unicoApp ? `<a class="b ok" href="${unicoApp.url}">Abrir o ${esc(unicoApp.nm)}</a>` : '<button type="button" class="b ok" data-fecha>Abrir os apps</button>'}</div>
     ${htmlInstalar('ret')}`);
@@ -1086,7 +1146,7 @@ async function carregaAcesso(){
   if (ACESSO !== null || !window.MT || !MT.user || MT.user.demo) return;
   ACESSO = false;   // em andamento
   try { ACESSO = (await MT.acessoEstado()) || { venda: false }; } catch(e) { ACESSO = { venda: false }; }
-  renderGrid(); preencheAssinatura(); renderFaixa(); planoDaURL(); escolhaPendente(); chegadaPagamento();
+  renderGrid(); preencheAssinatura(); renderFaixa(); planoDaURL(); escolhaPendente(); chegadaPagamento(); retomarPlano();
 }
 
 /* saudação + sair (via login central MedTech) */

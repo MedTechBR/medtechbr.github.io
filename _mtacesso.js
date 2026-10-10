@@ -15,6 +15,12 @@
    o Card Payment Brick do MercadoPago.js v2 (campos seguros do MP; o cartão
    nunca passa pelo nosso código); o token do cartão vai ao mpCheckout
    {modo:'cartao'}, que cria a assinatura já autorizada — sem conta no MP.
+   "Assinar pelo Mercado Pago" (10/10/2026, modo 'link'): segunda forma do
+   mensal com renovação, para quando o banco recusa a assinatura no formulário.
+   O servidor devolve o link do PLANO de assinatura do MP; a pessoa entra na
+   conta Mercado Pago/Mercado Livre dela e assina lá. Na volta
+   (?pago=1&via=plano&preapproval_id=...), o portal chama vincularPlano().
+   Desliga com "mp_plano_mensal": false no planos.json.
    Um link https no checkout continua funcionando como antes (Kiwify).
    Falha de rede ou do servidor também não bloqueia (falha aberta): a trava
    existe para quem não pagou, não para punir quem pagou quando a rede cai.
@@ -145,11 +151,20 @@ function opcoes(P, prod) {
     if (mp && per === 'mensal' && P && P.mp_pix_mensal === true) {
       out.push({ prod: prod, produto: prod.id, periodo: 'mensal', modo: 'pix', preco: v, mp: true, secundaria: true,
         titulo: '1 mês (Pix ou cartão)', botao: 'Pagar 1 mês', rotulo: brl(v) + ' por 1 mês', porMes: 0, economia: 0,
+        secTexto: 'Pagar 1 mês · ' + brl(v) + ', sem renovação',
         como: 'Pix ou cartão de crédito à vista. Pagamento único de 1 mês, sem renovação.' });
+    }
+    /* mensal com renovação assinado na conta Mercado Pago/Mercado Livre da pessoa (link do plano) */
+    if (mp && per === 'mensal' && planoLigado(P)) {
+      out.push({ prod: prod, produto: prod.id, periodo: 'mensal', modo: 'link', preco: v, mp: true, secundaria: true, renova: true,
+        titulo: 'Assinar pelo Mercado Pago', botao: 'Assinar pelo Mercado Pago', rotulo: brl(v) + ' por mês', porMes: 0, economia: 0,
+        secTexto: 'Assinar pelo Mercado Pago · ' + brl(v) + ' por mês, renova sozinho',
+        como: 'Renova todo mês. Você entra na sua conta do Mercado Pago ou do Mercado Livre e assina por lá. Cancele quando quiser.' });
     }
   });
   return out;
 }
+function planoLigado(P) { return !(P && P.mp_plano_mensal === false); }
 var MP_URL = /^https:\/\/([a-z0-9-]+\.)*mercadopago\.com(\.br)?\//i;
 /* mensal no cartão com renovação = formulário do MP dentro do site */
 function ehCartao(op) { return !!(op && op.mp && op.periodo === 'mensal' && !op.modo); }
@@ -177,6 +192,14 @@ function comprar(op, user, extra) {
   });
 }
 function irPara(url) { location.href = url; }
+/* volta do link de plano: liga a assinatura à conta logada (mpCheckout {acao:'vincular'}).
+   Resolve {status:'authorized'|'aguardando', produto, ...}; erro de regra vem com .status */
+function vincularPlano(user, preapproval, produto) {
+  var dados = { acao: 'vincular' };
+  if (preapproval) dados.preapproval = String(preapproval);
+  if (produto) dados.produto = String(produto);
+  return chamar('mpCheckout', dados, user);
+}
 
 /* ---------------- assinatura mensal no cartão (formulário do Mercado Pago) ----------------
    O SDK (https://sdk.mercadopago.com/js/v2) só é baixado quando o diálogo abre.
@@ -226,6 +249,7 @@ function cssCartao() {
    + '.mtc .mtc-d{margin:6px 0 0;font-size:14px}.mtc .mtc-d b{color:#14633F;font-weight:600}'
    + '.mtc #mtc-brick{margin-top:12px;min-height:40px}.mtc .mta-m{margin-top:10px}.mtc .mta-m.e{background:#FDECEA;border-radius:12px;padding:10px 12px}'
    + '.mtc .mtc-ok{margin-top:16px;padding:16px;border-radius:16px;background:#E3F5EA;color:#14633F}.mtc .mtc-ok b{display:block;font-size:18px;color:#0E4D30}.mtc .mtc-ok p{color:#1F4A33;font-size:14px;margin-top:6px}'
+   + '.mtc .mtc-alt{margin-top:12px;padding:14px;border-radius:14px;background:#EEF3FF;border:1px solid #BCCBF5}.mtc .mtc-alt p{margin:0 0 10px;font-size:14px;color:#23272E;line-height:1.5}.mtc .mtc-alt .bt{width:100%}'
    + '.mtc .mtc-f{font-size:12.5px;color:#4A515A;margin-top:12px;line-height:1.5}'
    + '.mtc .mtc-spin{display:inline-block;width:14px;height:14px;border:2px solid #BFC5CD;border-top-color:#2B5CE6;border-radius:50%;vertical-align:-2px;margin-right:8px;animation:mtcGira .8s linear infinite}@keyframes mtcGira{to{transform:rotate(360deg)}}';
   document.head.appendChild(s);
@@ -247,7 +271,7 @@ function assinarCartao(o) {
       '<p class="mtc-v">' + esc(valor) + '<small> por mês</small></p>' +
       '<p class="mtc-d" id="mtc-d"><b>Renova todo mês · cancele quando quiser · desistência em 7 dias com reembolso total.</b></p>' +
       '<div class="mta-m" role="status" aria-live="polite"><span class="mtc-spin" aria-hidden="true"></span>Carregando o formulário seguro do Mercado Pago…</div>' +
-      '<div id="mtc-brick"></div><div class="mtc-fim"></div>' +
+      '<div id="mtc-brick"></div><div class="mtc-alt" hidden></div><div class="mtc-fim"></div>' +
       '<p class="mtc-f">Os dados do cartão são digitados nos campos seguros do Mercado Pago: a MedTech não vê nem guarda o número do cartão. A cobrança aparece como MEDTECH na fatura.' + (email ? ' Conta MedTech: ' + esc(email) + '.' : '') + '</p></div>';
     /* fundo inerte (inclusive a tela de assinatura, se aberta por cima dela) */
     Array.prototype.forEach.call(document.body.children, function (el) {
@@ -279,7 +303,25 @@ function assinarCartao(o) {
       if (e.shiftKey && (document.activeElement === pri || document.activeElement === h)) { e.preventDefault(); ult.focus(); }
       else if (!e.shiftKey && document.activeElement === ult) { e.preventDefault(); pri.focus(); }
     });
-    d.addEventListener('click', function (e) { var b = e.target.closest('[data-acao]'); if (b && b.dataset.acao === 'fechar') fechar(); });
+    d.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-acao]'); if (!b) return;
+      if (b.dataset.acao === 'fechar') { fechar(); return; }
+      if (b.dataset.acao === 'plano') {
+        /* banco recusou no formulário: a mesma assinatura mensal, feita na conta Mercado Pago da pessoa */
+        b.disabled = true; aviso('Abrindo o Mercado Pago…', false, true);
+        comprar(Object.assign({}, op, { modo: 'link', secundaria: true }), user).catch(function (e2) {
+          b.disabled = false; aviso((e2 && e2.message) || 'Não foi possível abrir o Mercado Pago agora.', true);
+        });
+      }
+    });
+    /* "Assinar pelo Mercado Pago" no diálogo do cartão, quando o banco recusa */
+    var linkOk = viaMP(prod, 'mensal') && planoLigado(cacheP);
+    function oferecerPlano() {
+      var alt = d.querySelector('.mtc-alt'); if (!linkOk || !alt || !alt.hidden) return;
+      alt.innerHTML = '<p>Seu banco pode aceitar a mesma assinatura feita direto no Mercado Pago: você entra na sua conta do Mercado Pago ou do Mercado Livre e assina por lá.</p>' +
+        '<button type="button" class="bt s" data-acao="plano">Assinar pelo Mercado Pago</button>';
+      alt.hidden = false;
+    }
 
     function ativar(r) {
       /* a claim chega pelo token renovado; tenta algumas vezes */
@@ -318,7 +360,8 @@ function assinarCartao(o) {
       }, function (e) {
         enviando = false; btX.disabled = false;
         var tm = (e && e.message) || 'O Mercado Pago não aceitou o cartão.';
-        aviso(/outro cartão|de novo|Minha assinatura/.test(tm) ? tm : tm + ' Corrija os dados ou use outro cartão.', true);
+        aviso(/outro cartão|de novo|Minha assinatura|Mercado Pago\"/.test(tm) ? tm : tm + ' Corrija os dados ou use outro cartão.', true);
+        if (/recus/i.test(tm)) oferecerPlano();
         throw e;   /* devolve o botão do formulário para nova tentativa */
       });
     }
@@ -442,7 +485,7 @@ function paywall(o) {
     prods.forEach(function (p) {
       var dele = opcoes(P, p), i0 = ops.length; ops = ops.concat(dele);
       var principais = dele.map(function (op, k) { return op.secundaria ? '' : cartaoOpcao(op, i0 + k, o.user); }).join('');
-      var sec = dele.map(function (op, k) { return op.secundaria ? '<button type="button" data-acao="comprar" data-i="' + (i0 + k) + '">' + esc(op.botao) + ' (' + esc(brl(op.preco)) + ', sem renovação)</button>' : ''; }).join('');
+      var sec = dele.map(function (op, k) { return op.secundaria ? '<button type="button" data-acao="comprar" data-i="' + (i0 + k) + '">' + esc(op.secTexto || (op.botao + ' · ' + brl(op.preco))) + '</button>' : ''; }).join('');
       var lista = appsDoProduto(P, p);
       corpo += '<section class="mta-prod" aria-label="' + esc(p.nome || p.id) + '">' +
         (unico ? '' : '<h3>' + esc(p.nome || p.id) + '</h3>' + (p.resumo ? '<p>' + esc(p.resumo) + '</p>' : '')) +
@@ -451,7 +494,7 @@ function paywall(o) {
     });
     if (!ops.length) corpo += '<p>Este app ainda não está à venda. Tente de novo mais tarde.</p>';
     corpo += '<div class="mta-g"><b>Sem fidelidade · desistência em 7 dias com reembolso total.</b><br>' +
-      (ops.some(function (op) { return op.mp; }) ? 'Pagamento pelo Mercado Pago: o cartão é digitado nos campos seguros dele (o anual e o Pix abrem a página do Mercado Pago). A MedTech não vê os dados do cartão.' : '') + '</div>';
+      (ops.some(function (op) { return op.mp; }) ? 'Pagamento pelo Mercado Pago: o cartão é digitado nos campos seguros dele (o anual, o Pix e "Assinar pelo Mercado Pago" abrem a página do Mercado Pago). A MedTech não vê os dados do cartão.' : '') + '</div>';
     var es = linha ? escolhidos(P, mt, linha) : [];
     if (linha && vagas(P, mt, linha, agora) > 0 && es.length) {
       corpo += '<p>Ou troque um app do seu plano pelo ' + esc(nome) + ':</p><div class="mta-r">' + es.map(function (a) { return '<button type="button" class="bt g" data-acao="trocar" data-sai="' + esc(a) + '">Trocar ' + esc(NOMES[a] || a) + '</button>'; }).join('') + '</div>';
@@ -496,7 +539,7 @@ function paywall(o) {
     if (a === 'fechar') { fechar(); return; }
     if (a === 'comprar') {
       var op = ops[Number(b.dataset.i)]; if (!op) return;
-      b.disabled = true; aviso(ehCartao(op) ? 'Abrindo o formulário do cartão…' : 'Abrindo o pagamento seguro do Mercado Pago…');
+      b.disabled = true; aviso(ehCartao(op) ? 'Abrindo o formulário do cartão…' : op.modo === 'link' ? 'Abrindo o Mercado Pago para você assinar…' : 'Abrindo o pagamento seguro do Mercado Pago…');
       comprar(op, o.user).then(function (res) {
         if (!res || typeof res !== 'object') return;             /* redirecionou */
         if (res.cancelado) { b.disabled = false; aviso(''); return; }
@@ -705,7 +748,7 @@ function estado(user) {
 }
 
 G.MTAcesso = { versao: 5, NOMES: NOMES, linhaDoApp: linhaDoApp, cobre: cobre, vendaAtiva: vendaAtiva, algumaVendaAtiva: algumaVendaAtiva, vagas: vagas, escolhidos: escolhidos, liberado: liberado, acessoAtivoQualquer: acessoAtivoQualquer, produtoPorId: produtoPorId, produtosQueCobrem: produtosQueCobrem,
-  carregarPlanos: carregarPlanos, chamar: chamar, lerMt: lerMt, checkoutUrl: checkoutUrl, viaMP: viaMP, opcoes: opcoes, comprar: comprar, ehCartao: ehCartao, assinarCartao: assinarCartao, irPara: irPara, paywall: paywall, fechar: fechar, verificar: verificar, estado: estado, brl: brl, dataBR: dataBR, anualPorMes: anualPorMes, economiaAnual: economiaAnual, appsDoProduto: appsDoProduto, AJUDA_URL: AJUDA_URL,
+  carregarPlanos: carregarPlanos, chamar: chamar, lerMt: lerMt, checkoutUrl: checkoutUrl, viaMP: viaMP, opcoes: opcoes, comprar: comprar, ehCartao: ehCartao, assinarCartao: assinarCartao, irPara: irPara, vincularPlano: vincularPlano, planoLigado: planoLigado, paywall: paywall, fechar: fechar, verificar: verificar, estado: estado, brl: brl, dataBR: dataBR, anualPorMes: anualPorMes, economiaAnual: economiaAnual, appsDoProduto: appsDoProduto, AJUDA_URL: AJUDA_URL,
   /* CPF e acesso ilimitado (10/10/2026) */
   cpfValido: cpfValido, formatarCpf: formatarCpf, mascararCampoCpf: mascararCampoCpf, pedirCpf: pedirCpf, salvarCpf: salvarCpf, garantirCpf: garantirCpf, erroDeRegraCpf: erroDeRegraCpf, ILIMITADO: ILIMITADO, ehIlimitado: ehIlimitado, validade: validade,
   _limparCache: function () { cacheP = null; } };
