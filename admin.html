@@ -14,7 +14,7 @@
 <script src="_mtfb.js?v=1"></script>
 <script type="module" src="_mtauth.js?v=35"></script>
 <link rel="stylesheet" href="_mtviva.css?v=2">
-<link rel="stylesheet" href="admin.css?v=1">
+<link rel="stylesheet" href="admin.css?v=2">
 </head>
 <body>
 <a class="sr" href="#conteudo">Pular para o conteúdo</a>
@@ -189,6 +189,22 @@
     <!-- ===================== DIAGNÓSTICO ===================== -->
     <section class="sec" id="diagnostico" data-painel aria-labelledby="h-dg" hidden>
       <div class="cab"><div><h2 id="h-dg">Diagnóstico do servidor</h2><p class="lead">Confere se o servidor lê o catálogo, as contas e o banco de dados, e se as funções do painel já foram publicadas.</p></div></div>
+      <div class="card ia" aria-labelledby="h-ia">
+        <div class="ia-topo">
+          <div><h3 id="h-ia"><i class="ti ti-sparkles" aria-hidden="true"></i>IA (Gemini na Vertex)</h3>
+          <p class="sub">Geração dos modelos que os apps usam. Testar não muda nada para os clientes; a troca vale para todos em até 1 minuto, sem publicar o servidor.</p></div>
+          <button class="btn btn-g sm" id="btIaAtualizar" type="button"><i class="ti ti-refresh" aria-hidden="true"></i>Atualizar</button>
+        </div>
+        <div class="aviso" id="iaPrazo"><i class="ti ti-calendar-exclamation" aria-hidden="true"></i><div><b>O Gemini 2.5 sai do ar em 20/10/2026.</b> <span id="iaFaltam"></span> Antes disso, teste a geração 3 e vire para ela.</div></div>
+        <div id="iaEstado" aria-live="polite"><p class="carregando">Lendo a geração em uso…</p></div>
+        <div class="acoesL" id="iaAcoes" hidden>
+          <button class="btn btn-p" id="btIaTeste3" type="button"><i class="ti ti-flask" aria-hidden="true"></i>Testar geração 3</button>
+          <button class="btn btn-g" id="btIaTesteAtual" type="button"><i class="ti ti-player-play" aria-hidden="true"></i>Testar geração atual</button>
+          <button class="btn btn-g" id="btIaUsar3" type="button" hidden><i class="ti ti-arrow-big-up-lines" aria-hidden="true"></i>Usar geração 3</button>
+          <button class="btn btn-dn" id="btIaVoltar" type="button" hidden><i class="ti ti-arrow-back-up" aria-hidden="true"></i>Voltar para a 2.5</button>
+        </div>
+        <div id="iaTeste" aria-live="polite"></div>
+      </div>
       <div class="card">
         <div class="acoesL"><button class="btn btn-p" id="btTeste" type="button"><i class="ti ti-player-play" aria-hidden="true"></i>Rodar diagnóstico</button></div>
         <div id="outTeste" aria-live="polite"></div>
@@ -207,6 +223,6 @@
 </dialog>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="admin.js?v=2" defer></script>
+<script src="admin.js?v=3" defer></script>
 </body>
 </html>

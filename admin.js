@@ -1,7 +1,7 @@
 /* ============================================================
    admin.js — Administração MedTech (10/10/2026, abertura das vendas)
    Tudo passa pelo servidor (o navegador não decide nada de acesso):
-     mtAdmin  {acao:'painel'|'assinantes'|'pedidos'|'ver'|'conceder'|'revogar'|'teste'}
+     mtAdmin  {acao:'painel'|'assinantes'|'pedidos'|'ver'|'conceder'|'revogar'|'teste'|'geracaoIA'|'testeIA'}
      mpCheckout / mpCancelar (compra de teste R$ 5)
      mtSinal  {op:'listar', status:'aberta'}
    Se o servidor ainda não tiver as ações novas (painel, assinantes, pedidos),
@@ -155,6 +155,7 @@ function abrirSecao(sec) {
   if (sec === 'pagamentos' && !E.carregou.pedidos) carregarPedidos();
   if (sec === 'planos' && !E.carregou.planos) desenharPlanos();
   if (sec === 'sinalizacoes' && !E.carregou.sinal) carregarSinal();
+  if (sec === 'diagnostico' && !E.carregou.ia) carregarIA();
 }
 
 /* ============================================================
@@ -657,6 +658,122 @@ $('btTeste').onclick = async () => {
   } catch (e) { out.innerHTML = E.bloqueado ? '' : avisoErro(e); }
   finally { $('btTeste').disabled = false; }
 };
+
+/* ============================================================
+   DIAGNÓSTICO: IA (10/10/2026)
+   mtAdmin geracaoIA → {atual, origem, em, por, modelos, geracoes}
+           geracaoIA {definir:'2.5'|'3'} grava config/ia no servidor
+   mtAdmin testeIA {geracao} → {ok, totalMs, niveis:[{nivel, modelo, ok, testes:[...]}]}
+   ============================================================ */
+const NIVEL_NM = { rapido: 'Rápido', padrao: 'Padrão', forte: 'Forte' };
+const NIVEL_USO = { rapido: 'consultas curtas e o padrão das chamadas sem nível', padrao: 'imagem, áudio, documento e respostas elaboradas', forte: 'revisão da prescrição e laudos' };
+const ORIGEM_IA = { firestore: 'escolhida no painel', ambiente: 'variável do servidor', padrao: 'padrão do servidor' };
+const PENSAR_NM = { LOW: 'baixo', MEDIUM: 'médio', HIGH: 'alto', MINIMAL: 'mínimo' };
+function nomeTeste(t) {
+  const m = /^raciocínio (\w+)$/.exec(t || '');
+  if (m) return 'Raciocínio ' + (PENSAR_NM[m[1]] || m[1]) + ' (' + m[1] + ')';
+  return ({ texto: 'Texto simples', json: 'JSON com esquema', busca: 'Busca do Google', imagem: 'Imagem (PNG 8×8)' })[t] || t;
+}
+const segs = ms => (Number(ms || 0) / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' s';
+function diasAte(iso) { return Math.ceil((new Date(iso + 'T23:59:59-03:00').getTime() - Date.now()) / 86400000); }
+E.ia = null; E.iaTeste = {};
+
+function iaOcupado(sim) { ['btIaTeste3', 'btIaTesteAtual', 'btIaUsar3', 'btIaVoltar', 'btIaAtualizar'].forEach(id => $(id).disabled = sim); }
+async function carregarIA() {
+  E.carregou.ia = true;
+  const d = diasAte('2026-10-20');
+  $('iaFaltam').textContent = d > 1 ? 'Faltam ' + d + ' dias.' : d === 1 ? 'Falta 1 dia.' : d === 0 ? 'É hoje.' : 'O prazo já passou.';
+  $('iaPrazo').className = 'aviso' + (d <= 3 ? ' err' : '');
+  $('iaEstado').innerHTML = carregando('Lendo a geração em uso…');
+  iaOcupado(true);
+  try {
+    E.ia = await admin({ acao: 'geracaoIA' });
+    desenharIA();
+  } catch (e) {
+    if (E.bloqueado) return;
+    E.ia = null;
+    $('iaAcoes').hidden = true;
+    $('iaEstado').innerHTML = ehNaoPublicado(e)
+      ? `<div class="aviso"><i class="ti ti-cloud-upload" aria-hidden="true"></i><div><b>Publique o servidor para testar e trocar a geração da IA.</b> As ações novas já estão prontas, mas ainda não foram publicadas. No Mac, rode <code>deploy-backend.command</code> (pasta MedTech/backend) e depois clique em Atualizar. Até lá, a IA segue no Gemini 2.5.</div></div>`
+      : avisoErro(e);
+  } finally { iaOcupado(false); }
+}
+function desenharIA() {
+  const s = E.ia || {};
+  const g3 = (s.geracoes || {})['3'] || {}, g25 = (s.geracoes || {})['2.5'] || {};
+  const outra = s.atual === '3' ? g25 : g3, outraNm = s.atual === '3' ? 'Geração 2.5' : 'Geração 3';
+  const quem = s.origem === 'firestore' && s.em ? ' · trocada em ' + quando(s.em) + (s.por ? ' por ' + s.por : '') : '';
+  $('iaEstado').innerHTML = `
+    <div class="ia-ger"><span>Geração em uso</span><b>${esc(s.atual || '—')}</b><span class="selo ${s.atual === '3' ? 'ok' : 'av'}">${esc(ORIGEM_IA[s.origem] || s.origem || '—')}</span><span>${esc(quem)}</span></div>
+    <div class="tblw"><table class="tbl resp"><caption class="sr">Modelos por nível</caption><thead><tr><th scope="col">Nível</th><th scope="col">Modelo em uso</th><th scope="col">${esc(outraNm)}</th><th scope="col">Usado em</th></tr></thead><tbody>
+    ${['rapido', 'padrao', 'forte'].map(n => `<tr><th scope="row" data-r="Nível" style="background:none;color:var(--tinta);font-size:14px">${NIVEL_NM[n]}</th>
+      <td data-r="Modelo em uso"><code>${esc((s.modelos || {})[n] || '—')}</code></td><td data-r="${esc(outraNm)}"><code>${esc(outra[n] || '—')}</code></td>
+      <td data-r="Usado em" class="fraco">${esc(NIVEL_USO[n])}</td></tr>`).join('')}
+    </tbody></table></div>`;
+  $('iaAcoes').hidden = false;
+  $('btIaUsar3').hidden = s.atual === '3';
+  $('btIaVoltar').hidden = s.atual !== '3';
+  $('btIaTesteAtual').innerHTML = `<i class="ti ti-player-play" aria-hidden="true"></i>Testar geração atual (${esc(s.atual || '?')})`;
+  $('btIaTeste3').hidden = s.atual === '3';
+}
+function desenharTesteIA(r) {
+  const niveis = r.niveis || [];
+  const testes = niveis.reduce((a, n) => a.concat(n.testes || []), []);
+  const falhas = testes.filter(t => !t.ok).length;
+  const linha = t => {
+    const tk = t.tokens ? `${inteiro(t.tokens.entrada)} → ${inteiro(t.tokens.saida)}${t.tokens.pensamento ? ' + ' + inteiro(t.tokens.pensamento) + ' pens.' : ''}` : '—';
+    const txt = t.ok ? (t.amostra || '(sem texto)') : (t.erro || 'falhou') + (t.amostra ? ' · ' + t.amostra : '');
+    return `<tr><th scope="row" data-r="Teste" style="background:none;color:var(--tinta);font-size:14px">${esc(nomeTeste(t.teste))}</th>
+      <td data-r="Situação">${t.ok ? '<span class="selo ok">ok</span>' : '<span class="selo err">erro</span>'}</td>
+      <td data-r="Tempo" class="n">${segs(t.ms)}</td><td data-r="Tokens" class="n fraco">${tk}</td>
+      <td data-r="${t.ok ? 'Resposta' : 'Erro'}" class="amostra cheia${t.ok ? '' : ' err'}">${esc(txt)}</td></tr>`;
+  };
+  return `<div class="ia-resumo">${r.ok ? '<span class="selo ok"><i class="ti ti-check" aria-hidden="true"></i>tudo ok</span>' : `<span class="selo err">${plural(falhas, 'falha', 'falhas')}</span>`}
+      <span>Geração <b>${esc(r.geracao)}</b> · ${plural(testes.length, 'chamada', 'chamadas')} em ${segs(r.totalMs)} · ${esc(quando(r.em))} · não conta na cota</span></div>
+    ${niveis.map(n => `<div class="ia-nivel"><h4>${n.ok ? '<span class="selo ok">ok</span>' : '<span class="selo err">com erro</span>'}${NIVEL_NM[n.nivel] || esc(n.nivel)} <code>${esc(n.modelo)}</code></h4>
+      <div class="tblw"><table class="tbl resp"><caption class="sr">Testes do nível ${esc(NIVEL_NM[n.nivel] || n.nivel)}, modelo ${esc(n.modelo)}</caption><thead><tr><th scope="col">Teste</th><th scope="col">Situação</th><th scope="col" class="n">Tempo</th><th scope="col" class="n">Tokens</th><th scope="col">Resposta (início)</th></tr></thead>
+      <tbody>${(n.testes || []).map(linha).join('')}</tbody></table></div></div>`).join('')}
+    <details class="tec"><summary>Dados técnicos</summary><pre>${esc(JSON.stringify(r, null, 2))}</pre></details>`;
+}
+async function testarIA(geracao) {
+  const out = $('iaTeste');
+  out.innerHTML = carregando('Testando a geração ' + geracao + ' na Vertex (até 1 minuto)…');
+  iaOcupado(true);
+  try {
+    const r = await admin({ acao: 'testeIA', geracao });
+    E.iaTeste[geracao] = r;
+    out.innerHTML = desenharTesteIA(r);
+    toast(r.ok ? 'Geração ' + geracao + ': tudo ok.' : 'Geração ' + geracao + ': há falhas, veja a tabela.', r.ok ? 'ok' : 'err');
+  } catch (e) {
+    out.innerHTML = E.bloqueado ? '' : (ehNaoPublicado(e) ? `<div class="aviso"><i class="ti ti-cloud-upload" aria-hidden="true"></i><div><b>Publique o servidor</b> (<code>deploy-backend.command</code>) para testar a IA.</div></div>` : avisoErro(e));
+  } finally { iaOcupado(false); }
+}
+async function definirIA(g) {
+  const t = E.iaTeste['3'];
+  let texto;
+  if (g === '3') {
+    texto = t && t.ok ? 'O último teste da geração 3 passou em todos os níveis. Todos os apps passam a usar os modelos 3.x em até 1 minuto. Dá para voltar quando quiser.'
+      : t ? '<b>O último teste da geração 3 teve falhas.</b> Trocar agora pode quebrar a IA de algum app. Tem certeza?'
+        : '<b>A geração 3 ainda não foi testada nesta sessão.</b> O recomendado é clicar em "Testar geração 3" antes. Trocar mesmo assim?';
+  } else {
+    texto = 'Todos os apps voltam para o Gemini 2.5 em até 1 minuto. Lembre: o 2.5 sai do ar em 20/10/2026.';
+  }
+  const ok = await confirmar(g === '3' ? 'Usar a geração 3?' : 'Voltar para a 2.5?', texto, g === '3' ? 'Usar geração 3' : 'Voltar para a 2.5', g !== '3' || !(t && t.ok));
+  if (!ok) return;
+  iaOcupado(true);
+  try {
+    E.ia = await admin({ acao: 'geracaoIA', definir: g });
+    desenharIA();
+    toast('IA na geração ' + E.ia.atual + '. Vale para todos em até 1 minuto.', 'ok');
+  } catch (e) {
+    if (!E.bloqueado) toast('Não troquei: ' + ((e && e.message) || e), 'err');
+  } finally { iaOcupado(false); }
+}
+$('btIaAtualizar').onclick = () => carregarIA();
+$('btIaTeste3').onclick = () => testarIA('3');
+$('btIaTesteAtual').onclick = () => testarIA((E.ia && E.ia.atual) || '2.5');
+$('btIaUsar3').onclick = () => definirIA('3');
+$('btIaVoltar').onclick = () => definirIA('2.5');
 
 /* ============================================================
    INÍCIO
