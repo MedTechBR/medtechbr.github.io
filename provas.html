@@ -368,7 +368,10 @@ function soFarmacia(){
 }
 function renderGrid(){
   const sel = soFarmacia() ? new Set(comprados()) : new Set(selecao());
-  comprados().forEach(id => sel.add(id));
+  /* app comprado entra sozinho só enquanto a pessoa nunca escolheu; depois de escolher em
+     "Meus apps", aparece exatamente o que ela marcou (pedido do Matheus, 10/10/2026) */
+  const d0 = dados(), escolheu = !!(d0 && d0[CAMPO_SEL] && Array.isArray(d0[CAMPO_SEL].sel));
+  if (!escolheu) comprados().forEach(id => sel.add(id));
   const lista = disponiveis().filter(a => sel.has(a.id));
   const g = document.getElementById('grid');
   g.innerHTML = itemAdmin() + (lista.length ? lista.map(appItem).join('')
