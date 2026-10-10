@@ -50,7 +50,7 @@ const E = { planos: null, painel: null, naoPublicado: false, bloqueado: false, c
 /* ---------------- servidor ---------------- */
 async function modulo() {
   if (window.MT && MT.acessoModulo) { const m = await MT.acessoModulo(); if (m) return m; }
-  if (!window.MTAcesso) await import('/_mtacesso.js?v=4');
+  if (!window.MTAcesso) await import('/_mtacesso.js?v=6');
   return window.MTAcesso;
 }
 async function chamar(nome, dados) { const A = await modulo(); return A.chamar(nome, dados || {}, MT.user); }
@@ -541,11 +541,29 @@ async function carregarPedidos() {
 }
 $('pgTipos').querySelectorAll('[data-tipo]').forEach(b => b.addEventListener('click', () => { E.pgTipo = b.dataset.tipo; carregarPedidos(); }));
 async function compraTeste(periodo) {
-  const out = $('outCompra'); out.innerHTML = carregando('Abrindo o Mercado Pago…');
+  const out = $('outCompra');
+  if (periodo === 'mensal') return compraTesteCartao(out);
+  out.innerHTML = carregando('Abrindo o Mercado Pago…');
   try {
     const r = await chamar('mpCheckout', { produto: 'teste-mp', periodo });
     if (r && r.url) { out.innerHTML = carregando('Indo para o pagamento…'); location.href = r.url; }
     else out.innerHTML = avisoErro('O servidor não devolveu o link de pagamento.');
+  } catch (e) { out.innerHTML = avisoErro(e); }
+}
+/* mensal de teste: o MESMO diálogo do cliente (formulário de cartão do Mercado Pago no site),
+   com o produto teste-mp e o campo de e-mail do pagador visível (o e-mail da conta vendedora
+   não pode pagar a si mesma). */
+async function compraTesteCartao(out) {
+  out.innerHTML = carregando('Abrindo o formulário do cartão…');
+  try {
+    const A = await modulo(), P = await planos();
+    const prod = A.produtoPorId(P, 'teste-mp');
+    const op = prod && A.opcoes(P, prod).find(o => o.periodo === 'mensal' && !o.modo);
+    if (!op || !A.ehCartao || !A.ehCartao(op)) { out.innerHTML = avisoErro('O produto teste-mp não está à venda no mensal pelo Mercado Pago (planos.json).'); return; }
+    const res = await A.assinarCartao({ op, user: MT.user, pedirEmail: true });
+    if (!res || res.cancelado) { out.innerHTML = ''; return; }
+    const ate = Number(((res.mt && res.mt.p) || {})['teste-mp'] || res.r.ate || 0);
+    out.innerHTML = `<div class="aviso info" style="margin-top:14px"><i class="ti ti-check" aria-hidden="true"></i><div>Assinatura de teste autorizada (nº ${esc(res.r.preapproval)}).${ate ? ' Acesso de teste provisório até ' + dataS(ate) + '.' : ''} A 1ª cobrança de R$ 5 sai em até 1 hora; confira depois em Pedidos e no Mercado Pago. Para não ser cobrado de novo, use "Cancelar a assinatura de teste".</div></div>`;
   } catch (e) { out.innerHTML = avisoErro(e); }
 }
 $('btTesteMensal').onclick = () => compraTeste('mensal');

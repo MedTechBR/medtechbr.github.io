@@ -9,10 +9,13 @@
 
    Enquanto nenhum produto do planos.json tiver checkout, NADA é bloqueado:
    verificar() devolve {ok:true, motivo:'livre'} sem chamar o servidor.
-   Checkout "mp" (09/10/2026) = venda pelo Mercado Pago: o botão Assinar pede
-   o link ao servidor (função mpCheckout) e redireciona; mensal = assinatura
-   no cartão, anual = pagamento único (Pix, cartão ou boleto). Um link
-   https no checkout continua funcionando como antes (Kiwify).
+   Checkout "mp" (09/10/2026) = venda pelo Mercado Pago: anual e "1 mês no
+   Pix" pedem o link ao servidor (função mpCheckout) e redirecionam (Pix,
+   cartão ou boleto). Mensal no cartão (10/10/2026): abre um diálogo NOSSO com
+   o Card Payment Brick do MercadoPago.js v2 (campos seguros do MP; o cartão
+   nunca passa pelo nosso código); o token do cartão vai ao mpCheckout
+   {modo:'cartao'}, que cria a assinatura já autorizada — sem conta no MP.
+   Um link https no checkout continua funcionando como antes (Kiwify).
    Falha de rede ou do servidor também não bloqueia (falha aberta): a trava
    existe para quem não pagou, não para punir quem pagou quando a rede cai.
    ============================================================ */
@@ -145,12 +148,16 @@ function opcoes(P, prod) {
   return out;
 }
 var MP_URL = /^https:\/\/([a-z0-9-]+\.)*mercadopago\.com(\.br)?\//i;
+/* mensal no cartão com renovação = formulário do MP dentro do site */
+function ehCartao(op) { return !!(op && op.mp && op.periodo === 'mensal' && !op.modo); }
 /* Abre o pagamento. Mercado Pago: o servidor cria o link (preferência ou
    assinatura) e devolve a URL. Guarda o retrato do mt e o que foi escolhido
    antes de sair, para o portal saber, na volta (?pago=1), quando a liberação
    chegou e o que oferecer em "Tentar de novo". */
-function comprar(op, user) {
+function comprar(op, user, extra) {
   if (!op || !user) return Promise.reject(new Error('Entre na sua conta para assinar.'));
+  /* mensal no cartão: resolve {ok:true, r, mt} (assinou) ou {cancelado:true} (fechou) */
+  if (ehCartao(op)) return assinarCartao(Object.assign({ op: op, user: user }, extra || {}));
   return lerMt(user, false).catch(function () { return null; }).then(function (mt) {
     try { localStorage.setItem('mt.pag.antes', JSON.stringify({ em: Date.now(), p: (mt && mt.p) || {}, produto: op.produto, periodo: op.periodo, modo: op.modo || '' })); } catch (e) {}
     if (!op.mp) {
@@ -167,6 +174,163 @@ function comprar(op, user) {
   });
 }
 function irPara(url) { location.href = url; }
+
+/* ---------------- assinatura mensal no cartão (formulário do Mercado Pago) ----------------
+   O SDK (https://sdk.mercadopago.com/js/v2) só é baixado quando o diálogo abre.
+   Card Payment Brick: os campos de número, validade e CVV são iframes do MP;
+   onSubmit entrega um token de uso único, que vai ao servidor. O diálogo é
+   modal de verdade (fundo inerte, foco preso, Esc fecha sem cobrar enquanto
+   nada foi enviado). */
+var MP_SDK = 'https://sdk.mercadopago.com/js/v2';
+var _sdk = null, _pk = null;
+function carregarSDK() {
+  if (G.MercadoPago) return Promise.resolve(G.MercadoPago);
+  if (_sdk) return _sdk;
+  _sdk = new Promise(function (ok, falha) {
+    var s = document.createElement('script'); s.src = MP_SDK; s.async = true;
+    s.onload = function () { if (G.MercadoPago) ok(G.MercadoPago); else { _sdk = null; falha(new Error('O formulário do Mercado Pago não carregou. Atualize a página e tente de novo.')); } };
+    s.onerror = function () { _sdk = null; s.remove(); falha(new Error('Não foi possível carregar o formulário do Mercado Pago. Confira a internet (ou um bloqueador de anúncios) e tente de novo.')); };
+    document.head.appendChild(s);
+  });
+  return _sdk;
+}
+function chavePublicaMP(user) {
+  if (_pk) return Promise.resolve(_pk);
+  return chamar('mpCheckout', { acao: 'chave' }, user).then(function (r) {
+    if (!r || !/^(APP_USR|TEST)-/.test(String(r.publicKey || ''))) throw new Error('O pagamento com cartão ainda não está disponível. Use o anual ou o Pix por enquanto.');
+    _pk = r.publicKey; return _pk;
+  });
+}
+function cssCartao() {
+  css();
+  if (document.getElementById('mtc-css')) return;
+  var s = document.createElement('style'); s.id = 'mtc-css';
+  s.textContent = '.mta.mtc{z-index:99997}.mtc .mtc-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.mtc .mta-k{margin:0}'
+   + '.mtc .mtc-x{flex:none;width:44px;height:44px;border-radius:999px;border:0;background:#F1F3F6;color:#1F2329;font:600 22px/1 Inter,system-ui,sans-serif;cursor:pointer}.mtc .mtc-x:hover{background:#E3E6EA}.mtc .mtc-x:disabled{opacity:.4;cursor:default}'
+   + '.mtc h2{margin-top:12px}.mtc .mtc-v{font-size:26px;font-weight:700;color:#1F2329;letter-spacing:-.01em;margin:6px 0 0}.mtc .mtc-v small{font-size:14px;font-weight:500;color:#4A515A}'
+   + '.mtc .mtc-d{margin:6px 0 0;font-size:14px}.mtc .mtc-d b{color:#14633F;font-weight:600}'
+   + '.mtc #mtc-brick{margin-top:12px;min-height:40px}.mtc .mta-m{margin-top:10px}.mtc .mta-m.e{background:#FDECEA;border-radius:12px;padding:10px 12px}'
+   + '.mtc .mtc-ok{margin-top:16px;padding:16px;border-radius:16px;background:#E3F5EA;color:#14633F}.mtc .mtc-ok b{display:block;font-size:18px;color:#0E4D30}.mtc .mtc-ok p{color:#1F4A33;font-size:14px;margin-top:6px}'
+   + '.mtc .mtc-f{font-size:12.5px;color:#4A515A;margin-top:12px;line-height:1.5}'
+   + '.mtc .mtc-spin{display:inline-block;width:14px;height:14px;border:2px solid #BFC5CD;border-top-color:#2B5CE6;border-radius:50%;vertical-align:-2px;margin-right:8px;animation:mtcGira .8s linear infinite}@keyframes mtcGira{to{transform:rotate(360deg)}}';
+  document.head.appendChild(s);
+}
+/* o = {op, user, pedirEmail} → Promise<{ok:true, r, mt} | {cancelado:true}> */
+function assinarCartao(o) {
+  return new Promise(function (resolver) {
+    cssCartao();
+    var antigo = document.getElementById('mtc'); if (antigo) antigo.remove();
+    var op = o.op, user = o.user, prod = op.prod || {}, nome = prod.nome || prod.id || 'MedTech';
+    var email = (user && user.email) || '', valor = brl(op.preco);
+    var volta = document.activeElement, overflowAntes = document.documentElement.style.overflow;
+    var ctrl = null, enviando = false, feito = null, fechado = false;
+    var d = document.createElement('div'); d.className = 'mta mtc'; d.id = 'mtc';
+    d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-labelledby', 'mtc-h'); d.setAttribute('aria-describedby', 'mtc-d');
+    d.innerHTML = '<div class="mta-c"><div class="mtc-top"><p class="mta-k">Assinatura mensal no cartão</p>' +
+      '<button type="button" class="mtc-x" data-acao="fechar" aria-label="Fechar sem assinar">&times;</button></div>' +
+      '<h2 id="mtc-h" tabindex="-1">' + esc(nome) + '</h2>' +
+      '<p class="mtc-v">' + esc(valor) + '<small> por mês</small></p>' +
+      '<p class="mtc-d" id="mtc-d"><b>Renova todo mês · cancele quando quiser · desistência em 7 dias com reembolso total.</b></p>' +
+      '<div class="mta-m" role="status" aria-live="polite"><span class="mtc-spin" aria-hidden="true"></span>Carregando o formulário seguro do Mercado Pago…</div>' +
+      '<div id="mtc-brick"></div><div class="mtc-fim"></div>' +
+      '<p class="mtc-f">Os dados do cartão são digitados nos campos seguros do Mercado Pago: a MedTech não vê nem guarda o número do cartão. A cobrança aparece como MEDTECH na fatura.' + (email ? ' Conta MedTech: ' + esc(email) + '.' : '') + '</p></div>';
+    /* fundo inerte (inclusive a tela de assinatura, se aberta por cima dela) */
+    Array.prototype.forEach.call(document.body.children, function (el) {
+      if (el !== d && el.nodeType === 1 && el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE' && !el.inert) { el.inert = true; el.setAttribute('data-mtc-inert', ''); }
+    });
+    document.body.appendChild(d); document.documentElement.style.overflow = 'hidden';
+    var msg = d.querySelector('.mta-m'), btX = d.querySelector('.mtc-x'), h = d.querySelector('#mtc-h');
+    setTimeout(function () { try { h.focus({ preventScroll: true }); } catch (e) {} }, 30);
+    function aviso(t, erro, girando) {
+      msg.innerHTML = (girando ? '<span class="mtc-spin" aria-hidden="true"></span>' : '') + esc(t);
+      msg.className = 'mta-m' + (erro ? ' e' : ''); msg.setAttribute('role', erro ? 'alert' : 'status');
+    }
+    function fechar() {
+      if (fechado || enviando) return; fechado = true;
+      try { if (ctrl) ctrl.unmount(); } catch (e) {}
+      d.remove(); document.documentElement.style.overflow = overflowAntes;
+      Array.prototype.forEach.call(document.querySelectorAll('[data-mtc-inert]'), function (el) { el.inert = false; el.removeAttribute('data-mtc-inert'); });
+      resolver(feito || { cancelado: true });
+      /* depois de quem chamou reativar o botão (microtarefas rodam antes deste setTimeout) */
+      setTimeout(function () { if (volta && document.contains(volta)) { try { volta.focus({ preventScroll: true }); } catch (e) {} } }, 0);
+    }
+    d.addEventListener('keydown', function (e) {
+      e.stopPropagation();   /* o Esc/Tab dos diálogos da página não agem por baixo deste */
+      if (e.key === 'Escape') { e.preventDefault(); fechar(); return; }
+      if (e.key !== 'Tab') return;
+      var f = Array.prototype.filter.call(d.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea,iframe,[tabindex]:not([tabindex="-1"])'), function (x) { return x.offsetParent !== null; });
+      if (!f.length) { e.preventDefault(); return; }
+      var pri = f[0], ult = f[f.length - 1];
+      if (e.shiftKey && (document.activeElement === pri || document.activeElement === h)) { e.preventDefault(); ult.focus(); }
+      else if (!e.shiftKey && document.activeElement === ult) { e.preventDefault(); pri.focus(); }
+    });
+    d.addEventListener('click', function (e) { var b = e.target.closest('[data-acao]'); if (b && b.dataset.acao === 'fechar') fechar(); });
+
+    function ativar(r) {
+      /* a claim chega pelo token renovado; tenta algumas vezes */
+      var pausas = [400, 1200, 2000, 3000, 4000], i = 0, ag = agoraS();
+      function vigente(mt) { return num(((mt && mt.p) || {})[op.produto]) > ag; }
+      function pronto(mt, chegou) {
+        enviando = false; btX.disabled = false;
+        feito = { ok: true, r: r, mt: mt || null };
+        d.querySelector('#mtc-brick').hidden = true;
+        aviso('');
+        d.querySelector('.mtc-fim').innerHTML = '<div class="mtc-ok" role="status"><b>Assinatura ativa</b>' +
+          '<p>' + (chegou ? 'O ' + esc(nome) + ' já está liberado na sua conta.' : 'O Mercado Pago autorizou o cartão. O acesso ao ' + esc(nome) + ' libera em instantes; se demorar, toque em "Já assinei — atualizar".') +
+          ' A primeira cobrança de ' + esc(valor) + ' é feita em até 1 hora e depois todo mês. O recibo chega por e-mail.</p></div>' +
+          '<div class="mta-r"><button type="button" class="bt s" data-acao="fechar">Continuar</button></div>';
+        var c = d.querySelector('.mtc-fim .bt'); setTimeout(function () { try { c.focus(); } catch (e) {} }, 30);
+      }
+      (function passo() {
+        lerMt(user, true).catch(function () { return null; }).then(function (mt) {
+          if (vigente(mt) || i >= pausas.length) { pronto(mt, vigente(mt)); return; }
+          setTimeout(passo, pausas[i++]);
+        });
+      })();
+    }
+    function enviar(cd) {
+      if (enviando) return Promise.reject(new Error('em andamento'));
+      enviando = true; btX.disabled = true;
+      aviso('Autorizando o cartão no Mercado Pago…', false, true);
+      var dados = { produto: op.produto, periodo: 'mensal', modo: 'cartao', cartao: { token: String((cd && cd.token) || '') } };
+      var em = cd && cd.payer && cd.payer.email; if (em) dados.cartao.email = String(em);
+      return chamar('mpCheckout', dados, user).then(function (r) {
+        if (!r || r.status !== 'authorized') throw new Error('O servidor de pagamentos está sendo atualizado. Nada foi cobrado; tente de novo em alguns minutos.');
+        try { if (ctrl) ctrl.unmount(); } catch (e) {} ctrl = null;
+        aviso('Cartão autorizado. Liberando o seu acesso…', false, true);
+        ativar(r);
+      }, function (e) {
+        enviando = false; btX.disabled = false;
+        var tm = (e && e.message) || 'O Mercado Pago não aceitou o cartão.';
+        aviso(/outro cartão|de novo|Minha assinatura/.test(tm) ? tm : tm + ' Corrija os dados ou use outro cartão.', true);
+        throw e;   /* devolve o botão do formulário para nova tentativa */
+      });
+    }
+
+    Promise.all([chavePublicaMP(user), carregarSDK()]).then(function (res) {
+      if (fechado) return;
+      var mp = new res[1](res[0], { locale: 'pt-BR' });
+      var ini = { amount: Number(op.preco) };
+      if (email && !o.pedirEmail) ini.payer = { email: email };
+      return mp.bricks().create('cardPayment', 'mtc-brick', {
+        initialization: ini,
+        customization: {
+          paymentMethods: { maxInstallments: 1, minInstallments: 1, types: { included: ['credit_card'] } },
+          visual: { hideFormTitle: true, texts: { formSubmit: 'Assinar por ' + valor + '/mês' },
+            style: { theme: 'default', customVariables: { baseColor: '#2B5CE6', baseColorFirstVariant: '#1E4FCB', baseColorSecondVariant: '#1A3FA8', borderRadiusLarge: '16px', borderRadiusMedium: '12px', formPadding: '0px' } } }
+        },
+        callbacks: {
+          onReady: function () { if (!enviando && !feito) aviso(''); },
+          onSubmit: function (cd) { return enviar(cd); },
+          onError: function (err) {
+            console.warn('Mercado Pago (formulário):', err && (err.cause || err.message));
+            if (err && err.type === 'critical') aviso('O formulário do Mercado Pago falhou ao abrir. Feche e tente de novo, ou use o anual ou o Pix.', true);
+          }
+        }
+      }).then(function (c) { ctrl = c; if (fechado) { try { c.unmount(); } catch (e) {} } });
+    }).catch(function (e) { if (!fechado) aviso((e && e.message) || 'Não foi possível abrir o formulário do cartão.', true); });
+  });
+}
 
 /* ---------------- tela de assinatura (trava do app) ----------------
    Diálogo modal de verdade: o resto da página fica inerte, o Tab não sai da
@@ -203,7 +367,7 @@ function css() {
 }
 /* fundo inerte enquanto a tela está aberta (marca só o que ela mesma tornou inerte) */
 var _mtaObs = null;
-function _mtaInerte(el) { if (el.nodeType === 1 && el.id !== 'mta' && el.id !== 'mta-css' && el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE' && !el.inert) { el.inert = true; el.setAttribute('data-mta-inert', ''); } }
+function _mtaInerte(el) { if (el.nodeType === 1 && el.id !== 'mta' && el.id !== 'mtc' && el.id !== 'mta-css' && el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE' && !el.inert) { el.inert = true; el.setAttribute('data-mta-inert', ''); } }
 function travaFundo() {
   Array.prototype.forEach.call(document.body.children, _mtaInerte);
   if (!_mtaObs && G.MutationObserver) { _mtaObs = new MutationObserver(function (ms) { ms.forEach(function (m) { m.addedNodes.forEach(_mtaInerte); }); }); _mtaObs.observe(document.body, { childList: true }); }
@@ -270,7 +434,7 @@ function paywall(o) {
     });
     if (!ops.length) corpo += '<p>Este app ainda não está à venda. Tente de novo mais tarde.</p>';
     corpo += '<div class="mta-g"><b>Sem fidelidade · desistência em 7 dias com reembolso total.</b><br>' +
-      (ops.some(function (op) { return op.mp; }) ? 'O pagamento é feito na página segura do Mercado Pago. A MedTech não vê os dados do cartão.' : '') + '</div>';
+      (ops.some(function (op) { return op.mp; }) ? 'Pagamento pelo Mercado Pago: o cartão é digitado nos campos seguros dele (o anual e o Pix abrem a página do Mercado Pago). A MedTech não vê os dados do cartão.' : '') + '</div>';
     var es = linha ? escolhidos(P, mt, linha) : [];
     if (linha && vagas(P, mt, linha, agora) > 0 && es.length) {
       corpo += '<p>Ou troque um app do seu plano pelo ' + esc(nome) + ':</p><div class="mta-r">' + es.map(function (a) { return '<button type="button" class="bt g" data-acao="trocar" data-sai="' + esc(a) + '">Trocar ' + esc(NOMES[a] || a) + '</button>'; }).join('') + '</div>';
@@ -315,8 +479,14 @@ function paywall(o) {
     if (a === 'fechar') { fechar(); return; }
     if (a === 'comprar') {
       var op = ops[Number(b.dataset.i)]; if (!op) return;
-      b.disabled = true; aviso('Abrindo o pagamento seguro do Mercado Pago…');
-      comprar(op, o.user).catch(function (e3) { b.disabled = false; aviso((e3 && e3.message) || 'Não foi possível abrir o pagamento.', true); });
+      b.disabled = true; aviso(ehCartao(op) ? 'Abrindo o formulário do cartão…' : 'Abrindo o pagamento seguro do Mercado Pago…');
+      comprar(op, o.user).then(function (res) {
+        if (!res || typeof res !== 'object') return;             /* redirecionou */
+        if (res.cancelado) { b.disabled = false; aviso(''); return; }
+        aviso('Conferindo a sua assinatura…');
+        rever().then(function (ok) { if (!ok) { b.disabled = false; aviso('Assinatura feita. O acesso libera em instantes: toque em "Já assinei — atualizar".'); } })
+          .catch(function () { b.disabled = false; aviso('Assinatura feita. Toque em "Já assinei — atualizar" em instantes.'); });
+      }).catch(function (e3) { b.disabled = false; aviso((e3 && e3.message) || 'Não foi possível abrir o pagamento.', true); });
       return;
     }
     if (a === 'atualizar') {
@@ -371,6 +541,6 @@ function estado(user) {
   });
 }
 
-G.MTAcesso = { versao: 3, NOMES: NOMES, linhaDoApp: linhaDoApp, cobre: cobre, vendaAtiva: vendaAtiva, algumaVendaAtiva: algumaVendaAtiva, vagas: vagas, escolhidos: escolhidos, liberado: liberado, acessoAtivoQualquer: acessoAtivoQualquer, produtoPorId: produtoPorId, produtosQueCobrem: produtosQueCobrem,
-  carregarPlanos: carregarPlanos, chamar: chamar, lerMt: lerMt, checkoutUrl: checkoutUrl, viaMP: viaMP, opcoes: opcoes, comprar: comprar, irPara: irPara, paywall: paywall, fechar: fechar, verificar: verificar, estado: estado, brl: brl, dataBR: dataBR, anualPorMes: anualPorMes, economiaAnual: economiaAnual, appsDoProduto: appsDoProduto, AJUDA_URL: AJUDA_URL, _limparCache: function () { cacheP = null; } };
+G.MTAcesso = { versao: 4, NOMES: NOMES, linhaDoApp: linhaDoApp, cobre: cobre, vendaAtiva: vendaAtiva, algumaVendaAtiva: algumaVendaAtiva, vagas: vagas, escolhidos: escolhidos, liberado: liberado, acessoAtivoQualquer: acessoAtivoQualquer, produtoPorId: produtoPorId, produtosQueCobrem: produtosQueCobrem,
+  carregarPlanos: carregarPlanos, chamar: chamar, lerMt: lerMt, checkoutUrl: checkoutUrl, viaMP: viaMP, opcoes: opcoes, comprar: comprar, ehCartao: ehCartao, assinarCartao: assinarCartao, irPara: irPara, paywall: paywall, fechar: fechar, verificar: verificar, estado: estado, brl: brl, dataBR: dataBR, anualPorMes: anualPorMes, economiaAnual: economiaAnual, appsDoProduto: appsDoProduto, AJUDA_URL: AJUDA_URL, _limparCache: function () { cacheP = null; } };
 })();
