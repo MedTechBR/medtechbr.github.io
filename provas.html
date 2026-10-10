@@ -312,8 +312,19 @@ function selecao(){
   let sel = (d && d[CAMPO_SEL] && Array.isArray(d[CAMPO_SEL].sel)) ? d[CAMPO_SEL].sel : null;
   if (!sel) { try { const c = JSON.parse(localStorage.getItem(CACHE_APPS)||'null'); if (Array.isArray(c)) sel = c; } catch(e){} }
   if (!sel) sel = PADRAO;
+  /* apps da linha vêm da escolha da linha; apps de estudo só da escolha própria deles
+     (campo separado): ids antigos de outra linha guardados na escolha não reaparecem */
+  const daLinha = new Set(CATALOGO_LINHA.map(a => a.id));
   const ok = new Set(disponiveis().map(a=>a.id));
-  return sel.filter(id => ok.has(id));
+  return sel.filter(id => daLinha.has(id) && ok.has(id)).concat(selecaoEstudo().filter(id => ok.has(id)));
+}
+const CAMPO_SEL_ESTUDO = 'appsEstudo', CACHE_ESTUDO = 'mt.portal.apps.estudo';
+function selecaoEstudo(){
+  if (LINHA !== 'clinica') return [];
+  const d = dados();
+  let s = (d && d[CAMPO_SEL_ESTUDO] && Array.isArray(d[CAMPO_SEL_ESTUDO].sel)) ? d[CAMPO_SEL_ESTUDO].sel : null;
+  if (!s) { try { const c = JSON.parse(localStorage.getItem(CACHE_ESTUDO)||'null'); if (Array.isArray(c)) s = c; } catch(e){} }
+  return s || [];
 }
 /* acesso por produto: ACESSO = {P, venda, mt} vindo do _mtacesso.js (null até carregar) */
 let ACESSO = null;
@@ -398,12 +409,15 @@ function marcarApps(modo){
 }
 function closeApps(){ const m=document.getElementById('appsModal'); if (m) m.remove(); }
 async function salvarApps(){
-  const sel = [...document.querySelectorAll('#appsLista input[type=checkbox]:checked')].map(i => i.dataset.id);
+  const todos = [...document.querySelectorAll('#appsLista input[type=checkbox]:checked')].map(i => i.dataset.id);
+  const daLinha = new Set(CATALOGO_LINHA.map(a => a.id));
+  const sel = todos.filter(id => daLinha.has(id)), estudo = todos.filter(id => !daLinha.has(id));
   const msg = document.getElementById('appsMsg'); msg.className='cfg-msg'; msg.textContent='Salvando';
-  try { localStorage.setItem(CACHE_APPS, JSON.stringify(sel)); } catch(e){}
+  try { localStorage.setItem(CACHE_APPS, JSON.stringify(todos)); if (LINHA === 'clinica') localStorage.setItem(CACHE_ESTUDO, JSON.stringify(estudo)); } catch(e){}
   try {
     const base = dados() || {};
-    if (window.MT && MT.save) await MT.save(Object.assign({}, base, { [CAMPO_SEL]: { sel, v:1, updatedAt: Date.now() } }));
+    const extra = LINHA === 'clinica' ? { [CAMPO_SEL_ESTUDO]: { sel: estudo, v:1, updatedAt: Date.now() } } : {};
+    if (window.MT && MT.save) await MT.save(Object.assign({}, base, { [CAMPO_SEL]: { sel, v:1, updatedAt: Date.now() } }, extra));
     closeApps(); renderGrid();
   } catch(e) { msg.className='cfg-msg err'; msg.textContent='Não foi possível salvar: '+(e.message||e); }
 }
