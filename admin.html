@@ -9,14 +9,16 @@
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="stylesheet" href="vendor/tabler/tabler-icons.min.css?v=3.48.0">
 <!-- Painel da administração (10/10/2026). Só a conta de administração consegue ler e mudar
-     algo: o servidor (mtAdmin, mpCheckout, mtSinal) confere o e-mail a cada chamada. -->
+     algo: o servidor (mtAdmin, mpCheckout, mtSinal) confere a conta a cada chamada. -->
 <script>window.MT_APP={id:"admin",name:"Administração",linha:"admin"};</script>
 <script src="_mtfb.js?v=1"></script>
 <script type="module" src="_mtauth.js?v=37"></script>
 <link rel="stylesheet" href="_mtviva.css?v=2">
-<link rel="stylesheet" href="admin.css?v=5">
+<link rel="stylesheet" href="admin.css?v=6">
 </head>
 <body>
+<!-- isca para o preenchimento automático do Chrome: sem ela, o e-mail do login cai no campo de busca de Usuários -->
+<div class="isca" aria-hidden="true"><input type="text" name="username" autocomplete="username" tabindex="-1"><input type="password" name="password" autocomplete="current-password" tabindex="-1"></div>
 <a class="sr" href="#conteudo">Pular para o conteúdo</a>
 <header class="adm-top">
   <div class="in">
@@ -36,6 +38,7 @@
   <nav class="menu" aria-label="Seções da administração">
     <ul>
       <li><a href="#visao" data-sec="visao"><i class="ti ti-chart-bar" aria-hidden="true"></i>Visão geral</a></li>
+      <li><a href="#usuarios" data-sec="usuarios"><i class="ti ti-user-circle" aria-hidden="true"></i>Usuários</a></li>
       <li><a href="#assinantes" data-sec="assinantes"><i class="ti ti-users" aria-hidden="true"></i>Assinantes</a></li>
       <li><a href="#acessos" data-sec="acessos"><i class="ti ti-key" aria-hidden="true"></i>Acessos</a></li>
       <li><a href="#pagamentos" data-sec="pagamentos"><i class="ti ti-credit-card" aria-hidden="true"></i>Pagamentos</a></li>
@@ -76,6 +79,34 @@
       <div class="grade3" id="vgMais"></div>
       <div class="card"><h3><i class="ti ti-user-plus" aria-hidden="true"></i>Contas novas por dia</h3><p class="sub">Últimos 30 dias, todas as contas criadas (com ou sem compra).</p><div class="graf" id="grafContas"></div></div>
       <div class="card"><h3><i class="ti ti-package" aria-hidden="true"></i>Por produto</h3><p class="sub">Assinantes com acesso vigente e vendas dos últimos 30 dias.</p><div id="vgProdutos"></div></div>
+    </section>
+
+    <!-- ===================== USUÁRIOS ===================== -->
+    <section class="sec" id="usuarios" data-painel aria-labelledby="h-us" hidden>
+      <div id="usLista" class="us-lista">
+        <div class="cab">
+          <div><h2 id="h-us">Usuários</h2><p class="lead">Todas as contas cadastradas no MedTech, com ou sem compra. Abra a ficha de uma conta para editar o cadastro, as liberações e as permissões.</p></div>
+          <div class="atualizado"><span id="usQuando" aria-live="polite"></span><button class="btn btn-g sm" id="btUs" type="button"><i class="ti ti-refresh" aria-hidden="true"></i>Atualizar</button></div>
+        </div>
+        <div id="usAviso"></div>
+        <div class="card us-filtros">
+          <form class="linhaC" id="usForm" role="search" onsubmit="return false">
+            <div class="campo"><label for="usBusca">Buscar por nome, e-mail ou CPF</label><input id="usBusca" name="busca-usuarios" type="search" autocomplete="off" spellcheck="false" placeholder="nome, parte do e-mail ou o CPF" aria-describedby="usBuscaAj"><span class="ajuda" id="usBuscaAj">O CPF inteiro é comparado no servidor; na lista ele aparece mascarado.</span></div>
+            <div class="campo"><label for="usOrdem">Ordem</label><select id="usOrdem"><option value="recentes">Criadas por último primeiro</option><option value="acesso">Último acesso</option><option value="nome">Nome (A a Z)</option><option value="email">E-mail (A a Z)</option></select></div>
+          </form>
+          <div class="chips" role="group" aria-label="Filtrar contas" id="usFiltros">
+            <button class="chip" type="button" data-usf="todos" aria-pressed="true">Todas<span class="n"></span></button>
+            <button class="chip" type="button" data-usf="semCpf" aria-pressed="false">Sem CPF<span class="n"></span></button>
+            <button class="chip" type="button" data-usf="comPlano" aria-pressed="false">Com plano<span class="n"></span></button>
+            <button class="chip" type="button" data-usf="semPlano" aria-pressed="false">Sem plano<span class="n"></span></button>
+            <button class="chip" type="button" data-usf="novos7" aria-pressed="false">Novas em 7 dias<span class="n"></span></button>
+            <button class="chip" type="button" data-usf="desativadas" aria-pressed="false">Desativadas<span class="n"></span></button>
+          </div>
+        </div>
+        <p class="us-resumo" id="usResumo" aria-live="polite"></p>
+        <div id="usTabela"></div>
+      </div>
+      <div id="usFicha" class="us-ficha" hidden></div>
     </section>
 
     <!-- ===================== ASSINANTES ===================== -->
@@ -253,6 +284,6 @@
 </dialog>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="admin.js?v=6" defer></script>
+<script src="admin.js?v=7" defer></script>
 </body>
 </html>

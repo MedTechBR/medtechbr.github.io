@@ -1,7 +1,9 @@
 /* ============================================================
    admin.js — Administração MedTech (10/10/2026, abertura das vendas)
    Tudo passa pelo servidor (o navegador não decide nada de acesso):
-     mtAdmin  {acao:'painel'|'assinantes'|'pedidos'|'ver'|'conceder'|'revogar'|'vincularCpf'|'teste'|'geracaoIA'|'testeIA'}
+     mtAdmin  {acao:'painel'|'assinantes'|'pedidos'|'usuarios'|'usuario'|'editarUsuario'|'resetSenha'|'papel'|'ver'|'conceder'|'revogar'|'vincularCpf'|'teste'|'geracaoIA'|'testeIA'}
+              (10/10/2026: seção Usuários = todas as contas, ficha com dados, liberações, permissões,
+               acesso à conta e histórico; o servidor nunca devolve o CPF inteiro nem segredo da conta)
               (10/10/2026: ver/revogar por e-mail ou CPF; conceder com lista mista e ilimitado;
                o servidor só devolve o CPF mascarado, 039.***.***-08)
      mpCheckout / mpCancelar (compra de teste R$ 5)
@@ -28,7 +30,7 @@ const ddmm = d => d ? d.slice(8, 10) + '/' + d.slice(5, 7) : '';
 const plural = (n, um, varios) => inteiro(n) + ' ' + (Number(n) === 1 ? um : varios);
 const agoraS = () => Math.floor(Date.now() / 1000);
 
-const SECOES = ['visao', 'assinantes', 'acessos', 'pagamentos', 'planos', 'sinalizacoes', 'diagnostico'];
+const SECOES = ['visao', 'usuarios', 'assinantes', 'acessos', 'pagamentos', 'planos', 'sinalizacoes', 'diagnostico'];
 /* apps: mesmos nomes, ícones e cores do catálogo do _mtauth */
 const APPS = {
   condutai: { nm: 'CondutAI', ic: 'ti-stethoscope', c: '#1D6FD0', url: '/condutai.html' },
@@ -69,7 +71,7 @@ async function admin(dados) {
   try { return await chamar('mtAdmin', dados); }
   catch (e) {
     if (ehNegado(e)) bloquear(e.message);
-    if (ehNaoPublicado(e) && ['painel', 'assinantes', 'pedidos'].includes(dados.acao)) { E.naoPublicado = true; e.naoPublicado = true; }
+    if (ehNaoPublicado(e) && ['painel', 'assinantes', 'pedidos', 'usuarios', 'usuario'].includes(dados.acao)) { E.naoPublicado = true; e.naoPublicado = true; }
     throw e;
   }
 }
@@ -145,8 +147,13 @@ function confirmar(titulo, texto, rotOk, perigo) {
 }
 
 /* ---------------- navegação ---------------- */
-function irPara(sec, focar) {
-  if (!SECOES.includes(sec)) sec = 'visao';
+function irPara(destino, focar) {
+  /* #usuarios/<uid> abre a ficha da conta (o voltar do navegador volta para a lista) */
+  let [sec, sub] = String(destino || '').split('/');
+  if (!SECOES.includes(sec)) { sec = 'visao'; sub = ''; }
+  let uid = '';
+  try { uid = decodeURIComponent(sub || ''); } catch (e) { uid = ''; }
+  E.sub = sec === 'usuarios' ? uid : '';
   if (!E.bloqueado) document.querySelectorAll('[data-painel]').forEach(el => el.hidden = el.id !== sec);
   document.querySelectorAll('.menu a').forEach(a => {
     if (a.dataset.sec === sec) { a.setAttribute('aria-current', 'page'); if (a.scrollIntoView && window.innerWidth <= 960) a.scrollIntoView({ block: 'nearest', inline: 'center' }); }
@@ -154,12 +161,13 @@ function irPara(sec, focar) {
   });
   window.scrollTo(0, 0);
   setTimeout(() => window.scrollTo(0, 0), 0);   /* o navegador ainda rola até a âncora depois de mostrar a seção */
-  if (focar) { const h = document.querySelector('#' + sec + ' h2'); if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); } }
+  if (focar && !E.sub) { const h = document.querySelector('#' + sec + ' h2'); if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); } }
   if (E.iniciado && !E.bloqueado) abrirSecao(sec);
 }
 window.addEventListener('hashchange', () => irPara(location.hash.slice(1), true));
 function abrirSecao(sec) {
   if (sec === 'visao') { if (!E.carregou.painel) carregarPainel(); else if (E.painel) desenharPainel(); }
+  if (sec === 'usuarios') abrirUsuarios(E.sub);
   if (sec === 'assinantes' && !E.carregou.assinantes) carregarAssinantes();
   if (sec === 'pagamentos' && !E.carregou.pedidos) carregarPedidos();
   if (sec === 'planos' && !E.carregou.planos) desenharPlanos();
@@ -190,8 +198,11 @@ async function carregarPainel() {
   } finally { $('btVg').disabled = false; }
 }
 const SEM = (motivo) => `<span class="semdado" title="${esc(motivo || 'o servidor não devolveu este número')}">sem dado</span>`;
-function kpi(rot, icone, valor, det) {
-  return `<div class="kpi"><span class="rot"><i class="ti ${icone}" aria-hidden="true"></i>${rot}</span><span class="v">${valor}</span><span class="det">${det || '&nbsp;'}</span></div>`;
+function kpi(rot, icone, valor, det, href, dica) {
+  const corpo = `<span class="rot"><i class="ti ${icone}" aria-hidden="true"></i>${rot}</span><span class="v">${valor}</span><span class="det">${det || '&nbsp;'}</span>`;
+  /* cartão que leva a uma lista: um link de verdade, com o destino dito no fim */
+  if (href) return `<a class="kpi kpi-link" href="${href}">${corpo}<span class="ir">${esc(dica || 'Abrir')}<i class="ti ti-arrow-right" aria-hidden="true"></i></span></a>`;
+  return `<div class="kpi">${corpo}</div>`;
 }
 function desenharPainel() {
   const p = E.painel || {};
@@ -209,7 +220,8 @@ function desenharPainel() {
   ks.push(kpi('Reembolsos em 30 dias', 'ti-receipt-refund', v ? inteiro(v.reembolsos.n) : SEM(erro(p.vendas)),
     v ? brl(v.reembolsos.valor) + ' · ' + plural(v.cancelamentos, 'cancelamento', 'cancelamentos') : ''));
   ks.push(kpi('Contas novas em 7 dias', 'ti-user-plus', c ? inteiro(c.contas.d7) : SEM(erro(p.contas)),
-    c ? 'hoje ' + inteiro(c.contas.hoje) + ' · 30 dias ' + inteiro(c.contas.d30) + ' · total ' + inteiro(c.contas.total) + (c.contas.comCpf != null ? ' · com CPF ' + inteiro(c.contas.comCpf) : '') : ''));
+    c ? 'hoje ' + inteiro(c.contas.hoje) + ' · 30 dias ' + inteiro(c.contas.d30) + ' · total ' + inteiro(c.contas.total) + (c.contas.comCpf != null ? ' · com CPF ' + inteiro(c.contas.comCpf) : '') : '',
+    '#usuarios', 'Ver todas as contas'));
   $('vgKpis').innerHTML = ks.join('');
 
   desenharGrafico();
@@ -444,6 +456,398 @@ $('asBusca').addEventListener('input', () => { clearTimeout(tBusca); tBusca = se
 ['asProd', 'asSit', 'asOrdem'].forEach(id => $(id).addEventListener('change', () => { E.as.pagina = 1; carregarAssinantes(); }));
 
 /* ============================================================
+   USUÁRIOS (10/10/2026): todas as contas e a ficha de cada uma
+   mtAdmin usuarios {filtro, ordem, busca, pagina, porPagina} → {total, contagens, itens, eu}
+           usuario {uid} → ficha (mesmos campos do "ver" + pedidos, sinalizações, log, pode)
+           editarUsuario {uid, nome?, email?, desativar?} · resetSenha {uid} · papel {uid, papel, ativo}
+   CPF: vincularCpf (Acessos). Liberações: o mesmo editor da seção Acessos (prefixo ulib).
+   Tudo que vem do servidor passa por esc() antes de ir para o HTML.
+   ============================================================ */
+E.us = { filtro: 'todos', ordem: 'recentes', pagina: 1, r: null, ficha: null, aba: 'dados', abrindo: '', digitou: false };
+const FILTRO_US = { todos: 'Todas', semCpf: 'Sem CPF', comPlano: 'Com plano', semPlano: 'Sem plano', novos7: 'Novas em 7 dias', desativadas: 'Desativadas' };
+const PROVEDOR = { password: 'e-mail e senha', 'google.com': 'Google', 'apple.com': 'Apple', phone: 'telefone', 'microsoft.com': 'Microsoft' };
+const ABAS_US = [['dados', 'Dados', 'ti-id'], ['liberacoes', 'Liberações', 'ti-checklist'], ['permissoes', 'Permissões', 'ti-shield-check'], ['acesso', 'Acesso à conta', 'ti-key'], ['historico', 'Histórico', 'ti-history']];
+const ACAO_LOG = { editarUsuario: 'Cadastro editado', resetSenha: 'Link de nova senha enviado', papel: 'Permissão alterada' };
+const dataC = iso => iso ? new Date(iso).toLocaleDateString('pt-BR') : '—';
+function relativo(iso) {
+  if (!iso) return 'nunca';
+  const d = Math.floor((Date.now() - Date.parse(iso)) / 86400000);
+  if (d <= 0) return 'hoje';
+  if (d === 1) return 'ontem';
+  if (d < 30) return 'há ' + d + ' dias';
+  return dataC(iso);
+}
+const nomeOuEmail = x => x.nome || x.email || '(conta sem nome e sem e-mail)';
+function selosConta(x, longo) {
+  const s = [];
+  if (x.dono) s.push('<span class="selo ac">dono</span>');
+  else if (x.admin) s.push('<span class="selo ac">administrador</span>');
+  if (x.coordenador) s.push(x.coordenadorAtivo ? '<span class="selo ac">coordenador ClínicaMed</span>' : '<span class="selo av" title="Vale quando a pessoa confirmar o e-mail">coordenador (falta confirmar e-mail)</span>');
+  if (x.desativada) s.push('<span class="selo err">desativada</span>');
+  if (x.email && !x.emailVerificado) s.push('<span class="selo av">e-mail não confirmado</span>');
+  if (x.teste) s.push(`<span class="selo">teste grátis até ${dataS(x.teste)}</span>`);
+  if (x.claimsIlegiveis) s.push('<span class="selo err">claims ilegíveis</span>');
+  if (longo && !s.length) s.push('<span class="selo">conta comum</span>');
+  return s.join(' ');
+}
+const produtosTxt = x => (x.produtos || []).filter(p => !p.teste).length
+  ? (x.produtos || []).filter(p => !p.teste).map(p => `<span class="us-prod"><b>${esc(nomeProd(p.id) || p.nome)}</b> <span class="fraco">${p.ilimitado ? 'ilimitado' : 'até ' + dataS(p.ate)}</span></span>`).join('')
+  : '<span class="fraco">nenhum</span>';
+
+function abrirUsuarios(uid) {
+  if (uid) { mostrarFicha(uid); return; }
+  $('usFicha').hidden = true; $('usLista').hidden = false;
+  /* de volta da ficha: o foco volta para a linha da pessoa */
+  const volta = () => {
+    if (!E.us.voltaFoco) return;
+    const b = $('usTabela').querySelector('button.us-nome[data-uid="' + CSS.escape(E.us.voltaFoco) + '"]');
+    E.us.voltaFoco = '';
+    if (b) setTimeout(() => b.focus(), 0);
+  };
+  if (!E.carregou.usuarios) carregarUsuarios().then(volta); else volta();
+}
+async function carregarUsuarios() {
+  E.carregou.usuarios = true;
+  $('btUs').disabled = true;
+  $('usQuando').textContent = 'Atualizando…';
+  if (!E.us.r) $('usTabela').innerHTML = carregando('Carregando as contas…');
+  const busca = buscaUs();
+  try {
+    const [r] = await Promise.all([admin({ acao: 'usuarios', filtro: E.us.filtro, ordem: $('usOrdem').value, busca, pagina: E.us.pagina, porPagina: 50 }), planos()]);
+    E.us.r = r; E.us.pagina = r.pagina;
+    $('usAviso').innerHTML = '';
+    desenharUsuarios(r);
+    $('usQuando').textContent = 'Atualizado às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  } catch (e) {
+    if (E.bloqueado) return;
+    $('usQuando').textContent = '';
+    $('usAviso').innerHTML = e.naoPublicado ? avisoPublicar('a lista de usuários') : avisoErro(e);
+    $('usTabela').innerHTML = e.naoPublicado ? '<p class="vazio">Enquanto isso, consulte uma conta pelo e-mail em Acessos.</p>' : '';
+  } finally { $('btUs').disabled = false; }
+}
+/* o Chrome põe o e-mail do login em campo de busca: ignora se ninguém digitou (honeypot no topo da página) */
+function buscaUs() {
+  const v = $('usBusca').value.trim();
+  if (!E.us.digitou && MT.user && v && v.toLowerCase() === String(MT.user.email || '').toLowerCase()) { $('usBusca').value = ''; return ''; }
+  return v;
+}
+function desenharUsuarios(r) {
+  const n = r.contagens || {};
+  $('usFiltros').querySelectorAll('[data-usf]').forEach(b => {
+    b.setAttribute('aria-pressed', String(b.dataset.usf === r.filtro));
+    const k = b.querySelector('.n'); k.textContent = n[b.dataset.usf] != null ? inteiro(n[b.dataset.usf]) : '';
+  });
+  const filtroTxt = r.filtro !== 'todos' ? ' · filtro: ' + FILTRO_US[r.filtro].toLowerCase() : '';
+  $('usResumo').textContent = plural(r.total, 'conta', 'contas') + (r.busca ? ' para "' + r.busca + '"' : '') + filtroTxt +
+    (r.total !== n.todos ? ' (de ' + inteiro(n.todos) + ' no total)' : '');
+  const avisos = [];
+  if (r.truncado) avisos.push('Há mais de 20 mil contas: a lista considera só as primeiras 20 mil.');
+  if (r.cpfsOk === false) avisos.push('Os CPFs não puderam ser lidos agora; o selo "sem CPF" pode estar errado.');
+  if (!r.itens.length) {
+    $('usTabela').innerHTML = `<p class="vazio">${r.buscaCpf ? 'Nenhuma conta com este CPF.' : r.busca ? 'Nenhuma conta encontrada com essa busca.' : 'Nenhuma conta neste filtro.'}</p>`;
+    return;
+  }
+  const linhas = r.itens.map(x => `<tr${x.desativada ? ' class="us-off"' : ''}>
+      <td data-r="Pessoa" class="cheia us-pessoa"><button type="button" class="us-nome" data-uid="${esc(x.uid)}" aria-label="Abrir a ficha de ${esc(nomeOuEmail(x))}">${esc(nomeOuEmail(x))}</button>
+        ${x.nome && x.email ? `<span class="us-email">${esc(x.email)}</span>` : ''}</td>
+      <td data-r="CPF">${x.cpf ? `<span class="us-cpf">${esc(x.cpf)}</span>` : (x.temCpf ? '<span class="fraco">cadastrado</span>' : '<span class="selo av">sem CPF</span>')}</td>
+      <td data-r="Criada em" class="fraco">${dataC(x.criadoEm)}</td>
+      <td data-r="Último acesso" class="fraco" title="${esc(x.ultimoAcesso ? quando(x.ultimoAcesso) : 'nunca entrou')}">${relativo(x.ultimoAcesso)}</td>
+      <td data-r="Situação" class="cheia us-sit">${selosConta(x) || '<span class="fraco">—</span>'}</td>
+      <td data-r="Produtos ativos" class="cheia us-prods">${produtosTxt(x)}</td>
+      <td class="acoes"><button class="btn btn-g sm" type="button" data-uid="${esc(x.uid)}" title="Abrir a ficha" aria-label="Abrir a ficha de ${esc(nomeOuEmail(x))}"><i class="ti ti-chevron-right" aria-hidden="true"></i><span class="tx">Abrir ficha</span></button></td>
+    </tr>`).join('');
+  $('usTabela').innerHTML = (avisos.length ? `<div class="aviso" style="margin-top:12px"><i class="ti ti-info-circle" aria-hidden="true"></i><div>${avisos.map(esc).join(' ')}</div></div>` : '') +
+    `<div class="tblw"><table class="tbl resp us-tbl"><caption class="sr">Contas, página ${r.pagina} de ${r.paginas}</caption><thead><tr>
+      <th scope="col">Pessoa</th><th scope="col">CPF</th><th scope="col">Criada em</th><th scope="col">Último acesso</th><th scope="col">Situação</th><th scope="col">Produtos ativos</th><th scope="col"><span class="sr">Ficha</span></th>
+    </tr></thead><tbody>${linhas}</tbody></table></div>
+    ${r.paginas > 1 ? `<div class="pag"><span>Página ${r.pagina} de ${r.paginas}</span>
+      <span class="acoesL"><button class="btn btn-g sm" type="button" id="usAnt" ${r.pagina <= 1 ? 'disabled' : ''}><i class="ti ti-chevron-left" aria-hidden="true"></i>Anterior</button>
+      <button class="btn btn-g sm" type="button" id="usProx" ${r.pagina >= r.paginas ? 'disabled' : ''}>Próxima<i class="ti ti-chevron-right" aria-hidden="true"></i></button></span></div>` : ''}`;
+  const ant = $('usAnt'), prox = $('usProx');
+  if (ant) ant.onclick = () => { E.us.pagina--; carregarUsuarios(); };
+  if (prox) prox.onclick = () => { E.us.pagina++; carregarUsuarios(); };
+  $('usTabela').querySelectorAll('[data-uid]').forEach(b => b.onclick = () => irFicha(b.dataset.uid));
+}
+function irFicha(uid) {
+  if (E.libOcupado) { toast('Espere terminar de aplicar as liberações.', 'err'); return; }
+  location.hash = 'usuarios/' + encodeURIComponent(uid);
+}
+
+/* ---------- ficha ---------- */
+async function mostrarFicha(uid) {
+  $('usLista').hidden = true; $('usFicha').hidden = false;
+  E.us.voltaFoco = uid;
+  if (E.us.ficha && E.us.ficha.uid === uid) { desenharFicha(E.us.ficha); return; }
+  E.us.ficha = null; E.us.aba = 'dados';
+  $('usFicha').innerHTML = barraVoltar() + carregando('Abrindo a ficha…');
+  ligaVoltar();
+  try {
+    const [r] = await Promise.all([admin({ acao: 'usuario', uid }), planos()]);
+    if (E.sub !== uid) return;                  // a pessoa já saiu desta ficha
+    E.us.ficha = r;
+    desenharFicha(r, true);
+  } catch (e) {
+    if (E.bloqueado) return;
+    $('usFicha').innerHTML = barraVoltar() + (e.naoPublicado ? avisoPublicar('a ficha da conta') : avisoErro(e));
+    ligaVoltar();
+  }
+}
+const barraVoltar = () => `<div class="us-volta"><button class="btn btn-g sm" type="button" id="usVoltar"><i class="ti ti-arrow-left" aria-hidden="true"></i>Voltar à lista</button></div>`;
+function ligaVoltar() { const b = $('usVoltar'); if (b) b.onclick = () => { location.hash = 'usuarios'; }; }
+/* relê a ficha depois de uma mudança e volta para a mesma aba */
+async function recarregarFicha(msg) {
+  const uid = E.us.ficha && E.us.ficha.uid;
+  if (!uid) return;
+  E.carregou.usuarios = false; E.carregou.assinantes = false; E.carregou.painel = false;
+  try {
+    const r = await admin({ acao: 'usuario', uid });
+    E.us.ficha = r;
+    if (E.sub === uid) desenharFicha(r);
+    if (msg) toast(msg, 'ok');
+  } catch (e) { if (!E.bloqueado) toast('Mudou, mas não consegui reler a ficha: ' + ((e && e.message) || e), 'err'); }
+}
+function desenharFicha(r, focar) {
+  const titulo = nomeOuEmail(r);
+  const inicial = (r.nome || r.email || '?').trim().charAt(0).toUpperCase();
+  const abas = ABAS_US.map(([id, nm, ic]) => `<button type="button" role="tab" id="usTab-${id}" aria-controls="usPan-${id}" aria-selected="${E.us.aba === id}" tabindex="${E.us.aba === id ? 0 : -1}" data-aba="${id}"><i class="ti ${ic}" aria-hidden="true"></i>${nm}</button>`).join('');
+  const painel = (id, html) => `<div class="card us-pan" role="tabpanel" id="usPan-${id}" aria-labelledby="usTab-${id}" tabindex="0"${E.us.aba === id ? '' : ' hidden'}>${html}</div>`;
+  $('usFicha').innerHTML = barraVoltar() + `
+    <div class="card us-topo">
+      <span class="us-av" aria-hidden="true">${esc(inicial)}</span>
+      <div class="us-id">
+        <h2 id="usFichaTit" tabindex="-1">${esc(titulo)}</h2>
+        <p class="sub">${r.nome && r.email ? esc(r.email) + ' · ' : ''}conta criada em ${dataC(r.criadoEm)} · último acesso ${esc(relativo(r.ultimoAcesso))}</p>
+        <div class="us-selos">${selosConta(r, true)}</div>
+      </div>
+    </div>
+    <div class="us-abas" role="tablist" aria-label="Partes da ficha">${abas}</div>
+    ${painel('dados', fichaDados(r))}
+    ${painel('liberacoes', fichaLiberacoes(r))}
+    ${painel('permissoes', fichaPermissoes(r))}
+    ${painel('acesso', fichaAcesso(r))}
+    ${painel('historico', fichaHistorico(r))}`;
+  ligaVoltar();
+  ligaAbas();
+  ligaDados(r); ligaLiberacoes(r); ligaPermissoes(r); ligaAcesso(r);
+  if (focar) { const h = $('usFichaTit'); if (h) h.focus({ preventScroll: true }); }
+}
+function ligaAbas() {
+  const tabs = [...$('usFicha').querySelectorAll('[role=tab]')];
+  const escolhe = (t, focar) => {
+    E.us.aba = t.dataset.aba;
+    tabs.forEach(x => { const on = x === t; x.setAttribute('aria-selected', String(on)); x.tabIndex = on ? 0 : -1; $(x.getAttribute('aria-controls')).hidden = !on; });
+    if (focar) t.focus();
+  };
+  tabs.forEach((t, i) => {
+    t.onclick = () => escolhe(t);
+    t.onkeydown = ev => {
+      const k = ev.key; let j = -1;
+      if (k === 'ArrowRight') j = (i + 1) % tabs.length;
+      else if (k === 'ArrowLeft') j = (i - 1 + tabs.length) % tabs.length;
+      else if (k === 'Home') j = 0; else if (k === 'End') j = tabs.length - 1;
+      if (j >= 0) { ev.preventDefault(); escolhe(tabs[j], true); }
+    };
+  });
+}
+const travaTxt = (r, tipo) => {
+  if (tipo === 'desativar') {
+    if (r.dono) return 'A conta do dono não pode ser desativada.';
+    if (r.uid === E.us.eu) return 'Você não pode desativar a própria conta.';
+  }
+  return 'Esta conta é da administração: só o dono do MedTech mexe nela.';
+};
+
+/* Dados: nome, e-mail e CPF */
+function fichaDados(r) {
+  const ficha = [
+    ['Identificador da conta', r.uid],
+    ['Forma de entrar', (r.provedores || []).map(p => PROVEDOR[p] || p).join(', ') || '—'],
+    ['E-mail confirmado', r.email ? (r.emailVerificado ? 'sim' : 'não') : 'sem e-mail'],
+    ['Criada em', r.criadoEm ? quando(r.criadoEm) : '—'],
+    ['Último acesso', r.ultimoAcesso ? quando(r.ultimoAcesso) : 'nunca entrou'],
+    ['Acesso agora', r.ativo ? 'liberado' : 'sem acesso pago']
+  ];
+  if (r.teste) ficha.push(['Teste grátis', 'até ' + dataS(r.teste)]);
+  const trava = !r.pode.editar;
+  return `<h3><i class="ti ti-id" aria-hidden="true"></i>Dados da conta</h3>
+    <dl class="ficha">${ficha.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
+    <form id="usFormDados" class="us-form" novalidate>
+      <h4>Nome e e-mail</h4>
+      ${trava ? `<p class="aviso"><i class="ti ti-lock" aria-hidden="true"></i><span>${esc(travaTxt(r))}</span></p>` : ''}
+      <div class="linhaC">
+        <div class="campo"><label for="usNome">Nome</label><input id="usNome" type="text" maxlength="80" autocomplete="off" value="${esc(r.nome)}"${trava ? ' disabled' : ''}></div>
+        <div class="campo"><label for="usEmail">E-mail (é o login)</label><input id="usEmail" type="email" maxlength="254" autocomplete="off" spellcheck="false" value="${esc(r.email)}" aria-describedby="usEmailAj"${trava ? ' disabled' : ''}></div>
+      </div>
+      <p class="ajuda" id="usEmailAj">Trocar o e-mail muda o login: a pessoa passa a entrar com o novo, que fica como não confirmado até ela abrir o link de confirmação.</p>
+      <div class="acoesL"><button class="btn btn-p" type="submit"${trava ? ' disabled' : ''}><i class="ti ti-device-floppy" aria-hidden="true"></i>Salvar nome e e-mail</button></div>
+    </form>
+    <form id="usFormCpf" class="us-form" novalidate>
+      <h4>CPF</h4>
+      <p class="sub">Atual: <b>${r.cpf ? esc(r.cpf) : (r.temCpf ? 'cadastrado' : 'não cadastrado')}</b>. O CPF inteiro nunca aparece aqui. Se o CPF estiver em outra conta, sai de lá; o CPF antigo desta conta fica livre.</p>
+      ${!r.email ? '<p class="aviso"><i class="ti ti-info-circle" aria-hidden="true"></i><span>Conta sem e-mail: o CPF se vincula pelo e-mail da conta.</span></p>' : ''}
+      <div class="linhaC">
+        <div class="campo"><label for="usCpf">${r.temCpf ? 'CPF correto' : 'CPF'}</label><input id="usCpf" type="text" inputmode="numeric" maxlength="14" autocomplete="off" spellcheck="false" placeholder="000.000.000-00"${r.email ? '' : ' disabled'}></div>
+        <div class="campo"><label for="usCpfMotivo">Motivo (fica registrado)</label><input id="usCpfMotivo" type="text" maxlength="300" autocomplete="off" placeholder="Ex.: titular pediu por e-mail; CPF digitado errado"${r.email ? '' : ' disabled'}></div>
+      </div>
+      <div class="acoesL"><button class="btn btn-g" type="submit"${r.email ? '' : ' disabled'}><i class="ti ti-link" aria-hidden="true"></i>${r.temCpf ? 'Corrigir CPF' : 'Vincular CPF'}</button></div>
+    </form>`;
+}
+function ligaDados(r) {
+  const f = $('usFormDados'), fc = $('usFormCpf');
+  f.onsubmit = async ev => {
+    ev.preventDefault();
+    if (!r.pode.editar) return;
+    const nome = $('usNome').value.replace(/\s+/g, ' ').trim(), email = $('usEmail').value.trim().toLowerCase();
+    const q = { acao: 'editarUsuario', uid: r.uid }, mud = [];
+    if (nome !== (r.nome || '')) { q.nome = nome; mud.push(nome ? 'Nome: <b>' + esc(nome) + '</b>' : 'Tirar o nome'); }
+    if (email !== (r.email || '')) {
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { toast('E-mail inválido.', 'err'); $('usEmail').focus(); return; }
+      q.email = email; mud.push('E-mail: <b>' + esc(r.email || '(nenhum)') + '</b> para <b>' + esc(email) + '</b>. A pessoa passa a entrar com o novo e precisa confirmá-lo.');
+    }
+    if (!mud.length) { toast('Nada mudou.'); return; }
+    if (!await confirmar('Salvar o cadastro', `<span>Para <b>${esc(nomeOuEmail(r))}</b>:</span></p><ul class="lib-notas">${mud.map(m => '<li>' + m + '</li>').join('')}</ul><p>`, 'Salvar')) return;
+    try { await admin(q); await recarregarFicha('Cadastro salvo.'); }
+    catch (e) { if (!E.bloqueado) toast('Não salvei: ' + ((e && e.message) || e), 'err'); }
+  };
+  $('usCpf').addEventListener('input', () => { const v = fmtCpf($('usCpf').value); if (v !== $('usCpf').value) $('usCpf').value = v; });
+  fc.onsubmit = async ev => {
+    ev.preventDefault();
+    if (!r.email) return;
+    const cpf = $('usCpf').value.trim(), motivo = $('usCpfMotivo').value.trim();
+    if (soDig(cpf).length !== 11) { toast('O CPF precisa dos 11 números.', 'err'); $('usCpf').focus(); return; }
+    if (motivo.length < 5) { toast('Escreva o motivo: ele fica registrado.', 'err'); $('usCpfMotivo').focus(); return; }
+    if (!await confirmar(r.temCpf ? 'Corrigir CPF' : 'Vincular CPF', `Vincular o CPF <b>${esc(fmtCpf(cpf))}</b> à conta <b>${esc(r.email)}</b>? Se ele estiver em outra conta, sai de lá. Se esta conta tiver outro CPF, o antigo fica livre.`, 'Vincular')) return;
+    try {
+      const x = await admin({ acao: 'vincularCpf', alvo: r.email, cpf, motivo });
+      E.carregou.pedidos = false;
+      await recarregarFicha(x.jaEstava ? 'Este CPF já era desta conta. Nada mudou.' : 'CPF ' + x.cpf + ' vinculado.' + (x.transferidoDe ? ' Saiu da conta ' + x.transferidoDe + '.' : ''));
+    } catch (e) { if (!E.bloqueado) toast('Não vinculei: ' + ((e && e.message) || e), 'err'); }
+  };
+}
+
+/* Liberações: o editor da seção Acessos, já carregado com esta conta */
+function fichaLiberacoes(r) {
+  if (!r.email) return `<h3><i class="ti ti-checklist" aria-hidden="true"></i>Liberações</h3><p class="aviso"><i class="ti ti-info-circle" aria-hidden="true"></i><span>Conta sem e-mail: libere pelo CPF na seção Acessos.</span></p>`;
+  return `<div class="us-lib" id="usLib">${editorLib(r, 'ulib')}</div>`;
+}
+function ligaLiberacoes(r) {
+  const raiz = $('usLib');
+  if (!raiz) return;
+  const uid = r.uid, alvo = r.email;
+  E.lib = { raiz, p: 'ulib', alvo, r,
+    recarregar: () => admin({ acao: 'usuario', uid }),
+    mostrar: (r2, res) => { E.us.ficha = r2; E.us.aba = 'liberacoes'; if (E.sub === uid) { desenharFicha(r2); mostrarResultadoLib(res); } } };
+  ligaLib();
+}
+
+/* Permissões: administrador (só o dono muda) e coordenação do ClínicaMed */
+function fichaPermissoes(r) {
+  const linha = (id, titulo, desc, ativo, estado, botao) => `<li class="us-papel">
+      <div class="us-ptx"><h4 id="usP-${id}">${titulo}</h4><p class="sub" id="usPd-${id}">${desc}</p></div>
+      <div class="us-pac">${estado}${botao}</div></li>`;
+  const btnPapel = (papel, ativo, pode, rotOn, rotOff, porque) => pode
+    ? `<button class="btn ${ativo ? 'btn-dn' : 'btn-p'} sm" type="button" data-papel="${papel}" data-ativo="${ativo ? 0 : 1}" aria-describedby="usPd-${papel}">${ativo ? rotOff : rotOn}</button>`
+    : `<button class="btn btn-g sm" type="button" disabled aria-describedby="usPd-${papel} usPw-${papel}">${ativo ? rotOff : rotOn}</button><span class="us-porque" id="usPw-${papel}">${esc(porque)}</span>`;
+  const admEstado = r.dono ? '<span class="selo ac">dono (permanente)</span>' : r.admin ? '<span class="selo ok">sim</span>' : '<span class="selo">não</span>';
+  const admBtn = r.dono ? '' : btnPapel('admin', r.admin, r.pode.admin, 'Dar administração', 'Tirar administração', 'Só o dono do MedTech muda este papel.');
+  const coEstado = r.dono ? '<span class="selo ac">sim (permanente)</span>' : r.coordenador ? (r.coordenadorAtivo ? '<span class="selo ok">sim</span>' : '<span class="selo av">sim, falta confirmar o e-mail</span>') : '<span class="selo">não</span>';
+  const coBtn = r.dono ? '' : btnPapel('coordenador', r.coordenador, !!r.email, 'Tornar coordenador', 'Tirar da coordenação', 'Conta sem e-mail.');
+  return `<h3><i class="ti ti-shield-check" aria-hidden="true"></i>Permissões</h3>
+    <ul class="us-papeis">
+      ${linha('admin', 'Administrador do MedTech', 'Entra neste painel e muda tudo nele. Exige e-mail confirmado. Só o dono dá ou tira.', r.admin, admEstado, admBtn)}
+      ${linha('coordenador', 'Coordenador do ClínicaMed', 'Cria turmas e vê o desempenho dos alunos no ClínicaMed. Vale quando o e-mail estiver confirmado.', r.coordenador, coEstado, coBtn)}
+    </ul>`;
+}
+function ligaPermissoes(r) {
+  $('usPan-permissoes').querySelectorAll('[data-papel]').forEach(b => b.onclick = async () => {
+    const papel = b.dataset.papel, ativo = b.dataset.ativo === '1';
+    const nm = esc(nomeOuEmail(r));
+    const txt = papel === 'admin'
+      ? (ativo ? `Dar administração a <b>${nm}</b>? A conta passa a ver e mudar tudo neste painel: contas, liberações, pagamentos e a IA.` : `Tirar a administração de <b>${nm}</b>? Ela deixa de entrar neste painel na hora.`)
+      : (ativo ? `Tornar <b>${nm}</b> coordenador do ClínicaMed? Ela passa a criar turmas e ver o desempenho dos alunos.` : `Tirar <b>${nm}</b> da coordenação do ClínicaMed?`);
+    if (!await confirmar(papel === 'admin' ? 'Administração' : 'Coordenação do ClínicaMed', txt, ativo ? 'Confirmar' : 'Tirar', !ativo)) return;
+    try {
+      const x = await admin({ acao: 'papel', uid: r.uid, papel, ativo });
+      await recarregarFicha(x.aviso ? 'Feito. ' + x.aviso : 'Permissão atualizada.');
+    } catch (e) { if (!E.bloqueado) toast('Não mudei: ' + ((e && e.message) || e), 'err'); }
+  });
+}
+
+/* Acesso à conta: link de nova senha e desativar/reativar */
+function fichaAcesso(r) {
+  const podeLink = r.pode.editar && !!r.email && !r.desativada;
+  const porqueLink = !r.email ? 'Conta sem e-mail.' : r.desativada ? 'Reative a conta antes.' : !r.pode.editar ? travaTxt(r) : '';
+  const porqueDes = r.desativada ? '' : (!r.pode.desativar ? travaTxt(r, 'desativar') : '');
+  return `<h3><i class="ti ti-key" aria-hidden="true"></i>Acesso à conta</h3>
+    <ul class="us-papeis">
+      <li class="us-papel"><div class="us-ptx"><h4>Nova senha</h4>
+        <p class="sub" id="usAcSenha">Manda para ${r.email ? '<b>' + esc(r.email) + '</b>' : 'o e-mail da conta'} o e-mail do MedTech com o link para criar uma senha nova. Ninguém vê nem define a senha por aqui.</p></div>
+        <div class="us-pac"><button class="btn btn-p sm" type="button" id="usBtSenha" aria-describedby="usAcSenha${porqueLink ? ' usAcSenhaP' : ''}"${podeLink ? '' : ' disabled'}><i class="ti ti-mail-forward" aria-hidden="true"></i>Enviar link de nova senha</button>
+        ${porqueLink ? `<span class="us-porque" id="usAcSenhaP">${esc(porqueLink)}</span>` : ''}</div></li>
+      <li class="us-papel"><div class="us-ptx"><h4>${r.desativada ? 'Conta desativada' : 'Desativar a conta'}</h4>
+        <p class="sub" id="usAcDes">${r.desativada ? 'A pessoa não consegue entrar. Reativar devolve o acesso com tudo como estava.' : 'A pessoa deixa de conseguir entrar e as sessões abertas caem. Nada é apagado: dá para reativar quando quiser.'}</p></div>
+        <div class="us-pac">${r.desativada
+          ? `<button class="btn btn-p sm" type="button" id="usBtDes" data-des="0"${r.pode.editar ? '' : ' disabled'}><i class="ti ti-player-play" aria-hidden="true"></i>Reativar conta</button>`
+          : `<button class="btn btn-dn sm" type="button" id="usBtDes" data-des="1" aria-describedby="usAcDes${porqueDes ? ' usAcDesP' : ''}"${r.pode.desativar ? '' : ' disabled'}><i class="ti ti-user-off" aria-hidden="true"></i>Desativar conta</button>`}
+        ${porqueDes ? `<span class="us-porque" id="usAcDesP">${esc(porqueDes)}</span>` : ''}</div></li>
+    </ul>`;
+}
+function ligaAcesso(r) {
+  $('usBtSenha').onclick = async () => {
+    if (!await confirmar('Enviar link de nova senha', `Mandar para <b>${esc(r.email)}</b> o e-mail com o link de redefinição de senha? A senha atual continua valendo até a pessoa criar a nova.`, 'Enviar link')) return;
+    try { const x = await admin({ acao: 'resetSenha', uid: r.uid }); await recarregarFicha('Link enviado para ' + x.email + '.'); }
+    catch (e) { if (!E.bloqueado) toast('Não enviei: ' + ((e && e.message) || e), 'err'); }
+  };
+  $('usBtDes').onclick = async () => {
+    const des = $('usBtDes').dataset.des === '1', nm = esc(nomeOuEmail(r));
+    const ok = await confirmar(des ? 'Desativar a conta' : 'Reativar a conta',
+      des ? `Desativar <b>${nm}</b>? A pessoa não consegue mais entrar e as sessões abertas caem em até 1 hora. Compras e dados ficam guardados; dá para reativar.` : `Reativar <b>${nm}</b>? A pessoa volta a entrar com a mesma senha.`,
+      des ? 'Desativar' : 'Reativar', des);
+    if (!ok) return;
+    try { await admin({ acao: 'editarUsuario', uid: r.uid, desativar: des }); await recarregarFicha(des ? 'Conta desativada.' : 'Conta reativada.'); }
+    catch (e) { if (!E.bloqueado) toast('Não mudei: ' + ((e && e.message) || e), 'err'); }
+  };
+}
+
+/* Histórico: pedidos e pagamentos, sinalizações, pendências e registros da administração */
+function fichaHistorico(r) {
+  const falhou = '<p class="vazio">Não consegui ler agora.</p>';
+  const peds = r.pedidos;
+  const tPed = peds === null ? falhou : !peds.length ? '<p class="vazio">Nenhum pedido ou pagamento.</p>' :
+    `<div class="tblw"><table class="tbl resp"><caption class="sr">Pedidos e pagamentos</caption><thead><tr><th scope="col">Quando</th><th scope="col">Evento</th><th scope="col">Produto</th><th scope="col" class="n">Valor</th><th scope="col">Meio</th></tr></thead><tbody>
+    ${peds.map(x => `<tr><td data-r="Quando" class="fraco">${quando(x.em)}</td>
+      <td data-r="Evento"><span class="selo ${SELO_TIPO[x.tipo] || ''}">${esc(x.tipo === 'revisar' ? 'A revisar' : x.rotulo)}</span>${x.teste ? ' <span class="selo">teste</span>' : ''}${x.motivo ? '<br><span class="fraco">Motivo: ' + esc(x.motivo) + '</span>' : ''}</td>
+      <td data-r="Produto">${esc(x.nome || '—')}${x.periodo ? ' <span class="fraco">(' + esc(/^\d+d$/.test(x.periodo) ? x.periodo.slice(0, -1) + ' dias' : x.periodo) + ')</span>' : ''}</td>
+      <td data-r="Valor" class="n">${x.valor === null ? '—' : (x.estimado ? '≈ ' : '') + brl(x.valor)}</td>
+      <td data-r="Meio" class="fraco">${esc(GATEWAY[x.gateway] || x.gateway)}${x.por ? ' · por ' + esc(x.por) : ''}</td></tr>`).join('')}</tbody></table></div>`;
+  const sis = r.sinalizacoes;
+  const tSi = sis === null ? falhou : !sis.length ? '<p class="vazio">Nenhuma questão sinalizada por esta conta.</p>' :
+    `<div class="tblw"><table class="tbl resp"><caption class="sr">Sinalizações</caption><thead><tr><th scope="col">Quando</th><th scope="col">App</th><th scope="col">Problema</th><th scope="col">Situação</th><th scope="col">Questão</th></tr></thead><tbody>
+    ${sis.map(x => `<tr><td data-r="Quando" class="fraco">${quando(x.em)}</td><td data-r="App">${esc(siNome(x))}</td><td data-r="Problema">${esc(TIPO_CURTO[x.tipo] || x.tipo)}</td>
+      <td data-r="Situação"><span class="selo ${(ST_SINAL[x.status] || {}).selo || ''}">${esc((ST_SINAL[x.status] || {}).nm || x.status)}</span></td><td data-r="Questão" class="cheia us-q">${esc(x.q || '—')}</td></tr>`).join('')}</tbody></table></div>`;
+  const log = r.log;
+  const tLog = log === null ? falhou : !log.length ? '<p class="vazio">Nenhuma mudança feita pela seção Usuários ainda. Liberações e CPF aparecem em Pedidos e pagamentos.</p>' :
+    `<div class="tblw"><table class="tbl resp"><caption class="sr">Registros da administração</caption><thead><tr><th scope="col">Quando</th><th scope="col">O que</th><th scope="col">Detalhe</th><th scope="col">Quem fez</th></tr></thead><tbody>
+    ${log.map(x => `<tr><td data-r="Quando" class="fraco">${quando(x.em)}</td><td data-r="O que">${esc(ACAO_LOG[x.acao] || x.acao)}</td><td data-r="Detalhe" class="cheia">${esc(x.resumo)}</td><td data-r="Quem fez" class="fraco em">${esc(x.por || '—')}</td></tr>`).join('')}</tbody></table></div>`;
+  const pend = [];
+  Object.entries((r.pendente && r.pendente.p) || {}).forEach(([id, ate]) => pend.push(`<li>${esc(nomeProd(id))}: ${dataS(ate)} <span class="fraco">(guardado para o e-mail; entra quando ele for confirmado)</span></li>`));
+  Object.entries((r.pendenteCpf && r.pendenteCpf.p) || {}).forEach(([id, ate]) => pend.push(`<li>${esc(nomeProd(id))}: ${dataS(ate)} <span class="fraco">(guardado para o CPF)</span></li>`));
+  return `<h3><i class="ti ti-history" aria-hidden="true"></i>Histórico</h3>
+    <h4 class="us-h4">Pedidos e pagamentos</h4>${tPed}
+    ${pend.length ? `<h4 class="us-h4">Liberações esperando</h4><ul class="us-pend">${pend.join('')}</ul>` : ''}
+    <h4 class="us-h4">Questões sinalizadas</h4>${tSi}
+    <h4 class="us-h4">Registros da administração</h4>${tLog}`;
+}
+
+$('btUs').onclick = () => { E.us.pagina = 1; carregarUsuarios(); };
+$('usFiltros').querySelectorAll('[data-usf]').forEach(b => b.addEventListener('click', () => { E.us.filtro = b.dataset.usf; E.us.pagina = 1; carregarUsuarios(); }));
+$('usOrdem').addEventListener('change', () => { E.us.pagina = 1; carregarUsuarios(); });
+['keydown', 'paste'].forEach(t => $('usBusca').addEventListener(t, () => { E.us.digitou = true; }));
+let tBuscaUs = 0;
+$('usBusca').addEventListener('input', () => { clearTimeout(tBuscaUs); tBuscaUs = setTimeout(() => { E.us.pagina = 1; carregarUsuarios(); }, 400); });
+
+/* ============================================================
    ACESSOS
    ============================================================ */
 function fichaConta(r, semProdutos) {
@@ -479,11 +883,16 @@ function fichaConta(r, semProdutos) {
    sozinhos); os de "teste": true ficam à parte, recolhidos. Aplicar = diferença:
    marcou um que não estava ativo → conceder {alvos:[alvo], produto, dias | ilimitado:true};
    desmarcou um ativo → revogar {alvo, produto}. Uma chamada por produto, em sequência,
-   e no fim a conta é consultada de novo. Sem conta: o servidor guarda como pendente. */
+   e no fim a conta é consultada de novo. Sem conta: o servidor guarda como pendente.
+   O MESMO editor serve a seção Acessos e a ficha da seção Usuários: o contexto E.lib diz
+   onde ele está desenhado (raiz), o prefixo dos ids (p: 'lib' em Acessos, 'ulib' na ficha)
+   e como reler a conta depois de aplicar (recarregar) e redesenhar (mostrar). */
 const LINHA_NOME = { clinica: 'MedTech App', provas: 'MedTech Provas' };
 const nomeLinha = l => LINHA_NOME[l] || (l ? l.charAt(0).toUpperCase() + l.slice(1) : 'Outros');
 const MOTIVOS = ['cortesia', 'residência', 'instituição', 'parceria'];
-const idLib = id => 'lib-' + String(id).replace(/[^\w-]/g, '_');
+const idLib = (id, p) => (p || 'lib') + '-' + String(id).replace(/[^\w-]/g, '_');
+/* elemento do editor ativo pelo id sem prefixo ('Resumo' → #libResumo ou #ulibResumo) */
+const qLib = nome => document.getElementById(((E.lib && E.lib.p) || 'lib') + nome);
 function situacoesConta(r) {
   const s = {};
   const pega = (obj, onde) => Object.entries((obj && obj.p) || {}).forEach(([id, ate]) => {
@@ -500,70 +909,71 @@ function seloSituacao(st, agora) {
   if (st.onde !== 'conta') return `<span class="selo av">pendente, ${ehIlim(st.ate) ? 'ilimitado' : 'até ' + dataS(st.ate)}</span>`;
   return ehIlim(st.ate) ? '<span class="selo ok">ilimitado</span>' : `<span class="selo ok">ativo até ${dataS(st.ate)}</span>`;
 }
-function itemLib(id, nome, sub, st, agora, extra) {
+function itemLib(id, nome, sub, st, agora, extra, p) {
   const ativo = !!(st && st.ate > agora);
-  const k = idLib(id);
+  const k = idLib(id, p);
   return `<li><label class="lib-item" for="${k}">
     <input type="checkbox" id="${k}" data-lib="${esc(id)}" data-orig="${ativo ? 1 : 0}"${ativo ? ' checked' : ''}${extra || ''}>
     <span class="lib-tx"><span class="lib-nm">${esc(nome)}</span>${sub && sub !== nome ? `<span class="lib-sub">${esc(sub)}</span>` : ''}
       <span class="lib-sel">${seloSituacao(st, agora)}<span class="lib-mud" data-mud></span></span></span>
   </label></li>`;
 }
-function editorLib(r) {
+function editorLib(r, p) {
+  p = p || 'lib';
   const P = E.planos || { produtos: [] }, agora = r.agora || agoraS(), sit = situacoesConta(r);
   const prods = (P.produtos || []).filter(p => p && p.id);
   const subDe = p => { const a = appsDoProduto(P, p); return a.txt || a.ids.map(x => (APPS[x] || {}).nm || x).join(', '); };
   const grupos = [], porLinha = {};
-  prods.filter(p => !p.teste).forEach(p => {
-    const l = p.linha || '';
+  prods.filter(x => !x.teste).forEach(x => {
+    const l = x.linha || '';
     if (!porLinha[l]) { porLinha[l] = []; grupos.push(l); }
-    porLinha[l].push(itemLib(p.id, p.nome || p.id, subDe(p), sit[p.id], agora, ` data-linha="${esc(l)}"`));
+    porLinha[l].push(itemLib(x.id, x.nome || x.id, subDe(x), sit[x.id], agora, ` data-linha="${esc(l)}"`, p));
   });
   /* produto que saiu do catálogo e ainda está ativo na conta: só dá para revogar */
-  const fora = Object.keys(sit).filter(id => !prods.some(p => p.id === id) && sit[id].ate > agora);
-  const testes = prods.filter(p => p.teste);
+  const fora = Object.keys(sit).filter(id => !prods.some(x => x.id === id) && sit[id].ate > agora);
+  const testes = prods.filter(x => x.teste);
   const fs = (titulo, itens) => `<fieldset class="lib-grupo"><legend>${esc(titulo)}</legend><ul class="lib-lista">${itens.join('')}</ul></fieldset>`;
   const semConta = !r.existe;
   const pendTxt = r.busca === 'cpf'
     ? 'Não há conta com este CPF. O que for liberado fica pendente e entra quando alguém cadastrar este CPF.'
     : 'Ainda não há conta com este e-mail. O que for liberado fica pendente e entra no primeiro login com este e-mail.';
-  return `<section class="lib" aria-labelledby="libTit">
-    <div><h4 id="libTit"><i class="ti ti-checklist" aria-hidden="true"></i>Liberações ${semConta ? 'pendentes ' : ''}desta ${r.busca === 'cpf' ? 'pessoa' : 'conta'}</h4>
+  return `<section class="lib" aria-labelledby="${p}Tit">
+    <div><h4 id="${p}Tit"><i class="ti ti-checklist" aria-hidden="true"></i>Liberações ${semConta ? 'pendentes ' : ''}desta ${r.busca === 'cpf' ? 'pessoa' : 'conta'}</h4>
       <p class="sub">Marcados são os que estão ativos agora. Marque ou desmarque e aplique tudo de uma vez. Os que já estão ativos ficam com a data que têm.</p></div>
     ${semConta ? `<div class="aviso"><i class="ti ti-clock-pause" aria-hidden="true"></i><div>${esc(pendTxt)}</div></div>` : ''}
-    <div class="chips" role="group" aria-label="Atalhos de seleção" id="libAtalhos">
+    <div class="chips" role="group" aria-label="Atalhos de seleção" id="${p}Atalhos">
       <button class="chip" type="button" data-sel="todos">Marcar todos</button>
       <button class="chip" type="button" data-sel="nenhum">Desmarcar todos</button>
       <button class="chip" type="button" data-sel="clinica">Só MedTech App</button>
       <button class="chip" type="button" data-sel="provas">Só provas</button>
     </div>
     ${grupos.map(l => fs(nomeLinha(l), porLinha[l])).join('')}
-    ${fora.length ? fs('Fora do catálogo (só revogar)', fora.map(id => itemLib(id, id, 'Saiu do planos.json; ainda ativo nesta conta.', sit[id], agora, ' data-fora="1"'))) : ''}
+    ${fora.length ? fs('Fora do catálogo (só revogar)', fora.map(id => itemLib(id, id, 'Saiu do planos.json; ainda ativo nesta conta.', sit[id], agora, ' data-fora="1"', p))) : ''}
     ${testes.length ? `<details class="lib-teste"><summary>Produtos de teste (${testes.length})</summary>
-      <p class="sub">Os atalhos não mexem nestes.</p>${fs('Teste', testes.map(p => itemLib(p.id, p.nome || p.id, '', sit[p.id], agora, ' data-teste="1"')))}</details>` : ''}
+      <p class="sub">Os atalhos não mexem nestes.</p>${fs('Teste', testes.map(x => itemLib(x.id, x.nome || x.id, '', sit[x.id], agora, ' data-teste="1"', p)))}</details>` : ''}
     <div class="lib-opc">
       <fieldset class="lib-dur"><legend>Duração para os que forem adicionados</legend>
         <div class="chips">
-          <label class="chip lib-r"><input type="radio" name="libDur" value="30" checked>30 dias</label>
-          <label class="chip lib-r"><input type="radio" name="libDur" value="90">90 dias</label>
-          <label class="chip lib-r"><input type="radio" name="libDur" value="365">1 ano</label>
-          <label class="chip lib-r"><input type="radio" name="libDur" value="ilim">Ilimitado</label>
-          <label class="chip lib-r"><input type="radio" name="libDur" value="n">Outro</label>
+          <label class="chip lib-r"><input type="radio" name="${p}Dur" value="30" checked>30 dias</label>
+          <label class="chip lib-r"><input type="radio" name="${p}Dur" value="90">90 dias</label>
+          <label class="chip lib-r"><input type="radio" name="${p}Dur" value="365">1 ano</label>
+          <label class="chip lib-r"><input type="radio" name="${p}Dur" value="ilim">Ilimitado</label>
+          <label class="chip lib-r"><input type="radio" name="${p}Dur" value="n">Outro</label>
         </div>
-        <div class="campo lib-n"><label for="libN">Número de dias</label><input id="libN" type="number" min="1" max="3660" value="180" inputmode="numeric" disabled aria-describedby="libNaj"><span class="ajuda" id="libNaj">De 1 a 3660. Vale quando "Outro" estiver escolhido.</span></div>
+        <div class="campo lib-n"><label for="${p}N">Número de dias</label><input id="${p}N" type="number" min="1" max="3660" value="180" inputmode="numeric" disabled aria-describedby="${p}Naj"><span class="ajuda" id="${p}Naj">De 1 a 3660. Vale quando "Outro" estiver escolhido.</span></div>
       </fieldset>
-      <div class="campo"><label for="libMotivo">Motivo (opcional)</label>
-        <select id="libMotivo" aria-describedby="libMotAj"><option value="">Sem motivo</option>${MOTIVOS.map(m => `<option value="${esc(m)}">${esc(m.charAt(0).toUpperCase() + m.slice(1))}</option>`).join('')}</select>
-        <span class="ajuda" id="libMotAj">Aparece no resumo desta aplicação.</span></div>
+      <div class="campo"><label for="${p}Motivo">Motivo (opcional)</label>
+        <select id="${p}Motivo" aria-describedby="${p}MotAj"><option value="">Sem motivo</option>${MOTIVOS.map(m => `<option value="${esc(m)}">${esc(m.charAt(0).toUpperCase() + m.slice(1))}</option>`).join('')}</select>
+        <span class="ajuda" id="${p}MotAj">Aparece no resumo desta aplicação.</span></div>
     </div>
     <div class="lib-rod">
-      <p class="lib-res" id="libResumo" aria-live="polite">Nenhuma alteração marcada.</p>
-      <button class="btn btn-p" type="button" id="libAplicar" disabled><i class="ti ti-check" aria-hidden="true"></i>Aplicar alterações</button>
+      <p class="lib-res" id="${p}Resumo" aria-live="polite">Nenhuma alteração marcada.</p>
+      <button class="btn btn-p" type="button" id="${p}Aplicar" disabled><i class="ti ti-check" aria-hidden="true"></i>Aplicar alterações</button>
     </div>
-    <div id="libOut"></div>
+    <div class="lib-out" id="${p}Out"></div>
   </section>`;
 }
-const caixasLib = () => [...$('outVer').querySelectorAll('[data-lib]')];
+const caixasLib = () => (E.lib && E.lib.raiz) ? [...E.lib.raiz.querySelectorAll('[data-lib]')] : [];
 function difLib() {
   const cx = caixasLib();
   return { add: cx.filter(c => c.checked && c.dataset.orig !== '1').map(c => c.dataset.lib),
@@ -576,21 +986,24 @@ function atualizaLib() {
     m.innerHTML = !mudou ? '' : (c.checked ? '<span class="selo ac">vai liberar</span>' : '<span class="selo err">vai revogar</span>');
   });
   const d = difLib(), n = d.add.length + d.rem.length;
-  $('libResumo').textContent = n ? [d.add.length ? 'Liberar ' + plural(d.add.length, 'produto', 'produtos') : '', d.rem.length ? 'revogar ' + plural(d.rem.length, 'produto', 'produtos') : ''].filter(Boolean).join(', ').replace(/^r/, 'R') + '.' : 'Nenhuma alteração marcada.';
-  $('libAplicar').disabled = !n || !!E.libOcupado;
+  qLib('Resumo').textContent = n ? [d.add.length ? 'Liberar ' + plural(d.add.length, 'produto', 'produtos') : '', d.rem.length ? 'revogar ' + plural(d.rem.length, 'produto', 'produtos') : ''].filter(Boolean).join(', ').replace(/^r/, 'R') + '.' : 'Nenhuma alteração marcada.';
+  qLib('Aplicar').disabled = !n || !!E.libOcupado;
 }
 function duracaoLib() {
-  const v = ($('outVer').querySelector('input[name=libDur]:checked') || {}).value || '30';
+  const v = (E.lib.raiz.querySelector('input[name="' + E.lib.p + 'Dur"]:checked') || {}).value || '30';
   if (v === 'ilim') return { ilimitado: true, txt: 'ilimitado' };
-  const dias = v === 'n' ? Math.floor(Number($('libN').value)) : Number(v);
+  const dias = v === 'n' ? Math.floor(Number(qLib('N').value)) : Number(v);
   if (!(dias >= 1 && dias <= 3660)) return { erro: 'Informe de 1 a 3660 dias.' };
   return { dias, txt: dias === 365 ? '1 ano' : plural(dias, 'dia', 'dias') };
 }
 function ligaLib() {
-  const out = $('outVer');
-  if (!out.querySelector('.lib')) return;
-  out.querySelectorAll('[data-lib]').forEach(c => c.addEventListener('change', atualizaLib));
-  $('libAtalhos').querySelectorAll('[data-sel]').forEach(b => b.onclick = () => {
+  const out = E.lib && E.lib.raiz;
+  if (!out || !out.querySelector('.lib')) return;
+  /* cada editor desenhado (Acessos e ficha) volta a ser o ativo quando alguém mexe nele */
+  const ctx = E.lib, ativa = () => { E.lib = ctx; };
+  out.querySelectorAll('[data-lib]').forEach(c => c.addEventListener('change', () => { ativa(); atualizaLib(); }));
+  qLib('Atalhos').querySelectorAll('[data-sel]').forEach(b => b.onclick = () => {
+    ativa();
     const q = b.dataset.sel;
     caixasLib().forEach(c => {
       if (c.dataset.teste) return;
@@ -598,21 +1011,27 @@ function ligaLib() {
       c.checked = q === 'todos' ? true : q === 'nenhum' ? false : c.dataset.linha === q;
     });
     atualizaLib();
-    toast(b.textContent + ': ' + $('libResumo').textContent);
+    toast(b.textContent + ': ' + qLib('Resumo').textContent);
   });
-  out.querySelectorAll('input[name=libDur]').forEach(r => r.addEventListener('change', () => {
+  out.querySelectorAll('input[name="' + E.lib.p + 'Dur"]').forEach(r => r.addEventListener('change', () => {
+    ativa();
     const outro = r.value === 'n' && r.checked;
-    $('libN').disabled = !outro;
-    if (outro) $('libN').focus();
+    qLib('N').disabled = !outro;
+    if (outro) qLib('N').focus();
   }));
-  $('libAplicar').onclick = aplicarLib;
+  qLib('Aplicar').onclick = () => { ativa(); aplicarLib(); };
   atualizaLib();
 }
 function mostrarConta(alvo, r, resultado) {
-  E.lib = { alvo, r };
-  $('outVer').innerHTML = fichaConta(r, editorLib(r));
+  E.lib = { raiz: $('outVer'), p: 'lib', alvo, r, recarregar: () => admin({ acao: 'ver', alvo }), mostrar: (r2, res) => mostrarConta(alvo, r2, res) };
+  $('outVer').innerHTML = fichaConta(r, editorLib(r, 'lib'));
   ligaLib();
-  if (resultado) { $('libOut').innerHTML = resultado; const h = $('libOut').querySelector('[tabindex="-1"]'); if (h) h.focus(); }
+  mostrarResultadoLib(resultado);
+}
+function mostrarResultadoLib(resultado) {
+  if (!resultado) return;
+  const o = qLib('Out'); o.innerHTML = resultado;
+  const h = o.querySelector('[tabindex="-1"]'); if (h) h.focus();
 }
 /* alvo que o servidor entende: o CPF digitado (com máscara) ou o e-mail da conta */
 function alvoDaBusca(digitado, r) {
@@ -622,11 +1041,12 @@ function alvoDaBusca(digitado, r) {
 const nomeAlvo = (alvo, r) => r.busca === 'cpf' ? 'CPF ' + alvo + (r.email ? ' (' + r.email + ')' : '') : alvo;
 async function aplicarLib() {
   if (E.libOcupado || !E.lib) return;
-  const { alvo, r } = E.lib, d = difLib();
+  const ctx = E.lib, { alvo, r } = ctx, d = difLib();
+  const qc = n => document.getElementById(ctx.p + n);   // fixo neste editor, mesmo se outro virar o ativo durante a aplicação
   if (!d.add.length && !d.rem.length) return;
   const dur = duracaoLib();
-  if (d.add.length && dur.erro) { toast(dur.erro, 'err'); $('libN').focus(); return; }
-  const motivo = $('libMotivo').value;
+  if (d.add.length && dur.erro) { toast(dur.erro, 'err'); qc('N').focus(); return; }
+  const motivo = qc('Motivo').value;
   const nomes = l => l.map(nomeProd).join(', ');
   const linha = [d.add.length ? 'Liberar: ' + nomes(d.add) + ' (' + dur.txt + ')' : '', d.rem.length ? 'Revogar: ' + nomes(d.rem) : ''].filter(Boolean).join(' · ');
   const notas = [];
@@ -644,10 +1064,10 @@ async function aplicarLib() {
 
   const passos = d.add.map(id => ({ tipo: 'add', id })).concat(d.rem.map(id => ({ tipo: 'rem', id })));
   E.libOcupado = true;
-  const sec = $('outVer').querySelector('.lib');
+  const sec = ctx.raiz.querySelector('.lib');
   sec.querySelectorAll('input,select,button').forEach(x => { x.disabled = true; });
   sec.setAttribute('aria-busy', 'true');
-  const out = $('libOut');
+  const out = qc('Out');
   const listaPasso = p => {
     const rot = (p.tipo === 'add' ? 'Liberar ' : 'Revogar ') + nomeProd(p.id);
     const est = !p.st ? '<span class="selo">aguardando</span>' : p.st === 'fazendo' ? '<span class="selo ac">aplicando…</span>'
@@ -656,13 +1076,14 @@ async function aplicarLib() {
     return `<li><i class="ti ${ic}" aria-hidden="true"></i><span class="lib-pn">${esc(rot)}</span>${est}</li>`;
   };
   /* região viva fixa: só o texto muda a cada passo (trocar o bloco inteiro faria o leitor de tela repetir tudo) */
-  out.innerHTML = `<div class="lib-prog"><p id="libProgTx" role="status" aria-live="polite"></p>
-      <progress id="libProgBar" max="${passos.length}" value="0" aria-labelledby="libProgTx"></progress>
-      <ol class="lib-passos" id="libPassos"></ol></div>`;
+  const pp = ctx.p;
+  out.innerHTML = `<div class="lib-prog"><p id="${pp}ProgTx" role="status" aria-live="polite"></p>
+      <progress id="${pp}ProgBar" max="${passos.length}" value="0" aria-labelledby="${pp}ProgTx"></progress>
+      <ol class="lib-passos" id="${pp}Passos"></ol></div>`;
   const desenhaPassos = feitos => {
-    $('libProgTx').textContent = feitos < passos.length ? 'Aplicando ' + (feitos + 1) + ' de ' + passos.length + '…' : 'Concluído.';
-    $('libProgBar').value = feitos;
-    $('libPassos').innerHTML = passos.map(listaPasso).join('');
+    qc('ProgTx').textContent = feitos < passos.length ? 'Aplicando ' + (feitos + 1) + ' de ' + passos.length + '…' : 'Concluído.';
+    qc('ProgBar').value = feitos;
+    qc('Passos').innerHTML = passos.map(listaPasso).join('');
   };
   for (let i = 0; i < passos.length; i++) {
     const p = passos[i];
@@ -688,7 +1109,7 @@ async function aplicarLib() {
     p.st = 'feito';
   }
   const erros = passos.filter(p => p.erro).length, feitos = passos.filter(p => p.st === 'feito').length;
-  E.carregou.assinantes = false; E.carregou.painel = false; E.carregou.pedidos = false;
+  E.carregou.assinantes = false; E.carregou.painel = false; E.carregou.pedidos = false; E.carregou.usuarios = false;
   const resumo = `<div class="aviso ${erros ? 'err' : 'info'} lib-fim"><i class="ti ${erros ? 'ti-alert-triangle' : 'ti-check'}" aria-hidden="true"></i><div>
       <p class="lib-fimtit" tabindex="-1"><b>${erros ? plural(feitos - erros, 'alteração aplicada', 'alterações aplicadas') + ', ' + plural(erros, 'com erro', 'com erro') + '.' : 'Tudo aplicado: ' + plural(feitos, 'alteração', 'alterações') + '.'}</b></p>
       <p>${esc(linha)}${motivo ? ' · Motivo: ' + esc(motivo) : ''}</p></div></div>
@@ -697,8 +1118,8 @@ async function aplicarLib() {
   if (E.bloqueado) return;
   out.innerHTML = resumo + carregando('Consultando a conta de novo…');
   try {
-    const r2 = await admin({ acao: 'ver', alvo });
-    mostrarConta(alvo, r2, resumo + `<p class="leg">Situação acima consultada de novo às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}.</p>`);
+    const r2 = await ctx.recarregar();
+    ctx.mostrar(r2, resumo + `<p class="leg">Situação acima consultada de novo às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}.</p>`);
   } catch (e) {
     out.innerHTML = resumo + avisoErro(e);
   }
@@ -1608,6 +2029,7 @@ $('btIaVoltar').onclick = () => definirIA('2.5');
    ============================================================ */
 async function iniciar() {
   if (E.iniciado) return;
+  E.us.eu = MT.user.uid;
   E.iniciado = true;
   $('quem').textContent = MT.user.email || MT.user.uid;
   const P = await planos();
@@ -1615,7 +2037,7 @@ async function iniciar() {
   $('cProd').innerHTML = ops; $('rProd').innerHTML = ops; $('cProd').value = 'cortesia';
   $('asProd').innerHTML = '<option value="">Todos</option>' + ops;
   const sec = location.hash.slice(1);
-  irPara(SECOES.includes(sec) ? sec : 'visao');
+  irPara(sec);
   if (sec && sec !== 'visao' && !E.carregou.painel) carregarPainel();   // contagem das sinalizações no menu
 }
 $('btSair').onclick = () => { if (window.MT && MT.signOut) MT.signOut(); };
