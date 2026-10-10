@@ -446,7 +446,7 @@ $('asBusca').addEventListener('input', () => { clearTimeout(tBusca); tBusca = se
 /* ============================================================
    ACESSOS
    ============================================================ */
-function fichaConta(r) {
+function fichaConta(r, semProdutos) {
   if (!r) return '';
   const agora = r.agora || agoraS();
   const prods = Object.entries((r.mt && r.mt.p) || {}).map(([id, ate]) => ({ id, ate, onde: 'conta' }))
@@ -470,15 +470,248 @@ function fichaConta(r) {
   const tabPed = peds.length ? `<div class="tblw"><table class="tbl"><caption>Últimos pedidos</caption><thead><tr><th scope="col">Quando</th><th scope="col">Evento</th><th scope="col">Produto</th></tr></thead><tbody>
       ${peds.map(p => `<tr><td class="fraco">${quando(p.em)}</td><td>${esc(ROTULO[p.evento] || p.evento)}${p.revisar ? ' <span class="selo err">a revisar</span>' : ''}</td><td>${esc(nomeProd(p.produto))}${p.periodo ? ' <span class="fraco">(' + esc(p.periodo) + ')</span>' : ''}</td></tr>`).join('')}</tbody></table></div>` : '';
   const limpo = JSON.parse(JSON.stringify(r)); delete limpo.agora;
-  return `<dl class="ficha">${ficha.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>${tabProd}${tabPed}
+  /* semProdutos = o editor de liberações (Acessos), que já mostra a situação de cada produto */
+  return `<dl class="ficha">${ficha.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>${semProdutos || tabProd}${tabPed}
     <details class="tec"><summary>Dados técnicos</summary><pre>${esc(JSON.stringify(limpo, null, 2))}</pre></details>`;
+}
+/* ---------- Liberações da conta consultada (10/10/2026) ----------
+   Marca de uma vez o que a pessoa tem. A lista vem do planos.json (produtos novos aparecem
+   sozinhos); os de "teste": true ficam à parte, recolhidos. Aplicar = diferença:
+   marcou um que não estava ativo → conceder {alvos:[alvo], produto, dias | ilimitado:true};
+   desmarcou um ativo → revogar {alvo, produto}. Uma chamada por produto, em sequência,
+   e no fim a conta é consultada de novo. Sem conta: o servidor guarda como pendente. */
+const LINHA_NOME = { clinica: 'MedTech App', provas: 'MedTech Provas' };
+const nomeLinha = l => LINHA_NOME[l] || (l ? l.charAt(0).toUpperCase() + l.slice(1) : 'Outros');
+const MOTIVOS = ['cortesia', 'residência', 'instituição', 'parceria'];
+const idLib = id => 'lib-' + String(id).replace(/[^\w-]/g, '_');
+function situacoesConta(r) {
+  const s = {};
+  const pega = (obj, onde) => Object.entries((obj && obj.p) || {}).forEach(([id, ate]) => {
+    ate = Number(ate) || 0;
+    if (!s[id] || ate > s[id].ate) s[id] = { ate, onde };
+  });
+  pega(r.mt, 'conta'); pega(r.pendente, 'pendente'); pega(r.pendenteCpf, 'pendente-cpf');
+  return s;
+}
+function seloSituacao(st, agora) {
+  if (!st || !st.ate) return '<span class="selo">sem acesso</span>';
+  if (st.ate <= agora) return `<span class="selo err">vencido em ${dataS(st.ate)}</span>`;
+  /* pendente = guardado para o e-mail ou CPF sem conta; entra quando a conta aparecer */
+  if (st.onde !== 'conta') return `<span class="selo av">pendente, ${ehIlim(st.ate) ? 'ilimitado' : 'até ' + dataS(st.ate)}</span>`;
+  return ehIlim(st.ate) ? '<span class="selo ok">ilimitado</span>' : `<span class="selo ok">ativo até ${dataS(st.ate)}</span>`;
+}
+function itemLib(id, nome, sub, st, agora, extra) {
+  const ativo = !!(st && st.ate > agora);
+  const k = idLib(id);
+  return `<li><label class="lib-item" for="${k}">
+    <input type="checkbox" id="${k}" data-lib="${esc(id)}" data-orig="${ativo ? 1 : 0}"${ativo ? ' checked' : ''}${extra || ''}>
+    <span class="lib-tx"><span class="lib-nm">${esc(nome)}</span>${sub && sub !== nome ? `<span class="lib-sub">${esc(sub)}</span>` : ''}
+      <span class="lib-sel">${seloSituacao(st, agora)}<span class="lib-mud" data-mud></span></span></span>
+  </label></li>`;
+}
+function editorLib(r) {
+  const P = E.planos || { produtos: [] }, agora = r.agora || agoraS(), sit = situacoesConta(r);
+  const prods = (P.produtos || []).filter(p => p && p.id);
+  const subDe = p => { const a = appsDoProduto(P, p); return a.txt || a.ids.map(x => (APPS[x] || {}).nm || x).join(', '); };
+  const grupos = [], porLinha = {};
+  prods.filter(p => !p.teste).forEach(p => {
+    const l = p.linha || '';
+    if (!porLinha[l]) { porLinha[l] = []; grupos.push(l); }
+    porLinha[l].push(itemLib(p.id, p.nome || p.id, subDe(p), sit[p.id], agora, ` data-linha="${esc(l)}"`));
+  });
+  /* produto que saiu do catálogo e ainda está ativo na conta: só dá para revogar */
+  const fora = Object.keys(sit).filter(id => !prods.some(p => p.id === id) && sit[id].ate > agora);
+  const testes = prods.filter(p => p.teste);
+  const fs = (titulo, itens) => `<fieldset class="lib-grupo"><legend>${esc(titulo)}</legend><ul class="lib-lista">${itens.join('')}</ul></fieldset>`;
+  const semConta = !r.existe;
+  const pendTxt = r.busca === 'cpf'
+    ? 'Não há conta com este CPF. O que for liberado fica pendente e entra quando alguém cadastrar este CPF.'
+    : 'Ainda não há conta com este e-mail. O que for liberado fica pendente e entra no primeiro login com este e-mail.';
+  return `<section class="lib" aria-labelledby="libTit">
+    <div><h4 id="libTit"><i class="ti ti-checklist" aria-hidden="true"></i>Liberações ${semConta ? 'pendentes ' : ''}desta ${r.busca === 'cpf' ? 'pessoa' : 'conta'}</h4>
+      <p class="sub">Marcados são os que estão ativos agora. Marque ou desmarque e aplique tudo de uma vez. Os que já estão ativos ficam com a data que têm.</p></div>
+    ${semConta ? `<div class="aviso"><i class="ti ti-clock-pause" aria-hidden="true"></i><div>${esc(pendTxt)}</div></div>` : ''}
+    <div class="chips" role="group" aria-label="Atalhos de seleção" id="libAtalhos">
+      <button class="chip" type="button" data-sel="todos">Marcar todos</button>
+      <button class="chip" type="button" data-sel="nenhum">Desmarcar todos</button>
+      <button class="chip" type="button" data-sel="clinica">Só MedTech App</button>
+      <button class="chip" type="button" data-sel="provas">Só provas</button>
+    </div>
+    ${grupos.map(l => fs(nomeLinha(l), porLinha[l])).join('')}
+    ${fora.length ? fs('Fora do catálogo (só revogar)', fora.map(id => itemLib(id, id, 'Saiu do planos.json; ainda ativo nesta conta.', sit[id], agora, ' data-fora="1"'))) : ''}
+    ${testes.length ? `<details class="lib-teste"><summary>Produtos de teste (${testes.length})</summary>
+      <p class="sub">Os atalhos não mexem nestes.</p>${fs('Teste', testes.map(p => itemLib(p.id, p.nome || p.id, '', sit[p.id], agora, ' data-teste="1"')))}</details>` : ''}
+    <div class="lib-opc">
+      <fieldset class="lib-dur"><legend>Duração para os que forem adicionados</legend>
+        <div class="chips">
+          <label class="chip lib-r"><input type="radio" name="libDur" value="30" checked>30 dias</label>
+          <label class="chip lib-r"><input type="radio" name="libDur" value="90">90 dias</label>
+          <label class="chip lib-r"><input type="radio" name="libDur" value="365">1 ano</label>
+          <label class="chip lib-r"><input type="radio" name="libDur" value="ilim">Ilimitado</label>
+          <label class="chip lib-r"><input type="radio" name="libDur" value="n">Outro</label>
+        </div>
+        <div class="campo lib-n"><label for="libN">Número de dias</label><input id="libN" type="number" min="1" max="3660" value="180" inputmode="numeric" disabled aria-describedby="libNaj"><span class="ajuda" id="libNaj">De 1 a 3660. Vale quando "Outro" estiver escolhido.</span></div>
+      </fieldset>
+      <div class="campo"><label for="libMotivo">Motivo (opcional)</label>
+        <select id="libMotivo" aria-describedby="libMotAj"><option value="">Sem motivo</option>${MOTIVOS.map(m => `<option value="${esc(m)}">${esc(m.charAt(0).toUpperCase() + m.slice(1))}</option>`).join('')}</select>
+        <span class="ajuda" id="libMotAj">Aparece no resumo desta aplicação.</span></div>
+    </div>
+    <div class="lib-rod">
+      <p class="lib-res" id="libResumo" aria-live="polite">Nenhuma alteração marcada.</p>
+      <button class="btn btn-p" type="button" id="libAplicar" disabled><i class="ti ti-check" aria-hidden="true"></i>Aplicar alterações</button>
+    </div>
+    <div id="libOut"></div>
+  </section>`;
+}
+const caixasLib = () => [...$('outVer').querySelectorAll('[data-lib]')];
+function difLib() {
+  const cx = caixasLib();
+  return { add: cx.filter(c => c.checked && c.dataset.orig !== '1').map(c => c.dataset.lib),
+    rem: cx.filter(c => !c.checked && c.dataset.orig === '1').map(c => c.dataset.lib) };
+}
+function atualizaLib() {
+  caixasLib().forEach(c => {
+    const m = c.closest('.lib-item').querySelector('[data-mud]');
+    const mudou = c.checked !== (c.dataset.orig === '1');
+    m.innerHTML = !mudou ? '' : (c.checked ? '<span class="selo ac">vai liberar</span>' : '<span class="selo err">vai revogar</span>');
+  });
+  const d = difLib(), n = d.add.length + d.rem.length;
+  $('libResumo').textContent = n ? [d.add.length ? 'Liberar ' + plural(d.add.length, 'produto', 'produtos') : '', d.rem.length ? 'revogar ' + plural(d.rem.length, 'produto', 'produtos') : ''].filter(Boolean).join(', ').replace(/^r/, 'R') + '.' : 'Nenhuma alteração marcada.';
+  $('libAplicar').disabled = !n || !!E.libOcupado;
+}
+function duracaoLib() {
+  const v = ($('outVer').querySelector('input[name=libDur]:checked') || {}).value || '30';
+  if (v === 'ilim') return { ilimitado: true, txt: 'ilimitado' };
+  const dias = v === 'n' ? Math.floor(Number($('libN').value)) : Number(v);
+  if (!(dias >= 1 && dias <= 3660)) return { erro: 'Informe de 1 a 3660 dias.' };
+  return { dias, txt: dias === 365 ? '1 ano' : plural(dias, 'dia', 'dias') };
+}
+function ligaLib() {
+  const out = $('outVer');
+  if (!out.querySelector('.lib')) return;
+  out.querySelectorAll('[data-lib]').forEach(c => c.addEventListener('change', atualizaLib));
+  $('libAtalhos').querySelectorAll('[data-sel]').forEach(b => b.onclick = () => {
+    const q = b.dataset.sel;
+    caixasLib().forEach(c => {
+      if (c.dataset.teste) return;
+      if (c.dataset.fora) { if (q === 'nenhum' || q === 'clinica' || q === 'provas') c.checked = false; return; }
+      c.checked = q === 'todos' ? true : q === 'nenhum' ? false : c.dataset.linha === q;
+    });
+    atualizaLib();
+    toast(b.textContent + ': ' + $('libResumo').textContent);
+  });
+  out.querySelectorAll('input[name=libDur]').forEach(r => r.addEventListener('change', () => {
+    const outro = r.value === 'n' && r.checked;
+    $('libN').disabled = !outro;
+    if (outro) $('libN').focus();
+  }));
+  $('libAplicar').onclick = aplicarLib;
+  atualizaLib();
+}
+function mostrarConta(alvo, r, resultado) {
+  E.lib = { alvo, r };
+  $('outVer').innerHTML = fichaConta(r, editorLib(r));
+  ligaLib();
+  if (resultado) { $('libOut').innerHTML = resultado; const h = $('libOut').querySelector('[tabindex="-1"]'); if (h) h.focus(); }
+}
+/* alvo que o servidor entende: o CPF digitado (com máscara) ou o e-mail da conta */
+function alvoDaBusca(digitado, r) {
+  if (r.busca === 'cpf') return fmtCpf(digitado);
+  return (r.email || digitado).toLowerCase();
+}
+const nomeAlvo = (alvo, r) => r.busca === 'cpf' ? 'CPF ' + alvo + (r.email ? ' (' + r.email + ')' : '') : alvo;
+async function aplicarLib() {
+  if (E.libOcupado || !E.lib) return;
+  const { alvo, r } = E.lib, d = difLib();
+  if (!d.add.length && !d.rem.length) return;
+  const dur = duracaoLib();
+  if (d.add.length && dur.erro) { toast(dur.erro, 'err'); $('libN').focus(); return; }
+  const motivo = $('libMotivo').value;
+  const nomes = l => l.map(nomeProd).join(', ');
+  const linha = [d.add.length ? 'Liberar: ' + nomes(d.add) + ' (' + dur.txt + ')' : '', d.rem.length ? 'Revogar: ' + nomes(d.rem) : ''].filter(Boolean).join(' · ');
+  const notas = [];
+  if (!r.existe && d.add.length) notas.push(r.busca === 'cpf' ? 'Sem conta com este CPF: a liberação fica pendente até alguém cadastrar o CPF.' : 'Sem conta com este e-mail: a liberação fica pendente até o primeiro login.');
+  if (d.add.some(id => ((situacoesConta(r)[id] || {}).ate || 0) > 0)) notas.push('Produto vencido volta a valer a partir de hoje.');
+  if (d.rem.length) notas.push('Revogar tira o acesso na hora. Cobrança no Mercado Pago não é cancelada por aqui.');
+  if (motivo) notas.push('Motivo: ' + motivo + '.');
+  let ok = false;
+  const dl = dialogo('Aplicar alterações', `<p>Para <b>${esc(nomeAlvo(alvo, r))}</b>:</p>
+    <p class="lib-linha">${esc(linha)}</p>
+    ${notas.length ? `<ul class="lib-notas">${notas.map(n => `<li>${esc(n)}</li>`).join('')}</ul>` : ''}`,
+    [{ rot: 'Cancelar', cls: 'btn-g' }, { rot: 'Aplicar ' + plural(d.add.length + d.rem.length, 'alteração', 'alterações'), cls: d.rem.length ? 'btn-dn' : 'btn-p', acao: () => { ok = true; } }]);
+  await new Promise(res => dl.addEventListener('close', res, { once: true }));
+  if (!ok) return;
+
+  const passos = d.add.map(id => ({ tipo: 'add', id })).concat(d.rem.map(id => ({ tipo: 'rem', id })));
+  E.libOcupado = true;
+  const sec = $('outVer').querySelector('.lib');
+  sec.querySelectorAll('input,select,button').forEach(x => { x.disabled = true; });
+  sec.setAttribute('aria-busy', 'true');
+  const out = $('libOut');
+  const listaPasso = p => {
+    const rot = (p.tipo === 'add' ? 'Liberar ' : 'Revogar ') + nomeProd(p.id);
+    const est = !p.st ? '<span class="selo">aguardando</span>' : p.st === 'fazendo' ? '<span class="selo ac">aplicando…</span>'
+      : `<span class="selo ${p.erro ? 'err' : (p.pend ? 'av' : 'ok')}">${esc(p.txt)}</span>`;
+    const ic = !p.st || p.st === 'fazendo' ? 'ti-point' : p.erro ? 'ti-alert-triangle' : 'ti-circle-check';
+    return `<li><i class="ti ${ic}" aria-hidden="true"></i><span class="lib-pn">${esc(rot)}</span>${est}</li>`;
+  };
+  /* região viva fixa: só o texto muda a cada passo (trocar o bloco inteiro faria o leitor de tela repetir tudo) */
+  out.innerHTML = `<div class="lib-prog"><p id="libProgTx" role="status" aria-live="polite"></p>
+      <progress id="libProgBar" max="${passos.length}" value="0" aria-labelledby="libProgTx"></progress>
+      <ol class="lib-passos" id="libPassos"></ol></div>`;
+  const desenhaPassos = feitos => {
+    $('libProgTx').textContent = feitos < passos.length ? 'Aplicando ' + (feitos + 1) + ' de ' + passos.length + '…' : 'Concluído.';
+    $('libProgBar').value = feitos;
+    $('libPassos').innerHTML = passos.map(listaPasso).join('');
+  };
+  for (let i = 0; i < passos.length; i++) {
+    const p = passos[i];
+    p.st = 'fazendo'; desenhaPassos(i);
+    try {
+      if (p.tipo === 'add') {
+        const q = Object.assign({ acao: 'conceder', alvos: [alvo], produto: p.id }, dur.ilimitado ? { ilimitado: true } : { dias: dur.dias });
+        if (motivo) q.motivo = motivo;
+        const res = ((await admin(q)).resultado || [])[0] || {};
+        if (res.erro) { p.erro = true; p.txt = res.erro; }
+        else {
+          p.pend = res.destino !== 'conta';
+          p.txt = (p.pend ? 'pendente, ' : 'liberado, ') + (ehIlim(res.ate) ? 'ilimitado' : 'até ' + dataS(res.ate));
+        }
+      } else {
+        const res = await admin({ acao: 'revogar', alvo, produto: p.id });
+        p.txt = res.conta && res.pendente ? 'revogado da conta e do pendente' : res.conta ? 'revogado' : res.pendente ? 'revogado do pendente' : 'já não estava ativo';
+      }
+    } catch (e) {
+      p.erro = true; p.txt = (e && e.message) || String(e);
+      if (E.bloqueado) break;
+    }
+    p.st = 'feito';
+  }
+  const erros = passos.filter(p => p.erro).length, feitos = passos.filter(p => p.st === 'feito').length;
+  E.carregou.assinantes = false; E.carregou.painel = false; E.carregou.pedidos = false;
+  const resumo = `<div class="aviso ${erros ? 'err' : 'info'} lib-fim"><i class="ti ${erros ? 'ti-alert-triangle' : 'ti-check'}" aria-hidden="true"></i><div>
+      <p class="lib-fimtit" tabindex="-1"><b>${erros ? plural(feitos - erros, 'alteração aplicada', 'alterações aplicadas') + ', ' + plural(erros, 'com erro', 'com erro') + '.' : 'Tudo aplicado: ' + plural(feitos, 'alteração', 'alterações') + '.'}</b></p>
+      <p>${esc(linha)}${motivo ? ' · Motivo: ' + esc(motivo) : ''}</p></div></div>
+    <ol class="lib-passos">${passos.map(listaPasso).join('')}</ol>`;
+  E.libOcupado = false;
+  if (E.bloqueado) return;
+  out.innerHTML = resumo + carregando('Consultando a conta de novo…');
+  try {
+    const r2 = await admin({ acao: 'ver', alvo });
+    mostrarConta(alvo, r2, resumo + `<p class="leg">Situação acima consultada de novo às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}.</p>`);
+  } catch (e) {
+    out.innerHTML = resumo + avisoErro(e);
+  }
 }
 $('fVer').addEventListener('submit', async ev => {
   ev.preventDefault();
   const alvo = $('vEmail').value.trim();
-  if (!alvo) return;
+  if (!alvo || E.libOcupado) return;
   const out = $('outVer'); out.innerHTML = carregando('Consultando…');
-  try { out.innerHTML = fichaConta(await admin({ acao: 'ver', alvo })); }
+  try {
+    const [r] = await Promise.all([admin({ acao: 'ver', alvo }), planos()]);
+    mostrarConta(alvoDaBusca(alvo, r), r);
+  }
   catch (e) { out.innerHTML = E.bloqueado ? '' : avisoErro(e); }
 });
 /* e-mails e CPFs misturados: separa por linha, vírgula, ponto e vírgula ou espaço
