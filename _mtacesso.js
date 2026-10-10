@@ -90,7 +90,8 @@ function acessoAtivoQualquer(P, mt, agora) {
   agora = typeof agora === 'number' ? agora : agoraS();
   if (!algumaVendaAtiva(P)) return true; mt = mt || {};
   if (mt.adm) return true; if (num(mt.t) > agora) return true;
-  return Object.values(mt.p || {}).some(function (ate) { return num(ate) > agora; });
+  /* produto de TESTE (R$ 5) não conta, como no servidor (10/10/2026) */
+  return Object.keys(mt.p || {}).some(function (id) { var pr = produtoPorId(P, id); return num(mt.p[id]) > agora && !(pr && pr.teste); });
 }
 
 /* ---------------- catálogo, servidor, token ---------------- */
