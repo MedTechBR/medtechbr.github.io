@@ -14,7 +14,7 @@
 <script src="_mtfb.js?v=1"></script>
 <script type="module" src="_mtauth.js?v=45"></script>
 <link rel="stylesheet" href="_mtviva.css?v=2">
-<link rel="stylesheet" href="admin.css?v=8">
+<link rel="stylesheet" href="admin.css?v=9">
 </head>
 <body>
 <!-- isca para o preenchimento automático do Chrome: sem ela, o e-mail do login cai no campo de busca de Usuários -->
@@ -44,6 +44,7 @@
       <li><a href="#pagamentos" data-sec="pagamentos"><i class="ti ti-credit-card" aria-hidden="true"></i>Pagamentos</a></li>
       <li><a href="#planos" data-sec="planos"><i class="ti ti-apps" aria-hidden="true"></i>Aplicativos e planos</a></li>
       <li><a href="#sinalizacoes" data-sec="sinalizacoes"><i class="ti ti-flag" aria-hidden="true"></i>Sinalizações<span class="cnt" id="cntSinal" hidden></span></a></li>
+      <li><a href="#atendente" data-sec="atendente"><i class="ti ti-message-chatbot" aria-hidden="true"></i>Atendente</a></li>
       <li><a href="#diagnostico" data-sec="diagnostico"><i class="ti ti-stethoscope" aria-hidden="true"></i>Diagnóstico</a></li>
     </ul>
     <p class="rod">Só esta conta vê e muda o que está aqui. Mudança de preço ou abertura de venda: peça ao Claude.</p>
@@ -252,6 +253,27 @@
       <p class="leg"><a href="sinalizacoes.html">Abrir a caixa de sinalizações antiga</a> (mesmos dados, sem a questão completa e sem a IA).</p>
     </section>
 
+    <!-- ===================== ATENDENTE (WhatsApp) ===================== -->
+    <section class="sec" id="atendente" data-painel aria-labelledby="h-at" hidden>
+      <div class="cab"><div><h2 id="h-at">Atendente virtual</h2><p class="lead">A assistente que vai responder os clientes no WhatsApp da MedTech. Ela responde com a página de Ajuda e os preços do catálogo, e passa para você o que não for dúvida comum.</p></div></div>
+      <div class="card at-card">
+        <div class="at-topo">
+          <div><h3><i class="ti ti-message-chatbot" aria-hidden="true"></i>Testar a atendente</h3>
+          <p class="sub">Escreva como se fosse um cliente. Nada vai para o WhatsApp e nada fica gravado.</p></div>
+          <button class="btn btn-g sm" id="btAtNovo" type="button"><i class="ti ti-refresh" aria-hidden="true"></i>Nova conversa</button>
+        </div>
+        <div class="at-chat" id="atChat" aria-live="polite">
+          <p class="at-vazio" id="atVazio">Sugestões: “quanto custa o ClínicaMed?”, “paguei por Pix e não liberou”, “vocês têm sistema para hospital?”, “como cancelo?”</p>
+        </div>
+        <form class="at-form" id="atForm">
+          <label class="sr" for="atTexto">Mensagem do cliente</label>
+          <textarea id="atTexto" rows="2" maxlength="3000" placeholder="Mensagem do cliente" autocomplete="off"></textarea>
+          <button class="btn btn-p" id="btAtEnviar" type="submit"><i class="ti ti-send" aria-hidden="true"></i>Enviar</button>
+        </form>
+      </div>
+      <p class="leg">O WhatsApp de verdade é ligado depois, com o número da empresa (ativar-whatsapp.command).</p>
+    </section>
+
     <!-- ===================== DIAGNÓSTICO ===================== -->
     <section class="sec" id="diagnostico" data-painel aria-labelledby="h-dg" hidden>
       <div class="cab"><div><h2 id="h-dg">Diagnóstico do servidor</h2><p class="lead">Confere se o servidor lê o catálogo, as contas e o banco de dados, e se as funções do painel já foram publicadas.</p></div></div>
@@ -289,6 +311,6 @@
 </dialog>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="admin.js?v=11" defer></script>
+<script src="admin.js?v=12" defer></script>
 </body>
 </html>

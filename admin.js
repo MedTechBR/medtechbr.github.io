@@ -11,6 +11,8 @@
               banco público de cada app, análise pela IA (MT.ai, nível forte, sem busca) e pedido de correção)
               {op:'errata'|'listarErratas'|'responder'} (10/10/2026: corrigir, tirar do ar e desfazer pelo painel;
               resposta a quem sinalizou, entregue no app pelo mterrata.js ou por e-mail)
+     waSimular {mensagens:[{r:'c'|'ia', t}]} → {texto, encaminhou} (13/10/2026: Atendente = a atendente
+              do WhatsApp sem WhatsApp e sem gravar nada)
    Se o servidor ainda não tiver as ações novas (painel, assinantes, pedidos),
    a página avisa para publicar (deploy-backend.command) e o resto segue.
    ============================================================ */
@@ -32,7 +34,7 @@ const ddmm = d => d ? d.slice(8, 10) + '/' + d.slice(5, 7) : '';
 const plural = (n, um, varios) => inteiro(n) + ' ' + (Number(n) === 1 ? um : varios);
 const agoraS = () => Math.floor(Date.now() / 1000);
 
-const SECOES = ['visao', 'usuarios', 'assinantes', 'acessos', 'pagamentos', 'planos', 'sinalizacoes', 'diagnostico'];
+const SECOES = ['visao', 'usuarios', 'assinantes', 'acessos', 'pagamentos', 'planos', 'sinalizacoes', 'atendente', 'diagnostico'];
 /* apps: mesmos nomes, ícones e cores do catálogo do _mtauth */
 const APPS = {
   condutai: { nm: 'CondutAI', ic: 'ti-stethoscope', c: '#1D6FD0', url: '/condutai.html' },
@@ -2652,6 +2654,52 @@ $('btIaVoltar').onclick = () => definirIA('2.5');
 /* ============================================================
    INÍCIO
    ============================================================ */
+/* ---------------- atendente virtual (13/10/2026) ---------------- */
+const AT = { hist: [], ocupado: false };
+function atMsg(cls, html) {
+  const v = $('atVazio'); if (v) v.hidden = true;
+  const d = document.createElement('div');
+  d.className = cls; d.innerHTML = html;
+  $('atChat').appendChild(d); $('atChat').scrollTop = $('atChat').scrollHeight;
+  return d;
+}
+/* *negrito* e _itálico_ do WhatsApp, depois de escapar */
+const atFmt = t => esc(t).replace(/\*([^*\n]+)\*/g, '<b>$1</b>').replace(/(^|\s)_([^_\n]+)_/g, '$1<i>$2</i>');
+async function atEnviar(ev) {
+  if (ev) ev.preventDefault();
+  const t = $('atTexto').value.trim();
+  if (!t || AT.ocupado) return;
+  AT.ocupado = true; $('btAtEnviar').disabled = true;
+  $('atTexto').value = '';
+  AT.hist.push({ r: 'c', t });
+  atMsg('at-msg c', esc(t));
+  const p = atMsg('at-msg ia pensando', 'digitando…');
+  try {
+    const r = await chamar('waSimular', { mensagens: AT.hist });
+    p.className = 'at-msg ia'; p.innerHTML = atFmt(r.texto || '');
+    AT.hist.push({ r: 'ia', t: r.texto || '' });
+    if (r.encaminhou) {
+      const e = r.encaminhou;
+      atMsg('at-enc', `<i class="ti ti-user-share" aria-hidden="true"></i><div><b>Aqui a conversa iria para você</b> (${esc(e.motivo)}). ${esc(e.resumo)}${e.email ? ' · ' + esc(e.email) : ''}<br>No WhatsApp de verdade você receberia este aviso, e a atendente pararia de responder até você devolver a conversa.</div>`);
+    }
+  } catch (e) {
+    p.remove(); AT.hist.pop();
+    $('atTexto').value = t;
+    const naoPub = ehNaoPublicado(e) || /not.?found|internal/i.test(String((e && (e.status || e.code)) || ''));
+    atMsg('at-enc', `<i class="ti ti-alert-triangle" aria-hidden="true"></i><div>${naoPub ? '<b>Publique o servidor para testar.</b> Rode <code>deploy-backend.command</code> no Mac e tente de novo.' : '<b>Não consegui falar com a atendente.</b> ' + esc((e && e.message) || e)}</div>`);
+  } finally {
+    AT.ocupado = false; $('btAtEnviar').disabled = false; $('atTexto').focus();
+  }
+}
+$('atForm').addEventListener('submit', atEnviar);
+$('atTexto').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) atEnviar(e); });
+$('btAtNovo').onclick = () => {
+  AT.hist = [];
+  $('atChat').querySelectorAll('.at-msg,.at-enc').forEach(n => n.remove());
+  const v = $('atVazio'); if (v) v.hidden = false;
+  $('atTexto').focus();
+};
+
 async function iniciar() {
   if (E.iniciado) return;
   E.us.eu = MT.user.uid;
