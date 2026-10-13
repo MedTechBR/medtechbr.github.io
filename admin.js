@@ -11,8 +11,10 @@
               banco público de cada app, análise pela IA (MT.ai, nível forte, sem busca) e pedido de correção)
               {op:'errata'|'listarErratas'|'responder'} (10/10/2026: corrigir, tirar do ar e desfazer pelo painel;
               resposta a quem sinalizou, entregue no app pelo mterrata.js ou por e-mail)
-     waSimular {mensagens:[{r:'c'|'ia', t}]} → {texto, encaminhou} (13/10/2026: Atendente = a atendente
-              do WhatsApp sem WhatsApp e sem gravar nada)
+     waSimular {mensagens:[{r:'c'|'ia', t}]} → {texto, encaminhou} (13/10/2026: a atendente
+              do WhatsApp sem WhatsApp e sem gravar nada; aba "Testar a atendente" da Equipe de IA)
+     mtEquipe {op:'painel'|'conversa'|'decidir'|'config'|'pausar'|'responder'|'devolver'|'turno'}
+              (13/10/2026: Equipe de IA — o que cada funcionário fez, pendências, conversas, avisos)
    Se o servidor ainda não tiver as ações novas (painel, assinantes, pedidos),
    a página avisa para publicar (deploy-backend.command) e o resto segue.
    ============================================================ */
@@ -34,7 +36,7 @@ const ddmm = d => d ? d.slice(8, 10) + '/' + d.slice(5, 7) : '';
 const plural = (n, um, varios) => inteiro(n) + ' ' + (Number(n) === 1 ? um : varios);
 const agoraS = () => Math.floor(Date.now() / 1000);
 
-const SECOES = ['visao', 'usuarios', 'assinantes', 'acessos', 'pagamentos', 'planos', 'sinalizacoes', 'atendente', 'diagnostico'];
+const SECOES = ['visao', 'usuarios', 'assinantes', 'acessos', 'pagamentos', 'planos', 'sinalizacoes', 'equipe', 'diagnostico'];
 /* apps: mesmos nomes, ícones e cores do catálogo do _mtauth */
 const APPS = {
   condutai: { nm: 'CondutAI', ic: 'ti-stethoscope', c: '#1D6FD0', url: '/condutai.html' },
@@ -158,6 +160,7 @@ function confirmar(titulo, texto, rotOk, perigo) {
 function irPara(destino, focar) {
   /* #usuarios/<uid> abre a ficha da conta (o voltar do navegador volta para a lista) */
   let [sec, sub] = String(destino || '').split('/');
+  if (sec === 'atendente') { sec = 'equipe'; E.eqAba = 'teste'; }      /* endereço antigo do simulador */
   if (!SECOES.includes(sec)) { sec = 'visao'; sub = ''; }
   let uid = '';
   try { uid = decodeURIComponent(sub || ''); } catch (e) { uid = ''; }
@@ -181,6 +184,7 @@ function abrirSecao(sec) {
   if (sec === 'planos' && !E.carregou.planos) desenharPlanos();
   if (sec === 'sinalizacoes' && !E.carregou.sinal) carregarSinal();
   if (sec === 'diagnostico' && !E.carregou.ia) carregarIA();
+  if (sec === 'equipe') { mostrarAbaEq(E.eqAba || 'pend'); if (!E.carregou.equipe) carregarEquipe(); }
 }
 
 /* ============================================================
@@ -2700,6 +2704,167 @@ $('btAtNovo').onclick = () => {
   $('atTexto').focus();
 };
 
+
+/* ---------------- equipe de IA (13/10/2026) ---------------- */
+const EQ_AREAS = {
+  atendente: { nm: 'Atendente', ic: 'ti-message-chatbot', desc: 'Responde os clientes no WhatsApp na hora e passa para você o que não for dúvida comum.' },
+  operacoes: { nm: 'Operações', ic: 'ti-settings-automation', desc: 'Questões sinalizadas, pagamentos para revisar, erros do servidor e clientes esperando. Às segundas, o que melhorar.' },
+  financeiro: { nm: 'Financeiro', ic: 'ti-cash', desc: 'Vendas, reembolsos, contestações, recusas com o motivo e planos anuais vencendo. Nunca mexe em dinheiro.' },
+  instagram: { nm: 'Instagram', ic: 'ti-brand-instagram', desc: 'Responde comentários e mensagens, propõe os posts da semana e publica depois da sua aprovação.' },
+  diretoria: { nm: 'Diretoria', ic: 'ti-crown', desc: 'Conversa com você no WhatsApp e manda o resumo das 7h.' }
+};
+const PEND_COM_TEXTO = ['sinal_resposta', 'ig_comentario', 'ig_dm'];
+const haQuanto = iso => {
+  if (!iso) return '—';
+  const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (m < 1) return 'agora'; if (m < 60) return 'há ' + m + ' min';
+  const h = Math.round(m / 60); if (h < 24) return 'há ' + h + ' h';
+  return quando(iso);
+};
+async function equipeOp(dados) { return chamar('mtEquipe', dados); }
+async function carregarEquipe() {
+  $('eqAviso').innerHTML = '';
+  try {
+    E.eq = await equipeOp({ op: 'painel' });
+    E.carregou.equipe = true;
+    $('eqQuando').textContent = 'atualizado ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    desenharEquipe();
+  } catch (e) {
+    $('eqFunc').innerHTML = '';
+    $('eqAviso').innerHTML = ehNaoPublicado(e) || /not.?found|internal/i.test(String((e && (e.status || e.code)) || ''))
+      ? avisoPublicar('a equipe de IA') : avisoErro(e);
+  }
+}
+function statusArea(a) {
+  const q = E.eq, c = q.config || {};
+  if (a === 'atendente') return q.atendente.pausado ? { t: 'Pausada', cls: 'av', liga: true } : { t: 'Ligada', cls: 'ok', liga: false };
+  if (a === 'diretoria') return { t: 'Ligada', cls: 'ok' };
+  if (a === 'instagram' && !q.instagram_ativo) return { t: 'Falta ligar à Meta', cls: '' };
+  return c[a] ? { t: 'Ligado', cls: 'ok', liga: false } : { t: 'Desligado', cls: 'av', liga: true };
+}
+function desenharEquipe() {
+  const q = E.eq;
+  $('eqFunc').innerHTML = Object.keys(EQ_AREAS).map(a => {
+    const m = EQ_AREAS[a], st = statusArea(a), ct = (q.contagem || {})[a] || {};
+    const ult = ct.ultima ? `<p class="eq-ult"><b>${esc(ct.ultima.acao)}</b> ${esc(haQuanto(ct.ultima.em))}<br>${esc(String(ct.ultima.detalhe || '').slice(0, 120))}</p>` : '<p class="eq-ult">Nada registrado ainda.</p>';
+    const bt = st.liga === undefined ? '' : `<button class="btn btn-g sm" type="button" data-eqliga="${a}" data-v="${st.liga ? 1 : 0}">${st.liga ? (a === 'atendente' ? 'Retomar' : 'Ligar') : (a === 'atendente' ? 'Pausar' : 'Desligar')}</button>`;
+    return `<article class="card eq-card"><div class="eq-topo"><span class="eq-ic"><i class="ti ${m.ic}" aria-hidden="true"></i></span><div><h3>${m.nm}</h3><span class="selo ${st.cls}">${st.t}</span></div></div>
+      <p class="sub">${m.desc}</p><div class="eq-num"><b>${inteiro(ct.h24 || 0)}</b><span>ações nas últimas 24 h</span></div>${ult}<div class="eq-acoes">${bt}<button class="btn btn-g sm" type="button" data-eqver="${a}">Ver atividade</button></div></article>`;
+  }).join('') + `<p class="leg eq-turno">Último turno: ${esc(q.turno_em ? quando(q.turno_em) : 'ainda não rodou')}${q.atendente.teste_dono ? ' · seu WhatsApp está no modo teste da atendente' : ''}</p>`;
+  const c = q.config || {};
+  document.querySelectorAll('#eqAvisos [data-avisos]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.avisos === c.avisos)));
+  $('eqResumo').checked = c.resumo !== false;
+  const np = (q.pendencias || []).length;
+  $('eqNPend').textContent = np ? np : '';
+  const cnt = $('cntEquipe'); if (cnt) { cnt.textContent = np; cnt.hidden = !np; }
+  $('eqNConv').textContent = (q.conversas || []).filter(x => x.estado === 'humano').length || '';
+  desenharPendencias(); desenharLog(); desenharConversas();
+}
+function mostrarAbaEq(aba) {
+  E.eqAba = aba;
+  document.querySelectorAll('[data-eqaba]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.eqaba === aba)));
+  document.querySelectorAll('[data-eqp]').forEach(p => p.hidden = p.dataset.eqp !== aba);
+}
+function desenharPendencias() {
+  const l = E.eq.pendencias || [];
+  if (!l.length) { $('eqPend').innerHTML = '<div class="card vazio">Nada esperando você. Quando um funcionário precisar de uma decisão, ela aparece aqui.</div>'; return; }
+  $('eqPend').innerHTML = l.map(p => {
+    const a = EQ_AREAS[p.area] || { nm: p.area, ic: 'ti-robot' };
+    const txt = PEND_COM_TEXTO.includes(p.tipo);
+    const valor = (p.proposta && p.proposta.texto) || '';
+    return `<article class="card eq-pend" data-pid="${esc(p.id)}">
+      <div class="eq-topo"><span class="eq-ic"><i class="ti ${a.ic}" aria-hidden="true"></i></span><div><h3>${esc(p.titulo)}</h3><span class="selo ac">${esc(a.nm)}</span> <span class="sub">${esc(p.id)} · ${esc(p.criada)}</span></div></div>
+      <pre class="eq-det">${esc(p.detalhe || '')}</pre>
+      ${txt ? `<div class="campo"><label for="eqt_${esc(p.id)}">${p.tipo === 'ig_dm' ? 'Sua resposta' : 'Texto que vai sair (pode editar)'}</label><textarea id="eqt_${esc(p.id)}" rows="3" maxlength="900">${esc(valor)}</textarea></div>` : ''}
+      <div class="eq-acoes"><button class="btn btn-p sm" type="button" data-eqdec="1">${p.tipo === 'ig_semana' ? 'Aprovar e agendar' : p.tipo === 'info' ? 'Ok' : 'Aprovar e enviar'}</button>
+      <button class="btn btn-g sm" type="button" data-eqdec="0">Recusar</button></div></article>`;
+  }).join('');
+}
+function desenharLog() {
+  const f = E.eqFiltro || '';
+  $('eqLogFiltro').innerHTML = [['', 'Todos']].concat(Object.keys(EQ_AREAS).map(a => [a, EQ_AREAS[a].nm]))
+    .map(([v, n]) => `<button class="chip" type="button" data-eqfil="${v}" aria-pressed="${v === f}">${n}</button>`).join('');
+  const l = (E.eq.log || []).filter(x => !f || x.area === f);
+  $('eqLog').innerHTML = l.length ? l.map(x => {
+    const a = EQ_AREAS[x.area] || { nm: x.area, ic: 'ti-robot' };
+    return `<li><span class="eq-ic sm"><i class="ti ${a.ic}" aria-hidden="true"></i></span><div><p><b>${esc(a.nm)}</b> · ${esc(x.acao)} <span class="sub">${esc(quando(x.em))}</span></p><p class="eq-tx">${esc(x.detalhe || '')}</p></div></li>`;
+  }).join('') : '<li class="vazio">Nada registrado ainda.</li>';
+}
+function desenharConversas() {
+  const l = E.eq.conversas || [];
+  $('eqConv').innerHTML = l.length ? `<div class="card eq-lista">${l.map(c => `
+    <button type="button" class="eq-conv" data-eqconv="${esc(c.id)}" data-canal="${c.canal}">
+      <span class="eq-ic sm"><i class="ti ${c.canal === 'instagram' ? 'ti-brand-instagram' : 'ti-brand-whatsapp'}" aria-hidden="true"></i></span>
+      <span class="eq-cx"><b>${esc(c.nome)}</b> <span class="sub">final ${esc(c.final)} · ${esc(haQuanto(c.atualizado))} · ${c.msgs} msg</span>
+      <span class="eq-tx">${c.ultima ? esc((c.ultima.de === 'c' ? '' : 'Resposta: ') + c.ultima.texto) : ''}</span></span>
+      ${c.estado === 'humano' ? `<span class="selo av">Esperando a equipe</span>` : '<span class="selo">Atendente</span>'}
+    </button>`).join('')}</div>` : '<div class="card vazio">Nenhuma conversa de cliente ainda.</div>';
+}
+async function abrirConversa(canal, id) {
+  let c;
+  try { c = await equipeOp({ op: 'conversa', canal, id }); } catch (e) { toast((e && e.message) || 'Não consegui abrir a conversa.', 'err'); return; }
+  if (c.erro) { toast(c.erro, 'err'); return; }
+  const msgs = (c.mensagens || []).map(m => `<div class="at-msg ${m.de === 'cliente' ? 'c' : m.de === 'equipe' ? 'ia eq' : 'ia'}">${m.de === 'equipe' ? '<b>Equipe:</b> ' : ''}${atFmt(m.texto)}<span class="eq-hora">${esc(quando(m.em))}</span></div>`).join('');
+  const topo = (c.estado === 'humano' ? `<div class="aviso"><i class="ti ti-user-share" aria-hidden="true"></i><div><b>Esperando a equipe</b>${c.motivo ? ' (' + esc(String(c.motivo).replace(/_/g, ' ')) + ')' : ''}. ${esc(c.resumo || '')}${c.email ? ' · ' + esc(c.email) : ''}</div></div>` : '');
+  const resp = canal === 'whatsapp' ? `<div class="campo"><label for="eqResp">Responder como equipe</label><textarea id="eqResp" rows="3" maxlength="3000" placeholder="A mensagem sai pelo WhatsApp da MedTech"></textarea></div>` : '';
+  const botoes = [{ rot: 'Fechar', cls: 'btn-g' }];
+  if (canal === 'whatsapp' && c.estado === 'humano') botoes.push({ rot: 'Devolver à atendente', cls: 'btn-g', acao: async () => {
+    try { const r = await equipeOp({ op: 'devolver', id }); if (r.erro) { toast(r.erro, 'err'); return false; } toast('A atendente voltou a responder essa pessoa.'); carregarEquipe(); } catch (e) { toast(e.message, 'err'); return false; } } });
+  if (canal === 'whatsapp') botoes.push({ rot: '<i class="ti ti-send" aria-hidden="true"></i>Enviar', cls: 'btn-p', acao: async () => {
+    const t = ($('eqResp').value || '').trim(); if (!t) { toast('Escreva a mensagem.', 'err'); return false; }
+    try { const r = await equipeOp({ op: 'responder', id, texto: t }); if (r.erro) { toast(r.erro, 'err'); return false; } toast('Enviado para ' + (r.enviado_para || 'o cliente') + '.'); carregarEquipe(); } catch (e) { toast(e.message, 'err'); return false; } } });
+  dialogo((c.nome || 'Conversa') + (canal === 'instagram' ? ' · Instagram' : ''), topo + `<div class="at-chat eq-chat">${msgs || '<p class="at-vazio">Sem mensagens.</p>'}</div>` + resp, botoes);
+}
+$('btEq').onclick = () => carregarEquipe();
+$('btEqTurno').onclick = async () => {
+  const b = $('btEqTurno'); b.disabled = true; b.innerHTML = '<i class="ti ti-loader-2" aria-hidden="true"></i>Rodando…';
+  try { const r = await equipeOp({ op: 'turno' }); toast(r && r.avisos ? `Turno feito: ${r.avisos} novidade(s).` : 'Turno feito, sem novidades.'); await carregarEquipe(); }
+  catch (e) { toast((e && e.message) || 'O turno não rodou.', 'err'); }
+  finally { b.disabled = false; b.innerHTML = '<i class="ti ti-player-play" aria-hidden="true"></i>Rodar turno agora'; }
+};
+$('equipe').addEventListener('click', async ev => {
+  const t = ev.target.closest('button'); if (!t) return;
+  if (t.dataset.eqaba) return mostrarAbaEq(t.dataset.eqaba);
+  if (t.dataset.eqfil !== undefined) { E.eqFiltro = t.dataset.eqfil; return desenharLog(); }
+  if (t.dataset.eqver) { E.eqFiltro = t.dataset.eqver; desenharLog(); mostrarAbaEq('log'); return; }
+  if (t.dataset.eqconv) return abrirConversa(t.dataset.canal, t.dataset.eqconv);
+  if (t.dataset.avisos) {
+    try { await equipeOp({ op: 'config', campos: { avisos: t.dataset.avisos } }); toast('Avisos no WhatsApp: ' + t.textContent.trim() + '.'); carregarEquipe(); } catch (e) { toast(e.message, 'err'); }
+    return;
+  }
+  if (t.dataset.eqliga) {
+    const a = t.dataset.eqliga, ligar = t.dataset.v === '1';
+    if (!ligar && !(await confirmar(a === 'atendente' ? 'Pausar a atendente?' : 'Desligar ' + EQ_AREAS[a].nm + '?',
+      a === 'atendente' ? 'Os clientes passam a receber só um aviso de que a equipe responde em breve, e você é avisado de cada mensagem.' : 'Ele para de trabalhar nos turnos até você ligar de novo.', a === 'atendente' ? 'Pausar' : 'Desligar', true))) return;
+    t.disabled = true;
+    try {
+      if (a === 'atendente') await equipeOp({ op: 'pausar', pausar: !ligar });
+      else await equipeOp({ op: 'config', campos: { [a]: ligar } });
+      toast(EQ_AREAS[a].nm + (ligar ? ' ligado.' : ' desligado.')); carregarEquipe();
+    } catch (e) { toast(e.message, 'err'); t.disabled = false; }
+    return;
+  }
+  if (t.dataset.eqdec !== undefined) {
+    const card = t.closest('[data-pid]'), id = card.dataset.pid, aprovar = t.dataset.eqdec === '1';
+    const p = (E.eq.pendencias || []).find(x => x.id === id) || {};
+    const ta = card.querySelector('textarea');
+    const texto = ta ? ta.value.trim() : '';
+    if (aprovar && p.tipo === 'ig_dm' && !texto) { toast('Escreva a resposta antes de enviar.', 'err'); return; }
+    if (!aprovar && !(await confirmar('Recusar ' + id + '?', 'Nada é enviado nem publicado.', 'Recusar', true))) return;
+    card.querySelectorAll('button').forEach(b => b.disabled = true);
+    try {
+      const orig = (p.proposta && p.proposta.texto) || '';
+      const r = await equipeOp({ op: 'decidir', id, aprovar, ajuste: aprovar && texto && texto !== orig ? texto : undefined });
+      if (r.erro) { toast(r.erro, 'err'); card.querySelectorAll('button').forEach(b => b.disabled = false); return; }
+      toast(r.resultado || 'Feito.'); carregarEquipe();
+    } catch (e) { toast(e.message, 'err'); card.querySelectorAll('button').forEach(b => b.disabled = false); }
+  }
+});
+$('eqResumo').addEventListener('change', async ev => {
+  try { await equipeOp({ op: 'config', campos: { resumo: ev.target.checked } }); toast(ev.target.checked ? 'Resumo das 7h ligado.' : 'Resumo das 7h desligado.'); }
+  catch (e) { ev.target.checked = !ev.target.checked; toast(e.message, 'err'); }
+});
+
 async function iniciar() {
   if (E.iniciado) return;
   E.us.eu = MT.user.uid;
@@ -2712,6 +2877,7 @@ async function iniciar() {
   const sec = location.hash.slice(1);
   irPara(sec);
   if (sec && sec !== 'visao' && !E.carregou.painel) carregarPainel();   // contagem das sinalizações no menu
+  if (sec !== 'equipe' && sec !== 'atendente') carregarEquipe();      // contagem das pendências da equipe no menu
 }
 $('btSair').onclick = () => { if (window.MT && MT.signOut) MT.signOut(); };
 $('btTrocar').onclick = () => { if (window.MT && MT.signOut) MT.signOut(); };

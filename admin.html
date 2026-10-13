@@ -14,7 +14,7 @@
 <script src="_mtfb.js?v=1"></script>
 <script type="module" src="_mtauth.js?v=45"></script>
 <link rel="stylesheet" href="_mtviva.css?v=2">
-<link rel="stylesheet" href="admin.css?v=9">
+<link rel="stylesheet" href="admin.css?v=10">
 </head>
 <body>
 <!-- isca para o preenchimento automático do Chrome: sem ela, o e-mail do login cai no campo de busca de Usuários -->
@@ -44,7 +44,7 @@
       <li><a href="#pagamentos" data-sec="pagamentos"><i class="ti ti-credit-card" aria-hidden="true"></i>Pagamentos</a></li>
       <li><a href="#planos" data-sec="planos"><i class="ti ti-apps" aria-hidden="true"></i>Aplicativos e planos</a></li>
       <li><a href="#sinalizacoes" data-sec="sinalizacoes"><i class="ti ti-flag" aria-hidden="true"></i>Sinalizações<span class="cnt" id="cntSinal" hidden></span></a></li>
-      <li><a href="#atendente" data-sec="atendente"><i class="ti ti-message-chatbot" aria-hidden="true"></i>Atendente</a></li>
+      <li><a href="#equipe" data-sec="equipe"><i class="ti ti-robot" aria-hidden="true"></i>Equipe de IA<span class="cnt" id="cntEquipe" hidden></span></a></li>
       <li><a href="#diagnostico" data-sec="diagnostico"><i class="ti ti-stethoscope" aria-hidden="true"></i>Diagnóstico</a></li>
     </ul>
     <p class="rod">Só esta conta vê e muda o que está aqui. Mudança de preço ou abertura de venda: peça ao Claude.</p>
@@ -253,10 +253,41 @@
       <p class="leg"><a href="sinalizacoes.html">Abrir a caixa de sinalizações antiga</a> (mesmos dados, sem a questão completa e sem a IA).</p>
     </section>
 
-    <!-- ===================== ATENDENTE (WhatsApp) ===================== -->
-    <section class="sec" id="atendente" data-painel aria-labelledby="h-at" hidden>
-      <div class="cab"><div><h2 id="h-at">Atendente virtual</h2><p class="lead">A assistente que vai responder os clientes no WhatsApp da MedTech. Ela responde com a página de Ajuda e os preços do catálogo, e passa para você o que não for dúvida comum.</p></div></div>
-      <div class="card at-card">
+    <!-- ===================== EQUIPE DE IA (13/10/2026) ===================== -->
+    <section class="sec" id="equipe" data-painel aria-labelledby="h-eq" hidden>
+      <div class="cab">
+        <div><h2 id="h-eq">Equipe de IA</h2><p class="lead">Os funcionários de IA trabalham sozinhos. A atendente responde os clientes na hora; Operações, Financeiro e Instagram rodam um turno a cada 2 horas, das 8h às 22h. Aqui você vê o que cada um fez e decide o que ficou esperando você.</p></div>
+        <div class="atualizado"><span id="eqQuando" aria-live="polite"></span>
+          <button class="btn btn-g sm" id="btEqTurno" type="button"><i class="ti ti-player-play" aria-hidden="true"></i>Rodar turno agora</button>
+          <button class="btn btn-g sm" id="btEq" type="button"><i class="ti ti-refresh" aria-hidden="true"></i>Atualizar</button></div>
+      </div>
+      <div id="eqAviso"></div>
+      <div class="eq-func" id="eqFunc"><p class="carregando">Carregando a equipe…</p></div>
+      <div class="card eq-conf">
+        <div><h3><i class="ti ti-bell" aria-hidden="true"></i>Avisos no seu WhatsApp</h3>
+          <p class="sub">O painel mostra tudo. No WhatsApp, você escolhe o que chega.</p></div>
+        <div class="chips" role="group" aria-label="Avisos no WhatsApp" id="eqAvisos">
+          <button class="chip" type="button" data-avisos="urgentes" aria-pressed="false">Só urgentes</button>
+          <button class="chip" type="button" data-avisos="tudo" aria-pressed="false">Tudo</button>
+          <button class="chip" type="button" data-avisos="nada" aria-pressed="false">Nada</button>
+        </div>
+        <label class="eq-sw"><input type="checkbox" id="eqResumo"> Resumo das 7h no WhatsApp</label>
+        <p class="leg" id="eqAvisosLeg">Urgente: cliente pedindo a equipe ou esperando há mais de 4 h, reembolso, contestação no cartão e comentário delicado no Instagram.</p>
+      </div>
+      <div class="chips eq-abas" role="tablist" aria-label="Partes da equipe">
+        <button class="chip" type="button" role="tab" data-eqaba="pend" aria-pressed="true">Pendências<span class="n" id="eqNPend"></span></button>
+        <button class="chip" type="button" role="tab" data-eqaba="log" aria-pressed="false">Atividade</button>
+        <button class="chip" type="button" role="tab" data-eqaba="conv" aria-pressed="false">Conversas<span class="n" id="eqNConv"></span></button>
+        <button class="chip" type="button" role="tab" data-eqaba="teste" aria-pressed="false">Testar a atendente</button>
+      </div>
+      <div class="eq-painel" data-eqp="pend" id="eqPend"></div>
+      <div class="eq-painel" data-eqp="log" hidden>
+        <div class="chips" role="group" aria-label="Filtrar por funcionário" id="eqLogFiltro"></div>
+        <ol class="eq-tl" id="eqLog"></ol>
+      </div>
+      <div class="eq-painel" data-eqp="conv" id="eqConv" hidden></div>
+      <div class="eq-painel" data-eqp="teste" hidden>
+        <div class="card at-card">
         <div class="at-topo">
           <div><h3><i class="ti ti-message-chatbot" aria-hidden="true"></i>Testar a atendente</h3>
           <p class="sub">Escreva como se fosse um cliente. Nada vai para o WhatsApp e nada fica gravado.</p></div>
@@ -271,7 +302,7 @@
           <button class="btn btn-p" id="btAtEnviar" type="submit"><i class="ti ti-send" aria-hidden="true"></i>Enviar</button>
         </form>
       </div>
-      <p class="leg">O WhatsApp de verdade é ligado depois, com o número da empresa (ativar-whatsapp.command).</p>
+      </div>
     </section>
 
     <!-- ===================== DIAGNÓSTICO ===================== -->
@@ -311,6 +342,6 @@
 </dialog>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="admin.js?v=12" defer></script>
+<script src="admin.js?v=13" defer></script>
 </body>
 </html>
