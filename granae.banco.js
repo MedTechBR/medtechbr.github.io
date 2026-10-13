@@ -250,7 +250,7 @@
       <section class="bk-hero">
         <div class="bk-hero-top">
           <span class="bk-chip">Saldo em conta · ${correntes.length} conta${correntes.length === 1 ? '' : 's'}</span>
-          ${f ? `<button type="button" class="bk-sync" id="bkSync" title="Sincronizar agora"><i class="ti ti-refresh" aria-hidden="true"></i> ${esc(haQuanto(f.syncedAt))}</button>` : ''}
+          ${f ? `<button type="button" class="bk-sync" id="bkSync" title="Sincronizar agora"><i class="ti ti-refresh" aria-hidden="true"></i> ${esc((() => { const fr = window.GranaeOF && GranaeOF.frescor && GranaeOF.frescor(f); return fr ? 'lido ' + fr.lidoTxt + (fr.ate ? ' · até ' + fr.ateTxt : '') : haQuanto(f.syncedAt); })())}</button>` : ''}
         </div>
         <strong class="bk-total" id="bkTotal">${brl(saldoContas)}</strong>
         <div class="bk-bancos">${bancos.filter(x => x.s).map(x => `<span><b>${esc(x.b)}</b> ${brl(x.s)}</span>`).join('')}</div>

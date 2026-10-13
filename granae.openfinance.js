@@ -382,6 +382,35 @@
     if (h < 24) return `há ${h} h`;
     return new Date(ms).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
   }
+  /* Honestidade sobre o atraso: o MeuPluggy lê os bancos uma vez por dia (à
+     noite) e o banco publica a compra no Open Finance 1 a 3 dias depois. Então
+     mostramos QUANDO o banco foi lido e ATÉ QUE DIA vão os lançamentos, em vez
+     de "ao vivo". */
+  const SEM = ['dom.', 'seg.', 'ter.', 'qua.', 'qui.', 'sex.', 'sáb.'];
+  function quando(ms) {
+    if (!ms) return '';
+    const d = new Date(ms), hoje = new Date();
+    const h = String(d.getHours()).padStart(2, '0') + 'h' + String(d.getMinutes()).padStart(2, '0');
+    const dd = Math.round((new Date(hoje.toDateString()) - new Date(d.toDateString())) / DIA);
+    if (dd === 0) return 'hoje às ' + h;
+    if (dd === 1) return 'ontem às ' + h;
+    return `${SEM[d.getDay()]} ${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')} às ${h}`;
+  }
+  function diaCurto(iso) {
+    if (!iso) return '';
+    const d = new Date(iso + 'T12:00:00');
+    return `${SEM[d.getDay()]} ${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+  }
+  function frescor(f) {
+    f = f || feed;
+    if (!f) return null;
+    const lido = Math.max(0, ...(f.items || []).map(i => i.lastUpdatedAt ? Date.parse(i.lastUpdatedAt) : 0)) || f.syncedAt || 0;
+    const ate = (f.transactions || []).reduce((m, t) => (t.date && t.date > m && t.date <= todayISO() ? t.date : m), '');
+    return { lido, ate, lidoTxt: quando(lido), ateTxt: diaCurto(ate) };
+  }
+  const ultimoDaConta = (f, contaIds) => (f.transactions || []).filter(t => contaIds.includes(t.accountId) && t.date <= todayISO())
+    .reduce((m, t) => (t.date > m ? t.date : m), '');
+
   const ESTADO = { UPDATED: 'ok', UPDATING: 'atualizando', LOGIN_ERROR: 'reconectar', OUTDATED: 'desatualizado', WAITING_USER_INPUT: 'aguardando você', WAITING_USER_ACTION: 'aguardando você', ERROR: 'erro' };
 
   function render(msg) {
@@ -393,11 +422,11 @@
       bar.hidden = !itens.length;
       if (itens.length) {
         const erro = itens.some(i => i.error || /ERROR|OUTDATED/.test(i.status));
-        const ult = Math.max(0, ...itens.map(i => i.lastUpdatedAt ? Date.parse(i.lastUpdatedAt) : 0));
+        const fr = frescor();
         bar.classList.toggle('erro', erro);
         bar.innerHTML = `<span class="of-dot" aria-hidden="true"></span>
           <span>${msg ? escapeHTML(msg) : (erro ? 'Open Finance: uma conexão precisa de atenção'
-            : `Banco ao vivo · atualizado ${haQuanto(ult || feed.syncedAt)}`)}</span>
+            : `Bancos lidos ${fr.lidoTxt}${fr.ate ? ' · até ' + fr.ateTxt : ''}`)}</span>
           <i class="ti ti-refresh" aria-hidden="true"></i>`;
       }
     }
@@ -422,14 +451,14 @@
           ${i.error ? `<p class="small of-erro">${escapeHTML(i.error)}</p>` : ''}
           ${cs.map(a => `<div class="of-conta small"><span>${escapeHTML(a.name)}${a.number ? ' ••' + escapeHTML(a.number) : ''}</span>
             <span>${a.kind === 'cartao' ? 'fatura ' : ''}<strong>${fmt.format(a.balance)}</strong></span></div>`).join('')}
-          <p class="muted small" style="margin:4px 0 0">Atualizado ${haQuanto(i.lastUpdatedAt ? Date.parse(i.lastUpdatedAt) : 0) || '—'}</p>
+          <p class="muted small" style="margin:4px 0 0">Lido ${quando(i.lastUpdatedAt ? Date.parse(i.lastUpdatedAt) : 0) || '—'}${(() => { const u = ultimoDaConta(feed, cs.map(a => a.id)); return u ? ' · último lançamento ' + diaCurto(u) : ''; })()}</p>
         </li>`;
       }).join('')}</ul>` : '<p class="muted small" style="margin:2px 0 8px">Conecte suas contas pelo Open Finance e os gastos e ganhos entram sozinhos, sem digitar.</p>'}
       <div class="row" style="gap:8px;flex-wrap:wrap;margin-top:8px">
         <button type="button" class="primary" id="ofConectar"${ocupado ? ' disabled' : ''}><i class="ti ti-building-bank" aria-hidden="true"></i> Conectar banco</button>
         ${itens.length ? `<button type="button" class="ghost" id="ofSync"${ocupado ? ' disabled' : ''}><i class="ti ti-refresh" aria-hidden="true"></i> Sincronizar agora</button>` : ''}
       </div>
-      ${feed && feed.syncedAt ? `<p class="muted small" style="margin:6px 0 0">Última leitura: ${haQuanto(feed.syncedAt)}</p>` : ''}`;
+      ${itens.length ? `<p class="muted small" style="margin:6px 0 0">O MeuPluggy lê os bancos uma vez por dia, à noite, e o Granaê atualiza em seguida. Compras no cartão costumam chegar 1 a 3 dias depois, e as do fim de semana na segunda ou terça.</p>` : ''}`;
     $('ofConectar')?.addEventListener('click', () => conectar());
     $('ofSync')?.addEventListener('click', sincronizarAgora);
     box.querySelectorAll('[data-of-rec]').forEach(b => b.addEventListener('click', () => conectar(b.dataset.ofRec)));
@@ -441,5 +470,5 @@
   render();
 
   // para testes
-  window.GranaeOF = { feed: () => feed, importar, categoriaDoBanco, apagarTudo, temDados, _setFeed: (f) => { feed = f; dadosProntos = true; importar(); } };
+  window.GranaeOF = { feed: () => feed, frescor, importar, categoriaDoBanco, apagarTudo, temDados, _setFeed: (f) => { feed = f; dadosProntos = true; importar(); } };
 })();
