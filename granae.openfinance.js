@@ -164,7 +164,53 @@
       mudou = true;
     }
 
+    /* Pendente repetido: o banco às vezes manda o MESMO pendente duas vezes com
+       ids diferentes (mesma conta, data, valor e descrição com nº de documento).
+       Fica o primeiro; a cópia é ignorada e sai do estado sem lápide (se virar
+       um lançamento definitivo de verdade, entra normalmente). */
+    const chavePend = (t) => [t.accountId, t.date, (+t.amount).toFixed(2), t.type, String(t.desc || '').toLowerCase().replace(/\s+/g, ' ').trim()].join('|');
+    const pendVistos = new Map(), copias = new Set();
+    for (const t of feed.transactions) {
+      if (!t.pending) continue;
+      const k = chavePend(t);
+      if (pendVistos.has(k)) copias.add(t.id); else pendVistos.set(k, t.id);
+    }
+    if (copias.size) {
+      const fora = new Set([...copias].map(i => 'of_' + i));
+      const antes = state.transactions.length;
+      state.transactions = state.transactions.filter(x => !fora.has(x.id));
+      if (state.transactions.length !== antes) { mudou = true; fora.forEach(i => porId.delete(i)); }
+    }
+
+    /* Aprendizado pela conciliação: lançamento do banco que você já casou com
+       uma parcela de financiamento/parcelamento (groupId) ensina os próximos
+       iguais (mesma descrição do banco, conta e tipo, valor até 15% diferente):
+       entram no mesmo compromisso, como a parcela seguinte. */
+    const normDesc = (d) => String(d || '').toLowerCase().replace(/\d{2}\/\d{2}(\/\d{2,4})?/g, ' ').replace(/\s+/g, ' ').trim();
+    const descDoFeed = new Map(feed.transactions.map(t => ['of_' + t.id, t.desc]));
+    const aprendido = new Map();
+    for (const x of state.transactions) {
+      if (x.of || !x.ofId || !x.groupId) continue;
+      const d = x.ofDesc || descDoFeed.get(x.ofId);
+      if (!d) continue;
+      const k = normDesc(d) + '|' + (x.accountId || '') + '|' + x.type;
+      const prev = aprendido.get(k);
+      if (!prev || x.date > prev.date) aprendido.set(k, x);
+    }
+    function ensinar(obj, t, conta) {
+      const m = aprendido.get(normDesc(t.desc) + '|' + (conta || '') + '|' + t.type);
+      if (!m || Math.abs((+m.amount || 0) - t.amount) > (+m.amount || 0) * 0.15) return false;
+      obj.category = m.category; obj.sub = m.sub || null; obj.groupId = m.groupId;
+      const pi = typeof parcelaInfo === 'function' ? parcelaInfo(m) : null;
+      if (pi) {
+        const n = Math.max(pi.k, ...state.transactions.filter(y => y.groupId === m.groupId && !y.ofPend).map(y => (parcelaInfo(y) || {}).k || 0));
+        obj.description = `${pi.base} (${Math.min(n + 1, pi.n)}/${pi.n})`;
+      }
+      return true;
+    }
+
     for (const t0 of feed.transactions) {
+      if (copias.has(t0.id)) { noResumo.add('of_' + t0.id); continue; }
       const marcado = t0.transfer || proprios.some(p => String(t0.desc || '').toLowerCase().includes(p));
       const t = { ...t0, transfer: !!marcado && temPar(t0) };
       const id = 'of_' + t.id;
@@ -181,6 +227,11 @@
         if (ex.of && ex.date !== t.date) mud.date = t.date;
         if (ex.of && !!ex.ofPend !== !!t.pending) mud.ofPend = !!t.pending;
         if (ex.of && !!ex.pending !== pend) mud.pending = pend;
+        // importado antes do aprendizado (caiu em "Outros"): entra no compromisso
+        if (ex.of && !ex.groupId && !ex.transferId && ex.category === 'Outros') {
+          const tmp = {};
+          if (ensinar(tmp, t, ex.accountId)) Object.assign(mud, tmp);
+        }
         if (Object.keys(mud).length) { Object.assign(ex, mud); ex.updatedAt = agora; mudou = true; }
         continue;
       }
@@ -192,6 +243,7 @@
         .sort((a, b) => (Math.abs((+a.amount || 0) - t.amount) - Math.abs((+b.amount || 0) - t.amount)) || (dias(a.date, t.date) - dias(b.date, t.date)))[0];
       if (manual) {
         manual.ofId = id;
+        manual.ofDesc = t.desc; // guarda a descrição do banco para o aprendizado
         if (!manual.accountId && conta) manual.accountId = conta;
         manual.updatedAt = agora;
         porId.set(id, manual);
@@ -207,6 +259,7 @@
       } else {
         obj.category = categoriaDoBanco(t.cat, t.type);
         aplicarRegras(obj);
+        ensinar(obj, t, conta);
         if (conta && obj.accountId !== conta) obj.accountId = conta; // a conta de verdade vence a regra
       }
       state.transactions.push(obj);
