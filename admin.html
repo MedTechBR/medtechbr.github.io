@@ -14,7 +14,7 @@
 <script src="_mtfb.js?v=1"></script>
 <script type="module" src="_mtauth.js?v=45"></script>
 <link rel="stylesheet" href="_mtviva.css?v=2">
-<link rel="stylesheet" href="admin.css?v=10">
+<link rel="stylesheet" href="admin.css?v=11">
 </head>
 <body>
 <!-- isca para o preenchimento automático do Chrome: sem ela, o e-mail do login cai no campo de busca de Usuários -->
@@ -66,6 +66,18 @@
       </div>
       <div id="vgAviso"></div>
       <div class="kpis" id="vgKpis" aria-live="polite"><p class="carregando">Carregando os números…</p></div>
+      <div class="vg-dupla">
+        <div class="card vg-precisa">
+          <div class="vg-cab"><h3><i class="ti ti-bell-ringing" aria-hidden="true"></i>Precisa de você<span class="vg-n" id="vgNPrec"></span></h3><a class="vg-ver" href="#equipe">Ver tudo<i class="ti ti-arrow-right" aria-hidden="true"></i></a></div>
+          <div id="vgPrecisa" class="vg-lista"><p class="carregando">Carregando…</p></div>
+        </div>
+        <div class="card vg-eq">
+          <div class="vg-cab"><h3><i class="ti ti-robot" aria-hidden="true"></i>Equipe de IA</h3><a class="vg-ver" href="#equipe">Abrir equipe<i class="ti ti-arrow-right" aria-hidden="true"></i></a></div>
+          <ul id="vgEquipe" class="vg-func"></ul>
+          <div class="vg-cab vg-cab2"><h4>Atividade recente</h4><a class="vg-ver" href="#equipe" data-ir-log>Ver todas<i class="ti ti-arrow-right" aria-hidden="true"></i></a></div>
+          <ol id="vgAtividade" class="vg-tl"></ol>
+        </div>
+      </div>
       <div class="card">
         <div class="cab" style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
           <div><h3><i class="ti ti-chart-bar" aria-hidden="true"></i>Vendas por dia</h3><p class="sub">Últimos 30 dias, pagamentos aprovados (sem reembolsos e sem a compra de teste).</p></div>
@@ -262,25 +274,19 @@
           <button class="btn btn-g sm" id="btEq" type="button"><i class="ti ti-refresh" aria-hidden="true"></i>Atualizar</button></div>
       </div>
       <div id="eqAviso"></div>
-      <div class="eq-func" id="eqFunc"><p class="carregando">Carregando a equipe…</p></div>
-      <div class="card eq-conf">
-        <div><h3><i class="ti ti-bell" aria-hidden="true"></i>Avisos no seu WhatsApp</h3>
-          <p class="sub">O painel mostra tudo. No WhatsApp, você escolhe o que chega.</p></div>
-        <div class="chips" role="group" aria-label="Avisos no WhatsApp" id="eqAvisos">
-          <button class="chip" type="button" data-avisos="urgentes" aria-pressed="false">Só urgentes</button>
-          <button class="chip" type="button" data-avisos="tudo" aria-pressed="false">Tudo</button>
-          <button class="chip" type="button" data-avisos="nada" aria-pressed="false">Nada</button>
-        </div>
-        <label class="eq-sw"><input type="checkbox" id="eqResumo"> Resumo das 7h no WhatsApp</label>
-        <p class="leg" id="eqAvisosLeg">Urgente: cliente pedindo a equipe ou esperando há mais de 4 h, reembolso, contestação no cartão e comentário delicado no Instagram.</p>
+      <div class="eq-bloco">
+        <div class="vg-cab"><h3 class="eq-h"><i class="ti ti-checklist" aria-hidden="true"></i>Para você decidir<span class="vg-n" id="eqNPend"></span></h3></div>
+        <div class="eq-painel" id="eqPend"></div>
+      </div>
+      <div class="eq-bloco">
+        <div class="vg-cab"><h3 class="eq-h"><i class="ti ti-users-group" aria-hidden="true"></i>Funcionários</h3></div>
+        <div class="eq-func" id="eqFunc"><p class="carregando">Carregando a equipe…</p></div>
       </div>
       <div class="chips eq-abas" role="tablist" aria-label="Partes da equipe">
-        <button class="chip" type="button" role="tab" data-eqaba="pend" aria-pressed="true">Pendências<span class="n" id="eqNPend"></span></button>
-        <button class="chip" type="button" role="tab" data-eqaba="log" aria-pressed="false">Atividade</button>
-        <button class="chip" type="button" role="tab" data-eqaba="conv" aria-pressed="false">Conversas<span class="n" id="eqNConv"></span></button>
-        <button class="chip" type="button" role="tab" data-eqaba="teste" aria-pressed="false">Testar a atendente</button>
+        <button class="chip" type="button" role="tab" data-eqaba="log" aria-pressed="true"><i class="ti ti-history" aria-hidden="true"></i>Atividade</button>
+        <button class="chip" type="button" role="tab" data-eqaba="conv" aria-pressed="false"><i class="ti ti-messages" aria-hidden="true"></i>Conversas<span class="n" id="eqNConv"></span></button>
+        <button class="chip" type="button" role="tab" data-eqaba="teste" aria-pressed="false"><i class="ti ti-message-chatbot" aria-hidden="true"></i>Testar a atendente</button>
       </div>
-      <div class="eq-painel" data-eqp="pend" id="eqPend"></div>
       <div class="eq-painel" data-eqp="log" hidden>
         <div class="chips" role="group" aria-label="Filtrar por funcionário" id="eqLogFiltro"></div>
         <ol class="eq-tl" id="eqLog"></ol>
@@ -303,6 +309,19 @@
         </form>
       </div>
       </div>
+      <details class="card eq-conf">
+        <summary><span><i class="ti ti-bell" aria-hidden="true"></i>Avisos no seu WhatsApp</span><i class="ti ti-chevron-down si-chev" aria-hidden="true"></i></summary>
+        <div class="eq-conf-in">
+          <p class="sub">O painel mostra tudo. No WhatsApp, você escolhe o que chega.</p>
+          <div class="chips" role="group" aria-label="Avisos no WhatsApp" id="eqAvisos">
+            <button class="chip" type="button" data-avisos="urgentes" aria-pressed="false">Só urgentes</button>
+            <button class="chip" type="button" data-avisos="tudo" aria-pressed="false">Tudo</button>
+            <button class="chip" type="button" data-avisos="nada" aria-pressed="false">Nada</button>
+          </div>
+          <label class="eq-sw"><input type="checkbox" id="eqResumo"> Resumo das 7h no WhatsApp</label>
+          <p class="leg" id="eqAvisosLeg">Urgente: cliente pedindo a equipe ou esperando há mais de 4 h, reembolso, contestação no cartão e comentário delicado no Instagram. O e-mail não manda WhatsApp.</p>
+        </div>
+      </details>
     </section>
 
     <!-- ===================== DIAGNÓSTICO ===================== -->
@@ -342,6 +361,6 @@
 </dialog>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="admin.js?v=14" defer></script>
+<script src="admin.js?v=15" defer></script>
 </body>
 </html>

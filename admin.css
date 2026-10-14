@@ -602,3 +602,123 @@ html[data-viva] body .us-ficha .btn-ex:disabled{background:var(--sup2)!important
 .at-msg.eq{border-color:var(--ac);background:var(--acSup)}
 .eq-hora{display:block;margin-top:4px;font-size:11px;opacity:.7}
 @media (max-width:560px){.eq-conf{grid-template-columns:1fr}}
+
+/* ============================================================
+   Camada colorida (14/10/2026): cada seção e cada funcionário com a sua cor,
+   ícones em bloco tingido, "Precisa de você" e a equipe na Visão geral.
+   --c = cor da peça; o ícone mistura com a tinta (claro no escuro, escuro no claro).
+   ============================================================ */
+#visao,.menu a[data-sec=visao]{--c:var(--c-indigo)}
+#usuarios,.menu a[data-sec=usuarios]{--c:var(--c-azul)}
+#assinantes,.menu a[data-sec=assinantes]{--c:var(--c-verde)}
+#acessos,.menu a[data-sec=acessos]{--c:var(--c-ambar)}
+#pagamentos,.menu a[data-sec=pagamentos]{--c:var(--c-teal)}
+#planos,.menu a[data-sec=planos]{--c:var(--c-violeta)}
+#sinalizacoes,.menu a[data-sec=sinalizacoes]{--c:var(--c-coral)}
+#equipe,.menu a[data-sec=equipe]{--c:var(--c-ciano)}
+#diagnostico,.menu a[data-sec=diagnostico]{--c:var(--c-cinza)}
+[data-area=atendente]{--c:var(--c-verde)}
+[data-area=operacoes]{--c:var(--c-azul)}
+[data-area=financeiro]{--c:var(--c-ambar)}
+[data-area=instagram]{--c:var(--c-rosa)}
+[data-area=email]{--c:var(--c-laranja)}
+[data-area=diretoria]{--c:var(--c-violeta)}
+[data-area=sinal]{--c:var(--c-coral)}
+[data-area=pag]{--c:var(--c-teal)}
+[data-area=cont]{--c:var(--c-cinza)}
+
+/* menu: ícone em bloco tingido; o item atual ganha o bloco cheio */
+.menu a{gap:12px;padding:0 10px}
+.menu a i{width:32px;height:32px;flex:0 0 32px;border-radius:10px;display:grid;place-items:center;font-size:18px;
+  background:color-mix(in srgb,var(--c,var(--ac)) 15%,transparent);color:color-mix(in srgb,var(--c,var(--ac)) 72%,var(--tinta))}
+.menu a[aria-current=page]{background:color-mix(in srgb,var(--c,var(--ac)) 13%,var(--sup));color:var(--tinta);font-weight:650}
+.menu a[aria-current=page] i{background:var(--c,var(--ac));color:#fff}
+@media (max-width:960px){
+  .menu a{padding:0 12px 0 5px;gap:8px}
+  .menu a i{width:30px;height:30px;flex-basis:30px;border-radius:999px;font-size:16px}
+  .menu a[aria-current=page]{background:color-mix(in srgb,var(--c,var(--ac)) 16%,var(--sup));color:var(--tinta);border-color:color-mix(in srgb,var(--c,var(--ac)) 55%,var(--fio))}
+}
+
+/* cabeçalho de seção com o ícone da cor */
+.cab-t{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:14px;align-items:center}
+.cab-t .sec-ic{grid-row:1 / span 2;width:48px;height:48px;border-radius:15px;display:grid;place-items:center;font-size:24px;color:#fff;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--c,var(--ac)) 88%,#fff),var(--c,var(--ac)));
+  box-shadow:0 8px 20px color-mix(in srgb,var(--c,var(--ac)) 30%,transparent)}
+.cab-t h2,.cab-t .lead{grid-column:2}
+@media (max-width:560px){.cab-t .sec-ic{width:40px;height:40px;border-radius:13px;font-size:20px}}
+.sec .card h3 i{color:color-mix(in srgb,var(--c,var(--ac)) 72%,var(--tinta))}
+
+/* blocos de ícone tingidos (funcionários, pendências, atividade) */
+.eq-ic{background:color-mix(in srgb,var(--c,var(--ac)) 16%,transparent);color:color-mix(in srgb,var(--c,var(--ac)) 72%,var(--tinta));border-radius:12px}
+.eq-ic.sm{border-radius:9px}
+
+/* Visão geral: Precisa de você + Equipe */
+.vg-dupla{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:1100px){.vg-dupla{grid-template-columns:minmax(0,1fr)}}
+.vg-cab{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.vg-cab h3 .vg-n,.eq-h .vg-n{min-width:24px;height:24px;padding:0 8px;border-radius:999px;background:var(--errSup);color:var(--errV);font-size:12.5px;font-weight:700;display:inline-grid;place-items:center}
+.vg-n:empty{display:none!important}
+.vg-ver{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:600;text-decoration:none;color:color-mix(in srgb,var(--c,var(--ac)) 70%,var(--tinta));min-height:36px}
+.vg-ver i{font-size:15px}
+.vg-cab2{margin-top:16px;padding-top:14px;border-top:1px solid var(--fio)}
+.vg-cab2 h4{font-size:14px;font-weight:650}
+.vg-lista{margin-top:12px}
+.vg-itens{list-style:none;display:flex;flex-direction:column;gap:8px}
+.vg-itens li{display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;background:var(--sup2);
+  border-left:4px solid var(--c,var(--ac))}
+.vg-itens .eq-ic{flex:0 0 40px;width:40px;height:40px;font-size:20px}
+.vg-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.vg-tx b{font-size:14.5px;font-weight:650;line-height:1.3;overflow-wrap:anywhere}
+.vg-tx span{font-size:12.5px;color:var(--tinta2)}
+.vg-itens .btn{flex:0 0 auto}
+.vg-ok{display:flex;align-items:center;gap:10px;padding:18px 4px;color:var(--tinta2);font-size:14px}
+.vg-ok i{font-size:22px;color:var(--okV)}
+.vg-func{list-style:none;display:flex;flex-direction:column;margin-top:10px}
+.vg-func li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;column-gap:10px;row-gap:0;align-items:center;padding:9px 2px;border-bottom:1px solid var(--fio)}
+.vg-func li:last-child{border-bottom:0}
+.vg-func .eq-ic{grid-row:1 / span 2}
+.vg-func b{font-size:14px;font-weight:600}
+.vg-st{font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:6px;justify-self:end;color:var(--tinta2)}
+.vg-st::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--tinta2)}
+.vg-st.on{color:var(--okV)}.vg-st.on::before{background:var(--okV)}
+.vg-st.pausa{color:var(--avV)}.vg-st.pausa::before{background:var(--avV)}
+.vg-q{grid-column:2 / span 2;font-size:12px;color:var(--tinta2)}
+.vg-tl{list-style:none;display:flex;flex-direction:column;margin-top:8px;position:relative}
+.vg-tl li{display:flex;gap:12px;padding:8px 0;position:relative}
+.vg-tl li:not(:last-child)::after{content:"";position:absolute;left:5px;top:24px;bottom:-8px;width:2px;background:var(--fio)}
+.vg-pt{flex:0 0 12px;width:12px;height:12px;border-radius:50%;margin-top:4px;background:var(--c,var(--ac));box-shadow:0 0 0 4px color-mix(in srgb,var(--c,var(--ac)) 18%,transparent)}
+.vg-tl p{font-size:13.5px}
+.vg-tl .sub{font-size:12px;margin-left:2px}
+@media (max-width:560px){
+  .vg-itens li{flex-wrap:wrap}
+  .vg-itens .btn{flex:1 1 100%}
+}
+@media (prefers-color-scheme:light){html[data-viva] .vg-st.on{color:#0B6B4B}html[data-viva] .vg-st.pausa{color:#8A5A0B}}
+
+/* Equipe: decidir primeiro, funcionários compactos, abas, avisos recolhidos */
+.eq-bloco{display:flex;flex-direction:column;gap:12px}
+.eq-h{font-size:17px;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
+.eq-h i{font-size:20px;color:color-mix(in srgb,var(--c,var(--ac)) 72%,var(--tinta))}
+.eq-func{grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-bottom:0}
+.eq-card{gap:8px;padding:16px;border-top:3px solid var(--c,var(--ac))}
+.eq-card .eq-topo{align-items:center}
+.eq-nm{flex:1;min-width:0}
+.eq-nm h3{margin-bottom:2px}
+.eq-card .eq-num{flex-direction:column;align-items:flex-end;gap:0}
+.eq-card .eq-num b{font-size:22px;color:color-mix(in srgb,var(--c,var(--ac)) 78%,var(--tinta))}
+.eq-card .eq-num span{font-size:11.5px}
+.eq-card>.sub{font-size:12.5px;line-height:1.45}
+.eq-pend{border-left:4px solid var(--c,var(--ac))}
+.eq-vazio{display:flex;align-items:center;justify-content:center;gap:10px}
+.eq-vazio i{font-size:22px;color:var(--okV)}
+.eq-abas{margin-bottom:0}
+.eq-abas .chip{display:inline-flex;align-items:center;gap:7px}
+.eq-abas .chip i{font-size:17px}
+.eq-tl li{border-left:3px solid var(--c,var(--ac))}
+details.eq-conf{display:block;margin-bottom:0}
+details.eq-conf summary{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;cursor:pointer;list-style:none;font-weight:650;font-size:15.5px}
+details.eq-conf summary::-webkit-details-marker{display:none}
+details.eq-conf summary span{display:flex;align-items:center;gap:8px}
+details.eq-conf summary span i{font-size:19px;color:color-mix(in srgb,var(--c,var(--ac)) 72%,var(--tinta))}
+details.eq-conf[open] summary .si-chev{transform:rotate(180deg)}
+.eq-conf-in{display:flex;flex-direction:column;gap:12px;margin-top:8px}

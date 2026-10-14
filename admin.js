@@ -184,7 +184,7 @@ function abrirSecao(sec) {
   if (sec === 'planos' && !E.carregou.planos) desenharPlanos();
   if (sec === 'sinalizacoes' && !E.carregou.sinal) carregarSinal();
   if (sec === 'diagnostico' && !E.carregou.ia) carregarIA();
-  if (sec === 'equipe') { mostrarAbaEq(E.eqAba || 'pend'); if (!E.carregou.equipe) carregarEquipe(); }
+  if (sec === 'equipe') { mostrarAbaEq(E.eqAba || 'log'); if (!E.carregou.equipe) carregarEquipe(); }
 }
 
 /* ============================================================
@@ -255,17 +255,8 @@ function desenharPainel() {
       <div><b>${inteiro(ia.detalhe.rapido)}</b><span>Flash-Lite</span></div><div><b>${inteiro(ia.detalhe.padrao)}</b><span>Flash</span></div><div><b>${inteiro(ia.detalhe.forte)}</b><span>Pro</span></div></div>` : ''}
       ${ia.total ? '' : '<p class="sub" style="margin-top:10px">O dia do uso passou a ser gravado com a publicação do servidor de 10/10/2026. Antes disso este número fica zerado.</p>'}`
       : `<p class="vazio">${SEM(erro(p.ia))}</p>`}</div>`);
-  const alertas = [];
-  if (si) alertas.push(`<li><a href="#sinalizacoes"><b>${inteiro(si.abertas)}</b> ${si.abertas === 1 ? 'sinalização aberta' : 'sinalizações abertas'}</a></li>`);
-  if (v && v.revisar) alertas.push(`<li><a href="#pagamentos" data-pg="revisar"><b>${inteiro(v.revisar)}</b> ${v.revisar === 1 ? 'pagamento a revisar' : 'pagamentos a revisar'}</a> (sem conta ou produto reconhecido)</li>`);
-  if (pend && pend.n) alertas.push(`<li><b>${inteiro(pend.n)}</b> ${pend.n === 1 ? 'compra ou liberação espera' : 'compras ou liberações esperam'} a pessoa criar a conta</li>`);
-  if (v && v.testes) alertas.push(`<li><b>${inteiro(v.testes)}</b> ${v.testes === 1 ? 'compra de teste' : 'compras de teste'} em 30 dias (fora da receita)</li>`);
-  if (c && c.truncado) alertas.push('<li>Mais de 20 mil contas: os números de contas consideram só as primeiras 20 mil.</li>');
-  if (v && v.truncado) alertas.push('<li>Mais de 2.000 pedidos em 30 dias: a receita considera só os 2.000 mais recentes.</li>');
-  mais.push(`<div class="card"><h3><i class="ti ti-bell" aria-hidden="true"></i>Pede atenção</h3>
-    ${alertas.length ? `<ul style="margin:10px 0 0 18px;display:flex;flex-direction:column;gap:6px;font-size:14px">${alertas.join('')}</ul>` : `<p class="vazio">${E.painel ? 'Nada pendente.' : SEM()}</p>`}</div>`);
   $('vgMais').innerHTML = mais.join('');
-  $('vgMais').querySelectorAll('[data-pg]').forEach(x => x.addEventListener('click', () => { E.pgTipo = x.dataset.pg; E.carregou.pedidos = false; marcarChips('pgTipos', 'tipo', E.pgTipo); }));
+  desenharPrecisa();
   if (c) barras($('grafContas'), c.contas.porDia.map(d => ({ dia: d.dia, v: d.n })), inteiro, 'Contas novas por dia', 150);
   else $('grafContas').innerHTML = `<p class="vazio">${SEM(erro(p.contas))}</p>`;
 
@@ -2750,8 +2741,8 @@ function desenharEquipe() {
     const m = EQ_AREAS[a], st = statusArea(a), ct = (q.contagem || {})[a] || {};
     const ult = ct.ultima ? `<p class="eq-ult"><b>${esc(ct.ultima.acao)}</b> ${esc(haQuanto(ct.ultima.em))}<br>${esc(String(ct.ultima.detalhe || '').slice(0, 120))}</p>` : '<p class="eq-ult">Nada registrado ainda.</p>';
     const bt = st.liga === undefined ? '' : `<button class="btn btn-g sm" type="button" data-eqliga="${a}" data-v="${st.liga ? 1 : 0}">${st.liga ? (a === 'atendente' ? 'Retomar' : 'Ligar') : (a === 'atendente' ? 'Pausar' : 'Desligar')}</button>`;
-    return `<article class="card eq-card"><div class="eq-topo"><span class="eq-ic"><i class="ti ${m.ic}" aria-hidden="true"></i></span><div><h3>${m.nm}</h3><span class="selo ${st.cls}">${st.t}</span></div></div>
-      <p class="sub">${m.desc}</p><div class="eq-num"><b>${inteiro(ct.h24 || 0)}</b><span>ações nas últimas 24 h</span></div>${ult}<div class="eq-acoes">${bt}<button class="btn btn-g sm" type="button" data-eqver="${a}">Ver atividade</button></div></article>`;
+    return `<article class="card eq-card" data-area="${a}"><div class="eq-topo"><span class="eq-ic"><i class="ti ${m.ic}" aria-hidden="true"></i></span><div class="eq-nm"><h3>${m.nm}</h3><span class="selo ${st.cls}">${st.t}</span></div><div class="eq-num"><b>${inteiro(ct.h24 || 0)}</b><span>24 h</span></div></div>
+      <p class="sub">${m.desc}</p>${ult}<div class="eq-acoes">${bt}<button class="btn btn-g sm" type="button" data-eqver="${a}">Ver atividade</button></div></article>`;
   }).join('') + `<p class="leg eq-turno">Último turno: ${esc(q.turno_em ? quando(q.turno_em) : 'ainda não rodou')}${q.atendente.teste_dono ? ' · seu WhatsApp está no modo teste da atendente' : ''}</p>`;
   const c = q.config || {};
   document.querySelectorAll('#eqAvisos [data-avisos]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.avisos === c.avisos)));
@@ -2760,7 +2751,7 @@ function desenharEquipe() {
   $('eqNPend').textContent = np ? np : '';
   const cnt = $('cntEquipe'); if (cnt) { cnt.textContent = np; cnt.hidden = !np; }
   $('eqNConv').textContent = (q.conversas || []).filter(x => x.estado === 'humano').length || '';
-  desenharPendencias(); desenharLog(); desenharConversas();
+  desenharPendencias(); desenharLog(); desenharConversas(); desenharVgEquipe();
 }
 function mostrarAbaEq(aba) {
   E.eqAba = aba;
@@ -2769,12 +2760,12 @@ function mostrarAbaEq(aba) {
 }
 function desenharPendencias() {
   const l = E.eq.pendencias || [];
-  if (!l.length) { $('eqPend').innerHTML = '<div class="card vazio">Nada esperando você. Quando um funcionário precisar de uma decisão, ela aparece aqui.</div>'; return; }
+  if (!l.length) { $('eqPend').innerHTML = '<div class="card vazio eq-vazio"><i class="ti ti-circle-check" aria-hidden="true"></i>Nada esperando você. Quando um funcionário precisar de uma decisão, ela aparece aqui.</div>'; return; }
   $('eqPend').innerHTML = l.map(p => {
     const a = EQ_AREAS[p.area] || { nm: p.area, ic: 'ti-robot' };
     const txt = PEND_COM_TEXTO.includes(p.tipo);
     const valor = (p.proposta && p.proposta.texto) || '';
-    return `<article class="card eq-pend" data-pid="${esc(p.id)}">
+    return `<article class="card eq-pend" data-pid="${esc(p.id)}" data-area="${esc(p.area)}">
       <div class="eq-topo"><span class="eq-ic"><i class="ti ${a.ic}" aria-hidden="true"></i></span><div><h3>${esc(p.titulo)}</h3><span class="selo ac">${esc(a.nm)}</span> <span class="sub">${esc(p.id)} · ${esc(p.criada)}</span></div></div>
       <pre class="eq-det">${esc(p.detalhe || '')}</pre>
       ${txt ? `<div class="campo"><label for="eqt_${esc(p.id)}">${p.tipo === 'ig_dm' ? 'Sua resposta' : 'Texto que vai sair (pode editar)'}</label><textarea id="eqt_${esc(p.id)}" rows="3" maxlength="900">${esc(valor)}</textarea></div>` : ''}
@@ -2789,7 +2780,7 @@ function desenharLog() {
   const l = (E.eq.log || []).filter(x => !f || x.area === f);
   $('eqLog').innerHTML = l.length ? l.map(x => {
     const a = EQ_AREAS[x.area] || { nm: x.area, ic: 'ti-robot' };
-    return `<li><span class="eq-ic sm"><i class="ti ${a.ic}" aria-hidden="true"></i></span><div><p><b>${esc(a.nm)}</b> · ${esc(x.acao)} <span class="sub">${esc(quando(x.em))}</span></p><p class="eq-tx">${esc(x.detalhe || '')}</p></div></li>`;
+    return `<li data-area="${esc(x.area)}"><span class="eq-ic sm"><i class="ti ${a.ic}" aria-hidden="true"></i></span><div><p><b>${esc(a.nm)}</b> · ${esc(x.acao)} <span class="sub">${esc(quando(x.em))}</span></p><p class="eq-tx">${esc(x.detalhe || '')}</p></div></li>`;
   }).join('') : '<li class="vazio">Nada registrado ainda.</li>';
 }
 function desenharConversas() {
@@ -2847,26 +2838,100 @@ $('equipe').addEventListener('click', async ev => {
     return;
   }
   if (t.dataset.eqdec !== undefined) {
-    const card = t.closest('[data-pid]'), id = card.dataset.pid, aprovar = t.dataset.eqdec === '1';
-    const p = (E.eq.pendencias || []).find(x => x.id === id) || {};
-    const ta = card.querySelector('textarea');
-    const texto = ta ? ta.value.trim() : '';
-    if (aprovar && p.tipo === 'ig_dm' && !texto) { toast('Escreva a resposta antes de enviar.', 'err'); return; }
-    if (!aprovar && !(await confirmar('Recusar ' + id + '?', 'Nada é enviado nem publicado.', 'Recusar', true))) return;
+    const card = t.closest('[data-pid]'), ta = card.querySelector('textarea');
     card.querySelectorAll('button').forEach(b => b.disabled = true);
-    try {
-      const orig = (p.proposta && p.proposta.texto) || '';
-      const r = await equipeOp({ op: 'decidir', id, aprovar, ajuste: aprovar && texto && texto !== orig ? texto : undefined });
-      if (r.erro) { toast(r.erro, 'err'); card.querySelectorAll('button').forEach(b => b.disabled = false); return; }
-      toast(r.resultado || 'Feito.'); carregarEquipe();
-    } catch (e) { toast(e.message, 'err'); card.querySelectorAll('button').forEach(b => b.disabled = false); }
+    const ok = await decidirPend(card.dataset.pid, t.dataset.eqdec === '1', ta ? ta.value.trim() : '');
+    if (!ok) card.querySelectorAll('button').forEach(b => b.disabled = false);
   }
+});
+/* Aprova ou recusa uma pendência; devolve true se o servidor fez. */
+async function decidirPend(id, aprovar, texto) {
+  const p = ((E.eq && E.eq.pendencias) || []).find(x => x.id === id) || {};
+  if (aprovar && p.tipo === 'ig_dm' && !texto) { toast('Escreva a resposta antes de enviar.', 'err'); return false; }
+  if (!aprovar && !(await confirmar('Recusar ' + id + '?', 'Nada é enviado nem publicado.', 'Recusar', true))) return false;
+  try {
+    const orig = (p.proposta && p.proposta.texto) || '';
+    const r = await equipeOp({ op: 'decidir', id, aprovar, ajuste: aprovar && texto && texto !== orig ? texto : undefined });
+    if (r.erro) { toast(r.erro, 'err'); return false; }
+    toast(r.resultado || 'Feito.'); carregarEquipe();
+    return true;
+  } catch (e) { toast(e.message, 'err'); return false; }
+}
+const rotAprovar = p => p.tipo === 'ig_semana' ? 'Aprovar e agendar' : p.tipo === 'info' ? 'Ok, visto' : 'Aprovar e enviar';
+/* Abre uma pendência num diálogo (a partir da Visão geral). */
+function abrirPend(id) {
+  const p = ((E.eq && E.eq.pendencias) || []).find(x => x.id === id);
+  if (!p) { toast('Essa pendência já foi resolvida.'); carregarEquipe(); return; }
+  const a = EQ_AREAS[p.area] || { nm: p.area };
+  const txt = PEND_COM_TEXTO.includes(p.tipo);
+  const corpo = `<p class="sub">${esc(a.nm)} · ${esc(p.id)} · ${esc(p.criada)}</p><pre class="eq-det">${esc(p.detalhe || '')}</pre>`
+    + (txt ? `<div class="campo"><label for="dlgPendTx">${p.tipo === 'ig_dm' ? 'Sua resposta' : 'Texto que vai sair (pode editar)'}</label><textarea id="dlgPendTx" rows="5" maxlength="5000">${esc((p.proposta && p.proposta.texto) || '')}</textarea></div>` : '');
+  dialogo(p.titulo, corpo, [
+    { rot: 'Recusar', cls: 'btn-g', acao: async () => { const ok = await decidirPend(id, false, ''); return ok; } },
+    { rot: rotAprovar(p), cls: 'btn-p', acao: async () => { const ta = $('dlgPendTx'); return decidirPend(id, true, ta ? ta.value.trim() : ''); } }
+  ]);
+}
+
+/* ---------- Visão geral: o que precisa de você e a equipe (14/10/2026) ---------- */
+function desenharPrecisa() {
+  const el = $('vgPrecisa'); if (!el) return;
+  const p = E.painel || {};
+  const v = p.vendas && p.vendas.ok ? p.vendas : null;
+  const si = p.sinalizacoes && p.sinalizacoes.ok ? p.sinalizacoes : null;
+  const pend = p.pendentes && p.pendentes.ok ? p.pendentes : null;
+  const itens = [];
+  ((E.eq && E.eq.pendencias) || []).forEach(x => {
+    const a = EQ_AREAS[x.area] || { nm: x.area, ic: 'ti-robot' };
+    itens.push(`<li data-area="${esc(x.area)}"><span class="eq-ic"><i class="ti ${a.ic}" aria-hidden="true"></i></span>
+      <div class="vg-tx"><b>${esc(x.titulo)}</b><span>${esc(a.nm)} · ${esc(x.criada)}</span></div>
+      ${x.tipo === 'info' ? `<button class="btn btn-g sm" type="button" data-vgok="${esc(x.id)}">Ok</button>` : `<button class="btn btn-p sm" type="button" data-vgpend="${esc(x.id)}">Revisar</button>`}</li>`);
+  });
+  if (si && si.abertas) itens.push(`<li data-area="sinal"><span class="eq-ic"><i class="ti ti-flag" aria-hidden="true"></i></span><div class="vg-tx"><b>${inteiro(si.abertas)} ${si.abertas === 1 ? 'questão sinalizada' : 'questões sinalizadas'}</b><span>Alunos apontaram erro ou dúvida</span></div><a class="btn btn-g sm" href="#sinalizacoes">Ver</a></li>`);
+  if (v && v.revisar) itens.push(`<li data-area="pag"><span class="eq-ic"><i class="ti ti-credit-card" aria-hidden="true"></i></span><div class="vg-tx"><b>${inteiro(v.revisar)} ${v.revisar === 1 ? 'pagamento a revisar' : 'pagamentos a revisar'}</b><span>Sem conta ou produto reconhecido</span></div><a class="btn btn-g sm" href="#pagamentos" data-pg="revisar">Revisar</a></li>`);
+  if (pend && pend.n) itens.push(`<li data-area="cont"><span class="eq-ic"><i class="ti ti-user-question" aria-hidden="true"></i></span><div class="vg-tx"><b>${plural(pend.n, 'compra espera', 'compras esperam')} a conta</b><span>A pessoa ainda não criou a conta; libera sozinho quando criar</span></div></li>`);
+  const n = itens.length;
+  $('vgNPrec').textContent = n ? n : '';
+  el.innerHTML = n ? `<ul class="vg-itens">${itens.join('')}</ul>` : `<p class="vg-ok"><i class="ti ti-circle-check" aria-hidden="true"></i>Tudo em dia. Nada esperando você.</p>`;
+}
+function desenharVgEquipe() {
+  const q = E.eq; if (!q || !$('vgEquipe')) return;
+  $('vgEquipe').innerHTML = Object.keys(EQ_AREAS).map(a => {
+    const m = EQ_AREAS[a], st = statusArea(a), ct = (q.contagem || {})[a] || {};
+    const est = st.cls === 'ok' ? 'on' : st.cls === 'av' ? 'pausa' : 'falta';
+    return `<li data-area="${a}"><span class="eq-ic sm"><i class="ti ${m.ic}" aria-hidden="true"></i></span><b>${m.nm}</b>
+      <span class="vg-st ${est}">${esc(st.t)}</span><span class="vg-q">${ct.ultima ? esc(haQuanto(ct.ultima.em)) + ' · ' : ''}${inteiro(ct.h24 || 0)} em 24 h</span></li>`;
+  }).join('');
+  const log = (q.log || []).slice(0, 6);
+  $('vgAtividade').innerHTML = log.length ? log.map(x => {
+    const a = EQ_AREAS[x.area] || { nm: x.area, ic: 'ti-robot' };
+    return `<li data-area="${esc(x.area)}"><span class="vg-pt" aria-hidden="true"></span><div><p><b>${esc(x.acao)}</b> <span class="sub">${esc(a.nm)} · ${esc(haQuanto(x.em))}</span></p><p class="eq-tx">${esc(String(x.detalhe || '').slice(0, 140))}</p></div></li>`;
+  }).join('') : '<li class="vazio">Nada registrado ainda.</li>';
+  desenharPrecisa();
+}
+$('visao').addEventListener('click', async ev => {
+  const b = ev.target.closest('[data-vgpend],[data-vgok],[data-pg],[data-ir-log]'); if (!b) return;
+  if (b.dataset.vgpend) return abrirPend(b.dataset.vgpend);
+  if (b.dataset.vgok) { b.disabled = true; if (!(await decidirPend(b.dataset.vgok, true, ''))) b.disabled = false; return; }
+  if (b.dataset.pg) { E.pgTipo = b.dataset.pg; E.carregou.pedidos = false; marcarChips('pgTipos', 'tipo', E.pgTipo); }
+  if (b.dataset.irLog !== undefined) E.eqAba = 'log';
 });
 $('eqResumo').addEventListener('change', async ev => {
   try { await equipeOp({ op: 'config', campos: { resumo: ev.target.checked } }); toast(ev.target.checked ? 'Resumo das 7h ligado.' : 'Resumo das 7h desligado.'); }
   catch (e) { ev.target.checked = !ev.target.checked; toast(e.message, 'err'); }
 });
 
+function iconesDasSecoes() {
+  document.querySelectorAll('.menu a[data-sec]').forEach(a => {
+    const sec = document.getElementById(a.dataset.sec), i = a.querySelector('i');
+    if (!sec || !i) return;
+    sec.querySelectorAll('.cab > div:first-child').forEach(d => {
+      if (d.querySelector('.sec-ic') || !d.querySelector('h2')) return;
+      d.classList.add('cab-t');
+      d.insertAdjacentHTML('afterbegin', `<span class="sec-ic" aria-hidden="true"><i class="${i.className}"></i></span>`);
+    });
+  });
+}
+iconesDasSecoes();
 async function iniciar() {
   if (E.iniciado) return;
   E.us.eu = MT.user.uid;
