@@ -26,6 +26,12 @@
     if (!temManifesto()) return 'MedTech App';
     return m || (document.title || 'app').split(/\s[—–|-]\s/)[0].trim();
   }
+  /* tela de login do _mtauth (.mt-auth) ou qualquer diálogo aberto */
+  function loginAberto() {
+    if (document.querySelector('dialog[open]')) return true;
+    var a = document.querySelector('.mt-auth');
+    return !!(a && !a.hidden && getComputedStyle(a).display !== 'none' && getComputedStyle(a).visibility !== 'hidden');
+  }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
   window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); prompt = e; });
@@ -89,7 +95,15 @@
     if (instalado() || !celular()) return;
     var ate = Number(ler(CHAVE) || 0);
     if (ate && Date.now() < ate) return;
-    setTimeout(function () { if (!document.querySelector('dialog[open]')) abrir(false); }, 6000);
+    setTimeout(function () {
+    /* espera a tela de login (ou outro diálogo) fechar: tenta a cada 5 s por até 10 min */
+    var tentativas = 0;
+    (function tenta() {
+      if (instalado() || document.getElementById('mtinst')) return;
+      if (!loginAberto()) { abrir(false); return; }
+      if (++tentativas < 120) setTimeout(tenta, 5000);
+    })();
+    }, 6000);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', automatico); else automatico();
 })();
