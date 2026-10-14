@@ -52236,11 +52236,17 @@ Vale reconhecer também as apresentações não pulmonares. Congestão hepática
 
 ## Classificação e gravidade
 
-**Pela fração de ejeção (FEVE):**
-- **ICFEr** — FE ≤ 40%
-- **ICFElr** (levemente reduzida) — FE 41–49%
-- **ICFEp** — FE ≥ 50% + disfunção diastólica / pressões de enchimento elevadas
-- **IC com FE melhorada** — basal ≤ 40% que subiu > 10 pontos para > 40%
+**Pela fração de ejeção (FEVE), Diretriz Brasileira de IC 2026 (SBC):** o corte passou a ser **50%**.
+- **ICFEr**: FEVE < 50%
+- **ICFEp**: FEVE ≥ 50%
+
+A categoria "levemente reduzida" (FEVE 41–49%) **foi excluída** pela diretriz de 2026: esses pacientes têm características e resposta terapêutica semelhantes às da fração reduzida, e a faixa parece ser mais uma fase da trajetória da FEVE do que um fenótipo próprio. Na prática, FEVE de 41 a 49% é ICFEr e recebe o tratamento da ICFEr.
+
+**Pela trajetória (após tratamento):**
+- **IC melhorada**: FEVE basal ≤ 40% que sobe ≥ 10 pontos para > 40%, mas ainda < 50%, com sintomas persistentes (NYHA II–IV), NT-proBNP elevado e alterações estruturais persistentes.
+- **IC em remissão**: FEVE inicial < 50% que sobe ≥ 10 pontos para > 50%, paciente assintomático ou com sintomas leves (NYHA I–II), alterações estruturais mínimas e NT-proBNP discretamente elevado.
+- **IC recuperada**: FEVE inicial ≤ 50% que sobe ≥ 10 pontos e se mantém > 50% por pelo menos 12 meses, com normalização estrutural e funcional, NYHA I e NT-proBNP normal.
+- **IC persistente**: estágio C sem melhora de sintomas nem da cardiopatia estrutural (pior prognóstico).
 
 **Funcional (NYHA):** I (sem limitação) · II (leve) · III (acentuada) · IV (em repouso).
 
@@ -52289,13 +52295,19 @@ Suspeite de **amiloidose cardíaca** diante da tríade hipertrofia ventricular i
 
 **Congestão com FE normal — a armadilha:** **pericardite constritiva** (turgência jugular proeminente, sinal de Kussmaul, calcificação pericárdica, ausência de B3) e **cardiomiopatia restritiva/amiloidose** (HVE concêntrica com baixa voltagem no ECG, strain com poupança apical). Ambas são frequentemente rotuladas como ICFEp e têm conduta própria.
 
-## Tratamento — ICFEr (FE ≤ 40%)
+## Tratamento — ICFEr (FEVE < 50%)
+
+A diretriz de 2026 adota o sistema **GRADE**: cada recomendação tem força (forte ou fraca) e certeza da evidência (alta, moderada, baixa ou muito baixa), no lugar das antigas classes I, IIa, IIb e III.
 
 **Os 4 pilares — iniciar TODOS precocemente e titular até a dose-alvo / máxima tolerada (reduzem mortalidade):**
 
 A estratégia moderna é "começar baixo, começar tudo": instituir as quatro classes em doses baixas nas primeiras semanas e só depois titular, em vez de maximizar uma classe por vez. O ganho de mortalidade aparece já nos primeiros 30 dias.
 
-**1. IECA/ARNI (preferir ARNI):**
+Na faixa de FEVE 41–49%, agora incluída na ICFEr, a evidência vem de subgrupos: iSGLT2, sacubitril-valsartana e BRA reduzem sobretudo eventos de piora da IC, sem redução clara de mortalidade cardiovascular, e o benefício do betabloqueador parece restrito a quem está em ritmo sinusal.
+
+**1. IECA/BRA ou INRA (sacubitril-valsartana):**
+- Ambulatorial ainda sintomático com IECA ou BRA otimizado: **trocar por INRA** (forte, certeza moderada). Internado por piora, já em tratamento: trocar após estabilização (PAS > 100 mmHg) e antes da alta (forte, moderada).
+- Diagnóstico novo, sem IECA prévio: pode-se começar direto com INRA (recomendação fraca, certeza baixa).
 - Sacubitril-valsartana 24/26 mg 12/12h → alvo **97/103 mg 12/12h**.
 - Alternativa: Enalapril 2,5 → 10–20 mg 12/12h; BRA (losartana/valsartana) se tosse por IECA.
 - ⚠️ Nunca associar IECA + ARNI; aguardar ≥ 36h ao trocar IECA → ARNI (angioedema). Vigiar K⁺, creatinina e PA.
@@ -52313,15 +52325,15 @@ A estratégia moderna é "começar baixo, começar tudo": instituir as quatro cl
 
 **Sintomáticos e adjuvantes:**
 - **Diurético de alça** (congestão; NÃO reduz mortalidade): Furosemida 20–40 mg/dia, titular; resistência → ↑ dose, IV, ou associar tiazídico.
-- **Deficiência de ferro** (ferritina < 100, ou 100–299 com sat < 20%): **carboximaltose férrica IV**.
-- Hidralazina + nitrato: afrodescendentes sintomáticos ou intolerância a IECA/ARNI/BRA.
-- Ivabradina: ritmo sinusal e FC ≥ 70 apesar de BB otimizado.
-- Digoxina: sintomático refratário ou FA (controle de FC) — janela terapêutica estreita.
-- Vericiguat: piora recente apesar de terapia otimizada.
+- **Deficiência de ferro** (ferritina < 100 µg/L, ou 100–299 µg/L com saturação de transferrina < 20%): **ferro IV** (carboximaltose férrica ou derisomaltose férrica) para sintomas e qualidade de vida; ferro oral não funciona nesse cenário.
+- Hidralazina + dinitrato de isossorbida: autodeclarados negros em NYHA III–IV já otimizados (forte, moderada), ou intolerância a IECA, BRA e INRA, inclusive por creatinina > 2,5 mg/dL ou K⁺ > 5,5 mEq/L persistente.
+- Ivabradina: FEVE < 35%, sintomático, ritmo sinusal e FC ≥ 70 bpm apesar de betabloqueador na dose máxima tolerada.
+- **Digoxina em baixa dose** (reposicionada em 2026): ICFEr sintomática (NYHA II–IV), em ritmo sinusal ou FA, já com terapia otimizada, para reduzir hospitalização por piora da IC e o desfecho de morte cardiovascular ou piora da IC (forte, certeza moderada). **Alvo de nível sérico 0,5–0,9 ng/mL**, com dose ajustada à função renal, idade e peso. Não retirar rotineiramente em quem já usa e está estável (risco de piora mesmo com terapia quádrupla).
+- Vericiguat: piora recente (internação por IC ou diurético venoso nos últimos meses) apesar de terapia otimizada; o benefício é mais consistente nesse perfil de maior risco.
 
 **Dispositivos:**
-- **CDI:** FE ≤ 35% sintomático (NYHA II–III) após ≥ 3 meses de terapia otimizada; prevenção secundária pós-PCR/TV.
-- **TRC:** FE ≤ 35% + BRE + QRS ≥ 130–150 ms em ritmo sinusal.
+- **CDI (prevenção primária):** etiologia isquêmica com FEVE ≤ 35% em NYHA II–III (ou ≤ 30% em NYHA I), pelo menos 40 dias após infarto e 90 dias após revascularização cirúrgica, terapia otimizada e expectativa de vida > 1 ano. Não isquêmica com FEVE ≤ 35%: decisão individualizada, a favor quando há marcadores de risco de morte súbita. Prevenção secundária após PCR ou TV sustentada.
+- **TRC:** FEVE < 35%, sintomático após ≥ 90 dias de terapia otimizada, ritmo sinusal e **BRE com QRS ≥ 150 ms** (forte); BRE com QRS 130–149 ms (fraca). Não indicar com bloqueio de ramo direito ou distúrbio inespecífico. Em FA com BRE, só com estratégia que garanta estimulação biventricular > 90%.
 - IC avançada (estágio D): avaliar dispositivo de assistência ventricular / transplante.
 
 ## Como contornar os obstáculos da titulação
@@ -52342,13 +52354,13 @@ O motivo mais comum de subdosagem não é intolerância verdadeira, é receio. V
 
 \`\`\`mermaid
 flowchart TD
-    A["IC com FE menor ou igual a 40%<br/>diagnóstico confirmado"] --> B["Congestão presente?<br/>jugular, edema, ortopneia"]
+    A["IC com FEVE menor que 50%<br/>diagnóstico confirmado"] --> B["Congestão presente?<br/>jugular, edema, ortopneia"]
     B -->|Sim| C["Diurético de alça<br/>furosemida, titular"]
     B -->|Não| D["Iniciar os 4 pilares<br/>doses baixas simultâneas"]
     C --> D
     D --> E["Titular a cada 2 a 4 semanas<br/>vigiar PA, FC, K e creatinina"]
     E --> F["Após 3 meses otimizado<br/>FE ainda menor ou igual a 35%?"]
-    F -->|Sim| G["Avaliar CDI e TRC<br/>TRC se BRE com QRS largo"]
+    F -->|Sim| G["Avaliar CDI e TRC<br/>TRC se BRE com QRS de 150 ms ou mais"]
     F -->|Não| H["Manter terapia e seguimento<br/>reavaliar FE periodicamente"]
     G --> I["Sintomas refratários ou estágio D<br/>encaminhar a IC avançada"]
     class F critical;
@@ -52369,13 +52381,21 @@ flowchart TD
 
 **Apneia obstrutiva do sono**, **obesidade**, **DPOC** (betabloqueador cardiosseletivo é seguro e não deve ser negado), **depressão** e **anemia** completam a lista de comorbidades que, tratadas, mudam sintomas e reinternação.
 
-## Tratamento — ICFElr e ICFEp
+## Tratamento — ICFEp (FEVE ≥ 50%)
 
-- **iSGLT2** (dapa/empa) — única classe com redução consistente de hospitalização.
-- Diurético para congestão; controle rigoroso de PA, FA, isquemia, obesidade e SAOS.
-- Considerar ARNI/MRA em casos selecionados (ICFElr e ICFEp limítrofe).
+- **Diagnóstico:** na dispneia inexplicada com suspeita de ICFEp, aplicar o **escore H2FPEF** (forte, moderada).
+- **iSGLT2** (empagliflozina ou dapagliflozina) em todo sintomático: reduz morte cardiovascular ou piora da IC (forte, certeza alta).
+- **Antagonista mineralocorticoide** (espironolactona ou **finerenona**) se TFG > 25 mL/min/1,73 m² e K⁺ < 5,0 mEq/L: reduz hospitalização e eventos de piora da IC (forte, alta).
+- **Diurético**, de preferência de alça, para congestão (forte, baixa).
+- **Não** usar medicação bradicardizante para atingir FC < 70 bpm em ritmo sinusal (recomendação contra, forte).
+- Sacubitril-valsartana teve efeito neutro com FEVE > 60%.
 
-Na ICFElr o conjunto de evidências se aproxima da ICFEr, e é razoável oferecer os quatro pilares. Na ICFEp, o tratamento é sobretudo das comorbidades — e sempre procurar amiloidose e constrição antes de aceitar o rótulo.
+**Obesidade (IMC ≥ 30 kg/m²) com ICFEp:**
+- Restrição calórica e exercício para capacidade funcional e qualidade de vida (forte, moderada).
+- **Tirzepatida**: reduz peso, melhora qualidade de vida e reduz eventos de piora da IC ou morte cardiovascular (forte, moderada).
+- **Semaglutida**: reduz peso e melhora qualidade de vida e capacidade funcional (forte, moderada); efeito sobre morte cardiovascular ou piora da IC com evidência mais fraca (fraca, baixa).
+
+Controle rigoroso de PA, FA, isquemia e apneia do sono completa o tratamento. Sempre procurar amiloidose e constrição antes de aceitar o rótulo de ICFEp.
 
 ## Quando internar / UTI
 
@@ -52407,7 +52427,8 @@ Sobre cuidados paliativos: eles não são o fim da linha e não competem com a t
 - Sempre dosar ferro: a carência é tratável e muito comum.
 - Elevação discreta de creatinina ao iniciar IECA/ARNI/MRA é esperada e não é motivo para suspender — reavaliar, não abandonar a droga.
 - Diurético em dose alta crônica sem congestão é iatrogenia: piora função renal e limita a titulação dos pilares.
-- FE "melhorada" não autoriza suspender a medicação — a retirada leva a recaída na maioria.
+- FE "melhorada" ou "em remissão" não autoriza suspender a medicação: remissão funcional não é cura, e a retirada leva a recaída na maioria.
+- **FEVE de 41 a 49% é ICFEr** desde a diretriz brasileira de 2026: não deixe esse paciente sem os quatro pilares.
 - ICFEp com HVE, baixa voltagem no ECG e intolerância a vasodilatadores: pense em amiloidose antes de intensificar diurético.
 - **Não use atenolol nem propranolol na ICFEr.** Apenas carvedilol, bisoprolol, succinato de metoprolol (e nebivolol no idoso) têm evidência de redução de mortalidade.
 - **Peça sorologia de Chagas em toda miocardiopatia dilatada sem causa definida**, mesmo sem história de exposição rural — é barato, definitivo e muda o manejo arrítmico.
@@ -52415,7 +52436,9 @@ Sobre cuidados paliativos: eles não são o fim da linha e não competem com a t
 - **Hipotensão assintomática não é motivo para reduzir pilar.** Antes disso, retire o que não muda mortalidade: diurético em excesso, nitrato, bloqueador de canal de cálcio.
 - **Titular uma classe por vez até a dose máxima antes de iniciar a próxima** é estratégia ultrapassada e atrasa o benefício — comece as quatro em dose baixa.
 - **Consulta de retorno em 7 a 14 dias após alta** é o intervalo que reduz reinternação; marcar para 90 dias equivale a não marcar.
-- **Restrição hídrica e de sal exageradas** pioram nutrição, sede e adesão sem benefício demonstrado — o alvo é moderação, não privação.`,
+- **Restrição hídrica e de sal exageradas** pioram nutrição, sede e adesão sem benefício demonstrado — o alvo é moderação, não privação.
+
+**Fonte:** Sociedade Brasileira de Cardiologia. Diretriz Brasileira de Insuficiência Cardíaca – 2026. Arq Bras Cardiol. 2026;123(10):e20260830.`,
 
 hipona: `## Fisiopatologia
 
@@ -55893,7 +55916,7 @@ Os critérios objetivos para considerar o paciente pronto para alta são simples
 
 A janela pós-alta é o período de maior risco de reinternação e morte. É nela que se ganha desfecho: a evidência atual sustenta **titulação rápida das drogas modificadoras de doença antes da alta e nas primeiras semanas**, com consultas frequentes no primeiro mês e meio — a estratégia intensiva reduz reinternação e morte quando comparada ao cuidado usual. Na prática, isso significa não mandar o paciente embora só com furosemida e uma consulta em três meses.
 
-Nos pacientes com fração de ejeção reduzida, os quatro pilares — bloqueio do sistema renina-angiotensina (preferencialmente sacubitril-valsartana quando disponível), betabloqueador, antagonista do receptor mineralocorticoide e inibidor de SGLT2 — devem ser iniciados o mais cedo possível, em doses baixas e simultâneas, e depois titulados. Nas frações levemente reduzida e preservada, o inibidor de SGLT2 tem indicação estabelecida.
+Nos pacientes com fração de ejeção reduzida, os quatro pilares — bloqueio do sistema renina-angiotensina (preferencialmente sacubitril-valsartana quando disponível), betabloqueador, antagonista do receptor mineralocorticoide e inibidor de SGLT2 — devem ser iniciados o mais cedo possível, em doses baixas e simultâneas, e depois titulados. Desde a Diretriz Brasileira de IC 2026 (SBC), fração de ejeção abaixo de 50% já conta como reduzida (a faixa "levemente reduzida", de 41 a 49%, deixou de existir); na fração preservada, o inibidor de SGLT2 também tem indicação estabelecida.
 
 Oriente por escrito: pesar-se todos os dias pela manhã, após urinar e com a mesma roupa; procurar atendimento se ganhar 2 kg em três dias ou 3 kg em uma semana; restringir sal; ajustar líquidos conforme orientação individual; não usar anti-inflamatórios; manter vacinação em dia (influenza, pneumococo, COVID-19); e reconhecer os sinais de alarme — dispneia progressiva, ortopneia nova, edema crescente, dispneia paroxística noturna, síncope, dor torácica.
 
