@@ -2711,9 +2711,10 @@ const EQ_AREAS = {
   operacoes: { nm: 'Operações', ic: 'ti-settings-automation', desc: 'Questões sinalizadas, pagamentos para revisar, erros do servidor e clientes esperando. Às segundas, o que melhorar.' },
   financeiro: { nm: 'Financeiro', ic: 'ti-cash', desc: 'Vendas, reembolsos, contestações, recusas com o motivo e planos anuais vencendo. Nunca mexe em dinheiro.' },
   instagram: { nm: 'Instagram', ic: 'ti-brand-instagram', desc: 'Responde comentários e mensagens, propõe os posts da semana e publica depois da sua aprovação.' },
+  email: { nm: 'E-mail', ic: 'ti-mail', desc: 'Lê o contato@medtechbr.com.br a cada 15 min: escreve a resposta dos clientes para você aprovar e avisa o que as plataformas pedirem.' },
   diretoria: { nm: 'Diretoria', ic: 'ti-crown', desc: 'Conversa com você no WhatsApp e manda o resumo das 7h.' }
 };
-const PEND_COM_TEXTO = ['sinal_resposta', 'ig_comentario', 'ig_dm'];
+const PEND_COM_TEXTO = ['sinal_resposta', 'ig_comentario', 'ig_dm', 'email_resposta'];
 const haQuanto = iso => {
   if (!iso) return '—';
   const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
@@ -2740,6 +2741,7 @@ function statusArea(a) {
   if (a === 'atendente') return q.atendente.pausado ? { t: 'Pausada', cls: 'av', liga: true } : { t: 'Ligada', cls: 'ok', liga: false };
   if (a === 'diretoria') return { t: 'Ligada', cls: 'ok' };
   if (a === 'instagram' && !q.instagram_ativo) return { t: 'Falta ligar à Meta', cls: '' };
+  if (a === 'email' && !q.email_visto && c.email !== false) return { t: 'Falta instalar o script', cls: '' };
   return c[a] ? { t: 'Ligado', cls: 'ok', liga: false } : { t: 'Desligado', cls: 'av', liga: true };
 }
 function desenharEquipe() {
