@@ -146,6 +146,11 @@
        como "mesma titularidade", mas para quem vê só as contas conectadas é
        dinheiro entrando: conta como receita. */
     const DIA3 = 3 * DIA;
+    const cartoesFeed = new Set(feed.accounts.filter(a => a.kind === 'cartao').map(a => a.id));
+    const temCartao = cartoesFeed.size > 0;
+    const ehFatura = (t) => /credit card payment/i.test(t.cat || '')
+      || (t.type === 'expense' && !cartoesFeed.has(t.accountId) && /pa?gto\.? ?fatura|pagamento de fatura|pag fatura/i.test(t.desc || ''))
+      || (t.type === 'income' && cartoesFeed.has(t.accountId) && /^pagamento \d+$|pagamento (recebido|efetuado|de fatura|fatura)/i.test(String(t.desc || '').trim()));
     const temPar = (t) => feed.transactions.some(o => o !== t && o.accountId !== t.accountId && o.type !== t.type
       && Math.abs(o.amount - t.amount) < 0.01 && Math.abs(new Date(o.date) - new Date(t.date)) <= DIA3);
 
@@ -212,7 +217,11 @@
     for (const t0 of feed.transactions) {
       if (copias.has(t0.id)) { noResumo.add('of_' + t0.id); continue; }
       const marcado = t0.transfer || proprios.some(p => String(t0.desc || '').toLowerCase().includes(p));
-      const t = { ...t0, transfer: !!marcado && temPar(t0) };
+      /* Pagamento de fatura com o cartão conectado é sempre transferência: os
+         gastos já entraram um a um pelo cartão. Não espera a outra ponta, que o
+         Open Finance às vezes entrega um ou dois dias depois. */
+      const fatura = ehFatura(t0) && temCartao;
+      const t = { ...t0, transfer: fatura || (!!marcado && temPar(t0)) };
       const id = 'of_' + t.id;
       noResumo.add(id);
       if (t.date < desde) continue;
@@ -227,8 +236,15 @@
         if (ex.of && ex.date !== t.date) mud.date = t.date;
         if (ex.of && !!ex.ofPend !== !!t.pending) mud.ofPend = !!t.pending;
         if (ex.of && !!ex.pending !== pend) mud.pending = pend;
+        /* entrou como gasto/receita antes de a outra ponta chegar: agora é
+           transferência (fatura sempre; Pix entre contas só se a categoria ainda
+           é a automática, para não desfazer escolha sua) */
+        if (ex.of && !ex.transferId && t.transfer
+          && (ehFatura(t) || ['Outros', 'Outras receitas', 'Pix'].includes(ex.category))) {
+          mud.category = 'Transferência'; mud.transferId = id;
+        }
         // importado antes do aprendizado (caiu em "Outros"): entra no compromisso
-        if (ex.of && !ex.groupId && !ex.transferId && ex.category === 'Outros') {
+        if (ex.of && !ex.groupId && !ex.transferId && !mud.transferId && ex.category === 'Outros') {
           const tmp = {};
           if (ensinar(tmp, t, ex.accountId)) Object.assign(mud, tmp);
         }
