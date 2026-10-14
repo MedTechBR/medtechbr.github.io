@@ -5,7 +5,7 @@ institucional.html e uma página por produto institucional) a partir de:
   _vitrine/header.html   cabeçalho + barra de produtos (compartilhados)
   _vitrine/footer.html   rodapé (compartilhado)
   _vitrine/paginas/*.html  o conteúdo de cada página; a 1ª linha é o meta:
-      <!-- meta title="..." description="..." linha="app|provas|institucional|" [home] -->
+      <!-- meta title="..." description="..." linha="app|provas|multi|institucional|" [home] -->
 
 Estilo e comportamento ficam em vitrine.css e vitrine.js (compartilhados por todas).
 NUNCA edite os *.html gerados na raiz: edite a parte em _vitrine/ e rode
@@ -16,7 +16,7 @@ O gerador confere que todo link local aponta para arquivo existente e que todo
 import io, os, re, sys, glob
 
 RAIZ = os.path.dirname(os.path.abspath(__file__))
-V = '17'   # versão de vitrine.css / vitrine.js (bumpar ao mudar qualquer um dos dois)
+V = '18'   # versão de vitrine.css / vitrine.js (bumpar ao mudar qualquer um dos dois)
 
 def ler(p): return io.open(os.path.join(RAIZ, p), encoding='utf-8').read()
 
@@ -55,7 +55,7 @@ MOLDE = '''<!DOCTYPE html>
 erros = []
 gerados = []
 # projetos publicados como "project pages" de OUTROS repositórios, no mesmo domínio: não existem aqui
-EXTERNOS = {'clinicamed/', 'trafego-titulo/', 'casos-clinicos/', 'clinicar/', 'farmauti/', 'quiz-enare-farmacia/', 'sos-farmacia/'}
+EXTERNOS = {'clinicamed/', 'trafego-titulo/', 'casos-clinicos/', 'clinicar/', 'farmauti/', 'quiz-enare-farmacia/', 'sos-farmacia/', 'enfermare/'}
 htmls = {}
 for parte in sorted(glob.glob(os.path.join(RAIZ, '_vitrine/paginas/*.html'))):
     nome = os.path.basename(parte)

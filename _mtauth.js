@@ -181,7 +181,9 @@ const MT_FUNCS = [
   /* farmácia (10/10/2026): vendidos na linha Provas, fora do padrão dos médicos (só aparecem para quem os escolhe ou compra) */
   { id:'farmauti',      nm:'FarmaUTI',      ic:'ti-pill',      c:'#4545D8', url:'/farmauti/',       linha:'provas' },
   { id:'enarefarmacia', nm:'ENARE Farmácia', ic:'ti-vaccine-bottle',    c:'#0A3F3B', url:'/quiz-enare-farmacia/', linha:'provas' },
-  { id:'sosfarmacia',   nm:'SOS Farmácia',  ic:'ti-first-aid-kit',     c:'#C8373C', url:'/sos-farmacia/',  linha:'provas' }
+  { id:'sosfarmacia',   nm:'SOS Farmácia',  ic:'ti-first-aid-kit',     c:'#C8373C', url:'/sos-farmacia/',  linha:'provas' },
+  /* enfermagem (14/10/2026): com os de farmácia formam a linha MedTech Multi da vitrine; mesma regra deles */
+  { id:'enfermare',     nm:'Enfermare',     ic:'ti-droplet',           c:'#B0306A', url:'/enfermare/',     linha:'provas' }
 ];
 /* A linha do app vem do MT_APP.linha; sem ela, do catálogo pelo id; sem nada, clínica. */
 function linhaAtual() {

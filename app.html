@@ -273,12 +273,14 @@ const CATALOGO = [
   /* farmácia (10/10/2026): público diferente; fora do PADRAO, aparece para quem escolhe ou compra */
   { id:'farmauti',      nm:'FarmaUTI',         ic:'ti-pill',             url:BASE+'farmauti/',             cat:'Farmácia',             linha:'provas', sub:'residência em Farmácia em Terapia Intensiva', c:'#4545D8' },
   { id:'enarefarmacia', nm:'Banca ENARE Farmácia', ic:'ti-vaccine-bottle',        url:BASE+'quiz-enare-farmacia/',  cat:'Farmácia',             linha:'provas', sub:'residência multiprofissional em Farmácia (ENARE)', c:'#0A3F3B' },
-  { id:'sosfarmacia',   nm:'SOS Farmácia Comercial', ic:'ti-first-aid-kit', url:BASE+'sos-farmacia/',         cat:'Farmácia',             linha:'provas', sub:'farmácia comercial: MIP, Portaria 344, RDC 471, interações e POPs', c:'#C8373C' }
+  { id:'sosfarmacia',   nm:'SOS Farmácia Comercial', ic:'ti-first-aid-kit', url:BASE+'sos-farmacia/',         cat:'Farmácia',             linha:'provas', sub:'farmácia comercial: MIP, Portaria 344, RDC 471, interações e POPs', c:'#C8373C' },
+  /* enfermagem (14/10/2026): linha MedTech Multi da vitrine, mesma regra dos de farmácia */
+  { id:'enfermare',     nm:'Enfermare',        ic:'ti-droplet',          url:BASE+'enfermare/',            cat:'Enfermagem',           linha:'provas', sub:'residência multiprofissional, concursos (EBSERH) e títulos de Enfermagem', c:'#B0306A' }
 ];
 /* Linha deste portal. provas.html é GERADO deste arquivo por _gera_provas.py — editar aqui. */
 const LINHA = 'clinica';
 const CATALOGO_LINHA = CATALOGO.filter(a => a.linha === LINHA);
-const CATEGORIAS = LINHA === 'provas' ? ['Prova de título','Residência e concursos','Farmácia'] : ['Referência clínica','Hospital e imagem','Rotina do médico'];
+const CATEGORIAS = LINHA === 'provas' ? ['Prova de título','Residência e concursos','Enfermagem','Farmácia'] : ['Referência clínica','Hospital e imagem','Rotina do médico'];
 /* Quem nunca escolheu vê o conjunto padrão da linha. */
 const PADRAO = LINHA === 'provas'
   ? ['clinicamed','cirurgiamed','trafegotitulo','flashmed']
@@ -365,14 +367,16 @@ function comprados(){
     MTAcesso.appsDoProduto(P, MTAcesso.produtoPorId(P, id)).forEach(a => { if (ids.has(a)) out.add(a); }); });
   return [...out];
 }
-const ehFarmacia = id => (CATALOGO.find(a => a.id === id) || {}).cat === 'Farmácia';
-/* Públicos não se misturam: quem comprou só app de farmácia e nunca escolheu os apps vê só os dele. */
-function soFarmacia(){
+/* MedTech Multi (14/10/2026): enfermagem e farmácia, os públicos que não são médicos */
+const CATS_MULTI = ['Enfermagem','Farmácia'];
+const ehMulti = id => CATS_MULTI.includes((CATALOGO.find(a => a.id === id) || {}).cat);
+/* Públicos não se misturam: quem comprou só app da linha Multi e nunca escolheu os apps vê só os dele. */
+function soMulti(){
   const d = dados(), c = comprados();
-  return !!c.length && c.every(ehFarmacia) && !(ACESSO.mt && ACESSO.mt.adm) && !(d && d[CAMPO_SEL] && Array.isArray(d[CAMPO_SEL].sel));
+  return !!c.length && c.every(ehMulti) && !(ACESSO.mt && ACESSO.mt.adm) && !(d && d[CAMPO_SEL] && Array.isArray(d[CAMPO_SEL].sel));
 }
 function renderGrid(){
-  const sel = soFarmacia() ? new Set(comprados()) : new Set(selecao());
+  const sel = soMulti() ? new Set(comprados()) : new Set(selecao());
   /* app comprado entra sozinho só enquanto a pessoa nunca escolheu; depois de escolher em
      "Meus apps", aparece exatamente o que ela marcou (pedido do Matheus, 10/10/2026) */
   const d0 = dados(), escolheu = !!(d0 && d0[CAMPO_SEL] && Array.isArray(d0[CAMPO_SEL].sel));
@@ -582,8 +586,8 @@ async function enviarResetSenha(){
    cliente (deixaria subcoleções órfãs e exige login recente): monta um e-mail pronto. */
 const MEUS_DADOS_APPS = ['portal','portal-provas','enfermaria','condutai','atbguia','calcmed','paliai','guiainterno','pocusai',
   'laudai','foco','plantaohub','granae','granae_of','logbook','medprovas','flashmed','flashmed_resumo','clinicamed','clinicamed_resumo',
-  'clinicamed_coord','cirurgiamed','cirurgiamed_resumo','trafego-titulo','radio-titulo','farmauti','enare-farmacia'];
-const MEUS_DADOS_SYNC = ['flashmed','clinicamed','cirurgiamed','trafego-titulo','radio-titulo','farmauti','enare-farmacia'];   // users/{uid}/apps/<app>/sync
+  'clinicamed_coord','cirurgiamed','cirurgiamed_resumo','trafego-titulo','radio-titulo','farmauti','enare-farmacia','enfermare','enfermare_resumo'];
+const MEUS_DADOS_SYNC = ['flashmed','clinicamed','cirurgiamed','trafego-titulo','radio-titulo','farmauti','enare-farmacia','enfermare'];   // users/{uid}/apps/<app>/sync
 function dataLocalISO(d){ d = d || new Date(); const p = n => String(n).padStart(2,'0'); return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
 /* Timestamp do Firestore e afins viram texto ISO; o resto passa igual */
 function limpaFs(v){
@@ -775,8 +779,8 @@ function preencheAssinatura(){
   const vg = MTAcesso.vagas(P, mt, LINHA), esc2 = MTAcesso.escolhidos(P, mt, LINHA).slice(0, vg);
   if (vg) B.push(`<div class="as-st"><p>Apps do seu plano (${esc2.length} de ${vg}): ${esc2.length ? esc2.map(a => esc(MTAcesso.NOMES[a] || a)).join(', ') : 'nenhum escolhido ainda'}.</p><div class="sug-row"><button type="button" class="b ok" onclick="escolherAppsPlano()">Escolher os apps do plano</button></div></div>`);
   let aVenda = prodDaLinha(P).filter(p => !ativos.has(p.id) && !(pend && pend.produto === p.id));
-  /* farmácia × medicina (campo publico do planos.json): quem já tem plano de um público vê só as ofertas dele */
-  const prodFarma = p => p.publico === 'farmacia';
+  /* MedTech Multi × medicina (campo publico do planos.json: farmacia, enfermagem): quem já tem plano de um lado vê só as ofertas dele */
+  const prodFarma = p => !!p.publico;
   const meus = [...ativos].map(id => MTAcesso.produtoPorId(P, id)).filter(p => p && p.linha === LINHA && !p.interno);
   if (meus.length && meus.every(prodFarma)) aVenda = aVenda.filter(prodFarma);
   else if (meus.length) aVenda = aVenda.filter(p => !prodFarma(p));
@@ -785,7 +789,7 @@ function preencheAssinatura(){
   const nadaAtivo = !ativos.size && !mt.adm && !(mt.t && mt.t > ag && Number(P.teste_dias) > 0);
   if (nadaAtivo && !pend) B.unshift(`<div class="as-st off"><span class="sel">Sem plano</span><p>Você ainda não tem plano ativo nesta conta. Escolha abaixo.</p></div>`);
   if (aVenda.length) {
-    B.push(`<div class="as-of"><h5>${nadaAtivo ? 'Assinar' : 'Outros planos'}</h5>${aVendaMed.length && aVendaFarma.length ? `<h6 class="as-pub">Medicina</h6>${ofertas(aVendaMed)}<h6 class="as-pub">Farmácia</h6>${ofertas(aVendaFarma)}` : ofertas(aVenda)}
+    B.push(`<div class="as-of"><h5>${nadaAtivo ? 'Assinar' : 'Outros planos'}</h5>${aVendaMed.length && aVendaFarma.length ? `<h6 class="as-pub">Medicina</h6>${ofertas(aVendaMed)}<h6 class="as-pub">Enfermagem e Farmácia</h6>${ofertas(aVendaFarma)}` : ofertas(aVenda)}
       <p class="as-mini">Mensal: cartão de crédito aqui mesmo ou pela sua conta do Mercado Pago (ou Mercado Livre), renova sozinho todo mês. Anual: Pix, cartão em até 12x ou boleto, pagamento único.</p></div>`);
   }
   const temCompra = donos.some(([id, ate]) => ate > ag && !ehIlim(ate) && !MTAcesso.produtoPorId(P, id).interno) || !!pend;

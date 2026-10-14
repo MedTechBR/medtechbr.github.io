@@ -32,11 +32,13 @@ const PROVAS=[
  {id:'trafegotitulo',nm:'TráfegoTítulo',ic:'ti-car',img:'trafego-390',url:'trafego-titulo/',d:'Título de Medicina do Tráfego, no formato da prova, com o conteúdo amarrado ao edital e às normas de trânsito vigentes.'},
  {id:'flashmed',nm:'FlashMed',ic:'ti-cards',img:'flashmed-390',url:'flashmed/',d:'Preparatório ENARE e ENAMED: questões de provas reais comentadas, simulados no formato da prova e leituras por área.'}
 ];
-/* farmácia (10/10/2026): vendidos na linha Provas, mas público diferente; ficam num grupo próprio */
-const FARMA=[
- {id:'farmauti',nm:'FarmaUTI',ic:'ti-pill',url:'farmauti/',d:'Para quem vai começar a residência em Farmácia em Terapia Intensiva: leituras com revisão essencial, interações com mecanismo e conduta, prescrições de UTI para avaliar, casos clínicos, bulário e calculadoras.'},
- {id:'enarefarmacia',nm:'Banca ENARE Farmácia',ic:'ti-vaccine-bottle',url:'quiz-enare-farmacia/',d:'Residência multiprofissional em Farmácia pelo ENARE: questões comentadas por tema do edital, provas anteriores em simulado, flashcards e painel de desempenho.'},
- {id:'sosfarmacia',nm:'SOS Farmácia Comercial',ic:'ti-prescription',url:'sos-farmacia/',d:'Para alunos do 9º e 10º semestres de Farmácia e farmacêuticos recém-formados que vão trabalhar em farmácia comercial: 11 módulos (MIP, Portaria 344/98, RDC 471/2021, interações, POPs, termolábeis e outros), cada um com resumo, mapa mental e material de apoio, e PDF com marca-d\'água.'}
+/* MedTech Multi (14/10/2026): enfermagem e farmácia. Vendidos pela linha Provas (retorno do pagamento),
+   mas com página, palco e lista de planos próprios: público diferente do médico */
+const MULTI=[
+ {id:'enfermare',nm:'Enfermare',ic:'ti-user-heart',img:'enfermare-390',url:'enfermare/',d:'Enfermagem: residência multiprofissional pelo ENARE, concursos da EBSERH e títulos de especialista. Questões de provas reais comentadas, simulados no formato de cada prova, leituras, cartões e casos de Processo de Enfermagem.'},
+ {id:'farmauti',nm:'FarmaUTI',ic:'ti-pill',img:'farmauti-390',url:'farmauti/',d:'Para quem vai começar a residência em Farmácia em Terapia Intensiva: leituras com revisão essencial, interações com mecanismo e conduta, prescrições de UTI para avaliar, casos clínicos, bulário e calculadoras.'},
+ {id:'enarefarmacia',nm:'Banca ENARE Farmácia',ic:'ti-vaccine-bottle',img:'enarefarmacia-390',url:'quiz-enare-farmacia/',d:'Residência multiprofissional em Farmácia pelo ENARE: questões comentadas por tema do edital, provas anteriores em simulado, flashcards e painel de desempenho.'},
+ {id:'sosfarmacia',nm:'SOS Farmácia Comercial',ic:'ti-prescription',img:'sosfarmacia-390',url:'sos-farmacia/',d:'Para alunos do 9º e 10º semestres de Farmácia e farmacêuticos recém-formados que vão trabalhar em farmácia comercial: 11 módulos (MIP, Portaria 344/98, RDC 471/2021, interações, POPs, termolábeis e outros), cada um com resumo, mapa mental e material de apoio, e PDF com marca-d\'água.'}
 ];
 const INST=[
  {nm:'Sistema Hospitalar (HospSys)',ic:'ti-building-hospital',url:'hospsys.html',d:'Prontuário, prescrição, leitos, bloco, farmácia e faturamento, dentro do hospital.'},
@@ -79,9 +81,10 @@ function xfShow(box,i){$$('img',box).forEach((im,k)=>im.classList.toggle('on',k=
 const LINHAS3=[
  {k:'app',nm:'MedTech App',url:'medtech-app.html',t:'Os apps do médico assistencial, numa conta só.',desk:['portal-1440','condutai-1440','granae-1440'],ph:['condutai-390','laudai-390','paliai-390','plantaohub-390']},
  {k:'provas',nm:'MedTech Provas',url:'medtech-provas.html',t:'Plataformas de estudo construídas em cima do edital.',desk:['clinicamed-1440','provas-1440'],ph:['clinicamed-390','trafego-390','flashmed-390']},
+ {k:'multi',nm:'MedTech Multi',url:'medtech-multi.html',t:'Plataformas de estudo para enfermeiros e farmacêuticos.',desk:['enfermare-1440','farmauti-1440'],ph:['enfermare-390','farmauti-390','enarefarmacia-390','sosfarmacia-390']},
  {k:'inst',nm:'MedTech Institucional',url:'institucional.html',t:'Sistema hospitalar, auditoria de faturamento e treinamentos para a instituição.',desk:['hospsys-mapa','auditoria-fat','capacita-painel','hospsys-pront'],ph:['capacita-390']}
 ];
-const ALT={'portal-1440':'MedTech App: a página inicial com os apps do médico','condutai-1440':'CondutAI no computador','granae-1440':'Granaê no computador: finanças do mês','clinicamed-1440':'ClínicaMed no computador','provas-1440':'Portal MedTech Provas','hospsys-mapa':'HospSys: mapa de leitos por setor','auditoria-fat':'Auditoria de faturamento: glosa e rejeição por competência','capacita-painel':'Capacita: adesão aos treinamentos por categoria e setor','hospsys-pront':'HospSys: prontuário do paciente','condutai-390':'CondutAI no celular','laudai-390':'LaudAI no celular','paliai-390':'PaliAI no celular','plantaohub-390':'PlantãoHub no celular','clinicamed-390':'ClínicaMed no celular','trafego-390':'TráfegoTítulo no celular','flashmed-390':'FlashMed no celular','capacita-390':'Capacita no celular: os treinamentos do colaborador'};
+const ALT={'portal-1440':'MedTech App: a página inicial com os apps do médico','condutai-1440':'CondutAI no computador','granae-1440':'Granaê no computador: finanças do mês','clinicamed-1440':'ClínicaMed no computador','provas-1440':'Portal MedTech Provas','hospsys-mapa':'HospSys: mapa de leitos por setor','auditoria-fat':'Auditoria de faturamento: glosa e rejeição por competência','capacita-painel':'Capacita: adesão aos treinamentos por categoria e setor','hospsys-pront':'HospSys: prontuário do paciente','condutai-390':'CondutAI no celular','laudai-390':'LaudAI no celular','paliai-390':'PaliAI no celular','plantaohub-390':'PlantãoHub no celular','clinicamed-390':'ClínicaMed no celular','trafego-390':'TráfegoTítulo no celular','flashmed-390':'FlashMed no celular','capacita-390':'Capacita no celular: os treinamentos do colaborador','enfermare-1440':'Enfermare no computador','farmauti-1440':'FarmaUTI no computador','enfermare-390':'Enfermare no celular','farmauti-390':'FarmaUTI no celular','enarefarmacia-390':'Banca ENARE Farmácia no celular','sosfarmacia-390':'SOS Farmácia Comercial no celular'};
 const hero=$('#hero'),stage=$('#stage3');
 if(stage){
   const lsw=$('#lsw'),dk=$('.dk .xf',stage),ph=$('.ph .xf',stage),cap=$('.stcap',stage);
@@ -90,7 +93,7 @@ if(stage){
   /* o palco está na primeira dobra: as imagens carregam já (lazy não dispararia enquanto invisíveis) */
   function monta(L){dk.innerHTML=L.desk.map((n,i)=>imgTag(n,ALT[n]||L.nm,'(max-width:900px) 92vw, 560px',i?'':'on',true)).join('');ph.innerHTML=L.ph.map((n,i)=>imgTag(n,ALT[n]||L.nm,'200px',i?'':'on',true)).join('')}
   const lapps=$('#lapps');
-  function produtosDa(k){return k==='app'?APPS.map(a=>({nm:a.nm,ic:a.ic,url:'medtech-app.html#app='+a.id})):k==='provas'?PROVAS.map(a=>({nm:a.nm,ic:a.ic,url:'medtech-provas.html#app='+a.id})):INST}
+  function produtosDa(k){return k==='app'?APPS.map(a=>({nm:a.nm,ic:a.ic,url:'medtech-app.html#app='+a.id})):k==='provas'?PROVAS.map(a=>({nm:a.nm,ic:a.ic,url:'medtech-provas.html#app='+a.id})):k==='multi'?MULTI.map(a=>({nm:a.nm,ic:a.ic,url:'medtech-multi.html#app='+a.id})):INST}
   function linha(i,user){li=i;fi=0;const L=LINHAS3[i];monta(L);
     if(lapps)lapps.innerHTML=produtosDa(L.k).map(a=>`<a href="${a.url}" aria-label="${esc(a.nm)}"><i class="ti ${a.ic}" aria-hidden="true"></i><span class="tp">${esc(a.nm)}</span></a>`).join('');cap.href=L.url;cap.innerHTML=`<b>${L.nm}</b><span>${L.t}</span><span class="go">Conhecer ${SVG.dir.replace('<svg','<svg width="14" height="14"')}</span>`;
     $$('button',lsw).forEach((b,k)=>{b.classList.toggle('on',k===i);b.setAttribute('aria-selected',k===i)});
@@ -115,7 +118,7 @@ const wall=$('#wall');
 if(wall){const it=(a,href)=>`<a href="${href}"><span class="k"><i class="ti ${a.ic}"></i></span>${esc(a.nm)}<span class="tip" role="tooltip"><b>${esc(a.nm)}</b>${esc(a.d)}</span></a>`;
   wall.innerHTML=`<div class="grp">MedTech App</div>`+APPS.map(a=>it(a,'medtech-app.html#app='+a.id)).join('')+
     `<div class="grp">MedTech Provas</div>`+PROVAS.map(a=>it(a,'medtech-provas.html#app='+a.id)).join('')+
-    `<div class="grp">Farmácia</div>`+FARMA.map(a=>it(a,'medtech-provas.html#farmacia')).join('')+
+    `<div class="grp">MedTech Multi</div>`+MULTI.map(a=>it(a,'medtech-multi.html#app='+a.id)).join('')+
     `<div class="grp">MedTech Institucional</div>`+INST.map(a=>it(a,a.url)).join('')}
 
 /* ---------- vitrine de apps (lista + celular) ---------- */
@@ -148,6 +151,7 @@ function vitrine(el,items,opts){
 }
 if($('#showApp'))vitrine($('#showApp'),APPS,{chips:'#chipsApp',cta:'<a class="pill ghost" href="index.html#planos">Planos</a>'});
 if($('#showProvas'))vitrine($('#showProvas'),PROVAS,{dur:7000,cta:'<a class="pill ghost" href="provas.html">Portal Provas</a>'});
+if($('#showMulti'))vitrine($('#showMulti'),MULTI,{dur:7000,cta:'<a class="pill ghost" href="#planos">Planos</a>'});
 
 /* ---------- galerias com abas / passo a passo ---------- */
 $$('[data-gal]').forEach(g=>{
@@ -160,7 +164,8 @@ $$('[data-gal]').forEach(g=>{
 
 /* ---------- planos (preços vêm do planos.json; o portal cuida de login e pagamento) ----------
    <div class="calc" data-linhas="clinica provas"> — um seletor Mensal/Anual vale para tudo o que o bloco mostra:
-   o MedTech App (linha clinica) num cartão e as provas (linha provas) numa lista, cada uma com o seu "Assinar". */
+   o MedTech App (linha clinica) num cartão e as provas (linha provas) numa lista, cada uma com o seu "Assinar".
+   "multi" (14/10/2026) = os produtos com campo publico (enfermagem, farmácia), vendidos pela linha provas. */
 const PLANOS_PADRAO={produtos:[
  {id:'app-tudo',curto:'MedTech App',linha:'clinica',resumo:'Os 5 apps (CondutAI, PaliAI, LaudAI, PlantãoHub e Granaê), com a IA incluída.',preco:{mensal:39.9,anual:399}},
  {id:'clinicamed',curto:'ClínicaMed',linha:'provas',resumo:'Título de Clínica Médica e acesso ao R+.',preco:{mensal:49.9,anual:397}},
@@ -169,6 +174,7 @@ const PLANOS_PADRAO={produtos:[
  {id:'flashmed',curto:'FlashMed',linha:'provas',resumo:'Preparatório ENARE/ENAMED: questões, simulados e leituras por área.',preco:{mensal:49.9,anual:397}},
  {id:'farmauti',curto:'FarmaUTI',linha:'provas',publico:'farmacia',resumo:'Residência em Farmácia em Terapia Intensiva: leituras, interações, prescrições e casos.',preco:{mensal:49.9,anual:397}},
  {id:'enarefarmacia',curto:'ENARE Farmácia',linha:'provas',publico:'farmacia',resumo:'Residência multiprofissional em Farmácia (ENARE): questões, simulados e revisão pelo edital.',preco:{mensal:49.9,anual:397}},
+ {id:'enfermare',curto:'Enfermare',linha:'provas',publico:'enfermagem',resumo:'Enfermagem: residência multiprofissional (ENARE), concursos (EBSERH) e títulos de especialista, com questões de provas reais comentadas.',preco:{mensal:49.9,anual:397}},
  {id:'sosfarmacia',curto:'SOS Farmácia',linha:'provas',publico:'farmacia',resumo:'Para quem vai trabalhar em farmácia comercial: MIP, Portaria 344/98, RDC 471/2021, interações, POPs e termolábeis, em 11 módulos.',preco:{mensal:49.9,anual:397}}]};
 const brl=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:Number.isInteger(v)?0:2});
 async function planos(){try{const r=await fetch('planos.json',{cache:'no-cache'});if(r.ok)return await r.json()}catch(e){}return PLANOS_PADRAO}
@@ -177,9 +183,9 @@ if(calcs.length)planos().then(P=>calcs.forEach(calc=>{
   const linhas=calc.dataset.linhas.split(/\s+/);
   const vende=p=>!p.interno&&!p.teste&&p.preco&&(p.preco.mensal||p.preco.anual);
   const app=linhas.includes('clinica')?(P.produtos||[]).filter(p=>p.linha==='clinica'&&vende(p)):[];
-  const daLinha=linhas.includes('provas')?(P.produtos||[]).filter(p=>p.linha==='provas'&&vende(p)):[];
-  /* público diferente: os planos de farmácia vão numa lista própria, depois dos de medicina */
-  const provas=daLinha.filter(p=>p.publico!=='farmacia'),farma=daLinha.filter(p=>p.publico==='farmacia');
+  const daLinha=(P.produtos||[]).filter(p=>p.linha==='provas'&&vende(p));
+  /* público diferente: os planos da linha Multi (campo publico) vão numa lista própria, depois dos de medicina */
+  const provas=linhas.includes('provas')?daLinha.filter(p=>!p.publico):[],farma=linhas.includes('multi')?daLinha.filter(p=>!!p.publico):[];
   if(!app.length&&!provas.length&&!farma.length)return;
   let per='mensal';
   const link=(base,p)=>`${base}?${new URLSearchParams({plano:p.id,periodo:per})}`;
@@ -189,7 +195,7 @@ if(calcs.length)planos().then(P=>calcs.forEach(calc=>{
     <p class="pay"><span>Mensal no cartão, renova sozinho</span><span>Anual em Pix, cartão até 12x ou boleto</span></p></div>
     ${app.length?'<div class="papp"></div>':''}
     ${provas.length?`${app.length?'<h3 class="lt">MedTech Provas <span>cada prova é um plano</span></h3>':''}<ul class="plist pmed"></ul>`:''}
-    ${farma.length?`<h3 class="lt" id="planos-farmacia">Farmácia <span>cada app é um plano</span></h3><ul class="plist pfar"></ul>`:''}`;
+    ${farma.length?`${app.length||provas.length?'<h3 class="lt" id="planos-multi">MedTech Multi <span>enfermagem e farmácia, cada app é um plano</span></h3>':''}<ul class="plist pfar"></ul>`:''}`;
   const pcs=$('.papp',calc),pl=$('.plist.pmed',calc),pf=$('.plist.pfar',calc);
   const itemProva=p=>`<li><div class="pn2"><b>${esc(p.curto)}</b><span>${esc(p.resumo||'')}</span></div><div class="pv">${valor(p)}${per==='anual'?`<span class="eq">${eq(p)}</span>`:''}</div>${p.preco[per]!=null?`<a class="pill ${app.length?'line':'solid'}" href="${link('provas.html',p)}" aria-label="Assinar o ${esc(p.curto)}, plano ${per}">Assinar</a>`:'<span></span>'}</li>`;
   function desenha(){
@@ -236,7 +242,7 @@ const linhaAtual=document.body.dataset.linha||'';
 $$('[data-linha]').forEach(a=>a.classList.toggle('on',!!linhaAtual&&a.dataset.linha===linhaAtual));
 /* a home era uma página só, com âncoras por produto; quem chega por um link antigo vai para a página nova */
 if(document.body.dataset.home!==undefined){
-  const R={app:'medtech-app.html',provas:'medtech-provas.html',institucional:'institucional.html',hospitalar:'hospsys.html',faturamento:'faturamento.html',casos:'casos.html',capacita:'capacita.html',internato:'internato.html',sobmedida:'sobmedida.html'};
+  const R={app:'medtech-app.html',provas:'medtech-provas.html',multi:'medtech-multi.html',farmacia:'medtech-multi.html',institucional:'institucional.html',hospitalar:'hospsys.html',faturamento:'faturamento.html',casos:'casos.html',capacita:'capacita.html',internato:'internato.html',sobmedida:'sobmedida.html'};
   const h=decodeURIComponent(location.hash.slice(1));if(R[h])location.replace(R[h]);
 }
 
