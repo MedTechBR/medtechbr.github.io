@@ -2729,6 +2729,7 @@ const EQ_AREAS = {
   operacoes: { nm: 'Operações', ic: 'ti-settings-automation', desc: 'Questões sinalizadas, pagamentos para revisar, erros do servidor e clientes esperando. Às segundas, o que melhorar.' },
   financeiro: { nm: 'Financeiro', ic: 'ti-cash', desc: 'Vendas, reembolsos, contestações, recusas com o motivo e planos anuais vencendo. Nunca mexe em dinheiro.' },
   instagram: { nm: 'Instagram', ic: 'ti-brand-instagram', desc: 'Responde comentários e mensagens, propõe os posts da semana e publica depois da sua aprovação.' },
+  conteudo: { nm: 'Curador', ic: 'ti-books', desc: 'Busca na internet todo dia diretrizes e normas novas e propõe a correção das questões e leituras de todos os apps.' },
   email: { nm: 'E-mail', ic: 'ti-mail', desc: 'Lê o contato@medtechbr.com.br a cada 15 min: escreve a resposta dos clientes para você aprovar e avisa o que as plataformas pedirem.' },
   diretoria: { nm: 'Diretoria', ic: 'ti-crown', desc: 'Conversa com você no WhatsApp e manda o resumo das 7h.' }
 };
@@ -2769,7 +2770,7 @@ function desenharEquipe() {
     const ult = ct.ultima ? `<p class="eq-ult"><b>${esc(ct.ultima.acao)}</b> ${esc(haQuanto(ct.ultima.em))}<br>${esc(String(ct.ultima.detalhe || '').slice(0, 120))}</p>` : '<p class="eq-ult">Nada registrado ainda.</p>';
     const bt = st.liga === undefined ? '' : `<button class="btn btn-g sm" type="button" data-eqliga="${a}" data-v="${st.liga ? 1 : 0}">${st.liga ? (a === 'atendente' ? 'Retomar' : 'Ligar') : (a === 'atendente' ? 'Pausar' : 'Desligar')}</button>`;
     return `<article class="card eq-card" data-area="${a}"><div class="eq-topo"><span class="eq-ic"><i class="ti ${m.ic}" aria-hidden="true"></i></span><div class="eq-nm"><h3>${m.nm}</h3><span class="selo ${st.cls}">${st.t}</span></div><div class="eq-num"><b>${inteiro(ct.h24 || 0)}</b><span>24 h</span></div></div>
-      <p class="sub">${m.desc}</p>${ult}<div class="eq-acoes">${bt}<button class="btn btn-g sm" type="button" data-eqver="${a}">Ver atividade</button></div></article>`;
+      <p class="sub">${m.desc}</p>${ult}<div class="eq-acoes">${bt}${a === 'conteudo' ? '<button class="btn btn-g sm" type="button" data-eqcur>Buscar agora</button>' : ''}<button class="btn btn-g sm" type="button" data-eqver="${a}">Ver atividade</button></div></article>`;
   }).join('') + `<p class="leg eq-turno">Último turno: ${esc(q.turno_em ? quando(q.turno_em) : 'ainda não rodou')}${q.atendente.teste_dono ? ' · seu WhatsApp está no modo teste da atendente' : ''}</p>`;
   const c = q.config || {};
   document.querySelectorAll('#eqAvisos [data-avisos]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.avisos === c.avisos)));
@@ -2796,7 +2797,7 @@ function desenharPendencias() {
       <div class="eq-topo"><span class="eq-ic"><i class="ti ${a.ic}" aria-hidden="true"></i></span><div><h3>${esc(p.titulo)}</h3><span class="selo ac">${esc(a.nm)}</span> <span class="sub">${esc(p.id)} · ${esc(p.criada)}</span></div></div>
       <pre class="eq-det">${esc(p.detalhe || '')}</pre>
       ${txt ? `<div class="campo"><label for="eqt_${esc(p.id)}">${p.tipo === 'ig_dm' ? 'Sua resposta' : 'Texto que vai sair (pode editar)'}</label><textarea id="eqt_${esc(p.id)}" rows="3" maxlength="900">${esc(valor)}</textarea></div>` : ''}
-      <div class="eq-acoes"><button class="btn btn-p sm" type="button" data-eqdec="1">${p.tipo === 'ig_semana' ? 'Aprovar e agendar' : p.tipo === 'info' ? 'Ok' : 'Aprovar e enviar'}</button>
+      <div class="eq-acoes"><button class="btn btn-p sm" type="button" data-eqdec="1">${rotAprovar(p)}</button>
       <button class="btn btn-g sm" type="button" data-eqdec="0">Recusar</button></div></article>`;
   }).join('');
 }
@@ -2848,6 +2849,16 @@ $('equipe').addEventListener('click', async ev => {
   if (t.dataset.eqfil !== undefined) { E.eqFiltro = t.dataset.eqfil; return desenharLog(); }
   if (t.dataset.eqver) { E.eqFiltro = t.dataset.eqver; desenharLog(); mostrarAbaEq('log'); return; }
   if (t.dataset.eqconv) return abrirConversa(t.dataset.canal, t.dataset.eqconv);
+  if (t.dataset.eqcur !== undefined) {
+    t.disabled = true; const rot = t.textContent; t.textContent = 'Buscando… (até 5 min)';
+    try {
+      const r = await equipeOp({ op: 'curadoria' });
+      toast(r && r.desligado ? 'O curador está desligado.' : `Curadoria: ${r.achadas} documento(s) no período, ${r.novas} novo(s), ${r.comImpacto} com impacto.`);
+      carregarEquipe();
+    } catch (e) { toast(ehNaoPublicado(e) ? 'Falta publicar o servidor (deploy-backend.command).' : ((e && e.message) || 'A curadoria não rodou.'), 'err'); }
+    finally { t.disabled = false; t.textContent = rot; }
+    return;
+  }
   if (t.dataset.avisos) {
     try { await equipeOp({ op: 'config', campos: { avisos: t.dataset.avisos } }); toast('Avisos no WhatsApp: ' + t.textContent.trim() + '.'); carregarEquipe(); } catch (e) { toast(e.message, 'err'); }
     return;
@@ -2884,7 +2895,7 @@ async function decidirPend(id, aprovar, texto) {
     return true;
   } catch (e) { toast(e.message, 'err'); return false; }
 }
-const rotAprovar = p => p.tipo === 'ig_semana' ? 'Aprovar e agendar' : p.tipo === 'info' ? 'Ok, visto' : 'Aprovar e enviar';
+const rotAprovar = p => p.tipo === 'ig_semana' ? 'Aprovar e agendar' : p.tipo === 'info' ? 'Ok, visto' : p.tipo === 'conteudo_diretriz' ? 'Aprovar e corrigir' : 'Aprovar e enviar';
 /* Abre uma pendência num diálogo (a partir da Visão geral). */
 function abrirPend(id) {
   const p = ((E.eq && E.eq.pendencias) || []).find(x => x.id === id);
