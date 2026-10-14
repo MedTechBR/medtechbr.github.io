@@ -2733,7 +2733,16 @@ const EQ_AREAS = {
   email: { nm: 'E-mail', ic: 'ti-mail', desc: 'Lê o contato@medtechbr.com.br a cada 15 min: escreve a resposta dos clientes para você aprovar e avisa o que as plataformas pedirem.' },
   diretoria: { nm: 'Diretoria', ic: 'ti-crown', desc: 'Conversa com você no WhatsApp e manda o resumo das 7h.' }
 };
-const PEND_COM_TEXTO = ['sinal_resposta', 'ig_comentario', 'ig_dm', 'email_resposta'];
+const PEND_COM_TEXTO = ['sinal_resposta', 'ig_comentario', 'ig_dm', 'email_resposta', 'ig_diario'];
+const rotTexto = p => p.tipo === 'ig_dm' ? 'Sua resposta' : p.tipo === 'ig_diario' ? 'Legenda (pode editar)' : 'Texto que vai sair (pode editar)';
+/* Prévia das artes de uma pendência (post diário do Instagram, 14/10/2026): miniaturas em rolagem
+   horizontal; o clique abre a imagem em tamanho real numa aba nova. */
+function previaImagens(p, max) {
+  const l = ((p.proposta && p.proposta.imagens) || []).filter(u => /^https:\/\//.test(String(u)));
+  if (!l.length) return '';
+  const vis = max ? l.slice(0, max) : l;
+  return `<div class="eq-imgs${max ? ' mini' : ''}" role="list" aria-label="Prévia das imagens do post">${vis.map((u, i) => `<a role="listitem" href="${esc(u)}" target="_blank" rel="noopener" title="Abrir a imagem ${i + 1} em tamanho real"><img src="${esc(u)}" alt="Imagem ${i + 1} de ${l.length}" loading="lazy" width="216" height="270"><span>${i + 1}/${l.length}</span></a>`).join('')}${max && l.length > max ? `<span class="eq-imgs-mais">+${l.length - max}</span>` : ''}</div>`;
+}
 const haQuanto = iso => {
   if (!iso) return '—';
   const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
@@ -2770,7 +2779,7 @@ function desenharEquipe() {
     const ult = ct.ultima ? `<p class="eq-ult"><b>${esc(ct.ultima.acao)}</b> ${esc(haQuanto(ct.ultima.em))}<br>${esc(String(ct.ultima.detalhe || '').slice(0, 120))}</p>` : '<p class="eq-ult">Nada registrado ainda.</p>';
     const bt = st.liga === undefined ? '' : `<button class="btn btn-g sm" type="button" data-eqliga="${a}" data-v="${st.liga ? 1 : 0}">${st.liga ? (a === 'atendente' ? 'Retomar' : 'Ligar') : (a === 'atendente' ? 'Pausar' : 'Desligar')}</button>`;
     return `<article class="card eq-card" data-area="${a}"><div class="eq-topo"><span class="eq-ic"><i class="ti ${m.ic}" aria-hidden="true"></i></span><div class="eq-nm"><h3>${m.nm}</h3><span class="selo ${st.cls}">${st.t}</span></div><div class="eq-num"><b>${inteiro(ct.h24 || 0)}</b><span>24 h</span></div></div>
-      <p class="sub">${m.desc}</p>${ult}<div class="eq-acoes">${bt}${a === 'conteudo' ? '<button class="btn btn-g sm" type="button" data-eqcur>Buscar agora</button>' : ''}<button class="btn btn-g sm" type="button" data-eqver="${a}">Ver atividade</button></div></article>`;
+      <p class="sub">${m.desc}</p>${ult}<div class="eq-acoes">${bt}${a === 'conteudo' ? '<button class="btn btn-g sm" type="button" data-eqcur>Buscar agora</button>' : ''}${a === 'instagram' ? `<button class="btn btn-g sm" type="button" data-eqpost>Gerar post de hoje</button><button class="btn btn-g sm" type="button" data-eqdiario="${(q.config || {}).conteudo_diario === false ? 1 : 0}">${(q.config || {}).conteudo_diario === false ? 'Ligar post diário' : 'Desligar post diário'}</button>` : ''}<button class="btn btn-g sm" type="button" data-eqver="${a}">Ver atividade</button></div></article>`;
   }).join('') + `<p class="leg eq-turno">Último turno: ${esc(q.turno_em ? quando(q.turno_em) : 'ainda não rodou')}${q.atendente.teste_dono ? ' · seu WhatsApp está no modo teste da atendente' : ''}</p>`;
   const c = q.config || {};
   document.querySelectorAll('#eqAvisos [data-avisos]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.avisos === c.avisos)));
@@ -2795,8 +2804,9 @@ function desenharPendencias() {
     const valor = (p.proposta && p.proposta.texto) || '';
     return `<article class="card eq-pend" data-pid="${esc(p.id)}" data-area="${esc(p.area)}">
       <div class="eq-topo"><span class="eq-ic"><i class="ti ${a.ic}" aria-hidden="true"></i></span><div><h3>${esc(p.titulo)}</h3><span class="selo ac">${esc(a.nm)}</span> <span class="sub">${esc(p.id)} · ${esc(p.criada)}</span></div></div>
+      ${previaImagens(p)}
       <pre class="eq-det">${esc(p.detalhe || '')}</pre>
-      ${txt ? `<div class="campo"><label for="eqt_${esc(p.id)}">${p.tipo === 'ig_dm' ? 'Sua resposta' : 'Texto que vai sair (pode editar)'}</label><textarea id="eqt_${esc(p.id)}" rows="3" maxlength="900">${esc(valor)}</textarea></div>` : ''}
+      ${txt ? `<div class="campo"><label for="eqt_${esc(p.id)}">${rotTexto(p)}</label><textarea id="eqt_${esc(p.id)}" rows="${p.tipo === 'ig_diario' ? 8 : 3}" maxlength="${p.tipo === 'ig_diario' ? 2200 : 900}">${esc(valor)}</textarea></div>` : ''}
       <div class="eq-acoes"><button class="btn btn-p sm" type="button" data-eqdec="1">${rotAprovar(p)}</button>
       <button class="btn btn-g sm" type="button" data-eqdec="0">Recusar</button></div></article>`;
   }).join('');
@@ -2859,6 +2869,15 @@ $('equipe').addEventListener('click', async ev => {
     finally { t.disabled = false; t.textContent = rot; }
     return;
   }
+  if (t.dataset.eqpost !== undefined) return gerarPostDoDia(t);
+  if (t.dataset.eqdiario !== undefined) {
+    const ligar = t.dataset.eqdiario === '1';
+    if (!ligar && !(await confirmar('Desligar o post diário?', 'O post das 6h deixa de ser montado. Você ainda pode gerar pelo botão.', 'Desligar', true))) return;
+    t.disabled = true;
+    try { await equipeOp({ op: 'config', campos: { conteudo_diario: ligar } }); toast(ligar ? 'Post diário ligado.' : 'Post diário desligado.'); carregarEquipe(); }
+    catch (e) { toast(e.message, 'err'); t.disabled = false; }
+    return;
+  }
   if (t.dataset.avisos) {
     try { await equipeOp({ op: 'config', campos: { avisos: t.dataset.avisos } }); toast('Avisos no WhatsApp: ' + t.textContent.trim() + '.'); carregarEquipe(); } catch (e) { toast(e.message, 'err'); }
     return;
@@ -2882,6 +2901,26 @@ $('equipe').addEventListener('click', async ev => {
     if (!ok) card.querySelectorAll('button').forEach(b => b.disabled = false);
   }
 });
+/* Post diário do Instagram (14/10/2026): monta agora o post do dia (o mesmo das 6h) e
+   deixa a pendência com a prévia; se o de hoje já existe, pergunta antes de refazer. */
+async function gerarPostDoDia(b) {
+  const rot = b.textContent;
+  const rodar = async refazer => {
+    b.disabled = true; b.textContent = 'Montando… (até 3 min)';
+    try { return await equipeOp({ op: 'postDoDia', refazer }); }
+    finally { b.disabled = false; b.textContent = rot; }
+  };
+  try {
+    let r = await rodar(false);
+    if (r && r.jaExiste) {
+      if (!(await confirmar('O post de hoje já existe', 'Refazer recusa a versão que está esperando você e monta outra com outro tema.', 'Refazer'))) { carregarEquipe(); return; }
+      r = await rodar(true);
+    }
+    if (r && r.erro) { toast(r.erro, 'err'); return; }
+    toast('Post montado: ' + ((r && r.resumo) || 'veja em Para você decidir') + '.');
+    carregarEquipe();
+  } catch (e) { toast(ehNaoPublicado(e) ? 'Falta publicar o servidor (deploy-backend.command).' : ((e && e.message) || 'Não consegui montar o post.'), 'err'); }
+}
 /* Aprova ou recusa uma pendência; devolve true se o servidor fez. */
 async function decidirPend(id, aprovar, texto) {
   const p = ((E.eq && E.eq.pendencias) || []).find(x => x.id === id) || {};
@@ -2895,15 +2934,15 @@ async function decidirPend(id, aprovar, texto) {
     return true;
   } catch (e) { toast(e.message, 'err'); return false; }
 }
-const rotAprovar = p => p.tipo === 'ig_semana' ? 'Aprovar e agendar' : p.tipo === 'info' ? 'Ok, visto' : p.tipo === 'conteudo_diretriz' ? 'Aprovar e corrigir' : 'Aprovar e enviar';
+const rotAprovar = p => p.tipo === 'ig_semana' || p.tipo === 'ig_diario' ? 'Aprovar e agendar' : p.tipo === 'info' ? 'Ok, visto' : p.tipo === 'conteudo_diretriz' ? 'Aprovar e corrigir' : 'Aprovar e enviar';
 /* Abre uma pendência num diálogo (a partir da Visão geral). */
 function abrirPend(id) {
   const p = ((E.eq && E.eq.pendencias) || []).find(x => x.id === id);
   if (!p) { toast('Essa pendência já foi resolvida.'); carregarEquipe(); return; }
   const a = EQ_AREAS[p.area] || { nm: p.area };
   const txt = PEND_COM_TEXTO.includes(p.tipo);
-  const corpo = `<p class="sub">${esc(a.nm)} · ${esc(p.id)} · ${esc(p.criada)}</p><pre class="eq-det">${esc(p.detalhe || '')}</pre>`
-    + (txt ? `<div class="campo"><label for="dlgPendTx">${p.tipo === 'ig_dm' ? 'Sua resposta' : 'Texto que vai sair (pode editar)'}</label><textarea id="dlgPendTx" rows="5" maxlength="5000">${esc((p.proposta && p.proposta.texto) || '')}</textarea></div>` : '');
+  const corpo = `<p class="sub">${esc(a.nm)} · ${esc(p.id)} · ${esc(p.criada)}</p>${previaImagens(p)}<pre class="eq-det">${esc(p.detalhe || '')}</pre>`
+    + (txt ? `<div class="campo"><label for="dlgPendTx">${rotTexto(p)}</label><textarea id="dlgPendTx" rows="${p.tipo === 'ig_diario' ? 8 : 5}" maxlength="5000">${esc((p.proposta && p.proposta.texto) || '')}</textarea></div>` : '');
   dialogo(p.titulo, corpo, [
     { rot: 'Recusar', cls: 'btn-g', acao: async () => { const ok = await decidirPend(id, false, ''); return ok; } },
     { rot: rotAprovar(p), cls: 'btn-p', acao: async () => { const ta = $('dlgPendTx'); return decidirPend(id, true, ta ? ta.value.trim() : ''); } }
@@ -2921,7 +2960,7 @@ function desenharPrecisa() {
   ((E.eq && E.eq.pendencias) || []).forEach(x => {
     const a = EQ_AREAS[x.area] || { nm: x.area, ic: 'ti-robot' };
     itens.push(`<li data-area="${esc(x.area)}"><span class="eq-ic"><i class="ti ${a.ic}" aria-hidden="true"></i></span>
-      <div class="vg-tx"><b>${esc(x.titulo)}</b><span>${esc(a.nm)} · ${esc(x.criada)}</span></div>
+      <div class="vg-tx"><b>${esc(x.titulo)}</b><span>${esc(a.nm)} · ${esc(x.criada)}</span>${previaImagens(x, 4)}</div>
       ${x.tipo === 'info' ? `<button class="btn btn-g sm" type="button" data-vgok="${esc(x.id)}">Ok</button>` : `<button class="btn btn-p sm" type="button" data-vgpend="${esc(x.id)}">Revisar</button>`}</li>`);
   });
   if (si && si.abertas) itens.push(`<li data-area="sinal"><span class="eq-ic"><i class="ti ti-flag" aria-hidden="true"></i></span><div class="vg-tx"><b>${inteiro(si.abertas)} ${si.abertas === 1 ? 'questão sinalizada' : 'questões sinalizadas'}</b><span>Alunos apontaram erro ou dúvida</span></div><a class="btn btn-g sm" href="#sinalizacoes">Ver</a></li>`);
