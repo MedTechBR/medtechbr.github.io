@@ -1437,34 +1437,7 @@ function ligarAssinatura(preapproval, emailPagador) {
   ]);
 }
 $('pgTipos').querySelectorAll('[data-tipo]').forEach(b => b.addEventListener('click', () => { E.pgTipo = b.dataset.tipo; carregarPedidos(); }));
-async function compraTeste(periodo) {
-  const out = $('outCompra');
-  if (periodo === 'mensal') return compraTesteCartao(out);
-  out.innerHTML = carregando('Abrindo o Mercado Pago…');
-  try {
-    const r = await chamar('mpCheckout', { produto: 'teste-mp', periodo });
-    if (r && r.url) { out.innerHTML = carregando('Indo para o pagamento…'); location.href = r.url; }
-    else out.innerHTML = avisoErro('O servidor não devolveu o link de pagamento.');
-  } catch (e) { out.innerHTML = avisoErro(e); }
-}
-/* mensal de teste: o MESMO diálogo do cliente (formulário de cartão do Mercado Pago no site),
-   com o produto teste-mp e o campo de e-mail do pagador visível (o e-mail da conta vendedora
-   não pode pagar a si mesma). */
-async function compraTesteCartao(out) {
-  out.innerHTML = carregando('Abrindo o formulário do cartão…');
-  try {
-    const A = await modulo(), P = await planos();
-    const prod = A.produtoPorId(P, 'teste-mp');
-    const op = prod && A.opcoes(P, prod).find(o => o.periodo === 'mensal' && !o.modo);
-    if (!op || !A.ehCartao || !A.ehCartao(op)) { out.innerHTML = avisoErro('O produto teste-mp não está à venda no mensal pelo Mercado Pago (planos.json).'); return; }
-    const res = await A.assinarCartao({ op, user: MT.user, pedirEmail: true });
-    if (!res || res.cancelado) { out.innerHTML = ''; return; }
-    const ate = Number(((res.mt && res.mt.p) || {})['teste-mp'] || res.r.ate || 0);
-    out.innerHTML = `<div class="aviso info" style="margin-top:14px"><i class="ti ti-check" aria-hidden="true"></i><div>Assinatura de teste autorizada (nº ${esc(res.r.preapproval)}).${ate ? ' Acesso de teste provisório até ' + dataS(ate) + '.' : ''} A 1ª cobrança de R$ 5 sai em até 1 hora; confira depois em Pedidos e no Mercado Pago. Para não ser cobrado de novo, use "Cancelar a assinatura de teste".</div></div>`;
-  } catch (e) { out.innerHTML = avisoErro(e); }
-}
-$('btTesteMensal').onclick = () => compraTeste('mensal');
-$('btTesteAnual').onclick = () => compraTeste('anual');
+/* 14/10/2026: o produto teste-mp saiu do planos.json; a compra de teste acabou e só ficou o cancelamento. */
 $('btTesteCancelar').onclick = async () => {
   const ok = await confirmar('Cancelar assinatura de teste', 'Cancelar a assinatura mensal de teste no Mercado Pago? O acesso de teste vale até o fim do período pago.', 'Cancelar assinatura', true);
   if (!ok) return;
@@ -2728,7 +2701,7 @@ const EQ_AREAS = {
   atendente: { nm: 'Atendente', ic: 'ti-message-chatbot', desc: 'Responde os clientes no WhatsApp na hora e passa para você o que não for dúvida comum.' },
   operacoes: { nm: 'Operações', ic: 'ti-settings-automation', desc: 'Questões sinalizadas, pagamentos para revisar, erros do servidor e clientes esperando. Às segundas, o que melhorar.' },
   financeiro: { nm: 'Financeiro', ic: 'ti-cash', desc: 'Vendas, reembolsos, contestações, recusas com o motivo e planos anuais vencendo. Nunca mexe em dinheiro.' },
-  instagram: { nm: 'Instagram', ic: 'ti-brand-instagram', desc: 'Responde comentários e mensagens, propõe os posts da semana e publica depois da sua aprovação.' },
+  instagram: { nm: 'Instagram', ic: 'ti-brand-instagram', desc: 'Responde comentários e mensagens, monta o post do dia para você aprovar aqui e publica às 12h depois da aprovação.' },
   conteudo: { nm: 'Curador', ic: 'ti-books', desc: 'Busca na internet toda semana diretrizes e normas novas e propõe a correção das questões e leituras de todos os apps.' },
   email: { nm: 'E-mail', ic: 'ti-mail', desc: 'Lê o contato@medtechbr.com.br a cada 15 min: escreve a resposta dos clientes para você aprovar e avisa o que as plataformas pedirem.' },
   diretoria: { nm: 'Diretoria', ic: 'ti-crown', desc: 'Conversa com você no WhatsApp e manda o resumo das 7h.' }
