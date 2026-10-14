@@ -1362,6 +1362,32 @@ function marcarChips(grupo, attr, valor) {
   $(grupo).querySelectorAll('[data-' + attr + ']').forEach(x => x.setAttribute('aria-pressed', String(x.dataset[attr] === valor)));
 }
 const SELO_TIPO = { venda: 'ok', reembolso: 'err', cancelamento: 'av', admin: 'ac', revisar: 'err', outro: '' };
+/* Pagamento "a revisar" (14/10/2026): explica o caso e deixa liberar o acesso ou tirar da fila. */
+function resolverPedido(x) {
+  if (!x) return;
+  const det = [
+    ['Quando', quando(x.em)], ['Pagamento', x.pagamento ? 'nº ' + x.pagamento + ' (' + (GATEWAY[x.gateway] || x.gateway) + ')' : '—'],
+    ['Valor', x.valor === null ? 'não informado' : brl(x.valor)], ['E-mail do pagador', x.email || 'não veio no pagamento'],
+    ['Produto', x.nome || 'não reconhecido'], ['Motivo', x.motivo || 'O pagamento chegou sem a referência da MedTech (produto ou conta). Costuma ser compra de teste ou pagamento feito fora do checkout do site.']
+  ].map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
+  const corpo = `<dl class="ficha" style="margin-top:0">${det}</dl>
+    <p class="sub">Se foi uma venda de verdade, libere o acesso para a conta da pessoa e depois marque como revisado. Se foi teste ou engano, só marque como revisado. Nada aqui mexe em dinheiro: estorno é no painel do Mercado Pago.</p>
+    <div class="campo"><label for="pgNota">Anotação (opcional)</label><input id="pgNota" maxlength="300" placeholder="Ex.: compra de teste minha"></div>`;
+  dialogo('Pagamento a revisar', corpo, [
+    { rot: '<i class="ti ti-key" aria-hidden="true"></i>Liberar acesso para uma conta', cls: 'btn-g', acao: () => {
+      location.hash = '#acessos';
+      setTimeout(() => { const c = $('cEmails'); if (c) { if (x.email) c.value = x.email; c.focus(); } if (x.produto && $('cProd')) $('cProd').value = x.produto; }, 300);
+    } },
+    { rot: '<i class="ti ti-check" aria-hidden="true"></i>Marcar como revisado', cls: 'btn-p', acao: async () => {
+      try {
+        const r = await admin({ acao: 'pedidoRevisado', id: x.id, nota: ($('pgNota').value || '').trim() });
+        if (r && r.erro) { toast(r.erro, 'err'); return false; }
+        toast('Pagamento marcado como revisado.');
+        E.carregou.pedidos = false; E.carregou.painel = false; carregarPedidos(); carregarPainel();
+      } catch (e) { toast(e.naoPublicado ? 'Falta publicar o servidor (deploy-backend.command).' : ((e && e.message) || 'Não consegui marcar.'), 'err'); return false; }
+    } }
+  ]);
+}
 async function carregarPedidos() {
   E.carregou.pedidos = true;
   marcarChips('pgTipos', 'tipo', E.pgTipo);
@@ -1379,10 +1405,11 @@ async function carregarPedidos() {
         <td data-r="Produto">${esc(x.nome || '—')}${x.periodo ? ' <span class="fraco">(' + esc(/^\d+d$/.test(x.periodo) ? x.periodo.slice(0, -1) + ' dias' : x.periodo) + ')</span>' : ''}</td>
         <td data-r="E-mail" class="em">${esc(x.email || (x.cpf ? 'CPF ' + x.cpf : '—'))}${x.email && x.cpf ? '<br><span class="fraco">CPF ' + esc(x.cpf) + '</span>' : ''}${x.motivo ? '<br><span class="fraco">Motivo: ' + esc(x.motivo) + '</span>' : ''}</td>
         <td data-r="Valor" class="n">${x.valor === null ? '—' : (x.estimado ? '<span title="Estimado pelo preço do catálogo">≈ </span>' : '') + brl(x.valor)}</td>
-        <td data-r="Meio" class="fraco">${esc(GATEWAY[x.gateway] || x.gateway)}${x.metodo ? ' · ' + esc(METODO[x.metodo] || x.metodo) : ''}${x.pagamento ? `<br><span title="Número do pagamento no Mercado Pago">nº ${esc(x.pagamento)}</span>` : ''}${x.preapproval ? `<br><span title="Assinatura no Mercado Pago (link de plano)">assinatura ${esc(x.preapproval)}</span>` : ''}${x.por ? `<br>por ${esc(x.por)}` : ''}${x.preapproval && x.tipo === 'revisar' ? `<br><button type="button" class="btn btn-g" data-ligar="${esc(x.preapproval)}" data-email="${esc(x.email || '')}">Ligar a uma conta</button>` : ''}</td>
+        <td data-r="Meio" class="fraco">${esc(GATEWAY[x.gateway] || x.gateway)}${x.metodo ? ' · ' + esc(METODO[x.metodo] || x.metodo) : ''}${x.pagamento ? `<br><span title="Número do pagamento no Mercado Pago">nº ${esc(x.pagamento)}</span>` : ''}${x.preapproval ? `<br><span title="Assinatura no Mercado Pago (link de plano)">assinatura ${esc(x.preapproval)}</span>` : ''}${x.por ? `<br>por ${esc(x.por)}` : ''}${x.preapproval && x.tipo === 'revisar' ? `<br><button type="button" class="btn btn-g" data-ligar="${esc(x.preapproval)}" data-email="${esc(x.email || '')}">Ligar a uma conta</button>` : ''}${x.tipo === 'revisar' ? `<br><button type="button" class="btn btn-p sm pg-resolver" data-resolver="${esc(x.id)}">Resolver</button>` : ''}</td>
       </tr>`).join('')}</tbody></table></div>
       ${estimado ? '<p class="leg">≈ valor estimado pelo preço do catálogo (pedido do Kiwify ou gravado antes de o servidor guardar o valor cobrado).</p>' : ''}`;
     $('pgLista').querySelectorAll('[data-ligar]').forEach(b => b.onclick = () => ligarAssinatura(b.dataset.ligar, b.dataset.email));
+    $('pgLista').querySelectorAll('[data-resolver]').forEach(b => b.onclick = () => resolverPedido(r.itens.find(x => x.id === b.dataset.resolver)));
   } catch (e) {
     if (E.bloqueado) return;
     $('pgAviso').innerHTML = e.naoPublicado ? avisoPublicar('os pedidos') : avisoErro(e);
