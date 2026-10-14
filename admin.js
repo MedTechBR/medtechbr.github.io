@@ -2729,7 +2729,7 @@ const EQ_AREAS = {
   operacoes: { nm: 'Operações', ic: 'ti-settings-automation', desc: 'Questões sinalizadas, pagamentos para revisar, erros do servidor e clientes esperando. Às segundas, o que melhorar.' },
   financeiro: { nm: 'Financeiro', ic: 'ti-cash', desc: 'Vendas, reembolsos, contestações, recusas com o motivo e planos anuais vencendo. Nunca mexe em dinheiro.' },
   instagram: { nm: 'Instagram', ic: 'ti-brand-instagram', desc: 'Responde comentários e mensagens, propõe os posts da semana e publica depois da sua aprovação.' },
-  conteudo: { nm: 'Curador', ic: 'ti-books', desc: 'Busca na internet todo dia diretrizes e normas novas e propõe a correção das questões e leituras de todos os apps.' },
+  conteudo: { nm: 'Curador', ic: 'ti-books', desc: 'Busca na internet toda semana diretrizes e normas novas e propõe a correção das questões e leituras de todos os apps.' },
   email: { nm: 'E-mail', ic: 'ti-mail', desc: 'Lê o contato@medtechbr.com.br a cada 15 min: escreve a resposta dos clientes para você aprovar e avisa o que as plataformas pedirem.' },
   diretoria: { nm: 'Diretoria', ic: 'ti-crown', desc: 'Conversa com você no WhatsApp e manda o resumo das 7h.' }
 };
