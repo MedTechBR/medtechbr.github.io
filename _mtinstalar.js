@@ -26,11 +26,12 @@
     if (!temManifesto()) return 'MedTech App';
     return m || (document.title || 'app').split(/\s[—–|-]\s/)[0].trim();
   }
-  /* tela de login do _mtauth (.mt-auth) ou qualquer diálogo aberto */
+  /* tela de login (do site ou dos apps de estudo) ou qualquer diálogo aberto */
   function loginAberto() {
     if (document.querySelector('dialog[open]')) return true;
-    var a = document.querySelector('.mt-auth');
-    return !!(a && !a.hidden && getComputedStyle(a).display !== 'none' && getComputedStyle(a).visibility !== 'hidden');
+    var vis = function (el) { return !!(el && !el.hidden && getComputedStyle(el).display !== 'none' && getComputedStyle(el).visibility !== 'hidden'); };
+    /* .mt-auth = login dos apps do site; #mtsPortao = login/espera dos apps de estudo (mtsync.js) */
+    return vis(document.querySelector('.mt-auth')) || vis(document.getElementById('mtsPortao'));
   }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
