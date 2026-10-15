@@ -275,12 +275,14 @@ const CATALOGO = [
   { id:'enarefarmacia', nm:'Banca ENARE Farmácia', ic:'ti-vaccine-bottle',        url:BASE+'quiz-enare-farmacia/',  cat:'Farmácia',             linha:'provas', sub:'residência multiprofissional em Farmácia (ENARE)', c:'#0A3F3B' },
   { id:'sosfarmacia',   nm:'SOS Farmácia Comercial', ic:'ti-first-aid-kit', url:BASE+'sos-farmacia/',         cat:'Farmácia',             linha:'provas', sub:'farmácia comercial: MIP, Portaria 344, RDC 471, interações e POPs', c:'#C8373C' },
   /* enfermagem (14/10/2026): linha MedTech Multi da vitrine, mesma regra dos de farmácia */
-  { id:'enfermare',     nm:'Enfermare',        ic:'ti-droplet',          url:BASE+'enfermare/',            cat:'Enfermagem',           linha:'provas', sub:'residência multiprofissional, concursos (EBSERH) e títulos de Enfermagem', c:'#B0306A' }
+  { id:'enfermare',     nm:'Enfermare',        ic:'ti-droplet',          url:BASE+'enfermare/',            cat:'Enfermagem',           linha:'provas', sub:'residência multiprofissional, concursos (EBSERH) e títulos de Enfermagem', c:'#B0306A' },
+  /* fisioterapia (15/10/2026): linha MedTech Multi */
+  { id:'fisiare',       nm:'Fisiare',          ic:'ti-stretching',       url:BASE+'fisiare/',              cat:'Fisioterapia',         linha:'provas', sub:'residência multiprofissional, concursos e título de especialista (COFFITO) em Fisioterapia', c:'#0B7A64' }
 ];
 /* Linha deste portal. provas.html é GERADO deste arquivo por _gera_provas.py — editar aqui. */
 const LINHA = 'clinica';
 const CATALOGO_LINHA = CATALOGO.filter(a => a.linha === LINHA);
-const CATEGORIAS = LINHA === 'provas' ? ['Prova de título','Residência e concursos','Enfermagem','Farmácia'] : ['Referência clínica','Hospital e imagem','Rotina do médico'];
+const CATEGORIAS = LINHA === 'provas' ? ['Prova de título','Residência e concursos','Enfermagem','Fisioterapia','Farmácia'] : ['Referência clínica','Hospital e imagem','Rotina do médico'];
 /* Quem nunca escolheu vê o conjunto padrão da linha. */
 const PADRAO = LINHA === 'provas'
   ? ['clinicamed','cirurgiamed','trafegotitulo','flashmed']
@@ -368,7 +370,7 @@ function comprados(){
   return [...out];
 }
 /* MedTech Multi (14/10/2026): enfermagem e farmácia, os públicos que não são médicos */
-const CATS_MULTI = ['Enfermagem','Farmácia'];
+const CATS_MULTI = ['Enfermagem','Fisioterapia','Farmácia'];
 const ehMulti = id => CATS_MULTI.includes((CATALOGO.find(a => a.id === id) || {}).cat);
 /* Públicos não se misturam: quem comprou só app da linha Multi e nunca escolheu os apps vê só os dele. */
 function soMulti(){
@@ -586,8 +588,8 @@ async function enviarResetSenha(){
    cliente (deixaria subcoleções órfãs e exige login recente): monta um e-mail pronto. */
 const MEUS_DADOS_APPS = ['portal','portal-provas','enfermaria','condutai','atbguia','calcmed','paliai','guiainterno','pocusai',
   'laudai','foco','plantaohub','granae','granae_of','logbook','medprovas','flashmed','flashmed_resumo','clinicamed','clinicamed_resumo',
-  'clinicamed_coord','cirurgiamed','cirurgiamed_resumo','trafego-titulo','radio-titulo','farmauti','enare-farmacia','enfermare','enfermare_resumo'];
-const MEUS_DADOS_SYNC = ['flashmed','clinicamed','cirurgiamed','trafego-titulo','radio-titulo','farmauti','enare-farmacia','enfermare'];   // users/{uid}/apps/<app>/sync
+  'clinicamed_coord','cirurgiamed','cirurgiamed_resumo','trafego-titulo','radio-titulo','farmauti','enare-farmacia','enfermare','enfermare_resumo','fisiare','fisiare_resumo'];
+const MEUS_DADOS_SYNC = ['flashmed','clinicamed','cirurgiamed','trafego-titulo','radio-titulo','farmauti','enare-farmacia','enfermare','fisiare'];   // users/{uid}/apps/<app>/sync
 function dataLocalISO(d){ d = d || new Date(); const p = n => String(n).padStart(2,'0'); return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
 /* Timestamp do Firestore e afins viram texto ISO; o resto passa igual */
 function limpaFs(v){
@@ -789,7 +791,7 @@ function preencheAssinatura(){
   const nadaAtivo = !ativos.size && !mt.adm && !(mt.t && mt.t > ag && Number(P.teste_dias) > 0);
   if (nadaAtivo && !pend) B.unshift(`<div class="as-st off"><span class="sel">Sem plano</span><p>Você ainda não tem plano ativo nesta conta. Escolha abaixo.</p></div>`);
   if (aVenda.length) {
-    B.push(`<div class="as-of"><h5>${nadaAtivo ? 'Assinar' : 'Outros planos'}</h5>${aVendaMed.length && aVendaFarma.length ? `<h6 class="as-pub">Medicina</h6>${ofertas(aVendaMed)}<h6 class="as-pub">Enfermagem e Farmácia</h6>${ofertas(aVendaFarma)}` : ofertas(aVenda)}
+    B.push(`<div class="as-of"><h5>${nadaAtivo ? 'Assinar' : 'Outros planos'}</h5>${aVendaMed.length && aVendaFarma.length ? `<h6 class="as-pub">Medicina</h6>${ofertas(aVendaMed)}<h6 class="as-pub">Enfermagem, Fisioterapia e Farmácia</h6>${ofertas(aVendaFarma)}` : ofertas(aVenda)}
       <p class="as-mini">Mensal: cartão de crédito aqui mesmo ou pela sua conta do Mercado Pago (ou Mercado Livre), renova sozinho todo mês. Anual: Pix, cartão em até 12x ou boleto, pagamento único.</p></div>`);
   }
   const temCompra = donos.some(([id, ate]) => ate > ag && !ehIlim(ate) && !MTAcesso.produtoPorId(P, id).interno) || !!pend;

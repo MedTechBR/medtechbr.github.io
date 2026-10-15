@@ -53,7 +53,9 @@ const APPS = {
   enarefarmacia: { nm: 'Banca ENARE Farmácia', ic: 'ti-vaccine-bottle', c: '#0A3F3B', url: '/quiz-enare-farmacia/' },
   sosfarmacia: { nm: 'SOS Farmácia Comercial', ic: 'ti-first-aid-kit', c: '#C8373C', url: '/sos-farmacia/' },
   /* enfermagem (linha provas, publico "enfermagem"); com a farmácia = linha MedTech Multi */
-  enfermare: { nm: 'Enfermare', ic: 'ti-droplet', c: '#B0306A', url: '/enfermare/' }
+  enfermare: { nm: 'Enfermare', ic: 'ti-droplet', c: '#B0306A', url: '/enfermare/' },
+  /* fisioterapia (linha provas, publico "fisioterapia"); linha MedTech Multi */
+  fisiare: { nm: 'Fisiare', ic: 'ti-stretching', c: '#0B7A64', url: '/fisiare/' }
 };
 const ROTULO = {
   mp_approved: 'Pagamento aprovado', mp_refunded: 'Reembolso', mp_charged_back: 'Contestação no cartão',
@@ -1526,6 +1528,7 @@ const SI_APP = {
   'quiz-enare-farmacia': { nm: 'Banca ENARE Farmácia', c: '#0F766E', repo: 'MedTechBR/quiz-enare-farmacia', base: '/quiz-enare-farmacia/', fmt: 'enare', arq: [['banco_edital.js', 'BANCO_EDITAL'], ['simulados.js', 'SIMULADOS']], onde: 'banco_edital.js (banco) e simulados.js (provas reais na íntegra); os simulados diários reaproveitam o banco', publico: 'residência multiprofissional em Farmácia (ENARE)' },
   farmauti: { nm: 'FarmaUTI', c: '#B4235A', repo: 'MedTechBR/farmauti', base: '/farmauti/', fmt: 'farmauti', arq: [['dados/estudo.js', 'FU_ESTUDO']], onde: 'lotes/*.json, montado por monta.py em dados/estudo.js', publico: 'residência de Farmácia em terapia intensiva' },
   enfermare: { nm: 'Enfermare', c: '#B0306A', repo: 'MedTechBR/enfermare', base: '/enfermare/', fmt: 'padrao', reordena: true, arq: [['banco.js', 'BANCO']], onde: ONDE_LEVAS, publico: 'Enfermagem: residência multiprofissional (ENARE), concursos (EBSERH) e títulos de especialista' },
+  fisiare: { nm: 'Fisiare', c: '#0B7A64', repo: 'MedTechBR/fisiare', base: '/fisiare/', fmt: 'padrao', reordena: true, arq: [['banco.js', 'BANCO']], onde: ONDE_LEVAS, publico: 'Fisioterapia: residência multiprofissional (ENARE), concursos (EBSERH e outros) e título de especialista (COFFITO)' },
   'radio-titulo': { nm: 'RadioTítulo', c: '#4166D6', privado: true, repo: 'repositório privado do RadioTítulo', publico: 'prova de título de Radiologia (CBR)' }
 };
 const siCfg = app => SI_APP[app] || { nm: app, c: 'var(--ac)' };
@@ -2016,7 +2019,7 @@ async function gerarPedido(id, botao) {
    que muda em relação ao banco, na ordem do BANCO (alternativas[], porAlt[], gabarito = índice no banco).
    Os apps buscam as erratas ao abrir (mterrata.js) e aplicam antes de desenhar as questões.
    ============================================================ */
-const APPS_ERRATA = ['clinicamed', 'cirurgiamed', 'flashmed', 'trafego-titulo', 'farmauti', 'quiz-enare-farmacia', 'enfermare'];
+const APPS_ERRATA = ['clinicamed', 'cirurgiamed', 'flashmed', 'trafego-titulo', 'farmauti', 'quiz-enare-farmacia', 'enfermare', 'fisiare'];
 const ehOpNova = e => /Operação desconhecida/i.test((e && e.message) || '');
 const chaveErr = (app, qid) => app + '|' + qid;
 const trechoTxt = (t, n) => { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n - 1) + '…' : t; };
