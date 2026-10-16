@@ -68,7 +68,7 @@ const MT = {
      Enquanto nenhum produto do /planos.json tiver checkout, nada é bloqueado. */
   _acesso: null,
   acessoModulo() {
-    if (!MT._acesso) MT._acesso = import('/_mtacesso.js?v=13').then(() => window.MTAcesso).catch(e => { console.warn('MTAcesso indisponível', e); return null; });
+    if (!MT._acesso) MT._acesso = import('/_mtacesso.js?v=15').then(() => window.MTAcesso).catch(e => { console.warn('MTAcesso indisponível', e); return null; });
     return MT._acesso;
   },
   async acessoEstado() { const M = await MT.acessoModulo(); return M && MT.user && !MT.user.demo ? M.estado(MT.user) : null; },
@@ -182,6 +182,7 @@ const MT_FUNCS = [
   { id:'farmauti',      nm:'FarmaUTI',      ic:'ti-pill',      c:'#4545D8', url:'/farmauti/',       linha:'provas' },
   { id:'enarefarmacia', nm:'AprovaFarma', ic:'ti-vaccine-bottle',    c:'#0A3F3B', url:'/quiz-enare-farmacia/', linha:'provas' },
   { id:'sosfarmacia',   nm:'SOS Farmácia',  ic:'ti-first-aid-kit',     c:'#C8373C', url:'/sos-farmacia/',  linha:'provas' },
+  { id:'sosfarmacologia', nm:'SOS Farmacologia', ic:'ti-pills',       c:'#0B7A6E', url:'/sos-farmacologia/', linha:'provas' },
   /* enfermagem (14/10/2026): com os de farmácia formam a linha MedTech Multi da vitrine; mesma regra deles */
   { id:'enfermare',     nm:'Enfermare',     ic:'ti-droplet',           c:'#B0306A', url:'/enfermare/',     linha:'provas' },
   /* fisioterapia (15/10/2026): linha MedTech Multi, mesma regra de enfermagem e farmácia */

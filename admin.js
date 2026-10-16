@@ -52,6 +52,7 @@ const APPS = {
   farmauti: { nm: 'FarmaUTI', ic: 'ti-pill', c: '#4545D8', url: '/farmauti/' },
   enarefarmacia: { nm: 'AprovaFarma', ic: 'ti-vaccine-bottle', c: '#0A3F3B', url: '/quiz-enare-farmacia/' },
   sosfarmacia: { nm: 'SOS Farmácia Comercial', ic: 'ti-first-aid-kit', c: '#C8373C', url: '/sos-farmacia/' },
+  sosfarmacologia: { nm: 'SOS Farmacologia', ic: 'ti-pills', c: '#0B7A6E', url: '/sos-farmacologia/' },
   /* enfermagem (linha provas, publico "enfermagem"); com a farmácia = linha MedTech Multi */
   enfermare: { nm: 'Enfermare', ic: 'ti-droplet', c: '#B0306A', url: '/enfermare/' },
   /* fisioterapia (linha provas, publico "fisioterapia"); linha MedTech Multi */
