@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Destrava</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: barra lateral de navegação + área de trabalho; no celular, abas embaixo. Dados 100% fictícios. */
+:root {
+  --bg: #f3f4f1; --panel: #ffffff; --ink: #17212b; --muted: #5d6874; --line: #dfe3de; --soft: #eef1ec;
+  --brand: #0f6b5a; --brand-ink: #ffffff; --brand-soft: #dcefe9;
+  --ok: #2e7d4a; --ok-soft: #e1f1e6; --warn: #a96a08; --warn-soft: #fbefd6; --crit: #b3261e; --crit-soft: #fbe3e0; --info: #1f4e8c; --info-soft: #e2eaf6;
+  --f-display: 'Archivo', 'Segoe UI', Arial, sans-serif; --f-body: 'Source Sans 3', 'Segoe UI', Arial, sans-serif; --f-data: 'JetBrains Mono', Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1519; --panel: #172026; --ink: #e8ecea; --muted: #9aa7a3; --line: #2a363d; --soft: #1d282e;
+  --brand: #3fb59a; --brand-ink: #06231c; --brand-soft: #173a33;
+  --ok: #5cc27e; --ok-soft: #173426; --warn: #e2a33a; --warn-soft: #3a2c12; --crit: #f07067; --crit-soft: #3d1d1b; --info: #7fa7e6; --info-soft: #1b2a40; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0f1519; --panel: #172026; --ink: #e8ecea; --muted: #9aa7a3; --line: #2a363d; --soft: #1d282e;
+  --brand: #3fb59a; --brand-ink: #06231c; --brand-soft: #173a33;
+  --ok: #5cc27e; --ok-soft: #173426; --warn: #e2a33a; --warn-soft: #3a2c12; --crit: #f07067; --crit-soft: #3d1d1b; --info: #7fa7e6; --info-soft: #1b2a40; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.45 var(--f-body); }
+button, select, input { font: inherit; color: inherit; }
+.app { display: grid; grid-template-columns: 236px 1fr; min-height: 100%; }
+nav.side { background: var(--panel); border-right: 1px solid var(--line); padding: 20px 14px calc(20px + env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 4px; position: sticky; top: 0; height: 100vh; }
+.logo { display: flex; align-items: center; gap: 10px; padding: 4px 8px 18px; }
+.logo svg { flex: none; }
+.logo b { font: 800 22px var(--f-display); letter-spacing: -.02em; }
+.logo small { display: block; font: 600 11px var(--f-body); color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+nav.side button { display: flex; align-items: center; gap: 10px; text-align: left; border: 0; background: none; padding: 10px 12px; border-radius: 10px; cursor: pointer; font-weight: 600; color: var(--muted); }
+nav.side button:hover { background: var(--soft); color: var(--ink); }
+nav.side button[aria-current="page"] { background: var(--brand-soft); color: var(--brand); }
+nav.side button[hidden] { display: none; }
+nav.side .sep { height: 1px; background: var(--line); margin: 10px 6px; }
+nav.side .foot { margin-top: auto; font-size: 12px; color: var(--muted); padding: 8px; }
+main { min-width: 0; padding-block: 18px 40px; padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); }
+.top { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin-bottom: 18px; }
+.top h1 { font: 700 26px/1.15 var(--f-display); margin: 0; letter-spacing: -.01em; text-wrap: balance; }
+.top .meta { color: var(--muted); font-size: 14px; }
+.top .grow { flex: 1; min-width: 0; }
+.role { display: flex; align-items: center; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 6px 6px 6px 12px; }
+.role label { font-size: 13px; color: var(--muted); font-weight: 600; }
+.role select { border: 1px solid var(--line); background: var(--soft); border-radius: 8px; padding: 6px 8px; font-weight: 600; }
+.demo { display: flex; gap: 10px; align-items: center; background: var(--warn-soft); color: var(--warn); border-radius: 10px; padding: 8px 14px; font-size: 14px; font-weight: 600; margin-bottom: 18px; }
+.grid { display: grid; gap: 16px; }
+.k4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.k3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.k2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; min-width: 0; }
+.card h2 { font: 700 17px var(--f-display); margin: 0 0 12px; }
+.card h2 small { font: 500 13px var(--f-body); color: var(--muted); margin-left: 6px; }
+.kpi .lab { font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.kpi .val { font: 700 38px/1.1 var(--f-display); margin: 6px 0 2px; font-variant-numeric: tabular-nums; }
+.kpi .sub { font-size: 14px; color: var(--muted); }
+.kpi.ok .val { color: var(--ok); } .kpi.crit .val { color: var(--crit); } .kpi.warn .val { color: var(--warn); } .kpi.info .val { color: var(--info); }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.p-alta { background: var(--ok-soft); color: var(--ok); } .p-altase { background: var(--brand-soft); color: var(--brand); }
+.p-piora { background: var(--crit-soft); color: var(--crit); } .p-exame { background: var(--info-soft); color: var(--info); }
+.p-reg { background: var(--warn-soft); color: var(--warn); } .p-neutro { background: var(--soft); color: var(--muted); }
+.setores { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.setor { border: 1px solid var(--line); border-radius: 12px; padding: 14px; background: var(--panel); cursor: pointer; text-align: left; display: flex; flex-direction: column; gap: 8px; }
+.setor:hover { border-color: var(--brand); }
+.setor .nm { font: 700 16px var(--f-display); display: flex; justify-content: space-between; gap: 8px; }
+.bar { height: 8px; background: var(--soft); border-radius: 99px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--brand); }
+.bar.cheio i { background: var(--crit); } .bar.alto i { background: var(--warn); }
+.mini { display: flex; justify-content: space-between; font-size: 13.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.mini b { color: var(--ink); }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th { text-align: left; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 700; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: middle; font-variant-numeric: tabular-nums; }
+tr:last-child td { border-bottom: 0; }
+td.num, th.num { text-align: right; }
+.scroll { overflow-x: auto; }
+.tend-up { color: var(--crit); font-weight: 700; } .tend-down { color: var(--ok); font-weight: 700; } .tend-eq { color: var(--muted); font-weight: 700; }
+.v-ok { color: var(--ok); font-weight: 700; } .v-bad { color: var(--crit); font-weight: 700; }
+.filtros { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.filtros select, .filtros input { border: 1px solid var(--line); background: var(--panel); border-radius: 10px; padding: 8px 10px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 6px 12px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+.leitos { display: grid; gap: 10px; }
+.leito { display: grid; grid-template-columns: 112px 1fr auto; gap: 14px; align-items: start; background: var(--panel); border: 1px solid var(--line); border-left: 5px solid var(--line); border-radius: 12px; padding: 14px 16px; cursor: pointer; text-align: left; width: 100%; }
+.leito:hover { border-color: var(--brand); }
+.leito.s-piora { border-left-color: var(--crit); } .leito.s-alta { border-left-color: var(--ok); } .leito.s-altase { border-left-color: var(--brand); }
+.leito.s-exame { border-left-color: var(--info); } .leito.s-reg { border-left-color: var(--warn); }
+.leito .id { font: 700 15px var(--f-data); }
+.leito .id small { display: block; font: 500 12.5px var(--f-body); color: var(--muted); }
+.leito .tx { min-width: 0; }
+.leito .tx p { margin: 2px 0; }
+.leito .tx .ac { color: var(--muted); font-size: 14.5px; }
+.leito .who { font-size: 12.5px; color: var(--muted); text-align: right; white-space: nowrap; }
+.drawer { position: fixed; inset: 0 0 0 auto; width: min(460px, 100%); background: var(--panel); border-left: 1px solid var(--line); box-shadow: -10px 0 40px rgba(0,0,0,.14); padding: calc(22px + env(safe-area-inset-top, 0px)) max(22px, env(safe-area-inset-right, 0px)) 22px 22px; overflow-y: auto; z-index: 20; }
+.drawer h3 { font: 700 22px var(--f-display); margin: 0 0 4px; }
+.drawer dl { display: grid; grid-template-columns: 120px 1fr; gap: 8px 12px; font-size: 15px; }
+.drawer dt { color: var(--muted); font-weight: 600; }
+.drawer dd { margin: 0; }
+.x { float: right; border: 1px solid var(--line); background: var(--soft); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+.veil { position: fixed; inset: 0; background: rgba(10,18,22,.35); z-index: 19; }
+.hist { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.note { font-size: 13.5px; color: var(--muted); }
+.lista li { margin: 6px 0; }
+.lock { display: flex; gap: 12px; align-items: center; background: var(--info-soft); color: var(--info); border-radius: 12px; padding: 12px 16px; font-weight: 600; margin-bottom: 16px; }
+.svgchart text { fill: var(--muted); font: 12px var(--f-body); }
+.diagram { width: 100%; height: auto; }
+.diagram text { fill: var(--ink); font: 600 13px var(--f-body); }
+.diagram .t-muted { fill: var(--muted); font-weight: 500; font-size: 12px; }
+:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+.tabbar { display: none; }
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; }
+  nav.side { display: none; }
+  .k4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .k3, .k2 { grid-template-columns: 1fr; }
+  main { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .tabbar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line); overflow-x: auto; padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); gap: 4px; z-index: 10; }
+  .tabbar button { flex: none; border: 0; background: none; padding: 8px 12px; border-radius: 10px; font-weight: 600; font-size: 14px; color: var(--muted); cursor: pointer; }
+  .tabbar button[aria-current="page"] { background: var(--brand-soft); color: var(--brand); }
+  .leito { grid-template-columns: 1fr; }
+  .leito .who { text-align: left; }
+  .kpi .val { font-size: 30px; }
+}
+@media (prefers-reduced-motion: no-preference) { .view { animation: in .2s ease-out; } @keyframes in { from { opacity: .6; transform: translateY(4px); } to { opacity: 1; transform: none; } } }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="side" aria-label="Seções">
+    <div class="logo">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="9" fill="var(--brand)"/><path d="M9 21h16M9 21v-7h7a4 4 0 0 1 4 4v3M25 21v-4" stroke="var(--brand-ink)" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 11l3 3 7-7" stroke="var(--brand-ink)" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>
+      <div><b>Destrava</b><small>Gestão de leitos</small></div>
+    </div>
+    <div id="nav"></div>
+    <div class="foot">Protótipo · dados fictícios<br>Hospital Modelo · 220 leitos</div>
+  </nav>
+  <main id="main"></main>
+</div>
+<nav class="tabbar" id="tabbar" aria-label="Seções"></nav>
+<div id="over"></div>
+
+<script>
+(function () {
+  /* ---------------- dados fictícios, gerados de forma determinística ---------------- */
+  var seed = 20261016;
+  function rnd() { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; }
+  function pick(a) { return a[Math.floor(rnd() * a.length)]; }
+  function rint(a, b) { return a + Math.floor(rnd() * (b - a + 1)); }
+  var SET = [
+    { k: 'CM', nome: 'Clínica Médica', cap: 30, meta: 10, perm7: 11.8, perm30: 10.2, permMes: 10.6, mort: 0.048, giro: 2.9, livres: 0, fila: 6 },
+    { k: 'CIR', nome: 'Cirúrgica', cap: 40, meta: 5, perm7: 3.4, perm30: 3.2, permMes: 3.3, mort: 0.004, giro: 10.1, livres: 2, fila: 9 },
+    { k: 'ORT', nome: 'Ortopedia', cap: 28, meta: 5.5, perm7: 4.6, perm30: 5.2, permMes: 4.8, mort: 0, giro: 6.0, livres: 1, fila: 3 },
+    { k: 'UCE', nome: 'Cuidados especiais', cap: 14, meta: 20, perm7: 22.5, perm30: 16.4, permMes: 17.9, mort: 0.42, giro: 1.8, livres: 0, fila: 4 },
+    { k: 'UTI', nome: 'UTI adulto', cap: 30, meta: 10, perm7: 13.9, perm30: 10.6, permMes: 11.8, mort: 0.29, giro: 2.8, livres: 0, fila: 5 },
+    { k: 'AVC', nome: 'Unidade AVC', cap: 20, meta: 9, perm7: 6.3, perm30: 5.9, permMes: 6.1, mort: 0, giro: 4.4, livres: 3, fila: 0 },
+    { k: 'OBS', nome: 'Obstetrícia', cap: 30, meta: 5, perm7: 3.7, perm30: 3.6, permMes: 3.5, mort: 0, giro: 6.4, livres: 6, fila: 0 },
+    { k: 'NEO', nome: 'Neonatologia', cap: 28, meta: 10, perm7: 6.1, perm30: 7.4, permMes: 7.2, mort: 0, giro: 2.5, livres: 12, fila: 0 }
+  ];
+  var SELOS = {
+    'ALTA HOJE': { c: 'p-alta', s: 's-alta', ex: ['Alta decidida na evolução de hoje; receita e orientações prontas.', 'Alta após curativo de hoje; retorno ambulatorial em 7 dias.'] },
+    'ALTA SE': { c: 'p-altase', s: 's-altase', ex: ['Alta se o laudo da TC de controle vier sem alteração (realizada ontem).', 'Alta se a última dose de antibiótico for hoje e seguir afebril.', 'Alta se o potássio de hoje estiver normal.', 'Alta se tolerar dieta oral até a tarde.'] },
+    'PIORA CLÍNICA': { c: 'p-piora', s: 's-piora', ex: ['Febre nova e queda de saturação na noite; antibiótico ampliado.', 'Rebaixamento do nível de consciência desde a madrugada.', 'Hipotensão com início de noradrenalina.'] },
+    'EM EXAME': { c: 'p-exame', s: 's-exame', ex: ['Ecocardiograma pedido há 3 dias, sem data marcada.', 'Ressonância de crânio realizada, aguarda laudo.', 'Endoscopia pedida, aguarda vaga.'] },
+    'REGULAÇÃO': { c: 'p-reg', s: 's-reg', ex: ['Aguarda vaga de hemodiálise ambulatorial.', 'Transferência para hospital de origem pedida há 4 dias.', 'Aguarda leito de retaguarda na regulação estadual.'] },
+    'CIRURGIA': { c: 'p-exame', s: 's-exame', ex: ['Aguarda cirurgia sem data no mapa cirúrgico.', 'Cirurgia marcada para amanhã; jejum a partir das 22h.'] },
+    'VIGILÂNCIA': { c: 'p-neutro', s: '', ex: ['Ajuste de insulina em curso; glicemias ainda altas.', 'Controle de dor ainda com opioide endovenoso.'] },
+    'ATB': { c: 'p-neutro', s: '', ex: ['Antibiótico endovenoso até o 10º dia (hoje D6).', 'Antibiótico com término a definir pela infectologia.'] }
+  };
+  var DEP = { 'ALTA HOJE': 'Equipe do setor', 'ALTA SE': 'Equipe do setor', 'PIORA CLÍNICA': 'Equipe do setor', 'EM EXAME': 'NAC / Imagem', 'REGULAÇÃO': 'NAC (terceiros)', 'CIRURGIA': 'Centro cirúrgico', 'VIGILÂNCIA': 'Equipe do setor', 'ATB': 'Equipe do setor' };
+  var ACAO = { 'ALTA HOJE': 'Dar a alta pela manhã e liberar o leito até 11h.', 'ALTA SE': 'Checar a condição até 10h e dar a alta se cumprida.', 'PIORA CLÍNICA': 'Reavaliar hoje; considerar UTI se não responder.', 'EM EXAME': 'Cobrar a marcação ou o laudo; a alta depende disso.', 'REGULAÇÃO': 'Manter o pedido ativo e registrar a resposta.', 'CIRURGIA': 'Confirmar data no mapa e os exames pré-operatórios.', 'VIGILÂNCIA': 'Seguir o plano; sem pendência que segure o leito.', 'ATB': 'Programar a alta para o dia seguinte ao fim do antibiótico.' };
+  var DX = ['Pneumonia comunitária', 'Pé diabético infectado', 'ICC descompensada', 'Fratura de fêmur', 'Colecistite aguda', 'AVC isquêmico', 'DPOC exacerbada', 'Pielonefrite', 'Pós-operatório de hernioplastia', 'Celulite de membro inferior', 'Cetoacidose diabética', 'Pancreatite aguda', 'Fratura de tíbia', 'Sepse de foco urinário', 'Insuficiência renal aguda', 'Gestação de 39 semanas', 'Recém-nascido com icterícia'];
+  var PESOS = { CM: ['ALTA SE', 'ALTA SE', 'EM EXAME', 'EM EXAME', 'REGULAÇÃO', 'PIORA CLÍNICA', 'VIGILÂNCIA', 'ATB', 'ATB', 'ALTA HOJE'],
+    CIR: ['ALTA SE', 'ALTA SE', 'ALTA HOJE', 'CIRURGIA', 'CIRURGIA', 'EM EXAME', 'VIGILÂNCIA', 'ATB'],
+    ORT: ['CIRURGIA', 'CIRURGIA', 'ALTA SE', 'ALTA HOJE', 'EM EXAME', 'VIGILÂNCIA'],
+    UCE: ['VIGILÂNCIA', 'REGULAÇÃO', 'ATB', 'PIORA CLÍNICA', 'ALTA SE'],
+    UTI: ['VIGILÂNCIA', 'VIGILÂNCIA', 'PIORA CLÍNICA', 'ALTA SE', 'ATB', 'EM EXAME'],
+    AVC: ['EM EXAME', 'ALTA SE', 'ALTA SE', 'VIGILÂNCIA', 'ALTA HOJE'],
+    OBS: ['ALTA SE', 'ALTA HOJE', 'ALTA HOJE', 'VIGILÂNCIA'],
+    NEO: ['VIGILÂNCIA', 'ALTA SE', 'ALTA SE', 'ATB'] };
+  var LEITOS = [];
+  SET.forEach(function (s) {
+    var ocup = s.cap - s.livres;
+    for (var i = 1; i <= ocup; i++) {
+      var selo = pick(PESOS[s.k]);
+      LEITOS.push({ set: s.k, leito: s.k + ' ' + String(100 + i), pront: String(rint(410000, 489999)), selo: selo, dx: pick(DX), pend: pick(SELOS[selo].ex), acao: ACAO[selo], dep: DEP[selo], dias: rint(1, s.k === 'UCE' ? 40 : s.k === 'UTI' ? 18 : 12), hist: [pick(PESOS[s.k]), pick(PESOS[s.k]), selo] });
+    }
+  });
+  function conta(f) { return LEITOS.filter(f).length; }
+  var DIAS = []; for (var d = 59; d >= 0; d--) DIAS.push(d);
+  function serie(base, amp, n) { var out = [], v = base; for (var i = 0; i < n; i++) { v += (rnd() - .5) * amp; v = Math.max(base * .7, Math.min(base * 1.3, v)); out.push(+v.toFixed(2)); } return out; }
+
+  /* ---------------- perfis e acesso ---------------- */
+  var PERFIS = {
+    direcao: { nome: 'Direção', telas: ['hoje', 'leitos', 'eficiencia', 'emergencia', 'cirurgia', 'desempenho', 'acessos'], setores: null },
+    coord: { nome: 'Coordenação · Clínica Médica', telas: ['hoje', 'leitos', 'eficiencia'], setores: ['CM'] },
+    nac: { nome: 'NAC (regulação e exames)', telas: ['leitos', 'emergencia'], setores: null, selos: ['EM EXAME', 'REGULAÇÃO', 'CIRURGIA'] },
+    medico: { nome: 'Médico de referência', telas: ['hoje', 'leitos', 'eficiencia', 'emergencia', 'cirurgia', 'desempenho'], setores: null },
+    ti: { nome: 'TI do hospital', telas: ['acessos'], setores: null }
+  };
+  var TELAS = { hoje: 'Hoje', leitos: 'Leito a leito', eficiencia: 'Eficiência', emergencia: 'Emergência', cirurgia: 'Centro cirúrgico', desempenho: 'Desempenho', acessos: 'Acessos' };
+  var st = { perfil: 'direcao', tela: 'hoje', fSet: '', fSelo: '', fDep: '', busca: '' };
+  try { var mem = JSON.parse(localStorage.getItem('destrava-demo') || '{}'); if (mem.perfil && PERFIS[mem.perfil]) st.perfil = mem.perfil; if (mem.tela) st.tela = mem.tela; } catch (e) {}
+  function salvar() { try { localStorage.setItem('destrava-demo', JSON.stringify({ perfil: st.perfil, tela: st.tela })); } catch (e) {} }
+  var LOG = [];
+  function registrar(acao) { var h = new Date(); LOG.unshift({ h: ('0' + h.getHours()).slice(-2) + ':' + ('0' + h.getMinutes()).slice(-2), perfil: PERFIS[st.perfil].nome, acao: acao }); LOG = LOG.slice(0, 40); }
+  ['07:02|Direção|abriu Hoje', '07:05|Coordenação · Clínica Médica|abriu Leito a leito (Clínica Médica)', '07:11|NAC (regulação e exames)|abriu Leito a leito (filtro: EM EXAME)', '07:20|Médico de referência|corrigiu o selo de CM 112', '07:31|Direção|abriu Eficiência'].forEach(function (l) { var p = l.split('|'); LOG.push({ h: p[0], perfil: p[1], acao: p[2] }); });
+
+  function visiveis() {
+    var p = PERFIS[st.perfil];
+    return LEITOS.filter(function (l) { return (!p.setores || p.setores.indexOf(l.set) >= 0) && (!p.selos || p.selos.indexOf(l.selo) >= 0); });
+  }
+  function setNome(k) { return (SET.filter(function (s) { return s.k === k; })[0] || {}).nome || k; }
+  function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  function br(n, c) { return Number(n).toLocaleString('pt-BR', { minimumFractionDigits: c || 0, maximumFractionDigits: c || 0 }); }
+  function pill(selo) { return '<span class="pill ' + SELOS[selo].c + '">' + selo + '</span>'; }
+  function spark(vals, meta) {
+    var w = 120, h = 30, mn = Math.min.apply(null, vals.concat([meta])) * .95, mx = Math.max.apply(null, vals.concat([meta])) * 1.05;
+    var y = function (v) { return (h - 3 - (v - mn) / (mx - mn) * (h - 6)).toFixed(1); };
+    var pts = vals.map(function (v, i) { return (i * (w / (vals.length - 1))).toFixed(1) + ',' + y(v); }).join(' ');
+    return '<svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" aria-hidden="true"><line x1="0" x2="' + w + '" y1="' + y(meta) + '" y2="' + y(meta) + '" stroke="var(--crit)" stroke-dasharray="3 3" stroke-width="1"/><polyline fill="none" stroke="var(--brand)" stroke-width="2" points="' + pts + '"/><circle cx="' + w + '" cy="' + y(vals[vals.length - 1]) + '" r="3" fill="var(--brand)"/></svg>';
+  }
+  function barras(vals, cor, alt, rot) {
+    var w = 640, h = alt || 180, mx = Math.max.apply(null, vals) * 1.1, bw = w / vals.length;
+    var s = '<svg class="svgchart" viewBox="0 0 ' + w + ' ' + (h + 22) + '" width="100%" role="img" aria-label="' + esc(rot || '') + '">';
+    [0.5, 1].forEach(function (f) { var yy = h - h * f * (1 / 1.1); s += '<line x1="0" x2="' + w + '" y1="' + yy + '" y2="' + yy + '" stroke="var(--line)"/>'; });
+    vals.forEach(function (v, i) { var bh = v / mx * h; s += '<rect x="' + (i * bw + 2) + '" y="' + (h - bh) + '" width="' + (bw - 4) + '" height="' + bh + '" rx="3" fill="' + (i === vals.length - 1 ? 'var(--brand)' : cor) + '"><title>' + br(v) + '</title></rect>'; });
+    s += '<text x="0" y="' + (h + 16) + '">há ' + vals.length + ' dias</text><text x="' + w + '" y="' + (h + 16) + '" text-anchor="end">ontem</text></svg>';
+    return s;
+  }
+  function linhas(series, metas, alt) {
+    var w = 640, h = alt || 190, all = []; series.forEach(function (s) { all = all.concat(s.v); }); metas.forEach(function (m) { all.push(m.v); });
+    var mn = Math.min.apply(null, all) * .9, mx = Math.max.apply(null, all) * 1.05, n = series[0].v.length;
+    var y = function (v) { return (h - (v - mn) / (mx - mn) * h).toFixed(1); };
+    var s = '<svg class="svgchart" viewBox="0 0 ' + w + ' ' + (h + 22) + '" width="100%" role="img">';
+    metas.forEach(function (m) { s += '<line x1="0" x2="' + w + '" y1="' + y(m.v) + '" y2="' + y(m.v) + '" stroke="var(--crit)" stroke-dasharray="5 4"/><text x="' + (w - 4) + '" y="' + (y(m.v) - 5) + '" text-anchor="end">' + esc(m.rot) + '</text>'; });
+    series.forEach(function (sr) { s += '<polyline fill="none" stroke="' + sr.cor + '" stroke-width="2.4" points="' + sr.v.map(function (v, i) { return (i * w / (n - 1)).toFixed(1) + ',' + y(v); }).join(' ') + '"/>'; });
+    s += '<text x="0" y="' + (h + 16) + '">há ' + n + ' dias</text><text x="' + w + '" y="' + (h + 16) + '" text-anchor="end">ontem</text></svg>';
+    return s;
+  }
+
+  /* ---------------- telas ---------------- */
+  var V = {};
+  V.hoje = function () {
+    var L = visiveis(), p = PERFIS[st.perfil];
+    var setores = SET.filter(function (s) { return !p.setores || p.setores.indexOf(s.k) >= 0; });
+    var ah = L.filter(function (l) { return l.selo === 'ALTA HOJE'; }), ase = L.filter(function (l) { return l.selo === 'ALTA SE'; }), pi = L.filter(function (l) { return l.selo === 'PIORA CLÍNICA'; });
+    var meta = setores.reduce(function (a, s) { return a + s.fila + Math.max(0, Math.round(s.cap * .04)); }, 0);
+    var h = '<div class="grid k4">' +
+      kpi('Meta de altas hoje', meta, 'para zerar a fila da emergência', '') +
+      kpi('Alta hoje', ah.length, 'decididas na evolução', 'ok') +
+      kpi('Alta possível', ase.length, 'com condição a cumprir hoje', 'info') +
+      kpi('Piora clínica', pi.length, 'reavaliar pela manhã', pi.length ? 'crit' : '') + '</div>';
+    h += '<div class="card" style="margin-top:16px"><h2>Setores <small>ocupação agora · altas necessárias · fila na emergência</small></h2><div class="setores">';
+    setores.forEach(function (s) {
+      var oc = (s.cap - s.livres) / s.cap, cls = oc >= .98 ? 'cheio' : oc >= .9 ? 'alto' : '';
+      var nA = conta(function (l) { return l.set === s.k && (l.selo === 'ALTA HOJE' || l.selo === 'ALTA SE'); });
+      h += '<button class="setor" data-set="' + s.k + '"><span class="nm">' + s.nome + '<span class="pill ' + (cls === 'cheio' ? 'p-piora' : cls ? 'p-reg' : 'p-alta') + '">' + br(oc * 100) + '%</span></span>' +
+        '<span class="bar ' + cls + '"><i style="width:' + Math.min(100, oc * 100) + '%"></i></span>' +
+        '<span class="mini"><span>Livres <b>' + s.livres + '</b></span><span>Fila <b>' + s.fila + '</b></span><span>Altas apontadas <b>' + nA + '</b></span></span></button>';
+    });
+    h += '</div></div>';
+    h += '<div class="grid k2" style="margin-top:16px"><div class="card"><h2>Piora clínica <small>prioridade da manhã</small></h2>' + lista(pi.slice(0, 6)) + '</div>' +
+      '<div class="card"><h2>Alta hoje <small>leitos que liberam até 11h</small></h2>' + lista(ah.slice(0, 6)) + '</div></div>';
+    return h;
+  };
+  function kpi(lab, val, sub, cls) { return '<div class="card kpi ' + (cls || '') + '"><div class="lab">' + lab + '</div><div class="val">' + val + '</div><div class="sub">' + sub + '</div></div>'; }
+  function lista(L) {
+    if (!L.length) return '<p class="note">Nenhum leito nesta situação agora.</p>';
+    return '<table><tbody>' + L.map(function (l) { return '<tr data-p="' + l.pront + '" style="cursor:pointer"><td style="width:92px"><b style="font-family:var(--f-data)">' + l.leito + '</b></td><td>' + esc(l.pend) + '</td></tr>'; }).join('') + '</tbody></table>';
+  }
+  V.leitos = function () {
+    var p = PERFIS[st.perfil], L = visiveis();
+    var h = '';
+    if (p.setores) h += '<div class="lock">Seu perfil vê só os leitos de ' + p.setores.map(setNome).join(', ') + '.</div>';
+    if (p.selos) h += '<div class="lock">Seu perfil vê só os leitos que dependem do NAC: exames, regulação e cirurgia.</div>';
+    var setOpts = SET.filter(function (s) { return !p.setores || p.setores.indexOf(s.k) >= 0; }).map(function (s) { return '<option value="' + s.k + '"' + (st.fSet === s.k ? ' selected' : '') + '>' + s.nome + '</option>'; }).join('');
+    h += '<div class="filtros"><select id="f-set" aria-label="Setor"><option value="">Todos os setores</option>' + setOpts + '</select>' +
+      '<select id="f-dep" aria-label="Quem precisa agir"><option value="">Quem precisa agir: todos</option>' + ['Equipe do setor', 'NAC / Imagem', 'NAC (terceiros)', 'Centro cirúrgico'].map(function (d) { return '<option' + (st.fDep === d ? ' selected' : '') + '>' + d + '</option>'; }).join('') + '</select>' +
+      '<input id="f-busca" type="search" placeholder="Buscar leito ou prontuário" value="' + esc(st.busca) + '" aria-label="Buscar"></div>';
+    var cont = {}; L.forEach(function (l) { cont[l.selo] = (cont[l.selo] || 0) + 1; });
+    h += '<div class="chips" style="margin-bottom:14px">' + ['', 'PIORA CLÍNICA', 'ALTA HOJE', 'ALTA SE', 'EM EXAME', 'REGULAÇÃO', 'CIRURGIA', 'ATB', 'VIGILÂNCIA'].filter(function (s) { return !s || cont[s]; }).map(function (s) {
+      return '<button class="chip" data-selo="' + s + '" aria-pressed="' + (st.fSelo === s) + '">' + (s || 'Todos') + ' <span class="note">' + (s ? cont[s] : L.length) + '</span></button>'; }).join('') + '</div>';
+    var F = L.filter(function (l) { return (!st.fSet || l.set === st.fSet) && (!st.fSelo || l.selo === st.fSelo) && (!st.fDep || l.dep === st.fDep) && (!st.busca || (l.leito + l.pront).toLowerCase().indexOf(st.busca.toLowerCase()) >= 0); });
+    var ordem = ['PIORA CLÍNICA', 'ALTA HOJE', 'ALTA SE', 'EM EXAME', 'REGULAÇÃO', 'CIRURGIA', 'ATB', 'VIGILÂNCIA'];
+    F.sort(function (a, b) { return ordem.indexOf(a.selo) - ordem.indexOf(b.selo); });
+    h += '<div class="leitos">' + F.slice(0, 60).map(function (l) {
+      return '<button class="leito ' + SELOS[l.selo].s + '" data-p="' + l.pront + '"><span class="id">' + l.leito + '<small>pront. ' + l.pront + ' · ' + l.dias + ' d</small></span>' +
+        '<span class="tx"><p>' + pill(l.selo) + ' ' + esc(l.dx) + '</p><p>' + esc(l.pend) + '</p><p class="ac">→ ' + esc(l.acao) + '</p></span><span class="who">' + esc(l.dep) + '</span></button>'; }).join('') + '</div>';
+    if (F.length > 60) h += '<p class="note">Mostrando 60 de ' + F.length + '. Use os filtros.</p>';
+    if (!F.length) h += '<p class="note">Nenhum leito com esses filtros.</p>';
+    return h;
+  };
+  V.eficiencia = function () {
+    var p = PERFIS[st.perfil], setores = SET.filter(function (s) { return !p.setores || p.setores.indexOf(s.k) >= 0; });
+    var h = '<div class="grid k4">' + kpi('Permanência 30 dias', '6,4 d', 'meta ≤ 9 · 7 dias: 6,8', 'ok') + kpi('Tendência', '→ estável', '7 dias × 30 dias', '') + kpi('Ocupação hoje', '91%', '220 leitos de internação', '') + kpi('Giro 30 dias', '4,3', 'saídas por leito', '') + '</div>';
+    h += '<div class="card" style="margin-top:16px"><h2>Setores <small>permanência em dias · curva dos últimos 30 dias · linha vermelha = meta</small></h2><div class="scroll"><table><thead><tr><th>Setor</th><th class="num">7 dias</th><th class="num">30 dias</th><th class="num">Mês</th><th class="num">Meta</th><th>Tendência</th><th>Curva 30 dias</th><th class="num">Ocupação</th><th class="num">Giro</th><th class="num">Mortalidade</th></tr></thead><tbody>';
+    setores.forEach(function (s) {
+      var t = s.perm7 > s.perm30 * 1.05 ? '<span class="tend-up">▲ pior</span>' : s.perm7 < s.perm30 * .95 ? '<span class="tend-down">▼ melhor</span>' : '<span class="tend-eq">→ estável</span>';
+      var oc = (s.cap - s.livres) / s.cap;
+      h += '<tr><td><b>' + s.nome + '</b></td><td class="num">' + br(s.perm7, 1) + '</td><td class="num ' + (s.perm30 <= s.meta ? 'v-ok' : 'v-bad') + '">' + br(s.perm30, 1) + '</td><td class="num">' + br(s.permMes, 1) + '</td><td class="num">' + br(s.meta, 1) + '</td><td>' + t + '</td><td>' + spark(serie(s.perm30, s.perm30 * .12, 30), s.meta) + '</td><td class="num">' + br(oc * 100) + '%</td><td class="num">' + br(s.giro, 1) + '</td><td class="num">' + br(s.mort * 100, 1) + '%</td></tr>';
+    });
+    h += '</tbody></table></div><p class="note">Medido todo dia a partir do censo do prontuário eletrônico. Permanência = pacientes-dia ÷ saídas.</p></div>';
+    if (!p.setores) {
+      h += '<div class="grid k2" style="margin-top:16px"><div class="card"><h2>Permanência do hospital <small>média móvel de 7 e de 30 dias</small></h2>' + linhas([{ v: serie(6.6, .5, 60), cor: 'var(--brand)' }, { v: serie(6.5, .15, 60), cor: 'var(--info)' }], [{ v: 9, rot: 'meta 9 dias' }]) + '</div>' +
+        '<div class="card"><h2>Matriz de eficiência <small>últimos 30 dias</small></h2>' + matriz() + '</div></div>';
+    }
+    return h;
+  };
+  function matriz() {
+    var q = { a: [], b: [], c: [], d: [] };
+    SET.forEach(function (s) { var oc = (s.cap - s.livres) / s.cap, ok = s.perm30 <= s.meta; (oc >= .85 ? (ok ? q.a : q.b) : (ok ? q.c : q.d)).push(s.nome); });
+    function cx(t, l, cls) { return '<div style="border-radius:10px;padding:12px;min-height:96px" class="' + cls + '"><b>' + t + '</b><div class="note" style="color:inherit">' + (l.join(', ') || '—') + '</div></div>'; }
+    return '<div class="grid k2" style="gap:10px">' + cx('Lotado e girando', q.a, 'p-alta') + cx('Lotado e lento · prioridade', q.b, 'p-piora') + cx('Com folga', q.c, 'p-exame') + cx('Lento com folga', q.d, 'p-reg') + '</div><p class="note">Linhas: ocupação ≥ 85% em cima. Colunas: permanência dentro da meta à esquerda.</p>';
+  }
+  V.emergencia = function () {
+    var h = '<div class="grid k4">' + kpi('Ocupação às 7h', '88%', 'meta abaixo de 85%', 'crit') + kpi('Aguardando leito', '28', '9 há mais de 24 h', 'warn') + kpi('Saíram em menos de 24 h', '71%', 'ontem · meta 85%', 'warn') + kpi('Internados ontem', '14', 'de 31 saídas · conversão 45%', '') + '</div>';
+    var M = [['Ocupação', '< 85%', '88%', '80%', false], ['Permanência abaixo de 24 h', '≥ 85%', '71%', '70%', false], ['Mortalidade', '≤ 1%', '0,0%', '0,8%', true], ['Conversão em internação', '> 30%', '45%', '47%', true], ['Decisão em até 6 h', '> 85%', 'mensal', '93%', true], ['Classificação de risco em 10 min', '≥ 90%', 'mensal', '84%', false], ['Laranjas e amarelos no tempo', '≥ 90%', 'mensal', '93%', true]];
+    h += '<div class="card" style="margin-top:16px"><h2>Metas do processo da emergência</h2><div class="scroll"><table><thead><tr><th>Indicador</th><th>Meta</th><th class="num">Ontem</th><th class="num">Mês</th><th>Situação</th></tr></thead><tbody>' +
+      M.map(function (m) { return '<tr><td><b>' + m[0] + '</b></td><td>' + m[1] + '</td><td class="num">' + m[2] + '</td><td class="num">' + m[3] + '</td><td><span class="pill ' + (m[4] ? 'p-alta' : 'p-piora') + '">' + (m[4] ? 'atinge' : 'não atinge') + '</span></td></tr>'; }).join('') + '</tbody></table></div></div>';
+    h += '<div class="card" style="margin-top:16px"><h2>Fila: aguardando leito de internação <small>maior espera primeiro</small></h2><div class="scroll"><table><thead><tr><th>Box</th><th>Prontuário</th><th>Destino</th><th class="num">Espera</th></tr></thead><tbody>';
+    var dest = ['Clínica Médica', 'UTI adulto', 'Cuidados especiais', 'Cirúrgica', 'Ortopedia'];
+    var fila = []; for (var i = 0; i < 8; i++) fila.push([rint(1, 30), String(rint(410000, 489999)), pick(dest), rint(2, 130)]);
+    fila.sort(function (a, b) { return b[3] - a[3]; });
+    h += fila.map(function (f) { return '<tr><td>Obs. ' + f[0] + '</td><td style="font-family:var(--f-data)">' + f[1] + '</td><td>' + f[2] + '</td><td class="num ' + (f[3] > 24 ? 'v-bad' : '') + '">' + f[3] + ' h</td></tr>'; }).join('') + '</tbody></table></div></div>';
+    return h;
+  };
+  V.cirurgia = function () {
+    var porDia = []; for (var i = 0; i < 30; i++) porDia.push(rint(18, 36));
+    var h = '<div class="grid k4">' + kpi('Cirurgias no mês', '419', '28,0 por dia · mês anterior 425 no mesmo período', '') + kpi('Procedimentos no mês', '613', '41,0 por dia', '') + kpi('Projeção do mês', '868', 'no ritmo atual', 'info') + kpi('Urgências', '20%', '84 das cirurgias', '') + '</div>';
+    h += '<div class="card" style="margin-top:16px"><h2>Cirurgias realizadas por dia <small>últimos 30 dias</small></h2>' + barras(porDia, 'var(--info-soft)', 170, 'Cirurgias por dia') + '</div>';
+    h += '<div class="grid k2" style="margin-top:16px"><div class="card"><h2>Por caráter</h2><table><tbody><tr><td>Eletivas</td><td class="num"><b>268</b></td></tr><tr><td>Urgências</td><td class="num"><b>84</b></td></tr><tr><td>No leito</td><td class="num"><b>61</b></td></tr><tr><td>Pequenas cirurgias</td><td class="num"><b>6</b></td></tr></tbody></table></div>' +
+      '<div class="card"><h2>Duas contagens <small>sistema × contrato</small></h2><table><thead><tr><th>Mês</th><th class="num">Sistema</th><th class="num">Contrato</th></tr></thead><tbody><tr><td>jul</td><td class="num">1.217</td><td class="num">830</td></tr><tr><td>ago</td><td class="num">1.322</td><td class="num">979</td></tr><tr><td>set</td><td class="num">1.303</td><td class="num">—</td></tr></tbody></table><p class="note">O sistema conta cada procedimento realizado; o contrato, o procedimento faturado.</p></div></div>';
+    return h;
+  };
+  V.desempenho = function () {
+    var h = '<div class="grid k4">' + kpi('Altas antecipadas', '62%', 'das altas do dia já estavam apontadas de manhã', 'ok') + kpi('Altas previstas que saíram', '38%', 'últimos 7 dias', 'warn') + kpi('Pendências que andaram', '68%', 'no dia seguinte à cobrança', 'ok') + kpi('Regras aprendidas', '14', 'desde a implantação', 'info') + '</div>';
+    h += '<div class="card" style="margin-top:16px"><h2>Acerto e escape das altas <small>por dia</small></h2>' + linhas([{ v: serie(62, 14, 30), cor: 'var(--ok)' }, { v: serie(28, 12, 30), cor: 'var(--crit)' }], []) + '<p class="note"><span style="color:var(--ok);font-weight:700">Verde</span>: altas apontadas de manhã que aconteceram. <span style="color:var(--crit);font-weight:700">Vermelho</span>: altas que escaparam (o painel não tinha apontado). Cada escape vira uma lição revisada pelo médico de referência.</p></div>';
+    return h;
+  };
+  V.acessos = function () {
+    var h = '<div class="grid k2"><div class="card"><h2>Onde roda</h2>' + diagrama() + '</div><div class="card"><h2>Perfis</h2><table><thead><tr><th>Perfil</th><th>O que vê</th></tr></thead><tbody>' +
+      '<tr><td><b>Direção</b></td><td>Tudo, com eficiência e desempenho</td></tr><tr><td><b>Coordenação de setor</b></td><td>Só os leitos do próprio setor</td></tr><tr><td><b>NAC</b></td><td>Exames, regulação e cirurgias pendentes</td></tr><tr><td><b>Médico de referência</b></td><td>Tudo, e corrige selos</td></tr><tr><td><b>TI</b></td><td>Acessos e registro, sem dado clínico</td></tr></tbody></table>' +
+      '<p class="note">Login com o mesmo usuário da rede do hospital. Quem é desligado perde o acesso no mesmo dia. Fora do hospital: pela VPN ou com segundo fator, conforme a TI decidir.</p></div></div>';
+    h += '<div class="card" style="margin-top:16px"><h2>Registro de acesso <small>quem abriu o quê (atualiza enquanto você navega)</small></h2><div class="scroll"><table><thead><tr><th>Hora</th><th>Perfil</th><th>O que fez</th></tr></thead><tbody>' +
+      LOG.slice(0, 14).map(function (l) { return '<tr><td style="font-family:var(--f-data)">' + l.h + '</td><td>' + esc(l.perfil) + '</td><td>' + esc(l.acao) + '</td></tr>'; }).join('') + '</tbody></table></div></div>';
+    return h;
+  };
+  function diagrama() {
+    return '<svg class="diagram" viewBox="0 0 520 330" role="img" aria-label="Servidor dentro da rede do hospital">' +
+      '<rect x="6" y="6" width="400" height="318" rx="14" fill="var(--soft)" stroke="var(--line)"/><text x="22" y="30">Rede do hospital</text>' +
+      '<rect x="24" y="48" width="160" height="58" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="38" y="72">Prontuário eletrônico</text><text x="38" y="92" class="t-muted">só leitura</text>' +
+      '<rect x="230" y="48" width="160" height="58" rx="10" fill="var(--brand-soft)" stroke="var(--brand)"/><text x="244" y="72">Servidor Destrava</text><text x="244" y="92" class="t-muted">máquina virtual da TI</text>' +
+      '<line x1="184" y1="77" x2="230" y2="77" stroke="var(--brand)" stroke-width="2"/>' +
+      '<rect x="24" y="150" width="160" height="58" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="38" y="174">Computadores</text><text x="38" y="194" class="t-muted">navegador + login da rede</text>' +
+      '<rect x="230" y="150" width="160" height="58" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="244" y="174">E-mail institucional</text><text x="244" y="194" class="t-muted">PDF ou aviso com link</text>' +
+      '<line x1="290" y1="106" x2="110" y2="150" stroke="var(--line)" stroke-width="2"/><line x1="310" y1="106" x2="310" y2="150" stroke="var(--line)" stroke-width="2"/>' +
+      '<rect x="24" y="250" width="366" height="52" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="38" y="272">VPN do hospital</text><text x="38" y="290" class="t-muted">celular, plantão de casa, suporte (registrado)</text>' +
+      '<rect x="424" y="48" width="90" height="58" rx="10" fill="var(--info-soft)" stroke="var(--info)"/><text x="436" y="72">IA</text><text x="436" y="92" class="t-muted">sem nomes</text>' +
+      '<line x1="390" y1="77" x2="424" y2="77" stroke="var(--info)" stroke-width="2" stroke-dasharray="5 4"/>' +
+      '<rect x="424" y="250" width="90" height="52" rx="10" fill="var(--panel)" stroke="var(--line)"/><text x="436" y="272">Fora</text><text x="436" y="290" class="t-muted">celular</text>' +
+      '<line x1="424" y1="276" x2="390" y2="276" stroke="var(--line)" stroke-width="2"/></svg>';
+  }
+
+  /* ---------------- montagem ---------------- */
+  var main = document.getElementById('main'), over = document.getElementById('over');
+  function desenhar() {
+    var p = PERFIS[st.perfil];
+    if (p.telas.indexOf(st.tela) < 0) st.tela = p.telas[0];
+    var navH = p.telas.map(function (t) { return '<button data-tela="' + t + '"' + (st.tela === t ? ' aria-current="page"' : '') + '>' + TELAS[t] + '</button>'; }).join('');
+    document.getElementById('nav').innerHTML = navH;
+    document.getElementById('tabbar').innerHTML = navH;
+    var opts = Object.keys(PERFIS).map(function (k) { return '<option value="' + k + '"' + (st.perfil === k ? ' selected' : '') + '>' + PERFIS[k].nome + '</option>'; }).join('');
+    main.innerHTML = '<div class="demo">Protótipo de demonstração · hospital, pacientes e números fictícios</div>' +
+      '<div class="top"><div class="grow"><h1>' + TELAS[st.tela] + '</h1><div class="meta">Hospital Modelo · atualizado às 06:42 pela rodada da madrugada</div></div>' +
+      '<div class="role"><label for="perfil">Ver como</label><select id="perfil">' + opts + '</select></div></div>' +
+      '<div class="view">' + V[st.tela]() + '</div>';
+    salvar();
+  }
+  function abrir(pront) {
+    var l = LEITOS.filter(function (x) { return x.pront === pront; })[0]; if (!l) return;
+    registrar('abriu o leito ' + l.leito);
+    over.innerHTML = '<div class="veil" data-fechar="1"></div><aside class="drawer" role="dialog" aria-label="Leito ' + l.leito + '"><button class="x" data-fechar="1">Fechar</button><h3>' + l.leito + '</h3><p class="note">' + setNome(l.set) + ' · prontuário ' + l.pront + ' · ' + l.dias + ' dias no setor</p>' +
+      '<p>' + pill(l.selo) + '</p><dl><dt>Diagnóstico</dt><dd>' + esc(l.dx) + '</dd><dt>O que segura</dt><dd>' + esc(l.pend) + '</dd><dt>Ação</dt><dd>' + esc(l.acao) + '</dd><dt>Quem age</dt><dd>' + esc(l.dep) + '</dd></dl>' +
+      '<p class="note" style="margin-top:18px">Últimos 3 dias</p><div class="hist">' + l.hist.map(pill).join('<span class="note">→</span>') + '</div>' +
+      (st.perfil === 'medico' ? '<p class="note" style="margin-top:18px">Como médico de referência você pode corrigir o selo; a correção vale para a próxima rodada e vira aprendizado.</p>' : '') + '</aside>';
+    var x = over.querySelector('.x'); if (x) x.focus();
+  }
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-tela]'); if (t) { st.tela = t.getAttribute('data-tela'); registrar('abriu ' + TELAS[st.tela]); desenhar(); window.scrollTo(0, 0); return; }
+    var s = e.target.closest('[data-set]'); if (s) { if (PERFIS[st.perfil].telas.indexOf('leitos') >= 0) { st.fSet = s.getAttribute('data-set'); st.fSelo = ''; st.tela = 'leitos'; registrar('abriu Leito a leito (' + setNome(st.fSet) + ')'); desenhar(); } return; }
+    var c = e.target.closest('[data-selo]'); if (c) { st.fSelo = c.getAttribute('data-selo'); desenhar(); return; }
+    var p = e.target.closest('[data-p]'); if (p) { abrir(p.getAttribute('data-p')); return; }
+    if (e.target.closest('[data-fechar]')) { over.innerHTML = ''; }
+  });
+  document.addEventListener('change', function (e) {
+    if (e.target.id === 'perfil') { st.perfil = e.target.value; st.fSet = ''; st.fSelo = ''; st.fDep = ''; registrar('entrou no sistema'); desenhar(); }
+    if (e.target.id === 'f-set') { st.fSet = e.target.value; desenhar(); }
+    if (e.target.id === 'f-dep') { st.fDep = e.target.value; desenhar(); }
+  });
+  document.addEventListener('input', function (e) { if (e.target.id === 'f-busca') { st.busca = e.target.value; var pos = e.target.selectionStart; desenhar(); var i = document.getElementById('f-busca'); if (i) { i.focus(); try { i.setSelectionRange(pos, pos); } catch (er) {} } } });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') over.innerHTML = ''; });
+  desenhar();
+})();
+</script>
+</body>
+</html>
