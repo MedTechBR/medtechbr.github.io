@@ -50,7 +50,7 @@ const APPS = {
   trafegotitulo: { nm: 'TráfegoTítulo', ic: 'ti-car', c: '#23272E', url: '/trafego-titulo/' },
   /* farmácia (linha provas, publico "farmacia" no planos.json) */
   farmauti: { nm: 'FarmaUTI', ic: 'ti-pill', c: '#4545D8', url: '/farmauti/' },
-  enarefarmacia: { nm: 'Banca ENARE Farmácia', ic: 'ti-vaccine-bottle', c: '#0A3F3B', url: '/quiz-enare-farmacia/' },
+  enarefarmacia: { nm: 'AprovaFarma', ic: 'ti-vaccine-bottle', c: '#0A3F3B', url: '/quiz-enare-farmacia/' },
   sosfarmacia: { nm: 'SOS Farmácia Comercial', ic: 'ti-first-aid-kit', c: '#C8373C', url: '/sos-farmacia/' },
   /* enfermagem (linha provas, publico "enfermagem"); com a farmácia = linha MedTech Multi */
   enfermare: { nm: 'Enfermare', ic: 'ti-droplet', c: '#B0306A', url: '/enfermare/' },
@@ -1525,7 +1525,7 @@ const SI_APP = {
   clinicamed: { nm: 'ClínicaMed', c: '#0B6A72', repo: 'MedTechBR/clinicamed', base: '/clinicamed/', fmt: 'padrao', reordena: true, arq: [['banco.js', 'BANCO']], onde: ONDE_LEVAS, publico: 'prova de título (TECM) e residência em Clínica Médica' },
   cirurgiamed: { nm: 'CirurgiaMed', c: '#33479E', repo: 'MedTechBR/cirurgiamed', base: '/cirurgiamed/', fmt: 'padrao', reordena: true, arq: [['banco.js', 'BANCO']], onde: ONDE_LEVAS, publico: 'Cirurgia Geral (prova de título e ENARE R+ cirúrgico)' },
   flashmed: { nm: 'FlashMed', c: '#A86D12', repo: 'MedTechBR/flashmed', base: '/flashmed/', fmt: 'padrao', reordena: true, peso: 'cerca de 10 MB', arq: [['banco.js', 'BANCO']], onde: ONDE_LEVAS + '; questão importada de outro app (campo orig) se corrige no app de origem e se reimporta com importa.py', publico: 'preparatório ENARE e ENAMED (residência médica, acesso direto)' },
-  'quiz-enare-farmacia': { nm: 'Banca ENARE Farmácia', c: '#0F766E', repo: 'MedTechBR/quiz-enare-farmacia', base: '/quiz-enare-farmacia/', fmt: 'enare', arq: [['banco_edital.js', 'BANCO_EDITAL'], ['simulados.js', 'SIMULADOS']], onde: 'banco_edital.js (banco) e simulados.js (provas reais na íntegra); os simulados diários reaproveitam o banco', publico: 'residência multiprofissional em Farmácia (ENARE)' },
+  'quiz-enare-farmacia': { nm: 'AprovaFarma', c: '#0F766E', repo: 'MedTechBR/quiz-enare-farmacia', base: '/quiz-enare-farmacia/', fmt: 'enare', arq: [['banco_edital.js', 'BANCO_EDITAL'], ['simulados.js', 'SIMULADOS']], onde: 'banco_edital.js (banco) e simulados.js (provas reais na íntegra); os simulados diários reaproveitam o banco', publico: 'residência multiprofissional em Farmácia (ENARE)' },
   farmauti: { nm: 'FarmaUTI', c: '#B4235A', repo: 'MedTechBR/farmauti', base: '/farmauti/', fmt: 'farmauti', arq: [['dados/estudo.js', 'FU_ESTUDO']], onde: 'lotes/*.json, montado por monta.py em dados/estudo.js', publico: 'residência de Farmácia em terapia intensiva' },
   enfermare: { nm: 'Enfermare', c: '#B0306A', repo: 'MedTechBR/enfermare', base: '/enfermare/', fmt: 'padrao', reordena: true, arq: [['banco.js', 'BANCO']], onde: ONDE_LEVAS, publico: 'Enfermagem: residência multiprofissional (ENARE), concursos (EBSERH) e títulos de especialista' },
   fisiare: { nm: 'Fisiare', c: '#0B7A64', repo: 'MedTechBR/fisiare', base: '/fisiare/', fmt: 'padrao', reordena: true, arq: [['banco.js', 'BANCO']], onde: ONDE_LEVAS, publico: 'Fisioterapia: residência multiprofissional (ENARE), concursos (EBSERH e outros) e título de especialista (COFFITO)' },

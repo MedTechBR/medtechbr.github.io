@@ -160,7 +160,7 @@ function injectCSS() {
 /* LINHAS DE PRODUTO (decisão do Matheus, 07/09/2026): cada app pertence a uma linha e o trocador,
    o botão de início e o portal só mostram a própria linha. Público diferente não se mistura —
    quem estuda para o TECM não vê ambulatório; quem atende não vê prova. Farmácia voltou em 10/10/2026
-   para ser vendida (FarmaUTI, Banca ENARE Farmácia e SOS Farmácia Comercial, na linha Provas por causa do retorno do pagamento),
+   para ser vendida (FarmaUTI, AprovaFarma e SOS Farmácia Comercial, na linha Provas por causa do retorno do pagamento),
    mas fica fora do padrão dos médicos; institucional não entra no
    PWA (vendido por contrato). Catálogo enxugado em 07/10/2026: EnfermarIA, Logbook, AltaEnf, Guia do
    Interno, MedProvas e Foco descontinuados; ATBguia, CalcMed e PocusAI passaram para dentro do CondutAI. */
@@ -180,7 +180,7 @@ const MT_FUNCS = [
   { id:'trafegotitulo', nm:'TráfegoTítulo', ic:'ti-car',       c:'#23272E', url:'/trafego-titulo/', linha:'provas' },
   /* farmácia (10/10/2026): vendidos na linha Provas, fora do padrão dos médicos (só aparecem para quem os escolhe ou compra) */
   { id:'farmauti',      nm:'FarmaUTI',      ic:'ti-pill',      c:'#4545D8', url:'/farmauti/',       linha:'provas' },
-  { id:'enarefarmacia', nm:'ENARE Farmácia', ic:'ti-vaccine-bottle',    c:'#0A3F3B', url:'/quiz-enare-farmacia/', linha:'provas' },
+  { id:'enarefarmacia', nm:'AprovaFarma', ic:'ti-vaccine-bottle',    c:'#0A3F3B', url:'/quiz-enare-farmacia/', linha:'provas' },
   { id:'sosfarmacia',   nm:'SOS Farmácia',  ic:'ti-first-aid-kit',     c:'#C8373C', url:'/sos-farmacia/',  linha:'provas' },
   /* enfermagem (14/10/2026): com os de farmácia formam a linha MedTech Multi da vitrine; mesma regra deles */
   { id:'enfermare',     nm:'Enfermare',     ic:'ti-droplet',           c:'#B0306A', url:'/enfermare/',     linha:'provas' },
