@@ -2708,13 +2708,13 @@ const EQ_AREAS = {
   atendente: { nm: 'Atendente', ic: 'ti-message-chatbot', desc: 'Responde os clientes no WhatsApp na hora e passa para você o que não for dúvida comum.' },
   operacoes: { nm: 'Operações', ic: 'ti-settings-automation', desc: 'Questões sinalizadas, pagamentos para revisar, erros do servidor e clientes esperando. Às segundas, o que melhorar.' },
   financeiro: { nm: 'Financeiro', ic: 'ti-cash', desc: 'Vendas, reembolsos, contestações, recusas com o motivo e planos anuais vencendo. Nunca mexe em dinheiro.' },
-  instagram: { nm: 'Instagram', ic: 'ti-brand-instagram', desc: 'Responde comentários e mensagens, monta o post do dia para você aprovar aqui e publica às 12h depois da aprovação.' },
+  instagram: { nm: 'Instagram', ic: 'ti-brand-instagram', desc: 'Responde comentários e mensagens, monta o post do dia (com story) para você aprovar e publica às 12h. Mede os resultados, lê o nicho aos domingos e deixa roteiros de Reels às terças e sextas.' },
   conteudo: { nm: 'Curador', ic: 'ti-books', desc: 'Busca na internet toda semana diretrizes e normas novas e propõe a correção das questões e leituras de todos os apps.' },
   email: { nm: 'E-mail', ic: 'ti-mail', desc: 'Lê o contato@medtechbr.com.br a cada 15 min: escreve a resposta dos clientes para você aprovar e avisa o que as plataformas pedirem.' },
   diretoria: { nm: 'Diretoria', ic: 'ti-crown', desc: 'Conversa com você no WhatsApp e manda o resumo das 7h.' }
 };
-const PEND_COM_TEXTO = ['sinal_resposta', 'ig_comentario', 'ig_dm', 'email_resposta', 'ig_diario'];
-const rotTexto = p => p.tipo === 'ig_dm' ? 'Sua resposta' : p.tipo === 'ig_diario' ? 'Legenda (pode editar)' : 'Texto que vai sair (pode editar)';
+const PEND_COM_TEXTO = ['sinal_resposta', 'ig_comentario', 'ig_dm', 'email_resposta', 'ig_diario', 'ig_reel'];
+const rotTexto = p => p.tipo === 'ig_dm' ? 'Sua resposta' : p.tipo === 'ig_diario' ? 'Legenda (pode editar)' : p.tipo === 'ig_reel' ? 'Legenda pronta para o Reel (pode editar e copiar)' : 'Texto que vai sair (pode editar)';
 /* Prévia das artes de uma pendência (post diário do Instagram, 14/10/2026): miniaturas em rolagem
    horizontal; o clique abre a imagem em tamanho real numa aba nova. */
 function previaImagens(p, max) {
@@ -2759,8 +2759,8 @@ function desenharEquipe() {
     const ult = ct.ultima ? `<p class="eq-ult"><b>${esc(ct.ultima.acao)}</b> ${esc(haQuanto(ct.ultima.em))}<br>${esc(String(ct.ultima.detalhe || '').slice(0, 120))}</p>` : '<p class="eq-ult">Nada registrado ainda.</p>';
     const bt = st.liga === undefined ? '' : `<button class="btn btn-g sm" type="button" data-eqliga="${a}" data-v="${st.liga ? 1 : 0}">${st.liga ? (a === 'atendente' ? 'Retomar' : 'Ligar') : (a === 'atendente' ? 'Pausar' : 'Desligar')}</button>`;
     return `<article class="card eq-card" data-area="${a}"><div class="eq-topo"><span class="eq-ic"><i class="ti ${m.ic}" aria-hidden="true"></i></span><div class="eq-nm"><h3>${m.nm}</h3><span class="selo ${st.cls}">${st.t}</span></div><div class="eq-num"><b>${inteiro(ct.h24 || 0)}</b><span>24 h</span></div></div>
-      <p class="sub">${m.desc}</p>${ult}<div class="eq-acoes">${bt}${a === 'conteudo' ? '<button class="btn btn-g sm" type="button" data-eqcur>Buscar agora</button>' : ''}${a === 'instagram' ? `<button class="btn btn-g sm" type="button" data-eqpost>Gerar post de hoje</button><button class="btn btn-g sm" type="button" data-eqdiario="${(q.config || {}).conteudo_diario === false ? 1 : 0}">${(q.config || {}).conteudo_diario === false ? 'Ligar post diário' : 'Desligar post diário'}</button>` : ''}<button class="btn btn-g sm" type="button" data-eqver="${a}">Ver atividade</button></div></article>`;
-  }).join('') + `<p class="leg eq-turno">Último turno: ${esc(q.turno_em ? quando(q.turno_em) : 'ainda não rodou')}${q.atendente.teste_dono ? ' · seu WhatsApp está no modo teste da atendente' : ''}</p>`;
+      <p class="sub">${m.desc}</p>${ult}<div class="eq-acoes">${bt}${a === 'conteudo' ? '<button class="btn btn-g sm" type="button" data-eqcur>Buscar agora</button>' : ''}${a === 'instagram' ? `<button class="btn btn-g sm" type="button" data-eqpost>Gerar post de hoje</button><button class="btn btn-g sm" type="button" data-eqig="igReel">Roteiro de Reel</button><button class="btn btn-g sm" type="button" data-eqdiario="${(q.config || {}).conteudo_diario === false ? 1 : 0}">${(q.config || {}).conteudo_diario === false ? 'Ligar post diário' : 'Desligar post diário'}</button>` : ''}<button class="btn btn-g sm" type="button" data-eqver="${a}">Ver atividade</button></div></article>`;
+  }).join('') + igResultados(q) + `<p class="leg eq-turno">Último turno: ${esc(q.turno_em ? quando(q.turno_em) : 'ainda não rodou')}${q.atendente.teste_dono ? ' · seu WhatsApp está no modo teste da atendente' : ''}</p>`;
   const c = q.config || {};
   document.querySelectorAll('#eqAvisos [data-avisos]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.avisos === c.avisos)));
   $('eqResumo').checked = c.resumo !== false;
@@ -2786,7 +2786,7 @@ function desenharPendencias() {
       <div class="eq-topo"><span class="eq-ic"><i class="ti ${a.ic}" aria-hidden="true"></i></span><div><h3>${esc(p.titulo)}</h3><span class="selo ac">${esc(a.nm)}</span> <span class="sub">${esc(p.id)} · ${esc(p.criada)}</span></div></div>
       ${previaImagens(p)}
       <pre class="eq-det">${esc(p.detalhe || '')}</pre>
-      ${txt ? `<div class="campo"><label for="eqt_${esc(p.id)}">${rotTexto(p)}</label><textarea id="eqt_${esc(p.id)}" rows="${p.tipo === 'ig_diario' ? 8 : 3}" maxlength="${p.tipo === 'ig_diario' ? 2200 : 900}">${esc(valor)}</textarea></div>` : ''}
+      ${txt ? `<div class="campo"><label for="eqt_${esc(p.id)}">${rotTexto(p)}</label><textarea id="eqt_${esc(p.id)}" rows="${p.tipo === 'ig_diario' || p.tipo === 'ig_reel' ? 8 : 3}" maxlength="${p.tipo === 'ig_diario' ? 2200 : 900}">${esc(valor)}</textarea></div>` : ''}
       <div class="eq-acoes"><button class="btn btn-p sm" type="button" data-eqdec="1">${rotAprovar(p)}</button>
       <button class="btn btn-g sm" type="button" data-eqdec="0">Recusar</button></div></article>`;
   }).join('');
@@ -2850,6 +2850,14 @@ $('equipe').addEventListener('click', async ev => {
     return;
   }
   if (t.dataset.eqpost !== undefined) return gerarPostDoDia(t);
+  if (t.dataset.eqig) return rodarIg(t, t.dataset.eqig);
+  if (t.dataset.eqigcfg) {
+    const campo = t.dataset.eqigcfg, ligar = t.dataset.v === '1';
+    t.disabled = true;
+    try { await equipeOp({ op: 'config', campos: { [campo]: ligar } }); toast((campo === 'ig_stories' ? 'Story do post diário ' : 'Roteiros de Reels ') + (ligar ? 'ligados.' : 'desligados.')); carregarEquipe(); }
+    catch (e) { toast(e.message, 'err'); t.disabled = false; }
+    return;
+  }
   if (t.dataset.eqdiario !== undefined) {
     const ligar = t.dataset.eqdiario === '1';
     if (!ligar && !(await confirmar('Desligar o post diário?', 'O post das 6h deixa de ser montado. Você ainda pode gerar pelo botão.', 'Desligar', true))) return;
@@ -2901,6 +2909,36 @@ async function gerarPostDoDia(b) {
     carregarEquipe();
   } catch (e) { toast(ehNaoPublicado(e) ? 'Falta publicar o servidor (deploy-backend.command).' : ((e && e.message) || 'Não consegui montar o post.'), 'err'); }
 }
+/* Instagram: resultados (16/10/2026). O que funcionou no perfil (resumo das segundas, com números),
+   as lições do nicho (benchmark de domingo, só formato) e os botões para rodar cada parte agora. */
+const listaIg = t => { const l = String(t || '').split('\n').map(x => x.replace(/^-\s*/, '').trim()).filter(Boolean); return l.length ? `<ul class="eq-igl">${l.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''; };
+function igResultados(q) {
+  const r = q.ig_resultados || {}, c = q.config || {};
+  const res = r.resultados, ni = r.nicho, met = r.metricas;
+  const avisos = [];
+  if (!q.instagram_ativo) avisos.push('O Instagram ainda não está ligado à Meta: nada é medido nem publicado.');
+  if (r.sem_insights) avisos.push('O token não tem a permissão instagram_manage_insights: as métricas usam só curtidas e comentários (sem alcance e salvamentos).');
+  if (r.stories_bloqueado) avisos.push('A API recusou o story (' + String(r.stories_motivo || '').slice(0, 120) + '). O post do feed sai normalmente; nova tentativa em 7 dias.');
+  const cfg = (campo, nome) => `<button class="btn btn-g sm" type="button" data-eqigcfg="${campo}" data-v="${c[campo] === false ? 1 : 0}">${c[campo] === false ? 'Ligar ' + nome : 'Desligar ' + nome}</button>`;
+  return `<section class="card eq-igres" data-area="instagram" aria-labelledby="eqIgResT"><div class="eq-topo"><span class="eq-ic"><i class="ti ti-chart-line" aria-hidden="true"></i></span><div class="eq-nm"><h3 id="eqIgResT">Instagram: resultados</h3><span class="sub">${met ? esc(inteiro(met.posts)) + ' posts medidos ' + esc(haQuanto(met.em)) + (met.seguidores ? ' · ' + esc(inteiro(met.seguidores)) + ' seguidores' : '') : 'Ainda não medido'}</span></div></div>
+    ${avisos.map(a => `<p class="eq-igav"><i class="ti ti-alert-triangle" aria-hidden="true"></i>${esc(a)}</p>`).join('')}
+    <div class="eq-igcols"><div><h4>No nosso perfil</h4>${res ? listaIg(res.texto) + `<p class="sub">Resumo de ${esc(quando(res.em))}</p>` : '<p class="sub">O resumo sai às segundas, 5h30, depois de alguns posts medidos.</p>'}</div>
+    <div><h4>No nicho (só formato)</h4>${ni && ni.texto ? listaIg(ni.texto) : '<p class="sub">O benchmark sai aos domingos, 5h30.</p>'}${ni ? `<p class="sub">${esc(inteiro(ni.lidas))} de ${esc(inteiro(ni.total))} perfis lidos em ${esc(quando(ni.em))}${(ni.falhas || []).length ? ' · sem leitura: ' + esc(ni.falhas.join(', ')) : ''}</p>` : ''}</div></div>
+    <div class="eq-acoes"><button class="btn btn-g sm" type="button" data-eqig="igMetricas">Medir agora</button><button class="btn btn-g sm" type="button" data-eqig="igBenchmark">Ler o nicho agora</button>${cfg('ig_stories', 'story')}${cfg('ig_reels', 'roteiros de Reels')}</div></section>`;
+}
+async function rodarIg(b, op) {
+  const rot = b.textContent;
+  b.disabled = true; b.textContent = op === 'igReel' ? 'Escrevendo… (até 3 min)' : op === 'igBenchmark' ? 'Lendo… (até 5 min)' : 'Medindo…';
+  try {
+    const r = await equipeOp({ op });
+    if (r && r.erro) { toast(r.erro, 'err'); return; }
+    if (op === 'igReel') toast('Roteiro pronto: ' + ((r && r.titulo) || 'veja em Para você decidir') + '.');
+    else if (op === 'igBenchmark') toast(`Nicho: ${r.lidas} de ${r.total} perfis lidos, ${r.licoes.length} lição(ões).`);
+    else toast(`Medidos ${(r.coleta && r.coleta.posts) || 0} posts${r.coleta && r.coleta.semPermissao ? ' (sem alcance: falta permissão de insights)' : ''}.`);
+    carregarEquipe();
+  } catch (e) { toast(ehNaoPublicado(e) ? 'Falta publicar o servidor (deploy-backend.command).' : ((e && e.message) || 'Não rodou.'), 'err'); }
+  finally { b.disabled = false; b.textContent = rot; }
+}
 /* Aprova ou recusa uma pendência; devolve true se o servidor fez. */
 async function decidirPend(id, aprovar, texto) {
   const p = ((E.eq && E.eq.pendencias) || []).find(x => x.id === id) || {};
@@ -2914,7 +2952,7 @@ async function decidirPend(id, aprovar, texto) {
     return true;
   } catch (e) { toast(e.message, 'err'); return false; }
 }
-const rotAprovar = p => p.tipo === 'ig_semana' || p.tipo === 'ig_diario' ? 'Aprovar e agendar' : p.tipo === 'info' ? 'Ok, visto' : p.tipo === 'conteudo_diretriz' ? 'Aprovar e corrigir' : 'Aprovar e enviar';
+const rotAprovar = p => p.tipo === 'ig_semana' || p.tipo === 'ig_diario' ? 'Aprovar e agendar' : p.tipo === 'ig_reel' ? 'Vou gravar' : p.tipo === 'info' ? 'Ok, visto' : p.tipo === 'conteudo_diretriz' ? 'Aprovar e corrigir' : 'Aprovar e enviar';
 /* Abre uma pendência num diálogo (a partir da Visão geral). */
 function abrirPend(id) {
   const p = ((E.eq && E.eq.pendencias) || []).find(x => x.id === id);
@@ -2922,7 +2960,7 @@ function abrirPend(id) {
   const a = EQ_AREAS[p.area] || { nm: p.area };
   const txt = PEND_COM_TEXTO.includes(p.tipo);
   const corpo = `<p class="sub">${esc(a.nm)} · ${esc(p.id)} · ${esc(p.criada)}</p>${previaImagens(p)}<pre class="eq-det">${esc(p.detalhe || '')}</pre>`
-    + (txt ? `<div class="campo"><label for="dlgPendTx">${rotTexto(p)}</label><textarea id="dlgPendTx" rows="${p.tipo === 'ig_diario' ? 8 : 5}" maxlength="5000">${esc((p.proposta && p.proposta.texto) || '')}</textarea></div>` : '');
+    + (txt ? `<div class="campo"><label for="dlgPendTx">${rotTexto(p)}</label><textarea id="dlgPendTx" rows="${p.tipo === 'ig_diario' || p.tipo === 'ig_reel' ? 8 : 5}" maxlength="5000">${esc((p.proposta && p.proposta.texto) || '')}</textarea></div>` : '');
   dialogo(p.titulo, corpo, [
     { rot: 'Recusar', cls: 'btn-g', acao: async () => { const ok = await decidirPend(id, false, ''); return ok; } },
     { rot: rotAprovar(p), cls: 'btn-p', acao: async () => { const ta = $('dlgPendTx'); return decidirPend(id, true, ta ? ta.value.trim() : ''); } }
