@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Celeris</title>
 <meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f6b5a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Celeris">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icone-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
@@ -101,6 +109,10 @@ tr.go { cursor: pointer; } tr.go:hover td { background: var(--soft); }
 .chip[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
 :focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
 .tabbar { display: none; }
+.inst { display: flex; align-items: center; gap: 12px; background: var(--brand-soft); color: var(--brand); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; font-weight: 600; flex-wrap: wrap; }
+.inst button { border: 0; background: var(--brand); color: var(--brand-ink); border-radius: 9px; padding: 7px 14px; font-weight: 700; cursor: pointer; }
+.inst .x2 { background: none; color: var(--brand); padding: 7px 8px; }
+@media (display-mode: standalone) { .demo { display: none; } }
 @media (max-width: 1100px) { .k5 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 900px) {
   .app { grid-template-columns: 1fr; } nav.side { display: none; }
@@ -118,7 +130,7 @@ tr.go { cursor: pointer; } tr.go:hover td { background: var(--soft); }
 <div class="app">
   <nav class="side" aria-label="Seções">
     <div class="logo">
-      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="9" fill="var(--brand)"/><path d="M24 11.5a8.5 8.5 0 1 0 0 11" fill="none" stroke="var(--brand-ink)" stroke-width="3" stroke-linecap="round"/><path d="M20.5 22.5h4v4" fill="none" stroke="var(--brand-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <img src="icone-192.png" width="34" height="34" alt="" style="border-radius:9px">
       <div><b>Celeris</b><small>Eficiência hospitalar</small></div>
     </div>
     <div id="nav"></div>
@@ -415,6 +427,26 @@ tr.go { cursor: pointer; } tr.go:hover td { background: var(--soft); }
     return h;
   };
 
+  /* ================= PWA: instalar na tela de início ================= */
+  var promptInst = null, fechouInst = false;
+  try { fechouInst = localStorage.getItem('celeris-inst-fechado') === '1'; } catch (e) {}
+  var standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+  var ios = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); promptInst = e; desenhar(); });
+  window.addEventListener('appinstalled', function () { promptInst = null; standalone = true; desenhar(); });
+  function instalarHTML() {
+    if (standalone || fechouInst) return '';
+    if (promptInst) return '<div class="inst">Instale o Celeris na tela de início para abrir como aplicativo.<button id="b-inst">Instalar</button><button class="x2" id="b-inst-x" aria-label="Fechar aviso">Agora não</button></div>';
+    if (ios) return '<div class="inst">No iPhone: toque em Compartilhar e depois em "Adicionar à Tela de Início".<button class="x2" id="b-inst-x" aria-label="Fechar aviso">Entendi</button></div>';
+    return '';
+  }
+  document.addEventListener('click', function (e) {
+    if (e.target.id === 'b-inst' && promptInst) { promptInst.prompt(); promptInst.userChoice.then(function () { promptInst = null; desenhar(); }); }
+    if (e.target.id === 'b-inst-x') { fechouInst = true; try { localStorage.setItem('celeris-inst-fechado', '1'); } catch (er) {} desenhar(); }
+  });
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') { window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); }); }
+  try { if (standalone && !localStorage.getItem('celeris-demo')) st.perfil = 'direcao'; } catch (e) {}   // aberto como app: entra na visão da direção
+
   /* ================= montagem ================= */
   var main = document.getElementById('main'), tip = document.getElementById('tip');
   function desenhar() {
@@ -427,7 +459,7 @@ tr.go { cursor: pointer; } tr.go:hover td { background: var(--soft); }
     var opts = Object.keys(PERFIS).map(function (k) { return '<option value="' + k + '"' + (st.perfil === k ? ' selected' : '') + '>' + PERFIS[k].nome + '</option>'; }).join('');
     var temJan = ['eficiencia', 'setor', 'emergencia', 'cirurgia', 'desempenho'].indexOf(st.tela) >= 0;
     var titulo = st.tela === 'setor' ? 'Setores · ' + S(st.setor).nome : TELAS[st.tela];
-    main.innerHTML = '<div class="demo">Protótipo de demonstração · hospital, pacientes e números fictícios</div>' +
+    main.innerHTML = instalarHTML() + '<div class="demo">Protótipo de demonstração · hospital, pacientes e números fictícios</div>' +
       '<div class="top"><div class="grow"><h1>' + titulo + '</h1><div class="meta">Hospital Modelo · atualizado às 06:42 pela rodada da madrugada</div></div>' +
       (temJan ? '<div class="seg" role="group" aria-label="Período">' + [30, 60, 90].map(function (j) { return '<button data-jan="' + j + '" aria-pressed="' + (st.jan === j) + '">' + j + ' dias</button>'; }).join('') + '</div>' : '') +
       '<div class="ctl"><label for="perfil">Ver como</label><select id="perfil">' + opts + '</select></div></div>' +
