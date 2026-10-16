@@ -654,7 +654,7 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
       card(null, 'Por caráter', 'Cirurgias no mês', '<div class="chart" id="ch-car" style="height:' + (CC.salas.length * 38 + 24) + 'px"></div>', 's6') + '</div>';
     h += '<div class="g c12 mt">' +
       card(null, 'Ocupação das salas', 'Percentual do tempo de sala eletiva usado, por dia', '<div class="chart" id="ch-ocsala"></div>', 's7') +
-      card(null, 'As duas contagens', 'Procedimentos por mês: registrados no sistema × contados no contrato', '<div class="chart" id="ch-duas"></div>', 's5') + '</div>';
+      card(null, 'Procedimentos por mês', 'Realizados, registrados no sistema · *outubro até ontem', '<div class="chart" id="ch-proc"></div>', 's5') + '</div>';
     POS.push(function () {
       spark('sp-cc1', CC.diaD.slice(-60), hexa('--brand')); spark('sp-cc2', CC.salaD.slice(-60), hexa('--info')); spark('sp-cc3', CC.suspD.slice(-60), hexa('--crit'));
       montar('ch-cal', { tooltip: { confine: true, formatter: function (p) { return p.value[0].split('-').reverse().join('/') + ': <b>' + p.value[1] + ' cirurgias</b>'; } },
@@ -666,9 +666,9 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
       var o3 = base(); o3.xAxis = eixoX(rotsPer()); o3.yAxis = eixoY('{value}%', 40);
       o3.series = [linha('Ocupação de sala', fat(CC.salaD), hexa('--info'), { areaStyle: area(hexa('--info')), markLine: linhaMeta(82, 'meta 82%') })];
       montar('ch-ocsala', o3);
-      var o4 = base(); o4.xAxis = eixoX(['mai', 'jun', 'jul', 'ago', 'set'], true); o4.yAxis = eixoY('{value}'); o4.legend.data = ['Sistema', 'Contrato']; o4.tooltip.axisPointer = { type: 'shadow' };
-      o4.series = [{ name: 'Sistema', type: 'bar', data: [1154, 1212, 1217, 1322, 1303], itemStyle: { color: hexa('--brand'), borderRadius: [5, 5, 0, 0] } }, { name: 'Contrato', type: 'bar', data: [873, 839, 830, 979, '-'], itemStyle: { color: hexa('--muted'), borderRadius: [5, 5, 0, 0] } }];
-      montar('ch-duas', o4);
+      var o4 = base(); o4.legend.show = false; o4.xAxis = eixoX(['mai', 'jun', 'jul', 'ago', 'set', 'out*'], true); o4.yAxis = eixoY('{value}'); o4.tooltip.axisPointer = { type: 'shadow' };
+      o4.series = [{ name: 'Procedimentos realizados', type: 'bar', barWidth: '52%', data: [1154, 1212, 1217, 1322, 1303, Math.round(mes * 1.46)].map(function (v, k) { return { value: v, itemStyle: { color: k === 5 ? hexa('--brand2') : hexa('--brand'), opacity: k === 5 ? .6 : 1, borderRadius: [6, 6, 0, 0] } }; }), label: { show: true, position: 'top', formatter: function (q) { return br(q.value); }, color: cor('--ink'), fontWeight: 600 } }];
+      montar('ch-proc', o4);
     });
     return h;
   };
