@@ -170,6 +170,14 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
 .bed:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
 .bed .n { font: 700 13px var(--f-data); }
 .bed .d { font-size: 11.5px; font-weight: 600; opacity: .85; }
+.bed .pc { position: absolute; right: 5px; bottom: 5px; font: 700 10px/1 var(--f-data); color: #fff; border-radius: 5px; padding: 3px 4px; }
+.pc-l { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 5px; color: #fff; font: 700 11px/1 var(--f-data); vertical-align: -3px; }
+.prevg { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 8px; }
+.prevg > div { background: var(--panel2); border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; }
+.prevg span { font-size: 11.5px; font-weight: 700; color: var(--muted); line-height: 1.2; }
+.prevg b { font: 700 20px var(--f-display); font-variant-numeric: tabular-nums; }
+.prevg small { font-size: 12px; color: var(--muted); }
+.rbar { display: block; height: 6px; border-radius: 6px; background: var(--grid); overflow: hidden; } .rbar i { display: block; height: 100%; }
 .bed .al { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--crit); box-shadow: 0 0 0 2px var(--panel); }
 .bed.free { background: transparent; border: 1px dashed var(--line); color: var(--muted); }
 .b-ok { background: var(--ok-soft); color: var(--ok); } .b-br { background: var(--brand-soft); color: var(--brand); } .b-crit { background: var(--crit-soft); color: var(--crit); }
@@ -273,6 +281,8 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
     alert: '<path d="M10.3 4.9a2 2 0 0 1 3.4 0l7.4 12.6a2 2 0 0 1-1.7 3H4.6a2 2 0 0 1-1.7-3z"/><path d="M12 9.8v4.2M12 17.1v.2"/>',
     perf: '<path d="M4 20h16"/><rect x="5" y="12" width="3.4" height="5.5" rx="1.5"/><rect x="10.3" y="8" width="3.4" height="9.5" rx="1.5"/><rect x="15.6" y="4.5" width="3.4" height="13" rx="1.5"/>',
     lock: '<rect x="4.5" y="10.5" width="15" height="10" rx="3.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/><path d="M12 14.5v2"/>',
+    atm: '<path d="M10.6 20.4a4.9 4.9 0 0 1-7-7l6.1-6.1a4.9 4.9 0 0 1 7 7z"/><path d="m6.7 10.3 7 7"/><circle cx="18.3" cy="5.7" r="2.2"/>',
+    equipe: '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19.5c.8-3.3 3-5.2 5.5-5.2s4.7 1.9 5.5 5.2"/><circle cx="16.9" cy="9.3" r="2.5"/><path d="M15.6 14.3c2.4-.3 4.3 1.3 5 4.4"/>',
     mais: '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
     sol: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>',
     lua: '<path d="M20 14.5A8 8 0 1 1 9.5 4 6.5 6.5 0 0 0 20 14.5z"/>',
@@ -373,6 +383,97 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
   var PAINEL = { acerto: walk(N, 52, 11, .12, 25, 82), escape: walk(N, 34, 11, -.1, 8, 60), andaram: walk(N, 62, 9, .05, 38, 86) };
   var TEV = SET.map(function (s) { var ind = Math.round(s.cap * .5); return [ind, Math.round(ind * (.6 + rnd() * .35))]; });
   var CREAT = [[1.1, 1.3, 1.6, 2.0, 2.3], [0.9, 1.0, 1.2, 1.5, 1.8], [1.4, 1.5, 1.5, 1.9, 2.6], [1.0, 1.0, 1.1, 1.3, 1.6]];
+
+  /* ----- equipe: classificação de pacientes e dimensionamento de enfermagem -----
+     Gerador próprio para não mudar a sequência dos dados das outras telas (prints e vídeos da apresentação). */
+  var seedEq = 70417;
+  function rq() { seedEq = (seedEq * 1103515245 + 12345) % 2147483648; return seedEq / 2147483648; }
+  var CAT = [ // Sistema de Classificação de Pacientes · horas de enfermagem por paciente nas 24 h e % mínimo de enfermeiros
+    { k: 'min', nome: 'Cuidado mínimo', h: 4, enf: 33, faixa: [9, 14], cor: '#7fcfae' },
+    { k: 'int', nome: 'Intermediário', h: 6, enf: 33, faixa: [15, 20], cor: '#2fa58a' },
+    { k: 'alta', nome: 'Alta dependência', h: 10, enf: 36, faixa: [21, 26], cor: '#e0a33a' },
+    { k: 'semi', nome: 'Semi-intensivo', h: 10, enf: 42, faixa: [27, 31], cor: '#e0703e' },
+    { k: 'ti', nome: 'Intensivo', h: 18, enf: 52, faixa: [32, 36], cor: '#c0352b' }
+  ];
+  var JORNADA = { 30: .2683, 36: .2236, 40: .2013, 44: .1830 }; // KM = 7 × 1,15 ÷ jornada semanal (IST de 15%), Parecer Normativo COFEN 1/2024
+  var MIX = { CM: [.18, .38, .24, .15, .05], CIR: [.35, .38, .15, .09, .03], ORT: [.2, .4, .3, .08, .02], UCE: [0, .1, .55, .3, .05],
+    AVC: [.1, .3, .35, .2, .05], OBS: [0, .85, .12, .03, 0], NEO: [0, .45, .25, .2, .1] }; // alojamento conjunto e RN: no mínimo intermediário
+  function catIdx(p) { var r = rq(), a = 0; for (var i = 0; i < p.length; i++) { a += p[i]; if (r < a) return i; } return p.length - 1; }
+  LEITOS.forEach(function (l) {
+    if (l.livre) return;
+    if (l.set === 'UTI') { l.nas = Math.round(Math.max(38, Math.min(118, 64 + (rq() + rq() + rq() - 1.5) * 34 + (l.selo === 'PIORA CLÍNICA' ? 18 : 0)))); l.cat = 4; l.hEnf = +(l.nas * .24).toFixed(1); return; }
+    var i = catIdx(MIX[l.set]); if (l.selo === 'PIORA CLÍNICA') i = Math.min(4, i + 1); if (l.selo === 'ALTA HOJE') i = Math.max(0, i - 1);
+    if (l.set === 'NEO') i = Math.max(1, i);
+    var f = CAT[i].faixa; l.cat = i; l.hEnf = CAT[i].h; if (l.set === 'NEO') l.dini = true; else l.fug = f[0] + Math.floor(rq() * (f[1] - f[0] + 1));
+  });
+  var ESCALA = { CM: [4, 7], CIR: [4, 7], ORT: [3, 6], UCE: [2, 5], UTI: [10, 16], AVC: [3, 4], OBS: [2, 4], NEO: [2, 5] }; // escalados hoje por turno: [enfermeiros, técnicos]
+  var QATUAL = { CM: 52, CIR: 56, ORT: 46, UCE: 36, UTI: 112, AVC: 35, OBS: 30, NEO: 38 }; // quadro de pessoal de enfermagem atual, fictício
+  var EQ_DIA = []; for (var qi = 0; qi < N; qi++) EQ_DIA.push(.9 + rq() * .07 + (qi / N) * .07);
+
+  /* ----- antimicrobianos, microbiologia e precauções (mesmo gerador próprio) ----- */
+  var ATB = { // grupo AWaRe da OMS
+    'Amoxicilina-clavulanato': 'A', 'Cefazolina': 'A', 'Ampicilina': 'A', 'Gentamicina': 'A', 'Metronidazol': 'A', 'Clindamicina': 'A', 'Sulfametoxazol-trimetoprima': 'A', 'Oxacilina': 'A',
+    'Ceftriaxona': 'W', 'Cefepima': 'W', 'Piperacilina-tazobactam': 'W', 'Meropeném': 'W', 'Vancomicina': 'W', 'Azitromicina': 'W', 'Ciprofloxacino': 'W',
+    'Polimixina B': 'R', 'Ceftazidima-avibactam': 'R', 'Linezolida': 'R' };
+  var AWARE = { A: ['Access', '#2f8a4f'], W: ['Watch', '#d97706'], R: ['Reserve', '#c0352b'] };
+  var USO = { CM: [.45, ['Ceftriaxona', 'Ceftriaxona', 'Piperacilina-tazobactam', 'Amoxicilina-clavulanato', 'Azitromicina', 'Ciprofloxacino', 'Meropeném']],
+    CIR: [.35, ['Cefazolina', 'Ceftriaxona', 'Metronidazol', 'Piperacilina-tazobactam', 'Ceftriaxona']], ORT: [.22, ['Cefazolina', 'Cefazolina', 'Clindamicina', 'Oxacilina']],
+    UCE: [.5, ['Piperacilina-tazobactam', 'Meropeném', 'Sulfametoxazol-trimetoprima', 'Ceftriaxona']], UTI: [.72, ['Meropeném', 'Piperacilina-tazobactam', 'Vancomicina', 'Polimixina B', 'Cefepima', 'Meropeném', 'Linezolida']],
+    AVC: [.2, ['Ceftriaxona', 'Amoxicilina-clavulanato']], OBS: [.12, ['Cefazolina', 'Ampicilina']], NEO: [.3, ['Ampicilina', 'Gentamicina', 'Cefepima']] };
+  var MICRO = [ // [microrganismo, perfil, precaução, antimicrobianos que cobrem, opção mais estreita, de quais esquemas descalonar]
+    ['Klebsiella pneumoniae', 'KPC', 'contato', ['Polimixina B', 'Ceftazidima-avibactam'], null, []],
+    ['Klebsiella pneumoniae', 'ESBL', 'contato', ['Meropeném'], null, []],
+    ['Escherichia coli', 'ESBL', 'contato', ['Meropeném'], null, []],
+    ['Escherichia coli', 'sensível', null, ['Ceftriaxona', 'Amoxicilina-clavulanato', 'Piperacilina-tazobactam', 'Meropeném', 'Cefepima', 'Ciprofloxacino'], 'Ceftriaxona', ['Meropeném', 'Piperacilina-tazobactam', 'Cefepima']],
+    ['Staphylococcus aureus', 'MRSA', 'contato', ['Vancomicina', 'Linezolida'], null, []],
+    ['Staphylococcus aureus', 'MSSA', null, ['Oxacilina', 'Cefazolina', 'Vancomicina', 'Linezolida', 'Piperacilina-tazobactam', 'Meropeném', 'Cefepima', 'Ceftriaxona', 'Amoxicilina-clavulanato'], 'Oxacilina', ['Vancomicina', 'Linezolida', 'Piperacilina-tazobactam', 'Meropeném', 'Cefepima']],
+    ['Pseudomonas aeruginosa', 'sensível', null, ['Piperacilina-tazobactam', 'Cefepima', 'Meropeném', 'Ciprofloxacino'], 'Cefepima', ['Meropeném']],
+    ['Acinetobacter baumannii', 'resistente a carbapenêmico', 'contato', ['Polimixina B'], null, []],
+    ['Enterococcus faecium', 'VRE', 'contato', ['Linezolida'], null, []]
+  ];
+  var MATERIAL = ['Hemocultura', 'Urocultura', 'Aspirado traqueal', 'Ponta de cateter', 'Secreção de ferida'];
+  var PREC = { contato: ['Contato', 'C', '#d97706'], goticulas: ['Gotículas', 'G', '#2459a8'], aerossois: ['Aerossóis', 'A', '#c0352b'] };
+  LEITOS.forEach(function (l) {
+    if (l.livre) return;
+    var u = USO[l.set], forca = l.selo === 'ANTIBIÓTICO' || l.causa === 'atb';
+    if (forca || rq() < u[0]) {
+      var m = /hoje D(\d+)/.exec(l.pend), dia = m ? +m[1] : 1 + Math.floor(Math.pow(rq(), 1.6) * 13), nomes = [pick2(u[1])];
+      if (l.set === 'UTI' && rq() < .32) { var gp = ['Vancomicina', 'Linezolida'], n2 = gp.indexOf(nomes[0]) >= 0 ? pick2(['Meropeném', 'Piperacilina-tazobactam', 'Polimixina B']) : pick2(['Vancomicina', 'Vancomicina', 'Polimixina B']); if (nomes.indexOf(n2) < 0 && !(n2 === 'Polimixina B' && nomes[0] === 'Polimixina B')) nomes.push(n2); }
+      var prof = nomes[0] === 'Cefazolina' && ['CIR', 'ORT', 'OBS'].indexOf(l.set) >= 0; if (prof) dia = 1 + (rq() < .5 ? 1 : 0);
+      l.atb = { nomes: nomes, dia: dia, prof: prof, lib: rq() > .3, reav: dia < 3 || rq() > .16, cult: prof || rq() > .13, fim: prof || (!/sem data de término/.test(l.pend) && (dia < 8 || rq() > .3)) };
+    }
+  });
+  function pick2(a) { return a[Math.floor(rq() * a.length)]; }
+  var CULT = [], comAtb = LEITOS.filter(function (l) { return l.atb && !l.atb.prof && ['UTI', 'CM', 'UCE', 'CIR'].indexOf(l.set) >= 0; });
+  comAtb.forEach(function (l, i) {
+    if (i % 3 !== 0) return;
+    var cob = MICRO.filter(function (m) { return l.atb.nomes.some(function (n) { return m[3].indexOf(n) >= 0; }); });
+    var mo = cob.length && rq() < .82 ? cob[Math.floor(rq() * cob.length)] : MICRO[Math.floor(rq() * MICRO.length)], h = 2 + Math.floor(rq() * 46);
+    var cobre = l.atb.nomes.some(function (n) { return mo[3].indexOf(n) >= 0; });
+    var estreita = cobre && mo[4] && l.atb.nomes.some(function (n) { return mo[5].indexOf(n) >= 0; }) ? mo[4] : null;
+    l.cult = { mo: mo[0], perfil: mo[1], material: l.set === 'UTI' ? pick2(['Hemocultura', 'Aspirado traqueal', 'Ponta de cateter']) : pick2(MATERIAL), h: h, cobre: cobre, estreita: estreita };
+    if (mo[2]) l.prec = { tipo: mo[2], motivo: mo[0] + ' ' + mo[1] };
+    CULT.push(l);
+  });
+  LEITOS.filter(function (l) { return !l.livre && !l.prec; }).forEach(function (l) {
+    var r = rq();
+    if (l.set === 'UTI' && r < .14) l.prec = { tipo: 'contato', motivo: 'Klebsiella pneumoniae KPC em swab retal de vigilância (colonização)' };
+    else if ((l.set === 'CM' || l.set === 'UCE') && r < .06) l.prec = { tipo: 'contato', motivo: 'Clostridioides difficile, toxina positiva nas fezes' };
+    else if (l.set === 'CM' && r < .11) l.prec = { tipo: 'goticulas', motivo: 'Influenza A no painel viral' };
+    else if (l.set === 'CM' && r < .135) l.prec = { tipo: 'aerossois', motivo: 'Suspeita de tuberculose pulmonar, aguarda baciloscopia' };
+  });
+  CULT.sort(function (a, b) { return a.cult.h - b.cult.h; });
+  /* ----- permanência prevista por paciente (histórico do próprio hospital, por diagnóstico) ----- */
+  var HIST_DX = {};
+  LEITOS.forEach(function (l) {
+    if (l.livre) return; var s = S(l.set);
+    if (!HIST_DX[l.dx]) { var md = Math.max(2, Math.round(s.meta * (.65 + rq() * .6))); HIST_DX[l.dx] = { med: md, p90: Math.round(md * (2 + rq() * .7)), n: 60 + Math.floor(rq() * 900) }; }
+    var hd = HIST_DX[l.dx], prev = Math.max(l.dias + .5, hd.med * (.75 + rq() * .7) + (l.selo === 'PIORA CLÍNICA' ? 3 : 0) + (l.cat >= 3 ? 2 : 0));
+    if (altas(l)) prev = l.dias + (l.selo === 'ALTA HOJE' ? 0 : 1);
+    var risco = Math.round(100 / (1 + Math.exp(-(prev - hd.p90 * .8) / (hd.med * .35))));
+    l.prev = { d: +prev.toFixed(1), lo: +Math.max(l.dias, prev * .7).toFixed(1), hi: +(prev * 1.38).toFixed(1), risco: Math.max(3, Math.min(95, risco)) };
+  });
+  var DOT_DIA = []; for (var ti = 0; ti < N; ti++) DOT_DIA.push(1.12 - .14 * ti / N + (rq() - .5) * .08);
   var PERFIS = {
     direcao: { nome: 'Direção', desc: 'Vê tudo', setores: null },
     coord: { nome: 'Coordenação · Clínica Médica', desc: 'Só o próprio setor', setores: ['CM'] },
@@ -387,21 +488,24 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
     { id: 'emg', nome: 'Emergência', ic: 'emg', cor: ['#dc2f45', '#ff7a7a'], grupo: 'Operação', perf: ['direcao', 'nac', 'medico'], per: true },
     { id: 'cir', nome: 'Centro cirúrgico', ic: 'cir', cor: ['#7c3aed', '#b58cff'], grupo: 'Operação', perf: ['direcao', 'medico'], per: true, semSetor: true },
     { id: 'pend', nome: 'Pendências', ic: 'pend', cor: ['#e07a00', '#ffc04d'], grupo: 'Operação', perf: ['direcao', 'coord', 'nac', 'medico'] },
+    { id: 'atm', nome: 'Antimicrobianos', ic: 'atm', cor: ['#4d7c0f', '#a3e635'], grupo: 'Clínico', perf: ['direcao', 'coord', 'medico'], per: true, soon: true },
     { id: 'alertas', nome: 'Alertas clínicos', ic: 'alert', cor: ['#db2777', '#ff7eb6'], grupo: 'Clínico', perf: ['direcao', 'coord', 'medico'], soon: true },
+    { id: 'equipe', nome: 'Equipe', ic: 'equipe', cor: ['#0d9488', '#5eead4'], grupo: 'Gestão', perf: ['direcao', 'coord', 'medico'], per: true },
     { id: 'desemp', nome: 'Desempenho', ic: 'perf', cor: ['#4338ca', '#8b8cff'], grupo: 'Gestão', perf: ['direcao', 'medico'], per: true, semSetor: true },
     { id: 'acessos', nome: 'Acessos', ic: 'lock', cor: ['#475569', '#94a3b8'], grupo: 'Gestão', perf: ['direcao', 'ti'], semSetor: true }
   ];
   var BOTTOM = ['inicio', 'hoje', 'leitos', 'emg', 'pend'];
 
   /* ===================== ESTADO ===================== */
-  var st = { tela: 'inicio', setor: 'ALL', per: 30, perfil: 'direcao', selo: '', quem: '', busca: '', tema: '' };
-  try { var sv = JSON.parse(localStorage.getItem('celeris-v2') || '{}'); ['tela', 'setor', 'per', 'perfil', 'tema'].forEach(function (k) { if (sv[k] != null) st[k] = sv[k]; }); } catch (e) {}
+  var st = { tela: 'inicio', setor: 'ALL', per: 30, perfil: 'direcao', selo: '', quem: '', busca: '', tema: '', jornada: 36, agr: 'd' };
+  try { var sv = JSON.parse(localStorage.getItem('celeris-v2') || '{}'); ['tela', 'setor', 'per', 'perfil', 'tema', 'jornada'].forEach(function (k) { if (sv[k] != null) st[k] = sv[k]; }); } catch (e) {}
   if ([30, 60, 90, 120].indexOf(st.per) < 0) st.per = 30;
+  if (!JORNADA[st.jornada]) st.jornada = 36;
   var hx = (location.hash || '').slice(1).split('.'); // atalho: #emg, #leitos.CM, #inicio.ALL.medico
   if (hx[0]) st.tela = hx[0]; if (hx[1]) st.setor = hx[1]; if (hx[2]) st.perfil = hx[2];
   var standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
   if (st.tema) document.documentElement.setAttribute('data-theme', st.tema);
-  function salvar() { try { localStorage.setItem('celeris-v2', JSON.stringify({ tela: st.tela, setor: st.setor, per: st.per, perfil: st.perfil, tema: st.tema })); } catch (e) {} }
+  function salvar() { try { localStorage.setItem('celeris-v2', JSON.stringify({ tela: st.tela, setor: st.setor, per: st.per, perfil: st.perfil, tema: st.tema, jornada: st.jornada })); } catch (e) {} }
   var LOG = [{ h: '07:31', p: 'Direção', a: 'abriu Emergência' }, { h: '07:20', p: 'Médico de referência', a: 'corrigiu o selo de CM 112' }, { h: '07:11', p: 'NAC', a: 'abriu Pendências' }, { h: '07:05', p: 'Coordenação · Clínica Médica', a: 'abriu Hoje · Médica' }, { h: '07:02', p: 'Direção', a: 'abriu Início' }];
   function reg(a) { var d = new Date(); LOG.unshift({ h: ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2), p: PERFIS[st.perfil].nome, a: a }); LOG = LOG.slice(0, 40); }
   function setoresPerfil() { var p = PERFIS[st.perfil]; return p.setores ? SET.filter(function (s) { return p.setores.indexOf(s.k) >= 0; }) : SET; }
@@ -587,16 +691,16 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
   V.leitos = function () {
     var ss = st.setor === 'ALL' ? setoresPerfil() : [atual()], nac = st.perfil === 'nac';
     var h = '<div class="toolbar"><label class="search">' + ic('busca') + '<input id="busca" type="search" placeholder="Leito ou prontuário" value="' + esc(st.busca) + '" aria-label="Buscar leito ou prontuário"></label>' +
-      '<div class="tabs">' + [['', 'Todos'], ['PIORA CLÍNICA', 'Piora'], ['ALTA HOJE', 'Alta hoje'], ['ALTA SE', 'Alta possível'], ['EM EXAME', 'Exame'], ['CIRURGIA', 'Cirurgia'], ['REGULAÇÃO', 'Vaga'], ['ALERTA', 'Com alerta']].map(function (t) { return '<button class="tab" data-selo="' + t[0] + '" aria-pressed="' + (st.selo === t[0]) + '">' + t[1] + '</button>'; }).join('') + '</div></div>';
-    h += '<div class="legend"><span><i style="background:var(--crit-soft);border:2px solid var(--crit)"></i>Piora</span><span><i style="background:var(--ok-soft);border:2px solid var(--ok)"></i>Alta hoje</span><span><i style="background:var(--brand-soft);border:2px solid var(--brand)"></i>Alta possível</span><span><i style="background:var(--info-soft);border:2px solid var(--info)"></i>Exame</span><span><i style="background:var(--violet-soft);border:2px solid var(--violet)"></i>Cirurgia</span><span><i style="background:var(--warn-soft);border:2px solid var(--warn)"></i>Vaga externa</span><span><i style="background:var(--panel2);border:2px solid var(--line)"></i>Em tratamento</span><span><i style="border:2px dashed var(--line)"></i>Livre</span><span><i style="background:var(--crit);border-radius:50%;width:8px;height:8px"></i>Alerta clínico</span></div>';
+      '<div class="tabs">' + [['', 'Todos'], ['PIORA CLÍNICA', 'Piora'], ['ALTA HOJE', 'Alta hoje'], ['ALTA SE', 'Alta possível'], ['EM EXAME', 'Exame'], ['CIRURGIA', 'Cirurgia'], ['REGULAÇÃO', 'Vaga'], ['ALERTA', 'Com alerta'], ['PREC', 'Precaução']].map(function (t) { return '<button class="tab" data-selo="' + t[0] + '" aria-pressed="' + (st.selo === t[0]) + '">' + t[1] + '</button>'; }).join('') + '</div></div>';
+    h += '<div class="legend"><span><i style="background:var(--crit-soft);border:2px solid var(--crit)"></i>Piora</span><span><i style="background:var(--ok-soft);border:2px solid var(--ok)"></i>Alta hoje</span><span><i style="background:var(--brand-soft);border:2px solid var(--brand)"></i>Alta possível</span><span><i style="background:var(--info-soft);border:2px solid var(--info)"></i>Exame</span><span><i style="background:var(--violet-soft);border:2px solid var(--violet)"></i>Cirurgia</span><span><i style="background:var(--warn-soft);border:2px solid var(--warn)"></i>Vaga externa</span><span><i style="background:var(--panel2);border:2px solid var(--line)"></i>Em tratamento</span><span><i style="border:2px dashed var(--line)"></i>Livre</span><span><i style="background:var(--crit);border-radius:50%;width:8px;height:8px"></i>Alerta clínico</span>' + Object.keys(PREC).map(function (k) { return '<span><span class="pc-l" style="background:' + PREC[k][2] + '">' + PREC[k][1] + '</span>' + PREC[k][0] + '</span>'; }).join('') + '</div>';
     if (nac) h += '<p class="note" style="margin:-4px 0 12px">Perfil NAC: ficam em destaque os leitos que dependem de exame, cirurgia ou vaga.</p>';
     h += '<div class="wards">' + ss.map(function (s) {
       var L = LEITOS.filter(function (l) { return l.set === s.k; }), ocup = L.filter(function (l) { return !l.livre; }).length;
       return '<section class="ward"><div class="wh"><span class="dot" style="background:var(--' + statusSetor(s) + ')"></span><b>' + s.nome + '</b><span class="pill p-n">' + ocup + '/' + s.cap + ' · ' + br(ocup / s.cap * 100) + '%</span><span class="pill p-n">permanência ' + br(last(s.p30), 1) + ' d · meta ' + br(s.meta, 1) + '</span>' + (s.fila ? '<span class="pill p-warn">' + s.fila + ' aguardando na emergência</span>' : '') + '</div><div class="beds">' +
         L.map(function (l) {
           if (l.livre) return '<div class="bed free"><span class="n">' + l.leito.split(' ')[1] + '</span><span class="d">livre</span></div>';
-          var vis = (!st.selo || (st.selo === 'ALERTA' ? !!l.alerta : l.selo === st.selo)) && (!st.busca || (l.leito + ' ' + l.pront).toLowerCase().indexOf(st.busca.toLowerCase()) >= 0) && (!nac || ['EM EXAME', 'CIRURGIA', 'REGULAÇÃO'].indexOf(l.selo) >= 0);
-          return '<button class="bed ' + SELOS[l.selo].cls + '" data-leito="' + l.leito + '" style="' + (vis ? '' : 'opacity:.16') + '" title="' + esc(l.leito + ' · ' + l.selo + ' · ' + l.dias + ' dias') + '">' + (l.alerta ? '<span class="al"></span>' : '') + '<span class="n">' + l.leito.split(' ')[1] + '</span><span class="d">' + l.dias + ' d</span></button>';
+          var vis = (!st.selo || (st.selo === 'ALERTA' ? !!l.alerta : st.selo === 'PREC' ? !!l.prec : l.selo === st.selo)) && (!st.busca || (l.leito + ' ' + l.pront).toLowerCase().indexOf(st.busca.toLowerCase()) >= 0) && (!nac || ['EM EXAME', 'CIRURGIA', 'REGULAÇÃO'].indexOf(l.selo) >= 0);
+          return '<button class="bed ' + SELOS[l.selo].cls + '" data-leito="' + l.leito + '" style="' + (vis ? '' : 'opacity:.16') + '" title="' + esc(l.leito + ' · ' + l.selo + ' · ' + l.dias + ' dias') + '">' + (l.alerta ? '<span class="al"></span>' : '') + (l.prec ? '<span class="pc" style="background:' + PREC[l.prec.tipo][2] + '" title="Precaução de ' + PREC[l.prec.tipo][0].toLowerCase() + '">' + PREC[l.prec.tipo][1] + '</span>' : '') + '<span class="n">' + l.leito.split(' ')[1] + '</span><span class="d">' + l.dias + ' d</span></button>';
         }).join('') + '</div></section>';
     }).join('') + '</div>';
     return h;
@@ -723,6 +827,155 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
     return h;
   };
 
+  /* ---------- EQUIPE: dimensionamento pelo perfil dos pacientes ---------- */
+  function dimSetor(s) {
+    var L = LEITOS.filter(function (l) { return l.set === s.k && !l.livre; }), cats = [0, 0, 0, 0, 0], the = 0, he = 0;
+    var hc = [0, 0, 0, 0, 0]; L.forEach(function (l) { cats[l.cat]++; the += l.hEnf; hc[l.cat] += l.hEnf; });
+    var maior = hc.indexOf(Math.max.apply(null, hc)), pct = CAT[maior].enf / 100; // setor misto: vale a proporção do grupo com maior carga de trabalho
+    var simult = Math.ceil(the / 24), enf = Math.max(1, Math.round(simult * pct)), tec = simult - enf, km = JORNADA[st.jornada] || JORNADA[36];
+    if (s.k === 'UTI') { enf = Math.max(enf, Math.ceil(s.cap / 10)); tec = Math.max(tec, Math.ceil(s.cap / 2)); simult = enf + tec; } // mínimos da RDC 7/2010 por turno
+    var qp = Math.ceil(simult * 24 * km), esc = ESCALA[s.k];
+    return { s: s, L: L, n: L.length, cats: cats, the: the, simult: simult, enf: enf, tec: tec, pct: pct, qp: qp, escEnf: esc[0], escTec: esc[1], esc: esc[0] + esc[1], qAtual: QATUAL[s.k] };
+  }
+  V.equipe = function () {
+    var ss = st.setor === 'ALL' ? setoresPerfil() : [atual()], D = ss.map(dimSetor), uni = st.setor !== 'ALL';
+    var tot = { the: 0, simult: 0, enf: 0, esc: 0, escEnf: 0, qp: 0, qAtual: 0, n: 0 }; D.forEach(function (d) { for (var k in tot) tot[k] += d[k]; });
+    var abaixo = D.filter(function (d) { return d.esc < d.simult || d.escEnf < d.enf; });
+    var dif = tot.esc - tot.simult;
+    var h = '<div class="kpis">' +
+      kpi({ sp: 'eq1', l: 'Horas de cuidado hoje', v: br(tot.the) + ' h', s: 'de enfermagem nas 24 h, pelo perfil dos ' + tot.n + ' pacientes internados' }) +
+      kpi({ l: 'Equipe por turno', v: tot.esc + ' de ' + tot.simult, d: dif >= 0 ? '<small class="down">cobre o sugerido</small>' : '<small class="up">faltam ' + (-dif) + '</small>', s: 'escalados hoje × sugeridos, enfermeiros e técnicos', cls: dif < 0 ? 'bad' : '' }) +
+      kpi({ l: 'Enfermeiros por turno', v: tot.escEnf + ' de ' + tot.enf, d: tot.escEnf >= tot.enf ? '<small class="down">cobre</small>' : '<small class="up">faltam ' + (tot.enf - tot.escEnf) + '</small>', s: 'mínimo proporcional à gravidade', cls: tot.escEnf < tot.enf ? 'bad' : '' }) +
+      kpi({ l: uni ? 'Setor abaixo do sugerido' : 'Setores abaixo do sugerido', v: uni ? (abaixo.length ? 'sim' : 'não') : String(abaixo.length), s: abaixo.length ? abaixo.map(function (d) { return d.s.curto; }).join(', ') : 'nenhum setor descoberto hoje', cls: abaixo.length ? 'bad' : 'good' }) +
+      kpi({ l: 'Quadro de pessoal', v: br(tot.qp), d: '<small class="' + (tot.qAtual >= tot.qp ? 'down' : 'up') + '">atual ' + tot.qAtual + '</small>', s: 'sugerido para a jornada de ' + st.jornada + ' h, com folgas, férias e faltas' }) + '</div>';
+    h += '<div class="g c12 mt">' +
+      card(null, 'Perfil dos pacientes', 'Classificação de hoje, por grau de dependência de enfermagem · na UTI, pelo NAS · toque numa barra para abrir o setor', '<div class="chart" id="ch-scp" style="height:' + (uni ? 130 : ss.length * 40 + 60) + 'px"></div>', 's7') +
+      card(null, uni && ss[0].k === 'UTI' ? 'Carga de trabalho na UTI' : 'Classificação de hoje', uni && ss[0].k === 'UTI' ? 'NAS por paciente · 100 pontos = um profissional nas 24 h' : (uni ? ss[0].nome : 'Hospital todo') + ', pacientes por categoria', '<div class="chart" id="ch-cat" style="height:' + (uni ? 250 : Math.min(380, Math.max(250, ss.length * 40 + 60))) + 'px"></div>', 's5') + '</div>';
+    h += '<div class="g c12 mt">' + card(null, 'Equipe por turno: sugerida × escalada', 'Profissionais de enfermagem ao mesmo tempo no setor · barra cheia = escalados hoje, contorno = sugerido pelo perfil', '<div class="chart" id="ch-esc"></div>', 's12') + '</div>';
+    h += '<div class="g c12 mt">' +
+      card(null, 'Horas de cuidado: necessárias × escaladas', (uni ? ss[0].nome : 'Hospital') + ', por dia', '<div class="chart" id="ch-the"></div>', 's7') +
+      card(null, 'Parâmetros', 'Ajustáveis pelo hospital', '<table><thead><tr><th>Categoria</th><th class="num">Horas/24 h</th><th class="num">Enfermeiros</th></tr></thead><tbody>' +
+        CAT.map(function (c) { return '<tr><td><span class="pill" style="background:' + c.cor + '22;color:var(--ink)"><i style="width:9px;height:9px;border-radius:50%;background:' + c.cor + ';display:inline-block"></i>' + c.nome + '</span></td><td class="num mono">' + c.h + '</td><td class="num mono">' + c.enf + '%</td></tr>'; }).join('') +
+        '</tbody></table><label class="fix mt">Jornada semanal da enfermagem<select data-jornada="1">' + Object.keys(JORNADA).map(function (j) { return '<option value="' + j + '"' + (+j === st.jornada ? ' selected' : '') + '>' + j + ' horas</option>'; }).join('') + '</select></label>' +
+        '<p class="note">Referência: Parecer Normativo COFEN 1/2024, parâmetros orientativos que substituíram a Resolução 543/2017, e RDC ANVISA 7/2010 na UTI. Escalas: Fugulin nas enfermarias, Dini na neonatologia e NAS na UTI, escolhidas pelo hospital. A classificação é lida do prontuário; quando a enfermagem ainda não registrou, a IA sugere pela evolução e a enfermagem confirma.</p>', 's5') + '</div>';
+    if (uni && ss[0].k === 'UTI') { var u = D[0], cp = ss[0].cap, R = [['Médico plantonista', Math.ceil(cp / 10), 3], ['Médico rotineiro (manhã e tarde)', Math.ceil(cp / 10), 3], ['Enfermeiro', Math.ceil(cp / 10), u.escEnf], ['Técnico de enfermagem', Math.ceil(cp / 2), u.escTec], ['Fisioterapeuta (18 h por dia)', Math.ceil(cp / 10), 2]];
+      h += '<div class="mt">' + card(null, 'Mínimos da RDC 7/2010', 'UTI adulto, ' + cp + ' leitos · por turno', '<div class="scroll"><table><thead><tr><th>Profissional</th><th class="num">Mínimo</th><th class="num">Escalado hoje</th><th></th></tr></thead><tbody>' + R.map(function (r) { var ok = r[2] >= r[1]; return '<tr><td>' + r[0] + '</td><td class="num mono">' + r[1] + '</td><td class="num mono">' + r[2] + '</td><td><span class="pill ' + (ok ? 'p-ok">cumpre' : 'p-crit">abaixo') + '</span></td></tr>'; }).join('') + '</tbody></table></div><p class="note">RDC ANVISA 7/2010, com a redação da RDC 26/2012: 1 médico e 1 enfermeiro para cada 10 leitos, 1 técnico para cada 2 leitos e 1 fisioterapeuta para cada 10 leitos nos três turnos.</p>') + '</div>'; }
+    if (uni) {
+      var P = D[0].L.slice().sort(function (a, b) { return b.hEnf - a.hEnf; });
+      h += '<div class="mt">' + card(null, 'Pacientes', 'Do mais dependente ao menos · toque para abrir o leito', '<div class="scroll"><table><thead><tr><th>Leito</th><th>Categoria</th><th class="num">' + (ss[0].k === 'UTI' ? 'NAS' : ss[0].k === 'NEO' ? 'Dini' : 'Fugulin') + '</th><th class="num">Horas/24 h</th><th>Situação</th></tr></thead><tbody>' +
+        P.map(function (l) { return '<tr class="clk" data-leito="' + l.leito + '"><td class="mono">' + l.leito + '</td><td><span class="pill" style="background:' + CAT[l.cat].cor + '22;color:var(--ink)">' + CAT[l.cat].nome + '</span></td><td class="num mono">' + (l.nas != null ? l.nas : l.fug != null ? l.fug : '—') + '</td><td class="num mono">' + br(l.hEnf, l.hEnf % 1 ? 1 : 0) + '</td><td>' + selPill(l.selo) + '</td></tr>'; }).join('') + '</tbody></table></div>') + '</div>';
+    } else {
+      h += '<div class="mt">' + card(null, 'Por setor', 'Toque para abrir o setor', '<div class="scroll"><table><thead><tr><th>Setor</th><th class="num">Pacientes</th><th class="num">Horas/24 h</th><th class="num">Sugerido por turno</th><th class="num">Escalado</th><th class="num">Diferença</th><th class="num hide-m">Quadro sugerido</th><th class="num hide-m">Quadro atual</th></tr></thead><tbody>' +
+        D.map(function (d) { var df = d.esc - d.simult, c = df < 0 ? 'var(--crit)' : df > 1 ? 'var(--warn)' : 'var(--ok)';
+          return '<tr class="clk" data-setor="' + d.s.k + '"><td><b>' + d.s.nome + '</b></td><td class="num mono">' + d.n + '</td><td class="num mono">' + br(d.the) + '</td><td class="num mono">' + d.simult + ' <span class="note">(' + d.enf + ' enf.)</span></td><td class="num mono">' + d.esc + ' <span class="note">(' + d.escEnf + ' enf.)</span></td><td class="num mono" style="color:' + c + '">' + (df > 0 ? '+' : '') + df + '</td><td class="num mono hide-m">' + d.qp + '</td><td class="num mono hide-m">' + d.qAtual + '</td></tr>'; }).join('') + '</tbody></table></div>' +
+        '<p class="note">Sugerido por turno = horas de cuidado ÷ 24, com no mínimo 1 enfermeiro por turno; na UTI, nunca abaixo da RDC 7/2010 (1 enfermeiro para 10 leitos e 1 técnico para 2 leitos). Quadro de pessoal = horas × 7 × 1,15 ÷ jornada semanal, com 15% para férias e faltas.</p>') + '</div>';
+    }
+    POS.push(function () {
+      var hrs = EQ_DIA.map(function (f) { return Math.round(tot.the * f); }); hrs[N - 1] = Math.round(tot.the);
+      spark('sp-eq1', hrs.slice(-60), hexa('--brand'));
+      var o = base(); o.legend.data = CAT.map(function (c) { return c.nome; }); o.legend.left = 0; o.legend.right = 'auto'; o.grid = { left: 8, right: 16, top: 34, bottom: 6, containLabel: true }; o.tooltip.axisPointer = { type: 'shadow' };
+      o.xAxis = { type: 'value', minInterval: 1, splitLine: { lineStyle: { color: cor('--grid') } }, axisLabel: { color: cor('--muted') } };
+      o.yAxis = eixoCat(ss.map(function (s) { return s.curto; }));
+      o.series = CAT.map(function (c, i) { return { name: c.nome, type: 'bar', stack: 't', barWidth: 16, itemStyle: { color: c.cor, borderColor: cor('--panel'), borderWidth: 2 }, data: D.map(function (d) { return d.cats[i]; }) }; });
+      montar('ch-scp', o, function (p) { irSetor(ss[p.dataIndex].k); });
+      if (uni && ss[0].k === 'UTI') {
+        var fx = [[0, 50, '< 50'], [50, 60, '50–59'], [60, 70, '60–69'], [70, 80, '70–79'], [80, 999, '≥ 80']], v = fx.map(function (f) { return D[0].L.filter(function (l) { return l.nas >= f[0] && l.nas < f[1]; }).length; });
+        var o2 = base(); o2.tooltip = tip('item'); o2.xAxis = eixoX(fx.map(function (f) { return f[2]; }), true); o2.xAxis.axisLabel.interval = 0; o2.yAxis = eixoY('{value}');
+        o2.series = [{ type: 'bar', barWidth: '58%', data: v.map(function (x, i) { return { value: x, itemStyle: { color: i >= 3 ? hexa('--crit') : i === 2 ? hexa('--warn') : hexa('--brand'), borderRadius: [6, 6, 0, 0] } }; }), label: { show: true, position: 'top', color: cor('--ink'), fontWeight: 700 } }];
+        montar('ch-cat', o2);
+      } else {
+        var cs = [0, 0, 0, 0, 0]; D.forEach(function (d) { d.cats.forEach(function (n, i) { cs[i] += n; }); });
+        donutTotal('ch-cat', CAT.map(function (c, i) { return { name: c.nome, value: cs[i], itemStyle: { color: c.cor } }; }).filter(function (x) { return x.value; }), String(sum(cs)), 'pacientes');
+      }
+      var o3 = base(); o3.tooltip.axisPointer = { type: 'shadow' }; o3.legend.data = ['Sugerido', 'Escalado'];
+      o3.xAxis = eixoX(ss.map(function (s) { return s.curto; }), true); o3.xAxis.axisLabel = { color: cor('--muted'), interval: 0, width: 64, overflow: 'break' }; o3.yAxis = eixoY('{value}');
+      o3.series = [{ name: 'Sugerido', type: 'bar', barGap: '-100%', barWidth: '50%', z: 1, data: D.map(function (d) { return d.simult; }), itemStyle: { color: 'transparent', borderColor: cor('--ink'), borderWidth: 2, borderType: 'dashed', borderRadius: [6, 6, 0, 0] }, label: { show: true, position: 'top', color: cor('--muted'), fontWeight: 600, formatter: function (p) { return 'sug. ' + p.value; } } },
+        { name: 'Escalado', type: 'bar', barGap: '-100%', barWidth: '34%', z: 3, data: D.map(function (d) { return { value: d.esc, itemStyle: { color: d.esc < d.simult ? hexa('--crit') : d.esc > d.simult + 1 ? hexa('--warn') : hexa('--brand'), borderRadius: [5, 5, 0, 0] } }; }), label: { show: true, position: 'inside', color: '#fff', fontWeight: 700 } }];
+      montar('ch-esc', o3, function (p) { irSetor(ss[p.dataIndex].k); });
+      var esc = D.reduce(function (a, d) { return a + d.esc * 24; }, 0);
+      var o4 = base(); o4.xAxis = eixoX(rotsPer()); o4.yAxis = eixoY('{value} h'); o4.yAxis.scale = true; o4.legend.data = ['Necessárias', 'Escaladas'];
+      o4.series = [linha('Necessárias', fat(hrs), hexa('--brand'), { areaStyle: area(hexa('--brand')) }), linha('Escaladas', fat(DIAS.map(function (d) { var w = d.getDay(); return Math.round(esc * (w === 0 || w === 6 ? .94 : 1)); })), hexa('--warn'), { step: 'middle', smooth: false })];
+      montar('ch-the', o4);
+    });
+    return h;
+  };
+
+  /* ---------- ANTIMICROBIANOS, MICROBIOLOGIA E PRECAUÇÕES (prévia) ---------- */
+  var RESIST30 = [['Klebsiella pneumoniae', 38, 'KPC', 11, 'ESBL', 13], ['Escherichia coli', 52, 'ESBL', 14, '', 0], ['Staphylococcus aureus', 31, 'MRSA', 11, '', 0],
+    ['Pseudomonas aeruginosa', 24, 'resistente a carbapenêmico', 5, '', 0], ['Acinetobacter baumannii', 11, 'resistente a carbapenêmico', 9, '', 0], ['Enterococcus faecium', 9, 'VRE', 4, '', 0]];
+  function revisar(l) {
+    var a = l.atb, m = [];
+    if (l.cult && !l.cult.cobre) m.push(['crit', 'Sem cobertura', l.cult.mo + ' ' + l.cult.perfil + ' em ' + l.cult.material.toLowerCase() + '; o esquema atual não cobre']);
+    if (l.cult && l.cult.estreita) m.push(['warn', 'Descalonar', l.cult.mo + ' ' + l.cult.perfil + '; considerar ' + l.cult.estreita]);
+    if (!a.lib && a.nomes.some(function (n) { return ATB[n] === 'R'; })) m.push(['vio', 'Reserva', 'Antimicrobiano do grupo Reserve sem liberação da CCIH registrada']);
+    if (!a.reav) m.push(['warn', 'Reavaliar', 'D' + a.dia + ' sem reavaliação registrada após 72 h']);
+    if (!a.cult && !a.prof) m.push(['info', 'Sem cultura', 'Iniciado sem cultura colhida antes da primeira dose']);
+    if (!a.fim && a.dia >= 5) m.push(['n', 'Sem duração', 'D' + a.dia + ' sem data de término definida']);
+    return m;
+  }
+  function donutTotal(id, dados, total, rotulo) {
+    var o = base(); o.tooltip = tip('item'); o.tooltip.formatter = '{b}: {c} ({d}%)';
+    var t = sum(dados.map(function (d) { return d.value; }));
+    o.legend = { orient: 'vertical', right: 0, top: 'middle', icon: 'roundRect', itemWidth: 12, itemHeight: 12, textStyle: { color: cor('--ink'), fontWeight: 600 }, formatter: function (n) { var d = dados.filter(function (x) { return x.name === n; })[0]; return n + '  ' + br(d.value / t * 100, 1) + '%'; } };
+    o.title = { text: total, subtext: rotulo, left: '29%', top: '40%', textAlign: 'center', textStyle: { fontFamily: 'Archivo', fontSize: 30, fontWeight: 800, color: cor('--ink') }, subtextStyle: { color: cor('--muted'), fontSize: 12 } };
+    o.series = [{ type: 'pie', radius: ['56%', '80%'], center: ['30%', '52%'], label: { show: false }, itemStyle: { borderColor: cor('--panel'), borderWidth: 3 }, data: dados }];
+    return montar(id, o);
+  }
+  V.atm = function () {
+    var L = LEITOS.filter(function (l) { return !l.livre && noFiltro(l); }), U = L.filter(function (l) { return l.atb; });
+    var dd = sum(U.map(function (l) { return l.atb.nomes.length; })), dot = L.length ? dd / L.length * 1000 : 0;
+    var r3 = U.filter(function (l) { return l.atb.dia >= 3; }), reav = r3.length ? r3.filter(function (l) { return l.atb.reav; }).length / r3.length * 100 : 100;
+    var ter = U.filter(function (l) { return !l.atb.prof; }), cult = ter.length ? ter.filter(function (l) { return l.atb.cult; }).length / ter.length * 100 : 100;
+    var aw = { A: 0, W: 0, R: 0 }; U.forEach(function (l) { l.atb.nomes.forEach(function (n) { aw[ATB[n]]++; }); }); var acc = dd ? aw.A / dd * 100 : 0;
+    var rev = U.map(function (l) { return { l: l, m: revisar(l) }; }).filter(function (x) { return x.m.length; }).sort(function (a, b) { return (a.m[0][0] === 'crit' ? 0 : 1) - (b.m[0][0] === 'crit' ? 0 : 1) || b.l.atb.dia - a.l.atb.dia; });
+    var C = CULT.filter(noFiltro), P = L.filter(function (l) { return l.prec; });
+    var h = '<div class="demo" style="color:var(--violet);background:var(--violet-soft)">Prévia de função em desenvolvimento · as sugestões são apoio à decisão da CCIH e do médico, nunca conduta automática</div>';
+    h += '<div class="kpis">' +
+      kpi({ l: 'Em uso de antimicrobiano', v: String(U.length), d: '<small class="flat">' + br(L.length ? U.length / L.length * 100 : 0) + '%</small>', s: 'dos ' + L.length + ' pacientes internados' }) +
+      kpi({ sp: 'dot', l: 'Dias de terapia', v: br(dot), s: 'DOT por 1.000 pacientes-dia, hoje · LOT ' + br(L.length ? U.length / L.length * 1000 : 0) }) +
+      kpi({ l: 'Reavaliados até 72 h', v: br(reav) + '%', s: 'dos tratamentos a partir do D3', cls: reav >= 80 ? 'good' : 'bad', ring: reav }) +
+      kpi({ l: 'Cultura antes da 1ª dose', v: br(cult) + '%', s: 'dos tratamentos, sem contar profilaxia', cls: cult >= 80 ? 'good' : 'bad' }) +
+      kpi({ l: 'Para revisar hoje', v: String(rev.length), s: rev.filter(function (x) { return x.m[0][0] === 'crit'; }).length + ' sem cobertura para a cultura', cls: rev.length ? 'bad' : '' }) + '</div>';
+    h += '<div class="g c12 mt">' +
+      card(null, 'Consumo por grupo AWaRe', 'Classificação da OMS, 2025 · dias de terapia de hoje', '<div class="chart" id="ch-aware"></div>', 's5') +
+      card(null, 'Uso de antimicrobianos', 'Pacientes em uso (barras) e DOT por 1.000 pacientes-dia (linha)', '<div class="chart" id="ch-dot"></div>', 's7', '<div class="seg" role="group" aria-label="Agrupar">' + [['d', 'Diário'], ['s', 'Semanal'], ['m', 'Mensal']].map(function (x) { return '<button data-agr="' + x[0] + '" aria-pressed="' + (st.agr === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div>') + '</div>';
+    h += '<div class="mt">' + card(null, 'Para revisar hoje', 'Tratamentos com algum ponto de atenção · toque para abrir o leito', '<div class="scroll"><table><thead><tr><th>Leito</th><th>Setor</th><th>Antimicrobiano</th><th>Ponto de atenção</th><th class="hide-m">Detalhe</th></tr></thead><tbody>' +
+      (rev.length ? rev.map(function (x) { var l = x.l; return '<tr class="clk" data-leito="' + l.leito + '"><td class="mono">' + l.leito + '</td><td>' + S(l.set).curto + '</td><td>' + l.atb.nomes.map(function (n) { return '<span style="color:' + AWARE[ATB[n]][1] + ';font-weight:700">' + n + '</span>'; }).join(' + ') + ' <span class="note">D' + l.atb.dia + '</span></td><td>' + x.m.map(function (m) { return '<span class="pill p-' + m[0] + '" style="margin:1px 4px 1px 0">' + m[1] + '</span>'; }).join('') + '</td><td class="hide-m">' + esc(x.m[0][2]) + '</td></tr>'; }).join('') : '<tr><td colspan="5" class="empty">Nenhum tratamento para revisar neste setor.</td></tr>') + '</tbody></table></div>') + '</div>';
+    h += '<div class="g c12 mt">' +
+      card(null, 'Culturas das últimas 48 h', 'Resultados liberados pelo laboratório · toque para abrir o leito', '<div class="scroll"><table><thead><tr><th>Leito</th><th>Material</th><th>Microrganismo</th><th>Perfil</th><th>Esquema atual</th><th class="num">Há</th></tr></thead><tbody>' +
+        (C.length ? C.map(function (l) { var c = l.cult, pr = c.perfil === 'sensível' || c.perfil === 'MSSA' ? 'p-ok' : c.perfil === 'ESBL' ? 'p-warn' : 'p-crit';
+          return '<tr class="clk" data-leito="' + l.leito + '"><td class="mono">' + l.leito + '</td><td>' + c.material + '</td><td><i>' + c.mo + '</i></td><td><span class="pill ' + pr + '">' + c.perfil + '</span></td><td>' + (c.cobre ? (c.estreita ? '<span class="pill p-warn">cobre · descalonar</span>' : '<span class="pill p-ok">cobre</span>') : '<span class="pill p-crit">não cobre</span>') + '</td><td class="num mono">' + c.h + ' h</td></tr>'; }).join('') : '<tr><td colspan="6" class="empty">Nenhuma cultura positiva neste setor nas últimas 48 h.</td></tr>') + '</tbody></table></div>', 's7') +
+      card(null, 'Perfil de resistência', 'Isolados dos últimos 30 dias, hospital · por microrganismo', '<div class="chart" id="ch-res" style="height:' + (RESIST30.length * 42 + 60) + 'px"></div>', 's5') + '</div>';
+    h += '<div class="g c12 mt">' +
+      card(null, 'Precauções', P.length + ' pacientes em precaução por transmissão · sinalizados no mapa de leitos · regras do Protocolo de Precauções e Isolamento da ANVISA (2025), adaptadas pela CCIH', '<div class="tabs" style="margin-bottom:12px">' + Object.keys(PREC).map(function (k) { var n = P.filter(function (l) { return l.prec.tipo === k; }).length; return '<button class="tab" data-ir="leitos" data-selo="PREC"><span class="pc-l" style="background:' + PREC[k][2] + '">' + PREC[k][1] + '</span> ' + PREC[k][0] + ' · ' + n + '</button>'; }).join('') + '</div>' +
+        '<div class="scroll" style="max-height:300px;overflow-y:auto"><table><tbody>' + P.map(function (l) { return '<tr class="clk" data-leito="' + l.leito + '"><td class="mono">' + l.leito + '</td><td><span class="pc-l" style="background:' + PREC[l.prec.tipo][2] + '">' + PREC[l.prec.tipo][1] + '</span> ' + PREC[l.prec.tipo][0] + '</td><td>' + esc(l.prec.motivo) + '</td></tr>'; }).join('') + '</tbody></table></div>', 's7') +
+      card(null, 'Mais usados', 'Dias de terapia de hoje · cor = grupo AWaRe', '<div class="chart" id="ch-top" style="height:330px"></div>', 's5') + '</div>';
+    h += '<p class="note">Indicadores da Diretriz Nacional para Elaboração de Programa de Gerenciamento de Antimicrobianos (ANVISA, revisão 2023): DOT, LOT e DDD por 1.000 pacientes-dia, revisão em 48 a 72 h e descalonamento. Grupos AWaRe da OMS (2025). Lista padronizada, grupos que exigem liberação e prazos são ajustados pela CCIH do hospital.</p>';
+    POS.push(function () {
+      var serie = mm(DOT_DIA, 7).map(function (f, i, a) { return dot * f / a[N - 1]; }), pac = DOT_DIA.map(function (f) { return U.length * (.92 + (f - 1) * .8); });
+      spark('sp-dot', serie.slice(-60), hexa('--violet'));
+      donutTotal('ch-aware', ['A', 'W', 'R'].map(function (k) { return { name: AWARE[k][0], value: aw[k], itemStyle: { color: AWARE[k][1] } }; }).filter(function (x) { return x.value; }), br(dd), 'dias de terapia');
+      var rot2 = rotsPer(), b = fat(pac), ln = fat(serie);
+      if (st.agr !== 'd') { var w = st.agr === 's' ? 7 : 30, r = [], bb = [], ll = []; for (var i = 0; i < b.length; i += w) { r.push(rot2[i]); bb.push(avg(b.slice(i, i + w))); ll.push(avg(ln.slice(i, i + w))); } rot2 = r; b = bb; ln = ll; }
+      var o = base(); o.legend.data = ['Pacientes em uso', 'DOT/1.000 (média de 7 dias)'];
+      o.xAxis = eixoX(rot2, true); o.yAxis = [eixoY('{value}'), { type: 'value', scale: true, position: 'right', splitLine: { show: false }, axisLabel: { color: cor('--muted') } }]; o.grid.right = 48;
+      o.series = [{ name: 'Pacientes em uso', type: 'bar', data: b.map(Math.round), barMaxWidth: st.agr === 'd' ? 8 : 26, itemStyle: { color: hexa('--brand') + '66', borderRadius: [4, 4, 0, 0] } },
+        linha('DOT/1.000 (média de 7 dias)', ln.map(Math.round), hexa('--violet'), { yAxisIndex: 1, symbol: st.agr === 'd' ? 'none' : 'circle', symbolSize: 7 })];
+      montar('ch-dot', o);
+      var cont = {}; U.forEach(function (l) { l.atb.nomes.forEach(function (n) { cont[n] = (cont[n] || 0) + 1; }); });
+      var top = Object.keys(cont).sort(function (a, b) { return cont[b] - cont[a]; }).slice(0, 8);
+      barrasH('ch-top', top, top.map(function (n) { return cont[n]; }), '{value}', top.map(function (n) { return AWARE[ATB[n]][1]; }));
+      var o2 = base(); o2.legend.data = ['Resistente', 'Sensível']; o2.legend.left = 0; o2.legend.right = 'auto'; o2.grid = { left: 8, right: 16, top: 34, bottom: 6, containLabel: true }; o2.tooltip.axisPointer = { type: 'shadow' };
+      o2.tooltip.formatter = function (ps) { var r = RESIST30[ps[0].dataIndex]; return '<b><i>' + r[0] + '</i></b><br>' + r[1] + ' isolados<br>' + r[2] + ': ' + r[3] + ' (' + br(r[3] / r[1] * 100) + '%)' + (r[4] ? '<br>' + r[4] + ': ' + r[5] + ' (' + br(r[5] / r[1] * 100) + '%)' : ''); };
+      o2.xAxis = { type: 'value', max: 100, splitLine: { lineStyle: { color: cor('--grid') } }, axisLabel: { color: cor('--muted'), formatter: '{value}%' } };
+      o2.yAxis = eixoCat(RESIST30.map(function (r) { return r[0].replace(/^(\w)\w+ /, '$1. '); }));
+      o2.series = [{ name: 'Resistente', type: 'bar', stack: 't', barWidth: 16, itemStyle: { color: hexa('--crit'), borderColor: cor('--panel'), borderWidth: 2 }, data: RESIST30.map(function (r) { return +((r[3] + r[5]) / r[1] * 100).toFixed(0); }), label: { show: true, color: '#fff', fontWeight: 700, formatter: '{c}%' } },
+        { name: 'Sensível', type: 'bar', stack: 't', barWidth: 16, itemStyle: { color: hexa('--ok') + '88', borderColor: cor('--panel'), borderWidth: 2 }, data: RESIST30.map(function (r) { return 100 - +((r[3] + r[5]) / r[1] * 100).toFixed(0); }) }];
+      montar('ch-res', o2);
+    });
+    return h;
+  };
+
   /* ---------- DESEMPENHO ---------- */
   V.desemp = function () {
     var h = '<div class="kpis">' + kpi({ sp: 'd1', l: 'Altas antecipadas', v: br(last(mm(PAINEL.acerto, 7))) + '%', s: 'das altas do dia já estavam apontadas de manhã', cls: 'good' }) +
@@ -759,8 +1012,15 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
     over.innerHTML = '<div class="veil" data-fechar="1"></div><aside class="drawer" role="dialog" aria-modal="true" aria-label="Leito ' + l.leito + '">' +
       '<div class="dh" style="border-top:5px solid ' + SELOS[l.selo].cor + '"><div><h3>' + l.leito + '</h3><div class="note" style="margin:2px 0 0">' + s.nome + ' · prontuário <span class="mono">' + l.pront + '</span></div></div><button class="close" data-fechar="1" aria-label="Fechar">' + ic('x') + '</button></div>' +
       '<div class="db"><div style="display:flex;gap:8px;flex-wrap:wrap">' + selPill(l.selo) + '<span class="pill p-n">' + l.dias + ' dias no setor</span>' + (l.dias > s.meta ? '<span class="pill p-crit">acima da meta de ' + br(s.meta, 1) + ' d</span>' : '<span class="pill p-ok">dentro da meta</span>') + '</div>' +
+      (l.prec ? '<div class="alertbox" style="background:' + PREC[l.prec.tipo][2] + '1f;color:var(--ink);border-left:4px solid ' + PREC[l.prec.tipo][2] + '"><b>Precaução de ' + PREC[l.prec.tipo][0].toLowerCase() + ':</b> ' + esc(l.prec.motivo) + '</div>' : '') +
       (l.alerta ? '<div class="alertbox" style="background:var(--violet-soft);color:var(--violet)"><b>Alerta clínico (prévia):</b> ' + esc(l.alerta[0]) + '</div>' : '') +
-      '<dl class="kv"><dt>Hipótese</dt><dd>' + esc(l.dx) + '</dd><dt>O que segura</dt><dd>' + esc(l.pend) + '</dd><dt>Ação</dt><dd><b>' + esc(l.acao) + '</b></dd><dt>Quem age</dt><dd>' + esc(l.quem) + '</dd></dl>' +
+      '<dl class="kv"><dt>Hipótese</dt><dd>' + esc(l.dx) + '</dd><dt>Enfermagem</dt><dd>' + CAT[l.cat].nome + ' · ' + (l.nas != null ? 'NAS ' + l.nas : l.dini ? 'escala de Dini' : 'Fugulin ' + l.fug) + ' · ' + br(l.hEnf, l.hEnf % 1 ? 1 : 0) + ' h nas 24 h</dd><dt>O que segura</dt><dd>' + esc(l.pend) + '</dd><dt>Ação</dt><dd><b>' + esc(l.acao) + '</b></dd><dt>Quem age</dt><dd>' + esc(l.quem) + '</dd>' + (l.atb ? '<dt>Antimicrobiano</dt><dd>' + l.atb.nomes.join(' + ') + ' · D' + l.atb.dia + (l.atb.prof ? ' · profilaxia' : '') + '</dd>' : '') + (l.cult ? '<dt>Cultura</dt><dd><i>' + l.cult.mo + '</i> ' + l.cult.perfil + ' · ' + l.cult.material.toLowerCase() + ' · há ' + l.cult.h + ' h' + (l.cult.cobre ? '' : ' · <b class="bad">o esquema atual não cobre</b>') + '</dd>' : '') + '</dl>' +
+      (function () { var p = l.prev, hd = HIST_DX[l.dx], rc = p.risco >= 50 ? 'crit' : p.risco >= 25 ? 'warn' : 'ok';
+        return '<div><div class="note" style="margin:0 0 8px;font-weight:700">Permanência prevista</div><div class="prevg">' +
+          '<div><span>Até agora</span><b>' + l.dias + ' d</b></div>' +
+          '<div><span>Prevista</span><b>' + br(p.d, 1) + ' d</b><small>' + br(p.lo, 1) + ' a ' + br(p.hi, 1) + ' d</small></div>' +
+          '<div><span>Risco de permanência prolongada</span><b class="' + (rc === 'ok' ? 'good' : 'bad') + '">' + p.risco + '%</b><i class="rbar"><i style="width:' + p.risco + '%;background:var(--' + rc + ')"></i></i></div></div>' +
+          '<p class="note" style="margin:6px 0 0">' + esc(l.dx) + ' neste hospital: mediana ' + hd.med + ' d, 90% saem até ' + hd.p90 + ' d (' + hd.n + ' internações). Estimativa de apoio, recalculada todo dia.</p></div>'; })() +
       '<div><div class="note" style="margin:0 0 8px;font-weight:700">Últimos 3 dias</div><div class="tl">' + l.hist.map(function (x, i) { return '<div><b>' + x + '</b><small>' + ['anteontem', 'ontem', 'hoje'][i] + '</small></div>'; }).join('') + '</div></div>' +
       (st.perfil === 'medico' ? '<label class="fix">Corrigir o selo<select data-corrige="' + l.leito + '">' + Object.keys(SELOS).map(function (k) { return '<option' + (k === l.selo ? ' selected' : '') + '>' + k + '</option>'; }).join('') + '</select><span class="note" style="margin:0;font-weight:500">A correção vale na próxima rodada e vira aprendizado.</span></label>'
         : '<p class="note" style="margin:0">Só o médico de referência corrige o selo. Troque o perfil em "Ver como" para testar.</p>') + '</div></aside>';
@@ -825,6 +1085,7 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
     if (e.target.closest('[data-mais]')) { var tp = telasPerfil().filter(function (x) { return BOTTOM.slice(0, 4).indexOf(x.id) < 0; }); over.innerHTML = '<div class="veil" data-fechar="1"></div><div class="morepanel">' + tp.map(function (x) { return '<button data-ir="' + x.id + '">' + tile(x) + x.nome + '</button>'; }).join('') + '</div>'; return; }
     if ((t = e.target.closest('[data-ir]'))) { over.innerHTML = ''; var sel = t.getAttribute('data-selo'); if (sel != null) st.selo = sel; ir(t.getAttribute('data-ir')); return; }
     if ((t = e.target.closest('[data-setor]'))) { var k = t.getAttribute('data-setor'); st.setor = k; reg('filtrou ' + (k === 'ALL' ? 'o hospital todo' : S(k).nome)); desenhar(); return; }
+    if ((t = e.target.closest('[data-agr]'))) { st.agr = t.getAttribute('data-agr'); desenhar(); return; }
     if ((t = e.target.closest('[data-per]'))) { st.per = +t.getAttribute('data-per'); desenhar(); return; }
     if ((t = e.target.closest('[data-selo]'))) { st.selo = t.getAttribute('data-selo'); desenhar(); return; }
     if ((t = e.target.closest('[data-quem]'))) { st.quem = t.getAttribute('data-quem'); desenhar(); return; }
@@ -832,6 +1093,7 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
     if (e.target.closest('[data-fechar]')) over.innerHTML = '';
   });
   document.addEventListener('change', function (e) {
+    if (e.target.getAttribute && e.target.getAttribute('data-jornada')) { st.jornada = +e.target.value; reg('mudou a jornada para ' + st.jornada + ' h'); desenhar(); return; }
     var id = e.target.getAttribute && e.target.getAttribute('data-corrige'); if (!id) return;
     var l = LEITOS.filter(function (x) { return x.leito === id; })[0]; if (!l) return;
     l.selo = e.target.value; l.hist[2] = l.selo; reg('corrigiu o selo de ' + id + ' para ' + l.selo); desenhar(); abrirLeito(id);
