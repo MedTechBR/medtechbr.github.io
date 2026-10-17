@@ -560,18 +560,40 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
   ];
   var BOTTOM = ['inicio', 'hoje', 'leitos', 'emg', 'pend'];
 
+
+  /* ===================== SERVIDOR DO HOSPITAL: dados reais no lugar dos fictícios ===================== */
+  var REAL = window.CELERIS_ESTADO || null, QUEM;
+  if (REAL) aplicarEstado(REAL);
+  function trocar(arr, novos) { arr.length = 0; Array.prototype.push.apply(arr, novos); }
+  function aplicarEstado(E) {
+    DIAS = E.dias.map(function (d) { return new Date(d + 'T12:00:00'); }); N = DIAS.length; HOJE = new Date(E.hoje + 'T12:00:00');
+    trocar(SET, E.setores); CAP = sum(SET.map(function (s) { return s.cap; }));
+    ['p7', 'p30', 'ocupD', 'saiD', 'intD', 'livres', 'fila', 'meta', 'cap'].forEach(function (k) { HOSP[k] = E.hosp[k]; });
+    PERM_MES = E.permMes; trocar(LEITOS, E.leitos);
+    trocar(AREAS, E.areas); EMGS.cap = sum(AREAS.map(function (a) { return a.cap; }));
+    EMG = E.emg; CC = E.cc; PAINEL = E.painel; CREAT = E.creat; RESIST30 = E.resist30; HIST_DX = E.histDx || {};
+    DOT_DIA = E.dotDia && E.dotDia.length ? E.dotDia.map(function (v) { return v || 0.0001; }) : DOT_DIA;
+    EQ_DIA = E.eqDia && E.eqDia.length ? E.eqDia : EQ_DIA;
+    for (var n in (E.atbGrupos || {})) if (!ATB[n]) ATB[n] = E.atbGrupos[n];
+    var u = E.usuario;
+    Object.keys(PERFIS).forEach(function (k) { if (k !== u.perfil) delete PERFIS[k]; });
+    PERFIS[u.perfil].nome = u.nome; if (u.perfil === 'coord') PERFIS.coord.setores = u.setores;
+    if (E.quem) QUEM = E.quem.filter(function (q) { return q !== 'Equipe do setor'; });
+  }
+
   /* ===================== ESTADO ===================== */
   var st = { tela: 'inicio', setor: 'ALL', per: 30, perfil: 'direcao', selo: '', quem: '', busca: '', tema: '', jornada: 36, agr: 'd', area: 'ALL', esel: 'AGUARDA LEITO' };
   try { var sv = JSON.parse(localStorage.getItem('celeris-v2') || '{}'); ['tela', 'setor', 'per', 'perfil', 'tema', 'jornada'].forEach(function (k) { if (sv[k] != null) st[k] = sv[k]; }); } catch (e) {}
   if ([30, 60, 90, 120].indexOf(st.per) < 0) st.per = 30;
   if (!JORNADA[st.jornada]) st.jornada = 36;
   var hx = (location.hash || '').slice(1).split('.'); // atalho: #emg, #leitos.CM, #inicio.ALL.medico
-  if (hx[0]) st.tela = hx[0]; if (hx[1]) st.setor = hx[1]; if (hx[2]) st.perfil = hx[2];
+  if (hx[0]) st.tela = hx[0]; if (hx[1]) st.setor = hx[1]; if (hx[2] && !REAL) st.perfil = hx[2];
+  if (REAL) { st.perfil = REAL.usuario.perfil; if (REAL.jornada && JORNADA[REAL.jornada]) st.jornada = REAL.jornada; }
   var standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
   if (st.tema) document.documentElement.setAttribute('data-theme', st.tema);
   function salvar() { try { localStorage.setItem('celeris-v2', JSON.stringify({ tela: st.tela, setor: st.setor, per: st.per, perfil: st.perfil, tema: st.tema, jornada: st.jornada })); } catch (e) {} }
-  var LOG = [{ h: '07:31', p: 'Direção', a: 'abriu Emergência' }, { h: '07:20', p: 'Médico de referência', a: 'corrigiu o selo de CM 112' }, { h: '07:11', p: 'NAC', a: 'abriu Pendências' }, { h: '07:05', p: 'Coordenação · Clínica Médica', a: 'abriu Hoje · Médica' }, { h: '07:02', p: 'Direção', a: 'abriu Início' }];
-  function reg(a) { var d = new Date(); LOG.unshift({ h: ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2), p: PERFIS[st.perfil].nome, a: a }); LOG = LOG.slice(0, 40); }
+  var LOG = REAL ? REAL.log || [] : [{ h: '07:31', p: 'Direção', a: 'abriu Emergência' }, { h: '07:20', p: 'Médico de referência', a: 'corrigiu o selo de CM 112' }, { h: '07:11', p: 'NAC', a: 'abriu Pendências' }, { h: '07:05', p: 'Coordenação · Clínica Médica', a: 'abriu Hoje · Médica' }, { h: '07:02', p: 'Direção', a: 'abriu Início' }];
+  function reg(a) { if (REAL) { try { fetch('/api/acesso', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ acao: a }), credentials: 'same-origin' }); } catch (e) {} } var d = new Date(); LOG.unshift({ h: ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2), p: PERFIS[st.perfil].nome, a: a }); LOG = LOG.slice(0, 40); }
   function setoresPerfil() { var p = PERFIS[st.perfil], t = T(st.tela), b = p.setores ? SET.filter(function (s) { return p.setores.indexOf(s.k) >= 0; }) : SET; return t && t.emg && !p.setores ? [EMGS].concat(b) : b; }
   function S(k) { return k === 'EMG' ? EMGS : SET.filter(function (s) { return s.k === k; })[0]; }
   function atual() { return st.setor === 'ALL' ? HOSP : (S(st.setor) || HOSP); }
@@ -836,10 +858,10 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
 
   /* ---------- CENTRO CIRÚRGICO ---------- */
   V.cir = function () {
-    var mes = sum(CC.diaD.slice(-15)), ant = Math.round(mes / 1.07);
+    var K = CC.kpi || { mes: sum(CC.diaD.slice(-15)), dias: 15 }, mes = K.mes, ant = K.ant != null ? K.ant : Math.round(mes / 1.07), proc = K.proc != null ? K.proc : Math.round(mes * 1.46), dm = K.dias || 15;
     var h = '<div class="kpis">' + kpi({ sp: 'cc1', l: 'Cirurgias no mês', v: br(mes), d: delta(mes, ant, false), s: 'até ontem · mesmo período do mês anterior: ' + ant }) +
-      kpi({ l: 'Procedimentos no mês', v: br(Math.round(mes * 1.46)), s: br(mes * 1.46 / 15, 1) + ' por dia' }) +
-      kpi({ l: 'Projeção do mês', v: br(Math.round(mes / 15 * 31)), s: 'cirurgias, no ritmo atual' }) +
+      kpi({ l: 'Procedimentos no mês', v: br(proc), s: br(proc / dm, 1) + ' por dia' }) +
+      kpi({ l: 'Projeção do mês', v: br(K.proj != null ? K.proj : Math.round(mes / dm * 31)), s: 'cirurgias, no ritmo atual' }) +
       kpi({ sp: 'cc2', l: 'Ocupação de sala', v: br(last(CC.salaD)) + '%', s: 'meta 82% do tempo de sala eletiva', cls: last(CC.salaD) >= 82 ? 'good' : 'bad' }) +
       kpi({ sp: 'cc3', l: 'Suspensão', v: br(last(CC.suspD), 1) + '%', s: 'meta até 5%', cls: last(CC.suspD) <= 5 ? 'good' : 'bad' }) + '</div>';
     h += '<div class="g c12 mt">' + card(null, 'Cirurgias por dia', 'Últimos 4 meses · cor mais forte, mais cirurgias no dia · passe o dedo ou o mouse para ver o número', '<div class="scroll"><div class="chart" id="ch-cal" style="height:200px;min-width:640px"></div></div>', 's12') + '</div>';
@@ -860,15 +882,15 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
       var o3 = base(); o3.xAxis = eixoX(rotsPer()); o3.yAxis = eixoY('{value}%', 40);
       o3.series = [linha('Ocupação de sala', fat(CC.salaD), hexa('--info'), { areaStyle: area(hexa('--info')), markLine: linhaMeta(82, 'meta 82%') })];
       montar('ch-ocsala', o3);
-      var o4 = base(); o4.legend.show = false; o4.xAxis = eixoX(['mai', 'jun', 'jul', 'ago', 'set', 'out*'], true); o4.yAxis = eixoY('{value}'); o4.tooltip.axisPointer = { type: 'shadow' };
-      o4.series = [{ name: 'Procedimentos realizados', type: 'bar', barWidth: '52%', data: [1154, 1212, 1217, 1322, 1303, Math.round(mes * 1.46)].map(function (v, k) { return { value: v, itemStyle: { color: k === 5 ? hexa('--brand2') : hexa('--brand'), opacity: k === 5 ? .6 : 1, borderRadius: [6, 6, 0, 0] } }; }), label: { show: true, position: 'top', formatter: function (q) { return br(q.value); }, color: cor('--ink'), fontWeight: 600 } }];
+      var o4 = base(); o4.legend.show = false; o4.xAxis = eixoX(CC.procMes ? CC.procMes.m : ['mai', 'jun', 'jul', 'ago', 'set', 'out*'], true); o4.yAxis = eixoY('{value}'); o4.tooltip.axisPointer = { type: 'shadow' };
+      o4.series = [{ name: 'Procedimentos realizados', type: 'bar', barWidth: '52%', data: (CC.procMes ? CC.procMes.v : [1154, 1212, 1217, 1322, 1303, proc]).map(function (v, k) { return { value: v, itemStyle: { color: k === 5 ? hexa('--brand2') : hexa('--brand'), opacity: k === 5 ? .6 : 1, borderRadius: [6, 6, 0, 0] } }; }), label: { show: true, position: 'top', formatter: function (q) { return br(q.value); }, color: cor('--ink'), fontWeight: 600 } }];
       montar('ch-proc', o4);
     });
     return h;
   };
 
   /* ---------- PENDÊNCIAS ---------- */
-  var QUEM = ['NAC', 'Imagem', 'Parecer', 'Regulação', 'Centro cirúrgico', 'Serviço social'];
+  QUEM = QUEM || ['NAC', 'Imagem', 'Parecer', 'Regulação', 'Centro cirúrgico', 'Serviço social'];
   V.pend = function () {
     var quem = st.perfil === 'nac' ? ['NAC', 'Imagem', 'Regulação'] : QUEM;
     var L = LEITOS.filter(function (l) { return !l.livre && noFiltro(l) && quem.indexOf(l.quem) >= 0; });
@@ -900,7 +922,7 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
     var h = '<p class="note" style="margin:0 0 12px">Toda sugestão é apoio à decisão do médico, nunca conduta automática.</p>';
     h += '<div class="kpis">' + TIPOS.map(function (t) { return kpi({ l: t[1], v: String(L.filter(function (l) { return l.alerta[1] === t[0]; }).length), s: 'pacientes com alerta agora', top: t[2] }); }).join('') + '</div>';
     h += '<div class="g c12 mt">' + card(null, 'Creatinina dos pacientes com alerta renal', 'Últimos 5 dias · exemplo do cruzamento de exames', '<div class="chart" id="ch-cr"></div>', 's6') +
-      card(null, 'Profilaxia de tromboembolismo', 'Pacientes com indicação (cinza) × com profilaxia prescrita, por setor', '<div class="chart" id="ch-tev"></div>', 's6') + '</div>';
+      (REAL ? '' : card(null, 'Profilaxia de tromboembolismo', 'Pacientes com indicação (cinza) × com profilaxia prescrita, por setor', '<div class="chart" id="ch-tev"></div>', 's6')) + '</div>';
     h += '<div class="mt">' + card(null, 'Alertas por paciente', 'Toque para abrir o leito', '<div class="scroll"><table><thead><tr><th>Leito</th><th>Setor</th><th>Alerta</th><th>Tipo</th></tr></thead><tbody>' +
       (L.length ? L.map(function (l) { var t = TIPOS.filter(function (x) { return x[0] === l.alerta[1]; })[0]; return '<tr class="clk" data-leito="' + l.leito + '"><td class="mono">' + l.leito + '</td><td>' + S(l.set).curto + '</td><td>' + esc(l.alerta[0]) + '</td><td><span class="pill" style="background:var(--panel2);color:' + t[2] + '">' + t[1] + '</span></td></tr>'; }).join('') : '<tr><td colspan="4" class="empty">Nenhum alerta neste setor.</td></tr>') + '</tbody></table></div>') + '</div>';
     POS.push(function () {
@@ -912,7 +934,7 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
       var ss = setoresPerfil().filter(function (s) { return s !== EMGS; }), ix = ss.map(function (s) { return SET.indexOf(s); });
       var o2 = base(); o2.xAxis = eixoX(ss.map(function (s) { return s.curto; }), true); o2.xAxis.axisLabel = { color: cor('--muted'), interval: 0, width: 64, overflow: 'break' }; o2.yAxis = eixoY('{value}'); o2.legend.data = ['Com indicação', 'Com profilaxia']; o2.tooltip.axisPointer = { type: 'shadow' };
       o2.series = [{ name: 'Com indicação', type: 'bar', barGap: '-100%', barWidth: '48%', data: ix.map(function (i) { return TEV[i][0]; }), itemStyle: { color: cor('--line'), borderRadius: [5, 5, 0, 0] } }, { name: 'Com profilaxia', type: 'bar', barGap: '-100%', barWidth: '30%', z: 3, data: ix.map(function (i) { return TEV[i][1]; }), itemStyle: { color: hexa('--violet'), borderRadius: [5, 5, 0, 0] } }];
-      montar('ch-tev', o2);
+      if (!REAL) montar('ch-tev', o2);
     });
     return h;
   };
@@ -1061,10 +1083,13 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
 
   /* ---------- DESEMPENHO ---------- */
   V.desemp = function () {
-    var h = '<div class="kpis">' + kpi({ sp: 'd1', l: 'Altas antecipadas', v: br(last(mm(PAINEL.acerto, 7))) + '%', s: 'das altas do dia já estavam apontadas de manhã', cls: 'good' }) +
-      kpi({ sp: 'd2', l: 'Altas que escaparam', v: br(last(mm(PAINEL.escape, 7))) + '%', s: 'saíram sem estar apontadas', cls: 'bad' }) +
-      kpi({ sp: 'd3', l: 'Pendências que andaram', v: br(last(mm(PAINEL.andaram, 7))) + '%', s: 'no dia seguinte à cobrança' }) +
-      kpi({ l: 'Regras aprendidas', v: '14', s: 'desde a implantação, revisadas pelo médico de referência' }) +
+    function med7(a) { var x = (a || []).filter(function (v) { return v != null; }).slice(-7); return x.length ? br(avg(x)) + '%' : '—'; }
+    var semHist = !(PAINEL.acerto || []).some(function (v) { return v != null; });
+    var h = (semHist ? '<p class="note" style="margin:0 0 12px">Os números de desempenho aparecem depois dos primeiros dias de uso: o Celeris compara o que apontou de manhã com o que aconteceu.</p>' : '') +
+      '<div class="kpis">' + kpi({ sp: 'd1', l: 'Altas antecipadas', v: med7(PAINEL.acerto), s: 'das altas do dia já estavam apontadas de manhã', cls: 'good' }) +
+      kpi({ sp: 'd2', l: 'Altas que escaparam', v: med7(PAINEL.escape), s: 'saíram sem estar apontadas', cls: 'bad' }) +
+      kpi({ sp: 'd3', l: 'Pendências que andaram', v: med7(PAINEL.andaram), s: 'no dia seguinte à cobrança' }) +
+      (REAL ? '' : kpi({ l: 'Regras aprendidas', v: '14', s: 'desde a implantação, revisadas pelo médico de referência' })) +
       kpi({ l: 'Correções do médico', v: '3', s: 'selos corrigidos nos últimos 7 dias' }) + '</div>';
     h += '<div class="g c12 mt">' + card(null, 'Acerto e escape das altas', 'Média de 7 dias', '<div class="chart lg" id="ch-ae"></div>', 's8') +
       card(null, 'Por que as altas escaparam', 'Últimos 30 dias', '<div class="chart lg" id="ch-por"></div>', 's4') + '</div>';
@@ -1083,7 +1108,7 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
     var h = '<div class="g c12">' + card(null, 'Acessos por perfil', 'Hoje', '<div class="chart" id="ch-acc" style="height:230px"></div>', 's6') +
       card(null, 'Perfis', 'Login com o usuário da rede do hospital', '<table><tbody>' + Object.keys(PERFIS).map(function (k) { return '<tr><td><b>' + PERFIS[k].nome + '</b></td><td>' + PERFIS[k].desc + '</td></tr>'; }).join('') + '</tbody></table><p class="note">Fora do hospital: pela VPN ou com segundo fator. Desligado da rede, perde o acesso no mesmo dia.</p>', 's6') + '</div>';
     h += '<div class="mt">' + card(null, 'Registro de acesso', 'Quem abriu o quê · atualiza enquanto você navega', '<div class="scroll"><table><thead><tr><th>Hora</th><th>Perfil</th><th>O que fez</th></tr></thead><tbody>' + LOG.slice(0, 16).map(function (l) { return '<tr><td class="mono">' + l.h + '</td><td>' + esc(l.p) + '</td><td>' + esc(l.a) + '</td></tr>'; }).join('') + '</tbody></table></div>') + '</div>';
-    POS.push(function () { barrasH('ch-acc', Object.keys(PERFIS).map(function (k) { return PERFIS[k].nome; }), [18, 46, 31, 12, 3], '{value}', Object.keys(PERFIS).map(function () { return hexa('--brand'); })); });
+    POS.push(function () { barrasH('ch-acc', Object.keys(PERFIS).map(function (k) { return PERFIS[k].nome; }), (REAL ? Object.keys(PERFIS).map(function (k) { return REAL.acessosPerfil[k] || 0; }) : [18, 46, 31, 12, 3]), '{value}', Object.keys(PERFIS).map(function () { return hexa('--brand'); })); });
     return h;
   };
 
@@ -1126,6 +1151,7 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
   function escuro() { var t = document.documentElement.getAttribute('data-theme'); return t ? t === 'dark' : !!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); }
   function perHTML(cls) { return '<div class="seg ' + cls + '" role="group" aria-label="Período">' + [30, 60, 90, 120].map(function (p) { return '<button data-per="' + p + '" aria-pressed="' + (st.per === p) + '">' + p + ' dias</button>'; }).join('') + '</div>'; }
   function desenhar() {
+    if (REAL) { document.querySelector('.upd span:last-child').textContent = REAL.atualizado; document.querySelector('.sidefoot').innerHTML = esc(REAL.hospital) + '<br>' + esc(REAL.usuario.nome); }
     var tp = telasPerfil(); if (!tp.some(function (t) { return t.id === st.tela; })) st.tela = tp[0].id;
     var pS = setoresPerfil(); if (st.setor !== 'ALL' && !pS.some(function (s) { return s.k === st.setor; })) st.setor = 'ALL';
     if (PERFIS[st.perfil].setores && pS.length === 1) st.setor = pS[0].k;
@@ -1156,7 +1182,7 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
         return '<button class="sec" data-area="' + a.k + '" aria-pressed="' + (st.area === a.k) + '" title="' + a.nome + '"><span class="st" style="background:var(--' + c + ')"></span><b>' + a.nome + '</b><span class="m">' + L.length + '/' + a.cap + ' · ' + ag + ' aguardam leito</span><span class="mb"><i style="width:' + Math.min(100, pc) + '%;background:var(--' + (c === 'ok' ? 'brand' : c) + ')"></i></span></button>'; }).join(''); }
     limpar(); POS = [];
     var html = V[st.tela]();
-    document.getElementById('conteudo').innerHTML = instalarHTML() + (standalone ? '' : '<div class="demo">Protótipo · Hospital Modelo, pacientes e números fictícios</div>') + (tela.per ? perHTML('mper') : '') + '<div class="view">' + html + '</div>';
+    document.getElementById('conteudo').innerHTML = instalarHTML() + (standalone || REAL ? '' : '<div class="demo">Protótipo · Hospital Modelo, pacientes e números fictícios</div>') + (tela.per ? perHTML('mper') : '') + '<div class="view">' + html + '</div>';
     POS.forEach(function (f) { try { f(); } catch (e) { if (window.console) console.error(e); } });
     var on = secEl.querySelector('[aria-pressed="true"]'); if (on && on.scrollIntoView && secEl.scrollWidth > secEl.clientWidth) { var r = on.getBoundingClientRect(), R = secEl.getBoundingClientRect(); if (r.left < R.left || r.right > R.right) secEl.scrollLeft += r.left - R.left - 16; }
     salvar();
@@ -1167,6 +1193,7 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
     if (e.target.closest('#b-inst') && promptInst) { promptInst.prompt(); promptInst.userChoice.then(function () { promptInst = null; desenhar(); }); return; }
     if (e.target.closest('#b-inst-x')) { fechouInst = true; try { localStorage.setItem('celeris-inst-fechado', '1'); } catch (er) {} desenhar(); return; }
     if (e.target.closest('#b-perfil')) { var m = document.getElementById('menu'); m.hidden = !m.hidden; e.target.closest('#b-perfil').setAttribute('aria-expanded', String(!m.hidden));
+      if (REAL) { m.innerHTML = '<div class="note" style="margin:4px 10px 6px;font-weight:700">' + esc(REAL.usuario.nome) + '</div><a href="/sair" style="display:flex;padding:9px 10px;border-radius:9px;font-weight:600;color:inherit;text-decoration:none">' + ic('x') + '&nbsp; Sair</a>'; return; }
       m.innerHTML = '<div class="note" style="margin:4px 10px 6px;font-weight:700">Ver como</div>' + Object.keys(PERFIS).map(function (k) { return '<button role="menuitemradio" aria-checked="' + (st.perfil === k) + '" data-perfil="' + k + '">' + ic('user') + '<span>' + PERFIS[k].nome + '<small>' + PERFIS[k].desc + '</small></span></button>'; }).join(''); return; }
     if ((t = e.target.closest('[data-perfil]'))) { st.perfil = t.getAttribute('data-perfil'); st.setor = 'ALL'; st.selo = ''; st.quem = ''; reg('entrou no sistema'); fecharMenus(); desenhar(); window.scrollTo(0, 0); return; }
     if (!e.target.closest('.profile')) fecharMenus();
@@ -1187,7 +1214,7 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
     if (e.target.getAttribute && e.target.getAttribute('data-jornada')) { st.jornada = +e.target.value; reg('mudou a jornada para ' + st.jornada + ' h'); desenhar(); return; }
     var id = e.target.getAttribute && e.target.getAttribute('data-corrige'); if (!id) return;
     var l = LEITOS.filter(function (x) { return x.leito === id; })[0]; if (!l) return;
-    l.selo = e.target.value; l.hist[2] = l.selo; reg('corrigiu o selo de ' + id + ' para ' + l.selo); desenhar(); abrirLeito(id);
+    l.selo = e.target.value; l.hist[2] = l.selo; if (REAL) { fetch('/api/correcao', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ leito: id, selo: l.selo }) }); LOG.unshift({ h: '', p: PERFIS[st.perfil].nome, a: 'corrigiu o selo de ' + id + ' para ' + l.selo }); } else reg('corrigiu o selo de ' + id + ' para ' + l.selo); desenhar(); abrirLeito(id);
   });
   document.addEventListener('input', function (e) {
     if (e.target.id !== 'busca') return;
@@ -1197,7 +1224,8 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { over.innerHTML = ''; fecharMenus(); } });
   if (window.matchMedia) { var mq = matchMedia('(prefers-color-scheme: dark)'); if (mq.addEventListener) mq.addEventListener('change', function () { if (!st.tema) desenhar(); }); }
-  if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+  if (REAL && 'serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).catch(function () {});
+  else if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
   desenhar();
 })();
 </script>
