@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Celeris Central</title>
+<meta name="description" content="Indicadores dos hospitais com Celeris: visão de rede e comparação entre hospitais.">
+<link rel="icon" type="image/png" href="/celeris/icone-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="/vendor/tabler/tabler-icons.min.css?v=3.48.0">
+<!-- Central do Celeris (17/10/2026). O navegador não decide nada: cada leitura passa pela função celerisPainel,
+     que confere a conta (administração MedTech, ou e-mail liberado para hospitais e redes) a cada chamada. -->
+<script>window.MT_APP={id:"celeris-central",name:"Celeris Central",linha:"celeris"};</script>
+<script src="/_mtfb.js?v=1"></script>
+<script type="module" src="/_mtauth.js?v=47"></script>
+<style>
+:root {
+  --bg: #f2f4f1; --panel: #ffffff; --panel2: #f6f8f5; --ink: #142028; --muted: #5b6772; --line: #dde2dc; --grid: #e9ece7;
+  --brand: #0f6b5a; --brand2: #13896f; --brand-ink: #ffffff; --brand-soft: #d9efe8;
+  --ok: #2f8a4f; --ok-soft: #e0f2e6; --warn: #b07100; --warn-soft: #fcefd3; --crit: #c0352b; --crit-soft: #fbe2df; --info: #2459a8; --info-soft: #e1eaf7;
+  --shadow: 0 1px 2px rgba(20,32,40,.06), 0 6px 20px rgba(20,32,40,.06);
+  --f-display: 'Archivo', 'Segoe UI', Arial, sans-serif; --f-body: 'Source Sans 3', 'Segoe UI', Arial, sans-serif; --f-data: 'JetBrains Mono', Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0d1418; --panel: #151f25; --panel2: #1a262d; --ink: #e6ebe9; --muted: #98a6a2; --line: #26333a; --grid: #223038;
+  --brand: #38b496; --brand2: #4fd0ae; --brand-ink: #04211a; --brand-soft: #173a32;
+  --ok: #5cc581; --ok-soft: #163426; --warn: #e6a73e; --warn-soft: #3a2b10; --crit: #f0766b; --crit-soft: #3e1c1a; --info: #82a9e8; --info-soft: #1a2a40;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25); color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0d1418; --panel: #151f25; --panel2: #1a262d; --ink: #e6ebe9; --muted: #98a6a2; --line: #26333a; --grid: #223038;
+  --brand: #38b496; --brand2: #4fd0ae; --brand-ink: #04211a; --brand-soft: #173a32;
+  --ok: #5cc581; --ok-soft: #163426; --warn: #e6a73e; --warn-soft: #3a2b10; --crit: #f0766b; --crit-soft: #3e1c1a; --info: #82a9e8; --info-soft: #1a2a40;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25); color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.45 var(--f-body); }
+h1, h2, h3 { font-family: var(--f-display); letter-spacing: -.01em; margin: 0; }
+button, input, select { font: inherit; color: inherit; }
+.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.top .in { max-width: 1240px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 12px; }
+.marca { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.marca .mk { width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center; color: #fff; font: 800 18px var(--f-display); background: linear-gradient(140deg, #0f6b5a, #2fc79a); }
+.marca b { font: 800 19px var(--f-display); } .marca small { display: block; color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; }
+.esp { flex: 1; }
+.quem { color: var(--muted); font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 34vw; }
+.btn { border: 1px solid var(--line); background: var(--panel); border-radius: 10px; padding: 7px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 14px; }
+.btn.p { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
+.btn:disabled { opacity: .55; cursor: default; }
+.abas { max-width: 1240px; margin: 0 auto; padding: 0 16px; display: flex; gap: 4px; overflow-x: auto; }
+.abas button { border: 0; background: none; padding: 10px 12px; border-bottom: 2px solid transparent; cursor: pointer; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.abas button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--brand); }
+main { max-width: 1240px; margin: 0 auto; padding: 20px 16px 80px; }
+.sub { color: var(--muted); margin: 4px 0 0; }
+.barra { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 16px 0; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--panel); }
+.seg button { border: 0; background: none; padding: 7px 12px; cursor: pointer; font-weight: 600; font-size: 14px; }
+.seg button[aria-pressed="true"] { background: var(--brand-soft); color: var(--brand); }
+select { border: 1px solid var(--line); background: var(--panel); border-radius: 10px; padding: 7px 10px; max-width: 100%; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 16px; box-shadow: var(--shadow); min-width: 0; }
+.card h3 { font-size: 17px; } .card .meta { color: var(--muted); font-size: 13px; margin-top: 2px; }
+.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 8px; margin-top: 14px; }
+.kpi .v { font: 700 21px var(--f-data); } .kpi .r { color: var(--muted); font-size: 12px; line-height: 1.25; }
+.pilula { display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; padding: 2px 9px; font-size: 12px; font-weight: 700; }
+.pilula.ok { background: var(--ok-soft); color: var(--ok); } .pilula.warn { background: var(--warn-soft); color: var(--warn); } .pilula.crit { background: var(--crit-soft); color: var(--crit); } .pilula.info { background: var(--info-soft); color: var(--info); }
+.tabela { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { padding: 9px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); background: var(--panel2); white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td.n { font-family: var(--f-data); text-align: right; white-space: nowrap; } th.n { text-align: right; }
+.faixa { position: relative; height: 22px; min-width: 160px; }
+.faixa .eixo { position: absolute; left: 0; right: 0; top: 10px; height: 2px; background: var(--grid); border-radius: 2px; }
+.faixa .iqr { position: absolute; top: 5px; height: 12px; background: var(--brand-soft); border: 1px solid color-mix(in srgb, var(--brand) 40%, transparent); border-radius: 6px; }
+.faixa .med { position: absolute; top: 3px; width: 2px; height: 16px; background: var(--brand); }
+.faixa .voce { position: absolute; top: 2px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; border: 3px solid var(--panel); background: var(--ink); box-shadow: 0 0 0 1px var(--ink); top: 4px; }
+.vazio { background: var(--panel); border: 1px dashed var(--line); border-radius: 16px; padding: 28px 20px; text-align: center; color: var(--muted); }
+.aviso { background: var(--info-soft); color: var(--ink); border-radius: 12px; padding: 12px 14px; margin: 12px 0; font-size: 14px; }
+.aviso.erro { background: var(--crit-soft); }
+h2 { font-size: 20px; margin-top: 26px; } h2:first-child { margin-top: 0; }
+.grafico { width: 100%; height: auto; display: block; }
+.grafico text { fill: var(--muted); font: 11px var(--f-body); }
+.form { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; align-items: end; }
+.form label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); font-weight: 600; }
+.form input, .form select { border: 1px solid var(--line); background: var(--panel); border-radius: 10px; padding: 8px 10px; color: var(--ink); width: 100%; }
+.chave { font: 600 14px var(--f-data); word-break: break-all; background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 10px; margin: 8px 0; }
+.oculto { display: none !important; }
+.legenda { display: flex; gap: 16px; flex-wrap: wrap; color: var(--muted); font-size: 13px; margin: 8px 0 0; }
+.legenda i.q { display: inline-block; width: 18px; height: 10px; border-radius: 4px; background: var(--brand-soft); border: 1px solid var(--brand); vertical-align: middle; margin-right: 4px; }
+.legenda i.b { display: inline-block; width: 11px; height: 11px; border-radius: 50%; background: var(--ink); vertical-align: middle; margin-right: 4px; }
+@media (max-width: 640px) { .kpis { grid-template-columns: repeat(2, 1fr); } .cards { grid-template-columns: 1fr; } .quem { display: none; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <a class="marca" href="#hospitais"><span class="mk" aria-hidden="true">C</span><span><b>Celeris</b><small>Central</small></span></a>
+    <span class="esp"></span>
+    <span class="quem" id="quem">Entrando…</span>
+    <button class="btn" id="btSair" type="button"><i class="ti ti-logout" aria-hidden="true"></i>Sair</button>
+  </div>
+  <nav class="abas" id="abas" role="tablist"></nav>
+</header>
+<main id="tela"><div class="vazio">Carregando…</div></main>
+<script>
+(function () {
+'use strict';
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const num = (v, d) => v === null || v === undefined || !isFinite(v) ? '—' : Number(v).toLocaleString('pt-BR', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 });
+const ddmm = d => d ? d.slice(8, 10) + '/' + d.slice(5, 7) : '';
+const E = { eu: null, aba: 'hospitais', periodo: 30, grupo: 'hospital', alvo: '', porte: false, serieDe: '', serie: null, adm: null };
+
+async function chamar(dados) {
+  const A = await MT.acessoModulo();
+  return A.chamar('celerisPainel', dados, MT.user);
+}
+/* casas decimais e formato de cada indicador */
+const FMT = { ocupacao: [0, '%'], permanencia: [1, ' d'], mortalidade: [1, '%'], giro: [1, ''], altas_12h: [0, '%'], altas_previstas: [0, '%'], dot: [0, ''], emg_espera: [1, ' h'], emg_conversao: [0, '%'] };
+const fmt = (ind, v) => v === null || v === undefined ? '—' : num(v, FMT[ind][0]) + FMT[ind][1];
+const nomeGrupo = g => g === 'hospital' ? 'Hospital todo' : (E.eu.categorias[g] || g);
+const PORTE = { pequeno: 'pequeno (até 49 leitos)', medio: 'médio (50 a 149)', grande: 'grande (150 a 499)', especial: 'especial (500 ou mais)' };
+const resumo = h => h[E.periodo === 90 ? 'resumo90' : 'resumo30'];
+
+function diasDesde(d) { return d ? Math.floor((Date.now() - Date.parse(d + 'T12:00:00-03:00')) / 864e5) : null; }
+function situacao(h) {
+  const n = diasDesde(h.ultimoDia);
+  if (n === null) return '<span class="pilula info">aguardando o primeiro envio</span>';
+  if (n <= 2) return '<span class="pilula ok"><i class="ti ti-circle-check"></i>em dia</span>';
+  return `<span class="pilula ${n > 7 ? 'crit' : 'warn'}">sem envio há ${n} dias</span>`;
+}
+
+/* ---------------- abas ---------------- */
+const ABAS = [['hospitais', 'Hospitais'], ['comparar', 'Lado a lado'], ['bench', 'Comparação com outros'], ['tendencia', 'Tendência']];
+function abas() {
+  const l = ABAS.concat(E.eu.admin ? [['admin', 'Administração']] : []);
+  $('#abas').innerHTML = l.map(([k, n]) => `<button role="tab" data-aba="${k}" aria-selected="${E.aba === k}">${n}</button>`).join('');
+  document.querySelectorAll('[data-aba]').forEach(b => b.onclick = () => { E.aba = b.dataset.aba; history.replaceState(null, '', '#' + E.aba); desenhar(); });
+}
+const segPeriodo = () => `<div class="seg" role="group" aria-label="Período">${[30, 90].map(p => `<button data-per="${p}" aria-pressed="${E.periodo === p}">${p} dias</button>`).join('')}</div>`;
+function ligaPeriodo() { document.querySelectorAll('[data-per]').forEach(b => b.onclick = () => { E.periodo = Number(b.dataset.per); desenhar(); }); }
+function selHospital(id) {
+  return `<select id="${id}" aria-label="Hospital">${E.eu.hospitais.map(h => `<option value="${esc(h.id)}" ${h.id === E.alvo ? 'selected' : ''}>${esc(h.nome)}</option>`).join('')}</select>`;
+}
+function semHospitais() {
+  return `<div class="vazio"><p><b>Esta conta ainda não acompanha nenhum hospital.</b></p><p>A MedTech libera o acesso pelo e-mail da conta (${esc(E.eu.email)}): fale com quem contratou o Celeris no seu hospital ou na sua rede.</p></div>`;
+}
+
+/* ---------------- Hospitais ---------------- */
+function vHospitais() {
+  if (!E.eu.hospitais.length) return semHospitais();
+  const redes = {}; E.eu.redes.forEach(r => redes[r.id] = r.nome);
+  const grupos = {};
+  E.eu.hospitais.forEach(h => (grupos[h.rede || ''] = grupos[h.rede || ''] || []).push(h));
+  const cartao = h => {
+    const r = resumo(h), x = r ? r.h : {};
+    return `<article class="card"><div style="display:flex;gap:10px;align-items:start"><div style="flex:1;min-width:0"><h3>${esc(h.nome)}</h3>
+      <div class="meta">${esc([h.uf, h.porte && ('porte ' + (PORTE[h.porte] || h.porte)), h.versao && ('Celeris ' + h.versao)].filter(Boolean).join(' · '))}</div></div>${situacao(h)}</div>
+      ${r ? `<div class="kpis">
+        <div class="kpi"><div class="v">${fmt('ocupacao', x.ocupacao)}</div><div class="r">ocupação</div></div>
+        <div class="kpi"><div class="v">${fmt('permanencia', x.permanencia)}</div><div class="r">permanência média</div></div>
+        <div class="kpi"><div class="v">${fmt('mortalidade', x.mortalidade)}</div><div class="r">mortalidade</div></div>
+        <div class="kpi"><div class="v">${fmt('giro', x.giro)}</div><div class="r">giro (saídas/leito/mês)</div></div>
+        <div class="kpi"><div class="v">${fmt('altas_12h', x.altas_12h)}</div><div class="r">altas até 12h</div></div>
+        <div class="kpi"><div class="v">${fmt('dot', x.dot)}</div><div class="r">DOT /1.000 pac-dia</div></div></div>
+        <p class="meta" style="margin-top:10px">${esc(ddmm(r.de))} a ${esc(ddmm(r.ate))} · ${num(x.leitos)} leitos · ${num(x.saidas)} saídas${h.benchmarking ? ' · participa da comparação' : ''}</p>`
+        : '<p class="sub" style="margin-top:12px">Ainda sem números. O servidor do hospital manda uma vez por dia, depois da meia-noite.</p>'}
+    </article>`;
+  };
+  return `<h1>Hospitais</h1><p class="sub">Indicadores dos últimos ${E.periodo} dias fechados, calculados aqui com a mesma definição para todos.</p>
+    <div class="barra">${segPeriodo()}</div>
+    ${Object.keys(grupos).sort().map(r => `${Object.keys(grupos).length > 1 || r ? `<h2>${esc(r ? (redes[r] || r) : 'Sem rede')}</h2>` : ''}<div class="cards" style="margin-top:12px">${grupos[r].map(cartao).join('')}</div>`).join('')}
+    <p class="sub" style="margin-top:20px;font-size:13px">Ocupação = pacientes-dia ÷ leitos-dia. Permanência = pacientes-dia ÷ saídas. Mortalidade = óbitos ÷ saídas. Giro = saídas por leito em 30 dias. DOT = dias de antimicrobiano por 1.000 pacientes-dia. Saídas contam as transferências entre setores. Com menos de 5 saídas no período, permanência e mortalidade ficam em branco.</p>`;
+}
+
+/* ---------------- Lado a lado (os hospitais desta conta, pelo nome) ---------------- */
+function gruposDisponiveis() {
+  const s = new Set(['hospital']);
+  E.eu.hospitais.forEach(h => { const r = resumo(h); if (r) Object.keys(r.c || {}).forEach(c => s.add(c)); });
+  return [...s];
+}
+function vComparar() {
+  if (!E.eu.hospitais.length) return semHospitais();
+  const gs = gruposDisponiveis(); if (!gs.includes(E.grupo)) E.grupo = 'hospital';
+  const inds = E.grupo === 'hospital' ? Object.keys(FMT) : ['ocupacao', 'permanencia', 'mortalidade', 'giro'];
+  const linhas = E.eu.hospitais.map(h => { const r = resumo(h); const x = !r ? null : E.grupo === 'hospital' ? r.h : (r.c || {})[E.grupo]; return { h, x }; }).filter(l => l.x);
+  return `<h1>Lado a lado</h1><p class="sub">Os hospitais que esta conta acompanha, pelo nome. A comparação com os outros clientes, sem nomes, fica na aba seguinte.</p>
+    <div class="barra">${segPeriodo()}<select id="grupo" aria-label="Categoria">${gs.map(g => `<option value="${g}" ${g === E.grupo ? 'selected' : ''}>${esc(nomeGrupo(g))}</option>`).join('')}</select></div>
+    ${linhas.length ? `<div class="tabela"><table><tr><th>Hospital</th>${inds.map(i => `<th class="n">${esc(E.eu.indicadores[i].nome)}</th>`).join('')}<th class="n">Leitos</th></tr>
+      ${linhas.map(({ h, x }) => `<tr><td><b>${esc(h.nome)}</b></td>${inds.map(i => `<td class="n">${fmt(i, x[i])}</td>`).join('')}<td class="n">${num(x.leitos)}</td></tr>`).join('')}
+    </table></div>` : `<div class="vazio">Nenhum hospital com números de ${esc(nomeGrupo(E.grupo))} neste período.</div>`}`;
+}
+
+/* ---------------- Comparação com outros (benchmarking, sem nomes) ---------------- */
+function faixa(l, ind) {
+  if (l.insuficiente || l.voce === null) return '';
+  const vs = [l.p25, l.mediana, l.p75, l.voce];
+  let lo = Math.min(...vs), hi = Math.max(...vs); const pad = (hi - lo) * .15 || 1; lo -= pad; hi += pad;
+  const x = v => ((v - lo) / (hi - lo) * 100).toFixed(1) + '%';
+  return `<div class="faixa" aria-hidden="true"><div class="eixo"></div><div class="iqr" style="left:${x(l.p25)};width:calc(${x(l.p75)} - ${x(l.p25)})"></div><div class="med" style="left:${x(l.mediana)}"></div><div class="voce" style="left:${x(l.voce)}"></div></div>`;
+}
+function posicao(l, ind) {
+  if (l.voce === null) return '';
+  if (l.insuficiente) return `<span class="sub" style="font-size:13px">aparece com ${E.bench.minimo} outros hospitais (hoje ${l.n})</span>`;
+  const s = E.eu.indicadores[ind].sentido;
+  const lado = l.voce < l.p25 ? -1 : l.voce > l.p75 ? 1 : 0;
+  const txt = lado === 0 ? 'entre os quartis' : lado < 0 ? 'abaixo do 1º quartil' : 'acima do 3º quartil';
+  const cls = lado === 0 || s === 0 ? 'info' : lado === s ? 'ok' : 'warn';
+  return `<span class="pilula ${cls}">${txt}</span>`;
+}
+async function carregaBench() {
+  E.bench = null;
+  try { E.bench = await chamar({ op: 'comparar', hospital: E.alvo, periodo: E.periodo, porte: E.porte }); }
+  catch (e) { E.bench = { erro: e.message }; }
+  if (E.aba === 'bench') desenhar();
+}
+function vBench() {
+  if (!E.eu.hospitais.length) return semHospitais();
+  const cab = `<h1>Comparação com outros hospitais</h1><p class="sub">Cada indicador deste hospital contra a distribuição dos outros clientes do Celeris que aceitaram a comparação: sem nomes, só mediana e quartis. Categoria com categoria: UTI com UTI, clínica médica com clínica médica.</p>
+    <div class="barra">${selHospital('alvoB')}${segPeriodo()}<label style="display:flex;gap:6px;align-items:center;font-size:14px"><input type="checkbox" id="porte" ${E.porte ? 'checked' : ''}> só hospitais do mesmo porte</label></div>`;
+  const b = E.bench;
+  if (!b) return cab + '<div class="vazio">Carregando…</div>';
+  if (b.erro) return cab + `<div class="aviso erro">${esc(b.erro)}</div>`;
+  if (b.recusado) return cab + `<div class="aviso">${esc(b.motivo)}</div>`;
+  if (b.semDados) return cab + '<div class="vazio">Este hospital ainda não tem números neste período.</div>';
+  const grupos = Object.keys(b.grupos);
+  return cab + `<p class="sub">${esc(ddmm(b.de))} a ${esc(ddmm(b.ate))} · ${b.participantes} ${b.participantes === 1 ? 'outro hospital participa' : 'outros hospitais participam'}${b.mesmoPorte ? ' (porte ' + esc(PORTE[b.porte] || b.porte) + ')' : ''} · cada linha aparece com pelo menos ${b.minimo} hospitais com o indicador.</p>
+    <div class="legenda"><span><i class="q"></i>metade do meio dos outros (1º ao 3º quartil)</span><span><i class="b"></i>este hospital</span><span>traço = mediana</span></div>
+    ${grupos.map(g => `<h2>${esc(nomeGrupo(g))}</h2><div class="tabela" style="margin-top:10px"><table>
+      <tr><th>Indicador</th><th class="n">Este hospital</th><th class="n">1º quartil</th><th class="n">Mediana</th><th class="n">3º quartil</th><th style="min-width:180px"></th><th>Posição</th></tr>
+      ${Object.keys(b.grupos[g]).map(ind => { const l = b.grupos[g][ind]; return `<tr><td>${esc(E.eu.indicadores[ind].nome)}</td><td class="n"><b>${fmt(ind, l.voce)}</b></td>
+        <td class="n">${l.insuficiente ? '—' : fmt(ind, l.p25)}</td><td class="n">${l.insuficiente ? '—' : fmt(ind, l.mediana)}</td><td class="n">${l.insuficiente ? '—' : fmt(ind, l.p75)}</td>
+        <td>${faixa(l, ind)}</td><td>${posicao(l, ind)}</td></tr>`; }).join('')}
+    </table></div>`).join('')}
+    <p class="sub" style="margin-top:16px;font-size:13px">Cor só onde o indicador tem um sentido claro (permanência, mortalidade, DOT e espera: menor; giro e altas até 12h: maior). Ocupação e internação pela emergência dependem do perfil do hospital e ficam sem cor.</p>`;
+}
+
+/* ---------------- Tendência (série diária) ---------------- */
+async function carregaSerie() {
+  E.serie = null; E.serieDe = E.alvo;
+  try { E.serie = await chamar({ op: 'serie', hospital: E.alvo, dias: 120 }); } catch (e) { E.serie = { erro: e.message }; }
+  if (E.aba === 'tendencia') desenhar();
+}
+function linhaSvg(pontos, titulo, un, cor) {
+  const W = 760, H = 190, ml = 40, mr = 10, mt = 14, mb = 26;
+  const vs = pontos.map(p => p.v).filter(v => v !== null);
+  if (vs.length < 2) return `<div class="vazio">${esc(titulo)}: poucos dias com dado.</div>`;
+  let lo = Math.min(...vs), hi = Math.max(...vs); if (hi === lo) { hi += 1; lo -= 1; } const pad = (hi - lo) * .1; lo -= pad; hi += pad;
+  const x = i => ml + i / (pontos.length - 1) * (W - ml - mr), y = v => mt + (1 - (v - lo) / (hi - lo)) * (H - mt - mb);
+  let d = ''; pontos.forEach((p, i) => { if (p.v === null) return; d += (d && pontos[i - 1] && pontos[i - 1].v !== null ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(p.v).toFixed(1); });
+  const ticks = [lo + pad, (lo + hi) / 2, hi - pad];
+  const marcas = pontos.map((p, i) => i).filter(i => i % Math.ceil(pontos.length / 6) === 0);
+  return `<figure class="card" style="margin:12px 0 0"><figcaption style="font-weight:700">${esc(titulo)}</figcaption>
+    <svg class="grafico" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(titulo)}">
+      ${ticks.map(t => `<line x1="${ml}" x2="${W - mr}" y1="${y(t)}" y2="${y(t)}" stroke="var(--grid)"/><text x="${ml - 6}" y="${y(t) + 4}" text-anchor="end">${num(t, un === 'd' ? 1 : 0)}</text>`).join('')}
+      ${marcas.map(i => `<text x="${x(i)}" y="${H - 8}" text-anchor="middle">${ddmm(pontos[i].d)}</text>`).join('')}
+      <path d="${d}" fill="none" stroke="${cor}" stroke-width="2.2" stroke-linejoin="round"/>
+    </svg></figure>`;
+}
+function vTendencia() {
+  if (!E.eu.hospitais.length) return semHospitais();
+  const cab = `<h1>Tendência</h1><p class="sub">Dia a dia, até 120 dias. A permanência é a média móvel de 7 dias (pacientes-dia ÷ saídas na semana).</p><div class="barra">${selHospital('alvoT')}</div>`;
+  if (!E.serie || E.serieDe !== E.alvo) return cab + '<div class="vazio">Carregando…</div>';
+  if (E.serie.erro) return cab + `<div class="aviso erro">${esc(E.serie.erro)}</div>`;
+  const dias = E.serie.dias || [];
+  if (!dias.length) return cab + '<div class="vazio">Ainda sem dias recebidos.</div>';
+  const tot = d => Object.values(d.c || {}).reduce((a, x) => ({ leitos: a.leitos + (x.leitos || 0), pd: a.pd + (x.pd || 0), saidas: a.saidas + (x.saidas || 0) }), { leitos: 0, pd: 0, saidas: 0 });
+  const T = dias.map(tot);
+  const ocup = dias.map((d, i) => ({ d: d.data, v: T[i].leitos ? T[i].pd / T[i].leitos * 100 : null }));
+  const perm = dias.map((d, i) => { if (i < 6) return { d: d.data, v: null }; const s = T.slice(i - 6, i + 1).reduce((a, x) => ({ pd: a.pd + x.pd, sa: a.sa + x.saidas }), { pd: 0, sa: 0 }); return { d: d.data, v: s.sa >= 5 ? s.pd / s.sa : null }; });
+  const espera = dias.map(d => ({ d: d.data, v: d.h && d.h.emg_espera !== null && d.h.emg_espera !== undefined ? d.h.emg_espera : null }));
+  return cab + linhaSvg(ocup, 'Ocupação do hospital (%)', '%', 'var(--brand)') + linhaSvg(perm, 'Permanência média, 7 dias (dias)', 'd', 'var(--info)')
+    + (espera.some(p => p.v !== null) ? linhaSvg(espera, 'Espera por leito na emergência às 7h (h)', 'h', 'var(--warn)') : '');
+}
+
+/* ---------------- Administração (só MedTech) ---------------- */
+async function carregaAdm() {
+  try { E.adm = await chamar({ op: 'adminListar' }); } catch (e) { E.adm = { erro: e.message }; }
+  if (E.aba === 'admin') desenhar();
+}
+function vAdmin() {
+  const a = E.adm;
+  if (!a) return '<div class="vazio">Carregando…</div>';
+  if (a.erro) return `<div class="aviso erro">${esc(a.erro)}</div>`;
+  const nomeRede = id => (a.redes.find(r => r.id === id) || {}).nome || id;
+  return `<h1>Administração</h1><p class="sub">Hospitais, redes, chaves de envio e quem acompanha cada um. A chave aparece uma vez só: entregue à TI do hospital, que cola em Configurar › Central MedTech no servidor do Celeris.</p>
+  <h2>Hospitais</h2>
+  <div class="tabela" style="margin-top:10px"><table><tr><th>Hospital</th><th>Rede</th><th>Situação</th><th>Versão</th><th>Comparação</th><th>Chave</th><th></th></tr>
+    ${a.hospitais.map(h => `<tr><td><b>${esc(h.nome)}</b><br><span class="sub" style="font-size:12px">${esc(h.id)}${h.uf ? ' · ' + esc(h.uf) : ''}</span></td><td>${esc(h.rede ? nomeRede(h.rede) : '—')}</td>
+      <td>${situacao(h)}</td><td>${esc(h.versao || '—')}</td><td>${h.ultimoEnvio ? (h.benchmarking ? 'participa' : 'não participa') : '—'}</td>
+      <td style="font-family:var(--f-data)">${h.chaveFim ? '…' + esc(h.chaveFim) : '—'}</td><td><button class="btn" data-chave="${esc(h.id)}">${h.chaveFim ? 'Trocar chave' : 'Gerar chave'}</button></td></tr>`).join('') || '<tr><td colspan="7" class="sub">Nenhum hospital cadastrado.</td></tr>'}
+  </table></div>
+  <div id="novaChave"></div>
+  <div class="card" style="margin-top:14px"><h3>Cadastrar ou editar hospital</h3><div class="form" style="margin-top:10px">
+    <label>Identificador<input id="hId" placeholder="ex.: hospital-central" autocomplete="off"></label><label>Nome<input id="hNome" autocomplete="off"></label>
+    <label>Rede<select id="hRede"><option value="">sem rede</option>${a.redes.map(r => `<option value="${esc(r.id)}">${esc(r.nome)}</option>`).join('')}</select></label>
+    <label>UF<input id="hUf" maxlength="2" autocomplete="off"></label><button class="btn p" id="hGravar">Gravar hospital</button></div></div>
+  <h2>Redes</h2>
+  <div class="card" style="margin-top:10px">${a.redes.length ? `<p>${a.redes.map(r => `<b>${esc(r.nome)}</b> <span class="sub">(${esc(r.id)})</span>`).join(' · ')}</p>` : '<p class="sub">Nenhuma rede.</p>'}
+    <div class="form"><label>Identificador<input id="rId" placeholder="ex.: rede-norte" autocomplete="off"></label><label>Nome<input id="rNome" autocomplete="off"></label><button class="btn p" id="rGravar">Gravar rede</button></div></div>
+  <h2>Quem acompanha</h2>
+  <div class="tabela" style="margin-top:10px"><table><tr><th>E-mail da conta MedTech</th><th>Redes</th><th>Hospitais</th><th>Desde</th></tr>
+    ${a.acessos.map(x => `<tr><td>${esc(x.email)}</td><td>${esc(x.redes.map(nomeRede).join(', ') || '—')}</td><td>${esc(x.hospitais.join(', ') || '—')}</td><td>${esc((x.em || '').slice(0, 10))}</td></tr>`).join('') || '<tr><td colspan="4" class="sub">Ninguém além da administração.</td></tr>'}
+  </table></div>
+  <div class="card" style="margin-top:14px"><h3>Liberar ou mudar acesso</h3><p class="sub">A pessoa entra com a conta MedTech desse e-mail (com o e-mail confirmado). Deixe redes e hospitais em branco para tirar o acesso.</p><div class="form" style="margin-top:10px">
+    <label>E-mail<input id="aEmail" type="email" autocomplete="off"></label><label>Redes (identificadores, vírgula)<input id="aRedes" autocomplete="off"></label>
+    <label>Hospitais (identificadores, vírgula)<input id="aHosp" autocomplete="off"></label><button class="btn p" id="aGravar">Gravar acesso</button></div></div>
+  <div id="admMsg"></div>`;
+}
+function ligaAdmin() {
+  const aviso = (t, erro) => { $('#admMsg').innerHTML = `<div class="aviso ${erro ? 'erro' : ''}">${esc(t)}</div>`; };
+  const faz = async (b, dados, ok) => { b.disabled = true; try { const r = await chamar(dados); await carregaAdm(); ok && ok(r); } catch (e) { aviso(e.message, true); } finally { b.disabled = false; } };
+  const lista = s => s.split(',').map(x => x.trim()).filter(Boolean);
+  $('#hGravar').onclick = e => faz(e.target, { op: 'adminHospital', id: $('#hId').value.trim(), nome: $('#hNome').value.trim(), rede: $('#hRede').value, uf: $('#hUf').value.trim() }, () => aviso('Hospital gravado. Gere a chave na tabela.'));
+  $('#rGravar').onclick = e => faz(e.target, { op: 'adminRede', id: $('#rId').value.trim(), nome: $('#rNome').value.trim() }, () => aviso('Rede gravada.'));
+  $('#aGravar').onclick = e => faz(e.target, { op: 'adminAcesso', email: $('#aEmail').value.trim(), redes: lista($('#aRedes').value), hospitais: lista($('#aHosp').value) }, r => aviso(r.removido ? 'Acesso retirado.' : 'Acesso gravado.'));
+  document.querySelectorAll('[data-chave]').forEach(b => b.onclick = () => {
+    const id = b.dataset.chave;
+    if (b.textContent.startsWith('Trocar') && !confirm('Trocar a chave? A atual deixa de valer na hora e o servidor do hospital para de enviar até a TI colar a nova.')) return;
+    faz(b, { op: 'adminChave', hospital: id }, r => {
+      $('#novaChave').innerHTML = `<div class="card" style="margin-top:14px"><h3>Chave de ${esc(id)}</h3><p class="sub">Copie agora: ela não aparece de novo. Entregue à TI do hospital por um canal seguro.</p><div class="chave" id="chaveTxt">${esc(r.chave)}</div><button class="btn" id="copiar"><i class="ti ti-copy"></i>Copiar</button></div>`;
+      $('#copiar').onclick = () => navigator.clipboard.writeText(r.chave).then(() => { $('#copiar').textContent = 'Copiada'; });
+    });
+  });
+}
+
+/* ---------------- desenho ---------------- */
+function desenhar() {
+  abas();
+  if (!E.alvo && E.eu.hospitais.length) E.alvo = E.eu.hospitais[0].id;
+  const V = { hospitais: vHospitais, comparar: vComparar, bench: vBench, tendencia: vTendencia, admin: vAdmin };
+  if (!V[E.aba] || (E.aba === 'admin' && !E.eu.admin)) E.aba = 'hospitais';
+  $('#tela').innerHTML = V[E.aba]();
+  ligaPeriodo();
+  const g = $('#grupo'); if (g) g.onchange = () => { E.grupo = g.value; desenhar(); };
+  const ab = $('#alvoB'); if (ab) ab.onchange = () => { E.alvo = ab.value; carregaBench(); desenhar(); };
+  const at = $('#alvoT'); if (at) at.onchange = () => { E.alvo = at.value; carregaSerie(); desenhar(); };
+  const po = $('#porte'); if (po) po.onchange = () => { E.porte = po.checked; carregaBench(); desenhar(); };
+  if (E.aba === 'bench' && E.eu.hospitais.length && (!E.bench || E.benchChave !== [E.alvo, E.periodo, E.porte].join())) { E.benchChave = [E.alvo, E.periodo, E.porte].join(); carregaBench(); }
+  if (E.aba === 'tendencia' && E.eu.hospitais.length && E.serieDe !== E.alvo) carregaSerie();
+  if (E.aba === 'admin' && E.eu.admin) { if (!E.adm) carregaAdm(); else if (!E.adm.erro) ligaAdmin(); }
+}
+
+async function iniciar() {
+  $('#quem').textContent = MT.user.email || '';
+  try { E.eu = await chamar({ op: 'eu' }); }
+  catch (e) { $('#tela').innerHTML = `<div class="aviso erro">${esc(e.message)}</div>`; return; }
+  const h = location.hash.slice(1); if (h) E.aba = h;
+  desenhar();
+}
+window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (E.eu && h && h !== E.aba) { E.aba = h; desenhar(); } });
+$('#btSair').onclick = () => MT.signOut && MT.signOut();
+let iniciou = false;
+(function espera() {
+  if (!window.MT || !MT.ready) return setTimeout(espera, 60);
+  MT.ready.then(() => MT.onData(() => { if (MT.user && !MT.user.demo && !iniciou) { iniciou = true; iniciar(); } }));
+})();
+})();
+</script>
+</body>
+</html>
