@@ -61,6 +61,9 @@ svg.i { width: 20px; height: 20px; flex: none; stroke: currentColor; fill: none;
 .ico svg.i { width: 19px; height: 19px; stroke-width: 2.3; }
 .navbtn:hover .ico { transform: scale(1.06); }
 .navbtn[aria-current="page"] .ico { transform: scale(1.08); box-shadow: 0 4px 14px -2px var(--c1), inset 0 1px 0 rgba(255,255,255,.3); }
+.navbtn .semd { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 0 7px; }
+.cob { display: flex; gap: 10px; align-items: flex-start; padding: 10px 14px; border-radius: 12px; background: var(--soft, rgba(127,127,127,.08)); border: 1px solid var(--line); font-size: 13.5px; margin: 0 0 14px; }
+.cob b { display: block; margin-bottom: 2px; }
 .navbtn .badge { margin-left: auto; font-size: 12px; font-weight: 700; background: var(--crit); color: #fff; border-radius: 999px; padding: 1px 7px; }
 .navbtn .soon { margin-left: auto; font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--violet); background: var(--violet-soft); border-radius: 6px; padding: 2px 6px; }
 .sidefoot { margin-top: auto; padding: 12px; font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); }
@@ -536,6 +539,21 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
   })();
   SET.forEach(function (s) { s.fila = LEITOS.filter(function (l) { return l.set === 'EMG' && l.destino === s.k; }).length; }); // quem aguarda leito vem dos boxes da emergência
   HOSP.fila = sum(SET.map(function (s) { return s.fila; }));
+  // Faturamento hospitalar: o que corrigir no próprio prontuário para evitar glosa e faturar o que foi feito (cirurgia
+  // como procedimento principal, procedimento feito e não registrado, diagnóstico, justificativa, evolução diária).
+  // Gerador próprio, depois de todos os outros, para não mudar nenhum número das outras telas.
+  var seedC = 30117;
+  function rcc() { seedC = (seedC * 1103515245 + 12345) % 2147483648; return seedC / 2147483648; }
+  if (!window.CELERIS_ESTADO) LEITOS.forEach(function (l) {   // só na demonstração; no servidor os leitos vêm do hospital
+    if (l.livre || l.set === 'EMG') return;
+    var s = S(l.set), r = rcc();
+    if (l.selo === 'PÓS-OP' && ['CIR', 'ORT'].indexOf(l.set) >= 0 && r < .35) l.fat = ['Procedimento principal', 'Internou como tratamento clínico e foi operado: a cirurgia precisa constar como procedimento principal'];
+    else if (l.set === 'UTI' && r < .12) l.fat = ['Procedimento', 'Hemodiálise de ontem sem registro do procedimento: registrar a sessão'];
+    else if (l.dias > s.meta * 1.3 && r < .45) l.fat = ['Justificativa', l.dias + ' dias internado, acima da média, sem justificativa na evolução: escrever o motivo'];
+    else if (r < .04) l.fat = ['Procedimento', 'Transfusão de ontem sem registro: registrar a transfusão'];
+    else if (r < .08) l.fat = ['Diagnóstico', 'A evolução já confirma ' + l.dx.toLowerCase() + ', mas o diagnóstico segue registrado como hipótese: confirmar o diagnóstico'];
+    else if (r < .11) l.fat = ['Evolução', 'Sem evolução médica ontem: registrar'];
+  });
   function tempo(l) { return l.set === 'EMG' ? l.h + ' h' : l.dias + ' d'; }
   function riscoPill(l) { var r = RISCO[l.risco]; return '<span class="risco"><i style="background:' + r[1] + '"></i>' + r[0] + '</span>'; }
   var PERFIS = {
@@ -753,7 +771,8 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
       kpi({ l: 'Meta de altas hoje', v: String(meta), s: 'para receber quem aguarda na emergência e as cirurgias eletivas' }) +
       kpi({ l: 'Altas apontadas', v: String(prev), d: prev >= meta ? '<small class="down">cobre a meta</small>' : '<small class="up">faltam ' + (meta - prev) + '</small>', s: 'alta hoje + alta possível' }) +
       kpi({ l: 'Piora clínica', v: String(L.filter(function (l) { return l.selo === 'PIORA CLÍNICA'; }).length), s: 'reavaliar pela manhã · ver no mapa', cls: 'bad', ir: 'leitos', selo: 'PIORA CLÍNICA' }) +
-      kpi({ l: 'Alertas clínicos', v: String(L.filter(function (l) { return l.alerta; }).length), s: 'exames em piora, dose, profilaxia', ir: 'alertas' }) +
+      (cobTela('alertas') && cobTela('alertas').situacao === 'ausente' ? kpi({ l: 'Alertas clínicos', v: '—', s: 'este hospital não envia exames com valor', ir: 'alertas' })
+        : kpi({ l: 'Alertas clínicos', v: String(L.filter(function (l) { return l.alerta; }).length), s: 'exames em piora, dose, profilaxia', ir: 'alertas' })) +
       kpi({ l: 'Leitos livres', v: String(a.livres), s: 'aguardando na emergência: ' + a.fila, ir: 'leitos' }) + '</div>';
     if (a === HOSP && setoresPerfil().length > 1) h += '<div class="g c12 mt">' + card(null, 'Meta × altas apontadas, por setor', 'Altas necessárias hoje (cinza) e altas já apontadas · toque para abrir o setor', '<div class="chart sm" id="ch-meta"></div>', 's12') + '</div>';
     h += '<div class="board mt">' + COLS.map(function (c) {
@@ -1122,6 +1141,7 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
       '<div class="db"><div style="display:flex;gap:8px;flex-wrap:wrap">' + selPill(l.selo) + (l.set === 'EMG' ? riscoPill(l) + '<span class="pill p-n">' + l.h + ' h na emergência</span>' + (l.h > 24 ? '<span class="pill p-crit">mais de 24 h</span>' : '<span class="pill p-ok">menos de 24 h</span>') : '<span class="pill p-n">' + l.dias + ' dias no setor</span>' + (l.dias > s.meta ? '<span class="pill p-crit">acima da meta de ' + br(s.meta, 1) + ' d</span>' : '<span class="pill p-ok">dentro da meta</span>')) + '</div>' +
       (l.prec ? '<div class="alertbox" style="background:' + PREC[l.prec.tipo][2] + '1f;color:var(--ink);border-left:4px solid ' + PREC[l.prec.tipo][2] + '"><b>Precaução de ' + PREC[l.prec.tipo][0].toLowerCase() + ':</b> ' + esc(l.prec.motivo) + '</div>' : '') +
       (l.alerta ? '<div class="alertbox" style="background:var(--violet-soft);color:var(--violet)"><b>Alerta clínico:</b> ' + esc(l.alerta[0]) + '</div>' : '') +
+      (l.fat ? '<div class="alertbox" style="background:var(--brand-soft);color:var(--ink);border-left:4px solid var(--brand)"><b style="color:var(--brand)">Faturamento hospitalar · ' + esc(l.fat[0]) + ':</b> ' + esc(l.fat[1]) + '</div>' : '') +
       '<dl class="kv"><dt>Hipótese</dt><dd>' + esc(l.dx) + '</dd>' + (l.set === 'EMG' ? '<dt>Risco</dt><dd>' + RISCO[l.risco][0] + ' (Manchester)</dd>' + (l.destino ? '<dt>Destino</dt><dd>' + S(l.destino).nome + ' · aguarda há ' + l.esp + ' h</dd>' : '') : '<dt>Enfermagem</dt><dd>' + CAT[l.cat].nome + ' · ' + (l.nas != null ? 'NAS ' + l.nas : l.dini ? 'escala de Dini' : 'Fugulin ' + l.fug) + ' · ' + br(l.hEnf, l.hEnf % 1 ? 1 : 0) + ' h nas 24 h</dd>') + '<dt>O que segura</dt><dd>' + esc(l.pend) + '</dd><dt>Ação</dt><dd><b>' + esc(l.acao) + '</b></dd><dt>Quem age</dt><dd>' + esc(l.quem) + '</dd>' + (l.atb ? '<dt>Antimicrobiano</dt><dd>' + l.atb.nomes.join(' + ') + ' · D' + l.atb.dia + (l.atb.prof ? ' · profilaxia' : '') + '</dd>' : '') + (l.cult ? '<dt>Cultura</dt><dd><i>' + l.cult.mo + '</i> ' + l.cult.perfil + ' · ' + l.cult.material.toLowerCase() + ' · há ' + l.cult.h + ' h' + (l.cult.cobre ? '' : ' · <b class="bad">o esquema atual não cobre</b>') + '</dd>' : '') + '</dl>' +
       (function () { if (!l.prev) return ''; var p = l.prev, hd = HIST_DX[l.dx], rc = p.risco >= 50 ? 'crit' : p.risco >= 25 ? 'warn' : 'ok';
         return '<div><div class="note" style="margin:0 0 8px;font-weight:700">Permanência prevista</div><div class="prevg">' +
@@ -1150,6 +1170,15 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
   function irSetor(k) { st.setor = k; reg('filtrou ' + S(k).nome); desenhar(); }
   function escuro() { var t = document.documentElement.getAttribute('data-theme'); return t ? t === 'dark' : !!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); }
   function perHTML(cls) { return '<div class="seg ' + cls + '" role="group" aria-label="Período">' + [30, 60, 90, 120].map(function (p) { return '<button data-per="' + p + '" aria-pressed="' + (st.per === p) + '">' + p + ' dias</button>'; }).join('') + '</div>'; }
+  // Mapa de cobertura (só no servidor do hospital): o que este hospital entrega ao Celeris
+  var COB = REAL && REAL.cobertura || null;
+  var TELA_MOD = { emg: 'emergencia', cir: 'cirurgias', atm: 'antimicrobianos', alertas: 'alertas', equipe: 'enfermagem' };
+  function cobTela(id) { return COB && TELA_MOD[id] && COB[TELA_MOD[id]] || null; }
+  function cobAviso(t, m) {
+    return '<div class="g c12">' + card(null, t.nome + ': sem dados deste hospital', esc(m.detalhe),
+      '<p class="note" style="font-size:14px">' + esc(m.pedir) + ' Assim que o dado começar a chegar, esta tela se preenche sozinha.</p>', 's12') + '</div>';
+  }
+  function cobNota(m) { return '<div class="cob"><div><b>Dado parcial neste hospital</b>' + esc(m.detalhe) + '. ' + esc(m.pedir) + '</div></div>'; }
   function desenhar() {
     if (REAL) { document.querySelector('.upd span:last-child').textContent = REAL.atualizado; document.querySelector('.sidefoot').innerHTML = esc(REAL.hospital) + '<br>' + esc(REAL.usuario.nome); }
     var tp = telasPerfil(); if (!tp.some(function (t) { return t.id === st.tela; })) st.tela = tp[0].id;
@@ -1158,7 +1187,8 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
     var tela = T(st.tela);
     var g = '', nav = '';
     tp.forEach(function (t) { if (t.grupo !== g) { g = t.grupo; nav += '<div class="navlab">' + g + '</div>'; } var badge = t.id === 'hoje' ? LEITOS.filter(function (l) { return !l.livre && l.set !== 'EMG' && l.selo === 'PIORA CLÍNICA' && noFiltro(l); }).length : 0;
-      nav += '<button class="navbtn" data-ir="' + t.id + '"' + (t.id === st.tela ? ' aria-current="page"' : '') + '>' + tile(t) + t.nome + (badge ? '<span class="badge" title="pacientes com piora clínica">' + badge + '</span>' : '') + '</button>'; });
+      var cm = cobTela(t.id);
+      nav += '<button class="navbtn" data-ir="' + t.id + '"' + (t.id === st.tela ? ' aria-current="page"' : '') + '>' + tile(t) + t.nome + (badge ? '<span class="badge" title="pacientes com piora clínica">' + badge + '</span>' : cm && cm.situacao === 'ausente' ? '<span class="semd" title="' + esc(cm.detalhe) + '">sem dados</span>' : '') + '</button>'; });
     document.getElementById('nav').innerHTML = nav;
     var bt = BOTTOM.filter(function (id) { return tp.some(function (t) { return t.id === id; }); });
     var mais = tp.length > bt.length; if (mais) bt = bt.slice(0, 4);
@@ -1181,7 +1211,8 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
         var L = EL.filter(function (l) { return a.k === 'ALL' || l.area === a.k; }), pc = L.length / a.cap * 100, ag = L.filter(function (l) { return l.selo === 'AGUARDA LEITO'; }).length, c = pc >= 100 ? 'crit' : pc >= 85 ? 'warn' : 'ok';
         return '<button class="sec" data-area="' + a.k + '" aria-pressed="' + (st.area === a.k) + '" title="' + a.nome + '"><span class="st" style="background:var(--' + c + ')"></span><b>' + a.nome + '</b><span class="m">' + L.length + '/' + a.cap + ' · ' + ag + ' aguardam leito</span><span class="mb"><i style="width:' + Math.min(100, pc) + '%;background:var(--' + (c === 'ok' ? 'brand' : c) + ')"></i></span></button>'; }).join(''); }
     limpar(); POS = [];
-    var html = V[st.tela]();
+    var cm = cobTela(st.tela);
+    var html = cm && cm.situacao === 'ausente' ? cobAviso(tela, cm) : (cm && cm.situacao === 'parcial' ? cobNota(cm) : '') + V[st.tela]();
     document.getElementById('conteudo').innerHTML = instalarHTML() + (standalone || REAL ? '' : '<div class="demo">Protótipo · Hospital Modelo, pacientes e números fictícios</div>') + (tela.per ? perHTML('mper') : '') + '<div class="view">' + html + '</div>';
     POS.forEach(function (f) { try { f(); } catch (e) { if (window.console) console.error(e); } });
     var on = secEl.querySelector('[aria-pressed="true"]'); if (on && on.scrollIntoView && secEl.scrollWidth > secEl.clientWidth) { var r = on.getBoundingClientRect(), R = secEl.getBoundingClientRect(); if (r.left < R.left || r.right > R.right) secEl.scrollLeft += r.left - R.left - 16; }
@@ -1193,7 +1224,7 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
     if (e.target.closest('#b-inst') && promptInst) { promptInst.prompt(); promptInst.userChoice.then(function () { promptInst = null; desenhar(); }); return; }
     if (e.target.closest('#b-inst-x')) { fechouInst = true; try { localStorage.setItem('celeris-inst-fechado', '1'); } catch (er) {} desenhar(); return; }
     if (e.target.closest('#b-perfil')) { var m = document.getElementById('menu'); m.hidden = !m.hidden; e.target.closest('#b-perfil').setAttribute('aria-expanded', String(!m.hidden));
-      if (REAL) { m.innerHTML = '<div class="note" style="margin:4px 10px 6px;font-weight:700">' + esc(REAL.usuario.nome) + '</div><a href="/sair" style="display:flex;padding:9px 10px;border-radius:9px;font-weight:600;color:inherit;text-decoration:none">' + ic('x') + '&nbsp; Sair</a>'; return; }
+      if (REAL) { m.innerHTML = '<div class="note" style="margin:4px 10px 6px;font-weight:700">' + esc(REAL.usuario.nome) + '</div>' + (REAL.usuario.perfil === 'ti' ? '<a href="/configurar" style="display:flex;padding:9px 10px;border-radius:9px;font-weight:600;color:inherit;text-decoration:none">' + ic('lock') + '&nbsp; Configurar</a>' : '') + '<a href="/sair" style="display:flex;padding:9px 10px;border-radius:9px;font-weight:600;color:inherit;text-decoration:none">' + ic('x') + '&nbsp; Sair</a>'; return; }
       m.innerHTML = '<div class="note" style="margin:4px 10px 6px;font-weight:700">Ver como</div>' + Object.keys(PERFIS).map(function (k) { return '<button role="menuitemradio" aria-checked="' + (st.perfil === k) + '" data-perfil="' + k + '">' + ic('user') + '<span>' + PERFIS[k].nome + '<small>' + PERFIS[k].desc + '</small></span></button>'; }).join(''); return; }
     if ((t = e.target.closest('[data-perfil]'))) { st.perfil = t.getAttribute('data-perfil'); st.setor = 'ALL'; st.selo = ''; st.quem = ''; reg('entrou no sistema'); fecharMenus(); desenhar(); window.scrollTo(0, 0); return; }
     if (!e.target.closest('.profile')) fecharMenus();
@@ -1214,7 +1245,7 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
     if (e.target.getAttribute && e.target.getAttribute('data-jornada')) { st.jornada = +e.target.value; reg('mudou a jornada para ' + st.jornada + ' h'); desenhar(); return; }
     var id = e.target.getAttribute && e.target.getAttribute('data-corrige'); if (!id) return;
     var l = LEITOS.filter(function (x) { return x.leito === id; })[0]; if (!l) return;
-    l.selo = e.target.value; l.hist[2] = l.selo; if (REAL) { fetch('/api/correcao', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ leito: id, selo: l.selo }) }); LOG.unshift({ h: '', p: PERFIS[st.perfil].nome, a: 'corrigiu o selo de ' + id + ' para ' + l.selo }); } else reg('corrigiu o selo de ' + id + ' para ' + l.selo); desenhar(); abrirLeito(id);
+    l.selo = e.target.value; l.hist[2] = l.selo; if (REAL) { fetch('/api/correcao', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ leito: id, pront: l.pront, selo: l.selo }) }); LOG.unshift({ h: '', p: PERFIS[st.perfil].nome, a: 'corrigiu o selo de ' + id + ' para ' + l.selo }); } else reg('corrigiu o selo de ' + id + ' para ' + l.selo); desenhar(); abrirLeito(id);
   });
   document.addEventListener('input', function (e) {
     if (e.target.id !== 'busca') return;
