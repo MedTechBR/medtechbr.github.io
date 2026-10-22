@@ -2801,6 +2801,23 @@ function desenharLog() {
     return `<li data-area="${esc(x.area)}"><span class="eq-ic sm"><i class="ti ${a.ic}" aria-hidden="true"></i></span><div><p><b>${esc(a.nm)}</b> · ${esc(x.acao)} <span class="sub">${esc(quando(x.em))}</span></p><p class="eq-tx">${esc(x.detalhe || '')}</p></div></li>`;
   }).join('') : '<li class="vazio">Nada registrado ainda.</li>';
 }
+/* "Ver atividade" (22/10/2026, pedido do Matheus: abrir já com as atividades, sem rolar até o fim da página):
+   janela com o que aquele funcionário fez hoje e as últimas antes disso. */
+function abrirAtividade(area) {
+  const a = EQ_AREAS[area] || { nm: area, ic: 'ti-robot' };
+  const l = (E.eq.log || []).filter(x => x.area === area);
+  const hojeTxt = new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Fortaleza' });
+  const ehHoje = x => new Date(x.em).toLocaleDateString('pt-BR', { timeZone: 'America/Fortaleza' }) === hojeTxt;
+  const hoje = l.filter(ehHoje), antes = l.filter(x => !ehHoje(x)).slice(0, Math.max(0, 25 - hoje.length));
+  const item = x => `<li data-area="${esc(x.area)}"><span class="eq-ic sm"><i class="ti ${a.ic}" aria-hidden="true"></i></span><div><p><b>${esc(x.acao)}</b> <span class="sub">${esc(quando(x.em))}</span></p><p class="eq-tx">${esc(x.detalhe || '')}</p></div></li>`;
+  const bloco = (tit, arr) => arr.length ? `<h3 class="eq-ativ-h">${tit}</h3><ol class="eq-tl">${arr.map(item).join('')}</ol>` : '';
+  const corpo = l.length ? `<div class="eq-ativ">${bloco('Hoje', hoje) || '<p class="sub">Nada hoje ainda.</p>'}${bloco(hoje.length ? 'Antes' : 'Últimas atividades', antes)}</div>`
+    : '<p class="sub">Nada registrado ainda.</p>';
+  dialogo(`Atividade: ${a.nm}`, corpo, [
+    { rot: 'Ver tudo na lista', cls: 'btn-g', acao: async () => { E.eqFiltro = area; desenharLog(); mostrarAbaEq('log'); setTimeout(() => { const el = $('eqLog'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50); return true; } },
+    { rot: 'Fechar', cls: 'btn-p' }
+  ]);
+}
 function desenharConversas() {
   const l = E.eq.conversas || [];
   $('eqConv').innerHTML = l.length ? `<div class="card eq-lista">${l.map(c => `
@@ -2837,7 +2854,7 @@ $('equipe').addEventListener('click', async ev => {
   const t = ev.target.closest('button'); if (!t) return;
   if (t.dataset.eqaba) return mostrarAbaEq(t.dataset.eqaba);
   if (t.dataset.eqfil !== undefined) { E.eqFiltro = t.dataset.eqfil; return desenharLog(); }
-  if (t.dataset.eqver) { E.eqFiltro = t.dataset.eqver; desenharLog(); mostrarAbaEq('log'); return; }
+  if (t.dataset.eqver) { abrirAtividade(t.dataset.eqver); return; }
   if (t.dataset.eqconv) return abrirConversa(t.dataset.canal, t.dataset.eqconv);
   if (t.dataset.eqcur !== undefined) {
     t.disabled = true; const rot = t.textContent; t.textContent = 'Buscando… (até 5 min)';
