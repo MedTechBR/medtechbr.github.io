@@ -64,8 +64,11 @@
     }
     var d = document.createElement("div");
     d.className = "mtck"; d.id = "mtck"; d.setAttribute("role", "region"); d.setAttribute("aria-label", "Cookies");
-    d.innerHTML = "<p>Usamos cookies da Meta (Facebook e Instagram) para medir os nossos anúncios. " +
-      "O site funciona igual se você recusar. <a href=\"/privacidade.html#cookies\">Saiba mais</a></p>" +
+    /* aviso da mudança na política (seção 15: "avisada no portal") durante 30 dias após ligar o Pixel */
+    var novo = Date.now() < Date.UTC(2026, 10, 27, 3);
+    d.innerHTML = "<p>" + (novo ? "<b>Atualizamos a Política de Privacidade em 27/10/2026.</b> " : "") +
+      "Usamos cookies da Meta (Facebook e Instagram) para medir os nossos anúncios, só se você aceitar. " +
+      "O site funciona igual se você recusar. <a href=\"/privacidade.html#cookies\">" + (novo ? "Ler a política" : "Saiba mais") + "</a></p>" +
       "<div class=\"mtck-b\"><button type=\"button\" class=\"nao\">Recusar</button><button type=\"button\" class=\"sim\">Aceitar</button></div>";
     d.querySelector(".sim").onclick = function () { gravar("sim"); d.remove(); carregar(); };
     d.querySelector(".nao").onclick = function () { gravar("nao"); fila.length = 0; d.remove(); };
