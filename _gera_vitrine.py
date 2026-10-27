@@ -8,7 +8,8 @@ institucional.html e uma página por produto institucional) a partir de:
       <!-- meta title="..." description="..." linha="app|provas|multi|institucional|" [home] -->
       opcionais (27/10/2026, página do anúncio): noindex (rascunho fora do Google), cover
       (viewport-fit=cover, para env(safe-area-inset-*) no iPhone), css="x.css" e js="x.js"
-      (folha e script só daquela página, depois dos compartilhados).
+      (folha e script só daquela página, depois dos compartilhados), mtck="compacto" (aviso de
+      cookies do _mtpixel.js em faixa baixa, para não cobrir a primeira tela).
 
 Estilo e comportamento ficam em vitrine.css e vitrine.js (compartilhados por todas).
 NUNCA edite os *.html gerados na raiz: edite a parte em _vitrine/ e rode
@@ -51,7 +52,7 @@ MOLDE = '''<!DOCTYPE html>
 
 {footer}
 <script src="vitrine.js?v={v}"></script>{js}
-<script defer src="_mtpixel.js?v=1"></script>
+<script defer src="_mtpixel.js?v=2"></script>
 </body>
 </html>
 '''
@@ -72,6 +73,7 @@ for parte in sorted(glob.glob(os.path.join(RAIZ, '_vitrine/paginas/*.html'))):
     attrs = ''
     if meta.get('linha'): attrs += f' data-linha="{meta["linha"]}"'
     if home: attrs += ' data-home'
+    if meta.get('mtck'): attrs += f' data-mtck="{meta["mtck"]}"'
     flags = set(re.findall(r'(?<![\w"=])(noindex|cover)(?![\w"=])', re.sub(r'"[^"]*"', '""', m.group(1))))
     extra = dict(cover=', viewport-fit=cover' if 'cover' in flags else '',
                  robots='\n<meta name="robots" content="noindex">' if 'noindex' in flags else '',

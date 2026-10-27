@@ -99,6 +99,17 @@
     atualiza();
   }
 
+  /* ---------- aviso de cookies (faixa compacta do _mtpixel.js): enquanto aberto, o vídeo encolhe a altura dele,
+     para o "Ver o plano" continuar à vista na primeira tela ---------- */
+  var raiz = document.documentElement;
+  function aviso() {
+    var a = document.getElementById("mtck");
+    var h = a ? Math.ceil(innerHeight - a.getBoundingClientRect().top) + 8 : 0;
+    raiz.style.setProperty("--lp-aviso", h + "px");
+  }
+  new MutationObserver(aviso).observe(document.body, { childList: true });
+  addEventListener("resize", aviso); aviso();
+
   /* ---------- utm e cupom do anúncio seguem para o checkout ---------- */
   try {
     var q = new URLSearchParams(location.search), leva = [];

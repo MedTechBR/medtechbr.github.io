@@ -65,7 +65,15 @@
     ".mtck-b{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}" +
     ".mtck button{font:inherit;font-weight:600;border:0;border-radius:999px;padding:9px 18px;cursor:pointer;min-height:40px}" +
     ".mtck .nao{background:var(--mtck-sec);color:var(--mtck-texto)}.mtck .sim{background:var(--mtck-pri);color:#fff}" +
-    ".mtck button:focus-visible{outline:2px solid var(--mtck-pri);outline-offset:2px}";
+    ".mtck button:focus-visible{outline:2px solid var(--mtck-pri);outline-offset:2px}" +
+    /* versão compacta (body[data-mtck="compacto"], página do anúncio do FlashMed): faixa baixa no rodapé,
+       texto curto e os dois botões na mesma linha do texto, para não cobrir o vídeo e o "Ver o plano" */
+    ".mtck.compacto{left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));max-width:720px;padding:8px 8px 8px 12px;border-radius:14px;" +
+    "display:flex;align-items:center;gap:8px;font-size:12px;line-height:1.3}" +
+    ".mtck.compacto p{margin:0;flex:1 1 auto;min-width:0}" +
+    ".mtck.compacto .mtck-b{flex:0 0 auto;flex-wrap:nowrap;gap:6px}" +
+    ".mtck.compacto button{min-height:36px;padding:0 11px;font-size:12.5px}" +
+    "@media (max-width:359px){.mtck.compacto{flex-wrap:wrap}.mtck.compacto .mtck-b{width:100%;justify-content:flex-end}}";
 
   function aviso() {
     if (document.getElementById("mtck")) return;
@@ -76,6 +84,13 @@
     d.className = "mtck"; d.id = "mtck"; d.setAttribute("role", "region"); d.setAttribute("aria-label", "Cookies");
     /* aviso da mudança na política (seção 15: "avisada no portal") durante 30 dias após ligar o Pixel */
     var novo = Date.now() < Date.UTC(2026, 10, 27, 3);
+    var compacto = !!(document.body && document.body.getAttribute("data-mtck") === "compacto");
+    if (compacto) {
+      d.className = "mtck compacto";
+      d.innerHTML = "<p>" + (novo ? "<b>Atualizamos a Política de Privacidade em 27/10/2026.</b> " : "") +
+        "Cookies da Meta só com o seu aceite. <a href=\"/privacidade.html#cookies\">" + (novo ? "Ler" : "Saiba mais") + "</a></p>" +
+        "<div class=\"mtck-b\"><button type=\"button\" class=\"nao\">Recusar</button><button type=\"button\" class=\"sim\">Aceitar</button></div>";
+    } else
     d.innerHTML = "<p>" + (novo ? "<b>Atualizamos a Política de Privacidade em 27/10/2026.</b> " : "") +
       "Usamos cookies da Meta (Facebook e Instagram) para medir os nossos anúncios, só se você aceitar. " +
       "O site funciona igual se você recusar. <a href=\"/privacidade.html#cookies\">" + (novo ? "Ler a política" : "Saiba mais") + "</a></p>" +
