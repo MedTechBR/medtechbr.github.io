@@ -15,7 +15,8 @@
 <meta name="apple-mobile-web-app-title" content="MedTech Provas">
 <script>window.MT_APP={id:"portal-provas",name:"MedTech Provas",linha:"provas"};</script>
 <script src="_mtfb.js?v=1"></script>
-<script type="module" src="_mtauth.js?v=47"></script>
+<script type="module" src="_mtauth.js?v=48"></script>
+<script defer src="_mtpixel.js?v=1"></script>
 <style>
 /* ============================================================
    Portal no tema vivo (23/09/2026), modelo ClínicaMed "camada viva".
@@ -852,6 +853,7 @@ function pedirDesistencia(){
    mensal no cartão = formulário do Mercado Pago num diálogo aqui mesmo (MTAcesso.assinarCartao) */
 async function abrirCompra(op, bt, msgEl){
   if (!op) return;
+  if (window.MTPixel) MTPixel.evento('InitiateCheckout', { value: Number(op.preco) || 0, currency: 'BRL', content_ids: [op.prod.id] });
   if (bt) bt.disabled = true;
   const diz = (t, err) => { if (msgEl) { msgEl.className = 'cfg-msg' + (err ? ' err' : ''); msgEl.textContent = t; } else if (t) aviso(t); };
   const cartao = MTAcesso.ehCartao && MTAcesso.ehCartao(op);
@@ -862,6 +864,7 @@ async function abrirCompra(op, bt, msgEl){
     if (bt) bt.disabled = false;
     if (res.cancelado) { diz(''); return; }
     ACESSO.mt = res.mt || await MTAcesso.lerMt(MT.user, true).catch(() => ACESSO.mt);
+    if (window.MTPixel) MTPixel.compra(op.prod.id, op.periodo, op.preco, res.preapproval_id || res.id || '');
     const doModal = !!(msgEl && msgEl.closest('#cpModal'));
     ASSIN_MP = null; document.getElementById('cpModal')?.remove();
     renderGrid(); preencheAssinatura();
@@ -998,7 +1001,10 @@ async function chegadaPagamento(){
   /* aprovado (ou assinatura mensal, que volta só com preapproval_id): o webhook libera em segundos */
   const base = (antes && antes.p) || {};
   const mudou = mt => { const ps = (mt && mt.p) || {}; return produto ? Number(ps[produto] || 0) > Math.max(Number(base[produto] || 0), agoraS()) : Object.entries(ps).some(([id, a]) => a > Math.max(Number(base[id] || 0), agoraS())); };
-  const terminar = mt => { ACESSO.mt = mt; lsGravar('mt.pag.antes', null); lsGravar('mt.pag.pendente', null); ASSIN_MP = null; renderGrid(); preencheAssinatura(); telaAprovado(prod, mt); };
+  const idPag = q.get('payment_id') || q.get('collection_id') || q.get('preapproval_id') || '';
+  const terminar = mt => {
+    if (window.MTPixel && prod) MTPixel.compra(prod.id, periodo, (prod.preco || {})[periodo], idPag);
+    ACESSO.mt = mt; lsGravar('mt.pag.antes', null); lsGravar('mt.pag.pendente', null); ASSIN_MP = null; renderGrid(); preencheAssinatura(); telaAprovado(prod, mt); };
   if (mudou(ACESSO.mt)) { terminar(ACESSO.mt); return; }
   const w = modal('retModal', `<h3 id="retModal-t" tabindex="-1"><span class="spin" aria-hidden="true"></span>Confirmando o pagamento</h3>
     <p class="sub" role="status">Recebemos a sua volta do Mercado Pago. Estamos liberando o acesso ao ${esc(nome)}. Leva alguns segundos.</p>`, { fechavel: false });
@@ -1048,7 +1054,7 @@ async function chegadaPlano(q){
   for (const ms of pausas) {
     if (ms) await new Promise(r => setTimeout(r, ms));
     if (!document.body.contains(w)) return;
-    try { if (await confirmarPlano(pre, produto)) { telaAprovado(prod, ACESSO.mt, { plano: true }); return; } }
+    try { if (await confirmarPlano(pre, produto)) { if (window.MTPixel && prod) MTPixel.compra(prod.id, 'mensal', (prod.preco || {}).mensal, pre); telaAprovado(prod, ACESSO.mt, { plano: true }); return; } }
     catch(e) { if (regraDe(e)) { lsGravar('mt.pag.plano', null); telaPlanoErro(nome, e.message); return; } }
   }
   if (!document.body.contains(w)) return;
@@ -1060,7 +1066,7 @@ async function chegadaPlano(q){
     <div class="sug-row"><button type="button" class="b cancel" data-fecha>Fechar</button></div>`);
   w2.querySelector('#retDeNovo').onclick = async e => {
     const m = w2.querySelector('#retMsg'), b = e.currentTarget; b.disabled = true; m.className = 'cfg-msg'; m.textContent = 'Conferindo…';
-    try { if (await confirmarPlano(pre, produto)) { telaAprovado(prod, ACESSO.mt, { plano: true }); return; } m.textContent = 'Ainda não chegou. Tente de novo em um minuto.'; }
+    try { if (await confirmarPlano(pre, produto)) { if (window.MTPixel && prod) MTPixel.compra(prod.id, 'mensal', (prod.preco || {}).mensal, pre); telaAprovado(prod, ACESSO.mt, { plano: true }); return; } m.textContent = 'Ainda não chegou. Tente de novo em um minuto.'; }
     catch(err) { if (regraDe(err)) { lsGravar('mt.pag.plano', null); telaPlanoErro(nome, err.message); return; } m.className = 'cfg-msg err'; m.textContent = 'Não foi possível conferir agora.'; }
     b.disabled = false;
   };

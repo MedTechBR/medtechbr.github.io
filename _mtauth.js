@@ -583,6 +583,7 @@ else {
           if (['INVALID_ARGUMENT', 'ALREADY_EXISTS', 'FAILED_PRECONDITION', 'RESOURCE_EXHAUSTED'].includes(st)) recusa = (err && err.message) || 'CPF recusado.';
           else console.warn('CPF não salvo no cadastro (o diálogo pede depois):', err && err.message);
         }
+        if (!recusa && window.MTPixel) window.MTPixel.evento('CompleteRegistration', {});
         if (recusa) {
           /* desfaz a conta que acabou de nascer, para a pessoa entrar com a dela */
           try { await cred.user.delete(); } catch (e3) { try { await A.signOut(auth); } catch (e4) {} }

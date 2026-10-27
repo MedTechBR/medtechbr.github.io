@@ -250,6 +250,9 @@ if(document.body.dataset.home!==undefined){
   const h=decodeURIComponent(location.hash.slice(1));if(R[h])location.replace(R[h]);
 }
 
+/* ---------- vídeo de demonstração: toca sozinho e sem som, menos para quem pediu menos movimento ---------- */
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches)$$('video[data-auto]').forEach(v=>{v.muted=true;v.play().catch(()=>{})});
+
 /* ---------- reveal ---------- */
 const rv=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');rv.unobserve(e.target)}}),{threshold:.12});
 $$('.rv').forEach(el=>rv.observe(el));
