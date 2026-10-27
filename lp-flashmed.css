@@ -1,0 +1,109 @@
+/* Página do anúncio do FlashMed (rascunho de 27/10/2026), pensada primeiro para o celular (360 a 430 px).
+   Carregada só por flashmed-enare-enamed-nova.html, depois do vitrine.css. Gerada por _gera_vitrine.py. */
+:root{--lp-azul:#2563eb;--lp-azul-cl:#8fb0ff;--lp-g:24px}
+@media(max-width:560px){:root{--lp-g:20px}.lp-topo .wrap,.lp-telas .wrap,.lp-plano .wrap,.lp-faq .wrap{padding:0 var(--lp-g)}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+.lp-rot{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- primeira tela ---------- */
+.lp-topo{position:relative;padding:calc(var(--header) + 14px) 0 26px;overflow:hidden}
+.lp-topo::before{content:"";position:absolute;left:50%;top:44%;width:min(150vw,1100px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(37,99,235,.30),rgba(37,99,235,.10) 45%,transparent 72%)}
+.lp-topo-g{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center}
+.lp-topo-txt{display:contents}
+.lp-marca{order:0;display:inline-flex;align-items:center;gap:9px;font-size:16px;font-weight:600;letter-spacing:-.01em}
+.lp-marca img{width:30px;height:30px;border-radius:8px;display:block}
+.lp-marca span{font-weight:400;color:var(--fg60);font-size:14px;padding-left:10px;border-left:1px solid var(--fg20)}
+.lp-topo h1{order:1;margin-top:10px;font-size:clamp(21px,6.1vw,30px);font-weight:600;letter-spacing:-.03em;line-height:1.15}
+.lp-sub{display:none}
+.lp-video{order:2;margin-top:14px}
+/* altura reservada: o vídeo nunca empurra o resto quando carrega */
+.lp-vbox{position:relative;height:clamp(300px,calc(100svh - var(--header) - 196px),640px);aspect-ratio:9/16;margin:0 auto;border-radius:22px;overflow:hidden;background:#050505;
+  box-shadow:0 0 0 1px var(--fg12),0 24px 70px rgba(37,99,235,.22)}
+.lp-vbox video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.lp-video figcaption{margin-top:8px;font-size:12.5px;color:var(--fg52)}
+.lp-play{position:absolute;right:10px;bottom:10px;width:40px;height:40px;border-radius:50%;border:0;cursor:pointer;display:grid;place-items:center;
+  background:rgba(0,0,0,.55);box-shadow:inset 0 0 0 1px var(--fg20);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.lp-play[hidden]{display:none}
+.lp-ic-pause{width:12px;height:14px;border-left:4px solid #fff;border-right:4px solid #fff}
+.lp-play.parado .lp-ic-pause{width:0;height:0;border:0;border-left:13px solid #fff;border-top:8px solid transparent;border-bottom:8px solid transparent;margin-left:4px}
+.lp-cta{order:3;margin-top:14px;width:100%;max-width:340px}
+.lp-cta i{font-size:18px}
+
+/* ---------- telas do app (carrossel com scroll-snap) ---------- */
+.lp-telas{padding:44px 0 36px;border-top:1px solid var(--fg12)}
+.lp-telas h2,.lp-plano h2,.lp-faq h2{font-size:clamp(24px,3vw,32px);font-weight:600;letter-spacing:-.025em;line-height:1.2}
+.lp-trilho{list-style:none;display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 var(--lp-g);overscroll-behavior-x:contain;
+  margin:18px calc(-1*var(--lp-g)) 0;padding:4px var(--lp-g) 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch;border-radius:4px}
+.lp-trilho::-webkit-scrollbar{display:none}
+.lp-trilho:focus-visible{outline:2px solid var(--fg60);outline-offset:2px}
+.lp-tela{flex:0 0 min(70vw,270px);scroll-snap-align:start;scroll-snap-stop:always}
+.lp-tela img{display:block;width:100%;height:auto;aspect-ratio:600/1299;border-radius:20px;background:#111113;box-shadow:0 0 0 1px var(--fg12)}
+.lp-tela p{margin-top:12px;font-size:15px;line-height:1.45;color:var(--fg)}
+.lp-nav{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:16px}
+.lp-nav[hidden]{display:none}
+.lp-seta{width:40px;height:40px;border-radius:50%;border:0;cursor:pointer;background:var(--fg6);box-shadow:inset 0 0 0 1px var(--fg20);color:var(--fg);display:grid;place-items:center}
+.lp-seta svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.lp-seta:disabled{opacity:.35;cursor:default}
+.lp-pontos{display:flex;align-items:center}
+.lp-pontos button{width:28px;height:40px;border:0;background:none;cursor:pointer;display:grid;place-items:center}
+.lp-pontos button::before{content:"";width:8px;height:8px;border-radius:99px;background:var(--fg40);transition:width .25s var(--ease),background-color .25s}
+.lp-pontos button[aria-current="true"]::before{width:22px;background:var(--lp-azul-cl)}
+.lp-nota{margin-top:6px;text-align:center;font-size:12.5px;color:var(--fg52)}
+
+/* ---------- preço e garantia ---------- */
+.lp-plano{padding:44px 0 40px;border-top:1px solid var(--fg12);scroll-margin-top:calc(var(--header) + 8px)}
+.lp-precos{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;margin-top:18px;max-width:780px}
+.lp-preco{display:flex;flex-direction:column;padding:20px;border-radius:18px;background:var(--fg6);box-shadow:inset 0 0 0 1px var(--fg20)}
+.lp-anual{background:rgba(37,99,235,.12);box-shadow:inset 0 0 0 1.5px rgba(96,140,255,.75)}
+.lp-preco h3{font-size:15px;font-weight:500;color:var(--fg60)}
+.lp-valor{margin-top:4px;font-size:36px;font-weight:600;letter-spacing:-.035em;line-height:1.1;font-variant-numeric:tabular-nums}
+.lp-valor small{font-size:15px;font-weight:400;letter-spacing:0;color:var(--fg60);margin-left:3px}
+.lp-como{margin-top:8px;font-size:14.5px;line-height:1.5;color:var(--fg60)}
+.lp-preco .pill{margin-top:16px;width:100%}
+.lp-garantia{list-style:none;display:grid;gap:12px;margin-top:22px;font-size:15px}
+.lp-garantia li{display:flex;align-items:center;gap:12px}
+.lp-garantia i{font-size:22px;color:var(--lp-azul-cl);flex:0 0 auto}
+
+/* ---------- perguntas ---------- */
+.lp-faq{padding:44px 0 48px;border-top:1px solid var(--fg12)}
+.lp-faq-l{margin-top:14px;max-width:780px}
+.lp-faq-l summary{padding:16px 0;min-height:44px}
+.lp-faq-l details p a,.lp-ajuda a{color:var(--fg);text-decoration:underline;text-underline-offset:3px}
+.lp-ajuda{margin-top:18px;font-size:14.5px;color:var(--fg60)}
+
+/* ---------- botão fixo de assinatura (só celular) ---------- */
+.lp-fixo{position:fixed;left:0;right:0;bottom:0;z-index:45;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:rgba(8,8,10,.88);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  border-top:1px solid var(--fg12);transform:translateY(110%);transition:transform .3s var(--ease)}
+.lp-fixo.on{transform:none}
+.lp-fixo p{display:flex;flex-direction:column;line-height:1.3;min-width:0}
+.lp-fixo b{font-size:15px;font-weight:600}
+.lp-fixo span{font-size:13px;color:var(--fg60);white-space:nowrap}
+.lp-fixo .pill{height:44px;min-width:128px;flex:0 0 auto}
+@media(max-width:760px){footer{padding-bottom:calc(72px + env(safe-area-inset-bottom))}}
+@media(min-width:761px){.lp-fixo{display:none}}
+
+/* ---------- computador e tablet ---------- */
+@media(min-width:761px){
+  .lp-precos{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .lp-garantia{display:flex;flex-wrap:wrap;gap:12px 28px}
+  .lp-telas,.lp-plano,.lp-faq{padding:72px 0}
+}
+@media(min-width:900px){
+  .lp-topo{padding:calc(var(--header) + 48px) 0 64px}
+  .lp-topo::before{left:68%;top:50%}
+  .lp-topo-g{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:56px;align-items:center;text-align:left}
+  .lp-topo-txt{display:block;max-width:540px}
+  .lp-topo h1{font-size:clamp(40px,4.4vw,54px);line-height:1.08;margin-top:18px}
+  .lp-sub{display:block;margin-top:18px;font-size:18px;line-height:1.55;color:var(--fg60);max-width:480px}
+  .lp-cta{margin-top:28px;width:auto}
+  .lp-video{margin-top:0}
+  .lp-vbox{height:min(calc(100vh - var(--header) - 140px),660px);min-height:420px}
+  .lp-video figcaption{text-align:center}
+  .lp-tela{flex:0 0 calc((100% - 3*20px)/4);scroll-snap-align:start}
+  .lp-trilho{gap:20px;margin-left:-2px;margin-right:-2px;padding-left:2px;padding-right:2px;scroll-padding:0 2px}
+}
+
+/* nesta página a barra de produtos (MedTech App, Multi, Institucional) não aparece: quem chega do anúncio fica no FlashMed */
+.pbar-wrap{display:none}

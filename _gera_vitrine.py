@@ -6,6 +6,9 @@ institucional.html e uma página por produto institucional) a partir de:
   _vitrine/footer.html   rodapé (compartilhado)
   _vitrine/paginas/*.html  o conteúdo de cada página; a 1ª linha é o meta:
       <!-- meta title="..." description="..." linha="app|provas|multi|institucional|" [home] -->
+      opcionais (27/10/2026, página do anúncio): noindex (rascunho fora do Google), cover
+      (viewport-fit=cover, para env(safe-area-inset-*) no iPhone), css="x.css" e js="x.js"
+      (folha e script só daquela página, depois dos compartilhados).
 
 Estilo e comportamento ficam em vitrine.css e vitrine.js (compartilhados por todas).
 NUNCA edite os *.html gerados na raiz: edite a parte em _vitrine/ e rode
@@ -28,7 +31,7 @@ MOLDE = '''<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0{cover}">{robots}
 <title>{title}</title>
 <meta name="description" content="{description}">
 <meta name="theme-color" content="#000000">
@@ -36,7 +39,7 @@ MOLDE = '''<!DOCTYPE html>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="preload" href="fonts/ti-vitrine.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="vitrine.css?v={v}">
+<link rel="stylesheet" href="vitrine.css?v={v}">{css}
 <link rel="icon" type="image/png" href="favicon.png">
 </head>
 <body{attrs}>
@@ -47,7 +50,7 @@ MOLDE = '''<!DOCTYPE html>
 </main>
 
 {footer}
-<script src="vitrine.js?v={v}"></script>
+<script src="vitrine.js?v={v}"></script>{js}
 <script defer src="_mtpixel.js?v=1"></script>
 </body>
 </html>
@@ -69,7 +72,12 @@ for parte in sorted(glob.glob(os.path.join(RAIZ, '_vitrine/paginas/*.html'))):
     attrs = ''
     if meta.get('linha'): attrs += f' data-linha="{meta["linha"]}"'
     if home: attrs += ' data-home'
-    html = MOLDE.format(title=meta['title'], description=meta['description'], v=V, attrs=attrs,
+    flags = set(re.findall(r'(?<![\w"=])(noindex|cover)(?![\w"=])', re.sub(r'"[^"]*"', '""', m.group(1))))
+    extra = dict(cover=', viewport-fit=cover' if 'cover' in flags else '',
+                 robots='\n<meta name="robots" content="noindex">' if 'noindex' in flags else '',
+                 css=f'\n<link rel="stylesheet" href="{meta["css"]}">' if meta.get('css') else '',
+                 js=f'\n<script src="{meta["js"]}"></script>' if meta.get('js') else '')
+    html = MOLDE.format(**extra, title=meta['title'], description=meta['description'], v=V, attrs=attrs,
                         header=header.rstrip('\n'), conteudo=conteudo, footer=footer.rstrip('\n'))
     io.open(os.path.join(RAIZ, nome), 'w', encoding='utf-8').write(html)
     gerados.append(nome); htmls[nome] = html
