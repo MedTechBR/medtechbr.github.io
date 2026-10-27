@@ -36,7 +36,7 @@ const ddmm = d => d ? d.slice(8, 10) + '/' + d.slice(5, 7) : '';
 const plural = (n, um, varios) => inteiro(n) + ' ' + (Number(n) === 1 ? um : varios);
 const agoraS = () => Math.floor(Date.now() / 1000);
 
-const SECOES = ['visao', 'usuarios', 'assinantes', 'acessos', 'pagamentos', 'planos', 'sinalizacoes', 'equipe', 'diagnostico'];
+const SECOES = ['visao', 'usuarios', 'assinantes', 'acessos', 'pagamentos', 'parceiros', 'planos', 'sinalizacoes', 'equipe', 'diagnostico'];
 /* apps: mesmos nomes, ícones e cores do catálogo do _mtauth */
 const APPS = {
   condutai: { nm: 'CondutAI', ic: 'ti-stethoscope', c: '#1D6FD0', url: '/condutai.html' },
@@ -76,7 +76,7 @@ const E = { planos: null, painel: null, naoPublicado: false, bloqueado: false, c
 /* ---------------- servidor ---------------- */
 async function modulo() {
   if (window.MT && MT.acessoModulo) { const m = await MT.acessoModulo(); if (m) return m; }
-  if (!window.MTAcesso) await import('/_mtacesso.js?v=13');
+  if (!window.MTAcesso) await import('/_mtacesso.js?v=16');
   return window.MTAcesso;
 }
 async function chamar(nome, dados) { const A = await modulo(); return A.chamar(nome, dados || {}, MT.user); }
@@ -186,6 +186,7 @@ function abrirSecao(sec) {
   if (sec === 'usuarios') abrirUsuarios(E.sub);
   if (sec === 'assinantes' && !E.carregou.assinantes) carregarAssinantes();
   if (sec === 'pagamentos' && !E.carregou.pedidos) carregarPedidos();
+  if (sec === 'parceiros' && !E.carregou.parceiros) carregarParceiros();
   if (sec === 'planos' && !E.carregou.planos) desenharPlanos();
   if (sec === 'sinalizacoes' && !E.carregou.sinal) carregarSinal();
   if (sec === 'diagnostico' && !E.carregou.ia) carregarIA();
@@ -1452,6 +1453,184 @@ $('btTesteCancelar').onclick = async () => {
     out.innerHTML = `<div class="aviso info" style="margin-top:14px"><i class="ti ti-check" aria-hidden="true"></i><div>${r.jaEstava ? 'A assinatura já estava cancelada.' : 'Assinatura cancelada.'}${r.valeAte ? ' O acesso de teste vale até ' + dataS(r.valeAte) + '.' : ''}</div></div>`;
   } catch (e) { out.innerHTML = avisoErro(e); }
 };
+
+/* ============================================================
+   PARCEIROS (cupom de parceiro, 27/10/2026)
+   mtAdmin: parceiros, parceiroSalvar, parceirosRelatorio, parceiroPago (parceiros.js no servidor).
+   ============================================================ */
+const LINK_PARCEIRO = 'https://medtechbr.com.br/medtech-provas.html?cupom=';
+const pct = v => String(Number(v || 0)).replace('.', ',') + '%';
+const mesAtualBR = () => new Date(Date.now() - 3 * 3600000).toISOString().slice(0, 7);
+const nomeMes = m => { const [a, n] = String(m || '').split('-').map(Number); return a && n ? new Date(Date.UTC(a, n - 1, 15)).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' }) : m; };
+const fmtDoc = d => { d = soDig(d); return d.length === 14 ? d.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5') : d.length === 11 ? fmtCpf(d) : d; };
+function produtosTxt2(p) {
+  if (!Array.isArray(p.produtos)) return 'Todos da linha Provas';
+  return p.produtos.map(nomeProd).join(', ') || '—';
+}
+async function carregarParceiros() {
+  E.carregou.parceiros = true;
+  if (!$('paMes').value) $('paMes').value = mesAtualBR();
+  $('paLista').innerHTML = carregando('Carregando parceiros…');
+  try {
+    const r = await admin({ acao: 'parceiros' });
+    E.pa = r;
+    $('paAviso').innerHTML = r.ligado ? '' : `<div class="aviso info"><i class="ti ti-info-circle" aria-hidden="true"></i><div><b>Os cupons estão desligados no site.</b> Pode cadastrar os parceiros e conferir os relatórios agora; o campo do cupom só aparece para os alunos quando o catálogo (planos.json) tiver <code>"cupons": true</code>. Peça ao Claude para ligar.</div></div>`;
+    desenharParceiros();
+    carregarRelParceiros();
+  } catch (e) {
+    if (E.bloqueado) return;
+    $('paAviso').innerHTML = ehNaoPublicado(e) ? avisoPublicar('os parceiros') : avisoErro(e);
+    $('paLista').innerHTML = ''; $('paRel').innerHTML = '';
+  }
+}
+function desenharParceiros() {
+  const itens = (E.pa && E.pa.itens) || [];
+  if (!itens.length) { $('paLista').innerHTML = '<p class="vazio">Nenhum parceiro cadastrado ainda. Use "Novo parceiro".</p>'; return; }
+  const hoje = mesAtualBR() + '-' + new Date(Date.now() - 3 * 3600000).toISOString().slice(8, 10);
+  $('paLista').innerHTML = `<div class="tblw"><table class="tbl resp"><caption class="sr">${itens.length} parceiros</caption><thead><tr>
+      <th scope="col">Cupom</th><th scope="col">Parceiro</th><th scope="col">Condições</th><th scope="col">Produtos</th><th scope="col">Situação</th><th scope="col"><span class="sr">Ações</span></th></tr></thead><tbody>
+    ${itens.map(p => {
+      const vencido = p.validade && p.validade < hoje;
+      const sit = !p.ativo ? '<span class="selo">inativo</span>' : vencido ? '<span class="selo av">vencido</span>' : '<span class="selo ok">ativo</span>';
+      return `<tr>
+        <td data-r="Cupom"><b>${esc(p.codigo)}</b></td>
+        <td data-r="Parceiro">${esc(p.nome)}${p.email ? '<br><span class="fraco">' + esc(p.email) + '</span>' : ''}${p.documento ? '<br><span class="fraco">' + esc(fmtDoc(p.documento)) + '</span>' : ''}</td>
+        <td data-r="Condições">${pct(p.desconto_pct)} de desconto<br><span class="fraco">${pct(p.comissao_pct)} de comissão</span></td>
+        <td data-r="Produtos" class="fraco">${esc(produtosTxt2(p))}</td>
+        <td data-r="Situação">${sit}<br><span class="fraco">${p.validade ? 'até ' + esc(p.validade.split('-').reverse().join('/')) : 'sem data de fim'}</span></td>
+        <td data-r="Ações" class="acoes"><div class="acoesL">
+          <button type="button" class="btn btn-g sm" data-pa-editar="${esc(p.codigo)}" title="Editar" aria-label="Editar ${esc(p.nome)}"><i class="ti ti-pencil" aria-hidden="true"></i><span class="tx">Editar</span></button>
+          <button type="button" class="btn btn-g sm" data-pa-link="${esc(p.codigo)}" title="Copiar o link do parceiro" aria-label="Copiar o link de ${esc(p.nome)}"><i class="ti ti-link" aria-hidden="true"></i><span class="tx">Copiar link</span></button>
+        </div></td></tr>`;
+    }).join('')}</tbody></table></div>
+    <p class="leg">Link do parceiro: ${esc(LINK_PARCEIRO)}CUPOM. Quem entra por ele fica com o cupom guardado por 30 dias no aparelho; o cupom também pode ser digitado na hora de pagar.</p>`;
+  $('paLista').querySelectorAll('[data-pa-editar]').forEach(b => b.onclick = () => editarParceiro(itens.find(x => x.codigo === b.dataset.paEditar)));
+  $('paLista').querySelectorAll('[data-pa-link]').forEach(b => b.onclick = async () => {
+    const ok = await copiar(LINK_PARCEIRO + b.dataset.paLink);
+    toast(ok ? 'Link copiado: ' + LINK_PARCEIRO + b.dataset.paLink : 'Não consegui copiar. Link: ' + LINK_PARCEIRO + b.dataset.paLink, ok ? '' : 'err');
+  });
+}
+function editarParceiro(p) {
+  const novo = !p, pa = E.pa || {}, padrao = pa.padrao || { desconto_pct: 10, comissao_pct: 30 };
+  p = p || { codigo: '', nome: '', documento: '', email: '', desconto_pct: padrao.desconto_pct, comissao_pct: padrao.comissao_pct, produtos: 'provas', validade: '', ativo: true };
+  const lista = Array.isArray(p.produtos) ? p.produtos : null;
+  const prods = (pa.produtos || []).map(x => `<label class="marca-l"><input type="checkbox" data-pa-prod value="${esc(x.id)}" ${lista ? (lista.includes(x.id) ? 'checked' : '') : (x.linha === 'provas' ? 'checked' : '')}> ${esc(x.nome)}${x.mensal ? ' <span class="fraco">(' + esc(brl(x.mensal)) + ' por mês)</span>' : ''}</label>`).join('');
+  const corpo = `<div style="display:flex;flex-direction:column;gap:12px">
+    <div class="linhaC">
+      <div class="campo"><label for="paCod">Código do cupom</label><input id="paCod" type="text" maxlength="20" autocomplete="off" spellcheck="false" style="text-transform:uppercase" value="${esc(p.codigo)}" ${novo ? '' : 'disabled'} aria-describedby="paCodA"><span class="ajuda" id="paCodA">Letras e números, de 4 a 20. ${novo ? 'Não muda depois.' : 'Não muda.'}</span></div>
+      <div class="campo"><label for="paNome">Nome do parceiro</label><input id="paNome" type="text" maxlength="120" autocomplete="off" value="${esc(p.nome)}"></div>
+    </div>
+    <div class="linhaC">
+      <div class="campo"><label for="paDoc">CNPJ ou CPF (para o relatório)</label><input id="paDoc" type="text" inputmode="numeric" maxlength="18" autocomplete="off" value="${esc(fmtDoc(p.documento))}"></div>
+      <div class="campo"><label for="paEmail">E-mail de contato</label><input id="paEmail" type="email" autocomplete="off" spellcheck="false" value="${esc(p.email)}"></div>
+    </div>
+    <div class="linhaC">
+      <div class="campo"><label for="paDesc">Desconto do aluno (%)</label><input id="paDesc" type="number" min="0" max="${pa.max || 90}" step="0.5" inputmode="decimal" value="${esc(p.desconto_pct)}"></div>
+      <div class="campo"><label for="paCom">Comissão do parceiro (%)</label><input id="paCom" type="number" min="0" max="${pa.max || 90}" step="0.5" inputmode="decimal" value="${esc(p.comissao_pct)}" aria-describedby="paComA"><span class="ajuda" id="paComA">Sobre o valor que o aluno pagou, já com desconto.</span></div>
+      <div class="campo"><label for="paVal">Validade (opcional)</label><input id="paVal" type="date" value="${esc(p.validade)}"></div>
+    </div>
+    <fieldset class="campo" style="border:0;padding:0;margin:0"><legend style="font-weight:600;margin-bottom:6px">Produtos em que o cupom vale</legend>
+      <label class="marca-l"><input type="radio" name="paModo" value="provas" ${lista ? '' : 'checked'}> Todos da linha Provas (inclui os que entrarem depois)</label>
+      <label class="marca-l"><input type="radio" name="paModo" value="lista" ${lista ? 'checked' : ''}> Escolher os produtos</label>
+      <div id="paProds" style="display:${lista ? 'flex' : 'none'};flex-direction:column;padding-left:24px">${prods}</div>
+    </fieldset>
+    <label class="marca-l"><input type="checkbox" id="paAtivo" ${p.ativo ? 'checked' : ''}> Cupom ativo</label>
+    <p class="sub" style="margin:0">Mudar desconto ou comissão vale para compras novas. Assinaturas mensais já feitas seguem no valor e na comissão de quando foram criadas.</p>
+  </div>`;
+  dialogo(novo ? 'Novo parceiro' : 'Editar parceiro ' + p.codigo, corpo, [
+    { rot: 'Cancelar', cls: 'btn-g' },
+    { rot: '<i class="ti ti-check" aria-hidden="true"></i>Salvar', cls: 'btn-p', acao: async () => {
+      const modo = (document.querySelector('input[name="paModo"]:checked') || {}).value;
+      const dados = { acao: 'parceiroSalvar', novo, codigo: ($('paCod').value || '').trim().toUpperCase(), nome: $('paNome').value.trim(),
+        documento: soDig($('paDoc').value), email: $('paEmail').value.trim(), desconto_pct: Number($('paDesc').value), comissao_pct: Number($('paCom').value),
+        validade: $('paVal').value || '', ativo: $('paAtivo').checked,
+        produtos: modo === 'lista' ? [...document.querySelectorAll('[data-pa-prod]:checked')].map(x => x.value) : 'provas' };
+      if (!/^[A-Z0-9]{4,20}$/.test(dados.codigo)) { toast('Código do cupom: só letras e números, de 4 a 20.', 'err'); return false; }
+      if (dados.nome.length < 2) { toast('Informe o nome do parceiro.', 'err'); return false; }
+      if (modo === 'lista' && !dados.produtos.length) { toast('Escolha ao menos um produto.', 'err'); return false; }
+      try {
+        await admin(dados);
+        toast(novo ? 'Parceiro ' + dados.codigo + ' cadastrado.' : 'Parceiro ' + dados.codigo + ' atualizado.');
+        carregarParceiros();
+      } catch (e) { if (!E.bloqueado) toast(ehNaoPublicado(e) ? 'Falta publicar o servidor (deploy-backend.command).' : ((e && e.message) || 'Não consegui salvar.'), 'err'); return false; }
+    } }
+  ]);
+  document.querySelectorAll('input[name="paModo"]').forEach(r => r.onchange = () => { const m = document.querySelector('input[name="paModo"]:checked'); $('paProds').style.display = m && m.value === 'lista' ? 'flex' : 'none'; });
+}
+async function carregarRelParceiros() {
+  const mes = $('paMes').value || mesAtualBR();
+  $('paRel').innerHTML = carregando('Carregando as comissões de ' + nomeMes(mes) + '…');
+  try {
+    const r = await admin({ acao: 'parceirosRelatorio', mes });
+    E.paRel = r;
+    desenharRelParceiros(r);
+  } catch (e) { if (!E.bloqueado) $('paRel').innerHTML = ehNaoPublicado(e) ? avisoPublicar('as comissões') : avisoErro(e); }
+}
+const FORMA = { anual: 'anual', pix: '1 mês (Pix ou cartão)', cartao: 'mensal no cartão', plano: 'mensal pelo Mercado Pago' };
+function desenharRelParceiros(r) {
+  if (!r.linhas.length) { $('paRel').innerHTML = `<p class="vazio">Nenhuma comissão em ${esc(nomeMes(r.mes))}.</p>`; return; }
+  const linhas = r.linhas.map(l => {
+    const sit = l.paga ? `<span class="selo ok">paga em ${esc(dataC(l.paga.em))}</span>${l.paga.por ? '<br><span class="fraco">por ' + esc(l.paga.por) + '</span>' : ''}${l.paga.obs ? '<br><span class="fraco">' + esc(l.paga.obs) + '</span>' : ''}`
+      : (l.total || l.pagamentos || l.ajustes) ? `<button type="button" class="btn btn-p sm" data-pa-pagar="${esc(l.codigo)}" style="width:auto;padding:0 12px" title="Registrar que a comissão deste mês foi paga"><i class="ti ti-cash" aria-hidden="true"></i>Marcar paga</button>` : '<span class="fraco">nada a pagar</span>';
+    return `<tr>
+      <td data-r="Parceiro"><b>${esc(l.nome || l.codigo)}</b><br><span class="fraco">cupom ${esc(l.codigo)}${l.documento ? ' · ' + esc(fmtDoc(l.documento)) : ''}</span></td>
+      <td data-r="Pagamentos" class="n">${inteiro(l.pagamentos)}${l.anulados ? '<br><span class="fraco">' + plural(l.anulados, 'anulado', 'anulados') + '</span>' : ''}</td>
+      <td data-r="Bruto e pago" class="n">${brl(l.bruto)}<br><span class="fraco">pago ${brl(l.pago)}</span></td>
+      <td data-r="Comissão e ajustes" class="n">${brl(l.comissao)}<br><span class="fraco">${l.ajustes ? 'ajustes ' + brl(l.ajustes) : 'sem ajustes'}</span></td>
+      <td data-r="Total a pagar" class="n"><b>${brl(l.total)}</b></td>
+      <td data-r="Situação">${sit}</td></tr>`;
+  }).join('');
+  const itens = r.itens.map(x => `<tr>
+      <td data-r="Quando" class="fraco">${quando(x.aprovado_em)}</td>
+      <td data-r="Cupom">${esc(x.parceiro)}</td>
+      <td data-r="Produto">${esc(nomeProd(x.produto))}<br><span class="fraco">${esc(FORMA[x.forma] || x.forma || x.periodo)}</span></td>
+      <td data-r="Pagamento" class="fraco">nº ${esc(x.pagamento)}</td>
+      <td data-r="Preço cheio" class="n">${x.tipo === 'ajuste' ? '—' : brl(x.preco_cheio)}</td>
+      <td data-r="Pago" class="n">${brl(x.valor_pago)}</td>
+      <td data-r="Comissão" class="n">${brl(x.comissao)} <span class="fraco">(${pct(x.comissao_pct)})</span></td>
+      <td data-r="Situação">${x.tipo === 'ajuste' ? '<span class="selo err">ajuste</span><br><span class="fraco">' + esc(x.motivo) + '</span>' : x.status === 'anulada' ? '<span class="selo">anulada (estorno)</span>' : '<span class="selo ok">devida</span>'}${x.mes_origem && x.mes_origem !== r.mes && x.tipo !== 'ajuste' ? '<br><span class="fraco">aprovado em ' + esc(nomeMes(x.mes_origem)) + ', mês já pago</span>' : ''}</td></tr>`).join('');
+  $('paRel').innerHTML = `<div class="tblw"><table class="tbl resp"><caption class="sr">Comissões de ${esc(nomeMes(r.mes))}</caption><thead><tr>
+      <th scope="col">Parceiro</th><th scope="col" class="n">Pagamentos</th><th scope="col" class="n">Valor bruto e pago</th><th scope="col" class="n">Comissão e ajustes</th><th scope="col" class="n">Total a pagar</th><th scope="col">Situação</th></tr></thead>
+      <tbody>${linhas}</tbody></table></div>
+    <p class="leg">Total do mês: <b>${brl(r.totais.total)}</b> (${plural(r.totais.pagamentos, 'pagamento', 'pagamentos')}). Valor bruto = preço do catálogo na hora da compra; valor pago = o que o aluno pagou com o desconto.</p>
+    <div class="acoesL" style="margin-top:12px">
+      <button type="button" class="btn btn-g" id="paCsv"><i class="ti ti-download" aria-hidden="true"></i>Exportar CSV (resumo)</button>
+      <button type="button" class="btn btn-g" id="paCsvItens"><i class="ti ti-download" aria-hidden="true"></i>Exportar CSV (pagamentos)</button>
+    </div>
+    ${r.itens.length ? `<details style="margin-top:14px"><summary>Ver os ${r.itens.length} lançamentos</summary><div class="tblw"><table class="tbl resp"><caption class="sr">Lançamentos</caption><thead><tr>
+      <th scope="col">Quando</th><th scope="col">Cupom</th><th scope="col">Produto</th><th scope="col">Pagamento</th><th scope="col" class="n">Preço cheio</th><th scope="col" class="n">Pago</th><th scope="col" class="n">Comissão</th><th scope="col">Situação</th></tr></thead><tbody>${itens}</tbody></table></div></details>` : ''}`;
+  $('paRel').querySelectorAll('[data-pa-pagar]').forEach(b => b.onclick = () => marcarComissaoPaga(r.linhas.find(l => l.codigo === b.dataset.paPagar), r.mes));
+  $('paCsv').onclick = () => baixarCsv('comissoes-' + r.mes + '.csv', [['Mês', 'Parceiro', 'Cupom', 'Documento', 'E-mail', 'Pagamentos', 'Anulados', 'Valor bruto', 'Valor pago', 'Comissão', 'Ajustes', 'Total a pagar', 'Paga em', 'Observação']]
+    .concat(r.linhas.map(l => [r.mes, l.nome, l.codigo, fmtDoc(l.documento), l.email, l.pagamentos, l.anulados, l.bruto, l.pago, l.comissao, l.ajustes, l.total, l.paga ? quando(l.paga.em) : '', l.paga ? l.paga.obs : ''])));
+  $('paCsvItens').onclick = () => baixarCsv('comissoes-' + r.mes + '-pagamentos.csv', [['Mês', 'Cupom', 'Aprovado em', 'Pagamento', 'Produto', 'Forma', 'Preço cheio', 'Desconto (%)', 'Valor pago', 'Comissão (%)', 'Comissão', 'Tipo', 'Situação', 'Observação']]
+    .concat(r.itens.map(x => [r.mes, x.parceiro, quando(x.aprovado_em), x.pagamento, nomeProd(x.produto), FORMA[x.forma] || x.forma, x.preco_cheio, x.desconto_pct, x.valor_pago, x.comissao_pct, x.comissao,
+      x.tipo === 'ajuste' ? 'ajuste' : 'pagamento', x.status, x.motivo || (x.mes_origem && x.mes_origem !== r.mes ? 'aprovado em ' + x.mes_origem : '')])));
+}
+/* CSV para o Excel em português: ponto e vírgula, vírgula decimal e BOM */
+function baixarCsv(nome, linhas) {
+  const cel = v => typeof v === 'number' ? String(v).replace('.', ',') : '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const txt = '﻿' + linhas.map(l => l.map(cel).join(';')).join('\r\n');
+  const url = URL.createObjectURL(new Blob([txt], { type: 'text/csv;charset=utf-8' }));
+  const a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+function marcarComissaoPaga(l, mes) {
+  if (!l) return;
+  dialogo('Marcar comissão paga', `<p>Registrar que a comissão de <b>${esc(nomeMes(mes))}</b> do cupom <b>${esc(l.codigo)}</b> (${esc(l.nome)}) foi paga: <b>${brl(l.total)}</b>.</p>
+    <p class="sub">Fica registrado com a data e a sua conta. Depois disso, pagamento ou estorno que cair neste mês vai para o mês seguinte. Não guarde aqui dados bancários.</p>
+    <div class="campo"><label for="paObs">Observação (opcional)</label><input id="paObs" type="text" maxlength="200" autocomplete="off" placeholder="Ex.: transferência feita em 05/11, comprovante no e-mail"></div>`, [
+    { rot: 'Cancelar', cls: 'btn-g' },
+    { rot: '<i class="ti ti-cash" aria-hidden="true"></i>Marcar como paga', cls: 'btn-p', acao: async () => {
+      try {
+        await admin({ acao: 'parceiroPago', codigo: l.codigo, mes, obs: ($('paObs').value || '').trim() });
+        toast('Comissão de ' + nomeMes(mes) + ' do cupom ' + l.codigo + ' marcada como paga.');
+        carregarRelParceiros();
+      } catch (e) { if (!E.bloqueado) toast((e && e.message) || 'Não consegui marcar.', 'err'); return false; }
+    } }
+  ]);
+}
+$('btPaNovo').onclick = () => { if (!E.pa) { toast('Aguarde a lista de parceiros carregar.', 'err'); return; } editarParceiro(null); };
+$('fPaMes').addEventListener('submit', e => { e.preventDefault(); carregarRelParceiros(); });
 
 /* ============================================================
    APLICATIVOS E PLANOS

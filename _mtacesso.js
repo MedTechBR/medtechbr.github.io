@@ -26,6 +26,11 @@
    existe para quem não pagou, não para punir quem pagou quando a rede cai.
    CPF (10/10/2026): conta sem CPF cadastrado (claim mt sem c) vê o diálogo
    "Complete seu cadastro" antes do app (garantirCpf/pedirCpf, função mtCpf).
+   Cupom de parceiro (27/10/2026): ?cupom=CODIGO em qualquer página guarda o
+   código por 30 dias (localStorage "mt.cupom"; o último vence). O campo do
+   cupom e o preço riscado SÓ aparecem com "cupons": true no planos.json; antes
+   disso nada muda para quem compra. O preço com desconto vem do servidor
+   (mpCheckout {acao:'cupom'}); o navegador só mostra e manda o código.
    ============================================================ */
 (function () {
 'use strict';
@@ -100,6 +105,104 @@ function acessoAtivoQualquer(P, mt, agora) {
   return Object.keys(mt.p || {}).some(function (id) { var pr = produtoPorId(P, id); return num(mt.p[id]) > agora && !(pr && pr.teste); });
 }
 
+/* ---------------- cupom de parceiro (27/10/2026) ---------------- */
+var CUPOM_CHAVE = 'mt.cupom', CUPOM_DIAS = 30, CUPOM_RE = /^[A-Z0-9]{4,20}$/;
+function normCupom(s) { return String(s == null ? '' : s).trim().toUpperCase(); }
+function cupomGuardado() {
+  try {
+    var o = JSON.parse(G.localStorage.getItem(CUPOM_CHAVE) || 'null');
+    if (!o || !CUPOM_RE.test(o.c || '') || Date.now() - Number(o.em || 0) > CUPOM_DIAS * 86400000) return '';
+    return o.c;
+  } catch (e) { return ''; }
+}
+function guardarCupom(c) {
+  try { if (c && CUPOM_RE.test(c)) G.localStorage.setItem(CUPOM_CHAVE, JSON.stringify({ c: c, em: Date.now() })); else G.localStorage.removeItem(CUPOM_CHAVE); } catch (e) {}
+}
+/* link com ?cupom=CODIGO: guarda (o último vence). Não mostra nada. */
+(function () {
+  try {
+    var m = /[?&]cupom=([^&#]*)/i.exec(String((G.location && G.location.search) || ''));
+    if (m) { var c = normCupom(decodeURIComponent(m[1].replace(/\+/g, ' '))); if (CUPOM_RE.test(c)) guardarCupom(c); }
+  } catch (e) {}
+})();
+function cupomLigado(P) { return !!(P && P.cupons === true); }
+/* resposta do servidor para o código guardado: {cupom, desconto_pct, parceiro, precos:{id:{mensal:{cheio,final}}}} */
+var _cupomOk = null, _cupomMsg = '', _cupomTentado = '';
+function cupomAplicado() { var c = cupomGuardado(); return _cupomOk && c && _cupomOk.cupom === c ? _cupomOk : null; }
+function validarCupom(user, codigo) {
+  var c = normCupom(codigo);
+  if (!CUPOM_RE.test(c)) { _cupomOk = null; _cupomMsg = 'Cupom inválido. Use só letras e números (4 a 20).'; return Promise.resolve({ ok: false, motivo: _cupomMsg }); }
+  _cupomTentado = c;
+  return chamar('mpCheckout', { acao: 'cupom', codigo: c }, user).then(function (r) {
+    if (r && r.ok === true && r.versao && r.cupom === c && r.precos) { guardarCupom(c); _cupomOk = r; _cupomMsg = ''; return { ok: true, r: r }; }
+    _cupomOk = null; _cupomMsg = (r && r.ok === false && r.motivo) ? r.motivo : 'Cupom indisponível no momento. O preço segue o valor cheio.';
+    if (r && r.ok === false) guardarCupom('');
+    return { ok: false, motivo: _cupomMsg };
+  }, function () {
+    _cupomOk = null; _cupomMsg = 'Não foi possível conferir o cupom agora. Você pode pagar o valor cheio ou tentar de novo.';
+    return { ok: false, motivo: _cupomMsg };
+  });
+}
+function tirarCupom() { guardarCupom(''); _cupomOk = null; _cupomMsg = ''; _cupomTentado = ''; }
+/* o servidor recusou o cupom na hora de pagar: volta ao preço cheio */
+function cupomRecusado(e) {
+  if (!e || !e.details || e.details.cupom !== 'invalido') return false;
+  tirarCupom(); _cupomMsg = (e.details.motivo || 'O cupom não vale mais.') + ' O preço voltou ao valor cheio.';
+  return true;
+}
+/* preço na tela: com cupom, o cheio riscado e o novo */
+function precoHTML(op) {
+  if (op && op.precoCheio) return '<s class="mtcup-de" aria-label="de ' + esc(brl(op.precoCheio)) + '">' + esc(brl(op.precoCheio)) + '</s> ' + esc(brl(op.preco));
+  return esc(brl(op && op.preco));
+}
+function cssCupom() {
+  if (!G.document || document.getElementById('mtcup-css')) return;
+  var s = document.createElement('style'); s.id = 'mtcup-css';
+  s.textContent = '.mtcup{margin-top:14px;font:14px/1.5 Inter,system-ui,sans-serif;color:inherit}.mtcup label{display:block;font-weight:600;margin:0 0 6px}'
+   + '.mtcup .mtcup-l{display:flex;gap:8px;flex-wrap:wrap}.mtcup input{flex:1 1 160px;min-height:44px;padding:8px 12px;border:1.5px solid #8A919A;border-radius:12px;background:transparent;color:inherit;font:600 15px Inter,system-ui,sans-serif;letter-spacing:.04em;text-transform:uppercase}'
+   + '.mtcup input:focus{outline:3px solid #1E4FCB;outline-offset:2px}.mtcup button{min-height:44px;padding:0 16px;border-radius:999px;border:1.5px solid currentColor;background:transparent;color:inherit;font:600 14px Inter,system-ui,sans-serif;cursor:pointer}'
+   + '.mtcup button:focus-visible{outline:3px solid #1E4FCB;outline-offset:2px}.mtcup button:disabled{opacity:.6;cursor:default}.mtcup .mtcup-m{margin:6px 0 0;min-height:1.5em;font-size:13.5px}.mtcup .mtcup-m.e{color:#B42318;font-weight:600}'
+   + '.mtcup .mtcup-ok{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:10px 14px;border-radius:14px;background:rgba(20,99,63,.1);border:1px solid rgba(20,99,63,.35)}.mtcup .mtcup-ok p{margin:0}'
+   + '.mtcup-de{opacity:.7;font-weight:500;font-size:.8em;text-decoration-thickness:1.5px}'
+   + '@media(prefers-color-scheme:dark){[data-viva-escuro] .mtcup .mtcup-m.e{color:#FF8A80}}';
+  document.head.appendChild(s);
+}
+var _cupomN = 0;
+/* campo do cupom (vazio enquanto o catálogo não ligar os cupons) */
+function cupomHTML(P) {
+  if (!cupomLigado(P)) return '';
+  cssCupom();
+  var n = ++_cupomN, ap = cupomAplicado();
+  if (ap) {
+    return '<div class="mtcup" data-mtcup><div class="mtcup-ok" role="status" tabindex="-1" data-mtcup-foco><p>Cupom <b>' + esc(ap.cupom) + '</b> aplicado: ' + esc(String(ap.desconto_pct).replace('.', ',')) + '% de desconto' +
+      (ap.parceiro ? ' (' + esc(ap.parceiro) + ')' : '') + '. O preço com desconto já aparece nos planos.</p><button type="button" data-mtcup-tirar>Remover cupom</button></div></div>';
+  }
+  var g = cupomGuardado() || (_cupomMsg ? _cupomTentado : '');
+  return '<div class="mtcup" data-mtcup><form data-mtcup-form novalidate><label for="mtcup-' + n + '">Cupom de desconto</label><div class="mtcup-l">' +
+    '<input id="mtcup-' + n + '" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="20" value="' + esc(g) + '" aria-describedby="mtcup-m' + n + '">' +
+    '<button type="submit">Aplicar</button></div><p class="mtcup-m' + (_cupomMsg ? ' e' : '') + '" id="mtcup-m' + n + '" role="status" aria-live="polite" tabindex="-1" data-mtcup-foco>' + esc(_cupomMsg) + '</p></form></div>';
+}
+/* liga os campos de cupom dentro de raiz; aoMudar() redesenha as ofertas.
+   Código guardado pelo link e ainda não conferido: confere sozinho uma vez. */
+function ligarCupom(raiz, user, aoMudar, P) {
+  if (!raiz || !user) return;
+  Array.prototype.forEach.call(raiz.querySelectorAll('[data-mtcup]'), function (box) {
+    var f = box.querySelector('[data-mtcup-form]'), tirar = box.querySelector('[data-mtcup-tirar]');
+    if (tirar) tirar.onclick = function () { tirarCupom(); _cupomMsg = 'Cupom removido. Os preços voltaram ao valor cheio.'; aoMudar(); };
+    if (!f) return;
+    var inp = f.querySelector('input'), bt = f.querySelector('button'), m = f.querySelector('.mtcup-m');
+    function aplicar(c) {
+      bt.disabled = true; m.className = 'mtcup-m'; m.textContent = 'Conferindo o cupom…';
+      validarCupom(user, c).then(function () { aoMudar(); });
+    }
+    f.onsubmit = function (e) { e.preventDefault(); var c = normCupom(inp.value); if (!c) { inp.focus(); return; } aplicar(c); };
+    var g = cupomGuardado();
+    if (g && !cupomAplicado() && _cupomTentado !== g) aplicar(g);
+  });
+}
+/* foco depois de redesenhar (para quem usa leitor de tela não perder o lugar) */
+function focoCupom(raiz) { var x = raiz && raiz.querySelector('[data-mtcup-foco]'); if (x) { try { x.focus({ preventScroll: true }); } catch (e) {} } }
+
 /* ---------------- catálogo, servidor, token ---------------- */
 var cacheP = null, cacheEm = 0;
 function carregarPlanos() {
@@ -113,7 +216,7 @@ function chamar(nome, dados, user) {
   return user.getIdToken().then(function (tk) {
     return fetch(FN + nome, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tk }, body: JSON.stringify({ data: dados || {} }) });
   }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) {
-    if (!r.ok || j.error) { var e = new Error((j.error && j.error.message) || ('erro ' + r.status)); e.status = (j.error && j.error.status) || r.status; throw e; }
+    if (!r.ok || j.error) { var e = new Error((j.error && j.error.message) || ('erro ' + r.status)); e.status = (j.error && j.error.status) || r.status; if (j.error && j.error.details) e.details = j.error.details; throw e; }
     return j.result;
   }); });
 }
@@ -162,6 +265,22 @@ function opcoes(P, prod) {
         como: 'Renova todo mês. Você entra na sua conta do Mercado Pago ou do Mercado Livre e assina por lá. Cancele quando quiser.' });
     }
   });
+  return comCupom(P, prod, out);
+}
+/* cupom conferido pelo servidor (só com "cupons": true e o preço cheio igual ao do catálogo atual) */
+function comCupom(P, prod, out) {
+  var ap = cupomLigado(P) ? cupomAplicado() : null, pr = ap && ap.precos && ap.precos[prod.id];
+  if (!pr) return out;
+  out.forEach(function (op) {
+    var x = op.mp && pr[op.periodo];
+    if (!x || !(Number(x.final) > 0) || Math.abs(Number(x.cheio) - Number(op.preco)) > 0.004 || Number(x.final) >= Number(x.cheio)) return;
+    var anual = op.periodo === 'anual';
+    op.precoCheio = Number(x.cheio); op.preco = Number(x.final); op.cupom = ap.cupom;
+    op.rotulo = brl(op.preco) + (anual ? ' por ano' : ' por mês');
+    if (anual) op.porMes = Math.round(op.preco / 12 * 100) / 100;
+    if (op.modo === 'pix') op.secTexto = 'Pagar 1 mês · ' + brl(op.preco) + ', sem renovação · cupom ' + ap.cupom;
+    if (op.modo === 'link') op.secTexto = 'Assinar pelo Mercado Pago · ' + brl(op.preco) + ' por mês, renova sozinho · cupom ' + ap.cupom;
+  });
   return out;
 }
 function planoLigado(P) { return !(P && P.mp_plano_mensal === false); }
@@ -183,7 +302,7 @@ function comprar(op, user, extra) {
       if (!u) throw new Error('Este plano ainda não está à venda.');
       G.MTAcesso.irPara(u); return u;
     }
-    var dados = { produto: op.produto, periodo: op.periodo }; if (op.modo) dados.modo = op.modo;
+    var dados = { produto: op.produto, periodo: op.periodo }; if (op.modo) dados.modo = op.modo; if (op.cupom) dados.cupom = op.cupom;
     return chamar('mpCheckout', dados, user).then(function (r) {
       var url = r && r.url;
       if (!url || !MP_URL.test(url)) throw new Error('Não foi possível abrir o pagamento agora. Tente de novo em instantes.');
@@ -268,7 +387,7 @@ function assinarCartao(o) {
     d.innerHTML = '<div class="mta-c"><div class="mtc-top"><p class="mta-k">Assinatura mensal no cartão</p>' +
       '<button type="button" class="mtc-x" data-acao="fechar" aria-label="Fechar sem assinar">&times;</button></div>' +
       '<h2 id="mtc-h" tabindex="-1">' + esc(nome) + '</h2>' +
-      '<p class="mtc-v">' + esc(valor) + '<small> por mês</small></p>' +
+      '<p class="mtc-v">' + precoHTML(op) + '<small> por mês' + (op.cupom ? ' · cupom ' + esc(op.cupom) : '') + '</small></p>' +
       '<p class="mtc-d" id="mtc-d"><b>Renova todo mês · cancele quando quiser · desistência em 7 dias com reembolso total.</b></p>' +
       '<div class="mta-m" role="status" aria-live="polite"><span class="mtc-spin" aria-hidden="true"></span>Carregando o formulário seguro do Mercado Pago…</div>' +
       '<div id="mtc-brick"></div><div class="mtc-alt" hidden></div><div class="mtc-fim"></div>' +
@@ -350,6 +469,7 @@ function assinarCartao(o) {
       enviando = true; btX.disabled = true;
       aviso('Autorizando o cartão no Mercado Pago…', false, true);
       var dados = { produto: op.produto, periodo: 'mensal', modo: 'cartao', cartao: { token: String((cd && cd.token) || '') } };
+      if (op.cupom) dados.cupom = op.cupom;
       var em = cd && cd.payer && cd.payer.email; if (em) dados.cartao.email = String(em);
       var dv = G.MP_DEVICE_SESSION_ID; if (dv) dados.cartao.device = String(dv);
       return chamar('mpCheckout', dados, user).then(function (r) {
@@ -359,6 +479,8 @@ function assinarCartao(o) {
         ativar(r);
       }, function (e) {
         enviando = false; btX.disabled = false;
+        /* cupom deixou de valer: fecha sem cobrar; quem abriu redesenha com o preço cheio */
+        if (cupomRecusado(e)) { aviso(_cupomMsg + ' Feche e toque de novo para assinar.', true); return Promise.reject(e); }
         var tm = (e && e.message) || 'O Mercado Pago não aceitou o cartão.';
         aviso(/outro cartão|de novo|Minha assinatura|Mercado Pago\"/.test(tm) ? tm : tm + ' Corrija os dados ou use outro cartão.', true);
         if (/recus/i.test(tm)) oferecerPlano();
@@ -453,7 +575,7 @@ function cartaoOpcao(op, i, user) {
   var p = op.prod, extra = typeof p.apps === 'number' ? ' Você escolhe ' + (p.apps === 1 ? '1 app' : p.apps + ' apps') + '.' : '';
   var bt = op.mp ? '<button type="button" class="bt ' + (op.periodo === 'anual' ? 's' : 'g') + '" data-acao="comprar" data-i="' + i + '">' + esc(op.botao) + '</button>'
                  : '<a class="bt s" href="' + esc(checkoutUrl(p, op.periodo, user)) + '">' + esc(op.botao) + '</a>';
-  var preco = op.periodo === 'anual' ? brl(op.preco) + '<small> por ano</small>' : brl(op.preco) + '<small> por mês</small>';
+  var preco = precoHTML(op) + (op.periodo === 'anual' ? '<small> por ano</small>' : '<small> por mês</small>');
   return '<div class="mta-o' + (op.periodo === 'anual' ? ' dest' : '') + '"><span class="t">' + esc(op.titulo) + (op.economia ? '<em>' + op.economia + '% a menos</em>' : '') + '</span>' +
     '<span class="v">' + preco + '</span>' + (op.porMes ? '<span class="pm">equivale a ' + esc(brl(op.porMes)) + ' por mês</span>' : '') +
     '<span class="c">' + esc(op.como + extra) + '</span>' + bt + '</div>';
@@ -493,6 +615,7 @@ function paywall(o) {
         '<div class="mta-l">' + principais + '</div>' + (sec ? '<div class="mta-x">' + sec + '</div>' : '') + '</section>';
     });
     if (!ops.length) corpo += '<p>Este app ainda não está à venda. Tente de novo mais tarde.</p>';
+    if (ops.some(function (op) { return op.mp; })) corpo += cupomHTML(P);
     corpo += '<div class="mta-g"><b>Sem fidelidade · desistência em 7 dias com reembolso total.</b><br>' +
       (ops.some(function (op) { return op.mp; }) ? 'Pagamento pelo Mercado Pago: o cartão é digitado nos campos seguros dele (o anual, o Pix e "Assinar pelo Mercado Pago" abrem a página do Mercado Pago). A MedTech não vê os dados do cartão.' : '') + '</div>';
     var es = linha ? escolhidos(P, mt, linha) : [];
@@ -513,7 +636,9 @@ function paywall(o) {
     '<button type="button" data-acao="sair">Sair da conta</button></div></div>';
   document.body.appendChild(d); document.documentElement.style.overflow = 'hidden';
   travaFundo();
-  var h = d.querySelector('#mta-h'); setTimeout(function () { try { h.focus({ preventScroll: true }); } catch (e) {} }, 30);
+  var h = d.querySelector('#mta-h'), focoCup = o._focoCupom; o._focoCupom = false;
+  setTimeout(function () { if (focoCup) focoCupom(d); else { try { h.focus({ preventScroll: true }); } catch (e) {} } }, 30);
+  ligarCupom(d, o.user, function () { o._focoCupom = true; paywall(o); });
   var msg = d.querySelector('.mta-m');
   function aviso(t, erro) { msg.textContent = t; msg.className = 'mta-m' + (erro ? ' e' : ''); }
   function rever() {
@@ -542,11 +667,14 @@ function paywall(o) {
       b.disabled = true; aviso(ehCartao(op) ? 'Abrindo o formulário do cartão…' : op.modo === 'link' ? 'Abrindo o Mercado Pago para você assinar…' : 'Abrindo o pagamento seguro do Mercado Pago…');
       comprar(op, o.user).then(function (res) {
         if (!res || typeof res !== 'object') return;             /* redirecionou */
-        if (res.cancelado) { b.disabled = false; aviso(''); return; }
+        if (res.cancelado) { if (op.cupom && !cupomAplicado()) { o._focoCupom = true; paywall(o); return; } b.disabled = false; aviso(''); return; }
         aviso('Conferindo a sua assinatura…');
         rever().then(function (ok) { if (!ok) { b.disabled = false; aviso('Assinatura feita. O acesso libera em instantes: toque em "Já assinei — atualizar".'); } })
           .catch(function () { b.disabled = false; aviso('Assinatura feita. Toque em "Já assinei — atualizar" em instantes.'); });
-      }).catch(function (e3) { b.disabled = false; aviso((e3 && e3.message) || 'Não foi possível abrir o pagamento.', true); });
+      }).catch(function (e3) {
+        if (cupomRecusado(e3)) { o._focoCupom = true; paywall(o); return; }
+        b.disabled = false; aviso((e3 && e3.message) || 'Não foi possível abrir o pagamento.', true);
+      });
       return;
     }
     if (a === 'atualizar') {
@@ -747,9 +875,12 @@ function estado(user) {
   });
 }
 
-G.MTAcesso = { versao: 5, NOMES: NOMES, linhaDoApp: linhaDoApp, cobre: cobre, vendaAtiva: vendaAtiva, algumaVendaAtiva: algumaVendaAtiva, vagas: vagas, escolhidos: escolhidos, liberado: liberado, acessoAtivoQualquer: acessoAtivoQualquer, produtoPorId: produtoPorId, produtosQueCobrem: produtosQueCobrem,
+G.MTAcesso = { versao: 6, NOMES: NOMES, linhaDoApp: linhaDoApp, cobre: cobre, vendaAtiva: vendaAtiva, algumaVendaAtiva: algumaVendaAtiva, vagas: vagas, escolhidos: escolhidos, liberado: liberado, acessoAtivoQualquer: acessoAtivoQualquer, produtoPorId: produtoPorId, produtosQueCobrem: produtosQueCobrem,
   carregarPlanos: carregarPlanos, chamar: chamar, lerMt: lerMt, checkoutUrl: checkoutUrl, viaMP: viaMP, opcoes: opcoes, comprar: comprar, ehCartao: ehCartao, assinarCartao: assinarCartao, irPara: irPara, vincularPlano: vincularPlano, planoLigado: planoLigado, paywall: paywall, fechar: fechar, verificar: verificar, estado: estado, brl: brl, dataBR: dataBR, anualPorMes: anualPorMes, economiaAnual: economiaAnual, appsDoProduto: appsDoProduto, AJUDA_URL: AJUDA_URL,
   /* CPF e acesso ilimitado (10/10/2026) */
   cpfValido: cpfValido, formatarCpf: formatarCpf, mascararCampoCpf: mascararCampoCpf, pedirCpf: pedirCpf, salvarCpf: salvarCpf, garantirCpf: garantirCpf, erroDeRegraCpf: erroDeRegraCpf, ILIMITADO: ILIMITADO, ehIlimitado: ehIlimitado, validade: validade,
+  /* cupom de parceiro (27/10/2026) */
+  cupomLigado: cupomLigado, cupomGuardado: cupomGuardado, cupomAplicado: cupomAplicado, validarCupom: validarCupom, tirarCupom: tirarCupom, cupomRecusado: cupomRecusado,
+  cupomHTML: cupomHTML, ligarCupom: ligarCupom, focoCupom: focoCupom, precoHTML: precoHTML,
   _limparCache: function () { cacheP = null; } };
 })();

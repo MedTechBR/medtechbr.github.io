@@ -741,7 +741,7 @@ function htmlOferta(P, p, titulo){
     const anual = op.periodo === 'anual';
     return `<button type="button" class="of-o${anual ? ' dest' : ''}" data-op="${i}">
       <span class="t">${esc(op.titulo)}${op.economia ? `<em>${op.economia}% a menos</em>` : ''}</span>
-      <span class="v">${esc(brl(op.preco))}<small>${anual ? ' por ano' : ' por mês'}</small></span>
+      <span class="v">${MTAcesso.precoHTML ? MTAcesso.precoHTML(op) : esc(brl(op.preco))}<small>${anual ? ' por ano' : ' por mês'}</small></span>
       ${op.porMes ? `<span class="pm">equivale a ${esc(brl(op.porMes))} por mês</span>` : ''}
       <span class="c">${esc(op.como)}</span>
       <span class="cta">${esc(op.botao)}</span></button>`;
@@ -793,7 +793,9 @@ function preencheAssinatura(){
   const nadaAtivo = !ativos.size && !mt.adm && !(mt.t && mt.t > ag && Number(P.teste_dias) > 0);
   if (nadaAtivo && !pend) B.unshift(`<div class="as-st off"><span class="sel">Sem plano</span><p>Você ainda não tem plano ativo nesta conta. Escolha abaixo.</p></div>`);
   if (aVenda.length) {
-    B.push(`<div class="as-of"><h5>${nadaAtivo ? 'Assinar' : 'Outros planos'}</h5>${aVendaMed.length && aVendaFarma.length ? `<h6 class="as-pub">Medicina</h6>${ofertas(aVendaMed)}<h6 class="as-pub">Enfermagem, Fisioterapia e Farmácia</h6>${ofertas(aVendaFarma)}` : ofertas(aVenda)}
+    /* cupom de parceiro (27/10/2026): só aparece com "cupons": true no planos.json */
+    const campoCupom = MTAcesso.cupomHTML && aVenda.some(p => MTAcesso.viaMP(p, 'mensal') || MTAcesso.viaMP(p, 'anual')) ? MTAcesso.cupomHTML(P) : '';
+    B.push(`<div class="as-of"><h5>${nadaAtivo ? 'Assinar' : 'Outros planos'}</h5>${campoCupom}${aVendaMed.length && aVendaFarma.length ? `<h6 class="as-pub">Medicina</h6>${ofertas(aVendaMed)}<h6 class="as-pub">Enfermagem, Fisioterapia e Farmácia</h6>${ofertas(aVendaFarma)}` : ofertas(aVenda)}
       <p class="as-mini">Mensal: cartão de crédito aqui mesmo ou pela sua conta do Mercado Pago (ou Mercado Livre), renova sozinho todo mês. Anual: Pix, cartão em até 12x ou boleto, pagamento único.</p></div>`);
   }
   const temCompra = donos.some(([id, ate]) => ate > ag && !ehIlim(ate) && !MTAcesso.produtoPorId(P, id).interno) || !!pend;
@@ -803,6 +805,7 @@ function preencheAssinatura(){
   </div>
   <p class="as-mini">Sem fidelidade · desistência em 7 dias com reembolso total. O pagamento é processado pelo Mercado Pago: no mensal, o cartão é digitado nos campos seguros dele; o anual, o Pix e "Assinar pelo Mercado Pago" abrem a página do Mercado Pago. A MedTech não vê nem guarda o número do cartão. Os recibos ficam na sua conta do Mercado Pago, em Atividade. Dúvidas: <a href="ajuda.html" target="_blank" rel="noopener">ajuda</a>, <a href="https://wa.me/558599583035?text=${encodeURIComponent('Olá! Tenho uma dúvida sobre a minha assinatura MedTech.')}" target="_blank" rel="noopener">WhatsApp (85) 99958-3035</a> ou <a href="mailto:${SUPORTE_EMAIL}?subject=${encodeURIComponent('Assinatura MedTech')}">${SUPORTE_EMAIL}</a>.</p>`);
   el.innerHTML = B.join('');
+  if (MTAcesso.ligarCupom) MTAcesso.ligarCupom(el, MT.user, () => { preencheAssinatura(); MTAcesso.focoCupom(document.getElementById('cfgAssin')); });
   el.querySelectorAll('[data-op]').forEach(b => b.onclick = () => abrirCompra(OPS[Number(b.dataset.op)], b, document.getElementById('cfgPagMsg')));
   el.querySelectorAll('[data-cancelar]').forEach(b => b.onclick = () => cancelarAssinatura(b.dataset.cancelar, b.dataset.nome, b));
 }
@@ -862,7 +865,7 @@ async function abrirCompra(op, bt, msgEl){
     const res = await MTAcesso.comprar(op, MT.user);
     if (!res || typeof res !== 'object') return;              // redirecionou ao Mercado Pago
     if (bt) bt.disabled = false;
-    if (res.cancelado) { diz(''); return; }
+    if (res.cancelado) { if (op.cupom && MTAcesso.cupomAplicado && !MTAcesso.cupomAplicado()) { redesenhaCompra(op); return; } diz(''); return; }
     ACESSO.mt = res.mt || await MTAcesso.lerMt(MT.user, true).catch(() => ACESSO.mt);
     if (window.MTPixel) MTPixel.compra(op.prod.id, op.periodo, op.preco, res.preapproval_id || res.id || '');
     const doModal = !!(msgEl && msgEl.closest('#cpModal'));
@@ -872,7 +875,20 @@ async function abrirCompra(op, bt, msgEl){
     const m = doModal ? null : (msgEl || document.getElementById('cfgPagMsg'));
     if (m && document.body.contains(m)) { m.className = 'cfg-msg ok'; m.textContent = t; } else aviso(t);
   }
-  catch(e) { if (bt) bt.disabled = false; diz((e && e.message) || 'Não foi possível abrir o pagamento.', true); }
+  catch(e) {
+    /* o cupom deixou de valer na hora de pagar: preço cheio de novo, sem cobrar nada */
+    if (MTAcesso.cupomRecusado && MTAcesso.cupomRecusado(e)) { redesenhaCompra(op); return; }
+    if (bt) bt.disabled = false; diz((e && e.message) || 'Não foi possível abrir o pagamento.', true);
+  }
+}
+/* redesenha as ofertas (e o "Ir para o pagamento", se aberto) depois de mudar o cupom */
+function redesenhaCompra(op){
+  const m = document.getElementById('cpModal');
+  if (m && op && op.prod) {
+    const novo = MTAcesso.opcoes(ACESSO.P, op.prod).find(o => o.periodo === op.periodo && (o.modo || '') === (op.modo || ''));
+    m.remove(); if (novo) { const w = confirmarCompra(novo); setTimeout(() => MTAcesso.focoCupom(w), 60); }
+  }
+  preencheAssinatura();
 }
 function escolherAppsPlano(){
   const P = ACESSO.P, mt = ACESSO.mt || {}, vg = MTAcesso.vagas(P, mt, LINHA);
@@ -965,8 +981,8 @@ function confirmarCompra(op){
   const jaTem = ate > ag ? `<p class="sub cp-aviso"><i class="ti ti-info-circle" aria-hidden="true"></i> Você já tem o ${esc(p.nome)} ativo até ${dataBR(ate)}. Se pagar agora, o novo período soma ao atual.</p>` : '';
   const adm = mt.adm ? '<p class="sub cp-aviso"><i class="ti ti-info-circle" aria-hidden="true"></i> Esta é uma conta de administração: ela já tem acesso a tudo.</p>' : '';
   const w = modal('cpModal', `<h3 id="cpModal-t" tabindex="-1"><i class="ti ti-credit-card" aria-hidden="true"></i>Ir para o pagamento</h3>
-    <div class="cp-res"><span class="t">${esc(p.nome)} · ${anual ? 'anual' : 'mensal'}</span><span class="v">${esc(brl(op.preco))}<small>${anual ? ' por ano' : ' por mês'}</small></span>${op.porMes ? `<span class="pm">equivale a ${esc(brl(op.porMes))} por mês</span>` : ''}</div>
-    <p class="sub">${esc(op.como)}</p>${jaTem}${adm}
+    <div class="cp-res"><span class="t">${esc(p.nome)} · ${anual ? 'anual' : 'mensal'}${op.cupom ? ' · cupom ' + esc(op.cupom) : ''}</span><span class="v">${MTAcesso.precoHTML ? MTAcesso.precoHTML(op) : esc(brl(op.preco))}<small>${anual ? ' por ano' : ' por mês'}</small></span>${op.porMes ? `<span class="pm">equivale a ${esc(brl(op.porMes))} por mês</span>` : ''}</div>
+    <p class="sub">${esc(op.como)}</p>${op.mp && MTAcesso.cupomHTML ? MTAcesso.cupomHTML(P) : ''}${jaTem}${adm}
     <p class="sub">Sem fidelidade · desistência em 7 dias com reembolso total.<br>Conta: <b>${esc(MT.user.email || '')}</b></p>
     <div class="sug-row"><button type="button" class="b ok cp-ir" id="cpIr">Ir para o pagamento<i class="ti ti-arrow-right" aria-hidden="true"></i></button></div>
     <div class="cfg-msg" id="cpMsg" role="status"></div>
@@ -974,6 +990,8 @@ function confirmarCompra(op){
     <p class="sub cp-fino">${MTAcesso.ehCartao && MTAcesso.ehCartao(op) ? 'O cartão é digitado nos campos seguros do Mercado Pago, aqui mesmo. A MedTech não vê os dados do cartão.' : 'Você vai para a página segura do Mercado Pago. A MedTech não vê os dados do cartão.'}</p>`);
   w.querySelector('#cpIr').onclick = e => abrirCompra(op, e.currentTarget, w.querySelector('#cpMsg'));
   w.querySelector('#cpOutras').onclick = () => { w.remove(); openAssinatura(); };
+  if (MTAcesso.ligarCupom) MTAcesso.ligarCupom(w, MT.user, () => redesenhaCompra(op));
+  return w;
 }
 
 /* ---------- volta do Mercado Pago: ?pago=1|0 + status/collection_status, payment_id, preapproval_id ---------- */

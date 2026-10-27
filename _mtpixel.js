@@ -13,6 +13,16 @@
    ============================================================ */
 (function () {
   "use strict";
+  /* Cupom de parceiro (27/10/2026): link com ?cupom=CODIGO guarda o código por 30 dias
+     (localStorage "mt.cupom", o último vence) para o checkout aplicar o desconto. É a mesma
+     captura do _mtacesso.js, aqui para as páginas da vitrine. Não mostra nada e não depende
+     do aviso de cookies (não é medição de anúncio: serve só ao desconto pedido pela pessoa). */
+  try {
+    var mc = /[?&]cupom=([^&#]*)/i.exec(location.search || "");
+    var cc = mc ? decodeURIComponent(mc[1].replace(/\+/g, " ")).trim().toUpperCase() : "";
+    if (/^[A-Z0-9]{4,20}$/.test(cc)) localStorage.setItem("mt.cupom", JSON.stringify({ c: cc, em: Date.now() }));
+  } catch (e) {}
+
   var PIXEL_ID = "1747270693021712";
   var CHAVE = "mt.cookies";
 
