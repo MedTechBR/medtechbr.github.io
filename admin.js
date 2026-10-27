@@ -2,6 +2,8 @@
    admin.js — Administração MedTech (10/10/2026, abertura das vendas)
    Tudo passa pelo servidor (o navegador não decide nada de acesso):
      mtAdmin  {acao:'painel'|'assinantes'|'pedidos'|'usuarios'|'usuario'|'editarUsuario'|'resetSenha'|'papel'|'ver'|'conceder'|'revogar'|'vincularCpf'|'vincularAssinatura'|'teste'|'geracaoIA'|'testeIA'}
+              (27/10/2026: seção Turmas = licença para turma: turmas, turmaSalvar, turmaAlunos, turmaImportar,
+               turmaRemoverAluno, turmaPrazo, turmaEncerrar, turmaCobranca; painel do curso em turma.html)
               (10/10/2026: seção Usuários = todas as contas, ficha com dados, liberações, permissões,
                acesso à conta e histórico; o servidor nunca devolve o CPF inteiro nem segredo da conta)
               (10/10/2026: ver/revogar por e-mail ou CPF; conceder com lista mista e ilimitado;
@@ -36,7 +38,7 @@ const ddmm = d => d ? d.slice(8, 10) + '/' + d.slice(5, 7) : '';
 const plural = (n, um, varios) => inteiro(n) + ' ' + (Number(n) === 1 ? um : varios);
 const agoraS = () => Math.floor(Date.now() / 1000);
 
-const SECOES = ['visao', 'usuarios', 'assinantes', 'acessos', 'pagamentos', 'parceiros', 'planos', 'sinalizacoes', 'equipe', 'diagnostico'];
+const SECOES = ['visao', 'usuarios', 'assinantes', 'acessos', 'pagamentos', 'parceiros', 'turmas', 'planos', 'sinalizacoes', 'equipe', 'diagnostico'];
 /* apps: mesmos nomes, ícones e cores do catálogo do _mtauth */
 const APPS = {
   condutai: { nm: 'CondutAI', ic: 'ti-stethoscope', c: '#1D6FD0', url: '/condutai.html' },
@@ -187,6 +189,7 @@ function abrirSecao(sec) {
   if (sec === 'assinantes' && !E.carregou.assinantes) carregarAssinantes();
   if (sec === 'pagamentos' && !E.carregou.pedidos) carregarPedidos();
   if (sec === 'parceiros' && !E.carregou.parceiros) carregarParceiros();
+  if (sec === 'turmas' && !E.carregou.turmas) carregarTurmas();
   if (sec === 'planos' && !E.carregou.planos) desenharPlanos();
   if (sec === 'sinalizacoes' && !E.carregou.sinal) carregarSinal();
   if (sec === 'diagnostico' && !E.carregou.ia) carregarIA();
@@ -1631,6 +1634,248 @@ function marcarComissaoPaga(l, mes) {
 }
 $('btPaNovo').onclick = () => { if (!E.pa) { toast('Aguarde a lista de parceiros carregar.', 'err'); return; } editarParceiro(null); };
 $('fPaMes').addEventListener('submit', e => { e.preventDefault(); carregarRelParceiros(); });
+
+/* ============================================================
+   TURMAS (licença para turma, 27/10/2026)
+   mtAdmin: turmas, turmaSalvar, turmaAlunos, turmaImportar, turmaRemoverAluno, turmaPrazo,
+   turmaEncerrar, turmaCobranca, turmaPainel (turmas.js no servidor). O painel do curso é o
+   turma.html (a administração abre o de qualquer turma).
+   ============================================================ */
+const dataD = d => d ? d.split('-').reverse().join('/') : '';
+const hojeD = () => new Date(Date.now() - 3 * 3600000).toISOString().slice(0, 10);
+const somaDias = (d, n) => new Date(Date.parse(d + 'T12:00:00Z') + n * 86400000).toISOString().slice(0, 10);
+function precoFaixa(n) {
+  const fx = (E.tu && E.tu.faixas) || [{ min: 500, valor: 10 }, { min: 200, valor: 12 }, { min: 0, valor: 15 }];
+  for (const f of fx) if (n >= f.min) return f.valor;
+  return fx[fx.length - 1].valor;
+}
+const SIT_ALUNO = a => a.removido_em ? '<span class="selo">retirado</span>' : a.conta ? '<span class="selo ok">conta ligada</span>' : '<span class="selo av">aguardando conta</span>';
+async function carregarTurmas() {
+  E.carregou.turmas = true;
+  if (!$('tuMes').value) $('tuMes').value = mesAtualBR();
+  $('tuLista').innerHTML = carregando('Carregando turmas…');
+  try {
+    const r = await admin({ acao: 'turmas' });
+    E.tu = r;
+    $('tuAviso').innerHTML = r.ligado ? '' : `<div class="aviso info"><i class="ti ti-info-circle" aria-hidden="true"></i><div><b>A licença para turma está desligada no site.</b> Pode cadastrar turmas e importar alunos agora; o acesso dos alunos, o aviso de autorização nos apps e o painel do curso só funcionam quando o catálogo (planos.json) tiver <code>"turmas": true</code>. Peça ao Claude para ligar.</div></div>`;
+    desenharTurmas();
+    carregarCobranca();
+  } catch (e) {
+    if (E.bloqueado) return;
+    $('tuAviso').innerHTML = ehNaoPublicado(e) ? avisoPublicar('as turmas') : avisoErro(e);
+    $('tuLista').innerHTML = ''; $('tuCob').innerHTML = '';
+  }
+}
+function desenharTurmas() {
+  const itens = (E.tu && E.tu.itens) || [];
+  if (!itens.length) { $('tuLista').innerHTML = '<p class="vazio">Nenhuma turma ainda. Use "Nova turma".</p>'; return; }
+  const hoje = hojeD();
+  $('tuLista').innerHTML = `<div class="tblw"><table class="tbl resp"><caption class="sr">${itens.length} turmas</caption><thead><tr>
+      <th scope="col">Turma</th><th scope="col">Apps</th><th scope="col">Período</th><th scope="col" class="n">Alunos</th><th scope="col" class="n">Valor</th><th scope="col"><span class="sr">Ações</span></th></tr></thead><tbody>
+    ${itens.map(t => {
+      const c = t.contagem || {};
+      const sit = t.status === 'encerrada' ? '<span class="selo">encerrada</span>' : t.fim < hoje ? '<span class="selo av">terminou</span>' : t.inicio > hoje ? '<span class="selo ac">começa em ' + esc(dataD(t.inicio)) + '</span>' : '<span class="selo ok">em andamento</span>';
+      return `<tr>
+        <td data-r="Turma"><b>${esc(t.nome)}</b><br><span class="fraco">${esc(t.curso_nome)}${t.curso_doc ? ' · ' + esc(fmtDoc(t.curso_doc)) : ''}</span><br><span class="fraco">${esc(t.curso_email)}</span></td>
+        <td data-r="Apps" class="fraco">${esc((t.produtos || []).map(nomeProd).join(', '))}${t.ver_desempenho ? '<br>curso vê o desempenho de quem autorizar' : '<br>curso vê só adesão e números da turma'}</td>
+        <td data-r="Período">${sit}<br><span class="fraco">${esc(dataD(t.inicio))} a ${esc(dataD(t.fim))}</span></td>
+        <td data-r="Alunos" class="n"><b>${inteiro(c.liberados || 0)}</b> liberados<br><span class="fraco">${inteiro(c.ativaram || 0)} ativaram · ${inteiro(c.autorizaram || 0)} autorizaram</span></td>
+        <td data-r="Valor" class="n">${brl(t.valor_aluno_mes)}<br><span class="fraco">por aluno/mês · mín. ${inteiro(t.minimo_alunos)}${t.pagamento === 'adiantado' ? ' · adiantado ' + pct(t.desconto_pct) : ''}</span></td>
+        <td data-r="Ações" class="acoes"><div class="acoesL">
+          <button type="button" class="btn btn-g sm" data-tu-alunos="${esc(t.id)}" aria-label="Alunos de ${esc(t.nome)}"><i class="ti ti-users" aria-hidden="true"></i><span class="tx">Alunos</span></button>
+          <button type="button" class="btn btn-g sm" data-tu-editar="${esc(t.id)}" aria-label="Editar ${esc(t.nome)}"><i class="ti ti-pencil" aria-hidden="true"></i><span class="tx">Editar</span></button>
+          <a class="btn btn-g sm" href="turma.html?turma=${encodeURIComponent(t.id)}" target="_blank" rel="noopener" aria-label="Painel do curso de ${esc(t.nome)}"><i class="ti ti-chart-bar" aria-hidden="true"></i><span class="tx">Painel</span></a>
+          <button type="button" class="btn btn-g sm" data-tu-prazo="${esc(t.id)}" aria-label="Prorrogar ${esc(t.nome)}"><i class="ti ti-calendar-plus" aria-hidden="true"></i><span class="tx">${t.status === 'encerrada' ? 'Reabrir' : 'Prorrogar'}</span></button>
+          ${t.status === 'encerrada' ? '' : `<button type="button" class="btn btn-dn sm" data-tu-encerrar="${esc(t.id)}" aria-label="Encerrar ${esc(t.nome)}"><i class="ti ti-player-stop" aria-hidden="true"></i><span class="tx">Encerrar</span></button>`}
+        </div></td></tr>`;
+    }).join('')}</tbody></table></div>
+    <p class="leg">O coordenador do curso entra com a conta MedTech dele em <b>medtechbr.com.br/turma.html</b>. Encerrar ou terminar a turma tira só o acesso dado pela turma: o progresso do aluno fica, e quem assinar por conta própria continua.</p>`;
+  const acha = id => itens.find(x => x.id === id);
+  $('tuLista').querySelectorAll('[data-tu-alunos]').forEach(b => b.onclick = () => abrirAlunosTurma(acha(b.dataset.tuAlunos)));
+  $('tuLista').querySelectorAll('[data-tu-editar]').forEach(b => b.onclick = () => editarTurma(acha(b.dataset.tuEditar)));
+  $('tuLista').querySelectorAll('[data-tu-prazo]').forEach(b => b.onclick = () => prazoTurma(acha(b.dataset.tuPrazo)));
+  $('tuLista').querySelectorAll('[data-tu-encerrar]').forEach(b => b.onclick = () => encerrarTurma(acha(b.dataset.tuEncerrar)));
+}
+function editarTurma(t) {
+  const novo = !t, tu = E.tu || {}, hoje = hojeD();
+  t = t || { nome: '', curso_nome: '', curso_doc: '', curso_email: '', produtos: [], inicio: hoje, fim: somaDias(hoje, 365), alunos_previstos: 50,
+    minimo_alunos: tu.minimo || 50, valor_aluno_mes: precoFaixa(50), pagamento: 'mensal', desconto_pct: 0, ver_desempenho: true, coord_emails: [], obs: '' };
+  const prods = (tu.produtos || []).map(x => `<label class="marca-l"><input type="checkbox" data-tu-prod value="${esc(x.id)}" ${(t.produtos || []).includes(x.id) ? 'checked' : ''}> ${esc(x.nome)}</label>`).join('');
+  const faixas = (tu.faixas || []).slice().reverse().map(f => (f.min ? f.min + '+' : 'até 199') + ': ' + brl(f.valor)).join(' · ');
+  const semConf = (t.coord_sem_confirmar || []).length ? `<span class="ajuda" style="color:var(--avV)">E-mail ainda não confirmado: ${esc(t.coord_sem_confirmar.join(', '))}. Confira com o curso se a conta é mesmo dessa pessoa.</span>` : '';
+  const corpo = `<div style="display:flex;flex-direction:column;gap:12px">
+    <div class="linhaC">
+      <div class="campo"><label for="tuNome">Nome da turma</label><input id="tuNome" type="text" maxlength="120" autocomplete="off" placeholder="Ex.: Extensivo ENARE 2027" value="${esc(t.nome)}"></div>
+      <div class="campo"><label for="tuCurso">Nome do curso</label><input id="tuCurso" type="text" maxlength="120" autocomplete="off" value="${esc(t.curso_nome)}"></div>
+    </div>
+    <div class="linhaC">
+      <div class="campo"><label for="tuDoc">CNPJ ou CPF do curso</label><input id="tuDoc" type="text" inputmode="numeric" maxlength="18" autocomplete="off" value="${esc(fmtDoc(t.curso_doc))}"></div>
+      <div class="campo"><label for="tuEmail">E-mail do responsável</label><input id="tuEmail" type="email" autocomplete="off" spellcheck="false" value="${esc(t.curso_email)}"></div>
+    </div>
+    <fieldset class="campo" style="border:0;padding:0;margin:0"><legend style="font-weight:600;margin-bottom:6px">Apps de estudo liberados</legend>
+      <div style="display:flex;flex-direction:column">${prods || '<span class="fraco">O catálogo não tem app de estudo para turma.</span>'}</div></fieldset>
+    <div class="linhaC">
+      <div class="campo"><label for="tuIni">Início</label><input id="tuIni" type="date" value="${esc(t.inicio)}"></div>
+      <div class="campo"><label for="tuFim">Fim (o acesso vale até o fim deste dia)</label><input id="tuFim" type="date" value="${esc(t.fim)}"></div>
+    </div>
+    <div class="linhaC">
+      <div class="campo"><label for="tuPrev">Alunos previstos</label><input id="tuPrev" type="number" min="0" step="1" inputmode="numeric" value="${esc(t.alunos_previstos)}"></div>
+      <div class="campo"><label for="tuMin">Mínimo cobrado (alunos)</label><input id="tuMin" type="number" min="0" step="1" inputmode="numeric" value="${esc(t.minimo_alunos)}"></div>
+      <div class="campo"><label for="tuValor">Valor por aluno por mês (R$)</label><input id="tuValor" type="number" min="0" step="0.01" inputmode="decimal" value="${esc(t.valor_aluno_mes)}" aria-describedby="tuSug"><span class="tu-sug" id="tuSug">Tabela: ${esc(faixas)}.</span></div>
+    </div>
+    <div class="linhaC">
+      <div class="campo"><label for="tuPag">Pagamento</label><select id="tuPag"><option value="mensal" ${t.pagamento !== 'adiantado' ? 'selected' : ''}>Mensal</option><option value="adiantado" ${t.pagamento === 'adiantado' ? 'selected' : ''}>Adiantado (turma inteira)</option></select></div>
+      <div class="campo"><label for="tuDesc">Desconto (%)</label><input id="tuDesc" type="number" min="0" max="90" step="0.5" inputmode="decimal" value="${esc(t.desconto_pct)}"></div>
+    </div>
+    <label class="marca-l"><input type="checkbox" id="tuVer" ${t.ver_desempenho ? 'checked' : ''}> O curso pode ver o desempenho individual de quem autorizar (o aluno decide no app)</label>
+    <div class="campo"><label for="tuCoord">Coordenadores do curso (e-mails das contas MedTech, um por linha)</label><textarea id="tuCoord" rows="3" spellcheck="false" autocomplete="off">${esc((t.coord_emails || []).join('\n'))}</textarea>
+      <span class="ajuda">Cada coordenador precisa ter conta MedTech com esse e-mail. Ele abre o painel em medtechbr.com.br/turma.html.</span>${semConf}</div>
+    <div class="campo"><label for="tuObs">Observação (opcional)</label><input id="tuObs" type="text" maxlength="400" autocomplete="off" value="${esc(t.obs)}"></div>
+  </div>`;
+  dialogo(novo ? 'Nova turma' : 'Editar turma ' + t.nome, corpo, [
+    { rot: 'Cancelar', cls: 'btn-g' },
+    { rot: '<i class="ti ti-check" aria-hidden="true"></i>Salvar', cls: 'btn-p', acao: async () => {
+      const dados = { acao: 'turmaSalvar', novo, id: t.id, nome: $('tuNome').value.trim(), curso_nome: $('tuCurso').value.trim(), curso_doc: soDig($('tuDoc').value),
+        curso_email: $('tuEmail').value.trim(), produtos: [...document.querySelectorAll('[data-tu-prod]:checked')].map(x => x.value), inicio: $('tuIni').value, fim: $('tuFim').value,
+        alunos_previstos: Number($('tuPrev').value || 0), minimo_alunos: $('tuMin').value === '' ? '' : Number($('tuMin').value), valor_aluno_mes: $('tuValor').value === '' ? '' : Number($('tuValor').value),
+        pagamento: $('tuPag').value, desconto_pct: $('tuDesc').value === '' ? '' : Number($('tuDesc').value), ver_desempenho: $('tuVer').checked,
+        coordenadores: $('tuCoord').value.split(/[\s,;]+/).map(x => x.trim()).filter(Boolean), obs: $('tuObs').value.trim() };
+      if (dados.nome.length < 2 || dados.curso_nome.length < 2) { toast('Informe o nome da turma e o do curso.', 'err'); return false; }
+      if (!dados.produtos.length) { toast('Escolha ao menos um app.', 'err'); return false; }
+      if (!dados.inicio || !dados.fim || dados.fim < dados.inicio) { toast('Confira as datas de início e fim.', 'err'); return false; }
+      try {
+        const r = await admin(dados);
+        toast((novo ? 'Turma criada.' : 'Turma atualizada.') + (r.reprojetados ? ' Acesso de ' + plural(r.reprojetados, 'aluno atualizado', 'alunos atualizados') + '.' : '') + (r.erros ? ' ' + plural(r.erros, 'aluno', 'alunos') + ' sem atualizar agora; salve de novo.' : ''), r.erros ? 'err' : '');
+        await carregarTurmas();
+        if (E.tuAberta && E.tuAberta === r.turma.id) abrirAlunosTurma(r.turma);
+      } catch (e) { if (!E.bloqueado) toast(ehNaoPublicado(e) ? 'Falta publicar o servidor (deploy-backend.command).' : ((e && e.message) || 'Não consegui salvar.'), 'err'); return false; }
+    } }
+  ]);
+  /* valor sugerido pela tabela enquanto o valor não foi mexido à mão */
+  let mexeu = !novo;
+  $('tuValor').addEventListener('input', () => { mexeu = true; });
+  const sug = () => { if (mexeu) return; const n = Math.max(Number($('tuPrev').value || 0), Number($('tuMin').value || 0)); $('tuValor').value = precoFaixa(n); };
+  $('tuPrev').addEventListener('input', sug); $('tuMin').addEventListener('input', sug);
+  $('tuPag').addEventListener('change', () => { const d = (E.tu && E.tu.descontoAdiantado) || 10; if ($('tuPag').value === 'adiantado' && !Number($('tuDesc').value)) $('tuDesc').value = d; if ($('tuPag').value === 'mensal' && Number($('tuDesc').value) === d) $('tuDesc').value = 0; });
+}
+async function abrirAlunosTurma(t) {
+  if (!t) return;
+  E.tuAberta = t.id;
+  $('tuDet').hidden = false;
+  $('tuDetTit').innerHTML = `<i class="ti ti-users" aria-hidden="true"></i>Alunos de ${esc(t.nome)}`;
+  $('tuImpRes').innerHTML = '';
+  $('tuImp').open = !((t.contagem || {}).liberados);
+  $('tuAlunos').innerHTML = carregando('Carregando alunos…');
+  $('tuDet').scrollIntoView({ block: 'start' });
+  $('tuDetTit').focus({ preventScroll: true });
+  try {
+    const r = await admin({ acao: 'turmaAlunos', turma: t.id });
+    E.tuAl = r;
+    desenharAlunosTurma();
+  } catch (e) { if (!E.bloqueado) $('tuAlunos').innerHTML = avisoErro(e); }
+}
+function desenharAlunosTurma() {
+  const r = E.tuAl; if (!r) return;
+  const c = r.contagem || {}, t = r.turma;
+  $('tuDetResumo').innerHTML = `<div class="tu-num"><span><b>${inteiro(c.liberados)}</b> liberados</span><span><b>${inteiro(c.comConta)}</b> com conta ligada</span><span><b>${inteiro(c.ativaram)}</b> ativaram</span><span><b>${inteiro(c.autorizaram)}</b> autorizaram o curso</span>${c.removidos ? `<span><b>${inteiro(c.removidos)}</b> retirados</span>` : ''}</div>
+    <p class="leg">${esc(t.curso_nome)} · ${esc(dataD(t.inicio))} a ${esc(dataD(t.fim))} · ${esc((t.produtos || []).map(nomeProd).join(', '))}. "Aguardando conta" = o acesso entra quando a pessoa criar a conta com esse e-mail (e confirmar o e-mail) ou cadastrar esse CPF.</p>`;
+  if (!r.itens.length) { $('tuAlunos').innerHTML = '<p class="vazio">Nenhum aluno ainda. Importe a lista acima.</p>'; return; }
+  $('tuAlunos').innerHTML = `<div class="acoesL" style="margin:6px 0 10px"><button type="button" class="btn btn-g sm" id="tuCsvAl"><i class="ti ti-download" aria-hidden="true"></i>Exportar CSV</button></div>
+    <div class="tblw"><table class="tbl resp"><caption class="sr">Alunos da turma</caption><thead><tr>
+      <th scope="col">Aluno</th><th scope="col">Situação</th><th scope="col">Ativou</th><th scope="col">Autorização</th><th scope="col"><span class="sr">Ações</span></th></tr></thead><tbody>
+    ${r.itens.map(a => `<tr>
+      <td data-r="Aluno">${a.nome ? '<b>' + esc(a.nome) + '</b><br>' : ''}<span class="em">${esc(a.email || '')}</span>${a.cpfMasc ? '<br><span class="fraco">CPF ' + esc(a.cpfMasc) + '</span>' : ''}</td>
+      <td data-r="Situação">${SIT_ALUNO(a)}${a.aviso ? '<br><span class="fraco">' + esc(a.aviso) + '</span>' : ''}<br><span class="fraco">desde ${esc(dataC(a.incluido_em))}${a.removido_em ? ' · retirado em ' + esc(dataC(a.removido_em)) : ''}</span></td>
+      <td data-r="Ativou">${a.ativou_em ? '<span class="selo ok">sim</span><br><span class="fraco">' + esc(dataC(a.ativou_em)) + '</span>' : '<span class="selo">não</span>'}</td>
+      <td data-r="Autorização">${a.autoriza === 'sim' ? '<span class="selo ok">autorizou</span>' : a.autoriza === 'nao' ? '<span class="selo">não autorizou</span>' : '<span class="fraco">ainda não respondeu</span>'}${a.autoriza_em ? '<br><span class="fraco">' + esc(dataC(a.autoriza_em)) + '</span>' : ''}</td>
+      <td data-r="Ações" class="acoes">${a.removido_em ? '' : `<button type="button" class="btn btn-g sm" data-tu-tirar="${esc(a.chave)}" aria-label="Retirar ${esc(a.nome || a.email || a.cpfMasc)} da turma"><i class="ti ti-user-minus" aria-hidden="true"></i><span class="tx">Retirar</span></button>`}</td></tr>`).join('')}
+    </tbody></table></div>`;
+  $('tuAlunos').querySelectorAll('[data-tu-tirar]').forEach(b => b.onclick = () => tirarAluno(r.itens.find(x => x.chave === b.dataset.tuTirar)));
+  $('tuCsvAl').onclick = () => baixarCsv('turma-' + t.id + '-alunos.csv', [['Turma', 'Curso', 'Nome', 'E-mail', 'CPF', 'Situação', 'Incluído em', 'Retirado em', 'Ativou em', 'Autorização', 'Autorização em']]
+    .concat(r.itens.map(a => [t.nome, t.curso_nome, a.nome, a.email, a.cpfMasc, a.removido_em ? 'retirado' : a.conta ? 'conta ligada' : 'aguardando conta', dataC(a.incluido_em), a.removido_em ? dataC(a.removido_em) : '',
+      a.ativou_em ? dataC(a.ativou_em) : '', a.autoriza === 'sim' ? 'autorizou' : a.autoriza === 'nao' ? 'não autorizou' : '', a.autoriza_em ? dataC(a.autoriza_em) : ''])));
+}
+async function tirarAluno(a) {
+  if (!a || !E.tuAl) return;
+  const ok = await confirmar('Retirar da turma', `Retirar <b>${esc(a.nome || a.email || a.cpfMasc)}</b> da turma <b>${esc(E.tuAl.turma.nome)}</b>? O acesso dado pela turma termina agora. O progresso do aluno não é apagado e a assinatura própria dele, se houver, continua.`, 'Retirar', true);
+  if (!ok) return;
+  try { await admin({ acao: 'turmaRemoverAluno', turma: E.tuAl.turma.id, aluno: a.chave }); toast('Aluno retirado da turma.'); await carregarTurmas(); abrirAlunosTurma(E.tuAl.turma); }
+  catch (e) { if (!E.bloqueado) toast((e && e.message) || 'Não consegui retirar.', 'err'); }
+}
+$('fTuImp').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  if (!E.tuAl) return;
+  let texto = $('tuTexto').value;
+  const arq = $('tuArq').files && $('tuArq').files[0];
+  if (arq) { try { texto = (texto ? texto + '\n' : '') + await arq.text(); } catch (e) { toast('Não consegui ler o arquivo.', 'err'); return; } }
+  const linhas = texto.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  if (!linhas.length) { toast('Cole a lista ou escolha um arquivo.', 'err'); return; }
+  const bt = ev.target.querySelector('button[type=submit]'); bt.disabled = true;
+  const LOTE = 100, res = []; let erro = '';
+  for (let i = 0; i < linhas.length; i += LOTE) {
+    $('tuImpRes').innerHTML = carregando('Liberando ' + Math.min(i + LOTE, linhas.length) + ' de ' + linhas.length + '…');
+    try {
+      const r = await admin({ acao: 'turmaImportar', turma: E.tuAl.turma.id, linhas: linhas.slice(i, i + LOTE) });
+      r.resultado.forEach(x => { x.linha += i; res.push(x); });
+    } catch (e) { erro = (e && e.message) || 'falha'; break; }
+  }
+  bt.disabled = false;
+  const n = s => res.filter(x => x.status === s).length;
+  const conta = res.filter(x => x.destino === 'conta').length, pend = res.filter(x => x.destino === 'pendente').length;
+  const ruins = res.filter(x => x.status === 'erro');
+  $('tuImpRes').innerHTML = `${erro ? avisoErro(erro + ' (as linhas antes do erro foram liberadas; mande de novo a lista, quem já entrou não duplica)') : ''}
+    <div class="tu-num"><span><b>${inteiro(n('novo'))}</b> novos</span><span><b>${inteiro(n('atualizado') + n('readmitido'))}</b> atualizados</span><span><b>${inteiro(n('ja_estava'))}</b> já estavam</span><span><b>${inteiro(conta)}</b> com acesso na hora</span><span><b>${inteiro(pend)}</b> aguardando conta</span><span><b>${inteiro(ruins.length)}</b> com erro</span></div>
+    ${ruins.length ? `<div class="tblw"><table class="tbl resp"><caption class="sr">Linhas com erro</caption><thead><tr><th scope="col" class="n">Linha</th><th scope="col">E-mail</th><th scope="col">Erro</th></tr></thead><tbody>${ruins.map(x => `<tr><td data-r="Linha" class="n">${x.linha}</td><td data-r="E-mail">${esc(x.email || x.cpfMasc || '')}</td><td data-r="Erro">${esc(x.erro)}</td></tr>`).join('')}</tbody></table></div>` : ''}`;
+  if (!erro) { $('tuTexto').value = ''; $('tuArq').value = ''; }
+  toast(n('novo') + ' alunos novos liberados.');
+  await carregarTurmas();
+  const t = (E.tu.itens || []).find(x => x.id === E.tuAl.turma.id); if (t) { const det = $('tuImpRes').innerHTML; await abrirAlunosTurma(t); $('tuImpRes').innerHTML = det; $('tuImp').open = true; }
+});
+$('btTuFechar').onclick = () => { $('tuDet').hidden = true; E.tuAberta = ''; };
+function prazoTurma(t) {
+  if (!t) return;
+  dialogo((t.status === 'encerrada' ? 'Reabrir ' : 'Prorrogar ') + t.nome, `<p>Nova data de fim da turma <b>${esc(t.nome)}</b> (hoje vale até ${esc(dataD(t.fim))}${t.status === 'encerrada' ? ', encerrada em ' + esc(dataC(t.encerrada_em)) : ''}). O acesso de todos os alunos acompanha.</p>
+    <div class="campo"><label for="tuNovoFim">Fim</label><input id="tuNovoFim" type="date" value="${esc(t.fim < hojeD() ? somaDias(hojeD(), 30) : somaDias(t.fim, 30))}"></div>`, [
+    { rot: 'Cancelar', cls: 'btn-g' },
+    { rot: '<i class="ti ti-calendar-plus" aria-hidden="true"></i>Salvar', cls: 'btn-p', acao: async () => {
+      try { const r = await admin({ acao: 'turmaPrazo', turma: t.id, fim: $('tuNovoFim').value }); toast('Fim da turma em ' + dataD(r.turma.fim) + '. ' + plural(r.reprojetados, 'aluno atualizado', 'alunos atualizados') + '.'); carregarTurmas(); }
+      catch (e) { if (!E.bloqueado) toast((e && e.message) || 'Não consegui salvar.', 'err'); return false; }
+    } }
+  ]);
+}
+async function encerrarTurma(t) {
+  if (!t) return;
+  const ok = await confirmar('Encerrar turma', `Encerrar <b>${esc(t.nome)}</b> agora? O acesso dado pela turma termina hoje para os ${inteiro((t.contagem || {}).liberados || 0)} alunos. O progresso deles fica, e quem assinar por conta própria continua. Dá para reabrir prorrogando.`, 'Encerrar', true);
+  if (!ok) return;
+  try { const r = await admin({ acao: 'turmaEncerrar', turma: t.id }); toast('Turma encerrada. ' + plural(r.reprojetados, 'aluno atualizado', 'alunos atualizados') + '.'); carregarTurmas(); }
+  catch (e) { if (!E.bloqueado) toast((e && e.message) || 'Não consegui encerrar.', 'err'); }
+}
+async function carregarCobranca() {
+  const mes = $('tuMes').value || mesAtualBR();
+  $('tuCob').innerHTML = carregando('Calculando ' + nomeMes(mes) + '…');
+  try {
+    const r = await admin({ acao: 'turmaCobranca', mes });
+    if (!r.linhas.length) { $('tuCob').innerHTML = `<p class="vazio">Nenhuma turma ativa em ${esc(nomeMes(r.mes))}.</p>`; return; }
+    $('tuCob').innerHTML = `<div class="tblw"><table class="tbl resp"><caption class="sr">Cobrança de ${esc(nomeMes(r.mes))}</caption><thead><tr>
+        <th scope="col">Turma</th><th scope="col" class="n">Liberados</th><th scope="col" class="n">Cobrados</th><th scope="col" class="n">Valor</th><th scope="col" class="n">Total do mês</th></tr></thead><tbody>
+      ${r.linhas.map(l => `<tr><td data-r="Turma"><b>${esc(l.nome)}</b><br><span class="fraco">${esc(l.curso_nome)}${l.curso_doc ? ' · ' + esc(fmtDoc(l.curso_doc)) : ''}</span></td>
+        <td data-r="Liberados" class="n">${inteiro(l.liberados)}</td><td data-r="Cobrados" class="n">${inteiro(l.cobrados)}${l.cobrados > l.liberados ? '<br><span class="fraco">mínimo ' + inteiro(l.minimo) + '</span>' : ''}</td>
+        <td data-r="Valor" class="n">${brl(l.valor_aluno_mes)}<br><span class="fraco">por aluno</span></td>
+        <td data-r="Total do mês" class="n"><b>${brl(l.total)}</b>${l.desconto ? '<br><span class="fraco">bruto ' + brl(l.bruto) + ', desconto ' + pct(l.desconto_pct) + (l.pagamento === 'adiantado' ? ' (adiantado)' : '') + '</span>' : ''}</td></tr>`).join('')}
+      </tbody></table></div>
+      <p class="leg">Total de ${esc(nomeMes(r.mes))}: <b>${brl(r.total)}</b>. Conta o aluno liberado em qualquer dia do mês (mês cheio). Sem gateway: a cobrança do curso é feita fora do site.</p>
+      <div class="acoesL" style="margin-top:12px">
+        <button type="button" class="btn btn-g" id="tuCobCsv"><i class="ti ti-download" aria-hidden="true"></i>Exportar CSV (resumo)</button>
+        <button type="button" class="btn btn-g" id="tuCobCsvAl"><i class="ti ti-download" aria-hidden="true"></i>Exportar CSV (alunos liberados)</button>
+      </div>`;
+    $('tuCobCsv').onclick = () => baixarCsv('turmas-cobranca-' + r.mes + '.csv', [['Mês', 'Turma', 'Curso', 'Documento', 'E-mail', 'Liberados', 'Mínimo', 'Cobrados', 'Valor por aluno', 'Bruto', 'Desconto (%)', 'Desconto', 'Total', 'Pagamento']]
+      .concat(r.linhas.map(l => [r.mes, l.nome, l.curso_nome, fmtDoc(l.curso_doc), l.curso_email, l.liberados, l.minimo, l.cobrados, l.valor_aluno_mes, l.bruto, l.desconto_pct, l.desconto, l.total, l.pagamento])));
+    $('tuCobCsvAl').onclick = () => baixarCsv('turmas-alunos-liberados-' + r.mes + '.csv', [['Mês', 'Turma', 'Curso', 'Nome', 'E-mail', 'CPF', 'Incluído em', 'Retirado em', 'Ativou']]
+      .concat(r.alunos.map(a => [r.mes, a.turma_nome, a.curso_nome, a.nome, a.email, a.cpfMasc, dataC(a.incluido_em), a.removido_em ? dataC(a.removido_em) : '', a.ativou ? 'sim' : 'não'])));
+  } catch (e) { if (!E.bloqueado) $('tuCob').innerHTML = ehNaoPublicado(e) ? avisoPublicar('a cobrança das turmas') : avisoErro(e); }
+}
+$('btTuNova').onclick = () => { if (!E.tu) { toast('Aguarde a lista de turmas carregar.', 'err'); return; } editarTurma(null); };
+$('fTuMes').addEventListener('submit', e => { e.preventDefault(); carregarCobranca(); });
 
 /* ============================================================
    APLICATIVOS E PLANOS

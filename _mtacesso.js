@@ -31,6 +31,11 @@
    cupom e o preço riscado SÓ aparecem com "cupons": true no planos.json; antes
    disso nada muda para quem compra. O preço com desconto vem do servidor
    (mpCheckout {acao:'cupom'}); o navegador só mostra e manda o código.
+   Licença para turma (27/10/2026): claim mt.g = {turma: [início, fim, produtos...]}
+   libera os apps da turma entre início e fim, SÓ com "turmas": true no planos.json
+   (mesma regra do servidor, functions/acesso.js). Com a chave ligada e a conta numa
+   turma, verificar() carrega /_mtresumo.js (aviso de autorização e resumo agregado de
+   estudo para o painel do curso). Sem isso, nada muda e nada é baixado.
    ============================================================ */
 (function () {
 'use strict';
@@ -93,6 +98,8 @@ function liberado(P, mt, appId, agora) {
     var prod = produtoPorId(P, ids[i]);
     if (prod && cobre(prod, P, appId, mtEf)) return { ok: true, motivo: 'plano', produto: ids[i] };
   }
+  var tu = turmaQueCobre(P, mt, appId, agora);
+  if (tu) return { ok: true, motivo: 'turma', produto: tu.produto, turma: tu.turma };
   var livres = Math.max(0, vg - es.length);
   if (livres > 0) return { ok: false, motivo: 'escolher', livres: livres };
   return { ok: false, motivo: 'assinar' };
@@ -102,7 +109,38 @@ function acessoAtivoQualquer(P, mt, agora) {
   if (!algumaVendaAtiva(P)) return true; mt = mt || {};
   if (mt.adm) return true; if (num(mt.t) > agora) return true;
   /* produto de TESTE (R$ 5) não conta, como no servidor (10/10/2026) */
-  return Object.keys(mt.p || {}).some(function (id) { var pr = produtoPorId(P, id); return num(mt.p[id]) > agora && !(pr && pr.teste); });
+  if (Object.keys(mt.p || {}).some(function (id) { var pr = produtoPorId(P, id); return num(mt.p[id]) > agora && !(pr && pr.teste); })) return true;
+  return turmaAtivaQualquer(P, mt, agora);
+}
+/* ---------------- licença para turma (27/10/2026, igual ao servidor) ---------------- */
+function turmasLigadas(P) { return !!(P && P.turmas === true); }
+function entradasTurma(mt) {
+  var g = (mt && mt.g && typeof mt.g === 'object' && !Array.isArray(mt.g)) ? mt.g : {};
+  return Object.keys(g).filter(function (k) { return Array.isArray(g[k]) && g[k].length >= 3; }).map(function (k) {
+    return { turma: k, ini: num(g[k][0]), fim: num(g[k][1]), produtos: g[k].slice(2).filter(function (x) { return typeof x === 'string'; }) };
+  });
+}
+function turmaQueCobre(P, mt, appId, agora) {
+  if (!turmasLigadas(P)) return null;
+  var es = entradasTurma(mt);
+  for (var i = 0; i < es.length; i++) {
+    var e = es[i]; if (!(e.ini <= agora && e.fim > agora)) continue;
+    for (var j = 0; j < e.produtos.length; j++) {
+      var prod = produtoPorId(P, e.produtos[j]);
+      if (prod && !prod.interno && !prod.teste && typeof prod.apps !== 'number' && cobre(prod, P, appId, null)) return { turma: e.turma, produto: e.produtos[j] };
+    }
+  }
+  return null;
+}
+function turmaAtivaQualquer(P, mt, agora) {
+  if (!turmasLigadas(P)) return false;
+  return entradasTurma(mt).some(function (e) { return e.ini <= agora && e.fim > agora && e.produtos.some(function (id) { var p = produtoPorId(P, id); return !!(p && !p.interno && !p.teste); }); });
+}
+/* turmas vigentes da conta (para o portal mostrar em Minha assinatura) */
+function turmasDoMt(P, mt, agora) {
+  agora = typeof agora === 'number' ? agora : agoraS();
+  if (!turmasLigadas(P)) return [];
+  return entradasTurma(mt).filter(function (e) { return e.ini <= agora && e.fim > agora; });
 }
 
 /* ---------------- cupom de parceiro (27/10/2026) ---------------- */
@@ -838,7 +876,26 @@ function garantirCpf(user, signOut) {
    Primeiro o CPF (conta sem CPF completa o cadastro), depois o acesso. */
 function verificar(o) {
   if (!o.user) return Promise.resolve({ ok: true, motivo: 'portal' });
-  return garantirCpf(o.user, o.signOut).catch(function () { return null; }).then(function () { return verificarAcesso(o); });
+  return garantirCpf(o.user, o.signOut).catch(function () { return null; }).then(function () { return verificarAcesso(o); })
+    .then(function (r) { try { ligarResumo(o); } catch (e) {} return r; });
+}
+/* Licença para turma: aluno de turma num app de estudo carrega o /_mtresumo.js.
+   Só com "turmas": true no planos.json e a conta com turma na claim (mt.g). */
+var RESUMO_URL = '/_mtresumo.js?v=1', _resumo = false;
+function ligarResumo(o) {
+  if (_resumo || !o || !o.user || o.user.demo || !o.appId || PORTAIS.indexOf(o.appId) > -1 || !G.document) return;
+  carregarPlanos().then(function (P) {
+    if (!turmasLigadas(P) || linhaDoApp(P, o.appId) !== 'provas') return;
+    return lerMt(o.user, false).then(function (mt) {
+      if (!mt || !entradasTurma(mt).length || _resumo) return;
+      _resumo = true;
+      function vai() { if (G.MTResumo) G.MTResumo.iniciar({ appId: o.appId, user: o.user, P: P, mt: mt, chamar: function (n, d, u) { return G.MTAcesso.chamar(n, d, u); } }); }
+      if (G.MTResumo) return vai();
+      var s = document.createElement('script'); s.src = RESUMO_URL; s.async = true; s.onload = vai;
+      s.onerror = function () { try { s.remove(); } catch (e) {} };
+      document.head.appendChild(s);
+    });
+  }).catch(function () {});
 }
 function verificarAcesso(o) {
   var app = o.appId;
@@ -875,12 +932,14 @@ function estado(user) {
   });
 }
 
-G.MTAcesso = { versao: 6, NOMES: NOMES, linhaDoApp: linhaDoApp, cobre: cobre, vendaAtiva: vendaAtiva, algumaVendaAtiva: algumaVendaAtiva, vagas: vagas, escolhidos: escolhidos, liberado: liberado, acessoAtivoQualquer: acessoAtivoQualquer, produtoPorId: produtoPorId, produtosQueCobrem: produtosQueCobrem,
+G.MTAcesso = { versao: 7, NOMES: NOMES, linhaDoApp: linhaDoApp, cobre: cobre, vendaAtiva: vendaAtiva, algumaVendaAtiva: algumaVendaAtiva, vagas: vagas, escolhidos: escolhidos, liberado: liberado, acessoAtivoQualquer: acessoAtivoQualquer, produtoPorId: produtoPorId, produtosQueCobrem: produtosQueCobrem,
   carregarPlanos: carregarPlanos, chamar: chamar, lerMt: lerMt, checkoutUrl: checkoutUrl, viaMP: viaMP, opcoes: opcoes, comprar: comprar, ehCartao: ehCartao, assinarCartao: assinarCartao, irPara: irPara, vincularPlano: vincularPlano, planoLigado: planoLigado, paywall: paywall, fechar: fechar, verificar: verificar, estado: estado, brl: brl, dataBR: dataBR, anualPorMes: anualPorMes, economiaAnual: economiaAnual, appsDoProduto: appsDoProduto, AJUDA_URL: AJUDA_URL,
   /* CPF e acesso ilimitado (10/10/2026) */
   cpfValido: cpfValido, formatarCpf: formatarCpf, mascararCampoCpf: mascararCampoCpf, pedirCpf: pedirCpf, salvarCpf: salvarCpf, garantirCpf: garantirCpf, erroDeRegraCpf: erroDeRegraCpf, ILIMITADO: ILIMITADO, ehIlimitado: ehIlimitado, validade: validade,
   /* cupom de parceiro (27/10/2026) */
   cupomLigado: cupomLigado, cupomGuardado: cupomGuardado, cupomAplicado: cupomAplicado, validarCupom: validarCupom, tirarCupom: tirarCupom, cupomRecusado: cupomRecusado,
   cupomHTML: cupomHTML, ligarCupom: ligarCupom, focoCupom: focoCupom, precoHTML: precoHTML,
+  /* licença para turma (27/10/2026) */
+  turmasLigadas: turmasLigadas, turmaQueCobre: turmaQueCobre, turmasDoMt: turmasDoMt,
   _limparCache: function () { cacheP = null; } };
 })();

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-viva="portal-provas" data-viva-escuro>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Turma MedTech</title>
+<meta name="description" content="Painel da turma para o curso e autorização do aluno na licença para turma MedTech.">
+<meta name="theme-color" content="#F5F6FB">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="stylesheet" href="vendor/tabler/tabler-icons.min.css?v=3.48.0">
+<!-- Licença para turma (27/10/2026). Uma página, dois papéis:
+     - coordenador do curso: painel da turma (adesão, números da turma e, de quem autorizou, o desempenho);
+     - aluno de turma: vê a turma e muda a autorização dada ao curso.
+     Tudo passa pela função mtTurma, que confere a conta a cada chamada; o navegador não lê
+     nenhuma coleção da turma. Com "turmas" desligado no planos.json, a página não chama o servidor. -->
+<script>window.MT_APP={id:"turma",name:"Turma",linha:"provas"};</script>
+<script src="_mtfb.js?v=1"></script>
+<script type="module" src="_mtauth.js?v=47"></script>
+<link rel="stylesheet" href="_mtviva.css?v=2">
+<link rel="stylesheet" href="admin.css?v=18">
+<style>
+.tu-top{position:sticky;top:0;z-index:40;padding-top:env(safe-area-inset-top)}
+.tu-top .in{max-width:1080px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;min-height:64px}
+.tu{max-width:1080px;margin:0 auto;padding:16px 16px calc(48px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:18px}
+.tu h2{font-size:clamp(22px,4vw,28px);font-weight:700;letter-spacing:-.03em;line-height:1.15}
+.tu .lead{color:var(--tinta2);font-size:14.5px;max-width:720px;margin-top:4px}
+.tu-sel{display:flex;gap:10px;align-items:end;flex-wrap:wrap}
+.tu-sel .campo{min-width:220px;flex:1 1 260px;max-width:420px}
+.kpis.k4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:860px){.kpis.k4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ar{list-style:none;display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.ar li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center;font-size:14px}
+.ar .nm{font-weight:600;min-width:0;overflow-wrap:anywhere}
+.ar .vl{font-variant-numeric:tabular-nums;font-weight:650}
+.ar .br{grid-column:1/-1;height:8px;border-radius:999px;background:var(--sup2);overflow:hidden}
+.ar .br span{display:block;height:100%;border-radius:999px;background:var(--ac)}
+.ar .qt{grid-column:1/-1;font-size:12.5px;color:var(--tinta2)}
+.filtros{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:10px;margin-top:12px}
+@media (max-width:560px){.filtros{grid-template-columns:minmax(0,1fr)}}
+.consent{display:flex;flex-direction:column;gap:10px}
+.consent .estado{font-size:15px}
+.tu-mini{font-size:13px;color:var(--tinta2)}
+.tu .card p+p{margin-top:8px}
+.tu-c{display:block;min-width:0;overflow-wrap:anywhere}
+@media (max-width:760px){.tbl.resp td .tu-c{text-align:right}.tbl.resp td.cheia .tu-c{text-align:left}}
+</style>
+</head>
+<body>
+<div class="isca" aria-hidden="true"><input type="text" name="username" autocomplete="username" tabindex="-1"><input type="password" name="password" autocomplete="current-password" tabindex="-1"></div>
+<a class="sr" href="#conteudo">Pular para o conteúdo</a>
+<header class="tu-top adm-top">
+  <div class="in">
+    <a class="marca" href="turma.html" aria-label="Turma MedTech">
+      <span class="mk" aria-hidden="true"><i class="ti ti-school"></i></span>
+      <h1><span>Turma </span><b>MedTech</b></h1>
+    </a>
+    <div class="conta">
+      <span class="quem" id="quem">Entrando…</span>
+      <button class="icbtn" id="btSair" type="button" title="Sair da conta"><i class="ti ti-logout" aria-hidden="true"></i><span class="tx">Sair</span></button>
+    </div>
+  </div>
+</header>
+
+<main class="tu" id="conteudo" tabindex="-1">
+  <div id="estado"><p class="carregando">Carregando…</p></div>
+
+  <!-- aluno: a turma e a autorização -->
+  <section id="secAluno" hidden aria-labelledby="hAluno">
+    <div><h2 id="hAluno">Sua turma</h2><p class="lead">Acesso liberado pelo seu curso. Aqui você vê até quando vale e decide se o curso pode acompanhar o seu desempenho.</p></div>
+    <div id="alunoTurmas" style="display:flex;flex-direction:column;gap:14px;margin-top:14px"></div>
+  </section>
+
+  <!-- coordenador: painel da turma -->
+  <section id="secPainel" hidden aria-labelledby="hPainel">
+    <div class="tu-sel">
+      <div style="flex:1 1 320px"><h2 id="hPainel">Painel da turma</h2><p class="lead" id="pLead"></p></div>
+      <div class="campo" id="selW" hidden><label for="selTurma">Turma</label><select id="selTurma"></select></div>
+      <div><button class="btn btn-g sm" id="btAtualizar" type="button"><i class="ti ti-refresh" aria-hidden="true"></i>Atualizar</button></div>
+    </div>
+    <div class="kpis k4" id="kpis" aria-live="polite" style="margin-top:14px"></div>
+    <div class="card" style="margin-top:14px">
+      <h3><i class="ti ti-chart-bar" aria-hidden="true"></i>Acerto médio da turma por área</h3>
+      <p class="sub">Todos os alunos com estudo registrado, sem identificar ninguém.</p>
+      <div id="areas" aria-live="polite"></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h3><i class="ti ti-user-check" aria-hidden="true"></i>Desempenho de quem autorizou</h3>
+      <p class="sub" id="indSub"></p>
+      <div class="filtros" id="indFiltros" hidden>
+        <div class="campo"><label for="fBusca">Buscar por nome ou e-mail</label><input id="fBusca" type="search" autocomplete="off" spellcheck="false"></div>
+        <div class="campo"><label for="fAtiv">Atividade</label><select id="fAtiv"><option value="">Todos</option><option value="7">Estudou nos últimos 7 dias</option><option value="30">Estudou nos últimos 30 dias</option><option value="parado">Sem estudo há mais de 30 dias</option></select></div>
+      </div>
+      <div id="ind" aria-live="polite"></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h3><i class="ti ti-list-check" aria-hidden="true"></i>Adesão da turma</h3>
+      <p class="sub">Quem já ativou o acesso (abriu um app da turma com a conta MedTech). Para quem não autorizou, o painel mostra só isso.</p>
+      <div class="filtros">
+        <div class="campo"><label for="aBusca">Buscar por nome ou e-mail</label><input id="aBusca" type="search" autocomplete="off" spellcheck="false"></div>
+        <div class="campo"><label for="aAtiv">Situação</label><select id="aAtiv"><option value="">Todos</option><option value="sim">Ativou</option><option value="nao">Ainda não ativou</option></select></div>
+      </div>
+      <div id="ades" aria-live="polite"></div>
+    </div>
+  </section>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function () {
+'use strict';
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const inteiro = v => Number(v || 0).toLocaleString('pt-BR');
+const pctTxt = v => v == null ? 'sem dado' : String(v).replace('.', ',') + '%';
+const dataD = d => d ? d.split('-').reverse().join('/') : '';
+const dataS = s => s ? new Date(s * 1000).toLocaleDateString('pt-BR', { timeZone: 'America/Fortaleza' }) : '';
+const dataC = iso => iso ? new Date(iso).toLocaleDateString('pt-BR') : '';
+const NOMES = { flashmed: 'FlashMed', clinicamed: 'ClínicaMed', cirurgiamed: 'CirurgiaMed', trafegotitulo: 'TráfegoTítulo', farmauti: 'FarmaUTI', enarefarmacia: 'AprovaFarma',
+  sosfarmacia: 'SOS Farmácia', sosfarmacologia: 'SOS Farmacologia', enfermare: 'Enfermare', fisiare: 'Fisiare', medprovas: 'MedProvas' };
+const nomeApp = a => NOMES[a] || a;
+const E = { P: null, painel: null, turma: '', iniciado: false };
+let tToast = 0;
+function toast(msg, tipo) { const t = $('toast'); t.textContent = msg; t.className = 'toast' + (tipo ? ' ' + tipo : ''); t.hidden = false; clearTimeout(tToast); tToast = setTimeout(() => { t.hidden = true; }, 4200); }
+function aviso(html, tipo, ic) { return `<div class="aviso${tipo ? ' ' + tipo : ''}"><i class="ti ${ic || 'ti-info-circle'}" aria-hidden="true"></i><div>${html}</div></div>`; }
+async function modulo() {
+  if (window.MT && MT.acessoModulo) { const m = await MT.acessoModulo(); if (m) return m; }
+  if (!window.MTAcesso) await import('/_mtacesso.js?v=16');
+  return window.MTAcesso;
+}
+async function turma(dados) { const A = await modulo(); return A.chamar('mtTurma', dados, MT.user); }
+
+async function iniciar() {
+  if (E.iniciado) return; E.iniciado = true;
+  $('quem').textContent = MT.user.email || MT.user.uid;
+  const A = await modulo();
+  E.P = await A.carregarPlanos();
+  /* desligado: nada é chamado no servidor */
+  if (!(E.P && E.P.turmas === true)) {
+    $('estado').innerHTML = aviso('<b>A licença para turma ainda não está aberta.</b> Quando o seu curso fizer a adesão, esta página mostra a sua turma. Dúvidas: contato@medtechbr.com.br.');
+    return;
+  }
+  const q = new URLSearchParams(location.search);
+  E.turma = /^[a-z0-9]{6,12}$/.test(q.get('turma') || '') ? q.get('turma') : '';
+  const [pa, mi] = await Promise.allSettled([turma({ acao: 'painel', turma: E.turma || undefined }), turma({ acao: 'minhas' })]);
+  let algo = false;
+  if (mi.status === 'fulfilled' && mi.value && (mi.value.turmas || []).length) { desenharAluno(mi.value.turmas); algo = true; }
+  if (pa.status === 'fulfilled' && pa.value && pa.value.coordena) { E.painel = pa.value; desenharPainel(); algo = true; }
+  else if (pa.status === 'rejected' && E.turma) { $('estado').innerHTML = aviso(esc(pa.reason && pa.reason.message || 'Não foi possível abrir esta turma.'), 'err', 'ti-alert-triangle'); return; }
+  if (!algo) {
+    const falhou = pa.status === 'rejected' && mi.status === 'rejected';
+    $('estado').innerHTML = falhou ? aviso('<b>Não foi possível abrir agora.</b> ' + esc((pa.reason && pa.reason.message) || '') + ' Tente de novo em instantes.', 'err', 'ti-alert-triangle')
+      : aviso('<b>Esta conta não está em nenhuma turma.</b> Se o seu curso liberou o acesso, entre com o mesmo e-mail que você passou ao curso, ou cadastre o seu CPF na conta (Configurações, no portal MedTech Provas). Coordenador do curso: peça à MedTech para incluir o e-mail da sua conta na turma.');
+    return;
+  }
+  $('estado').innerHTML = '';
+}
+
+/* ---------------- aluno ---------------- */
+function desenharAluno(ts) {
+  $('secAluno').hidden = false;
+  $('alunoTurmas').innerHTML = ts.map(t => {
+    const st = t.autoriza === 'sim' ? '<span class="selo ok">você autorizou</span>' : t.autoriza === 'nao' ? '<span class="selo">você não autorizou</span>' : '<span class="selo av">ainda sem resposta</span>';
+    return `<div class="card consent" data-t="${esc(t.id)}">
+      <h3><i class="ti ti-school" aria-hidden="true"></i>${esc(t.curso)}${t.nome ? ' · ' + esc(t.nome) : ''}</h3>
+      <p>${t.vigente ? 'Acesso liberado' : t.ini_s * 1000 > Date.now() ? 'Acesso começa em ' + esc(dataS(t.ini_s)) : 'O acesso pela turma terminou'} ${t.vigente || t.ini_s * 1000 > Date.now() ? 'até ' + esc(dataS(t.fim_s - 1)) : 'em ' + esc(dataS(t.fim_s - 1))} · ${esc((t.apps || []).map(nomeApp).join(', '))}.</p>
+      ${t.verDesempenho ? `<p class="estado">O ${esc(t.curso)} pode acompanhar seu desempenho (questões feitas, acerto por área, simulados, último acesso)? ${st}${t.autoriza_em ? ' <span class="tu-mini">em ' + esc(dataC(t.autoriza_em)) + '</span>' : ''}</p>
+      <div class="acoesL"><button type="button" class="btn ${t.autoriza === 'sim' ? 'btn-g' : 'btn-p'}" data-aut="1" ${t.autoriza === 'sim' ? 'disabled' : ''}><i class="ti ti-check" aria-hidden="true"></i>Autorizo</button>
+      <button type="button" class="btn btn-g" data-aut="0" ${t.autoriza === 'nao' ? 'disabled' : ''}><i class="ti ti-x" aria-hidden="true"></i>Não autorizo</button></div>`
+      : '<p class="estado">Nesta turma o curso não vê o desempenho individual de ninguém.</p>'}
+      <p class="tu-mini">Suas respostas, questão por questão, nunca vão para o curso. Sem a sua autorização, o curso vê só se você ativou o acesso e números da turma inteira, sem o seu nome. Quando a turma termina, o que você estudou continua na sua conta. Mais em <a href="privacidade.html#turmas">Privacidade</a>.</p>
+    </div>`;
+  }).join('');
+  $('alunoTurmas').querySelectorAll('[data-aut]').forEach(b => b.onclick = async () => {
+    const card = b.closest('[data-t]'), sim = b.dataset.aut === '1';
+    card.querySelectorAll('button').forEach(x => x.disabled = true);
+    try {
+      await turma({ acao: 'autorizar', turma: card.dataset.t, autoriza: sim, origem: 'turma' });
+      try { Object.keys(localStorage).filter(k => k.indexOf('mt.turma.' + MT.user.uid + '.') === 0).forEach(k => localStorage.removeItem(k)); } catch (e) {}
+      toast(sim ? 'Autorização registrada.' : 'Pronto: o curso não vê mais o seu desempenho individual.');
+      const r = await turma({ acao: 'minhas' }); desenharAluno(r.turmas || []);
+    } catch (e) { toast((e && e.message) || 'Não foi possível salvar agora.', 'err'); card.querySelectorAll('button').forEach(x => x.disabled = false); }
+  });
+}
+
+/* ---------------- coordenador ---------------- */
+function kpi(rot, icone, valor, det) { return `<div class="kpi card"><span class="rot"><i class="ti ${icone}" aria-hidden="true"></i>${rot}</span><span class="v">${valor}</span><span class="det">${det || '&nbsp;'}</span></div>`; }
+function desenharPainel() {
+  const p = E.painel;
+  $('secPainel').hidden = false;
+  if (p.desligado) { $('estado').innerHTML = aviso('A licença para turma ainda não está aberta.'); $('secPainel').hidden = true; return; }
+  const t = p.turma, n = p.numeros;
+  E.turma = t.id;
+  const lista = p.turmas || [];
+  if (lista.length > 1 || (p.admin && !lista.some(x => x.id === t.id))) {
+    $('selW').hidden = false;
+    const op = lista.slice(); if (!op.some(x => x.id === t.id)) op.unshift({ id: t.id, nome: t.nome, curso: t.curso_nome });
+    $('selTurma').innerHTML = op.map(x => `<option value="${esc(x.id)}" ${x.id === t.id ? 'selected' : ''}>${esc(x.nome)} (${esc(x.curso)})</option>`).join('');
+  }
+  $('pLead').innerHTML = `${esc(t.curso_nome)} · ${esc(t.nome)} · ${esc(dataD(t.inicio))} a ${esc(dataD(t.fim))}${t.status === 'encerrada' ? ' (encerrada)' : ''} · ${esc((t.apps || []).map(nomeApp).join(', '))}`;
+  const anon = 'Para proteger quem não autorizou, este número aparece quando há 5 ou mais alunos sem autorização com estudo (ou nenhum).';
+  $('kpis').innerHTML = kpi('Alunos liberados', 'ti-users', inteiro(n.liberados), inteiro(n.comConta) + ' com conta MedTech')
+    + kpi('Ativaram', 'ti-user-check', inteiro(n.ativaram), n.liberados ? Math.round(n.ativaram / n.liberados * 100) + '% da turma' : '')
+    + kpi('Estudaram em 7 dias', 'ti-calendar-week', n.estudaram7 == null ? '<span class="semdado" title="' + esc(anon) + '">oculto</span>' : inteiro(n.estudaram7), n.estudaram7 == null ? 'poucos dados para não identificar alunos' : 'alunos com atividade')
+    + kpi('Estudaram em 30 dias', 'ti-calendar-month', n.estudaram30 == null ? '<span class="semdado" title="' + esc(anon) + '">oculto</span>' : inteiro(n.estudaram30), p.podeIndividual ? inteiro(n.autorizaram) + ' autorizaram o desempenho individual' : 'turma sem desempenho individual');
+  const ag = p.agregado;
+  if (!ag) $('areas').innerHTML = `<p class="vazio">${p.anonimoOk ? 'Ainda não há estudo registrado nos apps da turma.' : 'Ainda são poucos alunos sem autorização com estudo registrado: para ninguém ser identificado, o agregado aparece a partir de 5.'}</p>`;
+  else $('areas').innerHTML = `<p class="tu-mini" style="margin-top:10px">Acerto geral: <b>${pctTxt(ag.acerto)}</b> em ${inteiro(ag.questoes)} questões de ${inteiro(ag.alunosComDados)} alunos · ${inteiro(ag.simulados)} simulados concluídos.</p>
+    <ul class="ar">${ag.areas.map(a => `<li><span class="nm">${esc(a.area)}</span><span class="vl">${pctTxt(a.acerto)}</span><span class="br" aria-hidden="true"><span style="width:${Math.max(0, Math.min(100, a.acerto || 0))}%"></span></span><span class="qt">${inteiro(a.q)} questões · ${inteiro(a.alunos)} alunos</span></li>`).join('')}</ul>
+    ${ag.areasOcultas ? `<p class="leg">${inteiro(ag.areasOcultas)} área(s) com poucos alunos sem autorização ficaram de fora, para ninguém ser identificado.</p>` : ''}`;
+  if (!p.podeIndividual) { $('indSub').textContent = 'Nesta turma o curso não vê o desempenho individual (combinado com a MedTech). O painel mostra só a adesão e os números da turma.'; $('indFiltros').hidden = true; $('ind').innerHTML = ''; }
+  else { $('indSub').textContent = 'Só aparecem os alunos que autorizaram no app. Quem não autorizou entra apenas nos números da turma, sem nome.'; $('indFiltros').hidden = !p.individuais.length; desenharInd(); }
+  desenharAdesao();
+}
+function filtraInd() {
+  const b = ($('fBusca').value || '').trim().toLowerCase(), f = $('fAtiv').value, ag = E.painel.agora;
+  return E.painel.individuais.filter(x => (!b || (x.nome + ' ' + x.email).toLowerCase().includes(b)) &&
+    (!f || (f === 'parado' ? !(x.ult && ag - x.ult <= 30 * 86400) : (x.ult && ag - x.ult <= Number(f) * 86400))));
+}
+function desenharInd() {
+  const l = filtraInd(), todos = E.painel.individuais;
+  if (!todos.length) { $('ind').innerHTML = '<p class="vazio">Nenhum aluno autorizou ainda.</p>'; return; }
+  $('ind').innerHTML = `<div class="acoesL" style="margin:12px 0 0"><button type="button" class="btn btn-g sm" id="csvInd"><i class="ti ti-download" aria-hidden="true"></i>Exportar CSV</button><span class="tu-mini">${inteiro(l.length)} de ${inteiro(todos.length)}</span></div>
+    <div class="tblw"><table class="tbl resp"><caption class="sr">Desempenho de quem autorizou</caption><thead><tr>
+      <th scope="col">Aluno</th><th scope="col" class="n">Questões</th><th scope="col" class="n">Acerto</th><th scope="col" class="n">Simulados</th><th scope="col" class="n">Dias de estudo</th><th scope="col">Último acesso</th><th scope="col">Por área</th></tr></thead><tbody>
+    ${l.map(x => `<tr><td data-r="Aluno">${x.nome ? '<b>' + esc(x.nome) + '</b><br>' : ''}<span class="em">${esc(x.email)}</span></td>
+      <td data-r="Questões" class="n">${inteiro(x.q)}</td><td data-r="Acerto" class="n">${pctTxt(x.acerto)}</td><td data-r="Simulados" class="n">${inteiro(x.sim)}</td>
+      <td data-r="Dias de estudo" class="n">${inteiro(x.dias)}<br><span class="fraco">${inteiro(x.d7)} nos últimos 7</span></td>
+      <td data-r="Último acesso">${x.ult ? esc(dataS(x.ult)) : '<span class="fraco">sem estudo</span>'}</td>
+      <td data-r="Por área" class="fraco cheia">${x.areas.length ? x.areas.sort((a, b) => b.q - a.q).slice(0, 6).map(a => esc(a.area) + ' ' + pctTxt(a.acerto)).join(' · ') : 'sem dado'}</td></tr>`).join('') || '<tr><td colspan="7" class="vazio">Nenhum aluno com este filtro.</td></tr>'}
+    </tbody></table></div>`;
+  embrulha($('ind'));
+  $('csvInd').onclick = () => baixarCsv('turma-' + E.turma + '-desempenho.csv', [['Nome', 'E-mail', 'Questões', 'Acerto (%)', 'Simulados', 'Dias de estudo', 'Dias nos últimos 7', 'Dias nos últimos 30', 'Último acesso', 'Autorizou em', 'Por área']]
+    .concat(l.map(x => [x.nome, x.email, x.q, x.acerto == null ? '' : x.acerto, x.sim, x.dias, x.d7, x.d30, x.ult ? dataS(x.ult) : '', dataC(x.autoriza_em), x.areas.map(a => a.area + ' ' + (a.acerto == null ? '' : String(a.acerto).replace('.', ',') + '%') + ' (' + a.q + ')').join('; ')])));
+}
+function desenharAdesao() {
+  const b = ($('aBusca').value || '').trim().toLowerCase(), f = $('aAtiv').value, todos = E.painel.alunos;
+  const l = todos.filter(x => (!b || (x.nome + ' ' + x.email).toLowerCase().includes(b)) && (!f || (f === 'sim') === x.ativou));
+  if (!todos.length) { $('ades').innerHTML = '<p class="vazio">A turma ainda não tem alunos.</p>'; return; }
+  $('ades').innerHTML = `<div class="acoesL" style="margin:12px 0 0"><button type="button" class="btn btn-g sm" id="csvAdes"><i class="ti ti-download" aria-hidden="true"></i>Exportar CSV</button><span class="tu-mini">${inteiro(l.length)} de ${inteiro(todos.length)}</span></div>
+    <div class="tblw"><table class="tbl resp"><caption class="sr">Adesão da turma</caption><thead><tr><th scope="col">Aluno</th><th scope="col">Ativou</th></tr></thead><tbody>
+    ${l.map(x => `<tr><td data-r="Aluno">${x.nome ? '<b>' + esc(x.nome) + '</b><br>' : ''}<span class="em">${esc(x.email || x.cpfMasc)}</span></td>
+      <td data-r="Ativou">${x.ativou ? '<span class="selo ok">sim</span>' + (x.ativou_em ? ' <span class="fraco">' + esc(dataC(x.ativou_em)) + '</span>' : '') : '<span class="selo">não</span>'}</td></tr>`).join('') || '<tr><td colspan="2" class="vazio">Nenhum aluno com este filtro.</td></tr>'}
+    </tbody></table></div>`;
+  embrulha($('ades'));
+  $('csvAdes').onclick = () => baixarCsv('turma-' + E.turma + '-adesao.csv', [['Nome', 'E-mail', 'CPF', 'Ativou', 'Ativou em']].concat(l.map(x => [x.nome, x.email, x.cpfMasc, x.ativou ? 'sim' : 'não', dataC(x.ativou_em)])));
+}
+/* célula com vários pedaços (nome, e-mail, detalhe) vira um bloco só: no celular a tabela vira cartão e cada
+   célula é uma linha "rótulo | valor"; sem isso os pedaços se espalham lado a lado */
+function embrulha(raiz) {
+  raiz.querySelectorAll('td[data-r]').forEach(td => {
+    if (td.childNodes.length < 2) return;
+    const s = document.createElement('span'); s.className = 'tu-c';
+    while (td.firstChild) s.appendChild(td.firstChild);
+    td.appendChild(s);
+  });
+}
+/* CSV para o Excel em português: ponto e vírgula, vírgula decimal e BOM */
+function baixarCsv(nome, linhas) {
+  const cel = v => typeof v === 'number' ? String(v).replace('.', ',') : '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const txt = '﻿' + linhas.map(l => l.map(cel).join(';')).join('\r\n');
+  const url = URL.createObjectURL(new Blob([txt], { type: 'text/csv;charset=utf-8' }));
+  const a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+async function recarregar(id) {
+  $('btAtualizar').disabled = true;
+  try { E.painel = await turma({ acao: 'painel', turma: id || E.turma }); desenharPainel(); }
+  catch (e) { toast((e && e.message) || 'Não foi possível atualizar.', 'err'); }
+  finally { $('btAtualizar').disabled = false; }
+}
+$('btAtualizar').onclick = () => recarregar();
+$('selTurma').onchange = () => { const id = $('selTurma').value; history.replaceState(null, '', '?turma=' + encodeURIComponent(id)); recarregar(id); };
+['fBusca', 'fAtiv'].forEach(id => $(id).addEventListener('input', desenharInd));
+['aBusca', 'aAtiv'].forEach(id => $(id).addEventListener('input', desenharAdesao));
+$('btSair').onclick = () => { if (window.MT && MT.signOut) MT.signOut(); };
+(function espera() {
+  if (!window.MT || !MT.ready) return setTimeout(espera, 60);
+  MT.ready.then(() => {
+    MT.onData(() => { if (MT.user && !MT.user.demo) iniciar().catch(e => { $('estado').innerHTML = aviso('Não foi possível abrir agora. ' + esc(e && e.message), 'err', 'ti-alert-triangle'); }); });
+    if (MT.user && MT.user.demo) $('quem').textContent = 'Modo demonstração: sem servidor';
+  });
+})();
+})();
+</script>
+</body>
+</html>

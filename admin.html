@@ -14,7 +14,7 @@
 <script src="_mtfb.js?v=1"></script>
 <script type="module" src="_mtauth.js?v=47"></script>
 <link rel="stylesheet" href="_mtviva.css?v=2">
-<link rel="stylesheet" href="admin.css?v=17">
+<link rel="stylesheet" href="admin.css?v=18">
 </head>
 <body>
 <!-- isca para o preenchimento automático do Chrome: sem ela, o e-mail do login cai no campo de busca de Usuários -->
@@ -43,6 +43,7 @@
       <li><a href="#acessos" data-sec="acessos"><i class="ti ti-key" aria-hidden="true"></i>Acessos</a></li>
       <li><a href="#pagamentos" data-sec="pagamentos"><i class="ti ti-credit-card" aria-hidden="true"></i>Pagamentos</a></li>
       <li><a href="#parceiros" data-sec="parceiros"><i class="ti ti-rosette-discount" aria-hidden="true"></i>Parceiros</a></li>
+      <li><a href="#turmas" data-sec="turmas"><i class="ti ti-school" aria-hidden="true"></i>Turmas</a></li>
       <li><a href="#planos" data-sec="planos"><i class="ti ti-apps" aria-hidden="true"></i>Aplicativos e planos</a></li>
       <li><a href="#sinalizacoes" data-sec="sinalizacoes"><i class="ti ti-flag" aria-hidden="true"></i>Sinalizações<span class="cnt" id="cntSinal" hidden></span></a></li>
       <li><a href="#equipe" data-sec="equipe"><i class="ti ti-robot" aria-hidden="true"></i>Equipe de IA<span class="cnt" id="cntEquipe" hidden></span></a></li>
@@ -248,6 +249,44 @@
       </div>
     </section>
 
+    <!-- ===================== TURMAS (licença para turma, 27/10/2026) ===================== -->
+    <section class="sec" id="turmas" data-painel aria-labelledby="h-tu" hidden>
+      <div class="cab">
+        <div><h2 id="h-tu">Turmas</h2><p class="lead">Licença para turma: o curso paga por aluno por mês e a MedTech libera os apps de estudo para cada aluno até a data de fim. O curso acompanha a adesão no painel da turma e, de quem autorizar, o desempenho individual.</p></div>
+        <button class="btn btn-p" id="btTuNova" type="button"><i class="ti ti-plus" aria-hidden="true"></i>Nova turma</button>
+      </div>
+      <div id="tuAviso"></div>
+      <div class="card">
+        <h3><i class="ti ti-school" aria-hidden="true"></i>Turmas cadastradas</h3>
+        <div id="tuLista" aria-live="polite"></div>
+      </div>
+      <div class="card" id="tuDet" hidden>
+        <div class="tu-cab"><h3 id="tuDetTit" tabindex="-1"><i class="ti ti-users" aria-hidden="true"></i>Alunos</h3>
+          <button class="btn btn-g sm" id="btTuFechar" type="button"><i class="ti ti-x" aria-hidden="true"></i>Fechar</button></div>
+        <div id="tuDetResumo" aria-live="polite"></div>
+        <details class="tu-imp" id="tuImp">
+          <summary><i class="ti ti-file-import" aria-hidden="true"></i>Importar lista de alunos</summary>
+          <p class="sub">Uma linha por aluno: <code>e-mail;CPF;nome</code> (o nome é opcional; pode faltar o e-mail ou o CPF). Também serve vírgula ou tabulação, e a primeira linha pode ser o cabeçalho. Prefira mandar o CPF: com ele o acesso entra assim que o aluno cadastra o CPF na conta, sem depender de confirmar o e-mail.</p>
+          <form id="fTuImp" class="tu-impf">
+            <div class="campo"><label for="tuTexto">Lista colada</label><textarea id="tuTexto" rows="6" spellcheck="false" autocomplete="off" placeholder="ana@exemplo.com;123.456.789-09;Ana Souza"></textarea></div>
+            <div class="campo"><label for="tuArq">Ou um arquivo CSV</label><input id="tuArq" type="file" accept=".csv,.txt,text/csv,text/plain"></div>
+            <div class="acoesL"><button class="btn btn-p" type="submit"><i class="ti ti-upload" aria-hidden="true"></i>Liberar estes alunos</button></div>
+          </form>
+          <div id="tuImpRes" aria-live="polite"></div>
+        </details>
+        <div id="tuAlunos" aria-live="polite"></div>
+      </div>
+      <div class="card">
+        <h3><i class="ti ti-report-money" aria-hidden="true"></i>Cobrança do mês</h3>
+        <p class="sub">Alunos liberados em algum dia do mês, dentro do período da turma (horário de Brasília). Cobra-se pelos liberados, não pelos que usam, com o mínimo de alunos de cada turma. Turma com pagamento adiantado aparece com o desconto.</p>
+        <form class="linhaC" id="fTuMes" style="margin-top:12px;max-width:420px">
+          <div class="campo"><label for="tuMes">Mês</label><input id="tuMes" type="month" required></div>
+          <div><button class="btn btn-g" type="submit"><i class="ti ti-refresh" aria-hidden="true"></i>Ver</button></div>
+        </form>
+        <div id="tuCob" aria-live="polite"></div>
+      </div>
+    </section>
+
     <!-- ===================== APLICATIVOS E PLANOS ===================== -->
     <section class="sec" id="planos" data-painel aria-labelledby="h-pl" hidden>
       <div class="cab"><div><h2 id="h-pl">Aplicativos e planos</h2><p class="lead">O catálogo que está no ar (planos.json do site). Só leitura.</p></div></div>
@@ -382,6 +421,6 @@
 </dialog>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="admin.js?v=24" defer></script>
+<script src="admin.js?v=25" defer></script>
 </body>
 </html>

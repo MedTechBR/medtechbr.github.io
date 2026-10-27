@@ -779,6 +779,13 @@ function preencheAssinatura(){
       B.push(`<div class="as-st off"><span class="sel">Vencido</span><h5>${esc(nm)}</h5><p>Venceu em ${dataBR(ate)}. O que você registrou continua salvo.</p></div>`);
     }
   });
+  /* licença para turma (27/10/2026): só aparece com "turmas": true no planos.json */
+  (MTAcesso.turmasDoMt ? MTAcesso.turmasDoMt(P, mt, ag) : []).forEach(e => {
+    const nomes = e.produtos.filter(id => MTAcesso.produtoPorId(P, id)).map(id => nomeProd(P, id));
+    if (!nomes.length) return;
+    e.produtos.forEach(id => ativos.add(id));
+    B.push(`<div class="as-st"><span class="sel ok">Turma</span><h5>${esc(nomes.join(', '))}</h5><p>Liberado pelo seu curso até <b>${dataBR(e.fim - 1)}</b> · sem cobrança para você. O que você estudar continua na sua conta depois.</p><div class="sug-row"><a class="b ok" href="turma.html">Ver a turma e a autorização do curso</a></div></div>`);
+  });
   if (pend) B.push(`<div class="as-st pend"><span class="sel pend">Pagamento pendente</span><h5>${esc(nomeProd(P, pend.produto))}${pend.periodo ? ' · ' + esc(pend.periodo) : ''}</h5><p>Recebemos o pedido. Assim que o pagamento compensar (boleto: até 3 dias úteis; Pix: minutos), o acesso libera sozinho e você recebe o recibo do Mercado Pago.</p></div>`);
   const vg = MTAcesso.vagas(P, mt, LINHA), esc2 = MTAcesso.escolhidos(P, mt, LINHA).slice(0, vg);
   if (vg) B.push(`<div class="as-st"><p>Apps do seu plano (${esc2.length} de ${vg}): ${esc2.length ? esc2.map(a => esc(MTAcesso.NOMES[a] || a)).join(', ') : 'nenhum escolhido ainda'}.</p><div class="sug-row"><button type="button" class="b ok" onclick="escolherAppsPlano()">Escolher os apps do plano</button></div></div>`);
