@@ -172,6 +172,7 @@ const PLANOS_PADRAO={produtos:[
  {id:'app-tudo',curto:'MedTech App',linha:'clinica',resumo:'Os 5 apps (CondutAI, PaliAI, LaudAI, PlantãoHub e Granaê), com a IA incluída.',preco:{mensal:39.9,anual:399}},
  {id:'clinicamed',curto:'ClínicaMed',linha:'provas',resumo:'Título de Clínica Médica e acesso ao R+.',preco:{mensal:49.9,anual:397}},
  {id:'cirurgiamed',curto:'CirurgiaMed',linha:'provas',resumo:'Título de Cirurgia Geral, R+ cirúrgico e concursos.',preco:{mensal:49.9,anual:397}},
+ {id:'familiamed',curto:'FamíliaMed',linha:'provas',resumo:'Título de MFC (TEMFC), ENARE MFC e concursos de ESF.',preco:{mensal:49.9,anual:397}},
  {id:'trafegotitulo',curto:'TráfegoTítulo',linha:'provas',resumo:'Título de Medicina do Tráfego.',preco:{mensal:49.9,anual:397}},
  {id:'flashmed',curto:'FlashMed',linha:'provas',resumo:'Preparatório ENARE/ENAMED: questões, simulados e leituras por área.',preco:{mensal:49.9,anual:397}},
  {id:'farmauti',curto:'FarmaUTI',linha:'provas',publico:'farmacia',resumo:'Residência em Farmácia em Terapia Intensiva: leituras, interações, prescrições e casos.',preco:{mensal:49.9,anual:397}},
