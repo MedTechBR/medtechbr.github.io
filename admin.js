@@ -3268,6 +3268,37 @@ async function abrirConversa(canal, id) {
   dialogo((c.nome || 'Conversa') + (canal === 'instagram' ? ' · Instagram' : ''), topo + `<div class="at-chat eq-chat">${msgs || '<p class="at-vazio">Sem mensagens.</p>'}</div>` + resp, botoes);
 }
 $('btEq').onclick = () => carregarEquipe();
+/* ---- parceria pelo WhatsApp (28/10/2026): modelo parceria_medtech + envio com confirmação ---- */
+const PC_SIT = { APPROVED: 'aprovado, pronto para enviar', PENDING: 'em análise na Meta', REJECTED: 'recusado pela Meta', PAUSED: 'pausado pela Meta (qualidade)', DISABLED: 'desativado pela Meta' };
+function mostrarModeloPc(r) {
+  const sit = r.existe || r.criado ? (PC_SIT[r.status] || r.status || 'em análise') : 'ainda não foi enviado à Meta';
+  $('pcModelo').innerHTML = `Situação do modelo: <b>${esc(sit)}</b>${r.motivo ? ' · motivo: ' + esc(r.motivo) : ''}`;
+  $('btPcCriar').hidden = !!(r.existe || r.criado);
+}
+$('btPcModelo').onclick = async () => {
+  const b = $('btPcModelo'); b.disabled = true;
+  try { const r = await equipeOp({ op: 'parceriaModelo' }); if (r.erro) toast(r.erro, 'err'); else mostrarModeloPc(r); }
+  catch (e) { toast(ehNaoPublicado(e) ? 'Falta publicar o servidor (deploy-backend.command).' : e.message, 'err'); }
+  finally { b.disabled = false; }
+};
+$('btPcCriar').onclick = async () => {
+  if (!await confirmar('Enviar o modelo para a Meta', 'O modelo de parceria vai para análise da Meta (categoria marketing). Nada é enviado a nenhum curso agora.', 'Enviar para análise')) return;
+  try { const r = await equipeOp({ op: 'parceriaModelo', criar: true }); if (r.erro) toast(r.erro, 'err'); else { mostrarModeloPc(r); toast('Modelo enviado para análise da Meta.'); } }
+  catch (e) { toast(e.message, 'err'); }
+};
+$('btPcEnviar').onclick = async () => {
+  const d = { numero: $('pcNum').value.trim(), curso: $('pcCurso').value.trim(), app: $('pcApp').value.trim(), arq: $('pcArq').value.trim().toLowerCase() };
+  if (!d.numero || !d.curso || !d.app || !d.arq) { toast('Preencha os quatro campos.', 'err'); return; }
+  const previa = `Para <b>${esc(d.numero)}</b>:<br><br>Olá, ${esc(d.curso)}. Sou Matheus Parente, médico e fundador da MedTech (medtechbr.com.br). Fazemos apps de estudo para provas da saúde, com banco extenso de questões comentadas alternativa por alternativa, e acompanhamos toda semana as diretrizes e normas novas para atualizar as questões afetadas. Queremos propor uma parceria com o ${esc(d.app)} para os alunos de vocês [...]<br><br>Botão "Ver a proposta": medtechbr.com.br/email/parcerias/${esc(d.arq)}.html`;
+  if (!await confirmar('Enviar a proposta pelo WhatsApp', previa, 'Enviar agora')) return;
+  try {
+    const r = await equipeOp({ op: 'parceriaEnviar', ...d });
+    if (r.erro) { toast(r.erro, 'err'); return; }
+    toast(`Proposta enviada para ${r.para}. A resposta aparece em Conversas.`);
+    ['pcNum', 'pcCurso', 'pcApp', 'pcArq'].forEach(id => $(id).value = '');
+    carregarEquipe();
+  } catch (e) { toast(e.message, 'err'); }
+};
 $('btEqTurno').onclick = async () => {
   const b = $('btEqTurno'); b.disabled = true; b.innerHTML = '<i class="ti ti-loader-2" aria-hidden="true"></i>Rodando…';
   try { const r = await equipeOp({ op: 'turno' }); toast(r && r.avisos ? `Turno feito: ${r.avisos} novidade(s).` : 'Turno feito, sem novidades.'); await carregarEquipe(); }
