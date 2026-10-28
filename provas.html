@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="MedTech Provas">
 <script>window.MT_APP={id:"portal-provas",name:"MedTech Provas",linha:"provas"};</script>
 <script src="_mtfb.js?v=1"></script>
-<script type="module" src="_mtauth.js?v=49"></script>
+<script type="module" src="_mtauth.js?v=50"></script>
 <script defer src="_mtpixel.js?v=1"></script>
 <style>
 /* ============================================================
@@ -269,6 +269,7 @@ const CATALOGO = [
   { id:'granae',        nm:'Granaê',           ic:'ti-wallet',           url:BASE+'granae.html',           cat:'Rotina do médico',     linha:'clinica' , c:'#7C4DE8' },
   { id:'clinicamed',    nm:'ClínicaMed',       ic:'ti-heartbeat',        url:BASE+'clinicamed/',           cat:'Prova de título',      linha:'provas', sub:'título de Clínica Médica (TECM) e acesso R+' , c:'var(--c-indigo)' },
   { id:'cirurgiamed',   nm:'CirurgiaMed',      ic:'ti-cut',              url:BASE+'cirurgiamed/',          cat:'Prova de título',      linha:'provas', sub:'título de Cirurgia Geral (CBC), R+ cirúrgico e concursos' , c:'#33479E' },
+  { id:'familiamed',    nm:'FamíliaMed',       ic:'ti-home-heart',       url:BASE+'familiamed/',           cat:'Prova de título',      linha:'provas', sub:'título de MFC (TEMFC), ENARE MFC e concursos de ESF' , c:'#A64B24' },
   { id:'trafegotitulo', nm:'TráfegoTítulo',    ic:'ti-car',              url:BASE+'trafego-titulo/',       cat:'Prova de título',      linha:'provas', sub:'título de Medicina do Tráfego' , c:'var(--c-teal)' },
   { id:'radiotitulo',   nm:'RadioTítulo',      ic:'ti-body-scan',        url:BASE+'radio-titulo/',         cat:'Prova de título',      linha:'provas', sub:'título de Radiologia e Diagnóstico por Imagem (CBR/AMB)', c:'#0E5A6D' },
   { id:'flashmed',      nm:'FlashMed',         ic:'ti-cards',            url:BASE+'flashmed/',         cat:'Residência e concursos', linha:'provas' , c:'var(--c-coral)' },
@@ -288,7 +289,7 @@ const CATALOGO_LINHA = CATALOGO.filter(a => a.linha === LINHA);
 const CATEGORIAS = LINHA === 'provas' ? ['Prova de título','Residência e concursos','Enfermagem','Fisioterapia','Farmácia'] : ['Referência clínica','Hospital e imagem','Rotina do médico'];
 /* Quem nunca escolheu vê o conjunto padrão da linha. */
 const PADRAO = LINHA === 'provas'
-  ? ['clinicamed','cirurgiamed','trafegotitulo','radiotitulo','flashmed']
+  ? ['clinicamed','cirurgiamed','familiamed','trafegotitulo','radiotitulo','flashmed']
   : ['condutai','laudai','paliai','plantaohub','granae'];
 const CACHE_APPS = 'mt.portal.apps.' + LINHA;   // lido também pelo trocador de funções (_mtauth.js), mesmo domínio
 const CAMPO_SEL = LINHA === 'provas' ? 'appsProvas' : 'apps';   // no doc da conta, um campo por linha
@@ -591,8 +592,8 @@ async function enviarResetSenha(){
    cliente (deixaria subcoleções órfãs e exige login recente): monta um e-mail pronto. */
 const MEUS_DADOS_APPS = ['portal','portal-provas','enfermaria','condutai','atbguia','calcmed','paliai','guiainterno','pocusai',
   'laudai','foco','plantaohub','granae','granae_of','logbook','medprovas','flashmed','flashmed_resumo','clinicamed','clinicamed_resumo',
-  'clinicamed_coord','cirurgiamed','cirurgiamed_resumo','trafego-titulo','radio-titulo','farmauti','enare-farmacia','enfermare','enfermare_resumo','fisiare','fisiare_resumo'];
-const MEUS_DADOS_SYNC = ['flashmed','clinicamed','cirurgiamed','trafego-titulo','radio-titulo','farmauti','enare-farmacia','enfermare','fisiare'];   // users/{uid}/apps/<app>/sync
+  'clinicamed_coord','cirurgiamed','cirurgiamed_resumo','familiamed','familiamed_resumo','trafego-titulo','radio-titulo','farmauti','enare-farmacia','enfermare','enfermare_resumo','fisiare','fisiare_resumo'];
+const MEUS_DADOS_SYNC = ['flashmed','clinicamed','cirurgiamed','familiamed','trafego-titulo','radio-titulo','farmauti','enare-farmacia','enfermare','fisiare'];   // users/{uid}/apps/<app>/sync
 function dataLocalISO(d){ d = d || new Date(); const p = n => String(n).padStart(2,'0'); return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
 /* Timestamp do Firestore e afins viram texto ISO; o resto passa igual */
 function limpaFs(v){
