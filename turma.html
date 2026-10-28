@@ -16,7 +16,7 @@
      nenhuma coleção da turma. Com "turmas" desligado no planos.json, a página não chama o servidor. -->
 <script>window.MT_APP={id:"turma",name:"Turma",linha:"provas"};</script>
 <script src="_mtfb.js?v=1"></script>
-<script type="module" src="_mtauth.js?v=47"></script>
+<script type="module" src="_mtauth.js?v=49"></script>
 <link rel="stylesheet" href="_mtviva.css?v=2">
 <link rel="stylesheet" href="admin.css?v=18">
 <style>
@@ -125,7 +125,7 @@ function toast(msg, tipo) { const t = $('toast'); t.textContent = msg; t.classNa
 function aviso(html, tipo, ic) { return `<div class="aviso${tipo ? ' ' + tipo : ''}"><i class="ti ${ic || 'ti-info-circle'}" aria-hidden="true"></i><div>${html}</div></div>`; }
 async function modulo() {
   if (window.MT && MT.acessoModulo) { const m = await MT.acessoModulo(); if (m) return m; }
-  if (!window.MTAcesso) await import('/_mtacesso.js?v=16');
+  if (!window.MTAcesso) await import('/_mtacesso.js?v=17');
   return window.MTAcesso;
 }
 async function turma(dados) { const A = await modulo(); return A.chamar('mtTurma', dados, MT.user); }

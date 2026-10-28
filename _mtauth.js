@@ -178,6 +178,7 @@ const MT_FUNCS = [
   { id:'clinicamed',    nm:'ClínicaMed',    ic:'ti-heartbeat', c:'#0B6A72', url:'/clinicamed/',     linha:'provas' },
   { id:'cirurgiamed',   nm:'CirurgiaMed',   ic:'ti-cut',       c:'#33479E', url:'/cirurgiamed/',    linha:'provas' },
   { id:'trafegotitulo', nm:'TráfegoTítulo', ic:'ti-car',       c:'#23272E', url:'/trafego-titulo/', linha:'provas' },
+  { id:'radiotitulo',   nm:'RadioTítulo',   ic:'ti-body-scan', c:'#0E5A6D', url:'/radio-titulo/',   linha:'provas' },
   /* farmácia (10/10/2026): vendidos na linha Provas, fora do padrão dos médicos (só aparecem para quem os escolhe ou compra) */
   { id:'farmauti',      nm:'FarmaUTI',      ic:'ti-pill',      c:'#4545D8', url:'/farmauti/',       linha:'provas' },
   { id:'enarefarmacia', nm:'AprovaFarma', ic:'ti-vaccine-bottle',    c:'#0A3F3B', url:'/quiz-enare-farmacia/', linha:'provas' },
@@ -198,7 +199,7 @@ function linhaAtual() {
    ele escolheu — e sempre o app atual — SEMPRE dentro da própria linha. */
 const FUNCS_PADRAO = {
   clinica: ['condutai','laudai','paliai','plantaohub','granae'],
-  provas:  ['flashmed','clinicamed','cirurgiamed','trafegotitulo']
+  provas:  ['flashmed','clinicamed','cirurgiamed','trafegotitulo','radiotitulo']
 };
 function funcsVisiveis() {
   const linha = linhaAtual();
