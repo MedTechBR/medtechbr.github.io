@@ -1368,6 +1368,9 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
       });
     }
     var ch = echarts.init(el, null, { renderer: 'canvas' }); ch.setOption(o); graficos.push(ch);
+    // a caixa pode ainda não ter largura na hora do desenho (painel abrindo, aba em segundo plano): acompanha o tamanho
+    if (window.ResizeObserver) new ResizeObserver(function () { if (!ch.isDisposed()) ch.resize(); }).observe(el);
+    else setTimeout(function () { ch.resize(); }, 60);
   }
 
   function rolar() { var m = painel && painel.querySelector('.msgs'); if (m) m.scrollTop = m.scrollHeight; }
@@ -1423,89 +1426,133 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
   }
 
   btn.addEventListener('click', abrir);
-  // ---- Demonstração (site): sem servidor nem IA. Responde às perguntas sugeridas com os dados fictícios desta página,
-  // calculados na hora, com as mesmas etapas e o mesmo formato do Celeris instalado no hospital.
+  // ---- Demonstração (site): sem servidor nem IA. Responde com os dados fictícios desta página, calculados na hora, no
+  // mesmo formato do Celeris instalado no hospital. Entende o setor e o período citados na pergunta ("clínica médica",
+  // "essa semana", "últimos 15 dias"); sem setor, responde pelo hospital.
   var D = window.CELERIS_DEMO || {};
   function v1(n) { return Number(n).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
   function v0(n) { return Number(n).toLocaleString('pt-BR', { maximumFractionDigits: 0 }); }
   function rotD(d) { return ('0' + d.getDate()).slice(-2) + '/' + ('0' + (d.getMonth() + 1)).slice(-2); }
   function media(a) { return a.reduce(function (x, y) { return x + y; }, 0) / (a.length || 1); }
   function soma(a) { return a.reduce(function (x, y) { return x + y; }, 0); }
-  function periodo(n) { return 'Período: ' + rotD(D.DIAS[D.N - n]) + ' a ' + rotD(D.DIAS[D.N - 1]) + '.'; }
+  function norm(t) { return String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+  function periodoTxt(n) { return 'Período: ' + rotD(D.DIAS[D.N - n]) + ' a ' + rotD(D.DIAS[D.N - 1]) + '.'; }
   var internados = function () { return (D.LEITOS || []).filter(function (l) { return !l.livre && l.set !== 'EMG'; }); };
   var setor = function (k) { return (D.SET || []).filter(function (s) { return s.k === k; })[0]; };
 
+  // setor citado na pergunta (nunca confunde "cirurgia" com a Clínica Cirúrgica)
+  var APELIDOS = [['CM', /clinica medica|\bmedica\b|\bcm\b/], ['CIR', /clinica cirurgica|\bcirurgica\b/], ['ORT', /ortoped|traumato/],
+    ['UCE', /cuidados especiais|\buce\b/], ['UTI', /\buti\b|terapia intensiva/], ['AVC', /\bavc\b/], ['OBS', /obstetric|maternidade|alojamento/],
+    ['NEO', /neonat|\butin\b|\bneo\b/]];
+  function setorDa(t) { var n = norm(t); for (var i = 0; i < APELIDOS.length; i++) if (APELIDOS[i][1].test(n)) return setor(APELIDOS[i][0]); return null; }
+  // período citado: semana = 7, quinzena = 15, "N dias", mês = 30
+  function diasDa(t, padrao) {
+    var n = norm(t), m = n.match(/(\d{1,3})\s*dias?/);
+    if (m) return Math.max(2, Math.min(60, +m[1]));
+    if (/semana/.test(n)) return 7;
+    if (/quinzena/.test(n)) return 15;
+    if (/\bmes\b|mensal/.test(n)) return 30;
+    if (/\bhoje\b|\bontem\b/.test(n)) return 7;
+    return padrao;
+  }
+  function nomePeriodo(n) { return n === 7 ? 'na última semana' : n === 30 ? 'no último mês' : 'nos últimos ' + n + ' dias'; }
+  function nomeAnterior(n) { return n === 7 ? 'na semana anterior' : n === 30 ? 'no mês anterior' : 'nos ' + n + ' dias anteriores'; }
+  // permanência média de um intervalo de dias [i0, i1): setor = média diária; hospital = paciente-dias ÷ saídas
+  function perm(s, i0, i1) {
+    if (s) return media(s.permD.slice(i0, i1));
+    var H = D.HOSP, pd = 0, sd = 0;
+    for (var i = i0; i < i1; i++) { pd += H.ocupD[i] / 100 * H.cap; sd += H.saiD[i]; }
+    return sd ? pd / sd : 0;
+  }
+
   var DEMO = [
-    { chave: /gargal|segur|trav|parad|motivo/i, etapas: ['Consultando: situação de cada leito agora', 'Consultando: motivos de permanência por setor', 'Montando o gráfico'],
-      resp: function () {
-        var L = internados(), por = {}, acima = 0, porSet = {};
+    { chave: /gargal|segur|trav|parad|motivo|o que (mais )?prende/i, etapas: ['Consultando: situação de cada leito agora', 'Consultando: motivos de permanência por setor', 'Montando o gráfico'],
+      resp: function (texto) {
+        var s = setorDa(texto), L = internados().filter(function (l) { return !s || l.set === s.k; }), por = {}, acima = 0, porSet = {};
         L.forEach(function (l) {
           if (l.causa && l.causa !== 'alta') { por[l.causa] = (por[l.causa] || 0) + 1; porSet[l.set] = porSet[l.set] || {}; porSet[l.set][l.causa] = (porSet[l.set][l.causa] || 0) + 1; }
-          var s = setor(l.set); if (s && l.dias > s.meta) acima++;
+          var ss = setor(l.set); if (ss && l.dias > ss.meta) acima++;
         });
         var top = Object.keys(por).sort(function (a, b) { return por[b] - por[a]; }), tot = soma(top.map(function (k) { return por[k]; }));
         var naoClin = top.filter(function (k) { return k !== 'clinica'; });
+        var onde = s ? 'na ' + s.nome : 'no hospital';
         var linhas = naoClin.slice(0, 3).map(function (k) {
-          var sets = Object.keys(porSet).filter(function (s) { return porSet[s][k]; }).sort(function (a, b) { return porSet[b][k] - porSet[a][k]; }).slice(0, 2);
-          return '- **' + D.CAUSA_NOME[k] + '**: ' + por[k] + ' pacientes (' + v0(por[k] / tot * 100) + '%), mais na ' + sets.map(function (s) { return setor(s).nome + ' (' + porSet[s][k] + ')'; }).join(' e ');
+          var txt = '- **' + D.CAUSA_NOME[k] + '**: ' + por[k] + ' paciente' + (por[k] > 1 ? 's' : '') + ' (' + v0(por[k] / tot * 100) + '%)';
+          if (s) return txt;
+          var sets = Object.keys(porSet).filter(function (x) { return porSet[x][k]; }).sort(function (a, b) { return porSet[b][k] - porSet[a][k]; }).slice(0, 2);
+          return txt + ', mais na ' + sets.map(function (x) { return setor(x).nome + ' (' + porSet[x][k] + ')'; }).join(' e ');
         });
-        return { resposta: 'Hoje, fora o tratamento em curso, o que mais segura os pacientes no hospital é **' + D.CAUSA_NOME[naoClin[0]].toLowerCase() + '**, seguido de ' +
-            D.CAUSA_NOME[naoClin[1]].toLowerCase() + ' e ' + D.CAUSA_NOME[naoClin[2]].toLowerCase() + '.\n\n' + linhas.join('\n') +
-            '\n\n' + acima + ' dos ' + L.length + ' internados já passaram da permanência-meta do próprio setor. Esses são os primeiros leitos a olhar na reunião da manhã.\n\nRetrato de agora, com a classificação da madrugada.',
-          graficos: [{ tipo: 'barra_horizontal', titulo: 'O que segura os internados hoje', unidade: '', categorias: top.map(function (k) { return D.CAUSA_NOME[k]; }), series: [{ nome: 'Pacientes', valores: top.map(function (k) { return por[k]; }) }] }],
-          consultas: ['situação de cada leito agora', 'motivos de permanência por setor', 'pacientes acima da permanência-meta'] };
+        var nomes = naoClin.slice(0, 3).map(function (k) { return D.CAUSA_NOME[k].toLowerCase(); });
+        return { resposta: 'Hoje, fora o tratamento em curso, o que mais segura os pacientes ' + onde + ' é **' + nomes[0] + '**' +
+            (nomes.length > 2 ? ', seguido de ' + nomes[1] + ' e ' + nomes[2] : nomes.length > 1 ? ', seguido de ' + nomes[1] : '') + '.\n\n' + linhas.join('\n') +
+            '\n\n' + acima + ' dos ' + L.length + ' internados ' + (s ? 'do setor' : '') + ' já passaram da permanência-meta' + (s ? ' (' + v1(s.meta) + ' dias)' : ' do próprio setor') +
+            '. Esses são os primeiros leitos a olhar na reunião da manhã.\n\nRetrato de agora, com a classificação da madrugada.',
+          graficos: [{ tipo: 'barra_horizontal', titulo: 'O que segura os internados hoje' + (s ? ' · ' + s.nome : ''), unidade: '', categorias: top.map(function (k) { return D.CAUSA_NOME[k]; }), series: [{ nome: 'Pacientes', valores: top.map(function (k) { return por[k]; }) }] }],
+          consultas: ['situação de cada leito agora' + (s ? ' na ' + s.nome : ''), 'motivos de permanência por setor', 'pacientes acima da permanência-meta'] };
       } },
-    { chave: /ocupa/i, etapas: ['Calculando os indicadores dos últimos 15 dias', 'Consultando: ocupação diária do hospital', 'Montando o gráfico'],
-      resp: function () {
-        var n = 15, H = D.HOSP, oc = H.ocupD.slice(D.N - n), ant = H.ocupD.slice(D.N - 2 * n, D.N - n);
+    { chave: /ocupa|lotad|leitos livres/i, etapas: ['Calculando os indicadores do período', 'Consultando: ocupação diária', 'Montando o gráfico'],
+      resp: function (texto) {
+        var s = setorDa(texto), n = diasDa(texto, 15), serie = (s || D.HOSP).ocupD, oc = serie.slice(D.N - n), ant = serie.slice(D.N - 2 * n, D.N - n);
         var mx = Math.max.apply(null, oc), mn = Math.min.apply(null, oc), dMx = rotD(D.DIAS[D.N - n + oc.indexOf(mx)]);
-        var sets = (D.SET || []).map(function (s) { return { s: s, o: media(s.ocupD.slice(D.N - n)) }; }).sort(function (a, b) { return b.o - a.o; });
-        var dif = media(oc) - media(ant);
-        return { resposta: 'A ocupação média do hospital nos últimos 15 dias foi de **' + v1(media(oc)) + '%**, ' + (Math.abs(dif) < 1 ? 'estável em relação aos 15 dias anteriores' : (dif > 0 ? 'acima' : 'abaixo') + ' dos 15 dias anteriores (' + v1(media(ant)) + '%)') + '.\n\n' +
-            '- Maior ocupação: ' + v1(mx) + '% em ' + dMx + '; menor: ' + v1(mn) + '%\n- Setores mais cheios no período:\n\n| Setor | Ocupação média |\n|---|---|\n' +
-            sets.slice(0, 4).map(function (x) { return '| ' + x.s.nome + ' | ' + v1(x.o) + '% |'; }).join('\n') + '\n\n' + periodo(n),
-          graficos: [{ tipo: 'linha', titulo: 'Ocupação do hospital por dia', unidade: '%', categorias: D.DIAS.slice(D.N - n).map(rotD), series: [{ nome: 'Ocupação', valores: oc }] }],
-          consultas: ['indicadores dos últimos 15 dias e dos 15 anteriores', 'ocupação diária do hospital'] };
+        var dif = media(oc) - media(ant), onde = s ? 'da ' + s.nome : 'do hospital';
+        var corpo = '- Maior ocupação: ' + v1(mx) + '% em ' + dMx + '; menor: ' + v1(mn) + '%';
+        if (!s) {
+          var sets = (D.SET || []).map(function (x) { return { s: x, o: media(x.ocupD.slice(D.N - n)) }; }).sort(function (a, b) { return b.o - a.o; });
+          corpo += '\n- Setores mais cheios no período:\n\n| Setor | Ocupação média |\n|---|---|\n' + sets.slice(0, 4).map(function (x) { return '| ' + x.s.nome + ' | ' + v1(x.o) + '% |'; }).join('\n');
+        } else corpo += '\n- ' + s.cap + ' leitos no setor';
+        return { resposta: 'A ocupação média ' + onde + ' ' + nomePeriodo(n) + ' foi de **' + v1(media(oc)) + '%**, ' +
+            (Math.abs(dif) < 1 ? 'estável em relação ao período anterior de mesmo tamanho (' + v1(media(ant)) + '%)' : (dif > 0 ? 'acima' : 'abaixo') + ' do período anterior de mesmo tamanho (' + v1(media(ant)) + '%)') + '.\n\n' + corpo + '\n\n' + periodoTxt(n),
+          graficos: [{ tipo: 'linha', titulo: 'Ocupação ' + onde + ' por dia', unidade: '%', categorias: D.DIAS.slice(D.N - n).map(rotD), series: [{ nome: 'Ocupação', valores: oc }] }],
+          consultas: ['indicadores ' + nomePeriodo(n) + ' e ' + nomeAnterior(n), 'ocupação diária ' + onde] };
       } },
-    { chave: /(perman|demor|aument).*(cir|cirúrg)|por que|porque/i, etapas: ['Calculando os indicadores do último mês e do anterior', 'Consultando: motivos de permanência na Clínica Cirúrgica', 'Consultando: saídas e entradas por dia', 'Montando o gráfico'],
-      resp: function () {
-        var s = setor('CIR'), agora = s.p30[D.N - 1], antes = s.p30[D.N - 31];
-        var sai = soma(s.saiD.slice(D.N - 30)), saiAnt = soma(s.saiD.slice(D.N - 60, D.N - 30));
-        var L = internados().filter(function (l) { return l.set === 'CIR'; }), por = {};
+    { chave: /perman|demor|por que|porque|aument|caiu|piorou|melhorou|tempo de internac/i, etapas: ['Calculando a permanência do período e do anterior', 'Consultando: motivos de permanência', 'Consultando: saídas por dia', 'Montando o gráfico'],
+      resp: function (texto) {
+        var s = setorDa(texto), n = diasDa(texto, 30), nome = s ? s.nome : 'hospital', onde = s ? 'da ' + s.nome : 'do hospital';
+        var agora = perm(s, D.N - n, D.N), antes = perm(s, D.N - 2 * n, D.N - n), meta = s ? s.meta : D.HOSP.meta;
+        var sai = soma((s || D.HOSP).saiD.slice(D.N - n)), saiAnt = soma((s || D.HOSP).saiD.slice(D.N - 2 * n, D.N - n));
+        var L = internados().filter(function (l) { return !s || l.set === s.k; }), por = {};
         L.forEach(function (l) { if (l.causa && l.causa !== 'alta') por[l.causa] = (por[l.causa] || 0) + 1; });
         var top = Object.keys(por).sort(function (a, b) { return por[b] - por[a]; });
-        var acima = L.filter(function (l) { return l.dias > s.meta; }).length, subiu = agora > antes;
-        return { resposta: 'A permanência média da Clínica Cirúrgica ' + (Math.abs(agora - antes) < .15 ? 'ficou estável' : subiu ? 'subiu' : 'caiu') + ' no último mês: **' + v1(agora) + ' dias**, contra ' + v1(antes) + ' no mês anterior (meta: ' + v1(s.meta) + ').\n\n' +
+        var acima = L.filter(function (l) { var ss = setor(l.set); return ss && l.dias > ss.meta; }).length;
+        var dif = agora - antes, verbo = Math.abs(dif) < .1 ? 'ficou estável' : dif > 0 ? 'subiu' : 'caiu';
+        var pediu = /aument|subiu|piorou/i.test(texto), contrario = pediu && dif < -.1;
+        var dica = top[0] === 'cirurgia' ? 'os pacientes que aguardam cirurgia sem data no mapa' : top[0] === 'exame' ? 'os exames pedidos sem data e os laudos atrasados'
+          : top[0] === 'regulacao' ? 'os pedidos de vaga externa parados' : top[0] === 'parecer' ? 'os pareceres pedidos há mais de 24 horas' : 'os pacientes acima da meta, um a um';
+        var serie = s ? mmJ(s.permD, n) : null;
+        return { resposta: (contrario ? 'Pelos dados, a permanência média ' + onde + ' não aumentou ' + nomePeriodo(n) + ': caiu para **' + v1(agora) + ' dias**, contra ' + v1(antes) + ' ' + nomeAnterior(n) + ' (meta: ' + v1(meta) + ').\n\n'
+            : 'A permanência média ' + onde + ' ' + verbo + ' ' + nomePeriodo(n) + ': **' + v1(agora) + ' dias**, contra ' + v1(antes) + ' ' + nomeAnterior(n) + ' (meta: ' + v1(meta) + ').\n\n') +
             'O que mudou junto no período:\n' +
-            '- Saídas: ' + sai + ' no último mês, contra ' + saiAnt + ' no anterior\n' +
-            '- Hoje, ' + acima + ' dos ' + L.length + ' internados da Cirúrgica já passaram da meta de ' + v1(s.meta) + ' dias\n' +
+            '- Saídas: ' + v0(sai) + ' ' + nomePeriodo(n) + ', contra ' + v0(saiAnt) + ' ' + nomeAnterior(n) + '\n' +
+            '- Hoje, ' + acima + ' dos ' + L.length + ' internados ' + (s ? 'do setor' : 'do hospital') + ' já passaram da permanência-meta\n' +
             '- O que mais segura esses pacientes agora: ' + top.slice(0, 3).map(function (k) { return D.CAUSA_NOME[k].toLowerCase() + ' (' + por[k] + ')'; }).join(', ') + '\n\n' +
-            'São fatores que andaram junto com a mudança, não uma causa comprovada. Vale olhar com a equipe os pacientes que aguardam cirurgia sem data no mapa.\n\nPeríodo: últimos 30 dias, comparados aos 30 anteriores.',
-          graficos: [{ tipo: 'linha', titulo: 'Permanência da Clínica Cirúrgica (média de 30 dias)', unidade: 'd', meta: s.meta, categorias: D.DIAS.slice(D.N - 60).map(rotD), series: [{ nome: 'Cirúrgica', valores: s.p30.slice(D.N - 60).map(function (v) { return +v.toFixed(2); }) }] }],
-          consultas: ['indicadores do último mês e do anterior', 'motivos de permanência na Clínica Cirúrgica', 'saídas e entradas por dia'] };
+            'São fatores que andaram junto com a mudança, não uma causa comprovada. Vale olhar com a equipe ' + dica + '.\n\nPeríodo: ' + rotD(D.DIAS[D.N - n]) + ' a ' + rotD(D.DIAS[D.N - 1]) + ', comparado aos ' + n + ' dias anteriores.',
+          graficos: [{ tipo: 'linha', titulo: 'Permanência ' + onde + (s ? ' (média de ' + n + ' dias)' : ' (média de 30 dias)'), unidade: 'd', meta: meta,
+            categorias: D.DIAS.slice(D.N - Math.max(30, 2 * n)).map(rotD), series: [{ nome: nome, valores: (s ? serie : D.HOSP.p30).slice(D.N - Math.max(30, 2 * n)).map(function (v) { return +(+v).toFixed(2); }) }] }],
+          consultas: ['permanência ' + onde + ' ' + nomePeriodo(n) + ' e ' + nomeAnterior(n), 'motivos de permanência ' + onde, 'saídas por dia'] };
       } },
-    { chave: /especialid|operar|operaram|cirurgias/i, etapas: ['Consultando: cirurgias realizadas nos últimos 10 dias, por especialidade', 'Montando o gráfico'],
-      resp: function () {
-        var tot = soma(D.CC.diaD.slice(D.N - 10)), pesos = [['Cirurgia geral', 30], ['Ortopedia', 24], ['Ginecologia e obstetrícia', 16], ['Urologia', 10], ['Cirurgia vascular', 8], ['Neurocirurgia', 6], ['Otorrinolaringologia', 4], ['Cirurgia plástica', 2]];
+    { chave: /especialid|operar|operaram|cirurgias/i, etapas: ['Consultando: cirurgias realizadas, por especialidade', 'Montando o gráfico'],
+      resp: function (texto) {
+        var n = diasDa(texto, 10), tot = soma(D.CC.diaD.slice(D.N - n)), pesos = [['Cirurgia geral', 30], ['Ortopedia', 24], ['Ginecologia e obstetrícia', 16], ['Urologia', 10], ['Cirurgia vascular', 8], ['Neurocirurgia', 6], ['Otorrinolaringologia', 4], ['Cirurgia plástica', 2]];
         var v = pesos.map(function (p) { return Math.round(tot * p[1] / 100); }); v[0] += tot - soma(v);
-        return { resposta: 'Nos últimos 10 dias o centro cirúrgico fez **' + tot + ' cirurgias**. As especialidades que mais operaram foram **' + pesos[0][0] + '** (' + v[0] + '), **' + pesos[1][0] + '** (' + v[1] + ') e **' + pesos[2][0] + '** (' + v[2] + '), juntas ' + v0((v[0] + v[1] + v[2]) / tot * 100) + '% do total.\n\n' + periodo(10),
-          graficos: [{ tipo: 'barra_horizontal', titulo: 'Cirurgias por especialidade · últimos 10 dias', unidade: '', categorias: pesos.map(function (p) { return p[0]; }), series: [{ nome: 'Cirurgias', valores: v }] }],
-          consultas: ['cirurgias realizadas nos últimos 10 dias, por especialidade'] };
+        return { resposta: (n === 7 ? 'Na última semana' : 'Nos últimos ' + n + ' dias') + ' o centro cirúrgico fez **' + tot + ' cirurgias**. As especialidades que mais operaram foram **' + pesos[0][0] + '** (' + v[0] + '), **' + pesos[1][0] + '** (' + v[1] + ') e **' + pesos[2][0] + '** (' + v[2] + '), juntas ' + v0((v[0] + v[1] + v[2]) / tot * 100) + '% do total.\n\n' + periodoTxt(n),
+          graficos: [{ tipo: 'barra_horizontal', titulo: 'Cirurgias por especialidade · ' + (n === 7 ? 'última semana' : 'últimos ' + n + ' dias'), unidade: '', categorias: pesos.map(function (p) { return p[0]; }), series: [{ nome: 'Cirurgias', valores: v }] }],
+          consultas: ['cirurgias realizadas ' + nomePeriodo(n) + ', por especialidade'] };
       } }
   ];
+  function mmJ(a, w) { return a.map(function (_, i) { return media(a.slice(Math.max(0, i - w + 1), i + 1)); }); }
 
   function demoResponder(texto, etapaCb, fim) {
-    var d = DEMO.filter(function (x) { return x.chave.test(texto); })[0];
+    var d = DEMO.filter(function (x) { return x.chave.test(norm(texto)) || x.chave.test(texto); })[0];
     if (!d) {
       setTimeout(function () {
-        fim({ resposta: 'Nesta demonstração eu respondo às perguntas sugeridas, com os dados fictícios desta página.\n\nNo hospital, o Celeris responde a qualquer pergunta sobre os dados do próprio hospital: permanência, ocupação, motivos de internação longa, pacientes por idade, cirurgias, pareceres, exames, antimicrobianos e o que mais o prontuário registrar.', graficos: [], consultas: [] });
+        fim({ resposta: 'Nesta demonstração eu respondo a perguntas sobre gargalos de permanência, ocupação, a permanência de um setor e cirurgias por especialidade, com os dados fictícios desta página.\n\nNo hospital, o Celeris responde a qualquer pergunta sobre os dados do próprio hospital: pacientes por idade, pareceres, exames, antimicrobianos e o que mais o prontuário registrar.', graficos: [], consultas: [] });
       }, 700);
       return;
     }
     var k = 0;
     (function prox() {
       if (k < d.etapas.length) { etapaCb(d.etapas[k++]); setTimeout(prox, 650 + Math.random() * 450); return; }
-      var r = d.resp();
+      var r = d.resp(texto);
       fim({ resposta: r.resposta, graficos: r.graficos, consultas: r.consultas.map(function (c) { return { objetivo: c, linhas: null }; }) });
     })();
   }
