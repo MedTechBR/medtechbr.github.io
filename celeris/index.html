@@ -540,21 +540,6 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
   })();
   SET.forEach(function (s) { s.fila = LEITOS.filter(function (l) { return l.set === 'EMG' && l.destino === s.k; }).length; }); // quem aguarda leito vem dos boxes da emergência
   HOSP.fila = sum(SET.map(function (s) { return s.fila; }));
-  // Faturamento hospitalar: o que corrigir no próprio prontuário para evitar glosa e faturar o que foi feito (cirurgia
-  // como procedimento principal, procedimento feito e não registrado, diagnóstico, justificativa, evolução diária).
-  // Gerador próprio, depois de todos os outros, para não mudar nenhum número das outras telas.
-  var seedC = 30117;
-  function rcc() { seedC = (seedC * 1103515245 + 12345) % 2147483648; return seedC / 2147483648; }
-  if (!window.CELERIS_ESTADO) LEITOS.forEach(function (l) {   // só na demonstração; no servidor os leitos vêm do hospital
-    if (l.livre || l.set === 'EMG') return;
-    var s = S(l.set), r = rcc();
-    if (l.selo === 'PÓS-OP' && ['CIR', 'ORT'].indexOf(l.set) >= 0 && r < .35) l.fat = ['Procedimento principal', 'Internou como tratamento clínico e foi operado: a cirurgia precisa constar como procedimento principal'];
-    else if (l.set === 'UTI' && r < .12) l.fat = ['Procedimento', 'Hemodiálise de ontem sem registro do procedimento: registrar a sessão'];
-    else if (l.dias > s.meta * 1.3 && r < .45) l.fat = ['Justificativa', l.dias + ' dias internado, acima da média, sem justificativa na evolução: escrever o motivo'];
-    else if (r < .04) l.fat = ['Procedimento', 'Transfusão de ontem sem registro: registrar a transfusão'];
-    else if (r < .08) l.fat = ['Diagnóstico', 'A evolução já confirma ' + l.dx.toLowerCase() + ', mas o diagnóstico segue registrado como hipótese: confirmar o diagnóstico'];
-    else if (r < .11) l.fat = ['Evolução', 'Sem evolução médica ontem: registrar'];
-  });
   function tempo(l) { return l.set === 'EMG' ? l.h + ' h' : l.dias + ' d'; }
   function riscoPill(l) { var r = RISCO[l.risco]; return '<span class="risco"><i style="background:' + r[1] + '"></i>' + r[0] + '</span>'; }
   var PERFIS = {
@@ -1142,7 +1127,6 @@ tr.clk { cursor: pointer; } tr.clk:hover td { background: var(--panel2); }
       '<div class="db"><div style="display:flex;gap:8px;flex-wrap:wrap">' + selPill(l.selo) + (l.set === 'EMG' ? riscoPill(l) + '<span class="pill p-n">' + l.h + ' h na emergência</span>' + (l.h > 24 ? '<span class="pill p-crit">mais de 24 h</span>' : '<span class="pill p-ok">menos de 24 h</span>') : '<span class="pill p-n">' + l.dias + ' dias no setor</span>' + (l.dias > s.meta ? '<span class="pill p-crit">acima da meta de ' + br(s.meta, 1) + ' d</span>' : '<span class="pill p-ok">dentro da meta</span>')) + '</div>' +
       (l.prec ? '<div class="alertbox" style="background:' + PREC[l.prec.tipo][2] + '1f;color:var(--ink);border-left:4px solid ' + PREC[l.prec.tipo][2] + '"><b>Precaução de ' + PREC[l.prec.tipo][0].toLowerCase() + ':</b> ' + esc(l.prec.motivo) + '</div>' : '') +
       (l.alerta ? '<div class="alertbox" style="background:var(--violet-soft);color:var(--violet)"><b>Alerta clínico:</b> ' + esc(l.alerta[0]) + '</div>' : '') +
-      (l.fat ? '<div class="alertbox" style="background:var(--brand-soft);color:var(--ink);border-left:4px solid var(--brand)"><b style="color:var(--brand)">Faturamento hospitalar · ' + esc(l.fat[0]) + ':</b> ' + esc(l.fat[1]) + '</div>' : '') +
       '<dl class="kv"><dt>Hipótese</dt><dd>' + esc(l.dx) + '</dd>' + (l.set === 'EMG' ? '<dt>Risco</dt><dd>' + RISCO[l.risco][0] + ' (Manchester)</dd>' + (l.destino ? '<dt>Destino</dt><dd>' + S(l.destino).nome + ' · aguarda há ' + l.esp + ' h</dd>' : '') : '<dt>Enfermagem</dt><dd>' + CAT[l.cat].nome + ' · ' + (l.nas != null ? 'NAS ' + l.nas : l.dini ? 'escala de Dini' : 'Fugulin ' + l.fug) + ' · ' + br(l.hEnf, l.hEnf % 1 ? 1 : 0) + ' h nas 24 h</dd>') + '<dt>O que segura</dt><dd>' + esc(l.pend) + '</dd><dt>Ação</dt><dd><b>' + esc(l.acao) + '</b></dd><dt>Quem age</dt><dd>' + esc(l.quem) + '</dd>' + (l.atb ? '<dt>Antimicrobiano</dt><dd>' + l.atb.nomes.join(' + ') + ' · D' + l.atb.dia + (l.atb.prof ? ' · profilaxia' : '') + '</dd>' : '') + (l.cult ? '<dt>Cultura</dt><dd><i>' + l.cult.mo + '</i> ' + l.cult.perfil + ' · ' + l.cult.material.toLowerCase() + ' · há ' + l.cult.h + ' h' + (l.cult.cobre ? '' : ' · <b class="bad">o esquema atual não cobre</b>') + '</dd>' : '') + '</dl>' +
       (function () { if (!l.prev) return ''; var p = l.prev, hd = HIST_DX[l.dx], rc = p.risco >= 50 ? 'crit' : p.risco >= 25 ? 'warn' : 'ok';
         return '<div><div class="note" style="margin:0 0 8px;font-weight:700">Permanência prevista</div><div class="prevg">' +
