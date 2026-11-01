@@ -637,7 +637,7 @@ function paywall(o) {
     var unico = prods.length === 1 ? prods[0] : null;
     var nomeProd = unico ? (unico.nome || unico.id) : '';
     var mesmoNome = unico && unico.apps !== 'tudo' && appsDoProduto(P, unico).length <= 1;   /* ClínicaMed vende o ClínicaMed */
-    if (testeAcabou) { tit = 'Seu teste grátis terminou'; txt = 'O que você registrou continua salvo na sua conta. Para voltar a usar o ' + nome + ', escolha um plano.'; }
+    if (testeAcabou) { tit = 'Seu teste terminou'; txt = 'O que você registrou continua salvo na sua conta. Para voltar a usar o ' + nome + ', escolha um plano.'; }
     else if (unico && mesmoNome) { tit = 'Assine o ' + nomeProd; txt = unico.resumo || ('Assinatura do ' + nomeProd + '.'); }
     else if (unico) { tit = 'Assine o ' + nomeProd + ' para usar o ' + nome; txt = 'O ' + nome + ' faz parte do ' + nomeProd + '. Uma assinatura libera ' + (appsDoProduto(P, unico).length > 1 ? 'todos estes apps' : 'o app') + ', com a IA incluída.'; }
     else { tit = 'Assine para usar o ' + nome; txt = 'O ' + nome + ' faz parte dos planos abaixo. A IA vem incluída em todos.'; }

@@ -761,7 +761,7 @@ function preencheAssinatura(){
   OPS = [];
   if (!ASSIN_MP && !ASSIN_MP_CARREGANDO) carregaAssinMP();
   if (mt.adm) B.push(`<div class="as-st adm"><span class="sel ok">Administração</span><p>Conta de administração: todos os apps liberados, sem cobrança.</p><a class="b ok" href="${ADMIN_URL}"><i class="ti ti-shield-cog" aria-hidden="true"></i>Abrir a Administração</a></div>`);
-  if (mt.t && Number(P.teste_dias) > 0 && mt.t > ag) B.push(`<div class="as-st"><span class="sel ok">Teste grátis</span><p>Tudo liberado até <b>${dataBR(mt.t)}</b>.</p></div>`);
+  if (mt.t && Number(P.teste_dias) > 0 && mt.t > ag) B.push(`<div class="as-st"><span class="sel ok">Teste de 7 dias</span><p>Tudo liberado até <b>${dataBR(mt.t)}</b>.</p></div>`);
   const pend = pendenteValido();
   const donos = Object.entries(mt.p || {}).filter(([id]) => MTAcesso.produtoPorId(P, id));
   const ativos = new Set();
@@ -942,6 +942,9 @@ function openAssinatura(){
 const Q0 = new URLSearchParams(location.search);
 const PLANO_URL = Q0.get('plano') ? { id: Q0.get('plano'), periodo: Q0.get('periodo') === 'anual' ? 'anual' : 'mensal', apps: (Q0.get('apps') || '').split(',').filter(Boolean) } : null;
 const VOLTA_PAG = Q0.get('pago');
+/* Teste pela vitrine: ?testar=<id do app>. Sem login: a tela já abre em Criar conta, dizendo o que vem
+   depois. Depois de entrar ou criar a conta, o servidor inicia o teste (mtAcesso) e o app abre. */
+const TESTE_URL = PLANO_URL ? null : (CATALOGO.find(a => a.id === Q0.get('testar')) || null);
 let CTX_LOGIN = '', _ctxObs = null;
 if (PLANO_URL) {
   fetch('/planos.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : null).catch(() => null).then(P => {
@@ -951,6 +954,16 @@ if (PLANO_URL) {
     const v = p && p.preco && p.preco[PLANO_URL.periodo];
     if (!p || v == null) return;
     CTX_LOGIN = `<div class="mt-ctx" id="mt-ctx" role="note"><p>Você está assinando <b>${esc(p.nome || p.id)} · ${PLANO_URL.periodo} · ${esc(brl(v))}</b>. Entre ou crie a conta para ir ao pagamento.</p><button type="button" class="mt-ctx-b" id="mt-ctx-reg">Ainda não tenho conta: criar agora</button></div>`;
+    aplicaCtxLogin();
+    if (!_ctxObs && window.MutationObserver) { _ctxObs = new MutationObserver(aplicaCtxLogin); _ctxObs.observe(document.body, { childList: true }); }
+  });
+}
+if (TESTE_URL && TESTE_URL.linha !== LINHA) location.replace((TESTE_URL.linha === 'provas' ? 'provas.html' : 'app.html') + location.search);
+else if (TESTE_URL) {
+  fetch('/planos.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : null).catch(() => null).then(P => {
+    const dias = Number(P && P.teste_dias) || 0;
+    if (!dias) return;
+    CTX_LOGIN = `<div class="mt-ctx" id="mt-ctx" role="note"><p>Teste o <b>${esc(TESTE_URL.nm)}</b> por ${dias} dias, sem cartão e sem cobrança automática. Crie a conta para começar.</p></div>`;
     aplicaCtxLogin();
     if (!_ctxObs && window.MutationObserver) { _ctxObs = new MutationObserver(aplicaCtxLogin); _ctxObs.observe(document.body, { childList: true }); }
   });
@@ -969,6 +982,14 @@ function aplicaCtxLogin(){
   const dlg = document.getElementById('mt-auth'); if (dlg) dlg.setAttribute('aria-describedby', 'mt-ctx');
   const b = document.getElementById('mt-ctx-reg');
   if (b) b.onclick = () => { const r = document.getElementById('mt-go-reg'); if (r) r.click(); b.hidden = true; };
+  if (TESTE_URL) { const r = document.getElementById('mt-go-reg'); if (r) r.click(); }
+}
+/* depois de entrar: o teste já começou no servidor; abre o app escolhido */
+function testeDaURL(){
+  if (!TESTE_URL || !ACESSO || testeDaURL.feito) return;
+  testeDaURL.feito = true;
+  if (_ctxObs) { _ctxObs.disconnect(); _ctxObs = null; }
+  location.replace(TESTE_URL.url);
 }
 /* depois de entrar: confirma o plano escolhido e leva ao pagamento num clique */
 function planoDaURL(){
@@ -1212,7 +1233,7 @@ async function carregaAcesso(){
   if (ACESSO !== null || !window.MT || !MT.user || MT.user.demo) return;
   ACESSO = false;   // em andamento
   try { ACESSO = (await MT.acessoEstado()) || { venda: false }; } catch(e) { ACESSO = { venda: false }; }
-  renderGrid(); preencheAssinatura(); renderFaixa(); planoDaURL(); escolhaPendente(); chegadaPagamento(); retomarPlano();
+  renderGrid(); preencheAssinatura(); renderFaixa(); planoDaURL(); testeDaURL(); escolhaPendente(); chegadaPagamento(); retomarPlano();
 }
 
 /* saudação + sair (via login central MedTech) */
