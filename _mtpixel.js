@@ -83,15 +83,15 @@
     var d = document.createElement("div");
     d.className = "mtck"; d.id = "mtck"; d.setAttribute("role", "region"); d.setAttribute("aria-label", "Cookies");
     /* aviso da mudança na política (seção 15: "avisada no portal") durante 30 dias após ligar o Pixel */
-    var novo = Date.now() < Date.UTC(2026, 10, 27, 3);
+    var novo = Date.now() < Date.UTC(2026, 11, 1, 3);
     var compacto = !!(document.body && document.body.getAttribute("data-mtck") === "compacto");
     if (compacto) {
       d.className = "mtck compacto";
-      d.innerHTML = "<p>" + (novo ? "<b>Atualizamos a Política de Privacidade em 27/10/2026.</b> " : "") +
+      d.innerHTML = "<p>" + (novo ? "<b>Atualizamos a Política de Privacidade em 01/11/2026.</b> " : "") +
         "Cookies da Meta só com o seu aceite. <a href=\"/privacidade.html#cookies\">" + (novo ? "Ler" : "Saiba mais") + "</a></p>" +
         "<div class=\"mtck-b\"><button type=\"button\" class=\"nao\">Recusar</button><button type=\"button\" class=\"sim\">Aceitar</button></div>";
     } else
-    d.innerHTML = "<p>" + (novo ? "<b>Atualizamos a Política de Privacidade em 27/10/2026.</b> " : "") +
+    d.innerHTML = "<p>" + (novo ? "<b>Atualizamos a Política de Privacidade em 01/11/2026.</b> " : "") +
       "Usamos cookies da Meta (Facebook e Instagram) para medir os nossos anúncios, só se você aceitar. " +
       "O site funciona igual se você recusar. <a href=\"/privacidade.html#cookies\">" + (novo ? "Ler a política" : "Saiba mais") + "</a></p>" +
       "<div class=\"mtck-b\"><button type=\"button\" class=\"nao\">Recusar</button><button type=\"button\" class=\"sim\">Aceitar</button></div>";

@@ -15,7 +15,7 @@
               resposta a quem sinalizou, entregue no app pelo mterrata.js ou por e-mail)
      waSimular {mensagens:[{r:'c'|'ia', t}]} → {texto, encaminhou} (13/10/2026: a atendente
               do WhatsApp sem WhatsApp e sem gravar nada; aba "Testar a atendente" da Equipe de IA)
-     mtEquipe {op:'painel'|'conversa'|'decidir'|'config'|'pausar'|'responder'|'devolver'|'turno'}
+     mtEquipe {op:'painel'|'conversas'|'conversa'|'decidir'|'config'|'pausar'|'responder'|'devolver'|'turno'}
               (13/10/2026: Equipe de IA — o que cada funcionário fez, pendências, conversas, avisos)
    Se o servidor ainda não tiver as ações novas (painel, assinantes, pedidos),
    a página avisa para publicar (deploy-backend.command) e o resto segue.
@@ -38,7 +38,7 @@ const ddmm = d => d ? d.slice(8, 10) + '/' + d.slice(5, 7) : '';
 const plural = (n, um, varios) => inteiro(n) + ' ' + (Number(n) === 1 ? um : varios);
 const agoraS = () => Math.floor(Date.now() / 1000);
 
-const SECOES = ['visao', 'usuarios', 'assinantes', 'acessos', 'pagamentos', 'parceiros', 'turmas', 'planos', 'sinalizacoes', 'equipe', 'diagnostico'];
+const SECOES = ['visao', 'usuarios', 'assinantes', 'acessos', 'pagamentos', 'parceiros', 'turmas', 'planos', 'sinalizacoes', 'conversas', 'equipe', 'diagnostico'];
 /* apps: mesmos nomes, ícones e cores do catálogo do _mtauth */
 const APPS = {
   condutai: { nm: 'CondutAI', ic: 'ti-stethoscope', c: '#1D6FD0', url: '/condutai.html' },
@@ -193,6 +193,7 @@ function abrirSecao(sec) {
   if (sec === 'planos' && !E.carregou.planos) desenharPlanos();
   if (sec === 'sinalizacoes' && !E.carregou.sinal) carregarSinal();
   if (sec === 'diagnostico' && !E.carregou.ia) carregarIA();
+  if (sec === 'conversas' && !E.carregou.conversas) carregarConversas();
   if (sec === 'equipe') { mostrarAbaEq(E.eqAba || 'log'); if (!E.carregou.equipe) carregarEquipe(); }
 }
 
@@ -3191,8 +3192,8 @@ function desenharEquipe() {
   const np = (q.pendencias || []).length;
   $('eqNPend').textContent = np ? np : '';
   const cnt = $('cntEquipe'); if (cnt) { cnt.textContent = np; cnt.hidden = !np; }
-  $('eqNConv').textContent = (q.conversas || []).filter(x => x.estado === 'humano').length || '';
-  desenharPendencias(); desenharLog(); desenharConversas(); desenharVgEquipe();
+  contadorConversas(q.conversas);
+  desenharPendencias(); desenharLog(); desenharVgEquipe();
 }
 function mostrarAbaEq(aba) {
   E.eqAba = aba;
@@ -3242,30 +3243,68 @@ function abrirAtividade(area) {
     { rot: 'Fechar', cls: 'btn-p' }
   ]);
 }
-function desenharConversas() {
-  const l = E.eq.conversas || [];
-  $('eqConv').innerHTML = l.length ? `<div class="card eq-lista">${l.map(c => `
-    <button type="button" class="eq-conv" data-eqconv="${esc(c.id)}" data-canal="${c.canal}">
-      <span class="eq-ic sm"><i class="ti ${c.canal === 'instagram' ? 'ti-brand-instagram' : 'ti-brand-whatsapp'}" aria-hidden="true"></i></span>
-      <span class="eq-cx"><b>${esc(c.nome)}</b> <span class="sub">final ${esc(c.final)} · ${esc(haQuanto(c.atualizado))} · ${c.msgs} msg</span>
-      <span class="eq-tx">${c.ultima ? esc((c.ultima.de === 'c' ? '' : 'Resposta: ') + c.ultima.texto) : ''}</span></span>
-      ${c.estado === 'humano' ? `<span class="selo av">Esperando a equipe</span>` : '<span class="selo">Atendente</span>'}
-    </button>`).join('')}</div>` : '<div class="card vazio">Nenhuma conversa de cliente ainda.</div>';
+/* ---- aba Conversas (01/11/2026): WhatsApp, Instagram e e-mail num lugar só ---- */
+const CV_IC = { whatsapp: 'ti-brand-whatsapp', instagram: 'ti-brand-instagram', comentario: 'ti-message-circle', email: 'ti-mail' };
+const cvGrupo = c => c.canal === 'comentario' ? 'instagram' : c.canal;
+function contadorConversas(l) {
+  const n = (l || []).filter(x => x.estado === 'humano').length, cnt = $('cntConv');
+  if (cnt) { cnt.textContent = n; cnt.hidden = !n; }
 }
+async function carregarConversas() {
+  E.carregou.conversas = true;
+  $('btCv').disabled = true; $('cvQuando').textContent = 'Atualizando…';
+  try {
+    const r = await equipeOp({ op: 'conversas' });
+    E.cv = r.conversas || [];
+    contadorConversas(E.cv);
+    desenharConversas();
+    $('cvQuando').textContent = 'Atualizado às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  } catch (e) {
+    E.carregou.conversas = false;
+    $('cvQuando').textContent = '';
+    $('cvLista').innerHTML = `<div class="card vazio">${esc(ehNaoPublicado(e) ? 'Falta publicar o servidor.' : ((e && e.message) || 'Não consegui carregar as conversas.'))}</div>`;
+  } finally { $('btCv').disabled = false; }
+}
+function desenharConversas() {
+  const l = E.cv || [], filtro = E.cvFiltro || 'todas', busca = ($('cvBusca').value || '').trim().toLowerCase();
+  const conta = { todas: l.length, whatsapp: 0, instagram: 0, email: 0 };
+  l.forEach(c => { conta[cvGrupo(c)]++; });
+  Object.keys(conta).forEach(k => { $('cvN-' + k).textContent = conta[k] || ''; });
+  $('cvFiltros').querySelectorAll('[data-cvf]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cvf === filtro)));
+  const vis = l.filter(c => (filtro === 'todas' || cvGrupo(c) === filtro)
+    && (!busca || [c.nome, c.assunto, c.final, c.ultima && c.ultima.texto].join(' ').toLowerCase().includes(busca)));
+  const semDM = !l.some(c => c.canal === 'instagram');
+  $('cvNota').innerHTML = filtro === 'instagram' && semDM ? '<div class="aviso info"><i class="ti ti-info-circle" aria-hidden="true"></i><div>As mensagens diretas ainda não chegam aqui: a Meta só libera a leitura depois da análise do app. Responda pelo app do Instagram. Os comentários aparecem a partir de 01/11/2026.</div></div>' : '';
+  const vazio = busca ? 'Nada encontrado com essa busca.' : { whatsapp: 'Nenhuma conversa no WhatsApp ainda.', instagram: 'Nenhum comentário ou mensagem direta ainda.', email: 'Nenhuma troca de e-mail guardada ainda. Os novos aparecem aqui em até 15 minutos.' }[filtro] || 'Nenhuma conversa ainda.';
+  $('cvLista').innerHTML = vis.length ? `<div class="card eq-lista">${vis.map(c => `
+    <button type="button" class="eq-conv" data-eqconv="${esc(c.id)}" data-canal="${esc(c.canal)}">
+      <span class="eq-ic sm"><i class="ti ${CV_IC[c.canal] || 'ti-message'}" aria-hidden="true"></i></span>
+      <span class="eq-cx"><b>${esc(c.nome)}</b> <span class="sub">${c.final ? 'final ' + esc(c.final) + ' · ' : ''}${esc(haQuanto(c.atualizado))} · ${c.canal === 'comentario' ? 'comentário' : c.msgs + ' msg'}</span>
+      ${c.assunto ? `<span class="eq-tx"><b>${esc(c.assunto)}</b></span>` : ''}
+      <span class="eq-tx">${c.ultima ? esc((c.ultima.de === 'c' ? '' : 'Resposta: ') + c.ultima.texto) : ''}</span></span>
+      ${c.estado === 'humano' ? '<span class="selo av">Esperando você</span>' : c.canal === 'whatsapp' || c.canal === 'instagram' ? '<span class="selo">Atendente</span>' : ''}
+    </button>`).join('')}</div>` : `<div class="card vazio">${esc(vazio)}</div>`;
+}
+$('btCv').onclick = () => carregarConversas();
+$('cvBusca').addEventListener('input', () => { if (E.cv) desenharConversas(); });
+$('cvFiltros').addEventListener('click', ev => { const b = ev.target.closest('[data-cvf]'); if (!b) return; E.cvFiltro = b.dataset.cvf; if (E.cv) desenharConversas(); });
+$('cvLista').addEventListener('click', ev => { const b = ev.target.closest('[data-eqconv]'); if (b) abrirConversa(b.dataset.canal, b.dataset.eqconv); });
 async function abrirConversa(canal, id) {
   let c;
   try { c = await equipeOp({ op: 'conversa', canal, id }); } catch (e) { toast((e && e.message) || 'Não consegui abrir a conversa.', 'err'); return; }
   if (c.erro) { toast(c.erro, 'err'); return; }
-  const msgs = (c.mensagens || []).map(m => `<div class="at-msg ${m.de === 'cliente' ? 'c' : m.de === 'equipe' ? 'ia eq' : 'ia'}">${m.de === 'equipe' ? '<b>Equipe:</b> ' : ''}${atFmt(m.texto)}<span class="eq-hora">${esc(quando(m.em))}</span></div>`).join('');
+  const msgs = (c.mensagens || []).map(m => `<div class="at-msg ${m.de === 'cliente' ? 'c' : m.de === 'equipe' ? 'ia eq' : 'ia'}">${m.quem ? '<b>' + esc(m.quem) + '</b><br>' : m.de === 'equipe' ? '<b>Equipe:</b> ' : m.de === 'sugestão' ? '<b>Sugestão de resposta:</b> ' : ''}${atFmt(m.texto)}<span class="eq-hora">${esc(quando(m.em))}</span></div>`).join('');
   const topo = (c.estado === 'humano' ? `<div class="aviso"><i class="ti ti-user-share" aria-hidden="true"></i><div><b>Esperando a equipe</b>${c.motivo ? ' (' + esc(String(c.motivo).replace(/_/g, ' ')) + ')' : ''}. ${esc(c.resumo || '')}${c.email ? ' · ' + esc(c.email) : ''}</div></div>` : '');
   const resp = canal === 'whatsapp' ? `<div class="campo"><label for="eqResp">Responder como equipe</label><textarea id="eqResp" rows="3" maxlength="3000" placeholder="A mensagem sai pelo WhatsApp da MedTech"></textarea></div>` : '';
   const botoes = [{ rot: 'Fechar', cls: 'btn-g' }];
   if (canal === 'whatsapp' && c.estado === 'humano') botoes.push({ rot: 'Devolver à atendente', cls: 'btn-g', acao: async () => {
-    try { const r = await equipeOp({ op: 'devolver', id }); if (r.erro) { toast(r.erro, 'err'); return false; } toast('A atendente voltou a responder essa pessoa.'); carregarEquipe(); } catch (e) { toast(e.message, 'err'); return false; } } });
+    try { const r = await equipeOp({ op: 'devolver', id }); if (r.erro) { toast(r.erro, 'err'); return false; } toast('A atendente voltou a responder essa pessoa.'); carregarConversas(); carregarEquipe(); } catch (e) { toast(e.message, 'err'); return false; } } });
   if (canal === 'whatsapp') botoes.push({ rot: '<i class="ti ti-send" aria-hidden="true"></i>Enviar', cls: 'btn-p', acao: async () => {
     const t = ($('eqResp').value || '').trim(); if (!t) { toast('Escreva a mensagem.', 'err'); return false; }
-    try { const r = await equipeOp({ op: 'responder', id, texto: t }); if (r.erro) { toast(r.erro, 'err'); return false; } toast('Enviado para ' + (r.enviado_para || 'o cliente') + '.'); carregarEquipe(); } catch (e) { toast(e.message, 'err'); return false; } } });
-  dialogo((c.nome || 'Conversa') + (canal === 'instagram' ? ' · Instagram' : ''), topo + `<div class="at-chat eq-chat">${msgs || '<p class="at-vazio">Sem mensagens.</p>'}</div>` + resp, botoes);
+    try { const r = await equipeOp({ op: 'responder', id, texto: t }); if (r.erro) { toast(r.erro, 'err'); return false; } toast('Enviado para ' + (r.enviado_para || 'o cliente') + '.'); carregarConversas(); carregarEquipe(); } catch (e) { toast(e.message, 'err'); return false; } } });
+  const titulo = canal === 'email' ? (c.assunto || c.nome || 'E-mail') : (c.nome || 'Conversa') + (canal === 'instagram' || canal === 'comentario' ? ' · Instagram' : '');
+  const emailTopo = canal === 'email' ? `<p class="sub">Com ${esc(c.nome || '')} · <a href="https://mail.google.com/mail/u/medtechbr1@gmail.com/#all/${encodeURIComponent(c.threadId || id)}" target="_blank" rel="noopener">Abrir no Gmail para responder</a></p>` : '';
+  dialogo(titulo, emailTopo + topo + `<div class="at-chat eq-chat">${msgs || '<p class="at-vazio">Sem mensagens.</p>'}</div>` + resp, botoes);
 }
 $('btEq').onclick = () => carregarEquipe();
 /* ---- parceria pelo WhatsApp (28/10/2026): modelo parceria_medtech + envio com confirmação ---- */

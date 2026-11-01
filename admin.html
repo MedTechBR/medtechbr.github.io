@@ -14,7 +14,7 @@
 <script src="_mtfb.js?v=1"></script>
 <script type="module" src="_mtauth.js?v=50"></script>
 <link rel="stylesheet" href="_mtviva.css?v=2">
-<link rel="stylesheet" href="admin.css?v=18">
+<link rel="stylesheet" href="admin.css?v=19">
 </head>
 <body>
 <!-- isca para o preenchimento automático do Chrome: sem ela, o e-mail do login cai no campo de busca de Usuários -->
@@ -46,6 +46,7 @@
       <li><a href="#turmas" data-sec="turmas"><i class="ti ti-school" aria-hidden="true"></i>Turmas</a></li>
       <li><a href="#planos" data-sec="planos"><i class="ti ti-apps" aria-hidden="true"></i>Aplicativos e planos</a></li>
       <li><a href="#sinalizacoes" data-sec="sinalizacoes"><i class="ti ti-flag" aria-hidden="true"></i>Sinalizações<span class="cnt" id="cntSinal" hidden></span></a></li>
+      <li><a href="#conversas" data-sec="conversas"><i class="ti ti-messages" aria-hidden="true"></i>Conversas<span class="cnt" id="cntConv" hidden></span></a></li>
       <li><a href="#equipe" data-sec="equipe"><i class="ti ti-robot" aria-hidden="true"></i>Equipe de IA<span class="cnt" id="cntEquipe" hidden></span></a></li>
       <li><a href="#diagnostico" data-sec="diagnostico"><i class="ti ti-stethoscope" aria-hidden="true"></i>Diagnóstico</a></li>
     </ul>
@@ -326,6 +327,26 @@
     </section>
 
     <!-- ===================== EQUIPE DE IA (13/10/2026) ===================== -->
+    <section class="sec" id="conversas" data-painel aria-labelledby="h-cv" hidden>
+      <div class="cab">
+        <div><h2 id="h-cv">Conversas</h2><p class="lead">WhatsApp, Instagram e e-mail da MedTech num lugar só.</p></div>
+        <div class="atualizado"><span id="cvQuando" aria-live="polite"></span><button class="btn btn-g sm" id="btCv" type="button"><i class="ti ti-refresh" aria-hidden="true"></i>Atualizar</button></div>
+      </div>
+      <div class="card us-filtros">
+        <form class="linhaC" id="cvForm" role="search" onsubmit="return false">
+          <div class="campo"><label for="cvBusca">Buscar</label><input id="cvBusca" name="busca-conversas" type="search" autocomplete="off" spellcheck="false" placeholder="nome, assunto ou texto"></div>
+        </form>
+        <div class="chips" role="group" aria-label="Filtrar por canal" id="cvFiltros">
+          <button class="chip" type="button" data-cvf="todas" aria-pressed="true"><i class="ti ti-messages" aria-hidden="true"></i>Todas<span class="n" id="cvN-todas"></span></button>
+          <button class="chip" type="button" data-cvf="whatsapp" aria-pressed="false"><i class="ti ti-brand-whatsapp" aria-hidden="true"></i>WhatsApp<span class="n" id="cvN-whatsapp"></span></button>
+          <button class="chip" type="button" data-cvf="instagram" aria-pressed="false"><i class="ti ti-brand-instagram" aria-hidden="true"></i>Instagram<span class="n" id="cvN-instagram"></span></button>
+          <button class="chip" type="button" data-cvf="email" aria-pressed="false"><i class="ti ti-mail" aria-hidden="true"></i>E-mail<span class="n" id="cvN-email"></span></button>
+        </div>
+      </div>
+      <div id="cvNota"></div>
+      <div id="cvLista" class="cv-lista"><p class="carregando">Carregando as conversas…</p></div>
+    </section>
+
     <section class="sec" id="equipe" data-painel aria-labelledby="h-eq" hidden>
       <div class="cab">
         <div><h2 id="h-eq">Equipe de IA</h2><p class="lead">Eles trabalham sozinhos. Aqui você decide o que ficou esperando você e vê o que cada um fez.</p></div>
@@ -344,7 +365,6 @@
       </div>
       <div class="chips eq-abas" role="tablist" aria-label="Partes da equipe">
         <button class="chip" type="button" role="tab" data-eqaba="log" aria-pressed="true"><i class="ti ti-history" aria-hidden="true"></i>Atividade</button>
-        <button class="chip" type="button" role="tab" data-eqaba="conv" aria-pressed="false"><i class="ti ti-messages" aria-hidden="true"></i>Conversas<span class="n" id="eqNConv"></span></button>
         <button class="chip" type="button" role="tab" data-eqaba="teste" aria-pressed="false"><i class="ti ti-message-chatbot" aria-hidden="true"></i>Testar a atendente</button>
         <button class="chip" type="button" role="tab" data-eqaba="parc" aria-pressed="false"><i class="ti ti-heart-handshake" aria-hidden="true"></i>Parceria</button>
       </div>
@@ -352,7 +372,6 @@
         <div class="chips" role="group" aria-label="Filtrar por funcionário" id="eqLogFiltro"></div>
         <ol class="eq-tl" id="eqLog"></ol>
       </div>
-      <div class="eq-painel" data-eqp="conv" id="eqConv" hidden></div>
       <div class="eq-painel" data-eqp="parc" hidden>
         <div class="card">
           <h3><i class="ti ti-heart-handshake" aria-hidden="true"></i>Proposta de parceria pelo WhatsApp</h3>
@@ -438,6 +457,6 @@
 </dialog>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="admin.js?v=26" defer></script>
+<script src="admin.js?v=27" defer></script>
 </body>
 </html>
