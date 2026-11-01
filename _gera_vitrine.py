@@ -60,7 +60,7 @@ MOLDE = '''<!DOCTYPE html>
 erros = []
 gerados = []
 # projetos publicados como "project pages" de OUTROS repositórios, no mesmo domínio: não existem aqui
-EXTERNOS = {'clinicamed/', 'trafego-titulo/', 'casos-clinicos/', 'clinicar/', 'farmauti/', 'quiz-enare-farmacia/', 'sos-farmacia/', 'sos-farmacologia/', 'enfermare/', 'fisiare/', 'cirurgiamed/', 'familiamed/', 'radio-titulo/'}  # repos próprios no mesmo domínio (28/10/2026: + cirurgiamed, familiamed, radio-titulo)
+EXTERNOS = {'questoes/', 'clinicamed/', 'trafego-titulo/', 'casos-clinicos/', 'clinicar/', 'farmauti/', 'quiz-enare-farmacia/', 'sos-farmacia/', 'sos-farmacologia/', 'enfermare/', 'fisiare/', 'cirurgiamed/', 'familiamed/', 'radio-titulo/'}  # repos próprios no mesmo domínio (28/10/2026: + cirurgiamed, familiamed, radio-titulo)
 htmls = {}
 for parte in sorted(glob.glob(os.path.join(RAIZ, '_vitrine/paginas/*.html'))):
     nome = os.path.basename(parte)
