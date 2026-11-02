@@ -116,7 +116,7 @@ const Gemini = (() => {
       else if (p && p.text) texts.push(p.text);
     }
     const prompt = texts.join('\n\n');
-    if (images.length > 6) throw new Error('Máximo de 6 imagens por laudo — remova algumas e tente de novo.');
+    if (images.length > 6) throw new Error('Máximo de 6 imagens por vez. Remova algumas e tente de novo.');
     let text;
     try {
       // grounding:false: o texto é dado de exame/paciente e não pode virar consulta ao Google
@@ -210,7 +210,55 @@ const Gemini = (() => {
     };
   }
 
+  /* 01/11/2026, pedido do Matheus: modo Achados (?achados=1, app MedTech). Para quem está aprendendo a ler
+     exames: aponta o que a IA vê e ensina a conferir. Não é laudo, não indica conduta. */
+  function buildPromptAchados(ctx, media) {
+    const lang = { 'en': 'Respond in ENGLISH.', 'es': 'Responda en ESPAÑOL.' }[ctx.language] || 'Responda em português do Brasil, com linguagem clara de preceptor.';
+    const n = media.filter(m => m.kind !== 'video').length;
+    const material = [n ? `${n} imagem(ns)` : null, ctx.examText ? 'resultados em texto' : null].filter(Boolean).join(' e ') || 'os dados fornecidos';
+    const dicas = getExamContext(ctx.modality).hints;
+    return `Você é preceptor(a) de um estudante ou médico que está aprendendo a ler exames. Analise ${material} e diga o que você vê. Isto é um exercício de estudo: não escreva laudo.
+
+DADOS INFORMADOS:
+- Tipo: ${ctx.modality}
+${ctx.region ? `- Região ou detalhes: ${ctx.region}\n` : ''}${ctx.age ? `- Idade: ${ctx.age}\n` : ''}${ctx.sex ? `- Sexo: ${ctx.sex}\n` : ''}${ctx.history ? `- Contexto: ${ctx.history}\n` : ''}${ctx.examText ? `\nRESULTADOS EM TEXTO:\n"""\n${ctx.examText}\n"""\n` : ''}${ctx.dicomMeta ? `- Metadados: ${ctx.dicomMeta}\n` : ''}${ctx.leitura ? `\nLEITURA DO ALUNO, FEITA ANTES DE VER A SUA:\n"""\n${ctx.leitura}\n"""\n` : ''}
+RESPONDA EXATAMENTE NESTAS SEÇÕES, EM MARKDOWN:
+
+## Qualidade do material
+Uma ou duas frases: o que foi enviado, se dá para analisar e o que limita a leitura (incidência, corte, derivação ausente, foto de tela, resolução).
+
+## O que aparece no exame
+Lista. Cada item: **achado**, onde está e como se apresenta, terminando com (certeza alta), (certeza média) ou (certeza baixa). Inclua os achados negativos que importam neste tipo de exame. Em exame laboratorial, cite o valor e a referência.
+
+## O que isso pode significar
+Hipóteses para estudo, da mais para a menos provável, cada uma com o achado que a sustenta e o que falaria contra ela.
+
+## Como conferir você mesmo
+De 3 a 6 passos curtos de leitura sistemática deste exame, dizendo onde olhar nesta imagem ou nestes resultados.
+${ctx.leitura ? `
+## Sua leitura comparada
+O que o aluno acertou, o que faltou e o que ele interpretou de forma diferente, sem elogio vazio. Se ele viu algo que você não vê, diga isso e explique por quê.
+` : ''}
+## Para fixar
+Dois ou três pontos de aprendizado ou armadilhas comuns ligados a este caso.
+
+REGRAS:
+- ${lang}
+- ${dicas} Use isso como lista do que procurar, não como lista do que afirmar.
+- Afirme só o que dá para ver no material. Se não dá para avaliar uma estrutura, diga que não dá. Nunca invente medida, valor ou achado. Na dúvida, baixe a certeza.
+- Se a imagem não for bem interpretável, diga isso e pare nos limites; não preencha as seções com suposições.
+- Não escreva laudo, conclusão assinável nem seções de técnica ou impressão diagnóstica.
+- Não prescreva, não indique dose, conduta nem tratamento.
+- Se houver achado possivelmente tempo-dependente, comece a resposta, antes da primeira seção, com uma linha iniciada por ⚠️ dizendo qual é e que, se o exame for de um paciente em atendimento, é preciso acionar agora o médico responsável, sem depender desta análise.
+- Se aparecer nome, documento ou outro dado que identifique uma pessoa, não repita esse dado e avise em "Qualidade do material" que ele deveria ter sido retirado.
+- Se o material não for um exame médico, diga isso e não analise.
+- Escreva de forma direta, sem frases de efeito, sem emoji além do ⚠️ e sem avisos finais: o app já mostra o aviso de uso.
+
+Comece pela primeira seção:`;
+  }
+
   function buildPrompt(ctx, media) {
+    if (ctx.modo === 'achados') return buildPromptAchados(ctx, media);
     const langInstr = {
       'pt-BR': 'Responda em PORTUGUÊS DO BRASIL, terminologia médica formal.',
       'en': 'Respond in ENGLISH, formal medical terminology.',

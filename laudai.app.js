@@ -1,6 +1,8 @@
 // LaudAI IA — app principal
 // State + UI + Auth + Firestore sync
 
+/* Modo Achados (01/11/2026): só com ?achados=1 (app MedTech). A página pública segue como rascunho de laudo. */
+const MODO_ACHADOS = document.documentElement.dataset.achados === '1';
 const state = {
   media: [],          // [{id, kind:'image'|'video'|'dicom', name, ...}]
   laudoText: '',
@@ -38,6 +40,7 @@ let _mtEnteredUid = null;
     }
     state._tomb = (d && d._tomb) || {};
     state.declaracao = (d && d.declaracao) || null;
+    state.aceiteEstudo = (d && d.aceiteEstudo) || null;
     state.laudos = (d && Array.isArray(d.laudos) ? d.laudos : []).slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     if (typeof onLaudosAtualizados === 'function') onLaudosAtualizados();
   });
@@ -206,7 +209,50 @@ function mapAuthError(err) {
   return err?.message || 'Erro de autenticação.';
 }
 
+function textosAchados() {
+  const T = (sel, txt) => { const el = document.querySelector(sel); if (el) el.textContent = txt; };
+  const H = (sel, html) => { const el = document.querySelector(sel); if (el) el.innerHTML = html; };
+  document.title = 'Achados · MedTech';
+  T('.brand-wordmark', 'Achados');
+  T('.la-aba[data-view="novo"] span:last-child', 'Nova análise');
+  H('.warn-ribbon .txt', '<strong>Para estudo, não é laudo.</strong> A IA pode errar e não substitui a avaliação de um médico. Não use para decidir conduta. As imagens vão para a IA do Google (Gemini): tire nome, CPF e data de nascimento antes de enviar.');
+  H('#laudoCard .card-title', '<span class="num">3</span> Achados <span class="opt" id="output-meta"></span>');
+  T('#output-empty h3', 'O que a IA vê aparece aqui');
+  H('#output-empty .passos-vazio', '<li><b>1</b> Escolha o exame e anexe a imagem ou cole os resultados</li><li><b>2</b> Se quiser treinar, escreva antes o que você viu</li><li><b>3</b> Toque em Analisar e confira na imagem o que a IA apontar</li>');
+  H('#btn-generate', '<i class="ti ti-eye-search"></i> Analisar exame');
+  T('.loader-text', 'A IA examina o material e separa o que dá para afirmar. Costuma levar de 15 a 60 segundos.');
+  H('.laudo-aviso', '<i class="ti ti-alert-triangle" aria-hidden="true"></i> Análise de estudo feita por IA. Pode errar e não é laudo. Confira na imagem e não use para decidir conduta.');
+  H('#btn-copy', '<i class="ti ti-copy"></i> Copiar análise');
+  H('#btn-new', '<i class="ti ti-plus"></i> Nova análise');
+  ['#btn-edit', '#btn-print'].forEach(s => { const b = $(s); if (b) b.style.display = 'none'; });
+  T('.oe-t', 'Não deu para analisar');
+  T('.hist-sub', 'Suas análises ficam na sua conta MedTech e aparecem em todos os seus aparelhos.');
+  const reg = document.querySelector('label[for="region"]'); if (reg) reg.innerHTML = 'Detalhes ou região <span class="opt-l">opcional</span>';
+  H('.col-entrada .passo-card:nth-of-type(2) .card-title', '<span class="num">2</span> Contexto e treino <span class="opt-l">opcional</span>');
+  T('label[for="history"]', 'Contexto do caso');
+  const hist = $('#history');
+  if (hist && !$('#minha-leitura')) {
+    const f = document.createElement('div'); f.className = 'field';
+    f.innerHTML = '<label class="field-label" for="minha-leitura">O que você viu <span class="opt-l">opcional</span></label><textarea class="textarea" id="minha-leitura" autocomplete="off" placeholder="Escreva sua leitura antes de analisar. A IA compara com o que ela vê."></textarea>';
+    hist.closest('.field').after(f);
+  }
+  // PACS e favorito de exportação são fluxo de quem lauda
+  const u = document.querySelector('.url-section'); if (u) u.style.display = 'none';
+  document.querySelectorAll('details.tip p').forEach(p => { if (/PACS/.test(p.textContent)) p.remove(); });
+  T('details.tip summary', 'Dicas para DICOM');
+  T('#crm-titulo', 'Uso para estudo');
+  document.querySelector('#modal-crm .modal-sub').textContent = 'Confirme uma vez. Fica salvo na sua conta.';
+  const cb = $('#crm-ok').closest('label');
+  cb.previousElementSibling.style.display = 'none';
+  cb.querySelector('span').textContent = 'Entendo que esta análise é um exercício de estudo feito por IA, que pode errar, não é laudo e não substitui a avaliação de um médico. Não vou usá-la para decidir a conduta de um paciente e vou tirar nome e documentos das imagens antes de enviar.';
+  T('#crm-salvar', 'Confirmar e analisar');
+  const st = $('#style'); if (st && st.closest('.field')) st.closest('.field').style.display = 'none';
+  T('label[for="language"]', 'Idioma da resposta');
+  document.querySelector('#modal-settings .modal-sub').textContent = 'Modelo e idioma. A IA vem incluída na conta MedTech.';
+}
+
 function enterApp(user) {
+  if (MODO_ACHADOS) textosAchados();
   $('#landingPage').classList.add('hidden');
   $('#authScreen').classList.add('hidden');
   $('#mainApp').classList.remove('hidden');
@@ -389,10 +435,11 @@ async function saveLaudoToFirestore(text, ctx) {
     age: ctx.age || '',
     sex: ctx.sex || '',
     text,
+    ...(ctx.modo ? { modo: ctx.modo } : {}),
     updatedAt: Date.now(),
   });
   state.laudos = list;
-  if (window.MT && window.MT.save) await window.MT.save({ laudos: list, _tomb: state._tomb, declaracao: state.declaracao || null });
+  if (window.MT && window.MT.save) await window.MT.save({ laudos: list, _tomb: state._tomb, declaracao: state.declaracao || null, aceiteEstudo: state.aceiteEstudo || null });
 }
 
 // ===== File handling =====
@@ -614,17 +661,25 @@ function pedirDeclaracao() {
   if (uf.options.length < 2) UFS.forEach(u => { const o = document.createElement('option'); o.value = o.textContent = u; uf.appendChild(o); });
   $('#crm-erro').textContent = '';
   m.classList.remove('hidden');
-  setTimeout(() => $('#crm-num').focus(), 50);
+  if (!MODO_ACHADOS) setTimeout(() => $('#crm-num').focus(), 50);
 }
 function fecharDeclaracao() { $('#modal-crm').classList.add('hidden'); }
 async function salvarDeclaracao() {
+  if (MODO_ACHADOS) {
+    if (!$('#crm-ok').checked) { $('#crm-erro').textContent = 'Marque a confirmação para continuar.'; $('#crm-ok').focus(); return; }
+    state.aceiteEstudo = { em: new Date().toISOString(), versao: 1 };
+    try { if (window.MT && window.MT.save) await window.MT.save({ laudos: state.laudos || [], _tomb: state._tomb, declaracao: state.declaracao || null, aceiteEstudo: state.aceiteEstudo }); } catch (e) {}
+    fecharDeclaracao();
+    generate();
+    return;
+  }
   const crm = $('#crm-num').value.replace(/\D/g, ''), uf = $('#crm-uf').value, ok = $('#crm-ok').checked;
   const erro = $('#crm-erro');
   if (crm.length < 3 || crm.length > 8) { erro.textContent = 'Informe o número do CRM (só os dígitos).'; $('#crm-num').focus(); return; }
   if (!uf) { erro.textContent = 'Escolha a UF do CRM.'; uf && $('#crm-uf').focus(); return; }
   if (!ok) { erro.textContent = 'Marque a declaração para continuar.'; $('#crm-ok').focus(); return; }
   state.declaracao = { crm, uf, em: new Date().toISOString() };
-  try { if (window.MT && window.MT.save) await window.MT.save({ laudos: state.laudos || [], _tomb: state._tomb, declaracao: state.declaracao }); } catch (e) {}
+  try { if (window.MT && window.MT.save) await window.MT.save({ laudos: state.laudos || [], _tomb: state._tomb, declaracao: state.declaracao, aceiteEstudo: state.aceiteEstudo || null }); } catch (e) {}
   fecharDeclaracao();
   generate();
 }
@@ -636,14 +691,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function generate() {
   if (state.generating) return;
-  if (!declaracaoOk()) { pedirDeclaracao(); return; }
+  if (MODO_ACHADOS ? !state.aceiteEstudo : !declaracaoOk()) { pedirDeclaracao(); return; }
   // A IA vai pela conta MedTech (proxy generateLaudo); não há chave própria.
   const examText = $('#exam-text').value.trim();
   if (!state.media.some(m => m.kind !== 'video') && !examText) {
     toast('Anexe uma imagem ou cole os resultados do exame em texto.', 'error'); return;
   }
   const region = $('#region').value.trim();
-  if (!region) { toast('Informe os detalhes ou a região do exame.', 'error'); $('#region').focus(); return; }
+  if (!region && !MODO_ACHADOS) { toast('Informe os detalhes ou a região do exame.', 'error'); $('#region').focus(); return; }
   const nImg = state.media.filter(m => m.kind !== 'video').length;
   if (nImg > MAX_IMAGENS) { toast(`Até ${MAX_IMAGENS} imagens por laudo. Tire ${nImg - MAX_IMAGENS} e tente de novo.`, 'error'); $('#thumbs').scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
 
@@ -651,11 +706,11 @@ async function generate() {
   const btnG = $('#btn-generate');
   const btnGHtml = btnG.innerHTML;
   btnG.disabled = true;
-  btnG.innerHTML = '<span class="spin-mini"></span> Gerando laudo';
+  btnG.innerHTML = MODO_ACHADOS ? '<span class="spin-mini"></span> Analisando' : '<span class="spin-mini"></span> Gerando laudo';
   showOutput('loading');
   // no celular o laudo fica abaixo do formulário: leva a pessoa até ele
   if (matchMedia('(max-width: 960px)').matches) $('#laudoCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  const etapas = [['Enviando o material', 18], ['Lendo as imagens e os dados', 42], ['Descrevendo os achados', 64], ['Montando a impressão diagnóstica', 82], ['Revisando o texto', 92]];
+  const etapas = [['Enviando o material', 18], ['Lendo as imagens e os dados', 42], ['Descrevendo os achados', 64], [MODO_ACHADOS ? 'Separando o que dá para afirmar' : 'Montando a impressão diagnóstica', 82], ['Revisando o texto', 92]];
   let iEt = 0;
   setLoader(etapas[0][0], 8);
   const relogio = setInterval(() => { if (iEt < etapas.length) { setLoader(etapas[iEt][0], etapas[iEt][1]); iEt++; } }, 6000);
@@ -671,6 +726,7 @@ async function generate() {
     language: localStorage.getItem(LS_LANG) || 'pt-BR',
     style: localStorage.getItem(LS_STYLE) || 'estruturado',
   };
+  if (MODO_ACHADOS) { ctx.modo = 'achados'; ctx.leitura = ($('#minha-leitura') ? $('#minha-leitura').value : '').trim(); }
 
   // Include DICOM-derived metadata in context if any
   const dicomItems = state.media.filter(m => m.kind === 'dicom');
@@ -706,10 +762,10 @@ async function generate() {
     renderLaudo(laudo, ctx);
     try {
       await saveLaudoToFirestore(laudo, ctx);
-      toast('Laudo pronto e salvo no histórico. Revise antes de usar.', 'success');
+      toast(MODO_ACHADOS ? 'Análise pronta e salva no histórico.' : 'Laudo pronto e salvo no histórico. Revise antes de usar.', 'success');
     } catch (saveErr) {
       console.warn('Falha ao salvar no Firestore:', saveErr);
-      toast('Laudo gerado, mas não foi salvo na nuvem: ' + (saveErr.message || 'erro desconhecido'), 'error');
+      toast((MODO_ACHADOS ? 'Análise feita' : 'Laudo gerado') + ', mas não foi salva na nuvem: ' + (saveErr.message || 'erro desconhecido'), 'error');
     }
     onLaudosAtualizados();
     refreshSubscriptionBadge();
@@ -752,11 +808,11 @@ function renderLaudo(markdown, ctx) {
   state.laudoText = markdown;
   const html = mdToHtml(markdown);
 
-  const severity = detectSeverity(markdown);
+  const severity = MODO_ACHADOS ? null : detectSeverity(markdown);
   const metaEl = $('#laudo-meta');
   metaEl.innerHTML = '';
   metaEl.appendChild(makeTag(ctx.modality));
-  metaEl.appendChild(makeTag(ctx.region));
+  if (ctx.region) metaEl.appendChild(makeTag(ctx.region));
   if (ctx.age || ctx.sex) metaEl.appendChild(makeTag([ctx.age, ctx.sex].filter(Boolean).join(' · ')));
   metaEl.appendChild(makeTag(new Date().toLocaleString('pt-BR')));
   if (severity) metaEl.appendChild(makeTag(severity.label, severity.cls));
@@ -832,7 +888,7 @@ async function copyLaudo() {
   const b = $('#btn-copy');
   try {
     await navigator.clipboard.writeText(state.laudoText);
-    toast('Laudo copiado. Cole no prontuário.', 'success');
+    toast(MODO_ACHADOS ? 'Análise copiada.' : 'Laudo copiado. Cole no prontuário.', 'success');
     const h = b.innerHTML; b.innerHTML = '<i class="ti ti-check"></i> Copiado'; b.classList.add('feito');
     setTimeout(() => { b.innerHTML = h; b.classList.remove('feito'); }, 1800);
   }
@@ -1178,7 +1234,7 @@ function renderHistory() {
   const q = ($('#histBusca').value || '').trim().toLowerCase();
   $('#history-clear').classList.toggle('hidden', !list.length);
   if (!list.length) {
-    wrap.innerHTML = `<div class="vazio"><div class="v-ic"><i class="ti ti-history"></i></div><b>Nenhum laudo ainda</b><p>Os laudos que você gerar ficam aqui para abrir e copiar de novo.</p><button class="btn btn-primary" id="hist-novo"><i class="ti ti-file-plus"></i> Fazer o primeiro laudo</button></div>`;
+    wrap.innerHTML = `<div class="vazio"><div class="v-ic"><i class="ti ti-history"></i></div><b>${MODO_ACHADOS ? 'Nenhuma análise ainda' : 'Nenhum laudo ainda'}</b><p>${MODO_ACHADOS ? 'As análises que você fizer ficam aqui para abrir de novo.' : 'Os laudos que você gerar ficam aqui para abrir e copiar de novo.'}</p><button class="btn btn-primary" id="hist-novo"><i class="ti ti-file-plus"></i> Fazer o primeiro laudo</button></div>`;
     $('#hist-novo').addEventListener('click', () => showView('novo'));
     return;
   }
@@ -1213,7 +1269,7 @@ function renderHistory() {
     el.addEventListener('click', (e) => {
       if (e.target.closest('.hi-copiar')) {
         e.stopPropagation();
-        navigator.clipboard.writeText(item.text || '').then(() => toast('Laudo copiado.', 'success'), () => toast('Não foi possível copiar.', 'error'));
+        navigator.clipboard.writeText(item.text || '').then(() => toast(MODO_ACHADOS ? 'Análise copiada.' : 'Laudo copiado.', 'success'), () => toast('Não foi possível copiar.', 'error'));
         return;
       }
       abrir();
@@ -1228,7 +1284,7 @@ async function clearHistoryAll() {
      todos. Cada laudo precisa da própria lápide. */
   (state.laudos || []).forEach(l => { if (l && l.id != null) window.MT.markDeleted(state, l.id); });
   state.laudos = [];
-  if (window.MT && window.MT.save) await window.MT.save({ laudos: [], _tomb: state._tomb, declaracao: state.declaracao || null });
+  if (window.MT && window.MT.save) await window.MT.save({ laudos: [], _tomb: state._tomb, declaracao: state.declaracao || null, aceiteEstudo: state.aceiteEstudo || null });
   toast('Histórico apagado.', 'success');
   onLaudosAtualizados();
   renderHistory();
