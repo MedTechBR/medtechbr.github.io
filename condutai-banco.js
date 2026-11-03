@@ -17858,7 +17858,7 @@ Duas medidas sistêmicas de suporte que mudam desfecho e costumam ser esquecidas
 - Medidas escalonadas: otimize sedação e analgesia antes de escalar; considere drenagem liquórica por cateter ventricular quando disponível; hiperventilação leve e barbitúricos ficam para a refratariedade, com monitorização.
 - **Ácido tranexâmico** administrado precocemente é considerado no TCE com sangramento, conforme protocolo institucional de trauma, e não substitui nenhuma das medidas acima.
 
-Sobre o ácido tranexâmico, vale a leitura correta da evidência: no ensaio CRASH-3, o benefício em redução de morte por lesão craniana concentrou-se no **TCE leve a moderado (Glasgow 9–15) com sangramento intracraniano**, sem efeito demonstrável no **TCE grave (Glasgow 3–8)**. O esquema estudado foi 1 g intravenoso em 10 minutos seguido de 1 g em 8 horas, e o benefício cai rapidamente com o atraso — dentro de 3 horas do trauma. Ou seja: é um fármaco a ser lembrado cedo e sobretudo no paciente **menos** grave, exatamente o oposto da intuição comum.
+Sobre o ácido tranexâmico, vale a leitura correta da evidência: no ensaio CRASH-3, o benefício em redução de morte por lesão craniana concentrou-se no **TCE leve a moderado (Glasgow 9–15) com sangramento intracraniano**, e o subgrupo **grave (Glasgow 3–8)** não mostrou efeito nesse ensaio. O esquema estudado foi 1 g intravenoso em 10 minutos seguido de 1 g em 8 horas, e o benefício cai rapidamente com o atraso, dentro de 3 horas do trauma. O **ATLS 11** recomenda o ácido tranexâmico intravenoso no **TCE moderado a grave que chega em até 3 horas**: é seguro e pode reduzir a mortalidade. Ou seja: lembrar cedo, em até 3 horas, também no TCE grave.
 
 ### Terapia hiperosmolar na prática
 
@@ -22301,7 +22301,7 @@ Um cuidado prático: gradue o Hunt-Hess/WFNS **após a ressuscitação inicial e
 
 Notas que evitam erro de prescrição:
 
-- **Nimodipino é oral/enteral, nunca intravenoso.** A apresentação IV foi associada a hipotensão grave e morte quando administrada por engano em bolus. Se o paciente não deglute, administre por sonda nasoenteral — não converta para outra via.
+- **Nimodipino: via oral ou por sonda é a via de uso.** A bula brasileira (Nimotop) traz também solução intravenosa (10 mg/50 mL, em cateter central, 1 a 2 mg/h); a disponibilidade atual não foi confirmada. Se usar a forma IV, siga a bula: infusão contínua, nunca em bolus. Se o paciente não deglute, use a sonda nasoenteral.
 - **Antifibrinolítico não é rotina.** O uso rotineiro de ácido tranexâmico não reduz ressangramento de forma clinicamente útil nem melhora desfecho funcional, e não é recomendado. Não substitui a oclusão precoce do aneurisma, que é a única prevenção eficaz do ressangramento.
 - **Analgesia de verdade.** Dor descontrolada eleva PA e é fator de risco modificável de ressangramento. Use opioide quando necessário; a preocupação com "mascarar o nível de consciência" não justifica deixar o paciente com a pior dor da vida.
 - **Pressão arterial antes de ocluir o aneurisma**: não existe alvo numérico consensual, mas evita-se hipertensão franca (frequentemente adotando-se PAS abaixo de ~160 mmHg) com agente titulável, e evita-se **variabilidade** pressórica — picos e vales são tão deletérios quanto o valor absoluto. Depois de ocluído o aneurisma, a lógica se inverte: permite-se pressão mais alta para perfundir.
@@ -22402,7 +22402,7 @@ O volume de casos do centro importa: HSA manejada em serviços com unidade neuro
 - Erro comum: restringir água na hiponatremia. Na HSA, a hipovolemia precipita isquemia tardia — reponha sódio e volume.
 - Erro comum: suspender o nimodipino na primeira queda de pressão. Fracione a dose antes de abandonar o único fármaco com benefício em desfecho.
 - Analgesia insuficiente é fator de risco modificável de ressangramento — trate a dor de verdade.
-- Erro comum: administrar nimodipino por via intravenosa. É oral ou enteral — a via IV já causou hipotensão fatal.
+- Erro comum: dar nimodipino IV em bolus ou improvisar a via. Use oral ou sonda; a forma IV, se existir no serviço, só em infusão contínua pela bula.
 - Erro comum: coletar líquor cedo demais e concluir "sem xantocromia". Ela leva de 6 a 12 horas para se formar; interprete o resultado à luz do tempo desde o ictus.
 - Erro comum: atribuir a punção "traumática" a todo líquor sanguinolento. A queda de hemácias entre tubos é sugestiva, não definitiva — na dúvida, faça imagem vascular.
 - Erro comum: levar ao cateterismo o paciente com troponina elevada e alterações de ECG. Na HSA isso costuma ser disfunção neurogênica reversível, e antiagregar/anticoagular quem acabou de sangrar é desastre.
@@ -26565,7 +26565,7 @@ O **não respondedor** merece uma segunda pergunta antes da corrida para a cirur
 
 - **Controle da fonte é prioridade absoluta** — compressão direta, torniquete em extremidade (aplicado o mais precocemente possível em hemorragia exsanguinante, antes até de acessos venosos, se necessário), cirurgia, angioembolização ou endoscopia conforme o foco. Volume sem controle da fonte é "encher um balde furado".
 - Dois acessos venosos calibrosos (14–16G); se acesso periférico difícil, considerar via intraóssea.
-- **Cristaloide aquecido** em bolus inicial limitado (ex.: 1 L em adulto) enquanto se mobiliza sangue — evitar diluição excessiva.
+- **Cristaloide aquecido** em bolus inicial limitado (250 a 500 mL no adulto, se os hemoderivados não estiverem disponíveis em tempo hábil; ATLS 11) enquanto se mobiliza sangue — evitar diluição excessiva.
 - **Transfusão precoce** no choque hemorrágico moderado-grave: **protocolo de transfusão maciça** com relação hemácias:plasma:plaquetas próxima de **1:1:1**, guiada por resposta clínica e não apenas por número de bolsas.
 - **Ácido tranexâmico 1 g IV** em 10 min nas primeiras 3h do trauma, seguido de **1 g IV em 8h** de infusão — reduz mortalidade quando dado precocemente; sem indicação em hemorragia não traumática de rotina.
 - **Hipotensão permissiva** (PAS-alvo ~80–90 mmHg) até o controle cirúrgico do foco — **exceto** em TCE associado (manter PAS mais alta para perfusão cerebral).
@@ -27238,7 +27238,7 @@ Os exames que realmente mudam conduta são: **glicemia capilar** (em todos), **E
 
 - **Suporte é a base do tratamento** para a grande maioria dos casos: monitorização (oximetria, capnografia se disponível), posição lateral de segurança, proteção de via aérea, suporte ventilatório (O2, VNI ou intubação se necessário) — a maioria dos pacientes recupera apenas com observação em algumas horas.
 - Carvão ativado geralmente não é indicado rotineiramente (baixo risco de vida isolado, e risco de sedação/aspiração supera o benefício), exceto em coingestão relevante e ingestão muito recente com via aérea protegida.
-- **Flumazenil** (antagonista competitivo do receptor benzodiazepínico): **0,2 mg IV em 15–30 seg**, pode repetir 0,2–0,3 mg a cada 1 min até resposta ou dose máxima cumulativa de **3 mg** (alguns protocolos citam até 5 mg). **Uso com muita cautela e não de rotina** — reservado a situações selecionadas (ex.: reversão de sedação iatrogênica em procedimento, criança com ingestão exploratória isolada confirmada).
+- **Flumazenil** (antagonista competitivo do receptor benzodiazepínico): **0,2 mg IV em 15–30 seg**, pode repetir 0,2–0,3 mg a cada 1 min até resposta ou dose total de **2 mg** (bula Lanexat, uso em UTI; o COVISA usa até 1 mg). **Uso com muita cautela e não de rotina** — reservado a situações selecionadas (ex.: reversão de sedação iatrogênica em procedimento, criança com ingestão exploratória isolada confirmada).
 - **Contraindicações/riscos do flumazenil:** uso crônico de benzodiazepínico ou dependência (risco de abstinência/convulsão), coingestão com substância pró-convulsivante ou cardiotóxica (tricíclicos, cocaína, bupropiona, outros que baixam limiar convulsivo), história de convulsão, TCE/lesão estrutural do SNC — nesses cenários o risco de precipitar convulsão refratária supera o benefício de reverter a sedação.
 - Se depressão respiratória associada a opioide, **naloxona** é a prioridade antes de considerar flumazenil.
 
@@ -49535,8 +49535,9 @@ Existe ainda um grupo distinto e de melhor prognóstico: as **TVs idiopáticas**
 Sedar sempre que o paciente estiver consciente e houver tempo — mas nunca postergar o choque no paciente em choque circulatório. Confira se o aparelho está mesmo no modo **sincronizado**; em TV polimórfica a sincronização costuma falhar, e a conduta correta passa a ser choque **não sincronizado** em alta energia.
 
 **Estável, monomórfica:**
-- **Amiodarona 150 mg IV em 10 min**, repetir se necessário; manutenção 1 mg/min por 6h.
-- Alternativas: procainamida; lidocaína (contexto isquêmico).
+- **Cardioversão elétrica sincronizada é a primeira linha** quando o risco da sedação ou anestesia é baixo (ESC 2022, classe I).
+- Antiarrítmico IV como alternativa: procainamida (ESC 2022, IIa, com cardiopatia estrutural conhecida ou suspeita) ou **amiodarona 150 mg IV em 10 min** (ESC 2022, IIb), repetir se necessário; manutenção 1 mg/min por 6h.
+- Lidocaína no contexto isquêmico.
 
 Vale registrar a inversão de preferência trazida pelo estudo PROCAMIO e incorporada pela diretriz europeia de arritmias ventriculares: na taquicardia regular de QRS largo com cardiopatia estrutural conhecida ou suspeita, a **procainamida** passou a ser o antiarrítmico preferencial, com mais terminações precoces e menos eventos adversos que a amiodarona — que segue sendo alternativa aceitável e é a droga mais disponível na maioria dos serviços brasileiros. Independentemente da escolha, **droga única**: empilhar antiarrítmicos multiplica pró-arritmia e hipotensão. Se a primeira droga falhar, o próximo passo é cardioversão elétrica, não um segundo antiarrítmico.
 
@@ -49573,9 +49574,9 @@ flowchart TD
     A["Taquicardia QRS largo<br/>com pulso"] --> B["Instabilidade?<br/>hipotensão, IC, isquemia, rebaixamento"]
     B -->|Sim| C["Cardioversão elétrica<br/>sincronizada 100 J, escalar"]
     B -->|Não| D["Monomórfica ou polimórfica?"]
-    D -->|Monomórfica| E["Amiodarona 150 mg IV em 10 min<br/>ou procainamida"]
+    D -->|Monomórfica| E["Cardioversão sincronizada, 1ª linha<br/>ou procainamida / amiodarona IV"]
     D -->|Polimórfica com QT longo| F["Sulfato de magnésio 1-2 g IV<br/>corrigir K e Mg"]
-    E --> G["Sem resposta:<br/>cardioversão elétrica"]
+    E --> G["Sem resposta à droga:<br/>cardioversão elétrica"]
     A --> H["Sem pulso:<br/>desfibrilar - ACLS"]
     C --> I["Corrigir isquemia e eletrólitos<br/>avaliar CDI"]
     E --> I
