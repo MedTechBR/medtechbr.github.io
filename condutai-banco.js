@@ -19023,7 +19023,7 @@ Como titular sem errar: se a glicemia cai mais rápido que **90-120 mg/dL/h**, r
 
 Assim que a glicemia cair abaixo de 250 mg/dL, acrescentar soro glicosado a 5–10% ao esquema de hidratação e reduzir a insulina, mantendo a infusão até que a osmolaridade e o sensório normalizem — não se suspende insulina apenas porque a glicemia caiu.
 
-Bicarbonato não tem papel no EHH (o pH é ≥ 7,3 por definição). Fosfato só se houver hipofosfatemia grave com repercussão (fraqueza muscular, disfunção respiratória, hemólise), com monitorização do cálcio.
+Bicarbonato não tem papel no EHH (o pH é ≥ 7,3 por definição). Fosfato só com fosfato <1,0 mmol/L e fraqueza muscular, comprometimento respiratório ou cardíaco, com monitorização do cálcio.
 
 Sobre a **profilaxia de TEV**: prescreva heparina de baixo peso molecular em dose profilática (ou heparina não fracionada com ajuste na disfunção renal) salvo contraindicação. Anticoagulação plena só com evento trombótico documentado — não existe indicação de "anticoagular preventivamente pela hiperosmolaridade".
 
@@ -51407,7 +51407,7 @@ O risco hemorrágico precisa ser estimado em paralelo, não depois. Idade avanç
 - **Durante a internação:** os demais pacientes com suspeita mantida de SCA. A ESC 2023 aboliu a faixa de "até 72 h" do risco intermediário; diabetes, DRC, FE reduzida, revascularização prévia e GRACE 109–140 pesam a favor da estratégia invasiva na mesma internação.
 - Baixo risco sem recorrência: conduta seletiva/não invasiva com teste funcional antes da alta.
 
-Ajustes que evitam iatrogenia: **enoxaparina** com ClCr <30 mL/min (CKD-EPI 2021) passa a 1 mg/kg SC uma vez ao dia; em obesidade importante, prefira ajuste com monitorização de anti-Xa quando disponível. **Fondaparinux** é contraindicado se ClCr <20 mL/min e exige bólus adicional de heparina não fracionada no momento da angioplastia, pelo risco de trombose de cateter. **Ticagrelor** é contraindicado em história de hemorragia intracraniana e em hepatopatia grave, causa dispneia em cerca de um em cada dez pacientes (geralmente transitória e não relacionada a broncoespasmo) e não deve ser associado a doses altas de AAS. **Prasugrel** é contraindicado em AVC/AIT prévio e evitado acima de 75 anos ou abaixo de 60 kg.
+Ajustes que evitam iatrogenia: **enoxaparina** com ClCr <30 mL/min (CKD-EPI 2021) passa a 1 mg/kg SC uma vez ao dia; em obesidade importante, prefira ajuste com monitorização de anti-Xa quando disponível. **Fondaparinux** é contraindicado se ClCr <30 mL/min pela ACC 2025, por CKD-EPI 2021; a SBC 2021 usa 20 mL/min e exige bólus adicional de heparina não fracionada no momento da angioplastia, pelo risco de trombose de cateter. **Ticagrelor** é contraindicado em história de hemorragia intracraniana e em hepatopatia grave, causa dispneia em cerca de um em cada dez pacientes (geralmente transitória e não relacionada a broncoespasmo) e não deve ser associado a doses altas de AAS. **Prasugrel** é contraindicado em AVC/AIT prévio e evitado acima de 75 anos ou abaixo de 60 kg.
 
 A **revascularização** pode ser percutânea ou cirúrgica. Doença de tronco, triarterial com disfunção ventricular ou diabetes com anatomia complexa (SYNTAX alto) favorecem cirurgia; anatomia favorável e necessidade de tratamento imediato favorecem angioplastia. A decisão idealmente passa pelo *heart team*, e o momento da cirurgia precisa considerar o antiplaquetário em uso (suspender ticagrelor 3-5 dias, clopidogrel 5 dias, prasugrel 7 dias, quando a cirurgia puder ser adiada com segurança).
 
@@ -52521,7 +52521,7 @@ O **exame físico de volemia é ruim** — sensibilidade e especificidade em tor
 
 ## Tratamento (com doses e velocidades)
 
-**Sintomática grave (convulsão/coma):** **NaCl 3% 150 mL IV em 20 min** (ou 2 mL/kg), dosando o sódio ao fim; repetir até 2 vezes (3 bolus no total) enquanto o Na não subir 5 mEq/L ou os sintomas não melhorarem. Meta imediata: subir o Na **cerca de 5 mEq/L na primeira hora** — isso já reverte a herniação; não é preciso normalizar o sódio.
+**Sintomática grave (convulsão/coma):** **NaCl 3% 150 mL IV em 20 min** (ou 2 mL/kg), dosando o sódio ao fim; repetir até 2 vezes (3 bolus no total) enquanto o Na não subir 5 mEq/L ou os sintomas não melhorarem. Meta imediata: subir o Na **cerca de 5 mEq/L na primeira hora** — isso já reverte a herniação; não é preciso normalizar o sódio. **Sem melhora depois de subir 5 mEq/L na 1ª hora:** continuar salina a 3% buscando mais 1 mEq/L por hora; parar quando vier primeiro melhora dos sintomas, alta total de 10 mEq/L ou Na 130; investigar outras causas; sódio a cada 4 h com a infusão correndo.
 
 **Teto de correção:** **10 mEq/L nas primeiras 24 h e 8 mEq/L a cada 24 h seguintes** (risco de mielinólise pontina); **8 mEq/L em 24 h** já no primeiro dia em etilistas, desnutridos, hipocalêmicos, hepatopatas e Na ≤ 105. O guideline europeu limita a **10 mEq/L no primeiro dia e 8 mEq/L nos dias seguintes**; o consenso norte-americano tolera 10–12 mEq/L/24 h e 18 mEq/L/48 h em paciente de risco habitual, **mas mantém o teto de 8 mEq/L/24 h nos de alto risco** — etilista, desnutrido, hipocalêmico, hepatopata, Na < 105. Na prática, respeite o teto do grupo de risco e mire bem abaixo dele (4–8 mEq/L por dia): a diurese aquosa inesperada consome a margem de segurança em poucas horas.
 
@@ -52534,7 +52534,7 @@ O **exame físico de volemia é ruim** — sensibilidade e especificidade em tor
 | Estratégia | Como se faz | Quando usar |
 |---|---|---|
 | Reativa | Espera a correção passar da meta e então dá DDAVP + SG 5% | Padrão na maioria dos serviços |
-| Proativa ("clamp") | DDAVP 2 mcg IV de 6/6 h desde o início + NaCl 3% titulado | Alto risco de autocorreção (hipovolemia corrigida, tiazídico suspenso, insuf. adrenal tratada, DI transitório) |
+| Proativa ("clamp") | DDAVP 2 mcg IV de 6/6 h desde o início + NaCl 3% titulado. Estratégia sem apoio na diretriz europeia, que manda não repetir em menos de 8 h | Alto risco de autocorreção (hipovolemia corrigida, tiazídico suspenso, insuf. adrenal tratada, DI transitório) |
 | Resgate | DDAVP + SG 5% assim que se percebe o excesso | Sempre que ultrapassou o teto |
 
 O "clamp" desliga a diurese aquosa e transforma o sódio numa variável que **você** controla pela infusão de hipertônica, em vez de depender do rim. É especialmente útil no paciente cuja causa foi removida — porque nele o rim vai despejar água livre a qualquer momento.
@@ -52575,18 +52575,16 @@ flowchart TD
 \`\`\`mermaid
 flowchart TD
     A["Definiu meta do dia<br/>teto 10 no 1º dia, 8 no alto risco"] --> B["Causa removível presente?<br/>hipovolemia, tiazídico, adrenal"]
-    B -->|Sim| C["Risco alto de autocorreção<br/>considerar DDAVP proativo"]
+    B -->|Sim| C["Risco alto de autocorreção"]
     B -->|Não| D["Correção guiada por infusão"]
-    C --> E["DDAVP 2 mcg IV 6/6h<br/>+ NaCl 3% titulado"]
-    D --> F["Na de 2/2h nas 6h iniciais"]
-    E --> F
+    C --> F["Na de 2/2h nas 6h iniciais"]
+    D --> F
     F --> G["Débito urinário alto e claro?"]
     G -->|Sim| H["Alerta de autocorreção<br/>suspender salina, medir Na agora"]
     G -->|Não| I["Manter plano e reavaliar"]
     H --> J["Passou do teto?<br/>SG 5% 10 mL/kg em 1h + DDAVP 2 mcg"]
     class G critical;
     class H critical;
-    class E action;
     class J action;
 \`\`\`
 
@@ -53629,10 +53627,10 @@ A consequência prática dessa evidência é uma mudança de ênfase: em vez de 
 
 ## Conduta imediata
 
-1. **Adrenalina IM já** — 0,5 mg (0,01 mg/kg; máx 0,5 mg) no vasto lateral da coxa. **Repetir a cada 5–15 min** se sem melhora. **Dose pediátrica por peso:** 0,01 mg/kg IM (máx 0,3 mg em criança pequena); autoinjetores comerciais entregam 0,15 mg (10–25 kg) ou 0,3 mg (>25 kg).
+1. **Adrenalina IM já** — 0,5 mg (0,01 mg/kg; máx 0,5 mg) no vasto lateral da coxa. **Repetir a cada 5–15 min** se sem melhora. **Dose pediátrica por peso:** 0,01 mg/kg IM, teto de 0,5 mg em qualquer idade. Sem peso, pela idade: lactente com menos de 10 kg, 0,01 mg/kg; 1 a 5 anos, 0,15 mg; 6 a 12 anos, 0,3 mg; 13 anos ou mais e adulto, 0,5 mg.
 2. Decúbito dorsal com membros inferiores elevados (não levantar o paciente bruscamente — risco de colapso por redistribuição de volume).
 3. **O₂** alto fluxo; prepare via aérea se estridor/edema de glote. **Via aérea difícil:** se o edema laríngeo progride e a intubação não é rapidamente viável, não postergue a via aérea cirúrgica (cricotireoidostomia) — o edema piora rápido e pode inviabilizar a laringoscopia.
-4. **Volume**: SF 0,9% 1–2 L IV rápido (5–10 mL/kg nos primeiros 5 min, repetindo conforme PA e perfusão) se hipotensão.
+4. **Volume**: com instabilidade cardiovascular, cristaloide em bólus de 20 mL/kg, por acesso calibroso (14 ou 16 G no adulto). A WAO não define teto, tipo de cristaloide nem regra de repetição.
 5. Adjuvantes (2ª/3ª linha — NUNCA atrasam a adrenalina): anti-H1 só para sintoma cutâneo; **corticoide NÃO previne reação bifásica de forma confiável** (uso de rotina caiu — WAO/EAACI/AAAAI).
 
 **Como preparar sem errar a diluição.** A ampola brasileira de adrenalina é de **1 mg/mL (1:1.000)**, e é essa a apresentação que se usa **pura, por via IM**. A **1:10.000 (0,1 mg/mL)** é a diluída (no Brasil não há ampola pronta: prepara-se com 1 mL da ampola + 9 mL de SF), de uso **intravenoso** em parada/refratariedade. Trocar as duas é uma das confusões mais perigosas da emergência: 1 mg IV em bolus num paciente com pulso pode causar crise hipertensiva, arritmia e isquemia miocárdica.
@@ -53649,7 +53647,7 @@ flowchart TD
     B -->|Sim| C["Adrenalina IM 0,5mg<br/>vasto lateral da coxa"]
     C --> D["Decúbito + pernas elevadas<br/>O2 alto fluxo"]
     D --> E{"Hipotensão?"}
-    E -->|Sim| F["SF 0,9% 1-2L IV<br/>bolus 5-10 mL/kg"]
+    E -->|Sim| F["Cristaloide em bólus<br/>20 mL/kg"]
     E -->|Não| G{"Melhora em<br/>5-15min?"}
     F --> G
     G -->|Não| H["Repetir adrenalina IM<br/>a cada 5-15min"]
@@ -54035,9 +54033,11 @@ O **POCUS** resolve boa parte dessa árvore em minutos e é o jeito mais prátic
 flowchart TD
     A["Infecção suspeita<br/>+ disfunção orgânica (↑SOFA ≥2)"] --> B{"Choque séptico?<br/>(vasopressor + lactato >2)"}
     B -->|Sim| C["ATB amplo espectro em ≤1h<br/>+ lactato + hemoculturas antes"]
-    B -->|Não, sepse provável| D["ATB amplo espectro em até 3h"]
+    B -->|Não, provável ou definida| D["ATB amplo espectro<br/>idealmente em até 1h"]
+    B -->|Não, possível| D2["Investigar rápido; se a preocupação<br/>persistir, ATB em até 3h"]
     C --> E["Cristaloide balanceado<br/>30 mL/kg como ponto de partida"]
     D --> E
+    D2 --> E
     E --> F{"PAM ≥65 mmHg<br/>após volume?"}
     F -->|Não| G["Noradrenalina precoce<br/>pode iniciar em acesso periférico"]
     F -->|Sim| H["Reavaliar perfusão<br/>de forma dinâmica"]
@@ -54242,7 +54242,7 @@ Creatinina medida por método colorimétrico pode vir **falsamente elevada** pel
 ## 1) Volume
 
 - **Cristaloide balanceado (Ringer lactato)** é preferível ao soro fisiológico 0,9% — menor risco de **acidose hiperclorêmica** e de piora da função renal.
-- **500-1000 mL/h** nas primeiras 2-4 horas (no choque ou na desidratação grave, 15-20 mL/kg na primeira hora), com ajuste individualizado à volemia, função cardíaca e renal (cautela em idosos e cardiopatas — risco de sobrecarga).
+- **500-1000 mL/h** nas primeiras 2-4 horas (na hipovolemia grave, 1,0 L/h; no idoso, na insuficiência cardíaca ou em diálise, bólus menores, por exemplo 250 mL, com reavaliação hemodinâmica frequente), com ajuste individualizado à volemia, função cardíaca e renal (cautela em idosos e cardiopatas — risco de sobrecarga).
 - Quando a glicemia cai **abaixo de 250 mg/dL**, adicionar **soro glicosado 5-10%** à hidratação, mantendo a infusão de insulina em curso (parar a insulina precocemente é um dos erros mais comuns e reacende a cetogênese).
 
 Depois da fase de ressuscitação, a escolha do fluido passa a ser guiada pelo **sódio corrigido**: se estiver alto ou normal, migre para salina a 0,45%; se estiver baixo, mantenha isotônico. Alvo de diurese ≥0,5-1 mL/kg/h. Um erro comum é manter 1 L/h por muitas horas "porque o protocolo diz" — a partir da 4ª hora a taxa costuma cair para 250-500 mL/h.
@@ -54267,7 +54267,7 @@ Não use cloreto de potássio em bólus, nunca. A hipocalemia iatrogênica das p
 - **CAD leve a moderada, não complicada, em paciente hemodinamicamente estável**: **análogo de ação rápida por via subcutânea a cada 1-2 h** é alternativa validada, permitindo manejo **fora de UTI** (enfermaria ou unidade intermediária) — reduz custo e libera leitos críticos.
 - Considerar **insulina basal subcutânea precoce** (associada à BIC, iniciada quando a glicemia começa a estabilizar) — facilita a transição para o esquema definitivo e reduz o risco de hiperglicemia de rebote na suspensão da bomba.
 
-**Bomba de infusão (IV) ou bólus subcutâneo — como escolher.** A infusão IV é obrigatória na CAD **grave**, no choque, no rebaixamento de consciência, na gestante e sempre que houver dúvida sobre a perfusão subcutânea (hipotensão, edema, vasoconstrição intensa fazem a absorção SC ser errática). Já a CAD leve a moderada em paciente acordado, estável e capaz de ser monitorado de hora em hora pode ser tratada com **análogo rápido SC** — 0,2 U/kg iniciais seguidos de 0,1 U/kg de hora em hora, ou 0,3 U/kg iniciais seguidos de 0,2 U/kg a cada 2 h, com glicemia capilar horária; abaixo de 250 mg/dL, a dose cai à metade e entra o soro glicosado 5%. Essa escolha é especialmente relevante no Brasil, onde a espera por leito de UTI é o principal gargalo do tratamento.
+**Bomba de infusão (IV) ou bólus subcutâneo — como escolher.** A infusão IV é obrigatória na CAD **grave**, no choque, no rebaixamento de consciência, na gestante e sempre que houver dúvida sobre a perfusão subcutânea (hipotensão, edema, vasoconstrição intensa fazem a absorção SC ser errática). Já a CAD leve a moderada em paciente acordado, estável e capaz de ser monitorado de hora em hora pode ser tratada com **análogo rápido SC** — 0,1 U/kg na primeira dose, depois 0,1 U/kg de hora em hora ou 0,2 U/kg a cada 2 h; com glicemia <250 mg/dL, 0,05 U/kg/h ou 0,1 U/kg a cada 2 h, com dextrose, com glicemia capilar horária; abaixo de 250 mg/dL, a dose cai à metade e entra o soro glicosado 5%. Essa escolha é especialmente relevante no Brasil, onde a espera por leito de UTI é o principal gargalo do tratamento.
 
 Metas de titulação: queda de glicemia de **50-75 mg/dL/h** (não mais que 100) e, mais importante, **queda do β-OHB de ~0,5 mmol/L/h** ou aumento do bicarbonato de ~3 mEq/L/h. Se a glicemia não cai na velocidade esperada, verifique nesta ordem: bomba/acesso funcionando, volume adequado, e só então dobre a taxa de infusão.
 
@@ -54279,7 +54279,7 @@ Não há benefício demonstrado de bicarbonato na CAD com **pH ≥7,0**, e há d
 
 Se ainda assim optar por usar (pH <7,0 com repercussão hemodinâmica, hipercalemia grave ameaçadora, ou acidose refratária ao tratamento correto), faça **doses fracionadas e diluídas**, com potássio associado, e **reavalie a gasometria antes de repetir**. Nunca em bólus rápido, nunca "para corrigir o número".
 
-Para o **fosfato** vale a mesma lógica: reponha apenas se <1,0 mg/dL com repercussão (fraqueza da musculatura respiratória, disfunção cardíaca, rabdomiólise, hemólise), monitorando cálcio — a reposição rotineira não melhora desfecho e causa hipocalcemia.
+Para o **fosfato** vale a mesma lógica: reponha apenas com fosfato <1,0 mmol/L e fraqueza muscular, comprometimento respiratório ou cardíaco, monitorando cálcio — a reposição rotineira não melhora desfecho e causa hipocalcemia.
 
 \`\`\`mermaid
 flowchart TD
@@ -54330,7 +54330,7 @@ Na **transição para insulina subcutânea**, é essencial **sobrepor a insulina
 
 Na prática do SUS, essa transição é feita com **NPH e regular**: aproximadamente metade da dose total como NPH dividida em duas aplicações (manhã e noite) e metade como regular distribuída nas refeições, ajustando a partir do 2º dia. O ponto crítico não é o esquema escolhido, é **não deixar o paciente descoberto** entre a bomba e a primeira dose SC.
 
-**Bicarbonato de sódio** só está indicado se **pH <7,0** (consenso ADA/EASD 2024; a SBD 2023 usa 6,9): 100 mEq de bicarbonato de sódio 8,4% em 400 mL de água destilada, correndo em 2 h, com 20 mEq de KCl no frasco se K <5,0, repetidos a cada 2 h até pH ≥7,0 (gasometria antes de cada repetição — pode causar hipocalemia paradoxal e alcalose de rebote). **Fosfato** só se <1,0 mg/dL com repercussão clínica (fraqueza muscular, disfunção cardíaca/respiratória) — reposição rotineira não traz benefício comprovado.
+**Bicarbonato de sódio** só está indicado se **pH <7,0** (consenso ADA/EASD 2024; a SBD 2023 usa 6,9): 100 mEq de bicarbonato de sódio 8,4% em 400 mL de água destilada, correndo em 2 h, com 20 mEq de KCl no frasco se K <5,0, repetidos a cada 2 h até pH ≥7,0 (gasometria antes de cada repetição — pode causar hipocalemia paradoxal e alcalose de rebote). **Fosfato** só se <1,0 mmol/L com fraqueza muscular, comprometimento respiratório ou cardíaco (fraqueza muscular, disfunção cardíaca/respiratória) — reposição rotineira não traz benefício comprovado.
 
 Corrija o **déficit de água livre** estimado após a fase de ressuscitação volêmica inicial, geralmente com solução hipotônica (SF 0,45%) uma vez que a instabilidade hemodinâmica tenha sido revertida, monitorando sódio corrigido a cada 2-4 h. Sempre **identifique e trate o fator precipitante** (antibioticoterapia se infecção, reintrodução orientada de insulina, etc.) — sem isso, a recidiva é praticamente garantida.
 
@@ -55232,7 +55232,7 @@ Mesmo o paciente que responde à primeira linha e acorda bem merece leito monito
 
 - Sempre buscar a causa: hipoglicemia, distúrbio hidroeletrolítico, infecção do SNC, abstinência, intoxicação, suspensão de antiepiléptico.
 - Erro comum: repetir doses baixas de benzodiazepínico por medo de depressão respiratória — e chegar à segunda linha 40 minutos depois com o paciente já refratário.
-- Erro comum: parar no benzodiazepínico. Toda crise que exigiu benzodiazepínico em EME recebe antiepiléptico de segunda linha para prevenir recorrência.
+- Crise cessou e o paciente voltou ao basal: cuidado sintomático. Segunda linha só se a crise continua aos 20 min. Iniciar manutenção é decisão à parte, fora da AES 2016.
 - Erro comum: chamar de "pós-ictal prolongado" o paciente que não acorda. Se não recuperou em 20 a 30 minutos, peça EEG.
 - Erro comum: correr fenitoína rápido ou em soro glicosado — hipotensão, arritmia e precipitação do fármaco.
 - Em gestante ou puérpera com crise, pense eclâmpsia e sulfato de magnésio antes de seguir o algoritmo padrão.
@@ -55557,7 +55557,7 @@ O quadro clássico é **dor torácica opressiva, retroesternal, >20 min**, com o
 
 No exame físico, procure ativamente sinais de complicação: **B3, estertores** (Killip II+), turgência jugular e hipotensão com pulmão limpo (sugere infarto de VD, sobretudo em IAM inferior), sopro sistólico novo (ruptura de músculo papilar ou CIV), atrito pericárdico e sinais de baixo débito (extremidades frias, oligúria, rebaixamento do sensório).
 
-No ECG, além do supra de ST, busque **imagem em espelho (infradesnível recíproco)** — reforça o diagnóstico e ajuda a localizar a artéria culpada — e sempre registre **V3R/V4R** em IAM inferior (supra de ST em V4R = infarto de VD, evitar nitrato/morfina/diurético) e **V7-V9** quando houver infradesnível isolado de V1-V3 (suspeita de IAM posterior estrito). BRE novo ou presumivelmente novo em contexto clínico compatível equivale a supra de ST para fins de reperfusão.
+No ECG, além do supra de ST, busque **imagem em espelho (infradesnível recíproco)** — reforça o diagnóstico e ajuda a localizar a artéria culpada — e sempre registre **V3R/V4R** em IAM inferior (supra de ST em V4R = infarto de VD, evitar nitrato/morfina/diurético) e **V7-V9** quando houver infradesnível isolado de V1-V3 (suspeita de IAM posterior estrito). BRE novo ou presumivelmente novo é infrequente na apresentação e, isolado, não é diagnóstico de IAM: exige correlação clínica. Em paciente assintomático não é equivalente de supra.
 
 ## Localização eletrocardiográfica e o que ela prevê
 
@@ -55607,7 +55607,7 @@ O acesso **radial** é preferido ao femoral na ICP primária, por reduzir sangra
 
 \`\`\`mermaid
 flowchart TD
-    A["Dor torácica sugestiva<br/>ECG em menos de 10 min"] --> B{"Supra de ST ou<br/>BRE novo?"}
+    A["Dor torácica sugestiva<br/>ECG em menos de 10 min"] --> B{"Supra de ST ou equivalente,<br/>por julgamento clínico?"}
     B -->|Não| C["Investigar NSTEMI/<br/>outros diagnósticos"]
     B -->|Sim| D{"ICP primária em<br/>≤120 min do 1º contato?"}
     D -->|Sim| E["ICP primária<br/>meta porta-balão ≤90 min"]
@@ -55727,7 +55727,7 @@ Ticagrelor e prasugrel têm acesso mais irregular que clopidogrel, e inibidores 
 - **Sempre registrar V3R/V4R e V7-V9** quando o quadro é sugestivo mas o ECG de 12 derivações padrão é inconclusivo (IAM de VD e IAM posterior estrito são armadilhas clássicas de subdiagnóstico).
 - **Nitrato e morfina no IAM de VD/hipotenso** podem precipitar colapso hemodinâmico — checar PA e derivações direitas antes de prescrever.
 - Na fibrinólise, usar **meia-dose de tenecteplase em ≥75 anos** (reduz risco de sangramento intracraniano) e **não associar fondaparinux** quando o plano é ICP subsequente.
-- Reavaliar clinicamente 60-90 min após fibrinólise: queda de supra <50%, resolução da dor e pico precoce de enzimas sugerem sucesso; ausência desses sinais indica **ICP de resgate imediata**, não esperar até completar a "janela" fármaco-invasiva.
+- Reavaliar 60-90 min após a fibrinólise. Resolução do supra <50% nas derivações anteriores ou <70% nas inferiores indica possível falha e leva a angiografia imediata com ICP de resgate; ausência desses sinais indica **ICP de resgate imediata**, não esperar até completar a "janela" fármaco-invasiva.
 - Não deixar de ativar o código infarto por dúvida diagnóstica em paciente instável — ecocardiograma point-of-care resolve a maioria das dúvidas rapidamente sem atrasar a decisão.
 - **Um ECG normal na primeira hora não afasta STEMI.** Se a dor persiste, repita em 10-15 min e compare os traçados; oclusão em evolução muda o ECG em minutos.
 - **Infra difuso com supra em aVR não é STEMI clássico, mas é emergência** — pensar em tronco/triarterial e discutir cateterismo urgente, não trombolisar.
