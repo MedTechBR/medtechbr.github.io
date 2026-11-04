@@ -1,4 +1,4 @@
-/* Os 29 erros plantados de tools/sessao_ehh_teste.sh, na mesma ordem, traduzidos para ehh.js. */
+/* Os 30 erros plantados de tools/sessao_ehh_teste.sh, na mesma ordem, traduzidos para ehh.js. */
 export default [
   { nome: 'fórmula da osmolalidade com /20', de: 'return 2 * na + glicemia / 18;', para: 'return 2 * na + glicemia / 20;' },
   { nome: 'efetiva 300 confirma', de: '(ef !== null ? ef > 300 : false)', para: '(ef !== null ? ef >= 300 : false)' },
@@ -26,7 +26,8 @@ export default [
   { nome: 'diurese faltando vira normal', de: 'const diu = diurese(e);', para: 'const diu = diurese(e) ?? 1.0;' },
   { nome: 'K faltando vira normal', de: "if (k === null) {\n      c.valor = 'Falta potássio';", para: "k = k ?? 4.0;\n    if (false) {\n      c.valor = 'Falta potássio';" },
   { nome: 'exame vencido não sinalizado', de: "else if (proxima !== null && agora > proxima) s = 'vencido';", para: "else if (proxima !== null && agora > mais(proxima, 3600)) s = 'vencido';" },
-  { nome: 'fosfato de potássio com K alto', de: "if (k > 5.0) {\n    c.situacao = 'decisaoMedico';\n    c.valor = 'Sem orientação';", para: "if (k > 50) {\n    c.situacao = 'decisaoMedico';\n    c.valor = 'Sem orientação';" },
+  { nome: 'fosfato de potássio com K alto', de: "if (k >= 5.0) {\n    c.situacao = 'decisaoMedico';\n    c.valor = 'Sem orientação';", para: "if (k > 50) {\n    c.situacao = 'decisaoMedico';\n    c.valor = 'Sem orientação';" },
+  { nome: 'erro antigo: fosfato de potássio com K 5,0', de: "if (k >= 5.0) {\n    c.situacao = 'decisaoMedico';\n    c.valor = 'Sem orientação';", para: "if (k > 5.0) {\n    c.situacao = 'decisaoMedico';\n    c.valor = 'Sem orientação';" },
   { nome: 'idoso com taxa fixa', de: 'if (idoso || comp) {', para: 'if (comp) {' },
   { nome: 'salina 0,45% com osmolalidade caindo', de: "if (q.queda > 0) {\n    c.situacao = 'semIndicacao';", para: "if (q.queda > 100) {\n    c.situacao = 'semIndicacao';" },
 ];

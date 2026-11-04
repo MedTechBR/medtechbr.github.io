@@ -55,7 +55,7 @@ const R = {
   rAbaixoAlvo: regra(123, 'Glicemia entre 70 e 199: abaixo do alvo de 200-250; o app só mostra a faixa, sem conduta.', 'Seção 5: sem regra numérica'),
   rKCaindo: regra(124, 'K <3,5 com a insulina correndo: alerta, reposição de 10 mmol/h e decisão do médico, sem mandar parar.', 'Seção 5: sem regra numérica'),
   rK25: regra(125, 'K ≤2,5 durante o tratamento: a Tabela 3 liga a mortalidade maior, sem conduta numérica.', 'Seção 5: sem regra numérica'),
-  rFosfK: regra(126, 'Fosfato de potássio com K >5,0: sem orientação.', 'Seção 5: sem regra numérica'),
+  rFosfK: regra(126, 'Fosfato de potássio com K ≥5,0: sem orientação.', 'Seção 5: sem regra numérica'),
   rTrombose: regra(129, 'Conduta se houver trombose: não está na fonte.', 'Seção 5: sem regra numérica'),
   rQuedaFaixa: regra(151, 'Queda da glicemia: de 90 a 120 mg/dL/h aviso amarelo; acima de 120 aviso vermelho.', 'Seção 6: divergências'),
 };
@@ -756,12 +756,13 @@ function cartaoFosfato(e, fos, k) {
     c.detalhe = `Fosfato ${num(fos)} mmol/L. A reposição é com fosfato de potássio; falta o K.`;
     return c;
   }
-  if (k > 5.0) {
+  /* K ≥5,0: sem fosfato de potássio, como o cartão de potássio (K 5,0 exato pela R32). Decisão do Matheus, 04/11/2026. */
+  if (k >= 5.0) {
     c.situacao = 'decisaoMedico';
     c.valor = 'Sem orientação';
     c.conta = `Fosfato ${num(fos)} mmol/L. K ${num(k)} mmol/L`;
-    c.detalhe = 'Fosfato de potássio com K >5,0: sem orientação na fonte. Decisão do médico.';
-    c.regras = [R.rFosfK, R.r21];
+    c.detalhe = 'Fosfato de potássio com K ≥5,0: sem orientação. Decisão do médico.';
+    c.regras = k === 5.0 ? [R.rFosfK, R.r32, R.r21] : [R.rFosfK, R.r21];
     return c;
   }
   c.liberado = true;
