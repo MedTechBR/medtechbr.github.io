@@ -98,8 +98,9 @@ struct VarreduraEHH {
                     }
                 }
                 /* Velocidades: glicemia, osmolalidade calculada e medida, sódio em 24 h, pela hora real. */
-                for dt in [30.0, 60, 90, 120, 241] {
-                    for q in [-10.0, 0, 89, 90, 91, 119, 120, 121, 200] {
+                /* Intervalos curtos (decisão de 04/11/2026): abaixo de 30 min sem velocidade; 29,99 e 30 nas bordas. */
+                for dt in [0.01, 0.5, 1, 10, 29, 29.99, 30.0, 30.01, 60, 90, 120, 241] {
+                    for q in [-10.0, 0, 89, 90, 91, 119, 120, 121, 200, 15000] {
                         var e = base(t, medidas: false)
                         e.medir("peso", 70, h5); e.medir("potassio", 4.2, h5); e.medir("sodio", 145, h5)
                         e.medir("glicemia", 700, h5.addingTimeInterval(-dt * 60)); e.medir("glicemia", 700 - q * dt / 60, h5)
@@ -193,6 +194,16 @@ struct VarreduraEHH {
                     e.acoes.append(AcaoRegistrada(tipo: "basal.sc", rotulo: "SC", hora: t.addingTimeInterval(-m * 60)))
                     r.append((e, t)); r.append((e, t.addingTimeInterval(1))); r.append((e, t.addingTimeInterval(-1)))
                 }
+                /* Fosfato x K nas bordas, com e sem sinais (K 5,0 bloqueia desde 04/11/2026). */
+                for k in [nil, 4.99, 5.0, 5.01, 5.1] as [Double?] { for f in [nil, 0.5, 0.99, 1.0] as [Double?] { for si in [nil, true, false] as [Bool?] {
+                    var e = base(t)
+                    let h4 = t.addingTimeInterval(-240)
+                    if let k { e.medir("potassio", k, h4) } else { e.series["potassio"] = nil }
+                    if let f { e.medir("fosfato", f, h4) }
+                    if let si { e.respostas["sinaisFosfato"] = si }
+                    r.append((e, t))
+                    var c = e; c.acoes.append(AcaoRegistrada(tipo: "fosfato.inicio", rotulo: "", hora: h4)); r.append((c, t))
+                } } }
                 /* Saiu do perfil depois da confirmação, coleta antes e depois. */
                 for d in [-1.0, 1] {
                     for (id, v) in [("ph", 7.29), ("hco3", 17.9), ("bohb", 3.0), ("ph", 7.3), ("hco3", 18), ("bohb", 2.99)] {
@@ -235,6 +246,8 @@ struct VarreduraEHH {
                     let q = MotorEHH.quedaOsm(e)
                     compararFuncao("ehh", "quedaOsm", [est], q.map { ["queda": $0.queda, "medida": $0.medida] as Any } ?? NSNull())
                     compararFuncao("ehh", "quedaGlicemia", [est], MotorEHH.quedaGlicemia(e).map { $0 as Any } ?? NSNull())
+                    compararFuncao("ehh", "glicemiaIntervaloCurto", [est], MotorEHH.glicemiaIntervaloCurto(e))
+                    compararFuncao("ehh", "osmIntervaloCurto", [est], MotorEHH.osmIntervaloCurto(e))
                     compararFuncao("ehh", "quedaSodio24h", [est], MotorEHH.quedaSodio24h(e).map { $0 as Any } ?? NSNull())
                     compararFuncao("ehh", "diurese", [est], MotorEHH.diurese(e).map { $0 as Any } ?? NSNull())
                     let a = MotorEHH.osmAtual(e)
