@@ -1,0 +1,226 @@
+{
+ "id": "pac",
+ "emUmMinuto": [
+  {
+   "texto": "CURB-65: 0–1 ambulatorial, 2 enfermaria, ≥3 considerar UTI.",
+   "origens": [
+    {
+     "secao": "Gravidade — CURB-65",
+     "trecho": "0–1 ambulatorial · 2 enfermaria · ≥3 considerar UTI."
+    },
+    {
+     "secao": "Gravidade — CURB-65",
+     "trecho": "O CURB-65 é simples e útil no pronto-socorro"
+    }
+   ]
+  },
+  {
+   "texto": "Ambulatorial hígido: amoxicilina ou doxiciclina.",
+   "origens": [
+    {
+     "secao": "Tratamento empírico",
+     "trecho": "Ambulatorial hígido: amoxicilina (ou doxiciclina)."
+    }
+   ]
+  },
+  {
+   "texto": "Enfermaria: betalactâmico (ceftriaxona ou amoxclav) mais macrolídeo, ou fluoroquinolona respiratória.",
+   "origens": [
+    {
+     "secao": "Tratamento empírico",
+     "trecho": "Enfermaria: betalactâmico (ceftriaxona ou amoxclav) + macrolídeo OU fluoroquinolona respiratória (levo/moxifloxacino)."
+    }
+   ]
+  },
+  {
+   "texto": "UTI: betalactâmico mais macrolídeo ou fluoroquinolona. Cobrir Pseudomonas e MRSA se fatores de risco.",
+   "origens": [
+    {
+     "secao": "Tratamento empírico",
+     "trecho": "UTI: betalactâmico + macrolídeo (ou + fluoroquinolona). Cobrir Pseudomonas/MRSA se fatores de risco."
+    }
+   ]
+  },
+  {
+   "texto": "A primeira dose deve ser administrada ainda no pronto-socorro, sem esperar exames.",
+   "origens": [
+    {
+     "secao": "Tratamento empírico",
+     "trecho": "A primeira dose deve ser administrada ainda no pronto-socorro, sem esperar exames."
+    }
+   ]
+  },
+  {
+   "texto": "Reavaliar em 48–72 h e descalonar.",
+   "origens": [
+    {
+     "secao": "Conduta geral e critérios de internação",
+     "trecho": "reavaliar em 48–72 h e descalonar"
+    }
+   ]
+  }
+ ],
+ "primeirosPassos": [
+  {
+   "texto": "Confirmar: quadro clínico compatível mais infiltrado em imagem de tórax.",
+   "origens": [
+    {
+     "secao": "Diagnóstico",
+     "trecho": "O diagnóstico exige quadro clínico compatível mais infiltrado em imagem de tórax."
+    }
+   ]
+  },
+  {
+   "texto": "Estratificar pelo CURB-65 e definir onde tratar.",
+   "origens": [
+    {
+     "secao": "Gravidade — CURB-65",
+     "trecho": "0–1 ambulatorial · 2 enfermaria · ≥3 considerar UTI."
+    },
+    {
+     "secao": "Gravidade — CURB-65",
+     "trecho": "O CURB-65 é simples e útil no pronto-socorro"
+    }
+   ]
+  },
+  {
+   "texto": "Primeira dose de antibiótico ainda no pronto-socorro, sem esperar exames.",
+   "origens": [
+    {
+     "secao": "Tratamento empírico",
+     "trecho": "A primeira dose deve ser administrada ainda no pronto-socorro, sem esperar exames."
+    }
+   ]
+  },
+  {
+   "texto": "O₂ para SpO₂ ≥92%.",
+   "origens": [
+    {
+     "secao": "Conduta geral e critérios de internação",
+     "trecho": "O₂ para SpO₂ ≥92%"
+    }
+   ]
+  },
+  {
+   "texto": "Reavaliar em 48–72 h e descalonar.",
+   "origens": [
+    {
+     "secao": "Conduta geral e critérios de internação",
+     "trecho": "reavaliar em 48–72 h e descalonar"
+    }
+   ]
+  }
+ ],
+ "fluxoTratamento": {
+  "titulo": "Esquema empírico por local de tratamento",
+  "mermaid": "flowchart TD\n  A{\"Onde tratar\"} -->|Ambulatorial hígido| B[\"Amoxicilina<br/>ou doxiciclina\"]\n  A -->|Enfermaria| C[\"Betalactâmico: ceftriaxona ou amoxclav<br/>+ macrolídeo<br/>OU fluoroquinolona respiratória\"]\n  A -->|UTI| D[\"Betalactâmico + macrolídeo<br/>ou + fluoroquinolona\"]\n  D --> E{\"Fatores de risco para Pseudomonas/MRSA?\"}\n  E -->|Sim| F[\"Cobrir Pseudomonas/MRSA\"]\n  class B action;\n  class C action;\n  class D action;\n  class F action;\n  class E critical;",
+  "origens": [
+   {
+    "secao": "Tratamento empírico",
+    "trecho": "Ambulatorial hígido: amoxicilina (ou doxiciclina)."
+   },
+   {
+    "secao": "Tratamento empírico",
+    "trecho": "Enfermaria: betalactâmico (ceftriaxona ou amoxclav) + macrolídeo OU fluoroquinolona respiratória (levo/moxifloxacino)."
+   },
+   {
+    "secao": "Tratamento empírico",
+    "trecho": "UTI: betalactâmico + macrolídeo (ou + fluoroquinolona). Cobrir Pseudomonas/MRSA se fatores de risco."
+   }
+  ]
+ },
+ "testeSe": {
+  "tratamento": [
+   {
+    "pergunta": "Macrolídeo isolado no ambulatorial: quando?",
+    "resposta": "Só onde a resistência local do pneumococo ao macrolídeo for menor que 25%.",
+    "origens": [
+     {
+      "secao": "Tratamento empírico",
+      "trecho": "Macrolídeo isolado só onde a resistência local do pneumococo ao macrolídeo for menor que 25%."
+     }
+    ]
+   },
+   {
+    "pergunta": "Quando não usar o corticoide adjuvante na PAC grave?",
+    "resposta": "Não usar se influenza.",
+    "origens": [
+     {
+      "secao": "PAC grave (UTI)",
+      "trecho": "Não usar se influenza."
+     },
+     {
+      "secao": "PAC grave (UTI)",
+      "trecho": "O uso é para PAC grave em UTI"
+     }
+    ]
+   }
+  ],
+  "diagnostico": [
+   {
+    "pergunta": "Algum escore de PAC inclui a saturação de oxigênio?",
+    "resposta": "Nenhum. Nem CURB-65, nem os critérios menores usam SpO₂ diretamente.",
+    "origens": [
+     {
+      "secao": "Gravidade — CURB-65",
+      "trecho": "nenhum escore de PAC inclui a saturação de oxigênio — nem CURB-65, nem os critérios menores usam SpO₂ diretamente."
+     }
+    ]
+   },
+   {
+    "pergunta": "Quais os critérios maiores ATS/IDSA de PAC grave?",
+    "resposta": "Necessidade de vasopressor ou de ventilação mecânica invasiva.",
+    "origens": [
+     {
+      "secao": "Gravidade — CURB-65",
+      "trecho": "Os critérios ATS/IDSA de PAC grave definem UTI: um critério maior (necessidade de vasopressor ou de ventilação mecânica invasiva)"
+     }
+    ]
+   },
+   {
+    "pergunta": "Radiografia normal afasta pneumonia?",
+    "resposta": "Não, com clínica convincente e hipoxemia. Faça tomografia ou ultrassom.",
+    "origens": [
+     {
+      "secao": "Como interpretar cada exame (e suas armadilhas)",
+      "trecho": "Radiografia normal com clínica convincente e hipoxemia não afasta pneumonia — faça tomografia ou ultrassom."
+     }
+    ]
+   }
+  ],
+  "complicacoes": [
+   {
+    "pergunta": "O que é falha terapêutica?",
+    "resposta": "Ausência de melhora ou piora após 72 horas de antibiótico adequado.",
+    "origens": [
+     {
+      "secao": "Falha terapêutica e complicações",
+      "trecho": "Chama-se falha terapêutica a ausência de melhora ou a piora após 72 horas de antibiótico adequado."
+     }
+    ]
+   },
+   {
+    "pergunta": "O que indica drenagem torácica no derrame?",
+    "resposta": "pH abaixo de 7,20, pus ou cultura positiva.",
+    "origens": [
+     {
+      "secao": "Falha terapêutica e complicações",
+      "trecho": "pH abaixo de 7,20, pus ou cultura positiva indicam drenagem torácica."
+     }
+    ]
+   }
+  ],
+  "perolas": [
+   {
+    "pergunta": "Antes de trocar o antibiótico na falha, o que reavaliar?",
+    "resposta": "TEP, congestão e tuberculose.",
+    "origens": [
+     {
+      "secao": "Pérolas e erros comuns",
+      "trecho": "Reavalie TEP, congestão e tuberculose antes de simplesmente trocar o antibiótico"
+     }
+    ]
+   }
+  ]
+ }
+}

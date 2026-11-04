@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MedTech</title>
+<meta name="description" content="MedTech: condutas, ferramentas e exames do médico, com uma conta.">
+<meta name="theme-color" content="#F5F6FB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1017" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="../favicon.png">
+<link rel="apple-touch-icon" href="../icone-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="MedTech">
+<link rel="stylesheet" href="../vendor/tabler/tabler-icons.min.css?v=3.48.0">
+<link rel="stylesheet" href="medtech.css?v=1">
+<link rel="stylesheet" href="ferramentas.css?v=1">
+<link rel="stylesheet" href="gestao.css?v=1">
+<link rel="stylesheet" href="sessoes.css?v=1">
+<script>
+/* Conta: o mesmo login do portal (_mtauth.js) e a mesma checagem de acesso por produto.
+   ?demo=1 abre sem login, com dados só deste aparelho, para teste. */
+window.MT_APP = { id: "portal", name: "MedTech", linha: "clinica" };
+if (!/[?&]demo=1(&|$)/.test(location.search)) {
+  (function () {
+    var fb = document.createElement('script');
+    fb.src = '../_mtfb.js?v=1';
+    fb.onload = function () { var m = document.createElement('script'); m.type = 'module'; m.src = '../_mtauth.js?v=50'; document.head.appendChild(m); };
+    document.head.appendChild(fb);
+  })();
+}
+</script>
+<script defer src="ui.js?v=1"></script>
+<script defer src="dados.js?v=1"></script>
+<script defer src="conduta.js?v=1"></script>
+<script defer src="leitor.js?v=1"></script>
+<script defer src="presc.js?v=1"></script>
+<script defer src="fluxo.js?v=1"></script>
+<script defer src="casca.js?v=2"></script>
+<!-- Ferramentas: ligam-se à casca pelo ponto de encaixe (MedTechCasca.registrar) -->
+<script defer src="fer-ponte.js?v=1"></script>
+<script defer src="fer-motor.js?v=1"></script>
+<script defer src="fer-ui.js?v=1"></script>
+<script defer src="ferramentas.js?v=1"></script>
+<!-- espaço Gestão: Plantões e Finanças (lê e grava pelo PlantãoHub e pelo Granaê) -->
+<script defer src="cofre.js?v=1"></script>
+<script defer src="gestao.js?v=1"></script>
+<!-- sessões de acompanhamento sem IA: a tela (motores em sessoes/, mesmos do iPhone) -->
+<script type="module" src="sessoes-tela.js?v=1"></script>
+</head>
+<body>
+<!-- isca para o autopreenchimento do Chrome não jogar o e-mail do login na busca -->
+<div class="isca" aria-hidden="true"><input type="text" name="username" autocomplete="username" tabindex="-1"><input type="password" name="password" autocomplete="current-password" tabindex="-1"></div>
+<div id="app">
+  <header class="barra-espaco">
+    <div class="espacos" role="tablist" aria-label="Espaço">
+      <button type="button" role="tab" data-espaco="clinica" aria-selected="true">Clínica</button>
+      <button type="button" role="tab" data-espaco="gestao" aria-selected="false">Gestão</button>
+    </div>
+    <button type="button" class="perfil" aria-label="Sua conta"><span>M</span></button>
+  </header>
+  <main id="secoes">
+    <section class="secao" id="s-condutas" data-secao="condutas" aria-label="Condutas"></section>
+    <section class="secao" id="s-ferramentas" data-secao="ferramentas" aria-label="Ferramentas" hidden></section>
+    <section class="secao" id="s-exames" data-secao="exames" aria-label="Exames" hidden></section>
+    <section class="secao" id="s-plantoes" data-secao="plantoes" aria-label="Plantões" hidden></section>
+    <section class="secao" id="s-financas" data-secao="financas" aria-label="Finanças" hidden></section>
+  </main>
+  <nav class="barra-secoes" aria-label="Seções"><div class="bs-itens"></div></nav>
+</div>
+</body>
+</html>
