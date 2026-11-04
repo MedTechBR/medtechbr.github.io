@@ -27,6 +27,8 @@ Não mexe em `app.html`, no `/sw.js` do portal, no banco de condutas nem nas reg
 | `fer-ui.js` | camada de ferramenta, componentes, barra acima do teclado, painel e conversa de IA | `FerramentasComum.swift`, `FerramentasIA.swift` |
 | `ferramentas.js` | as telas das 14 ferramentas e o encaixe na casca (`ferramenta` e `busca`) | `Calculadoras.swift`, `Antibioticos.swift`, `Pocus.swift`, `Paliativos.swift`, `FerramentasCondutai.swift` |
 | `ferramentas.css` | estilo das Ferramentas (tinta por ferramenta, faixas de resultado, claro e escuro) | `Ferramentas.swift` (corFundo, corTinta), `FaixaClinica` |
+| `cofre.js` | dados de Plantões e Finanças: abre `plantaohub.html` e `granae.html` em quadros ocultos e lê e grava por eles | `MeuMes/CofreMes.swift` |
+| `gestao.js`, `gestao.css` | espaço Gestão: Plantões, Finanças, lançar, mais opções | `MeuMes/PlantoesView`, `FinancasView`, `LancarView`, `MaisMes`, `ModelosMes`, `ComumGestao` |
 
 ## De onde vêm os dados (nada copiado do banco)
 
@@ -130,7 +132,7 @@ MedTechCasca.registrar('ferramenta', function (id, item) { /* abre a ferramenta 
 
 ## Diferenças conhecidas em relação ao iPhone
 
-- Plantões, Finanças e as sessões de acompanhamento são pontos de encaixe (outras frentes); a linha "Acompanhar paciente" das Ferramentas segue para o encaixe das sessões.
+- As sessões de acompanhamento são ponto de encaixe (outra frente); a linha "Acompanhar paciente" das Ferramentas segue para o encaixe das sessões. Plantões e Finanças: ver "Espaço Gestão" abaixo.
 - Ferramentas: o diagrama do POCUS é desenhado em SVG a partir das mesmas formas do iPhone (com halo pulsante no ponto); clipes GIF, com Reduzir movimento,
   só tocam ao tocar em "Tocar clipe"; títulos e nomes aparecem sem travessão (": "), o texto clínico fica como veio; sem vibração;
   a data das calculadoras usa o seletor de data do navegador (o iPhone mostra o calendário aberto).
@@ -138,3 +140,56 @@ MedTechCasca.registrar('ferramenta', function (id, item) { /* abre a ferramenta 
 - Tópicos trocam por toque ou deslizando a página (scroll-snap); sem vibração; ícones Tabler no lugar dos SF Symbols.
 - Prescrição com IA (doenças sem modelo) leva ao CondutAI; no iPhone ela roda dentro do app.
 - Exames mostra o LaudAI no modo Achados dentro de um quadro, não a tela nativa `AchadosView`.
+
+## Espaço Gestão (Plantões e Finanças)
+
+Entra por `MedTechCasca.registrar('secao', 'plantoes' | 'financas', ...)` em `gestao.js`; `casca.js` não foi mexido. Clínica e Gestão não se misturam.
+
+### De onde vêm os dados (`cofre.js`, igual ao `CofreMes.swift`)
+
+- O PWA nunca fala direto com o Firestore. Ao abrir a seção, o cofre carrega `../plantaohub.html` ou `../granae.html` num `<iframe>` oculto,
+  inerte e fora da tela (mesmo domínio, mesma sessão de login). Cada app liga o `_mtauth.js` dele e lê `users/{uid}/apps/plantaohub` ou `.../granae`.
+- Pronta = `MT.user`, `MT._data` e `MT.mergeFn` presentes: o app registra o `mergeFn` no mesmo bloco em que liga o `MT.onData`, então o `state` dele já é o da nuvem.
+  (Sem essa última condição, uma gravação logo na abertura partiria do `state` vazio do app.)
+- Leitura: uma "capa" instalada na página exporta o `state` a cada `MT.onData` (100 ms de folga). Escrita: as operações de `JSMes` do iPhone, copiadas
+  dos formulários dos próprios apps (`saveForm`, `toggleStatus`, `del`, `dup`, `setCompDay`, `salvarRegraPg`, `txForm`, `txDelete`, `txDup`, `pagForm`,
+  `fixedForm`, `fixedDelete`, `catForm` só a meta), rodando dentro da página com as funções dela (`persist`, `saveState`, `stampTx`, `tombstone`,
+  `MT.markDeleted`, `uid`, `cid`, `aplicarRegras`, `compromissos`). Formato e lugar de gravação são os do app; o merge por entidade e as lápides são os dele.
+- Mesmas duas diferenças deliberadas do iPhone: salvar plantão mantém `pgDia`/`pgMes` do local; editar lançamento mantém grupo, banco e vencimento.
+- Uma gravação por vez (fila). Antes de gravar na conta real, a capa confere a nuvem (`getDocFromServer`, 8 s); sem rede, nada é gravado e o
+  `MT.save` da página não cai no `setDoc` sem merge. A tela só muda quando a gravação foi confirmada (até 20 s).
+- Sem rede a página nem abre (ela gravaria sozinha ao ativar agendados). Diferente do iPhone, não há cópia guardada em disco: sem rede, a tela mostra o
+  que foi carregado nesta sessão, com o horário.
+- Sair da conta: o cofre fecha os quadros antes do `MT.signOut` (assim o `clearIndexedDbPersistence` não esbarra neles) e esquece o que estava na memória.
+
+### `?demo=1`
+
+- As mesmas páginas, no modo demonstração nativo do `_mtauth.js`: o quadro recebe o HTML da página com só duas mudanças (`<base>` do site e a
+  configuração do Firebase vazia). Dados fictícios só neste navegador (`mt_plantaohub_anon`, `mt_granae_anon`), nunca a nuvem.
+- Trava: página em demo só com `?demo=1`, página na nuvem só sem ele; se não conferir, o quadro é fechado e nada é gravado.
+- Semente fictícia (a do `RepositorioDemo` do iPhone) gravada pela própria página na primeira abertura (`localStorage['medtech.demo.semeado.*']`).
+- O `granae.app.js` escreve `localStorage['gc-state-v1']` (cópia que ninguém lê); na demo o cofre devolve o valor que havia antes, para a cópia da conta real deste navegador não virar fictícia.
+- Para conferir a compatibilidade com os apps originais na demo, eles precisam abrir no modo demo nativo (Firebase sem configuração). No teste de 03/11
+  isso foi feito com um servidor local que entrega `_mtfb.js` vazio só quando `plantaohub.html?demo=1` ou `granae.html?demo=1` é aberto direto na aba.
+
+### Telas (iguais ao iPhone)
+
+- Plantões: cabeça do mês (ano ou período, Mais opções, vizinhos, arrastar de lado troca o mês), próximo plantão, Falta receber (abre recebidos,
+  previsão por local com a regra e atrasados), calendário (toque escolhe o dia; toque longo ou botão direito: copiar o dia e lançar nele; colar tocando nos dias),
+  lista do mês ou do dia (arrastar para a direita alterna recebido, para a esquerda exclui, com Desfazer), botão Lançar plantão (no dia escolhido).
+- Folha do plantão: locais recentes, outro local (preenche horário e valor do local), dia, início, fim, valor com horas e valor por hora, A receber/Recebido,
+  observação, Duplicar em 7 dias e Excluir.
+- Mais opções de Plantões: Locais e pagamento (período do mês, regra padrão, regra por local), Plantões no ano, e o PlantãoHub no site (CSV).
+- Finanças: cabeça do mês, Entrou (abre as receitas), Saiu (abre gastos por categoria com teto), Saldo, lista com filtro (tipo, busca, categoria),
+  agendados à parte, arrastar para a esquerda exclui com Desfazer, botão Lançar.
+- Lançar: Gasto/Receita (lembra o último), valor no teclado, data, toque na categoria salva; Descrição, parcelas e conta; na edição, Salvar, Duplicar para hoje e Excluir.
+- Mais opções de Finanças: Parcelas e dívidas (registrar parcela ou pagamento), Fixos e tetos, e as telas do Granaê no site (`granae.html#ia`, `#transacoes`...).
+
+### Diferenças em relação ao iPhone
+
+- Toque longo no dia vira folha com as duas ações (no iPhone é o menu de contexto); no computador, o botão direito também abre.
+- Categorias do lançamento quebram em linhas com rolagem vertical (no iPhone, duas linhas com rolagem lateral): nada rola de lado.
+- Plantões no ano: o gráfico é só visual e o detalhe de cada mês vem na lista "Por mês" (no iPhone, toque na barra). Assim nenhum alvo fica abaixo de 44 px.
+- Botão de voltar das telas internas diz "Voltar"; Desfazer, avisos e números sem animação de contagem; sem vibração.
+- As páginas abrem quando a seção é aberta (no iPhone, as duas abrem juntas): o Granaê é pesado e só carrega quando Finanças é aberta.
+- Sem cópia em disco para ver sem internet (ver acima).
