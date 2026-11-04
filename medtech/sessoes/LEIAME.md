@@ -15,7 +15,7 @@ e depois aqui; o teste diferencial (`teste/`) reprova qualquer diferença entre 
 | `index.js` | Registro: `todas`, `protocolo(id)`, `protocoloPorConduta(idConduta)` e `nucleo`. Porta de `SessoesDisponiveis.swift`. |
 | `cad.js`, `sca.js`, `sepse.js`, `anafilaxia.js`, `epileptico.js`, `ehh.js`, `hipona.js` | Um motor por doença, `export default` o protocolo. |
 | `package.json` | Só `"type": "module"`, para o Node tratar os `.js` como módulos ES. |
-| `DIVERGENCIAS.md` | Pontos do Swift que parecem erro, portados iguais, para decisão do Matheus. |
+| `DIVERGENCIAS.md` | Pontos do Swift que pareciam erro, achados na porta, e o que foi decidido (os cinco foram corrigidos em 04/11/2026, nos dois lados). |
 | `teste/` | Prova de equivalência com o Swift (não é carregado pela tela). |
 
 Ids: `cad`, `sca` (conduta `stemi`; `nstemi` cai na mesma sessão), `sepse`, `anafilaxia`, `epileptico`, `ehh`, `hipona`.
@@ -131,5 +131,5 @@ Precisa do Mac com o app iOS em `~/Documents/Claude/medtech-ios` (só leitura), 
   `troca_<id>.txt` desviam essas chamadas: com `PONTE=js`, cada uma também vai ao JS e reprova se ele discordar.
 - `node teste/plantar.mjs <id>`: os erros plantados do `tools/sessao_<id>_teste.sh` do app, traduzidos para o JS; cada um tem
   de reprovar no diferencial e nos testes do app sobre o JS.
-- `SWIFT_DETERMINISTIC_HASHING=1` fixa a ordem dos dicionários do Swift (ver `DIVERGENCIAS.md`, mal epiléptico). Datas do Swift
+- Não precisa de `SWIFT_DETERMINISTIC_HASHING`: desde 04/11/2026 o mal epiléptico junta as doses em ordem fixa, sem Dictionary (ver `DIVERGENCIAS.md`). Datas do Swift
   (segundos desde 2001) viram milissegundos desde 1970 arredondados; os testes rodam em `America/Fortaleza` e `America/New_York`.

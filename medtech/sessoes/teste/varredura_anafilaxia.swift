@@ -106,6 +106,20 @@ struct VarreduraAnafilaxia {
                     e.medir("adrenalinaHa", m, t)
                     r.append((e, t))
                 }
+                /* A mesma dose digitada de novo (decisão de 04/11/2026): mesmo minuto calculado com segundos variados, minutos
+                   vizinhos, três digitações, e confirmadas no mesmo minuto (essas não se juntam). */
+                for m in stride(from: 0.0, through: 40.0, by: 1.0) { for depois in [0.0, 1, 3, 10] { for (s1, s2) in [(0.0, 0.0), (0.0, 59.0), (59.0, 0.0), (20.0, 50.0), (30.0, 30.5), (0.4, 59.6)] { for viz in [0.0, 1, -1] {
+                    var e = base(t)
+                    e.medir("adrenalinaHa", m, t.addingTimeInterval(-depois * 60 - s1))
+                    e.medir("adrenalinaHa", m + depois + viz, t.addingTimeInterval(-s2))
+                    r.append((e, t))
+                    if viz == 0 && depois == 3 {
+                        var e3 = e; e3.medir("adrenalinaHa", m + depois + 5, t.addingTimeInterval(-s2 - 300)); r.append((e3, t))
+                        var ec = e; ec.acoes.append(AcaoRegistrada(tipo: "adrenalina.dose", rotulo: "", hora: t.addingTimeInterval(-(m + depois) * 60), valores: ["mg": 0.5, "mL": 0.5]))
+                        ec.acoes.append(AcaoRegistrada(tipo: "evolucao.persiste", rotulo: "", hora: t)); r.append((ec, t))
+                        var ep = e; ep.acoes.append(AcaoRegistrada(tipo: "evolucao.persiste", rotulo: "", hora: t)); r.append((ep, t))
+                    }
+                } } } }
                 /* Critérios: todas as respostas em três valores, exposição rodando. */
                 let chaves = ["inicioAgudo", "pele", "respiratorio", "paOrgao", "giGrave", "hipotensao", "bronco", "laringe"]
                 let exps: [String?] = [nil, "conhecido", "provavel", "sem"]

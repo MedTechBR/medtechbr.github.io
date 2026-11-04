@@ -95,10 +95,18 @@ export function criterio2(e) {
   return e_([tres(resposta(e, 'inicioAgudo')), exp, ou([hipotensao(e), tres(resposta(e, 'bronco')), tres(resposta(e, 'laringe'))])]);
 }
 
-/* Doses dadas: as confirmadas na tela e as digitadas (fora do serviço, por exemplo). */
+/* Doses dadas: as confirmadas na tela e as digitadas (fora do serviço, por exemplo).
+   Digitada de novo não conta duas vezes (decisão do Matheus, 04/11/2026, igual ao Swift): a mesma dose é a que cai no
+   mesmo minuto calculado (hora da coleta menos os minutos digitados, no minuto do relógio). Vale a primeira digitada.
+   Só junta digitada com digitada. */
 export function horasDoses(e) {
   const h = e.acoes.filter((a) => a.tipo === 'adrenalina.dose').map((a) => a.hora);
-  for (const m of e.series.adrenalinaHa ?? []) h.push(mais(m.hora, -Math.max(0, m.valor) * 60));
+  const minutos = new Set();
+  for (const m of e.series.adrenalinaHa ?? []) {
+    const quando = mais(m.hora, -Math.max(0, m.valor) * 60);
+    const minuto = Math.floor(quando / 60000);
+    if (!minutos.has(minuto)) { minutos.add(minuto); h.push(quando); }
+  }
   return h.sort((a, b) => a - b);
 }
 const RESPOSTAS = ['resolveu', 'persiste', 'piorou'];

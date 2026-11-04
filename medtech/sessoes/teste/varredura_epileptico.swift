@@ -1,8 +1,8 @@
 import Foundation
 
 /* Varredura diferencial do estado de mal epiléptico.
-   Rodar com SWIFT_DETERMINISTIC_HASHING=1: o motor Swift itera dicionários para juntar as doses, e com doses de drogas
-   diferentes na mesma hora a ordem muda a cada execução do app (ver DIVERGENCIAS.md). */
+   Desde 04/11/2026 o motor Swift junta as doses por lista em ordem fixa (não mais por Dictionary): não depende de
+   SWIFT_DETERMINISTIC_HASHING. O bloco 8 cobre o empate de hora entre todas as drogas (ver DIVERGENCIAS.md, item 1). */
 typealias ME = MotorEpileptico
 
 @main
@@ -184,12 +184,28 @@ struct VarreduraEpileptico {
                 for q in ME().triagem { var e = base(t); e.respostas[q.chave] = true; r.append((e, t)); e.respostas[q.chave] = nil; r.append((e, t)) }
                 var semInicio = base(t); semInicio.series["minCrise"] = nil; r.append((semInicio, t)); r.append((semInicio, t.addingTimeInterval(3600 * 20)))
                 var semConf = base(t); semConf.acoes.removeAll(); r.append((semConf, t))
-                /* 8. Doses de drogas diferentes na mesma hora (a ordem de desempate é a do Swift com hash determinístico). */
-                for (a, b) in [("inicial.lorazepam", "inicial.midazolam"), ("inicial.diazepam", "inicial.lorazepam"), ("segunda.valproato", "segunda.fosfenitoina"), ("segunda.fenitoina", "segunda.levetiracetam")] {
-                    var e = base(t, segundos: 1500)
-                    ac(&e, t, a, segundos: 400, ["mg": 1]); ac(&e, t, b, segundos: 400, ["mg": 2]); ac(&e, t, "crise.continua", segundos: 1)
-                    r.append((e, t))
-                    e.medir("dadoDiazepam", 3, t.addingTimeInterval(-400)); r.append((e, t))
+                /* 8. Doses de drogas diferentes na mesma hora: todos os pares, confirmadas ou digitadas, nas duas ordens de inserção. */
+                let listas: [(String, [String], [String: String])] = [
+                    ("inicial.", ["midazolam", "lorazepam", "diazepam", "fenobarbital", "diazepamRetal", "midazolamNasal"],
+                     ["midazolam": "dadoMidazolam", "lorazepam": "dadoLorazepam", "diazepam": "dadoDiazepam", "fenobarbital": "dadoFenobarbital"]),
+                    ("segunda.", ["fosfenitoina", "valproato", "levetiracetam", "fenitoina", "fenobarbital"],
+                     ["fosfenitoina": "dadoFosfenitoina", "valproato": "dadoValproato", "levetiracetam": "dadoLevetiracetam"]),
+                ]
+                for (prefixo, drogas, series) in listas {
+                    for a in drogas { for b in drogas where b != a { for (sa, sb) in [(false, false), (true, false), (false, true), (true, true)] {
+                        if sa && series[a] == nil || sb && series[b] == nil { continue }
+                        var e = base(t, segundos: prefixo == "inicial." ? 600 : 1500)
+                        for (d, ser, mg) in [(a, sa, 1.0), (b, sb, 2.0)] {
+                            if ser { e.medir(series[d]!, mg, t.addingTimeInterval(-400)) } else { ac(&e, t, prefixo + d, segundos: 400, ["mg": mg]) }
+                        }
+                        ac(&e, t, "crise.continua", segundos: 1)
+                        r.append((e, t))
+                        if prefixo == "inicial." { e.medir("dadoDiazepam", 3, t.addingTimeInterval(-400)); r.append((e, t)) }
+                    } } }
+                    var todas = base(t, segundos: 1500)
+                    for d in drogas.reversed() { if let ser = series[d] { todas.medir(ser, 1, t.addingTimeInterval(-400)) } else { ac(&todas, t, prefixo + d, segundos: 400, ["mg": 1]) } }
+                    ac(&todas, t, "crise.continua", segundos: 1)
+                    r.append((todas, t))
                 }
                 /* As funções auxiliares também, em cada estado desta lista. */
                 var n = 0

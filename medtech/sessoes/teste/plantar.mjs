@@ -22,7 +22,7 @@ const argsCasos = [`tools/sessao_${D}_casos.md`, ...(D === 'sca' ? ['docs/sessao
 
 const T = fs.mkdtempSync(path.join(os.tmpdir(), `mtsessoes-plantar-${D}-`));
 console.log(`Compilando os dois binários de ${D} (uma vez só; o Swift não muda)...`);
-const envBase = { ...process.env, SWIFT_DETERMINISTIC_HASHING: '1', PONTE_JS: path.join(aqui, 'ponte.mjs') };
+const envBase = { ...process.env, PONTE_JS: path.join(aqui, 'ponte.mjs') };
 execFileSync('zsh', [path.join(aqui, 'varredura.sh'), D], { env: { ...envBase, COMPILAR: `${T}/varr` }, stdio: ['ignore', 'inherit', 'inherit'] });
 execFileSync('zsh', [path.join(aqui, 'casos.sh'), D], { env: { ...envBase, COMPILAR: `${T}/casos` }, stdio: ['ignore', 'inherit', 'inherit'] });
 

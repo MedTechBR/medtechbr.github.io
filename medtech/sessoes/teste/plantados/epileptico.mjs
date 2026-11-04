@@ -1,4 +1,4 @@
-/* Os 27 erros plantados de tools/sessao_epileptico_teste.sh, na mesma ordem, traduzidos para epileptico.js. */
+/* Os 29 erros plantados de tools/sessao_epileptico_teste.sh, na mesma ordem, traduzidos para epileptico.js. */
 export default [
   { nome: 'chave da fenitoína desligada', de: 'export const fenitoinaCondutaLocal = { mgKg: 20, tetoMg: 1500 };', para: 'export const fenitoinaCondutaLocal = null;' },
   { nome: 'fenitoína em 25 mg/kg', de: 'export const fenitoinaCondutaLocal = { mgKg: 20, tetoMg: 1500 };', para: 'export const fenitoinaCondutaLocal = { mgKg: 25, tetoMg: 1500 };' },
@@ -27,4 +27,6 @@ export default [
   { nome: 'início faltando sem aviso', de: 'if (!temInicio) {', para: 'if (false) {' },
   { nome: 'avançar antes de 5 min', de: 'if (f === 1 || f === 2) {\n      c.acoes.push', para: 'if (f <= 2) {\n      c.acoes.push' },
   { nome: 'fonte apontando para a linha errada', de: "regra(69, 'R17.", para: "regra(70, 'R17." },
+  { nome: 'erro antigo: doses na mesma hora pela ordem do Dictionary (a do hash fixo)', de: "const tiposIniciais = [['midazolam', 'dadoMidazolam'], ['lorazepam', 'dadoLorazepam'], ['diazepam', 'dadoDiazepam'], ['fenobarbital', 'dadoFenobarbital'], ['diazepamRetal', ''], ['midazolamNasal', '']];\nconst tiposSegunda = [['fosfenitoina', 'dadoFosfenitoina'], ['valproato', 'dadoValproato'], ['levetiracetam', 'dadoLevetiracetam'], ['fenitoina', ''], ['fenobarbital', '']];", para: "const tiposIniciais = [['lorazepam', 'dadoLorazepam'], ['midazolam', 'dadoMidazolam'], ['diazepam', 'dadoDiazepam'], ['fenobarbital', 'dadoFenobarbital'], ['midazolamNasal', ''], ['diazepamRetal', '']];\nconst tiposSegunda = [['valproato', 'dadoValproato'], ['levetiracetam', 'dadoLevetiracetam'], ['fosfenitoina', 'dadoFosfenitoina'], ['fenitoina', ''], ['fenobarbital', '']];" },
+  { nome: 'empate de hora pela ordem inversa da lista', de: 'a[1] - b[1]', para: 'b[1] - a[1]' },
 ];
