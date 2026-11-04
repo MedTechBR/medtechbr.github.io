@@ -132,6 +132,16 @@ struct VarreduraEHH {
                         r.append((e, t))
                     }
                 }
+                /* Queda exata nos cortes, sem medida intermediária (a de 152 acima desloca o máximo da janela). */
+                for na0 in [150.0, 140.5, 133.3] {
+                    for q in [9.9, 9.99, 10, 10.01, 10.1] {
+                        for h in [0.5, 1.0, 23.99, 24, 24.0 + 1.0 / 3600] {
+                            var e = base(t, medidas: false)
+                            e.medir("sodio", na0, h5.addingTimeInterval(-h * 3600)); e.medir("sodio", na0 - q, h5)
+                            r.append((e, t))
+                        }
+                    }
+                }
                 /* Resolução: osmolalidade, glicemia, diurese e cognição. */
                 for o in [299.9, 300, 300.1] {
                     for g in [249.0, 250] {
