@@ -22,6 +22,11 @@ Não mexe em `app.html`, no `/sw.js` do portal, no banco de condutas nem nas reg
 | `ui.js` | folha que sobe, alerta, aviso, pilha de camadas com o Voltar do aparelho | (SwiftUI) |
 | `sw.js`, `manifest.webmanifest` | PWA com escopo `/medtech/`, offline | |
 | `didatica/*.json` | camada didática (Em 1 minuto, Primeiros passos, Teste-se, fluxo de tratamento) | `MedTech/Consultar/Dados/didatica/` |
+| `fer-ponte.js` | a ponte do iPhone (DOM mínimo), copiada sem mudança; cada chamada cria um global isolado | `Ferramentas/Dados/ferramentas_ponte.js` |
+| `fer-motor.js` | motor das Ferramentas, sem DOM: lê o JS original do site, roda na ponte e devolve dados e motores | `tools/ferramentas_gera_dados.mjs`, `MotorCalc`, `MotorATB`, `MotorPocus`, `MotorPali`, `MotorCondutai`, `BuscaFerramentas` |
+| `fer-ui.js` | camada de ferramenta, componentes, barra acima do teclado, painel e conversa de IA | `FerramentasComum.swift`, `FerramentasIA.swift` |
+| `ferramentas.js` | as telas das 14 ferramentas e o encaixe na casca (`ferramenta` e `busca`) | `Calculadoras.swift`, `Antibioticos.swift`, `Pocus.swift`, `Paliativos.swift`, `FerramentasCondutai.swift` |
+| `ferramentas.css` | estilo das Ferramentas (tinta por ferramenta, faixas de resultado, claro e escuro) | `Ferramentas.swift` (corFundo, corTinta), `FaixaClinica` |
 
 ## De onde vêm os dados (nada copiado do banco)
 
@@ -36,6 +41,25 @@ Não mexe em `app.html`, no `/sw.js` do portal, no banco de condutas nem nas reg
 - Conferido em 03/11/2026 contra o parser Swift do iPhone (`tools/consultar_verifica_main.swift` compilado no Mac):
   formas idênticas nas 274 condutas (mesma contagem por tipo); tópicos, doses citadas e selos de bula iguais em 274/274;
   links entre condutas iguais em 270/274 (4 condutas com 1 link a menos, porque aqui vale a regra `\b` do `linkifyRelated` do site).
+
+## Ferramentas (fer-*.js e ferramentas.js)
+
+- A lista da seção é a da casca (`montaFerramentas`, mesmas portas do iPhone). As telas entram por `MedTechCasca.registrar('ferramenta', ...)`
+  e os itens das ferramentas na busca da tela inicial por `registrar('busca', ...)`. `casca.js` não foi alterado.
+- Nenhuma regra clínica é escrita aqui. `fer-motor.js` faz em tempo real o que o gerador do iPhone faz uma vez:
+  `condutai-calc.js`, `condutai-atb.js` e `condutai-pocus.js` (versões do `condutai-areas.js`), `paliai.html` + `pali-conteudo.js` e os trechos de
+  `condutai.html` (mesma lista de `ferramentas_gera_dados.mjs`) + `condutai-seguranca.js` rodam sem mudança dentro do global da ponte
+  (`new Function` + `with`, sem `setTimeout` nem DOM, como o JavaScriptCore). Contas: `calc()`, `CVATB.calcDoseTool()`/`calcClcrFill()` (CKD-EPI 2021),
+  `compute()` do PaliAI, `interpretarGaso()`, calculadoras de ECG/VM, `runCid()`, `conferenciaInteracoes()`. Prompts de IA: as funções originais;
+  a chamada vai ao `MT.ai` do login central com o nível e as opções do iPhone. Com `?demo=1` a IA devolve uma resposta simulada (igual ao `-demo`).
+- Atalho de teste, como `-ferramenta=` do iPhone: `?ferramenta=calculadoras/ckdepi`, `?ferramenta=antibioticos/dose:vancomicina`, `?ferramenta=pocus/blue`,
+  `?ferramenta=paliativos/triagem`, `?ferramenta=cid/J18`.
+- Prova de paridade (Node, no scratchpad da sessão de 03/11/2026, pasta `paridade/`): os dados extraídos em tempo real são iguais aos JSON do pacote
+  do iPhone (calculadoras, antibióticos, POCUS, paliativos, CondutAI e índice de busca), a ponte e o trecho do `condutai.html` são idênticos byte a byte,
+  e os números batem com o caminho do iPhone nos casos do `AutotesteFerramentas.swift`: 64/64 calculadoras (4.444 casos), 534/534 doses em 89 faixas
+  renais (faixa acesa certa 495/495), 400/400 doses da ficha, TFG, 129/129 prompts, gasometria 400/400, ECG 200/200, VM 200/200, CID 173/173, triagem 504/504.
+- Favoritas e recentes das calculadoras: `localStorage['medtech.calc.favoritas']` e `['medtech.calc.recentes']` (ids por vírgula; recentes guarda 6).
+- Offline: o `sw.js` guarda os arquivos acima no precache; as imagens do POCUS entram no cache quando abertas.
 
 ## Pontos de encaixe (contrato)
 
@@ -106,7 +130,10 @@ MedTechCasca.registrar('ferramenta', function (id, item) { /* abre a ferramenta 
 
 ## Diferenças conhecidas em relação ao iPhone
 
-- Ferramentas, Plantões, Finanças e as sessões de acompanhamento são pontos de encaixe (outras frentes).
+- Plantões, Finanças e as sessões de acompanhamento são pontos de encaixe (outras frentes); a linha "Acompanhar paciente" das Ferramentas segue para o encaixe das sessões.
+- Ferramentas: o diagrama do POCUS é desenhado em SVG a partir das mesmas formas do iPhone (com halo pulsante no ponto); clipes GIF, com Reduzir movimento,
+  só tocam ao tocar em "Tocar clipe"; títulos e nomes aparecem sem travessão (": "), o texto clínico fica como veio; sem vibração;
+  a data das calculadoras usa o seletor de data do navegador (o iPhone mostra o calendário aberto).
 - Diagrama do fluxograma: desenhado pelo mermaid do site (com `sanitizeMermaid`, que troca `≤` por "menor ou igual a"), não pelo desenho nativo.
 - Tópicos trocam por toque ou deslizando a página (scroll-snap); sem vibração; ícones Tabler no lugar dos SF Symbols.
 - Prescrição com IA (doenças sem modelo) leva ao CondutAI; no iPhone ela roda dentro do app.
