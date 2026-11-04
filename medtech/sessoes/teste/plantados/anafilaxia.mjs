@@ -1,4 +1,4 @@
-/* Os 23 erros plantados de tools/sessao_anafilaxia_teste.sh, na mesma ordem, traduzidos para anafilaxia.js. */
+/* Os 25 erros plantados de tools/sessao_anafilaxia_teste.sh, na mesma ordem, traduzidos para anafilaxia.js. */
 export default [
   { nome: 'teto de 0,6 mg', de: 'Math.min(0.01 * peso, 0.5)', para: 'Math.min(0.01 * peso, 0.6)' },
   { nome: 'sem teto', de: 'Math.min(0.01 * peso, 0.5)', para: '0.01 * peso' },
@@ -23,4 +23,6 @@ export default [
   { nome: 'oxigênio sem a nova dose', de: 'if (resp === true || n >= 2) {', para: 'if (resp === true) {' },
   { nome: 'parada fora da triagem', de: "pergunta('parada', 'Parada cardiorrespiratória'),", para: '' },
   { nome: 'fonte apontando para a linha errada', de: "r13: regra(48, 'R13.", para: "r13: regra(49, 'R13." },
+  { nome: 'erro antigo: mesma dose digitada de novo conta duas', de: "if (!minutos.has(minuto)) { minutos.add(minuto); h.push(quando); }", para: 'h.push(quando);' },
+  { nome: 'mesma dose só no segundo exato', de: "const minuto = Math.floor(quando / 60000);", para: 'const minuto = quando;' },
 ];

@@ -1,7 +1,7 @@
 import Foundation
 
 /* Funções e regras estáticas de MotorAnafilaxia que o teste do app chama direto (doseAdrenalina, hipotensaoCalculada,
-   criterio1, criterio2 e as regras r01...rSemJanela por "let m = MotorAnafilaxia.self").
+   criterio1, criterio2, horasDoses e as regras r01...rSemJanela por "let m = MotorAnafilaxia.self").
    Devolvem o valor do Swift; com PONTE=js cada chamada também vai ao JS e reprova (saída 4) se o JS discordar.
    Ligado pelo troca_anafilaxia.txt na cópia do teste. */
 enum JSAnafilaxia {
@@ -26,6 +26,11 @@ enum JSAnafilaxia {
     static func criterio2(_ e: EstadoSessao) -> Tres {
         let v = MotorAnafilaxia.criterio2(e)
         if js { compararFuncao("anafilaxia", "criterio2", [Codec.estado(e)], tres(v)) }
+        return v
+    }
+    static func horasDoses(_ e: EstadoSessao) -> [Date] {
+        let v = MotorAnafilaxia.horasDoses(e)
+        if js { compararFuncao("anafilaxia", "horasDoses", [Codec.estado(e)], v.map { Codec.ms($0) }) }
         return v
     }
     static func regra(_ nome: String, _ r: RegraFonte) -> RegraFonte {
