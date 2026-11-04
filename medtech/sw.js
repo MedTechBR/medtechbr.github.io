@@ -4,10 +4,11 @@
      a cura do precache envenenado pela borda do CDN; o precache busca com cache:'reload'.
    - Páginas HTML: rede primeiro, cache só como reserva offline.
    - Só o próprio domínio; Firebase, gstatic e APIs passam direto. */
-const CACHE = 'medtech-pwa-v1';
+const CACHE = 'medtech-pwa-v2';
 const NUCLEO = [
   './', './index.html', './medtech.css?v=1', './manifest.webmanifest',
   './ui.js?v=1', './dados.js?v=1', './conduta.js?v=1', './leitor.js?v=1', './presc.js?v=1', './fluxo.js?v=1', './casca.js?v=1',
+  './gestao.css?v=1', './cofre.js?v=1', './gestao.js?v=1',
   '../condutai.html',
   '../condutai-banco.js?v=7', '../condutai-prescricoes.js?v=5', '../condutai-seguranca.js?v=4', '../condutai-didatica.js?v=1', '../condutai-ligacoes.js?v=1',
   '../vendor/tabler/tabler-icons.min.css?v=3.48.0', '../vendor/tabler/fonts/tabler-icons.woff2?v3.48.0',
