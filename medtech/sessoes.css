@@ -1,0 +1,239 @@
+/* MedTech PWA: tela das sessões de acompanhamento sem IA, igual ao iPhone (SessaoView.swift).
+   Usa a camada .fer das Ferramentas (cabeçalho, rolagem, pé, barra do teclado) e os tokens do medtech.css e do ferramentas.css.
+   Cor da sessão: --sessao (fundo, texto branco) e --ti-sessoes (tinta). Números clínicos sem animação. */
+:root { --ss-trava: #B91C1C; --ss-inativo-f: #5D6579; --ss-inativo-t: #FFFFFF; }
+@media (prefers-color-scheme: dark) {
+  :root { --ss-inativo-f: #A4ABBD; --ss-inativo-t: #0D1017; }
+}
+
+.ss { --fer: var(--sessao); }
+.ss .fer-rola { padding-top: 2px; }
+.ss-pilha { display: flex; flex-direction: column; gap: 12px; }
+.ss-pilha.g10 { gap: 10px; } .ss-pilha.g14 { gap: 14px; } .ss-pilha.g18 { gap: 18px; } .ss-pilha.g24 { gap: 24px; }
+.ss-pe { display: flex; flex-direction: column; gap: 8px; padding-top: 8px; }
+.ss-apoio { font-size: 13px; font-weight: 500; color: var(--tinta2); text-align: center; padding-bottom: 4px; line-height: 1.3; }
+.ss-dur { font-size: 15px; font-weight: 600; color: var(--tinta2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ss [data-num-clinico], .ss .ss-valor, .ss .ss-crono-n, .ss .ss-ex-n { transition: none !important; animation: none !important; }
+
+/* textos */
+.ss-intro { font-size: 17px; color: var(--tinta2); line-height: 1.35; }
+.ss-intro.t16 { font-size: 16px; }
+.ss-intro.t18 { font-size: 18px; font-weight: 600; }
+.ss-h30 { font-size: 30px; font-weight: 700; line-height: 1.15; overflow-wrap: anywhere; }
+.ss-h26 { font-size: 26px; font-weight: 700; line-height: 1.2; }
+.ss-h24 { font-size: 24px; font-weight: 700; line-height: 1.2; }
+.ss-h22 { font-size: 22px; font-weight: 700; line-height: 1.25; }
+.ss-h20 { font-size: 20px; font-weight: 700; line-height: 1.25; }
+.ss-t18 { font-size: 18px; line-height: 1.4; }
+.ss-t19 { font-size: 19px; line-height: 1.4; }
+.ss-t22s { font-size: 22px; font-weight: 600; line-height: 1.3; }
+.ss-ok { color: var(--fx-ok); }
+.ss-atencao { color: var(--fx-atencao); }
+.ss-alerta-t { color: var(--fx-alerta); }
+.ss-fora-ic { font-size: 54px; color: var(--fx-atencao); }
+
+/* botões grandes (BotaoGrande) */
+.ss-bt { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 62px; padding: 6px 12px; border-radius: 20px; background: var(--sessao); color: #fff;
+  font-size: 19px; font-weight: 700; line-height: 1.25; text-align: center; }
+.ss-bt.leve { background: var(--sup2); color: var(--tinta); }
+.ss-bt.inativo { background: var(--ss-inativo-f); color: var(--ss-inativo-t); }
+.ss-bt.perigo { background: var(--ss-trava); color: #fff; }
+.ss-bt.a54 { min-height: 54px; } .ss-bt.a66 { min-height: 66px; } .ss-bt.a78 { min-height: 78px; }
+.ss-par { display: flex; gap: 10px; }
+.ss-par > * { flex: 1; min-width: 0; }
+
+/* "Ver regra e fonte" */
+.ss-fonte { align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px; font-size: 15px; font-weight: 600; color: var(--tinta2); text-decoration: underline; text-underline-offset: 3px; }
+.ss-fonte.branca { color: #fff; }
+
+/* Sim e Não */
+.ss-simnao { display: flex; flex-direction: column; gap: 8px; }
+.ss-simnao > b { font-size: 20px; font-weight: 600; line-height: 1.3; }
+.ss-simnao > span { font-size: 15px; color: var(--tinta2); line-height: 1.35; }
+.ss-simnao .ss-par { gap: 8px; }
+.ss-sn { min-height: 58px; border-radius: 18px; background: var(--sup); border: 1px solid var(--fio); font-size: 20px; font-weight: 700; color: var(--tinta); text-align: center; }
+.ss-sn[aria-pressed="true"] { background: var(--sessao); border-color: transparent; color: #fff; }
+
+/* linha de marcar (triagem e lista do passo) */
+.ss-marca { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 60px; padding: 10px 16px; border-radius: 18px; background: var(--sup); border: 1px solid var(--fio);
+  font-size: 17px; line-height: 1.35; color: var(--tinta); text-align: left; }
+.ss-marca > span { flex: 1; min-width: 0; }
+.ss-marca > .ti { flex: none; font-size: 17px; -webkit-text-stroke: 1.2px currentColor; }
+.ss-marca[aria-pressed="true"] { background: var(--sessao); border-color: transparent; color: #fff; font-weight: 600; }
+.ss-marca.trava { border: 2px solid var(--ss-trava); }
+.ss-marca.trava[aria-pressed="true"] { background: var(--ss-trava); border-color: transparent; }
+.ss-marca.atencao[aria-pressed="true"] { background: var(--fx-atencao); color: #fff; }
+@media (prefers-color-scheme: dark) { .ss-marca.atencao[aria-pressed="true"] { color: #141827; } }
+
+/* campos */
+.ss-campos { display: flex; flex-direction: column; gap: 10px; }
+.ss-hora { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 54px; }
+.ss-hora label { font-size: 18px; font-weight: 600; }
+.ss-hora input, .ss-quando input { height: 50px; padding: 0 14px; border-radius: 14px; border: 1px solid var(--fio); background: var(--sup2); color: var(--tinta);
+  font: 600 19px var(--fonte); font-variant-numeric: tabular-nums; color-scheme: light dark; -webkit-appearance: none; appearance: none; }
+.ss-hora input:focus, .ss-quando input:focus { outline: 0; border-color: var(--sessao); box-shadow: 0 0 0 1.5px var(--sessao); }
+.ss-quando { display: flex; flex-direction: column; gap: 8px; }
+.ss-quando label { font-size: 15px; font-weight: 600; color: var(--tinta2); }
+.ss-quando input { width: 100%; height: 66px; font-size: 22px; border-radius: 20px; background: var(--sup); }
+.ss-quando-lido { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* lista de sessões */
+.ss-doenca { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 92px; padding: 16px; border-radius: 24px; background: var(--sessao); color: #fff; text-align: left; }
+.ss-doenca > i { flex: none; width: 56px; height: 56px; border-radius: 50%; background: rgba(255, 255, 255, .2); display: grid; place-items: center; font-size: 28px; }
+.ss-doenca > div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.ss-doenca b { font-size: 22px; font-weight: 700; line-height: 1.2; }
+.ss-doenca span { font-size: 16px; line-height: 1.3; }
+
+/* ramos */
+.ss-op { display: flex; flex-direction: column; justify-content: center; gap: 2px; width: 100%; min-height: 66px; padding: 8px 16px; border-radius: 18px; background: var(--sup); border: 1px solid var(--fio); color: var(--tinta); text-align: left; }
+.ss-op b { font-size: 20px; font-weight: 700; line-height: 1.25; }
+.ss-op span { font-size: 15px; line-height: 1.35; }
+.ss-op[aria-pressed="true"] { background: var(--sessao); border-color: transparent; color: #fff; }
+.ss-op:disabled { color: var(--tinta2); cursor: not-allowed; }
+.ss-op:disabled span { font-weight: 600; }
+.ss-op.passo { min-height: 70px; padding: 10px 16px; }
+.ss-op.passo b { font-size: 21px; }
+.ss-op.passo span { font-size: 16px; }
+
+/* critérios */
+.ss-crit { display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 22px; background: var(--sup); }
+.ss-crit-l { display: flex; align-items: flex-start; gap: 10px; }
+.ss-crit-l > .ti { flex: none; font-size: 24px; margin-top: 1px; }
+.ss-crit-l b { display: block; font-size: 18px; font-weight: 600; line-height: 1.3; }
+.ss-crit-l span { display: block; font-size: 16px; color: var(--tinta2); line-height: 1.35; }
+
+/* trava (vermelho cheio, no topo) */
+.ss-trava { display: flex; flex-direction: column; gap: 8px; padding: 18px; border-radius: 26px; background: var(--ss-trava); color: #fff; }
+.ss-trava-c { display: flex; align-items: center; gap: 12px; }
+.ss-trava-c > .ti { flex: none; font-size: 44px; }
+.ss-trava-c b { font-size: 32px; font-weight: 800; line-height: 1.1; overflow-wrap: anywhere; }
+.ss-trava p { font-size: 23px; font-weight: 700; line-height: 1.3; }
+
+/* alerta */
+.ss-alerta { display: flex; flex-direction: column; gap: 4px; padding: 14px; border-radius: 20px; background: var(--fx-f); }
+.ss-alerta-c { display: flex; align-items: flex-start; gap: 10px; }
+.ss-alerta-c > .ti { flex: none; font-size: 26px; color: var(--fx); }
+.ss-alerta-c p { font-size: 18px; font-weight: 600; line-height: 1.35; }
+
+/* resolução cumprida */
+.ss-resolvido { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 72px; padding: 16px; border-radius: 22px; background: var(--fx-ok-f); color: var(--tinta); text-align: left; }
+.ss-resolvido > .ti { flex: none; font-size: 26px; color: var(--fx-ok); }
+.ss-resolvido b { display: block; font-size: 20px; font-weight: 700; line-height: 1.25; }
+.ss-resolvido span { display: block; font-size: 15px; font-weight: 600; }
+
+/* cronômetro grande */
+.ss-crono { display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: 24px; background: var(--sup); border: 1px solid var(--fio); }
+.ss-crono-t { font-size: 16px; font-weight: 700; color: var(--tinta2); }
+.ss-crono-n { font-size: 56px; font-weight: 800; line-height: 1.05; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.ss-crono-s { font-size: 19px; font-weight: 700; line-height: 1.3; }
+.ss-marco { display: flex; align-items: baseline; gap: 10px; color: var(--tinta2); }
+.ss-marco > b { flex: none; width: 66px; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.ss-marco > span { flex: 1; font-size: 16px; line-height: 1.35; }
+.ss-marco > .ti { flex: none; font-size: 18px; color: var(--ti-sessoes); }
+.ss-marco.passou { color: var(--tinta); }
+.ss-marco.passou > span { font-weight: 600; }
+
+/* relógios dos exames */
+.ss-exames { display: flex; flex-direction: column; gap: 8px; }
+.ss-ex-grade { display: grid; grid-template-columns: repeat(var(--col, 3), minmax(0, 1fr)); gap: 8px; }
+.ss-ex { display: flex; flex-direction: column; justify-content: center; gap: 2px; min-height: 84px; min-width: 0; padding: 8px 10px; border-radius: 18px; background: var(--sup); border: 1px solid var(--fio); color: var(--tinta); text-align: left; }
+.ss-ex b, .ss-ex small, .ss-ex strong { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-ex b { font-size: 15px; font-weight: 700; line-height: 1.25; }
+.ss-ex small { font-size: 13px; font-weight: 500; line-height: 1.25; }
+.ss-ex strong { font-size: 20px; font-weight: 700; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.ss-ex-grade.c4 .ss-ex strong { font-size: 17px; }
+.ss-ex.vencido { background: var(--ss-trava); border-color: transparent; color: #fff; }
+.ss-outros { border-bottom: 1px solid var(--fio); }
+.ss-outros > button { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; text-align: left; color: var(--tinta); }
+.ss-outros > button > b { flex: 1; font-size: 17px; font-weight: 600; }
+.ss-outros > button > span { font-size: 15px; font-weight: 500; color: var(--tinta2); }
+.ss-outros > button > .ti { font-size: 15px; color: var(--tinta2); -webkit-text-stroke: 1px currentColor; }
+.ss-outros > button[aria-expanded="true"] > .ti { transform: rotate(180deg); }
+.ss-outros-c { display: flex; flex-direction: column; gap: 8px; padding-bottom: 12px; }
+.ss-ex-l { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 44px; text-align: left; color: var(--tinta); }
+.ss-ex-l b { font-size: 18px; font-weight: 600; }
+.ss-ex-l strong { font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ss-ex-l.vencido strong { color: var(--fx-alerta); }
+
+/* cartão */
+.ss-cartao { --c: var(--sessao); display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 26px; background: var(--sup); border: 1px solid var(--fio); }
+.ss-cartao.proximo { border: 3px solid var(--c); padding: 14px; }
+.ss-cartao.travado { border: 3px solid var(--ss-trava); padding: 14px; }
+.ss-cartao.correndo { background: color-mix(in srgb, var(--c) 10%, var(--papel)); }
+.ss-cab { display: flex; align-items: center; gap: 12px; }
+.ss-cab > i { flex: none; width: 50px; height: 50px; border-radius: 50%; background: var(--c); color: #fff; display: grid; place-items: center; font-size: 25px; }
+.ss-cab > div { flex: 1; min-width: 0; }
+.ss-cab h3 { font-size: 19px; font-weight: 700; line-height: 1.25; }
+.ss-cab span { display: block; font-size: 14px; font-weight: 600; color: var(--tinta2); line-height: 1.3; }
+.ss-cab span.atencao { color: var(--fx-atencao); }
+.ss-cab span.alerta { color: var(--fx-alerta); }
+.ss-valor { font-size: 30px; font-weight: 800; line-height: 1.15; overflow-wrap: break-word; }
+.ss-conta { font-size: 19px; font-weight: 600; line-height: 1.35; }
+.ss-detalhe { font-size: 17px; line-height: 1.4; }
+.ss-acao { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 58px; padding: 6px 10px; border-radius: 18px; background: var(--c); color: #fff; font-size: 18px; font-weight: 700; line-height: 1.25; text-align: center; }
+.ss-acao.sec { min-height: 50px; background: var(--sup2); color: var(--tinta); font-size: 16px; font-weight: 600; }
+
+/* sem indicação agora */
+.ss-calmos-t { font-size: 15px; font-weight: 600; color: var(--tinta2); padding-top: 4px; }
+.ss-calma { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 8px 12px; border-radius: 18px; background: var(--sup); text-align: left; color: var(--tinta); }
+.ss-calma > i { flex: none; width: 38px; height: 38px; border-radius: 50%; background: var(--c); color: #fff; display: grid; place-items: center; font-size: 19px; }
+.ss-calma > div { flex: 1; min-width: 0; }
+.ss-calma b { display: block; font-size: 17px; font-weight: 600; line-height: 1.3; }
+.ss-calma span { display: block; font-size: 15px; color: var(--tinta2); line-height: 1.35; }
+
+/* menu do fim da tela Agora */
+.ss-menu { display: flex; flex-direction: column; gap: 8px; padding-top: 6px; }
+.ss-linha { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 62px; padding: 6px 12px; border-radius: 20px; background: var(--sup); border: 1px solid var(--fio); text-align: left; color: var(--tinta); }
+.ss-linha > i { flex: none; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: 21px; }
+.ss-linha > b { flex: 1; min-width: 0; font-size: 19px; font-weight: 700; line-height: 1.25; }
+.ss-linha > span { flex: none; max-width: 40%; font-size: 13px; font-weight: 700; color: var(--fx-ok); text-align: right; line-height: 1.25; }
+.ss-linha.destaque { border: 2.5px solid var(--fx-ok); padding: 5px 11px; }
+
+/* aviso "Registrado às" com Desfazer */
+.ss-registrado { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 14px; border-radius: 14px; background: var(--sup2); }
+.ss-registrado span { font-size: 15px; font-weight: 600; }
+.ss-registrado button { min-height: 44px; font-size: 15px; font-weight: 700; color: var(--ti-sessoes); }
+
+/* curva */
+.ss-curva { display: flex; flex-direction: column; gap: 6px; padding: 14px; border-radius: 22px; background: var(--sup); }
+.ss-curva .ss-h22 { font-size: 22px; }
+.ss-curva-l { font-size: 17px; font-weight: 600; line-height: 1.35; }
+.ss-grafico { width: 100%; display: block; overflow: visible; }
+.ss-grafico .grade { stroke: var(--fio); stroke-width: 1; }
+.ss-grafico .eixo { fill: var(--tinta2); font: 500 12px var(--fonte); }
+.ss-grafico .linha { fill: none; stroke: var(--sessao); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.ss-grafico .ponto { fill: var(--sessao); }
+.ss-grafico .regra { stroke: var(--fx-alerta); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.ss-grafico .regra-t { fill: var(--fx-alerta); font: 600 12px var(--fonte); }
+@media (prefers-color-scheme: dark) { .ss-grafico .linha { stroke: var(--ti-sessoes); } .ss-grafico .ponto { fill: var(--ti-sessoes); } }
+.ss-evo { display: flex; flex-direction: column; gap: 8px; padding: 14px; border-radius: 22px; background: var(--sup); }
+.ss-evo h2 { font-size: 21px; font-weight: 700; }
+.ss-vazio { font-size: 18px; color: var(--tinta2); min-height: 90px; display: flex; align-items: center; }
+
+/* subtelas */
+.ss-mud { display: flex; flex-direction: column; gap: 6px; padding: 16px; border-radius: 22px; background: var(--sup); }
+.ss-mud h3 { font-size: 19px; font-weight: 700; }
+.ss-mud .antes { font-size: 17px; color: var(--tinta2); line-height: 1.35; }
+.ss-mud .agora { font-size: 21px; font-weight: 700; line-height: 1.3; }
+.ss-mud .porque { font-size: 16px; line-height: 1.4; }
+.ss-passagem { padding: 16px; border-radius: 22px; background: var(--sup); font-size: 17px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; -webkit-user-select: text; user-select: text; }
+.ss-reg { display: flex; align-items: baseline; gap: 12px; }
+.ss-reg b { flex: none; font-size: 19px; font-weight: 700; color: var(--ti-sessoes); font-variant-numeric: tabular-nums; }
+.ss-reg span { font-size: 18px; line-height: 1.35; }
+
+/* folha "Ver regra e fonte" */
+.ss-folha .folha-corpo { display: flex; flex-direction: column; gap: 14px; }
+.ss-folha .rot { font-size: 15px; font-weight: 600; color: var(--tinta2); }
+.ss-folha .regra { font-size: 22px; font-weight: 600; line-height: 1.3; }
+.ss-folha .origem { font-size: 19px; line-height: 1.35; }
+.ss-folha .ref { font-size: 17px; line-height: 1.4; }
+.ss-folha .linha { font-size: 15px; color: var(--tinta2); }
+.ss-folha hr { border: 0; border-top: 1px solid var(--fio); margin: 4px 0; width: 100%; }
+.ss-folha .outra { font-size: 18px; font-weight: 600; line-height: 1.3; }
+.ss-folha .outra-o { font-size: 16px; line-height: 1.35; }
+.ss-folha .bt-fechar { min-height: 54px; border-radius: 18px; background: var(--sup2); font-size: 17px; font-weight: 600; text-align: center; }
+
+@media (prefers-reduced-motion: reduce) { .ss * { transition: none !important; } }
+
+/* confirmação com mais de um valor fora da faixa: uma linha por valor */
+.alerta p { white-space: pre-line; }

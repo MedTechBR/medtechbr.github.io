@@ -50,7 +50,7 @@
     { id: 'hipona', nome: 'Hiponatremia', conduta: 'hipona' }
   ];
   var IRMAS = { nstemi: 'stemi' };   // sessão única para mais de uma conduta
-  var CHAVE_SESSAO = 'medtech.sessao.';
+  var CHAVE_SESSAO = 'mt.sessao.v1.';   // a mesma chave dos motores (sessoes/nucleo.js, CHAVE_ARMAZEM)
 
   var encaixes = { sessao: null, ferramenta: null, secao: {}, busca: [], prescricaoIA: null, perfil: [] };
 
@@ -425,7 +425,7 @@
       (W.requestIdleCallback || function (f) { setTimeout(f, 400); })(function () { W.MTDados.preparaTermos(); if (st.atualizaBusca) st.atualizaBusca(); });
     }).catch(function (e) { console.warn(e); });
     D.addEventListener('medtech:sessoes', desenhaCalma);
-    W.addEventListener('storage', function (e) { if (!e.key || e.key.indexOf('medtech.') === 0) desenhaCalma(); });
+    W.addEventListener('storage', function (e) { if (!e.key || e.key.indexOf('medtech.') === 0 || e.key.indexOf(CHAVE_SESSAO) === 0) desenhaCalma(); });
     setInterval(function () { if (Sessoes.emAndamento().length) desenhaCalma(); }, 60000);
     if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js', { scope: './' }).catch(function () { });
   }
