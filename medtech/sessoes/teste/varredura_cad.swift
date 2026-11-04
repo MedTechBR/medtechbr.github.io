@@ -77,6 +77,15 @@ struct VarreduraCAD {
                         }
                     }
                 }
+                /* Glicemia que não cai (04/11/2026): intervalo entre as duas glicemias em volta de 30 min, com a insulina antes e
+                   depois da primeira, subindo, igual e caindo. */
+                for dt in [0.0, 0.01, 0.5, 1, 10, 29, 29.99, 30, 30.01, 60, 240] { for d in [-1.0, 0, 1] { for antes in [false, true] {
+                    var e = cfg0(t)
+                    e.series["glicemia"] = nil
+                    e.acoes.append(AcaoRegistrada(tipo: "insulina.inicio", rotulo: "", hora: t.addingTimeInterval(antes ? -60 - dt * 30 : -18000), valores: ["uKgH": 0.1, "uH": 7]))
+                    e.medir("glicemia", 300, t.addingTimeInterval(-120 - dt * 60)); e.medir("glicemia", 300 + d, t.addingTimeInterval(-120))
+                    r.append((e, t))
+                } } }
                 /* Transição: basal a cada minuto em volta de 60 e 120 min. */
                 for m in stride(from: 50.0, through: 130.0, by: 1.0) {
                     var e = cfg0(t)

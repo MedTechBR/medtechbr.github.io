@@ -43,6 +43,9 @@ const R = {
 /* Gravidade: 0 fora das faixas, 1 leve, 2 moderada, 3 grave (o rawValue do enum Grav do Swift). */
 export const GRAV = { semFaixa: 0, leve: 1, moderada: 2, grave: 3 };
 
+/* "Glicemia não cai" só compara com as duas glicemias a 30 min ou mais (decisão de 04/11/2026). */
+export const intervaloMinimoComparacao = 1800;
+
 /* Tabela 2, linhas 16 a 18: basta um critério; a linha mais grave que casar vale. */
 export function gravidade(ph, hco3, bohb) {
   if (ph === null && hco3 === null && bohb === null) return null;
@@ -223,8 +226,13 @@ function avaliar(p, e, agora) {
   }
   if (correndo) {
     const d = ultimosDois(e, 'glicemia');
-    if (d && d[0].hora >= (inicioIns ?? agora) && d[1].valor >= d[0].valor) {
-      o.alertas.push(alerta('naoCai', 'amarelo', `A glicemia não caiu entre as duas últimas medidas (${num(d[0].valor, 0)} e ${num(d[1].valor, 0)} mg/dL). Sem regra numérica: reavalie a infusão.`, R.rNaoCai));
+    /* Só compara com as duas glicemias a 30 min ou mais uma da outra (decisão do Matheus, 04/11/2026, igual ao Swift). */
+    if (d && d[0].hora >= (inicioIns ?? agora)) {
+      if (desde(d[1].hora, d[0].hora) < intervaloMinimoComparacao) {
+        o.alertas.push(alerta('glicIntervalo', 'amarelo', 'Intervalo curto para calcular a velocidade da glicemia: as duas últimas medidas têm menos de 30 min entre si.', R.rNaoCai));
+      } else if (d[1].valor >= d[0].valor) {
+        o.alertas.push(alerta('naoCai', 'amarelo', `A glicemia não caiu entre as duas últimas medidas (${num(d[0].valor, 0)} e ${num(d[1].valor, 0)} mg/dL). Sem regra numérica: reavalie a infusão.`, R.rNaoCai));
+      }
     }
   }
 

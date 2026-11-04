@@ -1,7 +1,7 @@
 # Pontos do Swift que pareciam erro (achados na porta)
 
 Achados durante a porta, portados iguais ao Swift enquanto esperavam decisão. Em 04/11/2026 o Matheus aprovou corrigir
-os cinco e mais um achado depois (item 6). A correção foi feita primeiro no app (`medtech-ios`, com especificação, casos à mão e erro antigo plantado) e
+os cinco e mais dois achados depois (itens 6 e 7). A correção foi feita primeiro no app (`medtech-ios`, com especificação, casos à mão e erro antigo plantado) e
 depois aqui; o teste diferencial continua exigindo igualdade exata entre os dois.
 
 ## 1. Mal epiléptico: doses na mesma hora mudavam de ordem ao reabrir o app (lógica). RESOLVIDO em 04/11/2026
@@ -65,8 +65,16 @@ depois aqui; o teste diferencial continua exigindo igualdade exata entre os dois
   calculam). Abaixo disso a taxa não aparece; os cartões da osmolalidade e da salina 0,45% dizem "Intervalo curto para
   calcular a velocidade", e para a glicemia (que não tem cartão próprio) um aviso amarelo `glicIntervalo` diz o mesmo.
   Par com a mesma hora segue sem conta, como antes. Funções novas para o teste: `glicemiaIntervaloCurto`, `osmIntervaloCurto`.
-- Não mudou: a queda do sódio (R18) é em mmol/L numa janela de 24 h, sem divisão pelo tempo; fica para decisão. CAD e
-  hiponatremia não têm conta de velocidade por hora (ver o relatório da correção).
+- Sódio (R18): queda em mmol/L numa janela de 24 h, sem divisão pelo tempo. Decisão do Matheus: fica como está.
+  Hiponatremia: só diferenças em janelas de 24 e 48 h, sem conta por hora; não mudou. CAD: ver o item 7.
 - Prova: casos 100-104 e a grade de intervalos curtos do app reprovam o comportamento antigo; erro antigo, borda de 30 min
   e mínimo de 15 min plantados; a varredura cobre intervalos de 0,6 s a 241 min.
 
+## 7. CAD: "glicemia não cai" comparava duas glicemias com qualquer intervalo (lógica). RESOLVIDO em 04/11/2026
+
+- Onde: `MotorCAD.swift` e `cad.js`, alerta `naoCai` (sem regra numérica).
+- O que fazia: com a insulina correndo, comparava as duas últimas glicemias, mesmo a minutos uma da outra.
+- Decisão do Matheus: só compara com as duas glicemias a 30 min ou mais (30 min exatos comparam). Abaixo disso, mesma
+  hora inclusive, o alerta não acende e um aviso amarelo `glicIntervalo` diz "Intervalo curto para calcular a velocidade".
+- Prova: casos 69-72 e a grade nova do app reprovam o comportamento antigo; erro antigo e borda de 30 min plantados; a
+  varredura ganhou o bloco de intervalos em volta de 30 min, com a insulina antes e depois da primeira glicemia.

@@ -1,4 +1,4 @@
-/* Os 13 erros plantados de tools/sessao_cad_teste.sh, na mesma ordem, traduzidos para cad.js. */
+/* Os 15 erros plantados de tools/sessao_cad_teste.sh, na mesma ordem, traduzidos para cad.js. */
 export default [
   { nome: 'insulina liberada com K 3,5', de: 'const travaK = (k) => k <= 3.5;', para: 'const travaK = (k) => k < 3.5;' },
   { nome: 'KCl com K até 5,5', de: 'if (k > 5.0) {\n    c.valor = \'Sem K\';', para: 'if (k > 5.5) {\n    c.valor = \'Sem K\';' },
@@ -13,4 +13,6 @@ export default [
   { nome: 'exame vencido não sinalizado', de: "else if (proxima !== null && agora > proxima) s = 'vencido';", para: "else if (proxima !== null && agora > mais(proxima, 3600)) s = 'vencido';" },
   { nome: 'alerta de hipoglicemia em 70', de: 'if (g !== null && g < 70) {', para: 'if (g !== null && g <= 70) {' },
   { nome: 'K faltando vira normal', de: "if (k === null) {\n      c.valor = 'Falta potássio';", para: "k = k ?? 4.0;\n    if (false) {\n      c.valor = 'Falta potássio';" },
+  { nome: 'erro antigo: não cai com intervalo curto', de: "if (desde(d[1].hora, d[0].hora) < intervaloMinimoComparacao) {", para: 'if (false) {' },
+  { nome: '30 min exatos sem comparar', de: "if (desde(d[1].hora, d[0].hora) < intervaloMinimoComparacao) {", para: "if (desde(d[1].hora, d[0].hora) <= intervaloMinimoComparacao) {" },
 ];
