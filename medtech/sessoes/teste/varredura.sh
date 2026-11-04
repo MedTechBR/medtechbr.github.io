@@ -4,8 +4,6 @@
 # Variáveis: IOS (raiz do app), SESSOES_DIR (módulos JS, para erro plantado), BIN_VARREDURA (binário pronto),
 # COMPILAR (só compila para este caminho e sai), TZ.
 set -u
-# Ordem fixa dos dicionários do Swift (ver DIVERGENCIAS.md, mal epiléptico).
-export SWIFT_DETERMINISTIC_HASHING=1
 D=$1; SEM=${2:-1}; ESC=${3:-1}
 AQUI=${0:A:h}
 IOS=${IOS:-$HOME/Documents/Claude/medtech-ios}

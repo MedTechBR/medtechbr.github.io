@@ -10,7 +10,6 @@
 # (linhas "de<TAB>para", troca literal). Variáveis: IOS (raiz do app), SESSOES_DIR (módulos JS, para erro plantado),
 # BIN_CASOS (binário pronto), COMPILAR (só compila para este caminho e sai), ARGS_EXTRA (ex.: --rapido).
 set -u
-export SWIFT_DETERMINISTIC_HASHING=1
 D=$1; MODO=${2:-ambos}
 AQUI=${0:A:h}
 IOS=${IOS:-$HOME/Documents/Claude/medtech-ios}

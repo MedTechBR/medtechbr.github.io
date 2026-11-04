@@ -82,4 +82,9 @@ enum JSEpileptico {
         if js { compararFuncao("epileptico", "dosesIniciais", [Codec.estado(e)], v.map { ["droga": $0.droga, "hora": Codec.ms($0.hora), "mg": opt($0.mg)] as [String: Any] }) }
         return v
     }
+    static func dosesSegunda(_ e: EstadoSessao) -> [ME.DoseDada] {
+        let v = ME.dosesSegunda(e)
+        if js { compararFuncao("epileptico", "dosesSegunda", [Codec.estado(e)], v.map { ["droga": $0.droga, "hora": Codec.ms($0.hora), "mg": opt($0.mg)] as [String: Any] }) }
+        return v
+    }
 }

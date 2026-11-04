@@ -81,18 +81,19 @@ export function inicioCrise(e) {
   return e.inicio;
 }
 
-/* No Swift estes mapas são Dictionary, e a ordem de iteração muda a cada execução do app (hash com semente aleatória).
-   Ela só aparece na saída quando duas doses de drogas diferentes têm a mesma hora. Aqui a ordem é fixa: a que o Swift
-   usa com SWIFT_DETERMINISTIC_HASHING=1, para o teste diferencial bater. Ver DIVERGENCIAS.md. */
-const tiposIniciais = [['lorazepam', 'dadoLorazepam'], ['midazolam', 'dadoMidazolam'], ['diazepam', 'dadoDiazepam'], ['fenobarbital', 'dadoFenobarbital'], ['midazolamNasal', ''], ['diazepamRetal', '']];
-const tiposSegunda = [['valproato', 'dadoValproato'], ['levetiracetam', 'dadoLevetiracetam'], ['fosfenitoina', 'dadoFosfenitoina'], ['fenitoina', ''], ['fenobarbital', '']];
-function doses(e, prefixo, mapa) {
+/* Ordem das doses, decisão do Matheus de 04/11/2026 (igual ao Swift): por hora; no empate, pela ordem fixa destas listas
+   (a da Figura 1) e, dentro da mesma droga, a confirmada na tela antes da digitada, cada uma na ordem em que entrou.
+   O estado não guarda ordem de registro entre drogas diferentes, por isso o empate entre drogas vai pela lista. */
+const tiposIniciais = [['midazolam', 'dadoMidazolam'], ['lorazepam', 'dadoLorazepam'], ['diazepam', 'dadoDiazepam'], ['fenobarbital', 'dadoFenobarbital'], ['diazepamRetal', ''], ['midazolamNasal', '']];
+const tiposSegunda = [['fosfenitoina', 'dadoFosfenitoina'], ['valproato', 'dadoValproato'], ['levetiracetam', 'dadoLevetiracetam'], ['fenitoina', ''], ['fenobarbital', '']];
+function doses(e, prefixo, lista) {
   let r = [];
-  for (const [droga, serie] of mapa) {
+  for (const [droga, serie] of lista) {
     r = r.concat(e.acoes.filter((a) => a.tipo === prefixo + droga).map((a) => ({ droga, hora: a.hora, mg: a.valores.mg ?? null })));
     if (serie !== '') r = r.concat((e.series[serie] ?? []).map((m) => ({ droga, hora: m.hora, mg: m.valor })));
   }
-  return r.sort((a, b) => a.hora - b.hora);
+  /* Desempate explícito pela posição na lista montada acima, como o Swift. */
+  return r.map((d, i) => [d, i]).sort((a, b) => (a[0].hora !== b[0].hora ? a[0].hora - b[0].hora : a[1] - b[1])).map(([d]) => d);
 }
 export const dosesIniciais = (e) => doses(e, 'inicial.', tiposIniciais);
 export const dosesSegunda = (e) => doses(e, 'segunda.', tiposSegunda);
