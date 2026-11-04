@@ -2,6 +2,7 @@
    Network-first no shell do portal; cache só como fallback offline.
    NÃO intercepta apps externos (.web.app) nem APIs (origem diferente). */
 const CACHE = 'medtech-v810';
+const APPS_PROPRIOS = /^\/(flashmed|clinicamed|cirurgiamed|familiamed|radio-titulo|trafego-titulo|enfermare|fisiare|quiz-enare-farmacia|farmauti|sos-farmacia|sos-farmacologia|capifala)(\/|$)/;
 const SHELL = [
   './app.html',
   './provas.html',
@@ -40,7 +41,9 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      // 03/11/2026: a origem é uma só para o portal e todos os apps de estudo (Cache Storage por origem):
+      // apagar só os caches do portal. Antes, cada atualização dele zerava o cache offline dos apps.
+      .then(keys => Promise.all(keys.filter(k => k.startsWith('medtech-') && k !== CACHE).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
@@ -53,6 +56,10 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   // só o próprio domínio (não toca apps .web.app, gstatic, firebase, etc.)
   if (url.origin !== location.origin) return;
+  // 03/11/2026: cada app de estudo é um app instalável com SW próprio na sua pasta (repos de projeto).
+  // O escopo deste SW é '/', então sem isto ele controlava essas pastas (SOS sempre, os outros na 1ª visita),
+  // guardava tudo no cache do portal e, sem internet, respondia com o app.html (portal do médico).
+  if (APPS_PROPRIOS.test(url.pathname)) return;
   // HTML (navegação / *.html): SEMPRE buscar fresco da rede (cache:'reload') p/ nunca servir
   // código velho quando online; cache só como reserva offline. Estáticos (?v) seguem normal.
   const isHTML = req.mode === 'navigate' || url.pathname.endsWith('.html');

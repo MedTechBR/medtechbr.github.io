@@ -266,6 +266,9 @@ function checkoutUrl(prod, periodo, user) {
 }
 function produtosQueCobrem(P, appId) { return ((P && P.produtos) || []).filter(function (p) { return temCheckout(p) && cobre(p, P, appId); }); }
 function portalDaLinha(linha) { return linha === 'provas' ? '/provas.html' : '/app.html'; }
+/* 03/11/2026: app de outro público (MedTech Multi: enfermagem, fisioterapia, farmácia = produto com `publico`).
+   Por dentro segue a linha provas, mas a tela de assinatura não manda para o portal Provas, que lista apps de Medicina. */
+function publicoDoApp(P, appId) { var l = ((P && P.produtos) || []).filter(function (p) { return p.publico && cobre(p, P, appId); }); return l.length ? String(l[0].publico) : ''; }
 
 /* ---------------- compra: Mercado Pago (checkout "mp") ou link antigo ---------------- */
 function viaMP(prod, per) { return String(((prod && prod.checkout) || {})[per] || '').trim().toLowerCase() === 'mp'; }
@@ -661,16 +664,16 @@ function paywall(o) {
       corpo += '<p>Ou troque um app do seu plano pelo ' + esc(nome) + ':</p><div class="mta-r">' + es.map(function (a) { return '<button type="button" class="bt g" data-acao="trocar" data-sai="' + esc(a) + '">Trocar ' + esc(NOMES[a] || a) + '</button>'; }).join('') + '</div>';
     }
   }
-  var portal = portalDaLinha(linha);
+  var portal = portalDaLinha(linha), multi = !!publicoDoApp(P, app);
   var email = o.user && o.user.email ? o.user.email : '';
   d.innerHTML = '<div class="mta-c">' +
-    '<p class="mta-k">' + (linha === 'provas' ? 'MedTech Provas' : 'MedTech App') + '</p>' +
+    '<p class="mta-k">' + (multi ? 'MedTech Multi' : linha === 'provas' ? 'MedTech Provas' : 'MedTech App') + '</p>' +
     '<h2 id="mta-h" tabindex="-1">' + esc(tit) + '</h2><p id="mta-d">' + esc(txt) + '</p>' + corpo +
     '<div class="mta-m" role="status" aria-live="polite"></div>' +
     '<div class="mta-r"><button type="button" class="bt g" data-acao="atualizar">Já assinei — atualizar</button></div>' +
     (email ? '<p class="mta-who">Conta: ' + esc(email) + '</p>' : '') +
     '<div class="mta-f"><a href="' + AJUDA_URL + '" target="_blank" rel="noopener">Dúvidas</a>' +
-    (o.fechavel ? '<button type="button" data-acao="fechar">Fechar</button>' : '<a href="' + portal + '">Voltar ao portal</a>') +
+    (o.fechavel ? '<button type="button" data-acao="fechar">Fechar</button>' : multi ? '' : '<a href="' + portal + '">Voltar ao portal</a>') +
     '<button type="button" data-acao="sair">Sair da conta</button></div></div>';
   document.body.appendChild(d); document.documentElement.style.overflow = 'hidden';
   travaFundo();
