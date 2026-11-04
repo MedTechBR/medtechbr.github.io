@@ -299,6 +299,15 @@ function grafico(serie, d, linhas, altura, rotulo) {
   if (d && d.unidade) g += '<text class="ss-ge" x="' + (L - 6) + '" y="12" text-anchor="end">' + esc(d.unidade) + '</text>';
   return '<svg class="ss-grafico" viewBox="0 0 ' + Wd + ' ' + Hd + '" role="img" aria-label="' + esc(rotulo) + '">' + g + '</svg>';
 }
+/* minimumScaleFactor dos blocos de exame: o texto encolhe até 55% para caber, sem reticências */
+function encaixa(raiz) {
+  raiz.querySelectorAll('.ss-ex b, .ss-ex small, .ss-ex strong').forEach((x) => {
+    x.style.fontSize = '';
+    let t = parseFloat(getComputedStyle(x).fontSize);
+    const min = t * 0.55;
+    while (x.scrollWidth > x.clientWidth + 0.5 && t > min) { t -= 1; x.style.fontSize = t + 'px'; }
+  });
+}
 const serieOrdenada = (e, id) => [...(e.series[id] || [])].sort((a, b) => a.hora - b.hora);
 
 /* ---------- folha "Ver regra e fonte" (TelaFonteSessao) ---------- */
@@ -339,6 +348,7 @@ function camada(o) {
     t.direita(x.direita || '');
     t.rola.innerHTML = x.corpo;
     t.pe.innerHTML = x.pe || '';
+    encaixa(t.rola);
     t.voltar = x.voltar || null;
     ui.aoDigitar = x.aoDigitar || null;
     ui.aoHora = x.aoHora || null;
@@ -605,7 +615,7 @@ function abrirSessao(p) {
     const agora = Date.now();
     t.el.querySelectorAll('[data-dur]').forEach((x) => { const s = n.duracao((agora - +x.dataset.dur) / 1000); if (x.textContent !== s) x.textContent = s; });
     const ex = t.rola.querySelector('[data-exames]');
-    if (ex) { const hx = examesHTML(m, ui.v, agora); if (ex.innerHTML !== hx) ex.innerHTML = hx; }
+    if (ex) { const hx = examesHTML(m, ui.v, agora); if (ex.innerHTML !== hx) { ex.innerHTML = hx; encaixa(ex); } }
     const cr = t.rola.querySelector('[data-crono]');
     if (cr && m.o.cronometro) { const hc = cronometroHTML(c.r, m.o.cronometro, agora, (rg) => fonte(rg)); if (cr.innerHTML !== hc) cr.innerHTML = hc; }
   };
