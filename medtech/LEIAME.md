@@ -28,6 +28,8 @@ Não mexe em `app.html`, no `/sw.js` do portal, no banco de condutas nem nas reg
 | `ferramentas.js` | as telas das 14 ferramentas e o encaixe na casca (`ferramenta` e `busca`) | `Calculadoras.swift`, `Antibioticos.swift`, `Pocus.swift`, `Paliativos.swift`, `FerramentasCondutai.swift` |
 | `ferramentas.css` | estilo das Ferramentas (tinta por ferramenta, faixas de resultado, claro e escuro) | `Ferramentas.swift` (corFundo, corTinta), `FaixaClinica` |
 | `cofre.js` | dados de Plantões e Finanças: abre `plantaohub.html` e `granae.html` em quadros ocultos e lê e grava por eles | `MeuMes/CofreMes.swift` |
+| `sessoes-tela.js`, `sessoes.css` | tela das sessões de acompanhamento sem IA (lista, triagem, parâmetros, Agora, passo guiado, subtelas, avisos) | `Ferramentas/Sessoes/SessaoView.swift`, `SessaoArmazem.swift` |
+| `sessoes/*.js` | motores das sessões (contrato em `sessoes/LEIAME.md`) | `Ferramentas/Sessoes/Motor*.swift`, `NucleoSessao.swift` |
 | `gestao.js`, `gestao.css` | espaço Gestão: Plantões, Finanças, lançar, mais opções | `MeuMes/PlantoesView`, `FinancasView`, `LancarView`, `MaisMes`, `ModelosMes`, `ComumGestao` |
 
 ## De onde vêm os dados (nada copiado do banco)
@@ -96,14 +98,39 @@ MedTechCasca.registrar('ferramenta', function (id, item) { /* abre a ferramenta 
 
 - Lista (ordem do iPhone): `cad`, `sca` (condutas `stemi` e `nstemi`), `sepse`, `anafilaxia`, `epileptico`, `ehh`, `hipona`.
   `MedTechCasca.sessoes.lista` e `MedTechCasca.sessoes.daConduta(idConduta)`.
-- **Estado em andamento**: `localStorage['medtech.sessao.<id>']` = JSON com pelo menos `{ "protocolo": "<id>", "inicio": "<data ISO 8601 ou milissegundos>" }`
-  (o resto é livre; o formato do iPhone é `EstadoSessao`). Chave presente = sessão em andamento.
-  A barra azul da tela inicial lê essas chaves: nome, "Em andamento há…", "e mais N", "Continuar" e "Finalizar".
-- "Finalizar e apagar" remove a chave e dispara `medtech:sessoes` em `document` (`detail.finalizada = id`).
-  Quem gravar ou mudar uma sessão dispara o mesmo evento para a barra se redesenhar (`document.dispatchEvent(new CustomEvent('medtech:sessoes'))`).
-- Abrir: `MedTechCasca.registrar('sessao', function (id, sessao) { ... })`. `id` é o protocolo (ex.: `'sca'`) vindo de "Continuar"
-  ou de "Acompanhar este paciente" dentro da doença; `id = null` quando vem da barra "Acompanhar paciente" (escolher a doença).
+- **Estado em andamento**: uma chave só, a dos motores: `localStorage['mt.sessao.v1.<id>']` = JSON `EstadoSessao` (contrato em `sessoes/LEIAME.md`;
+  `inicio` em milissegundos). Chave presente = sessão em andamento. A barra azul da tela inicial lê essas chaves: nome, "Em andamento há…", "e mais N",
+  "Continuar" e "Finalizar". (Antes desta tela a casca lia `medtech.sessao.<id>`, que ninguém gravava; trocada sem migração.)
+  Os motores são importados sem `?v=`: ao mudar `sessoes/*.js`, subir o nome do `CACHE` no `sw.js` para o aparelho buscar a versão nova.
+- "Finalizar e apagar" remove a chave e dispara `medtech:sessoes` em `document` (`detail.finalizada = id`); a tela cancela os avisos dessa sessão.
+  Toda gravação da tela dispara o mesmo evento (`detail.id`) para a barra se redesenhar.
+- Abrir: `MedTechCasca.registrar('sessao', function (id, sessao) { ... })`, feito por `sessoes-tela.js`. `id` é o protocolo (ex.: `'sca'`) vindo de "Continuar"
+  ou de "Acompanhar este paciente" dentro da doença; `id = null` quando vem da linha "Acompanhar paciente" das Ferramentas ou da barra vazia (abre a lista).
 - Dado de paciente fica só no aparelho; nada disso vai para a nuvem. Sair da conta (`MT.signOut`) limpa o `localStorage`.
+
+### Tela das sessões (`sessoes-tela.js`, `sessoes.css`)
+
+Porta de `SessaoView.swift` e `SessaoArmazem.swift`. Módulo ES carregado depois da casca; importa `sessoes/index.js` (motores, que não são alterados aqui).
+Nenhuma regra clínica na tela: tudo o que aparece é o que `protocolo.avaliar(e, Date.now())` devolveu, reavaliado a cada toque, a cada 30 s e a cada
+segundo quando há cronômetro (como o app). Usa a camada `.fer` das Ferramentas (`MTFerUI.tela`: cabeçalho, barra acima do teclado, pé).
+
+- Telas: lista de sessões, triagem (com "Fora do escopo"), Parâmetros de agora (faixa plausível com "Confirme o valor"), Sobre o paciente, ramos
+  (classificação, critérios, opções bloqueadas), Agora (faixa do caminho, cronômetro grande, travas, alertas, resolução cumprida, curva fixa, relógios
+  dos exames, cartões na ordem `prioridade()` do app, "Sem indicação agora", menu) e passo guiado (uma pergunta por tela: sim/não, opções, número, hora,
+  lista, "sem dado"). Subtelas: Resolução e transição, Evolução em gráfico (SVG próprio, sem animação), Passagem de plantão (texto de `nucleo.passagem`),
+  Registro (com "Finalizar e apagar a sessão"), Novos resultados e O que mudou (`nucleo.mudancas`). "Ver regra e fonte" abre uma folha
+  (com as demais regras do cartão quando `mostraTodasAsFontes`).
+- Hora que exige escolha (`confirmarPadrao`): enquanto a hora for a padrão, o botão fica "Escolha a hora acima" e não faz nada; só a hora mexida ou o
+  botão do `confirmarPadrao` registram.
+- Avisos de exame: `Notification` com o título "MedTech" e o texto `exame.aviso` do motor (sem dado de paciente), nas horas `janelaInicio` e `proxima`
+  dos exames `noPrazo`. A permissão é pedida no toque em "Seguir" da triagem, como no iPhone. Os avisos são `setTimeout` com a página aberta
+  (reprogramados ao abrir o app para todas as sessões guardadas); sem permissão ou sem suporte, valem os relógios na tela.
+- Atalho de teste: `?sessao=lista` ou `?sessao=<id>` (com `?demo=1`). `window.MTSessoesTela.atual()` devolve `{ p, e, o }` da sessão aberta.
+
+Diferenças em relação ao iPhone: hora por seletor do navegador (`datetime-local` no passo, `time` na coleta) no lugar da roda; ícones Tabler no lugar
+dos SF Symbols; blocos de exame com mais de 3 itens quebram em linhas (o iPhone espreme numa linha); "O que mudou" tem botão de voltar no topo;
+o Voltar do aparelho fecha a sessão inteira (no app não existe esse gesto); na Resolução, confirmar um cartão mostra "Registrado às" num aviso
+passageiro (o app não mostra nada); os avisos de exame só disparam com o app aberto (o iPhone agenda notificação local no sistema); sem vibração.
 
 ### Outros
 
@@ -132,7 +159,7 @@ MedTechCasca.registrar('ferramenta', function (id, item) { /* abre a ferramenta 
 
 ## Diferenças conhecidas em relação ao iPhone
 
-- As sessões de acompanhamento são ponto de encaixe (outra frente); a linha "Acompanhar paciente" das Ferramentas segue para o encaixe das sessões. Plantões e Finanças: ver "Espaço Gestão" abaixo.
+- Sessões de acompanhamento: ver "Tela das sessões" acima. Plantões e Finanças: ver "Espaço Gestão" abaixo.
 - Ferramentas: o diagrama do POCUS é desenhado em SVG a partir das mesmas formas do iPhone (com halo pulsante no ponto); clipes GIF, com Reduzir movimento,
   só tocam ao tocar em "Tocar clipe"; títulos e nomes aparecem sem travessão (": "), o texto clínico fica como veio; sem vibração;
   a data das calculadoras usa o seletor de data do navegador (o iPhone mostra o calendário aberto).
