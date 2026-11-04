@@ -1,4 +1,4 @@
-/* Os 30 erros plantados de tools/sessao_ehh_teste.sh, na mesma ordem, traduzidos para ehh.js. */
+/* Os 33 erros plantados de tools/sessao_ehh_teste.sh, na mesma ordem, traduzidos para ehh.js. */
 export default [
   { nome: 'fórmula da osmolalidade com /20', de: 'return 2 * na + glicemia / 18;', para: 'return 2 * na + glicemia / 20;' },
   { nome: 'efetiva 300 confirma', de: '(ef !== null ? ef > 300 : false)', para: '(ef !== null ? ef >= 300 : false)' },
@@ -30,4 +30,7 @@ export default [
   { nome: 'erro antigo: fosfato de potássio com K 5,0', de: "if (k >= 5.0) {\n    c.situacao = 'decisaoMedico';\n    c.valor = 'Sem orientação';", para: "if (k > 5.0) {\n    c.situacao = 'decisaoMedico';\n    c.valor = 'Sem orientação';" },
   { nome: 'idoso com taxa fixa', de: 'if (idoso || comp) {', para: 'if (comp) {' },
   { nome: 'salina 0,45% com osmolalidade caindo', de: "if (q.queda > 0) {\n    c.situacao = 'semIndicacao';", para: "if (q.queda > 100) {\n    c.situacao = 'semIndicacao';" },
+  { nome: 'erro antigo: velocidade com intervalo curto', de: 'if (s < intervaloMinimoVelocidade) return { queda: null, curto: true };', para: 'if (false) return { queda: null, curto: true };' },
+  { nome: '30 min exatos sem velocidade', de: 'if (s < intervaloMinimoVelocidade) return { queda: null, curto: true };', para: 'if (s <= intervaloMinimoVelocidade) return { queda: null, curto: true };' },
+  { nome: 'intervalo mínimo de 15 min', de: 'export const intervaloMinimoVelocidade = 1800;', para: 'export const intervaloMinimoVelocidade = 900;' },
 ];
