@@ -904,4 +904,5 @@ export const funcoesTeste = {
   infundido: (e) => infundido(e),
   verossimilhanca: (e) => verossimilhanca(e),
   regras: () => R,
+  regra: (nome) => R[nome] ?? null,
 };
