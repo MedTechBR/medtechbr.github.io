@@ -1,7 +1,7 @@
 /* MedTech Portal — service worker (PWA instalável).
    Network-first no shell do portal; cache só como fallback offline.
    NÃO intercepta apps externos (.web.app) nem APIs (origem diferente). */
-const CACHE = 'medtech-v810';
+const CACHE = 'medtech-v811';
 const APPS_PROPRIOS = /^\/(flashmed|clinicamed|cirurgiamed|familiamed|radio-titulo|trafego-titulo|enfermare|fisiare|quiz-enare-farmacia|farmauti|sos-farmacia|sos-farmacologia|capifala)(\/|$)/;
 const SHELL = [
   './app.html',
@@ -73,6 +73,8 @@ self.addEventListener('fetch', e => {
         }
         return res;
       })
-      .catch(() => caches.match(req).then(c => c || caches.match('./app.html')))
+      // 03/11/2026: o app.html é reserva só de NAVEGAÇÃO. Antes valia para qualquer pedido: um script da raiz
+      // (/_mtacesso.js) que falhasse na rede chegava como HTML ao app de estudo (SyntaxError, app quebrado).
+      .catch(() => caches.match(req).then(c => c || (req.mode === 'navigate' ? caches.match('./app.html') : Response.error())))
   );
 });

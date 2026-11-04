@@ -129,3 +129,9 @@ Verificação (árvore local com o site na raiz e cada app na sua pasta, `python
   `/sw.js` do portal; na 1ª visita aos SOS o `/sw.js` do portal não guarda nada da pasta. FarmaUTI só registra SW
   em https (regra dele), por isso não aparece no teste local.
 - `node --check` em todo JS alterado (e no script inline dos SOS); `_testa_acesso.js`: 120 mil casos, 0 divergências.
+
+## Publicação (03/11/2026)
+Publicado com bump em cada repo (CACHE do sw.js; `bump.py` onde existe; `/_mtacesso.js?v=19` nos 6 apps da Multi).
+No reteste antes de publicar apareceu um defeito antigo do `/sw.js`: com a rede falhando, ele respondia com o
+`app.html` a QUALQUER pedido, então um script da raiz (`/_mtacesso.js`) chegava como HTML ao app de estudo na
+1ª visita (SyntaxError, app quebrado). Agora o `app.html` só é reserva de navegação. `/sw.js` em `medtech-v811`.
