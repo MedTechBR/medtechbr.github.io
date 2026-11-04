@@ -125,7 +125,7 @@
       st.travada[s] = 1;
       el.onclick = null;
       el.innerHTML = '<div class="trava rola-secao"><div class="em-obra"><span class="trava-ic" aria-hidden="true">' + ic('lock') + '</span><h1>' + SECOES[s].nome + '</h1><p class="corpo">Esta seção não faz parte do seu plano atual.</p>' +
-        '<a class="bt-cheio" href="../app.html">Ver planos e assinatura</a></div></div>';
+        '<a class="bt-cheio" href="../app.html?conta=1">Ver planos e assinatura</a></div></div>';
       return;
     }
     st.travada[s] = 0;
@@ -365,9 +365,9 @@
         var u = W.MT && W.MT.user, nome = u && !u.demo ? (u.displayName || u.email || '') : (DEMO ? 'Modo demonstração' : '');
         var link = function (t, href) { return '<a class="pf-l" href="' + href + '"><span>' + t + '</span>' + ic('arrow-up-right') + '</a>'; };
         c.innerHTML = '<h2 class="folha-titulo" data-foco tabindex="-1">Sua conta</h2>' + (nome ? '<p class="pf-nome">' + esc(nome) + '</p>' : '') +
-          '<div class="pf-grupo">' + link('Minha conta e assinatura', '../app.html') + link('Ajuda', '../ajuda.html') + link('Termos de uso', '../termos.html') + link('Privacidade', '../privacidade.html') +
+          '<div class="pf-grupo">' + link('Minha conta e assinatura', '../app.html?conta=1') + link('Ajuda', '../ajuda.html') + link('Termos de uso', '../termos.html') + link('Privacidade', '../privacidade.html') +
           encaixes.perfil.map(function (x) { return link(esc(x.titulo), esc(x.href)); }).join('') + '</div>' +
-          (u && !u.demo ? '<button type="button" class="pf-sair">Sair da conta</button>' : '') + '<p class="pf-versao">Versão de teste 0.1</p>';
+          (u && !u.demo ? '<button type="button" class="pf-sair">Sair da conta</button>' : '') + '<p class="pf-versao">Versão 1.0</p>';
         var s = c.querySelector('.pf-sair');
         if (s) s.addEventListener('click', function () {
           U.confirma('Sair da conta?', 'Os dados deste aparelho serão limpos; na nuvem eles continuam.', [

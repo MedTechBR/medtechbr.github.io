@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR" data-viva="portal" data-viva-escuro>
 <head>
+<script>/* 04/11/2026: o MedTech App passou a ser o app novo em /medtech/ (igual ao app de iPhone).
+   Este portal continua só para compra (?plano=), retorno do pagamento (?pago=), teste (?testar=) e conta e assinatura (?conta=1). */
+(function(){var q=new URLSearchParams(location.search);if(!q.has('plano')&&!q.has('pago')&&!q.has('testar')&&!q.has('conta'))location.replace('/medtech/'+location.hash);})();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>MedTech App — seus apps médicos</title>
@@ -1235,6 +1238,7 @@ async function carregaAcesso(){
   ACESSO = false;   // em andamento
   try { ACESSO = (await MT.acessoEstado()) || { venda: false }; } catch(e) { ACESSO = { venda: false }; }
   renderGrid(); preencheAssinatura(); renderFaixa(); planoDaURL(); testeDaURL(); escolhaPendente(); chegadaPagamento(); retomarPlano();
+  if (Q0.get('conta')) openAssinatura();
 }
 
 /* saudação + sair (via login central MedTech) */
