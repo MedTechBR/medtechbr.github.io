@@ -1,12 +1,12 @@
 /* MedTech Portal — service worker (PWA instalável).
    Network-first no shell do portal; cache só como fallback offline.
    NÃO intercepta apps externos (.web.app) nem APIs (origem diferente). */
-const CACHE = 'medtech-v811';
+const CACHE = 'medtech-v812';
 const APPS_PROPRIOS = /^\/(flashmed|clinicamed|cirurgiamed|familiamed|radio-titulo|trafego-titulo|enfermare|fisiare|quiz-enare-farmacia|farmauti|sos-farmacia|sos-farmacologia|capifala)(\/|$)/;
+const PROVAS = /^\/provas\.(html|webmanifest)$/;   // não é mais app: rede direto, sem cópia nem reserva
 const SHELL = [
   './app.html',
-  './provas.html',
-  './provas.webmanifest',
+  // 03/11/2026: provas.html deixou de ser app instalável (só mostra as plataformas); fora do shell
   './flashmed.webmanifest',
   // FlashMed abre offline (antes caía no portal) e leva a conta vendorizada (mtsync + Firebase compat)
   './flashmed.html',
@@ -59,7 +59,7 @@ self.addEventListener('fetch', e => {
   // 03/11/2026: cada app de estudo é um app instalável com SW próprio na sua pasta (repos de projeto).
   // O escopo deste SW é '/', então sem isto ele controlava essas pastas (SOS sempre, os outros na 1ª visita),
   // guardava tudo no cache do portal e, sem internet, respondia com o app.html (portal do médico).
-  if (APPS_PROPRIOS.test(url.pathname)) return;
+  if (APPS_PROPRIOS.test(url.pathname) || PROVAS.test(url.pathname)) return;
   // HTML (navegação / *.html): SEMPRE buscar fresco da rede (cache:'reload') p/ nunca servir
   // código velho quando online; cache só como reserva offline. Estáticos (?v) seguem normal.
   const isHTML = req.mode === 'navigate' || url.pathname.endsWith('.html');

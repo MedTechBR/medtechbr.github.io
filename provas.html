@@ -8,11 +8,7 @@
 <meta name="theme-color" content="#F5F6FB">
 <link rel="stylesheet" href="vendor/tabler/tabler-icons.min.css?v=3.48.0">
 <link rel="icon" type="image/png" href="favicon.png">
-<link rel="manifest" href="provas.webmanifest">
 <link rel="apple-touch-icon" href="icone-provas-180.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="MedTech Provas">
 <script>window.MT_APP={id:"portal-provas",name:"MedTech Provas",linha:"provas"};</script>
 <script src="_mtfb.js?v=1"></script>
 <script type="module" src="_mtauth.js?v=50"></script>
@@ -1197,7 +1193,9 @@ const instalado = () => { try { return matchMedia('(display-mode: standalone)').
 const ehIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const ehCelular = () => ehIOS() || /Android|Mobi/i.test(navigator.userAgent);
 function htmlInstalar(onde){
-  if (instalado() || lsLer('mt.instalar.dispensado')) return '';
+  /* MedTech Provas: em vez de instalar o portal, cada plataforma se instala pela própria página */
+  if (onde !== 'portal') return '';
+  return `<section class="inst" aria-labelledby="inst-t-portal"><div class="inst-h"><span class="inst-ic" aria-hidden="true"><i class="ti ti-device-mobile-down"></i></span><h4 id="inst-t-portal">Cada plataforma é um app</h4></div><p>Abra a sua plataforma e instale por ela: no celular, ela ganha ícone e entrada próprios na tela inicial.</p></section>`;
   const nome = (window.MT_APP && MT_APP.name) || 'MedTech';
   let corpo;
   if (deferredPrompt) corpo = `<p>Abre como app, em tela cheia, direto da tela inicial.</p><div class="inst-r"><button type="button" class="b ok" data-instalar><i class="ti ti-download" aria-hidden="true"></i>Instalar</button></div>`;
@@ -1268,9 +1266,7 @@ document.addEventListener('click', e => {
 }); refreshUser(); } else setTimeout(waitMT,40); })();
 
 /* PWA: service worker + botão instalar */
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
-}
+/* sem service worker: o MedTech Provas não é app instalável (cada plataforma tem o seu) */
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault(); deferredPrompt = e;
   const b = document.getElementById('btnInstall'); b.hidden = false;

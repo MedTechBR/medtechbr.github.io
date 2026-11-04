@@ -135,3 +135,14 @@ Publicado com bump em cada repo (CACHE do sw.js; `bump.py` onde existe; `/_mtace
 No reteste antes de publicar apareceu um defeito antigo do `/sw.js`: com a rede falhando, ele respondia com o
 `app.html` a QUALQUER pedido, então um script da raiz (`/_mtacesso.js`) chegava como HTML ao app de estudo na
 1ª visita (SyntaxError, app quebrado). Agora o `app.html` só é reserva de navegação. `/sw.js` em `medtech-v811`.
+
+## Decisões do Matheus aplicadas (03/11/2026, noite)
+1. Botão "MedTech Provas" fora também do ClínicaMed, CirurgiaMed, FamíliaMed e FlashMed.
+2. Ícones do TráfegoTítulo, FarmaUTI e AprovaFarma em quadrado cheio, mesmo desenho (inclusive o maskable do
+   AprovaFarma e o ícone do iPhone), URLs com `?v=2`.
+3. `provas.html` deixa de ser app instalável: o `_gera_provas.py` tira manifesto, metas de app do iPhone e registro
+   do SW, e troca o cartão "Instale o MedTech Provas" por "Cada plataforma é um app" (abrir e instalar pela
+   própria plataforma). O `/sw.js` (medtech-v812) tirou `provas.html`/`provas.webmanifest` do shell e não trata mais
+   essas URLs. O `app.html` não mudou. `provas.webmanifest` e os ícones do Provas continuam no repo (quem já
+   instalou não quebra), mas nenhuma página liga o manifesto.
+4. Gestão da farmácia continua dentro do SOS Farmácia, sem manifesto próprio.
