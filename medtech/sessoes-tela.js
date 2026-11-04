@@ -20,6 +20,7 @@ const SIMBOLOS = {
   'waveform.path.ecg': 'activity-heartbeat', 'waveform.path.ecg.rectangle': 'heart-rate-monitor', 'waveform.path.ecg.rectangle.fill': 'heart-rate-monitor',
   'chart.line.uptrend.xyaxis': 'chart-line', 'clock.arrow.circlepath': 'history', 'arrow.triangle.2.circlepath': 'refresh', 'arrow.triangle.branch': 'git-branch',
   'arrow.triangle.swap': 'arrows-exchange', 'arrow.down.circle.fill': 'circle-arrow-down', 'bandage.fill': 'bandage', 'stethoscope': 'stethoscope',
+  'nosign': 'ban', 'magnifyingglass': 'search', 'note.text': 'note', 'scissors': 'scissors', 'scope': 'focus-2',
   'brain.head.profile': 'brain', 'brain': 'brain', 'thermometer': 'thermometer', 'clock.fill': 'clock', 'timer': 'clock', 'flag.checkered': 'flag-3'
 };
 const semIcone = new Set();
@@ -778,6 +779,6 @@ function liga() {
   const q = new URLSearchParams(location.search).get('sessao');
   if (q) setTimeout(() => { if (q === 'lista') abrirLista(); else if (protocolo(q)) abrirSessao(protocolo(q)); }, 0);
   /* para o teste: o que o motor devolveu para a sessão aberta */
-  W.MTSessoesTela = { nucleo: n, protocolo, todas, atual: () => (atual ? { p: atual.m.p, e: atual.m.e, o: atual.m.o } : null), semIcone };
+  W.MTSessoesTela = { nucleo: n, protocolo, todas, atual: () => (atual ? { p: atual.m.p, e: atual.m.e, o: atual.m.o } : null), semIcone, avisos: Avisos };
 }
 if (W.MedTechCasca) liga(); else D.addEventListener('DOMContentLoaded', liga);
