@@ -389,7 +389,8 @@ function renderGrid(){
   if (!escolheu) comprados().forEach(id => sel.add(id));
   const lista = disponiveis().filter(a => sel.has(a.id));
   const g = document.getElementById('grid');
-  g.innerHTML = itemAdmin() + (lista.length ? lista.map(appItem).join('')
+  /* 04/11/2026: a Administração virou app próprio (admin.webmanifest); não aparece mais na grade do portal */
+  g.innerHTML = (lista.length ? lista.map(appItem).join('')
     : `<div class="apps-vazio">Nenhum app na sua página ainda.<br><button class="b" onclick="openMeusApps()"><i class="ti ti-layout-grid-add" aria-hidden="true"></i> Escolher apps</button></div>`);
   /* de onde o app foi aberto: os apps de estudo mostram "Início" para voltar (/_mtvoltar.js) */
   g.onclick = e => { if (e.target.closest && e.target.closest('a.app')) marcaVolta(); };
