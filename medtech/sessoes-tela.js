@@ -152,7 +152,7 @@ function registro(t) {
   return { on(f) { H.push(f); return 'data-acao="h" data-h="' + (H.length - 1) + '"'; }, limpa() { H = []; } };
 }
 function bt(r, texto, f, cls = '') { return '<button type="button" class="ss-bt ' + cls + '" ' + r.on(f) + '>' + esc(texto) + '</button>'; }
-function botaoFonte(r, f, branca) { return '<button type="button" class="ss-fonte' + (branca ? ' branca' : '') + '" ' + r.on(f) + '>Ver regra e fonte</button>'; }
+function botaoFonte(r, f, branca) { return '<button type="button" class="ss-fonte' + (branca ? ' ss-branca' : '') + '" ' + r.on(f) + '>Ver regra e fonte</button>'; }
 function simNao(r, pergunta, detalhe, valor, responder) {
   const b = (t, v) => '<button type="button" class="ss-sn" aria-pressed="' + (valor === v) + '" ' + r.on(() => responder(v)) + '>' + t + '</button>';
   return '<div class="ss-simnao"><b>' + esc(pergunta) + '</b>' + (detalhe ? '<span>' + esc(detalhe) + '</span>' : '') +
@@ -189,11 +189,11 @@ const alertasOrdem = (lista) => [...lista].sort((a, b) => (b.nivel === 'vermelho
 
 function etiquetaCartao(p, c) {
   const texto = c.etiqueta ?? (c.situacao === 'proximoPasso' ? p.rotuloProximoPasso : n.rotuloSituacao(c.situacao, p.nomeFonte));
-  const cls = c.situacao === 'travado' ? 'alerta' : (c.situacao === 'faltaDado' || c.situacao === 'decisaoMedico' || c.situacao === 'pergunta') ? 'atencao' : '';
+  const cls = c.situacao === 'travado' ? 'et-alerta' : (c.situacao === 'faltaDado' || c.situacao === 'decisaoMedico' || c.situacao === 'pergunta') ? 'et-atencao' : '';
   return '<span class="' + cls + '">' + esc(texto) + '</span>';
 }
 function cartaoHTML(r, m, c, verFonte, aoConfirmar) {
-  const cls = c.situacao === 'proximoPasso' ? ' proximo' : c.situacao === 'travado' ? ' travado' : c.situacao === 'correndo' ? ' correndo' : '';
+  const cls = c.situacao === 'proximoPasso' ? ' ss-prox' : c.situacao === 'travado' ? ' ss-trav' : c.situacao === 'correndo' ? ' ss-corr' : '';
   let h = '<article class="ss-cartao' + cls + '" style="--c:' + corHex(c.corHex) + '" data-cartao="' + esc(c.id) + '"><div class="ss-cab">' + ic(icone(c.simbolo)) +
     '<div><h3>' + esc(c.titulo) + '</h3>' + etiquetaCartao(m.p, c) + '</div></div>' +
     '<p class="ss-valor">' + esc(c.valor).replace(/\//g, '⁠/⁠') + '</p>';
@@ -204,7 +204,7 @@ function cartaoHTML(r, m, c, verFonte, aoConfirmar) {
     h += simNao(r, q.texto, null, n.resposta(m.e, q.chave), (v) => { n.responderCartao(m.e, q, v, Date.now()); m.guardar(); });
   }
   for (const a of c.acoes) {
-    h += '<button type="button" class="ss-acao' + (a.secundaria ? ' sec' : '') + '" ' + r.on(() => aoConfirmar(a)) + '>' + esc(a.rotulo) + '</button>';
+    h += '<button type="button" class="ss-acao' + (a.secundaria ? ' ss-sec' : '') + '" ' + r.on(() => aoConfirmar(a)) + '>' + esc(a.rotulo) + '</button>';
   }
   if (c.regras.length) h += botaoFonte(r, () => verFonte(c.regras[0]));
   return h + '</article>';
@@ -214,7 +214,7 @@ function linhaCalma(r, c, verFonte) {
     '<div><b>' + esc(c.titulo + ': ' + c.valor) + '</b>' + (c.conta !== null ? '<span>' + esc(c.conta) + '</span>' : '') + (c.detalhe !== null ? '<span>' + esc(c.detalhe) + '</span>' : '') + '</div></button>';
 }
 function linhaMenu(r, titulo, icn, cor, f, destaque) {
-  return '<button type="button" class="ss-linha' + (destaque ? ' destaque' : '') + '" ' + r.on(f) + '><i class="ti ti-' + icn + '" aria-hidden="true" style="background:' + cor + '"></i><b>' + esc(titulo) + '</b>' +
+  return '<button type="button" class="ss-linha' + (destaque ? ' ss-dest' : '') + '" ' + r.on(f) + '><i class="ti ti-' + icn + '" aria-hidden="true" style="background:' + cor + '"></i><b>' + esc(titulo) + '</b>' +
     (destaque ? '<span>Critérios cumpridos</span>' : '') + '</button>';
 }
 /* O que pede ação vem primeiro; o bloqueado já está no topo em vermelho. */
@@ -239,10 +239,10 @@ function examesHTML(m, ui, agora) {
   let h = '';
   if (dest.length) {
     const col = dest.length <= 3 ? dest.length : dest.length === 4 ? 2 : 3;
-    h += '<div class="ss-ex-grade' + (col >= 3 ? ' c' + col : '') + '" style="--col:' + col + '">' + dest.map((x) => {
+    h += '<div class="ss-ex-grade' + (col >= 3 ? ' ss-c' + col : '') + '" style="--col:' + col + '">' + dest.map((x) => {
       const venc = x.situacao === 'semDado' || (x.situacao !== 'encerrado' && x.proxima !== null && x.proxima < agora);
       const t = textoExame(x, agora);
-      return '<button type="button" class="ss-ex' + (venc ? ' vencido' : '') + '" data-acao="exame" data-id="' + esc(x.id) + '" aria-label="' + esc(x.nome + (venc ? ', vencido' : ', no prazo') + '. ' + t[1] + ' ' + t[0]) + '" aria-description="Abre a regra">' +
+      return '<button type="button" class="ss-ex' + (venc ? ' ss-venc' : '') + '" data-acao="exame" data-id="' + esc(x.id) + '" aria-label="' + esc(x.nome + (venc ? ', vencido' : ', no prazo') + '. ' + t[1] + ' ' + t[0]) + '" aria-description="Abre a regra">' +
         '<b>' + esc(x.nome) + '</b><small>' + (esc(t[1]) || '&nbsp;') + '</small><strong class="ss-ex-n">' + esc(t[0]) + '</strong></button>';
     }).join('') + '</div>';
   }
@@ -251,7 +251,7 @@ function examesHTML(m, ui, agora) {
     h += '<div class="ss-outros"><button type="button" data-acao="outros" aria-expanded="' + !!ui.outros + '"><b>' + esc(m.p.tituloOutrosExames) + '</b>' + (pend ? '<span>pendente</span>' : '') + ic('chevron-down') + '</button>' +
       (ui.outros ? '<div class="ss-outros-c">' + resto.map((x) => {
         const venc = x.situacao === 'vencido' || x.situacao === 'semDado';
-        return '<button type="button" class="ss-ex-l' + (venc ? ' vencido' : '') + '" data-acao="exame" data-id="' + esc(x.id) + '"><b>' + esc(x.nome) + '</b><strong class="ss-ex-n">' + esc(textoExame(x, agora)[0]) + '</strong></button>';
+        return '<button type="button" class="ss-ex-l' + (venc ? ' ss-venc' : '') + '" data-acao="exame" data-id="' + esc(x.id) + '"><b>' + esc(x.nome) + '</b><strong class="ss-ex-n">' + esc(textoExame(x, agora)[0]) + '</strong></button>';
       }).join('') + '</div>' : '') + '</div>';
   }
   return h;
@@ -263,7 +263,7 @@ function cronometroHTML(r, c, agora, verFonte) {
   if (c.subtitulo !== null) h += '<div class="ss-crono-s">' + esc(c.subtitulo) + '</div>';
   for (const x of c.marcos) {
     const passou = s >= x.minutos * 60;
-    h += '<div class="ss-marco' + (passou ? ' passou' : '') + '"><b>' + n.num(x.minutos, 0) + ' min</b><span>' + esc(x.rotulo) + '</span>' + (passou ? '<i class="ti ti-circle-check" role="img" aria-label="marca atingida"></i>' : '') + '</div>';
+    h += '<div class="ss-marco' + (passou ? ' ss-passou' : '') + '"><b>' + n.num(x.minutos, 0) + ' min</b><span>' + esc(x.rotulo) + '</span>' + (passou ? '<i class="ti ti-circle-check" role="img" aria-label="marca atingida"></i>' : '') + '</div>';
   }
   if (c.regra) h += botaoFonte(r, () => verFonte(c.regra));
   return h;
@@ -271,7 +271,7 @@ function cronometroHTML(r, c, agora, verFonte) {
 
 /* ---------- gráfico (Charts): linha com pontos, eixo de horas, regras tracejadas; sem animação ---------- */
 function grafico(serie, d, linhas, altura, rotulo) {
-  const Wd = 340, Hd = altura, L = 46, R = 10, T = 16, B = 24;
+  const Wd = 340, Hd = altura, L = 46, R = 10, T = 26, B = 24;
   const xs = serie.map((s) => s.hora), ys = serie.map((s) => s.valor).concat((linhas || []).map((l) => l.valor));
   let x0 = Math.min(...xs), x1 = Math.max(...xs);
   if (x1 - x0 < 60000) { x0 -= 30 * 60000; x1 += 30 * 60000; }
@@ -282,21 +282,21 @@ function grafico(serie, d, linhas, altura, rotulo) {
   const px = (x) => L + (x - x0) / (x1 - x0) * (Wd - L - R), py = (y) => T + (1 - (y - y0) / (y1 - y0)) * (Hd - T - B);
   let g = '';
   for (let y = y0; y <= y1 + passo / 2; y += passo) {
-    g += '<line class="grade" x1="' + L + '" x2="' + (Wd - R) + '" y1="' + py(y).toFixed(1) + '" y2="' + py(y).toFixed(1) + '"/>' +
-      '<text class="eixo" x="' + (L - 6) + '" y="' + (py(y) + 4).toFixed(1) + '" text-anchor="end">' + esc(n.num(y, 2)) + '</text>';
+    g += '<line class="ss-gg" x1="' + L + '" x2="' + (Wd - R) + '" y1="' + py(y).toFixed(1) + '" y2="' + py(y).toFixed(1) + '"/>' +
+      '<text class="ss-ge" x="' + (L - 6) + '" y="' + (py(y) + 4).toFixed(1) + '" text-anchor="end">' + esc(n.num(y, 2)) + '</text>';
   }
   for (let i = 0; i < 4; i++) {
     const t = x0 + (x1 - x0) * (i / 3), x = px(t);
-    g += '<line class="grade" x1="' + x.toFixed(1) + '" x2="' + x.toFixed(1) + '" y1="' + T + '" y2="' + (Hd - B) + '"/>' +
-      '<text class="eixo" x="' + x.toFixed(1) + '" y="' + (Hd - 6) + '" text-anchor="' + (i === 0 ? 'start' : i === 3 ? 'end' : 'middle') + '">' + n.hora(t) + '</text>';
+    g += '<line class="ss-gg" x1="' + x.toFixed(1) + '" x2="' + x.toFixed(1) + '" y1="' + T + '" y2="' + (Hd - B) + '"/>' +
+      '<text class="ss-ge" x="' + x.toFixed(1) + '" y="' + (Hd - 6) + '" text-anchor="' + (i === 0 ? 'start' : i === 3 ? 'end' : 'middle') + '">' + n.hora(t) + '</text>';
   }
   for (const l of linhas || []) {
     const y = py(l.valor).toFixed(1);
-    g += '<line class="regra" x1="' + L + '" x2="' + (Wd - R) + '" y1="' + y + '" y2="' + y + '"/><text class="regra-t" x="' + (Wd - R) + '" y="' + (py(l.valor) - 4).toFixed(1) + '" text-anchor="end">' + esc(l.rotulo) + '</text>';
+    g += '<line class="ss-gr" x1="' + L + '" x2="' + (Wd - R) + '" y1="' + y + '" y2="' + y + '"/><text class="ss-grt" x="' + (Wd - R) + '" y="' + (py(l.valor) - 4).toFixed(1) + '" text-anchor="end">' + esc(l.rotulo) + '</text>';
   }
-  g += '<polyline class="linha" points="' + serie.map((s) => px(s.hora).toFixed(1) + ',' + py(s.valor).toFixed(1)).join(' ') + '"/>';
-  g += serie.map((s) => '<circle class="ponto" cx="' + px(s.hora).toFixed(1) + '" cy="' + py(s.valor).toFixed(1) + '" r="4.5"/>').join('');
-  if (d && d.unidade) g += '<text class="eixo" x="' + (L - 6) + '" y="10" text-anchor="end">' + esc(d.unidade) + '</text>';
+  g += '<polyline class="ss-gl" points="' + serie.map((s) => px(s.hora).toFixed(1) + ',' + py(s.valor).toFixed(1)).join(' ') + '"/>';
+  g += serie.map((s) => '<circle class="ss-gp" cx="' + px(s.hora).toFixed(1) + '" cy="' + py(s.valor).toFixed(1) + '" r="4.5"/>').join('');
+  if (d && d.unidade) g += '<text class="ss-ge" x="' + (L - 6) + '" y="12" text-anchor="end">' + esc(d.unidade) + '</text>';
   return '<svg class="ss-grafico" viewBox="0 0 ' + Wd + ' ' + Hd + '" role="img" aria-label="' + esc(rotulo) + '">' + g + '</svg>';
 }
 const serieOrdenada = (e, id) => [...(e.series[id] || [])].sort((a, b) => a.hora - b.hora);
@@ -307,11 +307,11 @@ function abreFonte(p, regra, outras = []) {
   U.folha({
     titulo: 'Regra e fonte', classe: 'ss-folha',
     conteudo(c, api) {
-      c.innerHTML = '<p class="rot" data-foco tabindex="-1">Regra</p><p class="regra">' + esc(regra.texto) + '</p><p class="rot">Onde está na fonte</p><p class="origem">' + esc(regra.origem) + '</p>' +
-        '<p class="rot">Referência</p><p class="ref">' + esc(p.referencia) + '</p><p class="linha">Linha ' + regra.linha + ' do arquivo de regras.</p>' +
-        outras.map((r) => '<hr><p class="outra">' + esc(r.texto) + '</p><p class="outra-o">' + esc(r.origem) + '</p><p class="linha">Linha ' + r.linha + ' do arquivo de regras.</p>').join('') +
-        '<button type="button" class="bt-fechar">Fechar</button>';
-      c.querySelector('.bt-fechar').addEventListener('click', api.fechar);
+      c.innerHTML = '<p class="f-rot" data-foco tabindex="-1">Regra</p><p class="f-regra">' + esc(regra.texto) + '</p><p class="f-rot">Onde está na fonte</p><p class="f-origem">' + esc(regra.origem) + '</p>' +
+        '<p class="f-rot">Referência</p><p class="f-ref">' + esc(p.referencia) + '</p><p class="f-linha">Linha ' + regra.linha + ' do arquivo de regras.</p>' +
+        outras.map((r) => '<hr><p class="f-outra">' + esc(r.texto) + '</p><p class="f-outra-o">' + esc(r.origem) + '</p><p class="f-linha">Linha ' + r.linha + ' do arquivo de regras.</p>').join('') +
+        '<button type="button" class="f-fechar">Fechar</button>';
+      c.querySelector('.f-fechar').addEventListener('click', api.fechar);
     }
   });
 }
@@ -334,7 +334,7 @@ function camada(o) {
     const foco = ativo && (ativo.dataset.campo || (ativo.dataset.hora !== undefined ? '@hora' : null));
     if (!mesma) { ui.chave = chave; ui.v = {}; }
     r.limpa();
-    const x = v(r, ui.v);
+    const x = v(r, ui.v, t);
     t.titulo(x.titulo);
     t.direita(x.direita || '');
     t.rola.innerHTML = x.corpo;
@@ -405,7 +405,7 @@ function abrirSessao(p) {
   /* Triagem de fora do escopo */
   function vTriagem(r, v) {
     if (v.fora === undefined) { v.fora = m.o.foraDeEscopo.length > 0; v.marcados = new Set(); }
-    let corpo = '<div class="ss-pilha g10">', pe = '<div class="ss-pe">';
+    let corpo = '<div class="ss-pilha ss-g10">', pe = '<div class="ss-pe">';
     if (v.fora) {
       corpo += '<i class="ti ti-alert-triangle ss-fora-ic" aria-hidden="true"></i><h2 class="ss-h30">Fora do escopo desta sessão</h2>' +
         m.o.foraDeEscopo.map((x) => '<p class="ss-t22s ss-atencao">' + esc(x) + '</p>').join('') +
@@ -414,9 +414,9 @@ function abrirSessao(p) {
         v.fora = false;
         for (const q of p.triagem) delete m.e.respostas[q.chave];
         m.recalcular(); desenha();
-      }) + bt(r, 'Sair', () => { m.encerrar(); fechar(); }, 'leve');
+      }) + bt(r, 'Sair', () => { m.encerrar(); fechar(); }, 'ss-leve');
     } else {
-      corpo += '<h2 class="ss-h30">Algum destes se aplica?</h2><p class="ss-intro t16" style="padding-bottom:6px">' + esc(p.escopo) + '</p>' +
+      corpo += '<h2 class="ss-h30">Algum destes se aplica?</h2><p class="ss-intro ss-i16" style="padding-bottom:6px">' + esc(p.escopo) + '</p>' +
         p.triagem.map((q) => {
           const on = v.marcados.has(q.chave);
           return '<button type="button" class="ss-marca" aria-pressed="' + on + '" ' + r.on(() => { if (on) v.marcados.delete(q.chave); else v.marcados.add(q.chave); desenha(); }) + '><span>' + esc(q.texto) + '</span>' + (on ? ic('check') : '') + '</button>';
@@ -445,7 +445,7 @@ function abrirSessao(p) {
     return {
       titulo: 'Parâmetros de agora', voltar: () => m.irPara('triagem'),
       aoHora: (x) => { const h = lerHoraHoje(x.value); if (h !== null) { v.hora = h; x.value = valorHora(h); } },
-      corpo: '<div class="ss-pilha"><p class="ss-intro t16">Digite só o que tem. O que faltar fica como falta, nunca como normal.</p>' + campos(t, p, p.parametrosIniciais, v.textos) + campoHora(t, 'Hora da coleta', v.hora) + '</div>',
+      corpo: '<div class="ss-pilha"><p class="ss-intro ss-i16">Digite só o que tem. O que faltar fica como falta, nunca como normal.</p>' + campos(t, p, p.parametrosIniciais, v.textos) + campoHora(t, 'Hora da coleta', v.hora) + '</div>',
       pe: '<div class="ss-pe">' + bt(r, 'Seguir', () => {
         const f = foraDaFaixa(p, v.textos);
         if (!f.length) return salvar();
@@ -458,7 +458,7 @@ function abrirSessao(p) {
   function vPerguntas(r) {
     return {
       titulo: 'Sobre o paciente', voltar: () => m.irPara('parametros'),
-      corpo: '<div class="ss-pilha g24">' + p.perguntasIniciais.map((q) => simNao(r, q.texto, q.detalhe, n.resposta(m.e, q.chave), (x) => m.responder(q.chave, x))).join('') + '</div>',
+      corpo: '<div class="ss-pilha ss-g24">' + p.perguntasIniciais.map((q) => simNao(r, q.texto, q.detalhe, n.resposta(m.e, q.chave), (x) => m.responder(q.chave, x))).join('') + '</div>',
       pe: '<div class="ss-pe">' + bt(r, 'Seguir', () => m.irPara('ramos')) + APOIO + '</div>'
     };
   }
@@ -467,7 +467,7 @@ function abrirSessao(p) {
   function vRamos(r) {
     const o = m.o;
     const pronto = p.ramos.every((x) => m.e.escolhas[x.id] !== undefined && o.ramoBloqueado[m.e.escolhas[x.id]] === undefined);
-    let corpo = '<div class="ss-pilha g14">';
+    let corpo = '<div class="ss-pilha ss-g14">';
     if (o.classificacao !== null) {
       corpo += '<div class="ss-pilha" style="gap:4px"><h2 class="ss-h26">' + esc(o.classificacao) + '</h2>' +
         (o.classificacaoDetalhe !== null ? '<p class="ss-t18 ss-alerta-t" style="font-weight:600">' + esc(o.classificacaoDetalhe) + '</p>' : '') +
@@ -482,7 +482,7 @@ function abrirSessao(p) {
     }
     let pe = '<div class="ss-pe">';
     const a = o.confirmacao && o.confirmacao.acao;
-    if (a) pe += '<button type="button" class="ss-bt' + (pronto ? '' : ' inativo') + '" aria-disabled="' + !pronto + '" ' + r.on(() => { if (!pronto) return; m.confirmar(a); m.irPara('agora'); }) + '>' + esc(a.rotulo) + '</button>';
+    if (a) pe += '<button type="button" class="ss-bt' + (pronto ? '' : ' ss-inativo') + '" aria-disabled="' + !pronto + '" ' + r.on(() => { if (!pronto) return; m.confirmar(a); m.irPara('agora'); }) + '>' + esc(a.rotulo) + '</button>';
     return { titulo: p.tituloRamos, voltar: () => m.irPara('perguntas'), corpo: corpo + '</div>', pe: pe + APOIO + '</div>' };
   }
 
@@ -504,20 +504,20 @@ function abrirSessao(p) {
       else salvarNumero();
     };
     v.seguirNumero = seguirNumero;
-    let corpo = '<div class="ss-pilha g14">' + o.travas.map((x) => travaGrande(r, x, (rg) => fonte(rg))).join('') + alertasOrdem(o.alertas).map((a) => alertaFaixa(r, a, (rg) => fonte(rg))).join('') +
+    let corpo = '<div class="ss-pilha ss-g14">' + o.travas.map((x) => travaGrande(r, x, (rg) => fonte(rg))).join('') + alertasOrdem(o.alertas).map((a) => alertaFaixa(r, a, (rg) => fonte(rg))).join('') +
       '<h2 class="ss-h30">' + esc(passo.texto) + '</h2>' + (passo.detalhe !== null ? '<p class="ss-t18">' + esc(passo.detalhe) + '</p>' : '');
     let pe = '<div class="ss-pe">';
     switch (tipo.caso) {
       case 'numero':
         if (def) corpo += F.campoNumero(t, { id: def.id, rotulo: rotuloCampo(def), valor: v.textos[def.id] || '', t24: true });
-        pe += '<button type="button" class="ss-bt' + (lerNumero(v.textos[def && def.id]) === null ? ' inativo' : '') + '" data-seguir ' + r.on(seguirNumero) + '>Seguir</button>';
+        pe += '<button type="button" class="ss-bt' + (lerNumero(v.textos[def && def.id]) === null ? ' ss-inativo' : '') + '" data-seguir ' + r.on(seguirNumero) + '>Seguir</button>';
         break;
       case 'hora': {
         const id = t.id + '-quando';
         corpo += '<div class="ss-quando"><label for="' + id + '">Hora</label><input id="' + id + '" type="datetime-local" step="60" data-hora value="' + valorDataHora(v.hora) + '" max="' + valorDataHora(Date.now()) + '"></div>';
         if (passo.confirmarPadrao !== null && v.horaPadrao !== null && v.hora === v.horaPadrao) {
-          pe += '<button type="button" class="ss-bt inativo" aria-disabled="true" ' + r.on(() => {}) + '>Escolha a hora acima</button>' +
-            bt(r, passo.confirmarPadrao, () => m.responderPasso(passo, passo.texto + ': ' + passo.confirmarPadrao, v.hora), 'leve a54');
+          pe += '<button type="button" class="ss-bt ss-inativo" aria-disabled="true" ' + r.on(() => {}) + '>Escolha a hora acima</button>' +
+            bt(r, passo.confirmarPadrao, () => m.responderPasso(passo, passo.texto + ': ' + passo.confirmarPadrao, v.hora), 'ss-leve ss-a54');
         } else {
           const d = new Date(v.hora), quando = ehHoje(v.hora) ? 'hoje' : 'em ' + dois(d.getDate()) + '/' + dois(d.getMonth() + 1);
           pe += bt(r, 'Confirmar ' + quando + ' às ' + n.hora(v.hora), () => m.responderPasso(passo, passo.texto + ': ' + n.hora(v.hora), v.hora));
@@ -525,27 +525,27 @@ function abrirSessao(p) {
         break;
       }
       case 'opcoes':
-        corpo += tipo.opcoes.map((op) => '<button type="button" class="ss-op passo" ' + r.on(() => m.responderPasso(passo, passo.texto + ' ' + op.rotulo, null, (e) => { e.escolhas[passo.chave] = op.id; })) + '><b>' + esc(op.rotulo) + '</b>' + (op.detalhe ? '<span>' + esc(op.detalhe) + '</span>' : '') + '</button>').join('');
+        corpo += tipo.opcoes.map((op) => '<button type="button" class="ss-op ss-opp" ' + r.on(() => m.responderPasso(passo, passo.texto + ' ' + op.rotulo, null, (e) => { e.escolhas[passo.chave] = op.id; })) + '><b>' + esc(op.rotulo) + '</b>' + (op.detalhe ? '<span>' + esc(op.detalhe) + '</span>' : '') + '</button>').join('');
         break;
       case 'lista':
         corpo += tipo.itens.map((i) => {
           const on = n.resposta(m.e, i.chave) === true;
-          return '<button type="button" class="ss-marca ' + (i.trava ? 'trava' : 'atencao') + '" aria-pressed="' + on + '" ' + r.on(() => m.responder(i.chave, !on)) + '><span>' + esc(i.texto) + '</span>' + (on ? ic('check') : '') + '</button>';
+          return '<button type="button" class="ss-marca ' + (i.trava ? 'ss-mtrava' : 'ss-maviso') + '" aria-pressed="' + on + '" ' + r.on(() => m.responder(i.chave, !on)) + '><span>' + esc(i.texto) + '</span>' + (on ? ic('check') : '') + '</button>';
         }).join('');
         pe += bt(r, 'Conferi a lista', () => m.responderPasso(passo, passo.texto + ': lista conferida'));
         break;
       case 'simNao':
-        pe += '<div class="ss-par">' + bt(r, 'Não', () => m.responderPasso(passo, passo.texto + ' Não', null, (e) => { e.respostas[passo.chave] = false; }), 'leve a78') +
-          bt(r, 'Sim', () => m.responderPasso(passo, passo.texto + ' Sim', null, (e) => { e.respostas[passo.chave] = true; }), 'leve a78') + '</div>';
+        pe += '<div class="ss-par">' + bt(r, 'Não', () => m.responderPasso(passo, passo.texto + ' Não', null, (e) => { e.respostas[passo.chave] = false; }), 'ss-leve ss-a78') +
+          bt(r, 'Sim', () => m.responderPasso(passo, passo.texto + ' Sim', null, (e) => { e.respostas[passo.chave] = true; }), 'ss-leve ss-a78') + '</div>';
         break;
     }
     if (passo.regras.length) corpo += botaoFonte(r, () => fonte(passo.regras[0], p.mostraTodasAsFontes ? passo.regras.slice(1) : []));
-    if (passo.semDado !== null) pe += bt(r, passo.semDado, () => m.responderPasso(passo, passo.texto + ' ' + passo.semDado, null, (e) => { e.respostas['semDado.' + passo.chave] = true; }), 'leve a54');
+    if (passo.semDado !== null) pe += bt(r, passo.semDado, () => m.responderPasso(passo, passo.texto + ' ' + passo.semDado, null, (e) => { e.respostas['semDado.' + passo.chave] = true; }), 'ss-leve ss-a54');
     return {
       titulo: passo.secao,
       direita: o.relogioDesde !== null ? '<span class="ss-dur" data-dur="' + o.relogioDesde + '">' + n.duracao((Date.now() - o.relogioDesde) / 1000) + '</span>' : '',
       voltar: () => { if (!m.voltarPasso()) m.irPara('parametros'); },
-      aoDigitar: (x) => { const s = t.pe.querySelector('[data-seguir]'); if (s) s.classList.toggle('inativo', lerNumero(x.value) === null); },
+      aoDigitar: (x) => { const s = t.pe.querySelector('[data-seguir]'); if (s) s.classList.toggle('ss-inativo', lerNumero(x.value) === null); },
       aoHora: (x) => { const h = lerDataHora(x.value); if (h !== null) { v.hora = h; desenha(); } },
       corpo: corpo + '</div>', pe: pe + APOIO + '</div>'
     };
@@ -589,7 +589,7 @@ function abrirSessao(p) {
     h += '</div></div>';
     let pe = '<div class="ss-pe">';
     if (v.aviso) pe += '<div class="ss-registrado" role="status"><span>' + esc(v.aviso) + '</span><button type="button" ' + r.on(() => { v.aviso = null; m.desfazerUltima(); desenha(); }) + '>Desfazer</button></div>';
-    pe += bt(r, 'Novos resultados', () => abrirResultados(sessao), 'a66') + APOIO + '</div>';
+    pe += bt(r, 'Novos resultados', () => abrirResultados(sessao), 'ss-a66') + APOIO + '</div>';
     const desde = o.relogioDesde !== null ? o.relogioDesde : m.e.inicio;
     return { titulo: p.nome, direita: '<span class="ss-dur" data-dur="' + desde + '">' + n.duracao((agora - desde) / 1000) + '</span>', corpo: h, pe };
   }
@@ -642,7 +642,10 @@ function curvaFixa(m, parametro) {
 
 /* ---------- subtelas (fullScreenCover) ---------- */
 function subtela(sessao, titulo, desenho, o = {}) {
+  /* um toque duplo não abre a mesma subtela duas vezes */
+  if ((sessao.subtelas || []).some((x) => x._sub === titulo)) return null;
   const c = camada({ titulo, grande: o.grande });
+  c.t._sub = titulo;
   const { m } = sessao;
   const desenha = () => { if (!m.encerrada) c.pinta('sub', desenho); };
   (sessao.subtelas = sessao.subtelas || []).push(c.t);
@@ -681,9 +684,9 @@ function abrirEvolucao(sessao) {
       x += serie.length ? grafico(serie, d, g.linhas[id] || [], 210, g.titulo + ', ' + serie.map((s) => n.num(s.valor, d ? d.casas : 1) + ' às ' + n.hora(s.hora)).join(', ')) : '<p class="ss-vazio">Sem registro.</p>';
       return x + '</section>';
     }).join('');
-    return { titulo: 'Evolução', corpo: '<div class="ss-pilha g18">' + h + '</div>', pe: '<div class="ss-pe">' + APOIO + '</div>' };
+    return { titulo: 'Evolução', corpo: '<div class="ss-pilha ss-g18">' + h + '</div>', pe: '<div class="ss-pe">' + APOIO + '</div>' };
   });
-  c.t.acoes.seg = (b) => { c.ui.v.escolha = c.ui.v.escolha || {}; c.ui.v.escolha[b.dataset.g] = b.dataset.v; c.repinta(); };
+  if (c) c.t.acoes.seg = (b) => { c.ui.v.escolha = c.ui.v.escolha || {}; c.ui.v.escolha[b.dataset.g] = b.dataset.v; c.repinta(); };
 }
 function abrirPassagem(sessao) {
   const { m } = sessao, p = m.p;
@@ -701,21 +704,21 @@ function abrirRegistro(sessao) {
   const { m } = sessao, p = m.p;
   subtela(sessao, 'Registro', (r) => {
     const acoes = [...m.e.acoes].sort((a, b) => b.hora - a.hora);
-    const corpo = '<div class="ss-pilha g10">' + (acoes.length ? '' : '<p class="ss-t19" style="color:var(--tinta2)">Nada confirmado ainda.</p>') +
+    const corpo = '<div class="ss-pilha ss-g10">' + (acoes.length ? '' : '<p class="ss-t19" style="color:var(--tinta2)">Nada confirmado ainda.</p>') +
       acoes.map((a) => '<div class="ss-reg"><b>' + n.hora(a.hora) + '</b><span>' + esc(a.rotulo) + '</span></div>').join('') + '</div>';
     return {
       titulo: 'Registro', corpo,
       pe: '<div class="ss-pe">' + bt(r, 'Finalizar e apagar a sessão', () => {
         U.confirma('Apagar a sessão deste aparelho?', 'Parâmetros, confirmações e horários somem. Não dá para desfazer.', [
           { rotulo: 'Apagar a sessão', perigo: true, acao: () => { m.encerrar(); sessao.c.t.fechar(); } }, { rotulo: 'Cancelar' }]);
-      }, 'perigo') + APOIO + '</div>'
+      }, 'ss-perigo') + APOIO + '</div>'
     };
   });
   void p;
 }
 function abrirResultados(sessao) {
   const { m } = sessao, p = m.p;
-  const c = subtela(sessao, 'Novos resultados', (r, v) => {
+  const c = subtela(sessao, 'Novos resultados', (r, v, tt) => {
     v.textos = v.textos || {};
     v.respostas = v.respostas || {};
     if (v.hora === undefined) v.hora = Date.now();
@@ -726,7 +729,7 @@ function abrirResultados(sessao) {
       c.t.fechar();
       abrirMudancas(sessao, lista);
     };
-    const corpo = '<div class="ss-pilha g14"><p class="ss-intro t18">Digite só o que tem.</p>' + campoHora(c.t, 'Hora da coleta', v.hora) + campos(c.t, p, ids, v.textos) +
+    const corpo = '<div class="ss-pilha ss-g14"><p class="ss-intro ss-i18">Digite só o que tem.</p>' + campoHora(tt, 'Hora da coleta', v.hora) + campos(tt, p, ids, v.textos) +
       p.perguntasResultados(m.e).map((q) => simNao(r, q.texto, null, q.chave in v.respostas ? v.respostas[q.chave] : n.resposta(m.e, q.chave), (x) => { v.respostas[q.chave] = x; c.repinta(); })).join('') + '</div>';
     return {
       titulo: 'Novos resultados', corpo,
@@ -745,8 +748,8 @@ function abrirMudancas(sessao, lista) {
   const c = subtela(sessao, 'O que mudou', (r) => ({
     titulo: 'O que mudou',
     corpo: '<div class="ss-pilha">' + (lista.length ? '' : '<p class="ss-t22s" style="color:var(--tinta2)">Nada mudou nas orientações.</p>') + lista.map((x) => '<div class="ss-mud"><h3>' + esc(x.titulo) + '</h3>' +
-      '<p class="antes">' + esc('Antes: ' + x.antes) + '</p><p class="agora">' + esc('Agora: ' + x.depois) + '</p>' +
-      (x.porque ? '<p class="porque">' + esc('Por quê: ' + x.porque.texto) + '</p>' + botaoFonte(r, () => abreFonte(p, x.porque)) : '') + '</div>').join('') + '</div>',
+      '<p class="m-antes">' + esc('Antes: ' + x.antes) + '</p><p class="m-agora">' + esc('Agora: ' + x.depois) + '</p>' +
+      (x.porque ? '<p class="m-porque">' + esc('Por quê: ' + x.porque.texto) + '</p>' + botaoFonte(r, () => abreFonte(p, x.porque)) : '') + '</div>').join('') + '</div>',
     pe: '<div class="ss-pe">' + bt(r, 'Voltar ao Agora', () => c.t.fechar()) + APOIO + '</div>'
   }), { vivo: false, grande: true });
 }
