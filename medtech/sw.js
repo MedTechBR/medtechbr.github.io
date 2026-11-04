@@ -4,11 +4,14 @@
      a cura do precache envenenado pela borda do CDN; o precache busca com cache:'reload'.
    - Páginas HTML: rede primeiro, cache só como reserva offline.
    - Só o próprio domínio; Firebase, gstatic e APIs passam direto. */
-const CACHE = 'medtech-pwa-v1';
+const CACHE = 'medtech-pwa-v2';
 const NUCLEO = [
   './', './index.html', './medtech.css?v=1', './manifest.webmanifest',
   './ui.js?v=1', './dados.js?v=1', './conduta.js?v=1', './leitor.js?v=1', './presc.js?v=1', './fluxo.js?v=1', './casca.js?v=1',
   '../condutai.html',
+  './ferramentas.css?v=1', './fer-ponte.js?v=1', './fer-motor.js?v=1', './fer-ui.js?v=1', './ferramentas.js?v=1',
+  /* JS original das Ferramentas (versões do condutai-areas.js e do paliai.html); imagens do POCUS entram no cache ao abrir */
+  '../condutai-areas.js?v=2', '../condutai-calc.js?v=1', '../condutai-atb.js?v=2', '../condutai-pocus.js?v=2', '../paliai.html', '../pali-conteudo.js?v=7',
   '../condutai-banco.js?v=7', '../condutai-prescricoes.js?v=5', '../condutai-seguranca.js?v=4', '../condutai-didatica.js?v=1', '../condutai-ligacoes.js?v=1',
   '../vendor/tabler/tabler-icons.min.css?v=3.48.0', '../vendor/tabler/fonts/tabler-icons.woff2?v3.48.0',
   '../_mtfb.js?v=1', '../_mtauth.js?v=50',
