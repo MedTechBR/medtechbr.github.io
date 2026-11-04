@@ -124,7 +124,7 @@ const R = {
   rEnoxBolusSemRegra: regra(260, 'CrCl abaixo de 30 e menos de 75 anos: a ACC não diz se o bólus IV de 30 mg é dado. Sem regra.', 'Especificação, seção 7: Enoxaparina com CrCl abaixo de 30'),
   rD2: regra(273, 'AAS: ACC 162-325 mg; ESC 150-300 mg. Faixa comum 162-300 mg, em destaque para o médico escolher.', 'Especificação, D2: ACC 162-325 mg; ESC 150-300 mg'),
   rD7: regra(278, 'Fondaparinux: ACC contraindica abaixo de 30 mL/min; SBC e banco, abaixo de 20 mL/min. Vale a ACC.', 'Especificação, D7: ACC: contraindicado abaixo de 30 mL/min'),
-  rD8: regra(279, 'A ACC escreve CrCl e não define o método de estimativa. O app mostra o valor e o método usado e pede confirmação. Decisão do médico, pendente.', 'Especificação, D8: Fórmula de função renal'),
+  rD8: regra(279, 'A ACC escreve CrCl e não define o método de estimativa. O app usa CKD-EPI 2021, decisão do médico de 02/11/2026; mostra o valor e o método usado e pede confirmação.', 'Especificação, D8: Fórmula de função renal'),
   rD9: regra(280, 'ESC: NSTEMI confirmado por algoritmo de hs-cTn é alto risco, menos de 24 h. Nota da tela: vale a ACC, a ESC pode antecipar o cateterismo.', 'Especificação, D9: a tela mostra a conduta da ESC em nota'),
   rD12: regra(283, 'ESC: ICP razoável de 12 a 48 h; sem indicação depois de 48 h. Vale a ACC, com aviso do corte da ESC.', 'Especificação, D12: ACC, com aviso do corte de 48 h da ESC'),
   rD18: regra(289, 'Após fibrinólise, para dar suporte à ICP: clopidogrel ou ticagrelor (menos de 75 anos, em 24 h) ou prasugrel (depois de 24 h).', 'Especificação, D18: Aviso na tela'),
@@ -665,7 +665,7 @@ function cartaoReperfusao(e, pl, agora, t0, inst) {
       const p = valor(e, 'projecao');
       if (p !== null && !considerar) c.conta = `Projeção de ${num(p, 0)} min, acima de 120 min, e sintomas há menos de 12 h`;
       c.detalhe = considerar ? 'Sem hemodinâmica acessível. Transferir logo em seguida.' : 'Estratégia fármaco-invasiva.';
-      c.regras = considerar ? [inst === 'sim' ? R.rS5 : R.rS6b, R.rS6b] : [R.rS3, R.rS6e];
+      c.regras = considerar ? (inst === 'sim' ? [R.rS5, R.rS6b] : [R.rS6b]) : [R.rS3, R.rS6e];
       if (teveAcao(e, 'fibrinolise.dose')) c.situacao = 'correndo'; else c.acoes = [acao('ci.rever', 'Rever a lista de contraindicações', {}, true)];
       break;
     }

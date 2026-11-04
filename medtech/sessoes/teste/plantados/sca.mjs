@@ -1,4 +1,4 @@
-/* Os 54 erros plantados de tools/sessao_sca_teste.sh, na mesma ordem, traduzidos para sca.js. */
+/* Os 55 erros plantados de tools/sessao_sca_teste.sh, na mesma ordem, traduzidos para sca.js. */
 export default [
   { nome: 'fibrinólise com contraindicação absoluta', de: 'if (absolutasMarcadas(e).length) return plano.icp(MOTIVO.s4);', para: 'if (false) return plano.icp(MOTIVO.s4);' },
   { nome: 'fibrinólise sem conferir a lista', de: 'if (!listaConferida(e)) {\n    return plano.passo(', para: 'if (!true) {\n    return plano.passo(' },
@@ -54,4 +54,5 @@ export default [
   { nome: 'CKD-EPI com constante errada', de: 'return 142 * Math.pow(', para: 'return 150 * Math.pow(' },
   { nome: 'classe errada na fonte', de: "'ACC 5.3 rec 2: COR 1, A'),", para: "'ACC 5.3 rec 2: COR 2a, A')," },
   { nome: 'método trocado sem decisão (só o teste de padrão pega)', de: "export const metodoCrCl = 'ckdEpi2021';", para: "export const metodoCrCl = 'cockcroftGault';" },
+  { nome: 'erro antigo: S6b repetida no cartão de fibrinólise', de: "(inst === 'sim' ? [R.rS5, R.rS6b] : [R.rS6b])", para: "[inst === 'sim' ? R.rS5 : R.rS6b, R.rS6b]" },
 ];
