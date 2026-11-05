@@ -687,379 +687,10 @@
   }
 
   /* =====================================================================
-     FINANÇAS (FinancasView)
+     FINANÇAS: a tela nova (6 abas e o Lançar) mora em financas.js. Aqui ficam só as folhas que as duas usam:
+     registrar parcela ou pagamento, teto da categoria e fixo (cópias do iPhone, gravando pelo cofre).
      ===================================================================== */
-  var Fz = { el: null, ref: new Date(), aberto: null, filtroAberto: false, filtroTipo: 'tudo', filtroCategoria: null, busca: '', sel: null, painel: null };
-
-  function montaFinancas(el) {
-    Fz.el = el;
-    el.classList.add('g-secao', 'g-financas');
-    el.innerHTML = '<div class="rola-secao g-rola"><div class="g-fin-topo"></div></div><div class="g-aviso-lugar" aria-live="polite"></div>' +
-      '<div class="g-pe"><button type="button" class="g-acao" data-acao="lancar">Lançar</button></div>';
-    Fz.lista = D.createElement('div'); Fz.lista.className = 'g-fin-lista g-lista';
-    desenhaFinancas();
-    C.ligar('granae');
-    if (el.__gestao) return;
-    el.__gestao = 1;
-    el.addEventListener('click', cliqueFinancas);
-    el.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('g-lc')) { e.preventDefault(); e.target.click(); } });
-    el.addEventListener('input', function (e) { if (e.target.name === 'busca') { Fz.busca = e.target.value; desenhaListaF(); desenhaBotaoFiltro(); } });
-    Fz.giro = arrastoMes(el, '.g-resumo-f, .g-cab2', function () { return el.querySelector('.g-desliza'); }, trocarMesF);
-    linhasDeslizantes(el, function (l) {
-      var t = achaLanc(l.dataset.id); if (!t) return {};
-      return { esquerda: { executar: function () { excluirL(t); } } };
-    });
-  }
-  function achaLanc(id) { return C.granae.transactions.filter(function (t) { return t.id === id; })[0] || null; }
-  function mesVizinho(n) { var s = Fz.painel ? Fz.painel.r.s : mesCivil(Fz.ref).s; return criar(s.getFullYear(), s.getMonth() + n, 1); }
-  function trocarMesF(n) { Fz.ref = mesVizinho(n); desenhaFinancas(); }
-
-  function desenhaFinancas() {
-    var el = Fz.el; if (!el || !el.querySelector('.g-fin-topo') || !Fz.lista) return;
-    var m = Fz.painel = painelFinancas(Fz.ref, C.granae), tem = C.temDinheiro;
-    var h = cabecaMes({ titulo: mesExtenso(m.r.s), ano: String(m.r.s.getFullYear()), anterior: mesCurto(mesVizinho(-1)), seguinte: mesCurto(mesVizinho(1)), corMais: 'var(--g-fi-tx)' });
-    h += faixa('granae');
-    h += '<div class="g-desliza"><div class="g-cartao g-resumo-f">';
-    h += numeroF('entrou', 'Entrou', m.entrou, 'var(--g-fi-tx)', m.entrar > 0 ? real(m.entrar) + ' agendados para entrar' : null, tem);
-    if (Fz.aberto === 'entrou' && tem) {
-      var rec = m.lancamentos.filter(function (t) { return t.type === 'income'; }).sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
-      h += '<div class="g-detalhe">' + (rec.length ? '' : '<p class="g-t2">Nenhuma receita lançada neste mês.</p>') + rec.slice(0, 6).map(function (t) {
-        return '<button type="button" class="g-rec" data-acao="editar-id" data-id="' + esc(t.id) + '"><span>' + esc(t.description) + '</span><b style="color:' + (t.pending ? 'var(--tinta2)' : 'var(--g-fi-tx)') + '">' + real(t.amount) + '</b></button>';
-      }).join('') + '</div>';
-    }
-    h += '<div class="g-fio"></div>';
-    h += numeroF('saiu', 'Saiu', m.saiu, 'var(--tinta)', m.sair > 0 ? real(m.sair) + ' agendados para sair' : null, tem);
-    if (Fz.aberto === 'saiu' && tem) h += '<div class="g-detalhe">' + gastosPorCategoria(m) + '</div>';
-    h += '<div class="g-fio"></div><div class="g-saldo"><span>Saldo</span><b' + (m.saldo < 0 ? ' style="color:var(--g-al-tx)"' : '') + '>' + (tem ? real(m.saldo) : vazio(110)) + '</b></div>';
-    h += '</div></div>';
-    el.querySelector('.g-fin-topo').innerHTML = h;
-    // a lista entra no mesmo deslizamento do mês
-    el.querySelector('.g-desliza').appendChild(Fz.lista);
-    desenhaListaF();
-    var bt = el.querySelector('.g-acao'), trav = !!C.bloqueio('granae');
-    bt.classList.toggle('travado', trav);
-    bt.style.background = trav ? '' : 'var(--g-fi)';
-  }
-  function numeroF(b, titulo, v, cor, nota, tem) {
-    var ab = Fz.aberto === b;
-    return '<button type="button" class="g-num" data-acao="bloco" data-b="' + b + '" aria-expanded="' + ab + '"' + (tem ? '' : ' disabled') + '>' +
-      '<span class="g-num-l"><span class="g-num-t">' + titulo + '</span><span class="g-num-v grande" style="color:' + cor + '">' + (tem ? real(v) : vazio(130)) + '</span></span>' +
-      (tem && nota ? '<span class="g-num-nota">' + esc(nota) + '</span>' : '') +
-      (tem && b === 'saiu' && !ab ? '<span class="g-num-link">Ver por categoria</span>' : '') + '</button>';
-  }
-
-  /* GastosPorCategoria: barras horizontais, cor única; a selecionada fica cheia; o traço marca o teto. */
-  function gastosPorCategoria(m) {
-    var com = m.categorias.filter(function (c) { return c.gasto > 0; });
-    var linhas = com.length > 7 ? com.slice(0, 6).concat([{ nome: 'Outras somadas', gasto: com.slice(6).reduce(function (s, c) { return s + c.gasto; }, 0), teto: 0 }]) : com;
-    var semGasto = m.categorias.filter(function (c) { return c.gasto === 0 && c.teto > 0; });
-    if (Fz.sel && !linhas.some(function (c) { return c.nome === Fz.sel; })) Fz.sel = null;
-    var h = '';
-    if (!linhas.length) h += '<p class="g-t2">Nenhum gasto neste mês.</p>';
-    else {
-      var esc0 = linhas.filter(function (c) { return c.nome === Fz.sel; })[0];
-      if (esc0) {
-        var pct = m.saiu > 0 ? Math.round(esc0.gasto / m.saiu * 100) : 0, tx, acima = false;
-        if (esc0.teto > 0) { var f = esc0.teto - esc0.gasto; acima = f < 0; tx = f >= 0 ? pct + '% do que saiu. Faltam ' + real(f) + ' do teto' : pct + '% do que saiu. ' + real(-f) + ' acima do teto'; }
-        else tx = pct + '% do que saiu';
-        h += '<div class="g-escolhida"><div class="g-esc-1"><b>' + esc(esc0.nome) + '</b><b>' + realCheio(esc0.gasto) + '</b></div><div class="g-esc-2"><span' + (acima ? ' style="color:var(--g-al-tx)"' : '') + '>' + esc(tx) + '</span>' +
-          (esc0.nome !== 'Outras somadas' ? '<button type="button" class="g-link-tx" data-acao="filtra-cat" data-cat="' + esc(esc0.nome) + '">' + (Fz.filtroCategoria === esc0.nome ? 'Mostrar tudo' : 'Ver lançamentos') + '</button>' : '') + '</div></div>';
-      } else h += '<p class="g-t2 g-dica">Toque numa barra para ver a categoria.</p>';
-      var mx = linhas.reduce(function (a, c) { return Math.max(a, c.gasto, c.teto); }, 0) || 1;
-      h += '<div class="g-cats" role="group" aria-label="Gastos por categoria">' + linhas.map(function (c) {
-        var on = !Fz.sel || Fz.sel === c.nome;
-        return '<button type="button" class="g-cat' + (Fz.sel === c.nome ? ' sel' : '') + '" data-acao="cat" data-cat="' + esc(c.nome) + '" aria-pressed="' + (Fz.sel === c.nome) + '" aria-label="' + esc(c.nome + ': ' + real(c.gasto) + (c.teto > 0 ? ', teto ' + real(c.teto) : '')) + '">' +
-          '<span class="g-cat-t">' + esc(c.nome) + '&nbsp;&nbsp;' + real(c.gasto) + '</span><span class="g-cat-area"><i class="g-cat-b" style="width:' + (c.gasto / mx * 100) + '%;opacity:' + (on ? 1 : 0.32) + '"></i>' +
-          (c.teto > 0 ? '<i class="g-cat-teto" style="left:calc(' + (c.teto / mx * 100) + '% - 1px)"></i>' : '') + '</span></button>';
-      }).join('') + '</div>';
-      if (linhas.some(function (c) { return c.teto > 0; })) h += '<p class="g-miuda">O traço marca o teto da categoria.</p>';
-    }
-    if (semGasto.length) h += '<p class="g-miuda">Sem gasto ainda: ' + esc(semGasto.map(function (c) { return c.nome + ' (teto ' + real(c.teto) + ')'; }).join(', ')) + '</p>';
-    return h;
-  }
-
-  function filtroLigado() { return Fz.filtroTipo !== 'tudo' || !!Fz.filtroCategoria || !!Fz.busca.trim(); }
-  function desenhaBotaoFiltro() { var b = Fz.el.querySelector('[data-acao=filtro]'); if (b) b.textContent = filtroLigado() ? 'Filtro ligado' : 'Filtrar'; }
-  function desenhaListaF() {
-    var lista = Fz.lista, m = Fz.painel, hj = hoje();
-    var q = Fz.busca.trim().toLowerCase();
-    var todos = m.lancamentos.filter(function (l) {
-      if ((Fz.filtroTipo === 'receitas' && l.type !== 'income') || (Fz.filtroTipo === 'gastos' && l.type === 'income')) return false;
-      if (Fz.filtroCategoria && l.category !== Fz.filtroCategoria) return false;
-      if (q && l.description.toLowerCase().indexOf(q) < 0 && l.category.toLowerCase().indexOf(q) < 0 && (l.sub || '').toLowerCase().indexOf(q) < 0) return false;
-      return true;
-    });
-    function agrupar(l, crescente) {
-      var dias = {}; l.forEach(function (t) { (dias[t.date] = dias[t.date] || []).push(t); });
-      return Object.keys(dias).sort(function (a, b) { return crescente ? (a < b ? -1 : 1) : (a < b ? 1 : -1); })
-        .map(function (d) { return { dia: d, itens: dias[d].sort(function (a, b) { return a.id < b.id ? -1 : a.id > b.id ? 1 : 0; }) }; });
-    }
-    var porVir = agrupar(todos.filter(function (t) { return t.date > hj; }), true), feitos = agrupar(todos.filter(function (t) { return t.date <= hj; }), false);
-    var cabAntes = lista.querySelector('.g-filtro');
-    var h = '';
-    if (!cabAntes) {
-      h += '<div class="g-lista-cab"><h2 class="g-h2">Lançamentos</h2><button type="button" class="g-link-tx" data-acao="filtro" aria-expanded="' + Fz.filtroAberto + '">' + (filtroLigado() ? 'Filtro ligado' : 'Filtrar') + '</button></div>';
-      if (Fz.filtroAberto) h += painelFiltro();
-      h += '<div class="g-lista-corpo"></div>';
-      lista.innerHTML = h;
-    }
-    var corpo = lista.querySelector('.g-lista-corpo'), b = '';
-    var fc = lista.querySelector('.g-filtro-cat');
-    if (fc) { fc.hidden = !Fz.filtroCategoria; fc.textContent = Fz.filtroCategoria ? 'Só ' + Fz.filtroCategoria + '. Toque para limpar' : ''; }
-    if (!todos.length) b += '<p class="g-vaziotx">' + (filtroLigado() ? 'Nada com esse filtro.' : 'Nada lançado neste mês.') + '</p>';
-    if (feitos.length) b += grupoLinhas(null, feitos);
-    if (porVir.length) b += grupoLinhas('Agendados', porVir);
-    corpo.innerHTML = b;
-  }
-  function painelFiltro() {
-    return '<div class="g-filtro">' +
-      '<div class="g-tipos" role="group" aria-label="Tipo">' + [['tudo', 'Tudo'], ['receitas', 'Receitas'], ['gastos', 'Gastos']].map(function (t) {
-        return '<button type="button" class="g-tipo' + (Fz.filtroTipo === t[0] ? ' sel' : '') + '" data-acao="tipo" data-t="' + t[0] + '" aria-pressed="' + (Fz.filtroTipo === t[0]) + '">' + t[1] + '</button>';
-      }).join('') + '</div>' +
-      '<input class="g-campo g-busca" type="search" name="busca" placeholder="Buscar" aria-label="Buscar nos lançamentos" autocomplete="off" autocapitalize="off" value="' + esc(Fz.busca) + '">' +
-      '<button type="button" class="g-link-tx g-filtro-cat" data-acao="limpa-cat"' + (Fz.filtroCategoria ? '' : ' hidden') + '>' + (Fz.filtroCategoria ? esc('Só ' + Fz.filtroCategoria + '. Toque para limpar') : '') + '</button></div>';
-  }
-  function grupoLinhas(titulo, grupos) {
-    return (titulo ? '<h3 class="g-grupo-t">' + titulo + '</h3>' : '') + '<div class="g-sup g-grupo">' + grupos.map(function (g) {
-      return '<p class="g-dia-t">' + esc(rotuloDia(g.dia)) + '</p>' + g.itens.map(function (l) {
-        var rec = l.type === 'income';
-        return linhaDeslizante('data-id="' + esc(l.id) + '"', null, { rotulo: 'Excluir', cor: 'var(--g-al)' },
-          '<span class="g-ll-m"><b>' + esc(l.description) + '</b>' + (l.category !== l.description || l.transferId ? '<small>' + esc(l.transferId ? 'Transferência' : l.category) + '</small>' : '') + '</span>' +
-          '<span class="g-ll-v"><b' + (rec ? ' style="color:var(--g-fi-tx)"' : '') + '>' + (rec ? '+ ' : '− ') + realCheio(l.amount) + '</b>' + (l.pending ? '<small>Agendado</small>' : '') + '</span>');
-      }).join('');
-    }).join('') + '</div>';
-  }
-
-  function cliqueFinancas(e) {
-    var a = e.target.closest('[data-acao]'); if (!a || !Fz.el.contains(a)) return;
-    var acao = a.dataset.acao;
-    if (acao === 'mes') return trocarMesF(+a.dataset.n);
-    if (acao === 'mais') return abreMaisFinancas();
-    if (acao === 'tentar') return C.tentarDeNovo('granae');
-    if (acao === 'bloco') { if (!C.temDinheiro || (Fz.giro && Fz.giro.acabou())) return; Fz.aberto = Fz.aberto === a.dataset.b ? null : a.dataset.b; if (Fz.aberto === 'saiu') Fz.sel = Fz.filtroCategoria; return desenhaFinancas(); }
-    if (acao === 'cat') { Fz.sel = Fz.sel === a.dataset.cat ? null : a.dataset.cat; return desenhaFinancas(); }
-    if (acao === 'filtra-cat') {
-      var n = Fz.filtroCategoria === a.dataset.cat ? null : a.dataset.cat;
-      Fz.filtroCategoria = n;
-      if (n) { Fz.filtroTipo = 'tudo'; Fz.filtroAberto = true; }
-      Fz.lista.innerHTML = '';
-      desenhaFinancas();
-      if (n) Fz.lista.scrollIntoView({ block: 'start', behavior: reduz() ? 'auto' : 'smooth' });
-      return;
-    }
-    if (acao === 'filtro') { Fz.filtroAberto = !Fz.filtroAberto; Fz.lista.innerHTML = ''; desenhaListaF(); var bu = Fz.el.querySelector('[name=busca]'); if (bu) bu.focus({ preventScroll: true }); return; }
-    if (acao === 'tipo') { Fz.filtroTipo = a.dataset.t; Fz.lista.innerHTML = ''; desenhaListaF(); var tb = Fz.el.querySelector('[data-t="' + Fz.filtroTipo + '"]'); if (tb) tb.focus({ preventScroll: true }); return; }
-    if (acao === 'limpa-cat') { Fz.filtroCategoria = null; desenhaListaF(); desenhaBotaoFiltro(); return; }
-    if (acao === 'editar-id') { var t0 = achaLanc(a.dataset.id); if (t0) folhaDinheiro({ editar: t0 }); return; }
-    if (acao === 'editar') { var li = a.closest('.g-linha'), t = li && achaLanc(li.dataset.id); if (t) folhaDinheiro({ editar: t }); return; }
-    if (acao === 'lancar') {
-      var b = C.bloqueio('granae'); if (b) return mostraAviso(Fz.el, { texto: b, erro: true });
-      return folhaDinheiro({});
-    }
-  }
-  function excluirL(l) {
-    C.excluirLancamento(l.id).then(function (copia) {
-      mostraAviso(Fz.el, { texto: 'Lançamento excluído', desfazer: function () { C.restaurarLancamento(copia).catch(function (e) { erroAviso(Fz.el, e); }); } });
-    }, function (e) { erroAviso(Fz.el, e); });
-  }
-
-  /* ---------- FolhaDinheiro + FormDinheiro: valor primeiro, categoria com um toque ---------- */
-  var CHAVE_MODO = 'medtech.meumes.modo';
-  function folhaDinheiro(pedido) {
-    var o = pedido.editar || null, g = C.granae;
-    var modo = o ? (o.type === 'income' ? 'receita' : 'gasto') : (function () { try { return localStorage.getItem(CHAVE_MODO) === 'Receita' ? 'receita' : 'gasto'; } catch (e) { return 'gasto'; } })();
-    var parc = o ? parcelaInfo(o.description) : null;
-    U.folha({
-      titulo: o ? (o.type === 'income' ? 'Editar receita' : 'Editar gasto') : 'Lançar', classe: 'g-folha g-fd', alta: true,
-      conteudo: function (c, api) {
-        var st = { digitos: o ? textoCampo(o.amount) : '', data: o ? o.date : hoje(), descricao: o ? o.description : '', categoria: o ? o.category : '', parcelas: 1, sub: (o && o.sub) || '', conta: (o && o.accountId) || '', detalhes: false, salvando: false, falta: false };
-        function tipo() { return modo === 'receita' ? 'income' : 'expense'; }
-        function categorias() {
-          var l = g.categories.map(function (x, i) { return { c: x, i: i }; }).filter(function (x) { return x.c.type === tipo(); }), usos = {};
-          g.transactions.slice(-400).forEach(function (t) { if (t.type === tipo()) usos[t.category] = (usos[t.category] || 0) + 1; });
-          return l.sort(function (a, b) { return ((usos[b.c.name] || 0) - (usos[a.c.name] || 0)) || a.i - b.i; }).map(function (x) { return x.c; });
-        }
-        function exibicao() {
-          if (!st.digitos) return 'R$ 0';
-          var pt = st.digitos.split(','), int = FI.format(+pt[0] || 0);
-          return pt.length > 1 ? 'R$ ' + int + ',' + pt[1] : 'R$ ' + int;
-        }
-        function valor() { return numeroCampo(st.digitos) || 0; }
-        function tocar(t) {
-          var x = st.digitos;
-          if (t === 'apagar') { st.digitos = x.slice(0, -1); return; }
-          if (t === ',') { if (x.indexOf(',') >= 0) return; st.digitos = x ? x + ',' : '0,'; return; }
-          var i = x.indexOf(',');
-          if (i >= 0) { if (x.length - i > 2) return; } else if (x.length >= 8) return;
-          st.digitos = x === '0' ? t : x + t;
-        }
-        function pinta() {
-          var cats = categorias(), ed = !!o;
-          var h = topo(o ? (o.type === 'income' ? 'Editar receita' : 'Editar gasto') : '');
-          if (!ed) h += '<div class="g-modo" role="group" aria-label="Tipo de lançamento">' + ['gasto', 'receita'].map(function (m) { return '<button type="button" class="g-modo-bt' + (modo === m ? ' sel' : '') + '" data-modo="' + m + '" aria-pressed="' + (modo === m) + '">' + (m === 'gasto' ? 'Gasto' : 'Receita') + '</button>'; }).join('') + '</div>';
-          h += '<p class="g-erro" role="alert"' + (st.erro ? '' : ' hidden') + '>' + esc(st.erro || '') + '</p>';
-          h += '<div class="g-vtopo"><output class="g-vgrande' + (st.digitos ? '' : ' zero') + '" aria-live="polite" aria-label="Valor ' + esc(real(valor())) + '">' + esc(exibicao()) + '</output>' +
-            '<div class="g-vdata"><input class="g-campo g-data" type="date" name="data" aria-label="Data" value="' + esc(st.data) + '">' + (st.data > hoje() ? '<span class="g-t2 g-forte">Agendado</span>' : '') + '</div>' +
-            (st.falta ? '<p class="g-alerta-tx g-forte">Digite o valor</p>' : '') + '</div>';
-          if (st.detalhes) {
-            h += '<div class="g-det-campos">' +
-              '<input class="g-campo" type="text" name="descricao" placeholder="Descrição" aria-label="Descrição" value="' + esc(st.descricao) + '">';
-            if (!ed) {
-              h += '<div class="g-parc"><span>' + (st.parcelas === 1 ? 'À vista' : st.parcelas + ' parcelas de ' + esc(realCheio(valor()))) + '</span><span class="g-passo"><button type="button" data-par="-1" aria-label="Menos parcelas"' + (st.parcelas <= 1 ? ' disabled' : '') + '>−</button><button type="button" data-par="1" aria-label="Mais parcelas"' + (st.parcelas >= 120 ? ' disabled' : '') + '>+</button></span></div>';
-              if (st.parcelas > 1) h += '<p class="g-miuda">O valor digitado é o de cada parcela. Elas ficam lançadas uma por mês.</p>';
-            } else if (parc) h += '<p class="g-t2">Esta é a parcela ' + parc.k + ' de ' + parc.n + '. A edição muda só ela.</p>';
-            h += '<input class="g-campo" type="text" name="sub" placeholder="Subcategoria (opcional)" aria-label="Subcategoria" value="' + esc(st.sub) + '">';
-            if (g.accounts.length) h += '<label class="g-parc"><span>Conta ou cartão</span><select class="g-sel" name="conta"><option value="">Não informado</option>' + g.accounts.map(function (a) { return '<option value="' + esc(a.id) + '"' + (a.id === st.conta ? ' selected' : '') + '>' + esc(a.name) + '</option>'; }).join('') + '</select></label>';
-            if (ed) h += '<div class="g-dois"><button type="button" class="g-linhabt" data-x="dup" style="color:var(--g-fi-tx)">Duplicar para hoje</button><button type="button" class="g-linhabt" data-x="exc" style="color:var(--g-al-tx)">Excluir</button></div>';
-            h += '</div>';
-          }
-          h += '<div class="g-cats-esc"><p class="g-rot">' + (ed ? 'Categoria' : 'Toque na categoria para salvar') + '</p><div class="g-chips g-chips-cat">' + cats.map(function (x) {
-            return '<button type="button" class="g-chip' + (st.categoria === x.name ? ' sel' : '') + '" data-cat="' + esc(x.name) + '" aria-pressed="' + (st.categoria === x.name) + '"' + (st.salvando ? ' disabled' : '') + '>' + esc(x.name) + '</button>';
-          }).join('') + '</div></div>';
-          if (!st.detalhes) h += '<div class="g-teclado">' + ['1', '2', '3', '4', '5', '6', '7', '8', '9', ',', '0', 'apagar'].map(function (t) {
-            return '<button type="button" class="g-tecla" data-t="' + t + '" aria-label="' + (t === 'apagar' ? 'Apagar' : t === ',' ? 'Vírgula' : t) + '">' + (t === 'apagar' ? U.ic('backspace') : t) + '</button>';
-          }).join('') + '</div>';
-          h += '<div class="g-rodape"><button type="button" class="g-linhabt" data-x="det" style="color:var(--g-fi-tx)">' + (st.detalhes ? 'Voltar ao valor' : ed ? 'Mais campos' : 'Descrição, parcelas e conta') + '</button>' +
-            (ed ? '<button type="button" class="g-cheio" data-x="salvar" style="background:var(--g-fi)"' + (st.salvando ? ' disabled' : '') + '>Salvar</button>' : '') + '</div>';
-          var foco = D.activeElement && c.contains(D.activeElement) ? (D.activeElement.dataset.t ? '[data-t="' + D.activeElement.dataset.t + '"]' : D.activeElement.dataset.cat ? '[data-cat="' + CSS.escape(D.activeElement.dataset.cat) + '"]' : D.activeElement.dataset.modo ? '[data-modo="' + D.activeElement.dataset.modo + '"]' : D.activeElement.dataset.x ? '[data-x="' + D.activeElement.dataset.x + '"]' : D.activeElement.dataset.par ? '[data-par="' + D.activeElement.dataset.par + '"]' : null) : null;
-          c.innerHTML = h;
-          if (foco) { var fe = c.querySelector(foco); if (fe && !fe.disabled) fe.focus({ preventScroll: true }); }
-        }
-        function lerCampos() {
-          var x;
-          if ((x = c.querySelector('[name=descricao]'))) st.descricao = x.value;
-          if ((x = c.querySelector('[name=sub]'))) st.sub = x.value;
-          if ((x = c.querySelector('[name=conta]'))) st.conta = x.value;
-          if ((x = c.querySelector('[name=data]'))) st.data = x.value || st.data;
-        }
-        c.addEventListener('input', function (e) { if (e.target.name === 'data') { lerCampos(); var ag = c.querySelector('.g-vdata .g-t2'); var fut = st.data > hoje(); if (fut && !ag) e.target.insertAdjacentHTML('afterend', '<span class="g-t2 g-forte">Agendado</span>'); if (!fut && ag) ag.remove(); } else lerCampos(); });
-        c.addEventListener('click', function (e) {
-          var b = e.target.closest('button'); if (!b || b.disabled) return;
-          lerCampos();
-          if (b.dataset.topo) return api.fechar();
-          if (b.dataset.modo) { if (b.dataset.modo === modo) return; modo = b.dataset.modo; try { localStorage.setItem(CHAVE_MODO, modo === 'receita' ? 'Receita' : 'Gasto'); } catch (x) { } st.categoria = ''; return pinta(); }
-          if (b.dataset.t) { st.falta = false; tocar(b.dataset.t); return pinta(); }
-          if (b.dataset.par) { st.parcelas = Math.max(1, Math.min(120, st.parcelas + +b.dataset.par)); return pinta(); }
-          if (b.dataset.cat != null) { st.categoria = b.dataset.cat; if (o) return pinta(); return salvar(b.dataset.cat); }
-          if (b.dataset.x === 'det') { st.detalhes = !st.detalhes; return pinta(); }
-          if (b.dataset.x === 'salvar') return salvar(st.categoria);
-          if (b.dataset.x === 'dup') return C.duplicarLancamentoHoje(o.id).then(function () { terminar('Duplicado para hoje', null, hoje()); }, falhou);
-          if (b.dataset.x === 'exc') return U.confirma('Excluir este lançamento?', o.description + ', ' + realCheio(o.amount) + '.', [
-            { rotulo: 'Excluir', perigo: true, acao: function () { C.excluirLancamento(o.id).then(function (copia) { terminar('Lançamento excluído', function () { C.restaurarLancamento(copia).catch(function (x) { erroAviso(Fz.el, x); }); }, null); }, falhou); } },
-            { rotulo: 'Cancelar' }]);
-        });
-        /* teclado físico no computador: números, vírgula e apagar */
-        c.addEventListener('keydown', function (e) {
-          if (st.detalhes || (e.target.matches && e.target.matches('input, select, textarea'))) return;
-          var k = e.key === '.' ? ',' : e.key === 'Backspace' ? 'apagar' : e.key;
-          if (/^[0-9,]$/.test(k) || k === 'apagar') { e.preventDefault(); st.falta = false; tocar(k); pinta(); }
-        });
-        function falhou(e) { st.salvando = false; if (!o) st.categoria = ''; st.erro = (e && e.message) || String(e); pinta(); }
-        function terminar(texto, desfazer, foiPara) {
-          api.fechar();
-          if (foiPara && Fz.painel && !contem(Fz.painel.r, foiPara)) { var d = data(foiPara); if (d) Fz.ref = d; }
-          desenhaFinancas();
-          mostraAviso(Fz.el, { texto: texto, desfazer: desfazer });
-        }
-        function salvar(cat) {
-          if (st.salvando) return;
-          if (!(valor() > 0)) { st.falta = true; if (!o) st.categoria = ''; return pinta(); }
-          if (!cat) { st.erro = 'Escolha a categoria.'; return pinta(); }
-          var r = { id: o ? o.id : null, type: tipo(), amount: valor(), description: st.descricao.trim() || cat, category: cat, date: st.data || hoje(), sub: st.sub.trim() || null, accountId: st.conta || null, parcelas: o ? 1 : st.parcelas };
-          st.salvando = true; st.erro = null; pinta();
-          C.salvarLancamento(r).then(function () {
-            var texto = r.parcelas > 1 ? r.parcelas + ' parcelas de ' + realCheio(r.amount) : r.date > hoje() ? 'Agendado para ' + curto(r.date) : (o ? 'Atualizado' : 'Lançado em ' + cat);
-            terminar(texto, null, r.date);
-          }, falhou);
-        }
-        pinta();
-      }
-    });
-  }
-
-  /* ---------- Mais opções de Finanças (MaisFinancasView, CompromissosView, FixosTetosView) ---------- */
-  function abreMaisFinancas() {
-    var cor = 'var(--g-fi-tx)';
-    folhaMais(cor, function () {
-      var ab = compromissos(C.granae).filter(function (c) { return !c.quitado; }).length;
-      return linkMais('comp', 'Parcelas e dívidas', ab === 1 ? '1 em aberto' : ab + ' em aberto') + linkMais('fixos', 'Fixos e tetos', C.granae.fixedItems.length + ' fixos');
-    }, {
-      comp: {
-        titulo: 'Parcelas e dívidas',
-        html: function (t) {
-          var lista = compromissos(C.granae), ab = lista.filter(function (c) { return !c.quitado; }), qt = lista.filter(function (c) { return c.quitado; });
-          var h = '<div class="g-comp-tot"><span><small>Falta pagar</small><b style="color:var(--g-fi-tx)">' + real(ab.reduce(function (s, c) { return s + c.aPagar; }, 0)) + '</b></span>' +
-            '<span class="dir"><small>Sai por mês</small><b>' + real(ab.reduce(function (s, c) { return s + c.valorParcela; }, 0)) + '</b></span></div>';
-          if (!ab.length) h += '<p class="g-vaziotx">Nada em aberto. Lance um gasto com parcelas e ele aparece aqui.</p>';
-          h += ab.map(function (c) { return cartaoComp(c, t); }).join('');
-          if (qt.length) {
-            h += '<button type="button" class="g-link-tx" data-c="quitados">' + (t.verQuitados ? 'Esconder' : 'Mostrar') + ' ' + qt.length + ' quitados</button>';
-            if (t.verQuitados) h += qt.map(function (c) { return cartaoComp(c, t); }).join('');
-          }
-          return h;
-        },
-        clique: function (b, t, pinta) {
-          if (b.dataset.c === 'quitados') { t.verQuitados = !t.verQuitados; return pinta(); }
-          if (b.dataset.abre) { t.aberto = t.aberto === b.dataset.abre ? null : b.dataset.abre; return pinta(); }
-          if (b.dataset.pagar) { var c = compromissos(C.granae).filter(function (x) { return x.id === b.dataset.pagar; })[0]; if (c) abrePagamento(c); }
-        }
-      },
-      fixos: {
-        titulo: 'Fixos e tetos',
-        html: function (t) {
-          t.aba = t.aba || 'tetos';
-          var g = C.granae, pf = painelFinancas(Fz.ref, g);
-          var h = '<div class="g-modo g-seg" role="group" aria-label="Ver"><button type="button" class="g-modo-bt' + (t.aba === 'tetos' ? ' sel' : '') + '" data-aba="tetos" aria-pressed="' + (t.aba === 'tetos') + '">Tetos</button><button type="button" class="g-modo-bt' + (t.aba === 'fixos' ? ' sel' : '') + '" data-aba="fixos" aria-pressed="' + (t.aba === 'fixos') + '">Fixos</button></div>';
-          if (t.aba === 'tetos') {
-            h += '<p class="g-t2">O teto é o valor da categoria no mês. Sem teto próprio, vale a soma dos fixos dela.</p><div class="g-sup">' + g.categories.filter(function (c) { return c.type === 'expense'; }).map(function (c) {
-              var x = pf.categorias.filter(function (k) { return k.nome === c.name; })[0], gasto = x ? x.gasto : 0, lim = x ? x.teto : 0, fr = lim > 0 ? Math.min(1, gasto / lim) : 0;
-              return '<button type="button" class="g-opcao g-teto" data-teto="' + esc(c.id) + '"><span class="g-local-1"><b>' + esc(c.name) + '</b><small' + (lim > 0 && gasto > lim ? ' style="color:var(--g-al-tx)"' : '') + '>' + esc(lim > 0 ? real(gasto) + ' de ' + real(lim) : gasto > 0 ? real(gasto) + ', sem teto' : 'Sem teto') + '</small></span>' +
-                (lim > 0 ? '<span class="g-trilho fino"><i style="width:' + (gasto > 0 ? 'max(6px,' + fr * 100 + '%)' : '0') + ';background:' + (gasto > lim ? 'var(--g-al)' : 'var(--g-fi)') + '"></i></span>' : '') + '</button>';
-            }).join('') + '</div>';
-          } else {
-            var fx = g.fixedItems.slice().sort(function (a, b) {
-              if (a.type !== b.type) return a.type === 'income' ? -1 : 1;
-              var ay = a.frequency === 'yearly', by = b.frequency === 'yearly'; if (ay !== by) return ay ? 1 : -1;
-              return a.name.localeCompare(b.name, 'pt-BR');
-            });
-            h += '<button type="button" class="g-cheio g-cheio-m" data-fixo="" style="background:var(--g-fi)">Novo fixo</button>' + (fx.length ? '' : '<p class="g-vaziotx">Nenhum fixo cadastrado.</p>') +
-              (fx.length ? '<div class="g-sup">' + fx.map(function (f) {
-                var rec = f.type === 'income';
-                return '<button type="button" class="g-opcao g-fixo" data-fixo="' + esc(f.id) + '"><span class="g-ll-m"><b>' + esc(f.name) + '</b><small>' + esc(f.category + ', ' + (f.frequency === 'yearly' ? '1 vez por ano' : 'todo mês')) + '</small></span><b' + (rec ? ' style="color:var(--g-fi-tx)"' : '') + '>' + (rec ? '+ ' : '− ') + real(f.amount) + '</b></button>';
-              }).join('') + '</div>' : '');
-          }
-          return h;
-        },
-        clique: function (b, t, pinta) {
-          if (b.dataset.aba) { t.aba = b.dataset.aba; return pinta(); }
-          if (b.dataset.teto) { var c = C.granae.categories.filter(function (x) { return x.id === b.dataset.teto; })[0]; if (c) abreTeto(c); return; }
-          if (b.dataset.fixo != null) { var f = b.dataset.fixo ? C.granae.fixedItems.filter(function (x) { return x.id === b.dataset.fixo; })[0] : null; abreFixo(f || null); }
-        }
-      }
-    }, [
-      { titulo: 'Bancos e Open Finance', href: '../granae.html#categorias' },
-      { titulo: 'Análise por IA, voz e fatura', href: '../granae.html#ia' },
-      { titulo: 'Regras, revisão em lote e CSV', href: '../granae.html#transacoes' },
-      { titulo: 'Cartões, faturas e novo financiamento', href: '../granae.html#compromissos' },
-      { titulo: 'Categorias e contas', href: '../granae.html#categorias' }
-    ]);
-  }
   function mesAno(s) { var d = data(s); return d ? MESES[d.getMonth()].slice(0, 3) + ' de ' + d.getFullYear() : s; }
-  function cartaoComp(c, t) {
-    var fr = c.divida ? (c.total > 0 ? Math.min(1, c.pago / c.total) : 0) : (c.n > 0 ? c.pagas / c.n : 0);
-    var linha = c.divida ? real(c.aPagar) + ' em aberto de ' + real(c.total) + (c.credor ? ', ' + c.credor : '')
-      : real(c.valorParcela) + ' por mês. Faltam ' + real(c.aPagar) + (c.estimado ? ' (estimado)' : '') + (c.ultima && !c.quitado ? '. Última em ' + mesAno(c.ultima) : '');
-    var hj = hoje();
-    var h = '<div class="g-comp"><button type="button" class="g-comp-cab" data-abre="' + esc(c.id) + '" aria-expanded="' + (t.aberto === c.id) + '"><span class="g-local-1"><b class="g-comp-n">' + esc(c.descricao) + '</b><b style="color:var(--g-fi-tx)">' + (c.divida ? Math.round(fr * 100) + '%' : c.pagas + ' de ' + c.n) + '</b></span>' +
-      '<span class="g-trilho fino"><i style="width:' + (fr > 0 ? 'max(8px,' + fr * 100 + '%)' : '0') + ';background:var(--g-fi)"></i></span><small class="g-t2">' + esc(linha) + '</small></button>';
-    if (t.aberto === c.id && c.txs.length) h += '<div class="g-comp-txs">' + c.txs.map(function (x) {
-      var pg = !x.pending && x.date <= hj, d = data(x.date);
-      return '<div class="g-comp-tx"><span>' + (d ? completo(d) : esc(x.date)) + '</span><b>' + realCheio(x.amount) + '</b><small' + (pg ? ' style="color:var(--g-fi-tx)"' : '') + '>' + (pg ? 'Paga' : 'Pendente') + '</small></div>';
-    }).join('') + '</div>';
-    if (!c.quitado && !c.divida && c.txs.length >= (c.n || 0)) h += '<p class="g-t2">As ' + c.n + ' parcelas já estão lançadas e entram na data de cada uma.</p>';
-    else if (!c.quitado) h += '<button type="button" class="g-cheio g-cheio-m" data-pagar="' + esc(c.id) + '" style="background:var(--g-fi)">' + (c.divida ? 'Registrar pagamento' : 'Registrar parcela ' + (c.pagas + 1) + ' de ' + c.n) + '</button>';
-    return h + '</div>';
-  }
 
   function abrePagamento(c) {
     var g = C.granae;
@@ -1082,7 +713,7 @@
           if (!(val > 0)) { err.textContent = 'Digite o valor.'; err.hidden = false; return; }
           var sc = el.querySelector('[name=conta]');
           salvando = true;
-          C.registrarPagamento(c.id, c.divida ? 'divida' : 'parcela', val, el.querySelector('[name=data]').value || hoje(), sc ? sc.value : '').then(function () { api.fechar(); desenhaFinancas(); }, function (x) { salvando = false; err.textContent = x.message; err.hidden = false; });
+          C.registrarPagamento(c.id, c.divida ? 'divida' : 'parcela', val, el.querySelector('[name=data]').value || hoje(), sc ? sc.value : '').then(function () { api.fechar(); }, function (x) { salvando = false; err.textContent = x.message; err.hidden = false; });
         });
       }
     });
@@ -1101,7 +732,7 @@
           if (b.dataset.topo) return api.fechar();
           if (b.dataset.x !== 'ok' || salvando) return;
           salvando = true;
-          C.definirTeto(cat.id, numeroCampo(el.querySelector('[name=valor]').value) || 0).then(function () { api.fechar(); desenhaFinancas(); }, function (x) { salvando = false; var r = el.querySelector('.g-erro'); r.textContent = x.message; r.hidden = false; });
+          C.definirTeto(cat.id, numeroCampo(el.querySelector('[name=valor]').value) || 0).then(function () { api.fechar(); }, function (x) { salvando = false; var r = el.querySelector('.g-erro'); r.textContent = x.message; r.hidden = false; });
         });
       }
     });
@@ -1145,9 +776,9 @@
             var v = numeroCampo(st.valor);
             if (!st.nome.trim() || !v) return falhou({ message: !st.nome.trim() ? 'Dê um nome ao fixo.' : 'Digite o valor.' });
             salvando = true;
-            return C.salvarFixo({ id: of ? of.id : null, type: st.tipo, name: st.nome, amount: v, category: st.categoria, frequency: st.anual ? 'yearly' : 'monthly', month: st.mes }).then(function () { api.fechar(); desenhaFinancas(); }, falhou);
+            return C.salvarFixo({ id: of ? of.id : null, type: st.tipo, name: st.nome, amount: v, category: st.categoria, frequency: st.anual ? 'yearly' : 'monthly', month: st.mes }).then(function () { api.fechar(); }, falhou);
           }
-          if (b.dataset.x === 'exc') return U.confirma('Excluir este fixo?', of.name + '.', [{ rotulo: 'Excluir', perigo: true, acao: function () { salvando = true; C.excluirFixo(of.id).then(function () { api.fechar(); desenhaFinancas(); }, falhou); } }, { rotulo: 'Cancelar' }]);
+          if (b.dataset.x === 'exc') return U.confirma('Excluir este fixo?', of.name + '.', [{ rotulo: 'Excluir', perigo: true, acao: function () { salvando = true; C.excluirFixo(of.id).then(function () { api.fechar(); }, falhou); } }, { rotulo: 'Cancelar' }]);
         });
         pinta();
       }
@@ -1158,13 +789,21 @@
   D.addEventListener('medtech:cofre', function (e) {
     var o = e.detail && e.detail.origem;
     if (P.el && (o === 'plantao' || o === 'situacao')) desenhaPlantoes();
-    if (Fz.el && (o === 'granae' || o === 'situacao')) {
-      var foco = D.activeElement && D.activeElement.name === 'busca';
-      if (foco) { Fz.painel = painelFinancas(Fz.ref, C.granae); desenhaListaF(); } else { Fz.lista.innerHTML = ''; desenhaFinancas(); }
-    }
   });
   Casca.registrar('secao', 'plantoes', montaPlantoes);
-  Casca.registrar('secao', 'financas', montaFinancas);
 
-  W.MTGestao = { _contas: { painelPlantoes: painelPlantoes, painelFinancas: painelFinancas, compromissos: compromissos, compRange: compRange, regraPg: regraPg, numeroCampo: numeroCampo, real: real, rotuloDia: rotuloDia }, P: P, F: Fz };
+  /* peças comuns que financas.js usa (a mesma família de telas do iPhone) */
+  W.MTGestao = {
+    _contas: { painelPlantoes: painelPlantoes, compromissos: compromissos, compRange: compRange, regraPg: regraPg, numeroCampo: numeroCampo, real: real, rotuloDia: rotuloDia },
+    P: P,
+    comum: {
+      MESES: MESES, SEM: SEM, SEM_LONGO: SEM_LONGO, p2: p2, iso: iso, data: data, criar: criar, hoje: hoje, primeira: primeira, mesExtenso: mesExtenso, mesCurto: mesCurto,
+      dm: dm, curto: curto, completo: completo, somaDias: somaDias, rotuloDia: rotuloDia, diaLongo: diaLongo, mesAno: mesAno,
+      real: real, realCheio: realCheio, textoCampo: textoCampo, numeroCampo: numeroCampo, FI: FI,
+      painelFinancas: painelFinancas, mesCivil: mesCivil, contem: contem, parcelaInfo: parcelaInfo, chaveGrupo: chaveGrupo, ativoEm: ativoEm, proximaData: proximaData,
+      arrastoMes: arrastoMes, linhasDeslizantes: linhasDeslizantes, linhaDeslizante: linhaDeslizante, cabecaMes: cabecaMes, faixa: faixa,
+      mostraAviso: mostraAviso, erroAviso: erroAviso, topo: topo, vigiaCofre: vigiaCofre, folhaMais: folhaMais, linkMais: linkMais, vazio: vazio,
+      abrePagamento: abrePagamento, abreTeto: abreTeto, abreFixo: abreFixo
+    }
+  };
 })();
