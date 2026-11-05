@@ -182,8 +182,8 @@ Entra por `MedTechCasca.registrar('secao', 'plantoes' | 'financas', ...)` em `ge
 - Leitura: uma "capa" instalada na página exporta o `state` a cada `MT.onData` (100 ms de folga). No Granaê a exportação (`exportaGranae` em `cofre.js`, rodada dentro da página)
   leva também o que as funções do próprio app calculam: `faturaDoCartao` e `faturaPaga` (2 meses antes a 4 depois, por cartão), `compromissos()`, `saldoDaConta`,
   `projecaoSaldo(3)`, `comprometimentoPorMes(7)`, `paraRevisar()`, o resumo do Open Finance (`GranaeOF.feed()` e `frescor`) e a Visão geral de `granae.banco.js`
-  (contas, financiamentos, investimentos, previdência e patrimônio). Como essas funções ficam fechadas no módulo dele, a Visão geral é cópia fiel, com uma
-  única diferença: pagamento que já pertence a um compromisso (`groupId`) não vira "parcela achada no extrato" (no original a dívida sem prazo aparecia duas vezes). Escrita: as operações de `JSMes` do iPhone, copiadas
+  (contas, financiamentos, investimentos, previdência e patrimônio). Como essas funções ficam fechadas no módulo dele, a Visão geral é cópia fiel
+  (inclusive a regra de que pagamento que já pertence a um compromisso, `groupId`, não vira "parcela achada no extrato", corrigida no `granae.banco.js?v=7`). Escrita: as operações de `JSMes` do iPhone, copiadas
   dos formulários dos próprios apps (`saveForm`, `toggleStatus`, `del`, `dup`, `setCompDay`, `salvarRegraPg`, `txForm`, `txDelete`, `txDup`, `pagForm`,
   `fixedForm`, `fixedDelete`, `catForm` só a meta; na Finanças nova também `alternarFaturaPaga`, `criarTransferencia`, `informar` da Visão geral
   (saldo devedor e previdência em `profile.bancoSaldos`), `cmtForm`, `divForm`, `accForm` e `aplicarRevisao` com regra), rodando dentro da página com as funções dela (`persist`, `saveState`, `stampTx`, `tombstone`,

@@ -129,6 +129,10 @@
       if (t.type !== 'expense' || t.transferId || t.pending || t.date < limite) continue;
       if (!(RE_FIN.test(t.description || '') || t.category === 'Dívidas')) continue;
       if (parcelaInfo(t)) continue; // compra parcelada no cartão aparece em Parcelas
+      /* pagamento que já pertence a um compromisso cadastrado (groupId: dívida sem
+         prazo, financiamento) já aparece por ele; achado de novo aqui, a dívida
+         saía duas vezes e a parcela entrava duas vezes no que sai por mês */
+      if (t.groupId) continue;
       const base = (t.description || '').toLowerCase().replace(/[\d./-]+/g, ' ').replace(/\s+/g, ' ').trim();
       const k = base + '|' + (t.accountId || '');
       if (!grupos.has(k)) grupos.set(k, []);
