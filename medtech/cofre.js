@@ -109,6 +109,9 @@
         if (t.type !== 'expense' || t.transferId || t.pending || t.date < limite) return;
         if (!(RE_FIN.test(t.description || '') || t.category === 'Dívidas')) return;
         if (parcelaInfo(t)) return;
+        /* única diferença do original: pagamento que já pertence a um compromisso (groupId: dívida sem prazo, financiamento)
+           não vira "parcela achada no extrato"; no granae.banco.js ele aparecia duas vezes (a dívida e a "recorrente") */
+        if (t.groupId) return;
         var base = (t.description || '').toLowerCase().replace(/[\d./-]+/g, ' ').replace(/\s+/g, ' ').trim();
         var k = base + '|' + (t.accountId || '');
         if (!grupos.has(k)) grupos.set(k, []);
