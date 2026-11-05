@@ -643,7 +643,7 @@
   function erro(e) { K.erroAviso(F.el, e); }
 
   function clique(e) {
-    var b = e.target.closest('button, a'); if (!b || !F.el.contains(b) || b.tagName === 'A') return;
+    var b = e.target.closest('button, a, [data-acao]'); if (!b || !F.el.contains(b) || b.tagName === 'A') return;
     var d = b.dataset;
     if (d.aba) return irAba(d.aba);
     if (d.ir) return irAba(d.ir);
@@ -821,7 +821,9 @@
           var foco = D.activeElement && c.contains(D.activeElement) ? D.activeElement : null, sel = null;
           if (foco) { var ds = foco.dataset; sel = ds.t ? '[data-t="' + ds.t + '"]' : ds.cat ? '[data-cat="' + CSS.escape(ds.cat) + '"]' : ds.modo ? '[data-modo="' + ds.modo + '"]' : ds.par ? '[data-par="' + ds.par + '"]' : ds.quando ? '[data-quando="' + ds.quando + '"]' : ds.conta != null ? '[data-conta="' + CSS.escape(ds.conta) + '"]' : ds.x ? '[data-x="' + ds.x + '"]' : foco.name === 'data' ? '[name=data]' : null; }
           c.innerHTML = h;
-          if (sel) { var fe = c.querySelector(sel); if (fe && !fe.disabled) fe.focus({ preventScroll: true }); }
+          var fe = sel && c.querySelector(sel);
+          if (fe && !fe.disabled) fe.focus({ preventScroll: true });
+          else if (foco) { api.el.tabIndex = -1; api.el.focus({ preventScroll: true }); }   // o teclado físico continua digitando o valor
         }
         function lerCampos() { var x; if ((x = c.querySelector('[name=descricao]'))) st.descricao = x.value; if ((x = c.querySelector('[name=data]')) && x.value) st.data = x.value; }
         c.addEventListener('input', function () { lerCampos(); });
@@ -845,7 +847,7 @@
             { rotulo: 'Excluir', perigo: true, acao: function () { C.excluirLancamento(o.id).then(function (copia) { terminar('Lançamento excluído', function () { C.restaurarLancamento(copia).catch(erro); }, null); }, falhou); } },
             { rotulo: 'Cancelar' }]);
         });
-        c.addEventListener('keydown', function (e) {
+        api.el.addEventListener('keydown', function (e) {
           if (e.target.matches && e.target.matches('input, select, textarea')) return;
           var k = e.key === '.' ? ',' : e.key === 'Backspace' ? 'apagar' : e.key;
           if (/^[0-9,]$/.test(k) || k === 'apagar') { e.preventDefault(); tocar(k); pinta(); }
@@ -888,8 +890,8 @@
     U.folha({
       titulo: 'Escolher categoria', classe: 'g-folha fz-folha', alta: true,
       conteudo: function (c, api) {
-        var atual = t0, feitos = 0, salvando = false;
-        function fila() { var r = K.mesCivil(F.ref); return g().transactions.filter(function (t) { return K.contem(r, t.date) && semCategoria(t); }).sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; }); }
+        var atual = t0, feitos = 0, salvando = false, prontos = {};
+        function fila() { var r = K.mesCivil(F.ref); return g().transactions.filter(function (t) { return !prontos[t.id] && K.contem(r, t.date) && semCategoria(t); }).sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; }); }
         function pinta(msg) {
           var h = K.topo('Escolher categoria', 'Fechar');
           if (!atual) { c.innerHTML = h + '<p class="g-t2">' + esc(feitos ? 'Fim da fila. ' + feitos + ' revisado' + (feitos > 1 ? 's' : '') + '.' : 'Nada para revisar neste mês.') + '</p>'; return; }
@@ -914,8 +916,8 @@
             salvando = true;
             C.categorizar(atual.id, b.dataset.cat, regra).then(function (n) {
               salvando = false; feitos++;
-              var msg = regra.trim() ? 'Regra criada. ' + n + ' lançamento' + (n === 1 ? '' : 's') + ' atualizado' + (n === 1 ? '' : 's') + '.' : 'Salvo em ' + b.dataset.cat + '.';
-              proximo(); pinta(msg);
+              var msg = 'Salvo em ' + b.dataset.cat + '.' + (regra.trim() ? ' Regra criada' + (n ? ', e ' + n + ' outro' + (n === 1 ? '' : 's') + ' lançamento' + (n === 1 ? '' : 's') + ' mudou' + (n === 1 ? '' : 'aram') : '') + '.' : '');
+              var feito = atual.id; proximo(); prontos[feito] = 1; pinta(msg);
             }, function (x) { salvando = false; var r = c.querySelector('.g-erro'); r.textContent = x.message; r.hidden = false; });
           }
         });
