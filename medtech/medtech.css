@@ -1,6 +1,8 @@
 /* MedTech PWA: mesmo tema do app de iPhone (Tema.swift, EstiloConsultar.swift, Ferramentas.swift).
    Papel levemente cinza, superfície branca, uma cor por seção; claro e escuro pelo sistema. Fonte do sistema. */
 :root {
+  /* topo seguro: no app instalado do iPhone, o sistema embaça a faixa logo abaixo da barra de status (04/11/2026) */
+  --topo: env(safe-area-inset-top);
   color-scheme: light dark;
   --papel: #F5F6FB; --sup: #FFFFFF; --sup2: #F1F3F9; --tinta: #141827; --tinta2: #5D6579; --fio: #E6E9F2;
   --principal: #1D4ED8; --cheio: #2563EB; --dose-fundo: #E8EEFD; --acao-fundo: #E8EEFD;
@@ -51,7 +53,7 @@ body { font-size: 17px; line-height: 1.5; }
   #app { border-left: 1px solid var(--fio); border-right: 1px solid var(--fio); }
 }
 
-.barra-espaco { display: flex; align-items: center; gap: 22px; padding: calc(env(safe-area-inset-top) + 2px) 18px 0; background: var(--papel); flex: none; }
+.barra-espaco { display: flex; align-items: center; gap: 22px; padding: calc(var(--topo) + 2px) 18px 0; background: var(--papel); flex: none; }
 .espacos { display: flex; gap: 22px; }
 .espacos button { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 5px; min-height: 44px; font-size: 19px; font-weight: 600; color: var(--tinta2); }
 .espacos button::after { content: ""; display: block; width: 100%; height: 3px; border-radius: 3px; background: transparent; transition: background-color .3s; }
@@ -137,8 +139,8 @@ body.em-detalhe .barra-espaco, body.em-detalhe #secoes, body.em-detalhe .barra-s
 /* ---------- folhas (sheet) e alertas ---------- */
 .folha-fundo { position: absolute; inset: 0; z-index: 100; background: rgba(0, 0, 0, 0); transition: background-color .26s; }
 .folha-fundo.aberta { background: rgba(0, 0, 0, .38); }
-.folha { position: absolute; left: 0; right: 0; bottom: 0; max-height: calc(100% - env(safe-area-inset-top) - 30px); display: flex; flex-direction: column; background: var(--papel); border-radius: 26px 26px 0 0; transform: translateY(100%); transition: transform .3s cubic-bezier(.2, .9, .3, 1); }
-.folha.alta { height: calc(100% - env(safe-area-inset-top) - 30px); }
+.folha { position: absolute; left: 0; right: 0; bottom: 0; max-height: calc(100% - var(--topo) - 30px); display: flex; flex-direction: column; background: var(--papel); border-radius: 26px 26px 0 0; transform: translateY(100%); transition: transform .3s cubic-bezier(.2, .9, .3, 1); }
+.folha.alta { height: calc(100% - var(--topo) - 30px); }
 .folha-fundo.aberta .folha { transform: none; }
 .folha-alca { flex: none; height: 22px; display: grid; place-items: center; touch-action: none; cursor: grab; }
 .folha-alca::before { content: ""; width: 38px; height: 5px; border-radius: 3px; background: var(--tinta2); opacity: .45; }
@@ -176,7 +178,7 @@ body.em-detalhe .barra-espaco, body.em-detalhe #secoes, body.em-detalhe .barra-s
 .alerta-bts button + button { border-top: 1px solid var(--fio); font-weight: 600; }
 .alerta-bts button.perigo { color: var(--critico); }
 
-#aviso { position: absolute; z-index: 400; top: calc(env(safe-area-inset-top) + 10px); left: 50%; max-width: calc(100% - 40px); transform: translate(-50%, -12px); padding: 11px 16px; border-radius: 999px; background: var(--cheio); color: #fff; font-size: 15px; font-weight: 600; text-align: center; opacity: 0; pointer-events: none; transition: opacity .2s, transform .3s var(--mola); }
+#aviso { position: absolute; z-index: 400; top: calc(var(--topo) + 10px); left: 50%; max-width: calc(100% - 40px); transform: translate(-50%, -12px); padding: 11px 16px; border-radius: 999px; background: var(--cheio); color: #fff; font-size: 15px; font-weight: 600; text-align: center; opacity: 0; pointer-events: none; transition: opacity .2s, transform .3s var(--mola); }
 #aviso.vis { opacity: 1; transform: translate(-50%, 0); }
 
 /* ---------- texto clínico ---------- */
@@ -196,7 +198,7 @@ a.selo { display: inline-block; vertical-align: super; font-size: 13px; font-wei
 /* ---------- leitor de conduta ---------- */
 .leitor { --cor: var(--tp-tratamento); position: absolute; inset: 0; z-index: 50; display: flex; flex-direction: column; background: var(--papel); transform: translateX(100%); transition: transform .32s cubic-bezier(.2, .9, .3, 1); }
 .leitor.vis { transform: none; }
-.lt-topo { flex: none; padding-top: env(safe-area-inset-top); background: color-mix(in srgb, var(--cor) 13%, var(--papel)); transition: background-color .2s; }
+.lt-topo { flex: none; padding-top: var(--topo); background: color-mix(in srgb, var(--cor) 13%, var(--papel)); transition: background-color .2s; }
 .lt-linha { display: flex; align-items: center; gap: 4px; padding: 2px 6px 0; }
 .lt-volta { width: 44px; height: 48px; display: grid; place-items: center; font-size: 22px; color: var(--tinta); flex: none; }
 .lt-volta .ti { -webkit-text-stroke: 1px currentColor; }
@@ -562,3 +564,5 @@ iframe.exames { display: block; width: 100%; height: 100%; border: 0; background
   .leitor.vis { opacity: 1; }
   :is(.ac-bt, .caminho, .linha-g, .linha, .porta, .cen, .op-bt, .bt-cheio, .ff-saida):active { transform: none; }
 }
+
+@media (display-mode: standalone) { :root { --topo: calc(env(safe-area-inset-top) + 16px); } }
