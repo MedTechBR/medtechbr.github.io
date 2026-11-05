@@ -30,7 +30,8 @@ Não mexe em `app.html`, no `/sw.js` do portal, no banco de condutas nem nas reg
 | `cofre.js` | dados de Plantões e Finanças: abre `plantaohub.html` e `granae.html` em quadros ocultos e lê e grava por eles | `MeuMes/CofreMes.swift` |
 | `sessoes-tela.js`, `sessoes.css` | tela das sessões de acompanhamento sem IA (lista, triagem, parâmetros, Agora, passo guiado, subtelas, avisos) | `Ferramentas/Sessoes/SessaoView.swift`, `SessaoArmazem.swift` |
 | `sessoes/*.js` | motores das sessões (contrato em `sessoes/LEIAME.md`) | `Ferramentas/Sessoes/Motor*.swift`, `NucleoSessao.swift` |
-| `gestao.js`, `gestao.css` | espaço Gestão: Plantões, Finanças, lançar, mais opções | `MeuMes/PlantoesView`, `FinancasView`, `LancarView`, `MaisMes`, `ModelosMes`, `ComumGestao` |
+| `gestao.js`, `gestao.css` | espaço Gestão: Plantões e as peças comuns (`MTGestao.comum`: arrasto do mês, linha deslizante, avisos, folhas de pagamento, teto e fixo) | `MeuMes/PlantoesView`, `MaisMes`, `ModelosMes`, `ComumGestao` |
+| `financas.js`, `financas.css` | Finanças nova: 6 abas (Resumo, Lançamentos, Orçamento, Cartões, Dívidas, Contas), Lançar, revisão em lote, análise do mês por IA | `MeuMes/FinancasView`, `FinancasCartoes`, `FinancasDividasContas`, `FinancasLancamentos`, `FinancasCalculo`, `LancarView` |
 
 ## De onde vêm os dados (nada copiado do banco)
 
@@ -178,11 +179,19 @@ Entra por `MedTechCasca.registrar('secao', 'plantoes' | 'financas', ...)` em `ge
   inerte e fora da tela (mesmo domínio, mesma sessão de login). Cada app liga o `_mtauth.js` dele e lê `users/{uid}/apps/plantaohub` ou `.../granae`.
 - Pronta = `MT.user`, `MT._data` e `MT.mergeFn` presentes: o app registra o `mergeFn` no mesmo bloco em que liga o `MT.onData`, então o `state` dele já é o da nuvem.
   (Sem essa última condição, uma gravação logo na abertura partiria do `state` vazio do app.)
-- Leitura: uma "capa" instalada na página exporta o `state` a cada `MT.onData` (100 ms de folga). Escrita: as operações de `JSMes` do iPhone, copiadas
+- Leitura: uma "capa" instalada na página exporta o `state` a cada `MT.onData` (100 ms de folga). No Granaê a exportação (`exportaGranae` em `cofre.js`, rodada dentro da página)
+  leva também o que as funções do próprio app calculam: `faturaDoCartao` e `faturaPaga` (2 meses antes a 4 depois, por cartão), `compromissos()`, `saldoDaConta`,
+  `projecaoSaldo(3)`, `comprometimentoPorMes(7)`, `paraRevisar()`, o resumo do Open Finance (`GranaeOF.feed()` e `frescor`) e a Visão geral de `granae.banco.js`
+  (contas, financiamentos, investimentos, previdência e patrimônio). Como essas funções ficam fechadas no módulo dele, a Visão geral é cópia fiel, com uma
+  única diferença: pagamento que já pertence a um compromisso (`groupId`) não vira "parcela achada no extrato" (no original a dívida sem prazo aparecia duas vezes). Escrita: as operações de `JSMes` do iPhone, copiadas
   dos formulários dos próprios apps (`saveForm`, `toggleStatus`, `del`, `dup`, `setCompDay`, `salvarRegraPg`, `txForm`, `txDelete`, `txDup`, `pagForm`,
-  `fixedForm`, `fixedDelete`, `catForm` só a meta), rodando dentro da página com as funções dela (`persist`, `saveState`, `stampTx`, `tombstone`,
+  `fixedForm`, `fixedDelete`, `catForm` só a meta; na Finanças nova também `alternarFaturaPaga`, `criarTransferencia`, `informar` da Visão geral
+  (saldo devedor e previdência em `profile.bancoSaldos`), `cmtForm`, `divForm`, `accForm` e `aplicarRevisao` com regra), rodando dentro da página com as funções dela (`persist`, `saveState`, `stampTx`, `tombstone`,
   `MT.markDeleted`, `uid`, `cid`, `aplicarRegras`, `compromissos`). Formato e lugar de gravação são os do app; o merge por entidade e as lápides são os dele.
 - Mesmas duas diferenças deliberadas do iPhone: salvar plantão mantém `pgDia`/`pgMes` do local; editar lançamento mantém grupo, banco e vencimento.
+- Compra parcelada pelo total (Lançar): `salvarLancamento` com `porTotal` divide o total em centavos e a sobra fica na 1ª parcela (R$ 1.000 em 3x = 333,34 + 333,33 + 333,33);
+  o resto é o caminho do `txForm` (descrição "(k/N)", `groupId`, uma por mês com o dia ajustado, `pending` nas futuras). Igual ao `DivisaoParcelas` do iPhone.
+- Leituras sem gravar (`cofre.consultar`): `analisarMes` (Gemini.analyzeMonth + safeMD do Granaê) e `sincronizar` (o clique da faixa do Open Finance).
 - Uma gravação por vez (fila). Antes de gravar na conta real, a capa confere a nuvem (`getDocFromServer`, 8 s); sem rede, nada é gravado e o
   `MT.save` da página não cai no `setDoc` sem merge. A tela só muda quando a gravação foi confirmada (até 20 s).
 - Sem rede a página nem abre (ela gravaria sozinha ao ativar agendados). Diferente do iPhone, não há cópia guardada em disco: sem rede, a tela mostra o
@@ -194,7 +203,10 @@ Entra por `MedTechCasca.registrar('secao', 'plantoes' | 'financas', ...)` em `ge
 - As mesmas páginas, no modo demonstração nativo do `_mtauth.js`: o quadro recebe o HTML da página com só duas mudanças (`<base>` do site e a
   configuração do Firebase vazia). Dados fictícios só neste navegador (`mt_plantaohub_anon`, `mt_granae_anon`), nunca a nuvem.
 - Trava: página em demo só com `?demo=1`, página na nuvem só sem ele; se não conferir, o quadro é fechado e nada é gravado.
-- Semente fictícia (a do `RepositorioDemo` do iPhone) gravada pela própria página na primeira abertura (`localStorage['medtech.demo.semeado.*']`).
+- Semente fictícia (a do `RepositorioDemo` do iPhone, mais cartões, contas, parcelados, financiamento, meses anteriores e teto de subcategoria) gravada pela própria
+  página na primeira abertura (`localStorage['medtech.demo.semeado.v3.*']`). O resumo do Open Finance da demonstração (dois bancos fictícios, um pedindo reconexão)
+  entra a cada abertura por `GranaeOF._setFeed`, e a própria importação do Granaê cria as contas e os lançamentos. Na demonstração a análise por IA é simulada.
+- Atalho de teste: `?demo=1&aba=financas&fin=resumo|lancamentos|orcamento|cartoes|dividas|contas`. `window.MTFinancas` expõe `F`, `irAba` e `desenha`.
 - O `granae.app.js` escreve `localStorage['gc-state-v1']` (cópia que ninguém lê); na demo o cofre devolve o valor que havia antes, para a cópia da conta real deste navegador não virar fictícia.
 - Para conferir a compatibilidade com os apps originais na demo, eles precisam abrir no modo demo nativo (Firebase sem configuração). No teste de 03/11
   isso foi feito com um servidor local que entrega `_mtfb.js` vazio só quando `plantaohub.html?demo=1` ou `granae.html?demo=1` é aberto direto na aba.
@@ -207,10 +219,18 @@ Entra por `MedTechCasca.registrar('secao', 'plantoes' | 'financas', ...)` em `ge
 - Folha do plantão: locais recentes, outro local (preenche horário e valor do local), dia, início, fim, valor com horas e valor por hora, A receber/Recebido,
   observação, Duplicar em 7 dias e Excluir.
 - Mais opções de Plantões: Locais e pagamento (período do mês, regra padrão, regra por local), Plantões no ano, e o PlantãoHub no site (CSV).
-- Finanças: cabeça do mês, Entrou (abre as receitas), Saiu (abre gastos por categoria com teto), Saldo, lista com filtro (tipo, busca, categoria),
-  agendados à parte, arrastar para a esquerda exclui com Desfazer, botão Lançar.
-- Lançar: Gasto/Receita (lembra o último), valor no teclado, data, toque na categoria salva; Descrição, parcelas e conta; na edição, Salvar, Duplicar para hoje e Excluir.
-- Mais opções de Finanças: Parcelas e dívidas (registrar parcela ou pagamento), Fixos e tetos, e as telas do Granaê no site (`granae.html#ia`, `#transacoes`...).
+- Finanças (nova, 05/11/2026, igual ao app de iPhone): 6 abas em pílulas e Lançar fixo embaixo. Resumo, Lançamentos e Orçamento seguem o mês; Cartões, Dívidas e Contas são hoje.
+  Resumo: Entrou (verde-azulado) e Saiu (roxo) com previsto pelos fixos e "<mês> fechou em R$ X" no mês corrente (porcentagem nos meses fechados), alerta de teto,
+  "sem categoria", rosca (5 maiores e o resto), barras Entrou x Saiu de 6 meses, "Saldo acumulado" com a projeção do Granaê, atalhos, agendados e "Analisar este mês com IA".
+  Lançamentos: busca por descrição ou valor, Tudo/Saídas/Entradas, Sem categoria (abre a revisão em lote com regra), Conta, Categoria, selos (do banco, parcela k de N,
+  transferência, agendado). Orçamento: tetos pelo risco (roxo, âmbar a partir de 80%, laranja passou com o traço do teto), subcategoria, sem teto, fixos do mês.
+  Cartões: fatura aberta (`faturaAtual` do Granaê), fecha e vence, limite, faturas fechada/aberta/previstas com marcar paga, compras da fatura, peso das parcelas
+  (o mês corrente só entra se ainda há parcela por vencer), compras parceladas. Dívidas: falta pagar, sai por mês, prazo (sem data = faixa clara), cartão por dívida
+  com informar saldo ou registrar pagamento, novo financiamento e nova dívida. Contas: saldo, leitura do Open Finance com Sincronizar, Reconectar, bancos e estado,
+  importados sem categoria, patrimônio (dinheiro menos dívidas, mesmo negativo; imóvel e carro não entram).
+- Lançar: Despesa/Receita/Transferência, valor no teclado, descrição, categorias mais usadas, pagar com, quando, parcelas pelo total, aviso da fatura em que entra.
+- Mais opções de Finanças: Transferir, Revisar sem categoria, Fixos e tetos, CSV do mês (o mesmo do Granaê); abrem o Granaê no site: voz, leitura de fatura,
+  regras e filtros salvos, categorias e contas, conectar ou reconectar banco (o widget do Pluggy precisa de tela visível), planilha de fixos e análise completa.
 
 ### Diferenças em relação ao iPhone
 
@@ -219,4 +239,5 @@ Entra por `MedTechCasca.registrar('secao', 'plantoes' | 'financas', ...)` em `ge
 - Plantões no ano: o gráfico é só visual e o detalhe de cada mês vem na lista "Por mês" (no iPhone, toque na barra). Assim nenhum alvo fica abaixo de 44 px.
 - Botão de voltar das telas internas diz "Voltar"; Desfazer, avisos e números sem animação de contagem; sem vibração.
 - As páginas abrem quando a seção é aberta (no iPhone, as duas abrem juntas): o Granaê é pesado e só carrega quando Finanças é aberta.
+- Finanças: "Ver as N compras" leva a Lançamentos filtrado pela fatura (no iPhone abre uma folha); Conectar e Reconectar banco abrem o Granaê no site.
 - Sem cópia em disco para ver sem internet (ver acima).

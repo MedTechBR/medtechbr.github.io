@@ -145,7 +145,7 @@
     });
     return '<svg viewBox="0 0 ' + LARG + ' 154" role="img" aria-label="' + esc(rotulo + ': ' + dados.map(function (d) { return d.m + ' ' + real(d.v); }).join('; ')) + '">' + g0 + '</svg>';
   }
-  /* Até quando você paga: uma barra por dívida, do hoje ao fim; sem fim conhecido, contorno tracejado */
+  /* Até quando você paga: uma barra por dívida, do hoje ao fim; sem fim conhecido, faixa clara em toda a largura */
   function linhaDoTempo(lista) {
     var h0 = new Date(), ini = h0.getFullYear() + h0.getMonth() / 12;
     var fins = lista.filter(function (l) { return l.fim; }).map(function (l) { var d = data(l.fim); return d ? d.getFullYear() + d.getMonth() / 12 : ini; });
@@ -165,7 +165,7 @@
         var d = data(l.fim), w = d ? x(d.getFullYear() + d.getMonth() / 12) : 0;
         g0 += '<rect x="0" y="' + (y + 8) + '" width="' + Math.max(6, w).toFixed(1) + '" height="14" rx="4" fill="var(--g-fi)"><title>' + esc(l.nome + ' ' + l.txt) + '</title></rect>';
       } else {
-        g0 += '<rect x="0.6" y="' + (y + 8) + '" width="' + (LARG - 1.2) + '" height="14" rx="4" fill="none" stroke="var(--tinta2)" stroke-width="1.2" stroke-dasharray="4 4"><title>' + esc(l.nome + ', ' + l.txt) + '</title></rect>';
+        g0 += '<rect x="0" y="' + (y + 8) + '" width="' + LARG + '" height="14" rx="4" fill="var(--fz-trilho)"><title>' + esc(l.nome + ', ' + l.txt) + '</title></rect>';
       }
     });
     return '<svg viewBox="0 0 ' + LARG + ' ' + (alt + 14) + '" role="img" aria-label="' + esc('Até quando você paga: ' + lista.map(function (l) { return l.nome + ' ' + l.txt; }).join('; ')) + '">' + g0 + '</svg>';
@@ -206,11 +206,15 @@
     var tem = C.temDinheiro, m = painel(F.ref), r = m.r, ant = painel(mesDe(r.s, -1)), V = g().visao;
     var ehAtual = chaveMes(r.s) === chaveMes(new Date());
     var h = '<div class="g-cartao g-resumo-f">';
-    var notaE = [m.fixoEntra > 0 ? 'Previsto pelos fixos: ' + real(m.fixoEntra) : '', m.entrar > 0 ? real(m.entrar) + ' agendados para entrar' : ''].filter(Boolean).join('. ');
+    var notaE = m.fixoEntra > 0 ? 'Previsto pelos fixos: ' + real(m.fixoEntra) : '';
     h += '<div class="fz-ln"><span>Entrou</span><b style="color:var(--fz-entra-tx)">' + (tem ? real(m.entrou) : K.vazio(130)) + '</b></div>' + (tem && notaE ? '<p class="fz-nota">' + esc(notaE) + '</p>' : '<div class="fz-sem-nota"></div>');
     var comp = '';
-    if (ant.saiu > 0 && m.saiu > 0) { var pc = Math.round((m.saiu - ant.saiu) / ant.saiu * 100); comp = pc === 0 ? 'Igual a ' + MESES[ant.r.s.getMonth()] : Math.abs(pc) + '% ' + (pc < 0 ? 'menos' : 'mais') + ' que em ' + MESES[ant.r.s.getMonth()]; }
-    var notaS = [m.sair > 0 ? 'Ainda saem ' + real(m.sair) + ' até o fim do mês' : '', comp].filter(Boolean).join('. ');
+    /* mês corrente: quanto o anterior fechou; mês fechado: a diferença em porcentagem (igual ao iPhone) */
+    if (ant.saiu > 0) {
+      if (ehAtual) comp = K.primeira(MESES[ant.r.s.getMonth()]) + ' fechou em ' + real(ant.saiu);
+      else { var pc = Math.round((m.saiu - ant.saiu) / ant.saiu * 100); comp = pc === 0 ? 'Igual a ' + MESES[ant.r.s.getMonth()] : Math.abs(pc) + '% ' + (pc < 0 ? 'menos' : 'mais') + ' que em ' + MESES[ant.r.s.getMonth()]; }
+    }
+    var notaS = [m.sair > 0 ? 'Ainda saem ' + real(m.sair) + ' até o fim do mês.' : '', comp ? comp + '.' : ''].filter(Boolean).join(' ');
     h += '<div class="fz-fio"></div><div class="fz-ln"><span>Saiu</span><b>' + (tem ? real(m.saiu) : K.vazio(130)) + '</b></div>' + (tem && notaS ? '<p class="fz-nota">' + esc(notaS) + '</p>' : '<div class="fz-sem-nota"></div>');
     h += '<div class="fz-fio"></div><div class="fz-saldo"><span>Saldo do mês</span><b' + (m.saldo < 0 ? ' style="color:var(--g-al-tx)"' : '') + '>' + (tem ? sinal(m.saldo) : K.vazio(110)) + '</b></div></div>';
     if (!tem) return h;
@@ -225,7 +229,8 @@
     }
     var semCat = m.lancamentos.filter(semCategoria), doBanco = semCat.filter(function (t) { return t.doBanco; }).length;
     if (semCat.length) {
-      h += '<div class="fz-faixa fz-rx"><p>' + esc(semCat.length === 1 ? '1 lançamento sem categoria' : semCat.length + ' lançamentos sem categoria') + '<small>' + esc(doBanco ? (doBanco === semCat.length ? 'Chegaram pelo Open Finance' : doBanco + ' chegaram pelo Open Finance') : 'Escolha a categoria para entrar no orçamento') + '</small></p><button type="button" class="fz-bt" data-acao="revisar">Revisar</button></div>';
+      var doB = doBanco === semCat.length ? ' do banco' : '';
+      h += '<div class="fz-faixa fz-rx"><p>' + esc(semCat.length === 1 ? '1 lançamento' + doB + ' sem categoria' : semCat.length + ' lançamentos' + doB + ' sem categoria') + '<small>' + esc(doBanco ? (doBanco === semCat.length ? 'Chegaram pelo Open Finance' : doBanco + ' chegaram pelo Open Finance') : 'Escolha a categoria para entrar no orçamento') + '</small></p><button type="button" class="fz-bt" data-acao="revisar">Revisar</button></div>';
     }
 
     // rosca: 5 maiores e o resto somado
@@ -434,19 +439,19 @@
   function cartoesLista() { return g().visao.contas.filter(function (c) { return c.cartao; }); }
   function infoCartao(c) {
     var a = conta(c.id) || {}, fech = c.fecha || a.fechamento || null, venc = c.vence || a.vencimento || null;
-    var aberta = mesDaFatura(fech, hoje());
+    var aberta = mesDe(new Date());   // como a Visão geral do Granaê (faturaAtual): a fatura do mês corrente
     var lista = (g().calc.faturas[c.id] || []).map(function (x) { return Object.assign({}, x, { ref: deChave(x.mes) }); });
     var iA = lista.map(function (x) { return x.mes; }).indexOf(chaveMes(aberta));
     var tira = lista.slice(Math.max(0, iA - 1), Math.max(0, iA - 1) + 5).map(function (x) {
       var k = x.mes < chaveMes(aberta) ? -1 : x.mes === chaveMes(aberta) ? 0 : 1;
-      var v = k === 0 && c.doBanco ? c.fatura : x.total;
+      var v = k === 0 ? (c.fatura || 0) : x.total;
       return Object.assign(x, { k: k, v: v, st: x.paga ? 'paga' : k < 0 ? 'fechada' : k === 0 ? 'aberta' : 'prevista' });
     });
-    return { fech: fech, venc: venc, aberta: aberta, tira: tira, fechaEm: fech ? diaNoMes(aberta, fech) : null, venceEm: vencimentoDe(fech, venc, aberta) };
+    return { fech: fech, venc: venc, aberta: aberta, tira: tira, fechaEm: fech ? diaNoMes(aberta, fech) : null, venceEm: venc ? diaNoMes(mesDe(aberta, fech && venc <= fech ? 1 : 0), venc) : null };
   }
-  /* valor da fatura aberta: a do banco quando o cartão é conectado; senão faturaDoCartao do mês em que cai uma compra feita hoje */
-  function abertaDe(c) { var t = infoCartao(c).tira.filter(function (x) { return x.k === 0; })[0]; return t ? t.v : (c.fatura || 0); }
-  function totalAbertas() { return soma(cartoesLista(), abertaDe); }
+  /* fatura aberta = faturaAtual do Granaê (a do banco quando o cartão é conectado) */
+  function abertaDe(c) { return c.fatura || 0; }
+  function totalAbertas() { return g().visao.faturas; }
   function telaCartoes() {
     if (!C.temDinheiro) return espera();
     var cs = cartoesLista(), V = g().visao;
@@ -461,33 +466,25 @@
     F.fatSel = sel ? sel.mes : null;
     var fr = g().feed;
     var usado = c.limite ? (c.disponivel != null ? c.limite - c.disponivel : (c.fatura || 0)) : 0;
-    h += '<div class="g-cartao fz-pad"><div class="fz-cab fz-cab0"><small>' + esc('Fatura de ' + MESES[sel.ref.getMonth()] + ', ' + sel.st) + '</small>' + (sel.k === 0 ? selo(c.doBanco ? 'do banco' + (fr && fr.lidoTxt ? ', lida ' + fr.lidoTxt : '') : 'pelos lançamentos') : '') + '</div>' +
-      '<div class="fz-grande">' + realC(sel.v) + '</div>' +
-      '<p class="fz-med g-t2">' + esc(sel.k === 0 ? [inf.fechaEm ? 'Fecha ' + K.dm(inf.fechaEm) : 'Sem dia de fechamento', inf.venceEm ? 'vence ' + K.dm(inf.venceEm) : ''].filter(Boolean).join(' · ') : (inf.fech ? 'Fecha ' + K.dm(diaNoMes(sel.ref, inf.fech)) : '') + (inf.venc ? (inf.fech ? ' · ' : '') + 'vence ' + K.dm(vencimentoDe(inf.fech, inf.venc, sel.ref)) : '')) + '</p>';
-    if (c.limite) h += '<div class="fz-mt">' + trilho(Math.min(1, usado / c.limite), usado / c.limite > 0.8 ? 'x-av' : '', null, 'Limite usado ' + Math.round(usado / c.limite * 100) + '%') + '</div><div class="fz-limite"><span class="g-t2">Usado ' + real(usado) + ' de ' + real(c.limite) + '</span><b>Livre ' + real(c.limite - usado) + '</b></div>';
-    else h += '<p class="fz-peq g-t2 fz-mt">Limite não informado.</p>';
-    var a = conta(c.id);
-    if (a && a.orcamento > 0) {
-      var r = K.mesCivil(new Date()), gm = soma(g().transactions.filter(function (t) { return t.type === 'expense' && t.accountId === c.id && K.contem(r, t.date) && !t.transferId; }), function (t) { return t.amount; }), po = gm / a.orcamento;
-      h += '<p class="fz-peq fz-mt' + (po > 1 ? ' x-al' : po >= 0.8 ? ' x-av' : ' g-t2') + '">' + esc('Teto do cartão em ' + MESES[r.s.getMonth()] + ': ' + real(gm) + ' de ' + real(a.orcamento) + ' (' + Math.round(po * 100) + '%)') + '</p>';
-    }
+    var ab = inf.tira.filter(function (x) { return x.k === 0; })[0] || sel;
+    h += '<div class="g-cartao fz-pad"><div class="fz-cab fz-cab0"><small>' + esc('Fatura de ' + MESES[ab.ref.getMonth()] + ', aberta') + '</small>' + (c.doBanco ? selo('do banco' + (fr && fr.lidoTxt ? ', lida ' + fr.lidoTxt : '')) : '') + '</div>' +
+      '<div class="fz-grande">' + realC(ab.v) + '</div>' +
+      (inf.fechaEm || inf.venceEm ? '<p class="fz-med g-t2">' + esc([inf.fechaEm ? 'Fecha ' + K.dm(inf.fechaEm) : '', inf.venceEm ? 'vence ' + K.dm(inf.venceEm) : ''].filter(Boolean).join(' · ')) + '</p>' : '');
+    if (c.limite) h += '<div class="fz-mt">' + trilho(Math.min(1, usado / c.limite), usado / c.limite > 0.8 ? 'x-av' : '', null, 'Limite usado ' + Math.round(usado / c.limite * 100) + '%') + '</div><div class="fz-limite"><span class="g-t2">Usado ' + real(usado) + ' de ' + real(c.limite) + '</span><b>Livre ' + real(Math.max(0, c.limite - usado)) + '</b></div>';
     h += '</div>';
-    var fechada = inf.tira.filter(function (x) { return x.k < 0 && !x.paga && x.v > 0; }).pop();
-    if (fechada) {
-      var vf = vencimentoDe(inf.fech, inf.venc, fechada.ref);
-      h += '<div class="fz-faixa ' + (vf && iso(vf) < hoje() ? 'fz-al' : 'fz-av') + '"><p>' + esc('Fatura de ' + MESES[fechada.ref.getMonth()] + ' fechou em ' + realC(fechada.v)) + '<small>' + esc(vf ? (iso(vf) < hoje() ? 'Venceu em ' + K.dm(vf) + '. Já pagou? Marque como paga' : 'Vence ' + K.dm(vf) + '. Depois de pagar, marque como paga') : 'Depois de pagar, marque como paga') + '</small></p><button type="button" class="fz-bt" data-pagafat="' + fechada.mes + '">Paga</button></div>';
-    }
+    h += '</div>';
     h += '<div class="fz-faturas" role="group" aria-label="Faturas">' + inf.tira.map(function (x) {
-      return '<button type="button" class="' + x.st + (x.mes === sel.mes ? ' sel' : '') + '" data-fat="' + x.mes + '" aria-pressed="' + (x.mes === sel.mes) + '" aria-label="' + esc('Fatura de ' + MESES[x.ref.getMonth()] + ', ' + real(x.v) + ', ' + x.st) + '"><small>' + mesCurto3(x.ref) + '</small><b>' + (x.v >= 1000 ? mil(x.v) + ' mil' : real(Math.round(x.v))) + '</b><em>' + x.st + '</em></button>';
+      return '<button type="button" class="' + x.st + (x.mes === sel.mes ? ' sel' : '') + '" data-fat="' + x.mes + '" aria-pressed="' + (x.mes === sel.mes) + '" aria-label="' + esc('Fatura de ' + MESES[x.ref.getMonth()] + ', ' + real(x.v) + ', ' + x.st) + '"><small>' + mesCurto3(x.ref) + '</small><b>' + mil(x.v) + ' mil</b><em>' + x.st + '</em></button>';
     }).join('') + '</div>';
-    h += '<div class="fz-par"><button type="button" class="fz-claro" data-acao="compras">' + (sel.n === 1 ? 'Ver a compra' : 'Ver as ' + sel.n + ' compras') + '</button>' +
-      (sel.k <= 0 ? '<button type="button" class="fz-claro" data-acao="paga">' + (sel.paga ? 'Desmarcar paga' : 'Marcar como paga') + '</button>' : '') + '</div>';
+    h += '<div class="fz-par"><button type="button" class="fz-claro" data-acao="compras"' + (sel.n ? '' : ' disabled') + '>' + (sel.n === 0 ? 'Sem compras' : sel.n === 1 ? 'Ver a compra' : 'Ver as ' + sel.n + ' compras') + '</button>' +
+      '<button type="button" class="fz-claro" data-acao="paga">' + (sel.paga ? 'Desmarcar paga' : 'Marcar como paga') + '</button></div>';
     // peso das parcelas (comprometimentoPorMes só deste cartão)
     var hj = hoje(), pesos = [];
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < 7; i++) {
       var ref = mesDe(new Date(), i), rr = K.mesCivil(ref);
       pesos.push({ m: mesCurto3(ref), v: soma(g().transactions.filter(function (t) { return t.type === 'expense' && t.accountId === c.id && K.chaveGrupo(t) && K.contem(rr, t.date) && t.date >= hj; }), function (t) { return t.amount; }) });
     }
+    pesos = pesos[0].v > 0 ? pesos.slice(0, 6) : pesos.slice(1);   // o mês corrente só entra se ainda tem parcela por vencer
     h += '<div class="g-cartao fz-pad fz-graf"><div class="fz-cab"><h2>Parcelas nos próximos meses</h2></div><p class="fz-peq g-t2 fz-sob">Só o que já está parcelado neste cartão, sem compras novas</p>' +
       (pesos.some(function (p) { return p.v > 0; }) ? barrasSimples(pesos, 'Parcelas já compradas neste cartão por mês') : '<p class="g-t2">Nenhuma parcela futura neste cartão.</p>') + '</div>';
     var par = compromissos().filter(function (x) { return x.accountId === c.id && !x.quitado && x.kind !== 'divida' && x.kind !== 'financiamento' && x.type === 'expense'; })
@@ -587,7 +584,7 @@
       '<div><span>Contas</span><b>+ ' + real(V.saldoContas) + '</b></div>' +
       (V.totInv ? '<div><span>Investimentos</span><b>+ ' + real(V.totInv) + '</b></div>' : '') +
       (pv.saldo != null ? '<div><span>' + esc('Previdência' + (pv.informadoEm ? ', informada em ' + K.curto(pv.informadoEm) : pv.doBanco ? ', do banco' : '')) + '</span><b>+ ' + real(pv.saldo) + '</b></div>' : '') +
-      (V.faturas ? '<div><span>Faturas do mês</span><b>− ' + real(V.faturas) + '</b></div>' : '') +
+      (V.faturas ? '<div><span>Faturas abertas</span><b>− ' + real(V.faturas) + '</b></div>' : '') +
       (V.devedor ? '<div><span>Dívidas</span><b>− ' + real(V.devedor) + '</b></div>' : '') +
       '<div class="tot"><span>Total</span><b' + (V.patrimonio < 0 ? ' class="x-al"' : '') + '>' + sinal(V.patrimonio) + '</b></div></div>' +
       '<p class="fz-peq g-t2 fz-mt6">Imóvel e carro não entram. Só dinheiro e dívidas.' + (V.semSaldo ? ' ' + esc(V.semSaldo === 1 ? '1 dívida sem saldo informado fica de fora.' : V.semSaldo + ' dívidas sem saldo informado ficam de fora.') : '') + '</p>' +
@@ -816,7 +813,7 @@
             return '<button type="button" data-t="' + t + '" aria-label="' + (t === 'apagar' ? 'Apagar' : t === ',' ? 'Vírgula' : t) + '"' + (t === 'apagar' ? ' class="ap"' : '') + '>' + (t === 'apagar' ? 'Apagar' : t) + '</button>';
           }).join('') + '</div>';
           var rot = tr ? 'Transferir' : ed ? 'Salvar' : st.parcelas > 1 ? 'Salvar ' + st.parcelas + ' parcelas' : 'Salvar';
-          h += '<button type="button" class="fz-cheio" data-x="salvar"' + (st.salvando ? ' disabled' : '') + '>' + rot + '</button>';
+          h += '<div class="fz-pe-folha"><button type="button" class="fz-cheio" data-x="salvar"' + (st.salvando ? ' disabled' : '') + '>' + rot + '</button></div>';
           if (ed) h += '<div class="fz-par"><button type="button" class="fz-claro" data-x="dup">Duplicar para hoje</button><button type="button" class="fz-claro perigo" data-x="exc">Excluir</button></div>';
           var foco = D.activeElement && c.contains(D.activeElement) ? D.activeElement : null, sel = null;
           if (foco) { var ds = foco.dataset; sel = ds.t ? '[data-t="' + ds.t + '"]' : ds.cat ? '[data-cat="' + CSS.escape(ds.cat) + '"]' : ds.modo ? '[data-modo="' + ds.modo + '"]' : ds.par ? '[data-par="' + ds.par + '"]' : ds.quando ? '[data-quando="' + ds.quando + '"]' : ds.conta != null ? '[data-conta="' + CSS.escape(ds.conta) + '"]' : ds.x ? '[data-x="' + ds.x + '"]' : foco.name === 'data' ? '[name=data]' : null; }
@@ -1063,7 +1060,7 @@
   }
 
   /* =====================================================================
-     IA, voz e leitura de fatura (as funções do próprio Granaê: Gemini.analyzeMonth, classifyAudio, analyzeInvoice)
+     Analisar o mês com IA (Gemini.analyzeMonth do próprio Granaê). Voz e leitura de fatura abrem a tela do Granaê no site.
      Na demonstração a IA devolve uma resposta simulada (como as Ferramentas com ?demo=1).
      ===================================================================== */
   function folhaIA() {
@@ -1091,106 +1088,6 @@
     });
   }
 
-  function folhaVoz() {
-    U.folha({
-      titulo: 'Lançar por voz', classe: 'g-folha fz-folha', alta: true,
-      conteudo: function (c, api) {
-        var rec = null, partes = [], ini = 0, tempo = null, res = null;
-        function pinta(estado, msg) {
-          var h = K.topo('Lançar por voz', 'Fechar');
-          if (estado === 'gravando') h += '<p class="fz-voz-t" aria-live="polite">' + msg + '</p><button type="button" class="fz-cheio" data-x="parar">Parar e ler</button>';
-          else if (estado === 'lendo') h += '<p class="g-t2" aria-live="polite">Interpretando o áudio…</p>';
-          else if (estado === 'pronto' && res) {
-            h += (res.transcription ? '<p class="g-t2">' + esc('"' + res.transcription + '"') + '</p>' : '') + '<div class="g-cartao fz-pad"><p class="fz-rot">' + (res.type === 'income' ? 'Receita' : 'Despesa') + ' detectada</p>' +
-              '<div class="fz-pat"><div><span>Valor</span><b>' + realC(+res.amount || 0) + '</b></div><div><span>Descrição</span><b>' + esc(res.description || '') + '</b></div><div><span>Categoria</span><b>' + esc(res.category || 'Outros') + '</b></div><div><span>Data</span><b>' + esc(K.curto(res.date || hoje())) + '</b></div></div></div>' +
-              '<p class="g-erro" role="alert" hidden></p><button type="button" class="fz-cheio" data-x="salvar">Salvar</button><div class="fz-par"><button type="button" class="fz-claro" data-x="editar">Editar antes</button><button type="button" class="fz-claro" data-x="descartar">Descartar</button></div>';
-          } else {
-            h += '<p class="g-t2">Diga o valor, o que foi e, se quiser, a data. Por exemplo: gastei 42 reais no almoço do hospital. Até 30 segundos.</p>' + (msg ? '<p class="g-alerta-tx" role="alert">' + esc(msg) + '</p>' : '') +
-              '<button type="button" class="fz-cheio" data-x="gravar">Gravar</button>' + (DEMO ? '<button type="button" class="fz-claro" data-x="exemplo">Usar o exemplo da demonstração</button>' : '');
-          }
-          c.innerHTML = h;
-        }
-        function para() { if (rec && rec.state !== 'inactive') { rec.stop(); rec.stream.getTracks().forEach(function (t) { t.stop(); }); } clearInterval(tempo); }
-        function interpreta(blob) {
-          pinta('lendo');
-          var p = DEMO ? new Promise(function (ok) { setTimeout(function () { ok({ type: 'expense', amount: 42.5, description: 'Almoço no hospital', category: 'Alimentação', date: hoje(), transcription: 'gastei quarenta e dois e cinquenta no almoço do hospital' }); }, 400); })
-            : C.consultar('lerAudio', { blob: blob });
-          p.then(function (r) { res = r; pinta('pronto'); }, function (x) { pinta('', 'Não consegui ler o áudio: ' + x.message); });
-        }
-        c.addEventListener('click', function (e) {
-          var b = e.target.closest('button'); if (!b) return;
-          if (b.dataset.topo) { para(); return api.fechar(); }
-          var x = b.dataset.x;
-          if (x === 'exemplo') return interpreta(null);
-          if (x === 'gravar') {
-            if (!navigator.mediaDevices || !W.MediaRecorder) return pinta('', 'Este navegador não grava áudio.');
-            navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, sampleRate: 16000, echoCancellation: true, noiseSuppression: true, autoGainControl: true } }).then(function (stream) {
-              var mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '';
-              var op = { audioBitsPerSecond: 24000 }; if (mime) op.mimeType = mime;
-              rec = new MediaRecorder(stream, op); partes = [];
-              rec.ondataavailable = function (ev) { if (ev.data.size) partes.push(ev.data); };
-              rec.onstop = function () { interpreta(new Blob(partes, { type: rec.mimeType || 'audio/webm' })); };
-              rec.start(); ini = Date.now();
-              pinta('gravando', '0:00');
-              tempo = setInterval(function () { var s = Math.floor((Date.now() - ini) / 1000), t = c.querySelector('.fz-voz-t'); if (t) t.textContent = Math.floor(s / 60) + ':' + p2(s % 60); if (s >= 30) para(); }, 250);
-            }, function () { pinta('', 'Sem permissão para o microfone.'); });
-            return;
-          }
-          if (x === 'parar') return para();
-          if (x === 'descartar') { res = null; return pinta(''); }
-          if (x === 'editar') { var r0 = res; api.fechar(); return folhaLancar({ pre: { modo: r0.type === 'income' ? 'receita' : 'despesa', amount: +r0.amount || 0, description: r0.description || '', category: r0.category || '', date: r0.date || hoje() } }); }
-          if (x === 'salvar') {
-            b.disabled = true;
-            C.lancarVoz({ type: res.type === 'income' ? 'income' : 'expense', amount: +res.amount || 0, description: res.description || res.transcription || 'Lançamento por voz', category: res.category || 'Outros', date: res.date || hoje() })
-              .then(function () { api.fechar(); aviso('Lançado por voz'); }, function (er) { b.disabled = false; var r = c.querySelector('.g-erro'); r.textContent = er.message; r.hidden = false; });
-          }
-        });
-        pinta('');
-      },
-      aoFechar: function () { }
-    });
-  }
-
-  function folhaFatura() {
-    U.folha({
-      titulo: 'Ler fatura ou extrato', classe: 'g-folha fz-folha', alta: true,
-      conteudo: function (c, api) {
-        var itens = null;
-        function pinta(msg) {
-          var h = K.topo('Ler fatura ou extrato', 'Fechar');
-          if (itens) {
-            h += '<p class="g-t2">' + esc(itens.length + ' lançamentos encontrados. Confira antes de importar: entram como despesas.') + '</p><div class="g-cartao"><div class="fz-lista">' + itens.map(function (it) {
-              return item({ t: it.description, sub: K.curto(it.date) + ' · ' + it.category, v: '− ' + realC(+it.amount || 0) });
-            }).join('') + '</div></div><p class="g-erro" role="alert" hidden></p><button type="button" class="fz-cheio" data-x="importar">Importar tudo</button><button type="button" class="fz-claro" data-x="cancelar">Cancelar</button>';
-          } else {
-            h += '<p class="g-t2">Envie o PDF ou a foto da fatura do cartão ou do extrato. A IA do Granaê lê os lançamentos e você confere antes de importar. Até 10 MB.</p>' + (msg ? '<p class="' + (/^Lendo/.test(msg) ? 'g-t2' : 'g-alerta-tx') + '" role="status">' + esc(msg) + '</p>' : '') +
-              '<label class="fz-cheio fz-arquivo">Escolher arquivo<input type="file" name="arquivo" accept="application/pdf,image/*"></label>' + (DEMO ? '<button type="button" class="fz-claro" data-x="exemplo">Usar o exemplo da demonstração</button>' : '');
-          }
-          c.innerHTML = h;
-        }
-        function le(arq) {
-          if (arq && arq.size > 10 * 1024 * 1024) return pinta('Arquivo grande demais (máximo 10 MB). Envie as páginas em partes ou uma foto ou PDF mais leve.');
-          pinta('Lendo o arquivo. Pode levar até 30 segundos.');
-          var p = DEMO ? new Promise(function (ok) { setTimeout(function () { ok({ items: [{ description: 'Farmácia', amount: 58.4, date: iso(K.somaDias(new Date(), -3)), category: 'Saúde' }, { description: 'Posto de gasolina', amount: 210, date: iso(K.somaDias(new Date(), -4)), category: 'Transporte' }] }); }, 400); })
-            : C.consultar('lerFatura', { arquivo: arq });
-          p.then(function (r) { var l = (r && r.items) || []; if (!l.length) return pinta('Nenhum lançamento encontrado no arquivo.'); itens = l; pinta(); }, function (x) { pinta('Não consegui ler: ' + x.message); });
-        }
-        c.addEventListener('change', function (e) { if (e.target.name === 'arquivo' && e.target.files && e.target.files[0]) le(e.target.files[0]); });
-        c.addEventListener('click', function (e) {
-          var b = e.target.closest('button'); if (!b) return;
-          if (b.dataset.topo) return api.fechar();
-          if (b.dataset.x === 'exemplo') return le(null);
-          if (b.dataset.x === 'cancelar') { itens = null; return pinta(); }
-          if (b.dataset.x === 'importar') {
-            b.disabled = true;
-            C.importarFatura(itens).then(function (n) { api.fechar(); aviso(n + ' lançamentos importados'); }, function (er) { b.disabled = false; var r = c.querySelector('.g-erro'); r.textContent = er.message; r.hidden = false; });
-          }
-        });
-        pinta();
-      }
-    });
-  }
-
   /* CSV do mês: a mesma planilha do botão CSV do Granaê (; + BOM + proteção contra fórmula) */
   function baixarCSV() {
     var r = K.mesCivil(F.ref);
@@ -1214,9 +1111,10 @@
       conteudo: function (c, api) {
         function op(x, t, s) { return '<button type="button" class="g-opcao g-link" data-x="' + x + '"><span>' + esc(t) + '</span>' + (s ? '<small>' + esc(s) + '</small>' : '') + '</button>'; }
         c.innerHTML = '<div class="g-topo"><span class="g-topo-esq"></span><h2 class="g-topo-t" data-foco tabindex="-1">Mais opções</h2><button type="button" class="g-topo-bt dir" data-fechar="1" style="color:var(--g-fi-tx)">Fechar</button></div>' +
-          '<div class="g-sup">' + op('voz', 'Lançar por voz', 'fale o gasto') + op('fatura', 'Ler fatura ou extrato', 'PDF ou foto') + op('transferir', 'Transferir entre contas', '') +
+          '<div class="g-sup">' + op('transferir', 'Transferir entre contas', '') +
           op('revisar', 'Revisar sem categoria', n === 1 ? '1 neste mês' : n + ' neste mês') + op('fixos', 'Fixos e tetos', g().fixedItems.length + ' fixos') + op('csv', 'Baixar CSV de ' + MESES[r.s.getMonth()], '') + '</div>' +
           '<p class="g-rot g-rot-fora">Abrem o Granaê no site</p><div class="g-sup">' + [
+            ['Lançar por voz', '../granae.html#ia'], ['Ler fatura ou extrato (foto ou PDF)', '../granae.html#ia'],
             ['Regras automáticas e filtros salvos', '../granae.html#transacoes'], ['Categorias, contas e cartões', '../granae.html#categorias'],
             ['Conectar ou reconectar banco', '../granae.html#categorias'], ['Importar planilha de fixos', '../granae.html#fixos'], ['Análise completa por IA', '../granae.html#ia']
           ].map(function (x) { return '<a class="g-opcao" href="' + x[1] + '">' + esc(x[0]) + '</a>'; }).join('') + '</div>';
@@ -1225,8 +1123,6 @@
           if (b.dataset.fechar) return api.fechar();
           var x = b.dataset.x; if (!x) return;
           api.fechar();
-          if (x === 'voz') return folhaVoz();
-          if (x === 'fatura') return folhaFatura();
           if (x === 'transferir') return folhaLancar({ modo: 'transferencia' });
           if (x === 'revisar') return irAba('lancamentos', function () { limpaFiltro(); F.filtro.semCat = true; });
           if (x === 'fixos') return folhaFixosTetos('fixos');

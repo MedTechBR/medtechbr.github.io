@@ -348,26 +348,16 @@
     /* aplicarRevisao (revisão em lote): categoria e, se houver termo, a regra e reaplicarRegras */
     categorizar: "const t=state.transactions.find(x=>String(x.id)===id);if(!t)throw new Error('nao-achou');t.category=cat;t.updatedAt=Date.now();\n" +
       "let n=0;const termo=String(regra||'').trim();if(termo){state.rules=state.rules||[];state.rules.push({id:cid(),contem:termo,category:cat,updatedAt:Date.now()});n=reaplicarRegras();}\n" +
-      "saveState();return n;",
-    /* audConfirm (lançamento por voz): ensureCategory é o que onRecordingDone faz antes de mostrar */
-    lancarVoz: "ensureCategory(r.category,r.type);const tx={id:cid(),type:r.type,amount:Number(r.amount)||0,description:r.description||'Lançamento por voz',category:r.category||'Outros',date:r.date||todayISO()};\n" +
-      "if(!tx.amount)throw new Error('campos');stampTx(tx);state.transactions.push(tx);saveState();",
-    /* invConfirm (fatura ou extrato lido pela IA): importa tudo como o Granaê */
-    importarFatura: "if(!itens.length)throw new Error('campos');for(const it of itens){ensureCategory(it.category,'expense');state.transactions.push({id:cid(),type:'expense',amount:Number(it.amount)||0,description:it.description,category:it.category,date:it.date,updatedAt:Date.now()});}saveState();return itens.length;"
+      "saveState();return n;"
   };
 
-  /* ---------- leituras que usam funções da página sem gravar (IA, voz, fatura e Open Finance) ----------
-     Os objetos (Blob/File) passam direto para a página: mesmo domínio. */
+  /* ---------- leituras que usam funções da página sem gravar (análise por IA e Open Finance) ---------- */
   var CONSULTA = {
     /* runAnalysis do Granaê para o mês escolhido: Gemini.analyzeMonth com os lançamentos do mês, sem transferências; safeMD limpa o texto */
     analisarMes: function (w, a) {
       var p = a.mes.split('-'), ref = new w.Date(+p[0], +p[1] - 1, 1);
       return w.eval('(function(ref,q){return Gemini.analyzeMonth({transactions:state.transactions.filter(t=>inMonth(t.date,ref)&&!ehTransfer(t)),categories:state.categories,fixedItems:state.fixedItems,monthLabel:monthLongFmt.format(ref),customQuestion:q}).then(safeMD)})')(ref, a.pergunta || '');
     },
-    /* onRecordingDone: Gemini.classifyAudio(blob, categorias) */
-    lerAudio: function (w, a) { return w.eval('(function(b){return Gemini.classifyAudio(b,state.categories)})')(a.blob); },
-    /* invoiceFile: Gemini.analyzeInvoice(arquivo, categorias) */
-    lerFatura: function (w, a) { return w.eval('(function(f){return Gemini.analyzeInvoice(f,state.categories)})')(a.arquivo); },
     /* faixa "Bancos lidos" do Granaê: o clique dela é o sincronizarAgora do granae.openfinance.js */
     sincronizar: function (w) { var b = w.document.getElementById('ofBar'); if (!b) throw new Error('sem-banco'); b.click(); return true; }
   };
@@ -705,9 +695,7 @@
   cofre.novaDivida = function (r) { return G(JS.novaDivida, { r: { descricao: r.descricao, credor: r.credor || '', total: r.total, category: r.category || 'Dívidas' } }); };
   cofre.salvarConta = function (r) { return G(JS.salvarConta, { r: { kind: r.kind, name: r.name, color: r.color || '', saldoInicial: r.saldoInicial || 0, fechamento: r.fechamento || '', vencimento: r.vencimento || '', limite: r.limite || '', orcamento: r.orcamento || '' }, id: r.id || '' }); };
   cofre.categorizar = function (id, cat, regra) { return G(JS.categorizar, { id: id, cat: cat, regra: regra || '' }).then(function (n) { return +n || 0; }); };
-  cofre.lancarVoz = function (r) { return G(JS.lancarVoz, { r: { type: r.type, amount: r.amount, description: r.description, category: r.category, date: r.date } }); };
-  cofre.importarFatura = function (itens) { return G(JS.importarFatura, { itens: itens.map(function (i) { return { amount: i.amount, description: i.description, category: i.category, date: i.date }; }) }).then(function (n) { return +n || 0; }); };
-  /* leituras pela página (IA, voz, fatura, sincronizar o banco) */
+  /* leituras pela página (análise do mês por IA, sincronizar o banco) */
   cofre.consultar = function (nome, args) {
     var b = cofre.bloqueio('granae'); if (b) return Promise.reject(new Error(b));
     return paginas.granae.consultar(nome, args);
