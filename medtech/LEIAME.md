@@ -31,6 +31,7 @@ Não mexe em `app.html`, no `/sw.js` do portal, no banco de condutas nem nas reg
 | `sessoes-tela.js`, `sessoes.css` | tela das sessões de acompanhamento sem IA (lista, triagem, parâmetros, Agora, passo guiado, subtelas, avisos) | `Ferramentas/Sessoes/SessaoView.swift`, `SessaoArmazem.swift` |
 | `sessoes/*.js` | motores das sessões (contrato em `sessoes/LEIAME.md`) | `Ferramentas/Sessoes/Motor*.swift`, `NucleoSessao.swift` |
 | `gestao.js`, `gestao.css` | espaço Gestão: Plantões e as peças comuns (`MTGestao.comum`: arrasto do mês, linha deslizante, avisos, folhas de pagamento, teto e fixo) | `MeuMes/PlantoesView`, `MaisMes`, `ModelosMes`, `ComumGestao` |
+| `exames.js`, `exames.css` | seção Exames: tela nativa (tipo, foto ou arquivo, texto, treino, contexto, Analisar, resultado em blocos, histórico, ajustes); motor = `laudai.html?achados=1` num quadro oculto | `AchadosView.swift`, `Motor.swift` |
 | `financas.js`, `financas.css` | Finanças nova: 6 abas (Resumo, Lançamentos, Orçamento, Cartões, Dívidas, Contas), Lançar, revisão em lote, análise do mês por IA | `MeuMes/FinancasView`, `FinancasCartoes`, `FinancasDividasContas`, `FinancasLancamentos`, `FinancasCalculo`, `LancarView` |
 
 ## De onde vêm os dados (nada copiado do banco)
@@ -149,7 +150,7 @@ passageiro (o app não mostra nada); os avisos de exame só disparam com o app a
 - Acesso por produto como em `app.html`: `MT.acessoEstado()` e `MTAcesso.liberado(P, mt, produto)`. Seção → produto:
   Condutas e Ferramentas `condutai`, Exames `laudai`, Plantões `plantaohub`, Finanças `granae`. Fora do plano: aviso com link para Assinatura.
   Enquanto nenhum produto tiver venda ligada no `planos.json`, nada trava.
-- Exames abre `../laudai.html?achados=1` dentro da seção (mesmo domínio, mesma sessão de login).
+- Exames: tela nativa em `exames.js`; a IA, o histórico e o aceite passam pelo `../laudai.html?achados=1` aberto num quadro oculto (ver "Exames" abaixo).
 
 ## PWA
 
@@ -167,7 +168,6 @@ passageiro (o app não mostra nada); os avisos de exame só disparam com o app a
 - Diagrama do fluxograma: desenhado pelo mermaid do site (com `sanitizeMermaid`, que troca `≤` por "menor ou igual a"), não pelo desenho nativo.
 - Tópicos trocam por toque ou deslizando a página (scroll-snap); sem vibração; ícones Tabler no lugar dos SF Symbols.
 - Prescrição com IA (doenças sem modelo) leva ao CondutAI; no iPhone ela roda dentro do app.
-- Exames mostra o LaudAI no modo Achados dentro de um quadro, não a tela nativa `AchadosView`.
 
 ## Espaço Gestão (Plantões e Finanças)
 
@@ -241,3 +241,34 @@ Entra por `MedTechCasca.registrar('secao', 'plantoes' | 'financas', ...)` em `ge
 - As páginas abrem quando a seção é aberta (no iPhone, as duas abrem juntas): o Granaê é pesado e só carrega quando Finanças é aberta.
 - Finanças: "Ver as N compras" leva a Lançamentos filtrado pela fatura (no iPhone abre uma folha); Conectar e Reconectar banco abrem o Granaê no site.
 - Sem cópia em disco para ver sem internet (ver acima).
+
+## Exames (`exames.js`, `exames.css`)
+
+Porta de `AchadosView.swift`. Entra por `MedTechCasca.registrar('secao', 'exames', ...)`; `casca.js` não foi mexido (o quadro antigo do LaudAI
+continua lá só como reserva, se `exames.js` não carregar).
+
+- **Motor igual ao do iPhone (`Motor.swift`)**: `../laudai.html?achados=1&motor=1` num `<iframe>` oculto, inerte e fora da tela (mesmo domínio,
+  mesma sessão). Nada de prompt ou regra aqui: a tela chama as funções do próprio LaudAI lá dentro.
+  - Arquivos: `handleFiles` do LaudAI (ZIP, DICOM com o visualizador dele, imagens por `processImage`, teto de 200 MB); a mídia fica no `state.media` dele.
+    Com DICOM ou ZIP o quadro aparece por cima do app só enquanto o visualizador está aberto. Os `toast` dele viram o aviso do PWA.
+  - Análise: `Gemini.generateLaudo({ media, ctx, model: Gemini.getModel() })` com o `ctx` montado como o `generate()` do LaudAI no modo Achados
+    (`modo: 'achados'`, `leitura`, idioma e formato das chaves `laudai_lang`/`laudai_style`, `dicomMeta`), uma nova tentativa quando a IA não respondeu
+    (como o iPhone) e `saveLaudoToFirestore(texto, ctx)` para o histórico. O prompt é o `buildPromptAchados` do `laudai.gemini.js`.
+  - Aceite de estudo: `state.aceiteEstudo`; sem ele, a folha "Uso para estudo" grava `{ em, versao: 1 }` com o mesmo `MT.save` do `salvarDeclaracao`.
+  - Histórico: `state.laudos` com `modo === 'achados'` (como o iPhone). Ajustes: `Gemini.getModel/setModel` e `laudai_lang`, os do LaudAI.
+  - Pronto = `MT.user` real e `state.ready`; com login na página, a tela pede para entrar. Sair da conta fecha o quadro antes do `MT.signOut`.
+  - Ao ficar pronto, o motor reentrega o último dado (`MT._emit(MT._data)`): no modo Achados a primeira entrega do LaudAI para no meio
+    (o `initMainApp` procura `#btn-show-bookmarklet`, que o `textosAchados` já tirou) e o `state` ficaria sem laudos e sem aceite.
+- Fluxo: tipo (faixa que rola de lado, mesmos ids do iPhone, que vão como "Tipo" ao prompt) → Fotografar (câmera, `capture`) ou galeria/arquivo
+  (no computador: escolher, arrastar ou colar) → Resultados em texto → Treinar antes de ver → Contexto do caso → aviso "Para estudo, não é laudo" →
+  Analisar → leitura em curso → resultado (alerta, Qualidade, O que aparece com certeza em três traços, O que isso pode significar numerado,
+  Como conferir com marcar, Sua leitura comparada, Para fixar), imagem presa no alto com Recolher, compartilhar (ou copiar).
+  O Voltar do aparelho fecha o resultado.
+- `?demo=1`: sem motor e sem IA. "Usar o ECG sintético de exemplo" (traçado desenhado em SVG, sem dado de paciente); Analisar devolve o
+  `resultadoDemo` do iPhone com o selo "Exemplo de demonstração"; aceite e histórico só na memória da tela. DICOM e ZIP pedem a conta.
+- Atalho de teste: `?demo=1&aba=exames`. `window.MTExames` expõe `motor`, `lerAnalise`, `historico` e `_usarMotor(janela)` (liga a tela a uma
+  página do LaudAI já aberta, para provar o caminho com conta sem IA real).
+
+Diferenças em relação ao iPhone: a câmera é a do navegador; além de fotos, aceita arquivo, DICOM e ZIP (até 6 imagens por análise)
+(o iPhone só fotos); "Ajustes da IA" (modelo e idioma do LaudAI) que o iPhone não tem; a imagem amplia por pinça do navegador ou
+duplo toque; sem vibração.
