@@ -349,8 +349,10 @@ function initMainApp() {
 
   $('#btn-fetch-url').addEventListener('click', () => fetchExternalUrl($('#url-input').value.trim()));
   $('#url-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); fetchExternalUrl($('#url-input').value.trim()); } });
-  $('#btn-show-bookmarklet').addEventListener('click', openBookmarklet);
-  $('#bookmarklet-close').addEventListener('click', closeBookmarklet);
+  /* 06/11/2026: no modo ?achados=1 o parágrafo do PACS (com este botão) sai da página; sem o ?. a linha quebrava
+     e o Analisar, o histórico e o aceite nunca eram ligados. */
+  $('#btn-show-bookmarklet')?.addEventListener('click', openBookmarklet);
+  $('#bookmarklet-close')?.addEventListener('click', closeBookmarklet);
 
   $('#btn-generate').addEventListener('click', generate);
   $('#btn-copy').addEventListener('click', copyLaudo);
