@@ -364,7 +364,7 @@
 
   /* ---------- dados fictícios do modo demonstração (RepositorioDemo do iPhone), gravados pela própria página ---------- */
   var SEMEIA_PLANTAO = "const dia=n=>{const d=new Date();d.setDate(d.getDate()+n);return ymd(d)};\n" +
-    "const upa='UPA Central',sl='Hospital São Lucas, PS',cv='Clínica Vida, ambulatório';\n" +
+    "const upa='UPA Central',sl='Hospital Exemplo, PS',cv='Clínica Exemplo, ambulatório';\n" +
     "const pl=(i,n,l,a,b,v,st)=>({id:'dp'+i,date:dia(n),local:l,start:a,end:b,value:v,status:st,note:'',updatedAt:Date.now()});\n" +
     "state.shifts=[pl(1,-37,upa,'19:00','07:00',1200,'pago'),pl(2,-30,sl,'07:00','19:00',1100,'pago'),pl(3,-23,upa,'19:00','07:00',1200,'pago'),pl(4,-16,sl,'07:00','19:00',1100,'pago'),\n" +
     "pl(5,-9,upa,'19:00','07:00',1200,'agendado'),pl(6,-2,cv,'08:00','12:00',500,'agendado'),pl(7,0,sl,'07:00','19:00',1100,'agendado'),pl(8,1,upa,'19:00','07:00',1200,'agendado'),\n" +
