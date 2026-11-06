@@ -110,7 +110,9 @@ if(stage){
   new IntersectionObserver(es=>es.forEach(x=>{visivel=x.isIntersecting;if(visivel)agenda();else{clearTimeout(tLinha);clearInterval(tQuadro)}})).observe(stage);
   linha(0);
   if(PARADO){auto=false;lsw.classList.add('parado')}
-  /* brilho acompanha o ponteiro (sutil) */
+}
+/* brilho do herói acompanha o ponteiro (sutil); 06/11/2026: vale também para o herói do MedTech App, sem o palco */
+if(hero){
   const orb=$('#orb'),core=$('#core'),ring=$('#ring');
   if(!PARADO&&orb&&matchMedia('(hover:hover)').matches){let mx=0,my=0,tx=0,ty=0,raf=0,on=false;
     addEventListener('pointermove',e=>{tx=e.clientX/innerWidth-.5;ty=e.clientY/innerHeight-.5;if(!on){on=true;raf=requestAnimationFrame(f)}},{passive:true});
@@ -172,7 +174,7 @@ $$('[data-gal]').forEach(g=>{
    o MedTech App (linha clinica) num cartão e as provas (linha provas) numa lista, cada uma com o seu "Assinar".
    "multi" (14/10/2026) = os produtos com campo publico (enfermagem, farmácia), vendidos pela linha provas. */
 const PLANOS_PADRAO={produtos:[
- {id:'app-tudo',curto:'MedTech App',linha:'clinica',resumo:'Os 5 apps (CondutAI, PaliAI, LaudAI, PlantãoHub e Granaê), com a IA incluída.',preco:{mensal:39.9,anual:399}},
+ {id:'app-tudo',curto:'MedTech App',linha:'clinica',resumo:'O app do médico: acompanhar paciente, condutas com prescrição, ferramentas, plantões e finanças.',preco:{mensal:39.9,anual:399}},
  {id:'clinicamed',curto:'ClínicaMed',linha:'provas',resumo:'Título de Clínica Médica e acesso ao R+.',preco:{mensal:49.9,anual:397}},
  {id:'cirurgiamed',curto:'CirurgiaMed',linha:'provas',resumo:'Título de Cirurgia Geral, R+ cirúrgico e concursos.',preco:{mensal:49.9,anual:397}},
  {id:'familiamed',curto:'FamíliaMed',linha:'provas',resumo:'Título de MFC (TEMFC), ENARE MFC e concursos de ESF.',preco:{mensal:49.9,anual:397}},
